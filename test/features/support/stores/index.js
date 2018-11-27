@@ -116,20 +116,8 @@ export async function newOrganization(orgData, adminUser) {
  * @returns {Object} with references for `hostCollective`,
  *  `hostAdmin`, and `collective`.
  */
-export async function newCollectiveWithHost(
-  name,
-  currency,
-  hostCurrency,
-  hostFee,
-  user = null,
-  data = {},
-) {
-  const { hostAdmin, hostCollective } = await newHost(
-    `${name} Host`,
-    hostCurrency,
-    hostFee,
-    { currency },
-  );
+export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee, user = null, data = {}) {
+  const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee, { currency });
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
   const args = { ...data, name, slug, currency, hostFeePercent };
@@ -157,13 +145,7 @@ export async function newCollectiveWithHost(
  * @return {models.Collective} a newly created collective hosted by
  *  `hostCollective`.
  */
-export async function newCollectiveInHost(
-  name,
-  currency,
-  hostCollective,
-  user = null,
-  data = {},
-) {
+export async function newCollectiveInHost(name, currency, hostCollective, user = null, data = {}) {
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
   const args = { ...data, name, slug, currency, hostFeePercent };
@@ -295,9 +277,7 @@ export async function stripeOneTimeDonation(opt) {
     throw Error('stripeOneTimeDonation: please specify the remoteUser');
   }
   if (!from) {
-    throw Error(
-      'stripeOneTimeDonation: please specify the fromCollective or remoteUser.collective',
-    );
+    throw Error('stripeOneTimeDonation: please specify the fromCollective or remoteUser.collective');
   }
 
   // Create a new order

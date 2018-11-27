@@ -59,9 +59,7 @@ describe('meetup lib', () => {
     const header = meetup.makeHeader();
     const expectedHeader = `<p>Thank you to our sponsors Gitlab and <a href="https://github.com">Github</a></p> <p><a href="https://opencollective.com/${
       collective.slug
-    }#sponsors"><img src="https://opencollective.com/${
-      collective.slug
-    }/sponsors.png?width=700"></a></p>`;
+    }#sponsors"><img src="https://opencollective.com/${collective.slug}/sponsors.png?width=700"></a></p>`;
     expect(header).to.equal(expectedHeader);
   });
 
@@ -84,14 +82,8 @@ describe('meetup lib', () => {
 
     const meetup = new Meetup(meetupAccount, collectiveWithoutBackers);
     const header = meetup.makeHeader();
-    const descriptionWithHeader = meetup.generateNewDescription(
-      'addHeader',
-      description,
-    );
-    const descriptionWithoutHeader = meetup.generateNewDescription(
-      'removeHeader',
-      descriptionWithHeader,
-    );
+    const descriptionWithHeader = meetup.generateNewDescription('addHeader', description);
+    const descriptionWithoutHeader = meetup.generateNewDescription('removeHeader', descriptionWithHeader);
 
     expect(header).to.equal(
       '<p><a href="https://opencollective.com/opencollective#backers"><img src="https://opencollective.com/opencollective/backers.png?width=700"></a></p>',

@@ -56,18 +56,14 @@ const MemberFields = {
 
 export const Member = new GraphQLObjectType({
   name: 'Member',
-  description:
-    'This represents a Member relationship (ie: Organization backing a Collective)',
+  description: 'This represents a Member relationship (ie: Organization backing a Collective)',
   fields: () => {
     return {
       ...MemberFields,
       account: {
         type: Account,
         resolve(member, args, req) {
-          return (
-            member.memberCollective ||
-            req.loaders.collective.findById.load(member.MemberCollectiveId)
-          );
+          return member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
         },
       },
     };
@@ -76,18 +72,14 @@ export const Member = new GraphQLObjectType({
 
 export const MemberOf = new GraphQLObjectType({
   name: 'MemberOf',
-  description:
-    'This represents a MemberOf relationship (ie: Collective backed by an Organization)',
+  description: 'This represents a MemberOf relationship (ie: Collective backed by an Organization)',
   fields: () => {
     return {
       ...MemberFields,
       account: {
         type: Account,
         resolve(member, args, req) {
-          return (
-            member.collective ||
-            req.loaders.collective.findById.load(member.CollectiveId)
-          );
+          return member.collective || req.loaders.collective.findById.load(member.CollectiveId);
         },
       },
     };

@@ -17,29 +17,15 @@ import {
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
-import {
-  createExpense,
-  editExpense,
-  updateExpenseStatus,
-  payExpense,
-  deleteExpense,
-} from './mutations/expenses';
-import {
-  createPaymentMethod,
-  claimPaymentMethod,
-} from './mutations/paymentMethods';
+import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
+import { createPaymentMethod, claimPaymentMethod } from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
 
 import statuses from '../../constants/expense_status';
 
-import {
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLString,
-  GraphQLInt,
-} from 'graphql';
+import { GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt } from 'graphql';
 
 import {
   OrderType,
@@ -421,18 +407,15 @@ const mutations = {
       monthlyLimitPerMember: { type: GraphQLInt },
       limitedToTags: {
         type: new GraphQLList(GraphQLString),
-        description:
-          'Limit this payment method to make donations to collectives having those tags',
+        description: 'Limit this payment method to make donations to collectives having those tags',
       },
       limitedToCollectiveIds: {
         type: new GraphQLList(GraphQLInt),
-        description:
-          'Limit this payment method to make donations to those collectives',
+        description: 'Limit this payment method to make donations to those collectives',
       },
       limitedToHostCollectiveIds: {
         type: new GraphQLList(GraphQLInt),
-        description:
-          'Limit this payment method to make donations to the collectives hosted by those hosts',
+        description: 'Limit this payment method to make donations to the collectives hosted by those hosts',
       },
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       PaymentMethodId: { type: GraphQLInt },
@@ -442,9 +425,7 @@ const mutations = {
     resolve: async (_, args, req) => {
       // either amount or monthlyLimitPerMember needs to be present
       if (!args.amount && !args.monthlyLimitPerMember) {
-        throw Error(
-          'you need to define either the amount or the monthlyLimitPerMember of the payment method.',
-        );
+        throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
       }
       return createPaymentMethod(args, req.remoteUser);
     },

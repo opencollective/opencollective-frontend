@@ -23,9 +23,7 @@ const EmailType = new GraphQLScalarType({
   },
   parseLiteral: ast => {
     if (ast.kind !== Kind.STRING) {
-      throw new GraphQLError(
-        `Query error: Can only parse strings got a: ${ast.kind}`,
-      );
+      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
     }
 
     // Regex taken from: http://stackoverflow.com/a/46181/761555
@@ -190,8 +188,7 @@ export const TierInputType = new GraphQLInputObjectType({
     description: { type: GraphQLString },
     amount: {
       type: GraphQLInt,
-      description:
-        'amount in the lowest unit of the currency of the host (ie. in cents)',
+      description: 'amount in the lowest unit of the currency of the host (ie. in cents)',
     },
     currency: { type: GraphQLString },
     presets: { type: new GraphQLList(GraphQLInt) },
@@ -231,8 +228,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     paymentMethod: { type: PaymentMethodInputType },
     matchingFund: {
       type: GraphQLString,
-      description:
-        'The first part of the UUID of the PaymentMethod that can be used to match the donation',
+      description: 'The first part of the UUID of the PaymentMethod that can be used to match the donation',
     },
     referral: {
       type: CollectiveAttributesInputType,

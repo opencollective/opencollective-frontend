@@ -9,8 +9,8 @@ import models, { sequelize, Op } from '../models';
 const twoHoursInSeconds = 2 * 60 * 60;
 
 /*
-* Hacky way to do currency conversion
-*/
+ * Hacky way to do currency conversion
+ */
 const generateFXConversionSQL = aggregate => {
   let currencyColumn = 't.currency';
   let amountColumn = 't."netAmountInCollectiveCurrency"';
@@ -27,12 +27,7 @@ const generateFXConversionSQL = aggregate => {
 
   let sql = 'CASE ';
   sql += fxConversion
-    .map(
-      currency =>
-        `WHEN ${currencyColumn} = '${currency[0]}' THEN ${amountColumn} / ${
-          currency[1]
-        }`,
-    )
+    .map(currency => `WHEN ${currencyColumn} = '${currency[0]}' THEN ${amountColumn} / ${currency[1]}`)
     .join('\n');
   sql += 'ELSE 0 END';
 
@@ -58,9 +53,7 @@ const getPublicHostsByTotalCollectives = args => {
   )
   SELECT counts.count as collectives, c.*
   FROM "Collectives" c INNER JOIN counts ON counts."HostCollectiveId" = c.id
-  ORDER BY ${args.orderBy} ${args.orderDirection} LIMIT ${args.limit} OFFSET ${
-    args.offset
-  }
+  ORDER BY ${args.orderBy} ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
   `;
   return sequelize.query(query, {
     bind: { tags: args.tags || [], currency: args.currency },
@@ -224,12 +217,8 @@ const getTopDonorsForCollective = (CollectiveId, options = {}) => {
  */
 const getTopVendorsForCollective = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
-  const since = options.since
-    ? `AND t."createdAt" >= '${options.since.toISOString()}'`
-    : '';
-  const until = options.until
-    ? `AND t."createdAt" < '${options.until.toISOString()}'`
-    : '';
+  const since = options.since ? `AND t."createdAt" >= '${options.since.toISOString()}'` : '';
+  const until = options.until ? `AND t."createdAt" < '${options.until.toISOString()}'` : '';
   return sequelize.query(
     `
     SELECT MAX(c.slug) as slug, MAX(c."twitterHandle") as "twitterHandle", MAX(c.image) as image, MAX(c.name) as name, SUM("netAmountInCollectiveCurrency") as "totalExpenses"
@@ -254,12 +243,8 @@ const getTopVendorsForCollective = (CollectiveId, options = {}) => {
  */
 const getTopExpenseCategories = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
-  const since = options.since
-    ? `AND e."createdAt" >= '${options.since.toISOString()}'`
-    : '';
-  const until = options.until
-    ? `AND e."createdAt" < '${options.until.toISOString()}'`
-    : '';
+  const since = options.since ? `AND e."createdAt" >= '${options.since.toISOString()}'` : '';
+  const until = options.until ? `AND e."createdAt" < '${options.until.toISOString()}'` : '';
 
   return sequelize.query(
     `
@@ -281,12 +266,8 @@ const getTopExpenseCategories = (CollectiveId, options = {}) => {
  * E.g. top backers in open source collectives last June
  */
 const getTopBackers = (since, until, tags, limit) => {
-  const sinceClause = since
-    ? `AND t."createdAt" >= '${since.toISOString()}'`
-    : '';
-  const untilClause = until
-    ? `AND t."createdAt" < '${until.toISOString()}'`
-    : '';
+  const sinceClause = since ? `AND t."createdAt" >= '${since.toISOString()}'` : '';
+  const untilClause = until ? `AND t."createdAt" < '${until.toISOString()}'` : '';
   const tagsClause = tags ? 'AND collective.tags && $tags' : ''; // && operator means "overlaps"
 
   return sequelize.query(
@@ -378,10 +359,7 @@ const getCollectivesWithBalance = async (where = {}, options) => {
     collectives,
   ] = await Promise.all([
     sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
-    sequelize.query(
-      `${sql(allFields)} LIMIT ${limit} OFFSET ${offset}`,
-      params,
-    ),
+    sequelize.query(`${sql(allFields)} LIMIT ${limit} OFFSET ${offset}`, params),
   ]);
 
   return { total, collectives };
@@ -456,10 +434,7 @@ const getCollectivesByTag = async (
 
   const [[totalResult], collectives] = await Promise.all([
     sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
-    sequelize.query(
-      `${sql(allFields)} LIMIT ${limit} OFFSET ${offset || 0}`,
-      params,
-    ),
+    sequelize.query(`${sql(allFields)} LIMIT ${limit} OFFSET ${offset || 0}`, params),
   ]);
 
   const total = totalResult ? get(totalResult, 'dataValues.total') : 0;
@@ -528,10 +503,7 @@ const getCollectivesOrderedByMonthlySpendingQuery = async ({
   limit = 0,
   offset = 0,
 }) => {
-  const whereStatement = Object.keys(where).reduce(
-    (statement, key) => `${statement} AND c."${key}"=:${key}`,
-    '',
-  );
+  const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=:${key}`, '');
 
   const d = new Date();
   const since = new Date(d.setDate(d.getDate() - 90));
@@ -580,8 +552,7 @@ const getCollectivesOrderedByMonthlySpendingQuery = async ({
 };
 
 const getMembersOfCollectiveWithRole = CollectiveIds => {
-  const collectiveids =
-    typeof CollectiveIds === 'number' ? [CollectiveIds] : CollectiveIds;
+  const collectiveids = typeof CollectiveIds === 'number' ? [CollectiveIds] : CollectiveIds;
   return sequelize.query(
     `
     WITH memberships AS (
@@ -629,8 +600,7 @@ const getMembersWithTotalDonations = (where, options = {}) => {
   let types,
     filterByMemberCollectiveType = '';
   if (options.type) {
-    types =
-      typeof options.type === 'string' ? options.type.split(',') : options.type;
+    types = typeof options.type === 'string' ? options.type.split(',') : options.type;
     filterByMemberCollectiveType = 'AND c.type IN (:types)';
   }
 
@@ -645,9 +615,7 @@ const getMembersWithTotalDonations = (where, options = {}) => {
     groupBy = 'CollectiveId';
   }
   const collectiveids =
-    typeof where[memberCondAttribute] === 'number'
-      ? [where[memberCondAttribute]]
-      : where[memberCondAttribute];
+    typeof where[memberCondAttribute] === 'number' ? [where[memberCondAttribute]] : where[memberCondAttribute];
 
   const selector = `member."${groupBy}" as "${groupBy}", max(member."${memberCondAttribute}") as "${memberCondAttribute}"`;
 
@@ -656,17 +624,13 @@ const getMembersWithTotalDonations = (where, options = {}) => {
     SELECT
       "${sourceCollectiveIdColName}",
       ${
-        transactionType === 'DEBIT'
-          ? 'SUM("netAmountInCollectiveCurrency") * -1'
-          : 'SUM("amount")'
+        transactionType === 'DEBIT' ? 'SUM("netAmountInCollectiveCurrency") * -1' : 'SUM("amount")'
       } as "totalDonations",
       max("createdAt") as "lastDonation",
       min("createdAt") as "firstDonation"
     FROM "Transactions" t
     WHERE t."CollectiveId" IN (:collectiveids)
-    AND t.amount ${
-      transactionType === 'CREDIT' ? '>=' : '<='
-    } 0 ${untilCondition('t')}
+    AND t.amount ${transactionType === 'CREDIT' ? '>=' : '<='} 0 ${untilCondition('t')}
     AND t."deletedAt" IS NULL
     GROUP BY t."${sourceCollectiveIdColName}"
   `;
@@ -746,17 +710,14 @@ const getMembersWithBalance = (where, options = {}) => {
   let types,
     filterByMemberCollectiveType = '';
   if (options.type) {
-    types =
-      typeof options.type === 'string' ? options.type.split(',') : options.type;
+    types = typeof options.type === 'string' ? options.type.split(',') : options.type;
     filterByMemberCollectiveType = 'AND c.type IN (:types)';
   }
 
   let whereCondition = '';
-  Object.keys(pick(where, ['HostCollectiveId', 'ParentCollectiveId'])).forEach(
-    key => {
-      whereCondition += `AND c."${key}"=:${key} `;
-    },
-  );
+  Object.keys(pick(where, ['HostCollectiveId', 'ParentCollectiveId'])).forEach(key => {
+    whereCondition += `AND c."${key}"=:${key} `;
+  });
 
   let memberCondAttribute, groupBy;
   if (where.CollectiveId) {
@@ -767,9 +728,7 @@ const getMembersWithBalance = (where, options = {}) => {
     groupBy = 'CollectiveId';
   }
   const collectiveids =
-    typeof where[memberCondAttribute] === 'number'
-      ? [where[memberCondAttribute]]
-      : where[memberCondAttribute];
+    typeof where[memberCondAttribute] === 'number' ? [where[memberCondAttribute]] : where[memberCondAttribute];
   const selector = `member."${groupBy}" as "${groupBy}", max(member."${memberCondAttribute}") as "${memberCondAttribute}"`;
 
   // xdamman: this query can be optimized by first computing all the memberships
@@ -838,12 +797,8 @@ const getMembersWithBalance = (where, options = {}) => {
 };
 
 const getTotalNumberOfActiveCollectives = (since, until) => {
-  const sinceClause = since
-    ? `AND t."createdAt" >= '${since.toISOString()}'`
-    : '';
-  const untilClause = until
-    ? `AND t."createdAt" < '${until.toISOString()}'`
-    : '';
+  const sinceClause = since ? `AND t."createdAt" >= '${since.toISOString()}'` : '';
+  const untilClause = until ? `AND t."createdAt" < '${until.toISOString()}'` : '';
   return sequelize
     .query(
       `
@@ -885,10 +840,7 @@ const getCollectivesWithMinBackersQuery = async ({
 }) => {
   if (where.type) delete where.type;
 
-  const whereStatement = Object.keys(where).reduce(
-    (statement, key) => `${statement} AND c."${key}"=$${key}`,
-    '',
-  );
+  const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
     bind: where,
     model: models.Collective,
@@ -928,31 +880,23 @@ const serializeCollectivesResult = JSON.stringify;
 
 const unserializeCollectivesResult = string => {
   const result = JSON.parse(string);
-  result.collectives = result.collectives.map(collective =>
-    models.Collective.build(collective),
-  );
+  result.collectives = result.collectives.map(collective => models.Collective.build(collective));
   return result;
 };
 
-const getCollectivesOrderedByMonthlySpending = memoize(
-  getCollectivesOrderedByMonthlySpendingQuery,
-  {
-    key: 'collectives_ordered_by_monthly_spending',
-    maxAge: twoHoursInSeconds,
-    serialize: serializeCollectivesResult,
-    unserialize: unserializeCollectivesResult,
-  },
-);
+const getCollectivesOrderedByMonthlySpending = memoize(getCollectivesOrderedByMonthlySpendingQuery, {
+  key: 'collectives_ordered_by_monthly_spending',
+  maxAge: twoHoursInSeconds,
+  serialize: serializeCollectivesResult,
+  unserialize: unserializeCollectivesResult,
+});
 
-const getCollectivesWithMinBackers = memoize(
-  getCollectivesWithMinBackersQuery,
-  {
-    key: 'collectives_with_min_backers',
-    maxAge: twoHoursInSeconds,
-    serialize: serializeCollectivesResult,
-    unserialize: unserializeCollectivesResult,
-  },
-);
+const getCollectivesWithMinBackers = memoize(getCollectivesWithMinBackersQuery, {
+  key: 'collectives_with_min_backers',
+  maxAge: twoHoursInSeconds,
+  serialize: serializeCollectivesResult,
+  unserialize: unserializeCollectivesResult,
+});
 
 const queries = {
   getPublicHostsByTotalCollectives,

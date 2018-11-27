@@ -11,10 +11,7 @@ import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
-import {
-  getPaymentMethods,
-  createPaymentMethod,
-} from './controllers/paymentMethods';
+import { getPaymentMethods, createPaymentMethod } from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
@@ -53,8 +50,7 @@ const cacheControlMaxAge = maxAge => {
 /**
  * NotImplemented response.
  */
-const NotImplemented = (req, res, next) =>
-  next(new errors.NotImplemented('Not implemented yet.'));
+const NotImplemented = (req, res, next) => next(new errors.NotImplemented('Not implemented yet.'));
 
 export default app => {
   /**
@@ -77,10 +73,7 @@ export default app => {
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
       const body = sanitizeForLogs(req.body || {});
-      debug('operation')(
-        body.operationName,
-        JSON.stringify(body.variables, null),
-      );
+      debug('operation')(body.operationName, JSON.stringify(body.variables, null));
       if (body.query) {
         const query = body.query;
         debug('params')(query);
@@ -104,17 +97,8 @@ export default app => {
 
   // These two endpoints are used by opencollective-website and might
   // be removed when the new frontend replaces it.
-  app.post(
-    '/users/new_login_token',
-    required('email'),
-    mw.getOrCreateUser,
-    users.sendNewTokenByEmail,
-  );
-  app.post(
-    '/users/refresh_login_token',
-    aN.authenticateUserByJwtNoExpiry(),
-    users.refreshTokenByEmail,
-  );
+  app.post('/users/new_login_token', required('email'), mw.getOrCreateUser, users.sendNewTokenByEmail);
+  app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
 
   /**
    * Moving forward, all requests will try to authenticate the user if there is a JWT token provided
@@ -138,12 +122,8 @@ export default app => {
   const graphqlServerV1 = GraphHTTP({
     formatError,
     schema: graphqlSchemaV1,
-    pretty:
-      process.env.NODE_ENV !== 'production' &&
-      process.env.NODE_ENV !== 'staging',
-    graphiql:
-      process.env.NODE_ENV !== 'production' &&
-      process.env.NODE_ENV !== 'staging',
+    pretty: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
+    graphiql: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
   });
 
   app.use('/graphql/v1', graphqlServerV1);
@@ -173,10 +153,7 @@ export default app => {
    */
   app.post('/webhooks/stripe', stripeWebhook); // when it gets a new subscription invoice
   app.post('/webhooks/mailgun', email.webhook); // when receiving an email
-  app.get(
-    '/connected-accounts/:service/callback',
-    aN.authenticateServiceCallback,
-  ); // oauth callback
+  app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback); // oauth callback
 
   app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
 
@@ -190,10 +167,7 @@ export default app => {
    */
   app.get('/discover', getDiscoverPage);
 
-  app.get(
-    '/fxrate/:fromCurrency/:toCurrency/:date?',
-    transactions.getFxRateController,
-  );
+  app.get('/fxrate/:fromCurrency/:toCurrency/:date?', transactions.getFxRateController);
 
   /**
    * Users.
@@ -201,20 +175,11 @@ export default app => {
   app.post('/users', required('user'), users.create); // Create a user.
   app.get('/users/exists', required('email'), users.exists); // Checks the existence of a user based on email.
   app.get('/users/:userid', users.show); // Get a user.
-  app.put(
-    '/users/:userid/paypalemail',
-    auth.mustBeLoggedInAsUser,
-    required('paypalEmail'),
-    users.updatePaypalEmail,
-  ); // Update a user paypal email.
+  app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   // TODO: Why is this a PUT and not a GET?
-  app.put(
-    '/users/:userid/images',
-    required('userData'),
-    users.getSocialMediaAvatars,
-  ); // Return possible images for a user.
+  app.put('/users/:userid/images', required('userData'), users.getSocialMediaAvatars); // Return possible images for a user.
 
   /**
    * Credit paymentMethod.
@@ -224,11 +189,7 @@ export default app => {
   // delete this route #postmigration, once frontend is updated
   app.get('/users/:userid/cards', auth.mustBeLoggedInAsUser, getPaymentMethods); // Get a user's paymentMethods.
 
-  app.get(
-    '/users/:userid/payment-methods',
-    auth.mustBeLoggedInAsUser,
-    getPaymentMethods,
-  ); // Get a user's paymentMethods.
+  app.get('/users/:userid/payment-methods', auth.mustBeLoggedInAsUser, getPaymentMethods); // Get a user's paymentMethods.
   app.post('/users/:userid/payment-methods', NotImplemented); // Create a user's paymentMethod.
   app.put('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Update a user's paymentMethod.
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
@@ -254,61 +215,33 @@ export default app => {
   app.post('/groups', required('group'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
   app.get('/groups/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
   app.get('/groups/:collectiveid', collectives.getOne);
-  app.get(
-    '/groups/:collectiveid/:tierSlug(backers|users)',
-    cacheControlMaxAge(60),
-    collectives.getUsers,
-  ); // Get collective backers
+  app.get('/groups/:collectiveid/:tierSlug(backers|users)', cacheControlMaxAge(60), collectives.getUsers); // Get collective backers
   app.get(
     '/groups/:collectiveid/:tierSlug(backers|users).csv',
     cacheControlMaxAge(60),
     mw.format('csv'),
     collectives.getUsers,
   );
-  app.put(
-    '/groups/:collectiveid',
-    auth.canEditCollective,
-    required('group'),
-    collectives.update,
-  ); // Update a collective.
-  app.put(
-    '/groups/:collectiveid/settings',
-    auth.canEditCollective,
-    required('group'),
-    collectives.updateSettings,
-  ); // Update collective settings
+  app.put('/groups/:collectiveid', auth.canEditCollective, required('group'), collectives.update); // Update a collective.
+  app.put('/groups/:collectiveid/settings', auth.canEditCollective, required('group'), collectives.updateSettings); // Update collective settings
   app.delete('/groups/:collectiveid', NotImplemented); // Delete a collective.
 
-  app.get(
-    '/groups/:collectiveid/services/meetup/sync',
-    mw.fetchUsers,
-    syncMeetup,
-  );
+  app.get('/groups/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
   /**
    * Member.
    *
    *  Relations between a collective and a user.
    */
-  app.post(
-    '/groups/:collectiveid/users/:userid',
-    auth.canEditCollective,
-    collectives.addUser,
-  ); // Add a user to a collective.
+  app.post('/groups/:collectiveid/users/:userid', auth.canEditCollective, collectives.addUser); // Add a user to a collective.
 
   /**
    * Transactions (financial).
    */
 
   // Get transactions of a collective given its slug.
-  app.get(
-    '/v1/collectives/:collectiveSlug/transactions',
-    RestApi.getLatestTransactions,
-  );
-  app.get(
-    '/v1/collectives/:collectiveSlug/transactions/:IdOrUUID',
-    RestApi.getTransaction,
-  );
+  app.get('/v1/collectives/:collectiveSlug/transactions', RestApi.getLatestTransactions);
+  app.get('/v1/collectives/:collectiveSlug/transactions/:IdOrUUID', RestApi.getTransaction);
 
   // xdamman: Is this route still being used anywhere? If not, we should deprecate this
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
@@ -326,10 +259,7 @@ export default app => {
    *
    *  A user can subscribe by email to any type of activity of a Collective.
    */
-  app.post(
-    '/groups/:collectiveid/activities/:activityType/unsubscribe',
-    notifications.unsubscribe,
-  ); // Unsubscribe to a collective's activities
+  app.post('/groups/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
 
   /**
    * Separate route for uploading images to S3
@@ -342,15 +272,8 @@ export default app => {
    */
   app.get('/:slug/connected-accounts', connectedAccounts.list);
   app.get('/connected-accounts/:service(github)', aN.authenticateService); // backward compatibility
-  app.get(
-    '/connected-accounts/:service(github|twitter|meetup|stripe|paypal)/oauthUrl',
-    aN.authenticateService,
-  );
-  app.get(
-    '/connected-accounts/:service/verify',
-    aN.parseJwtNoExpiryCheck,
-    connectedAccounts.verify,
-  );
+  app.get('/connected-accounts/:service(github|twitter|meetup|stripe|paypal)/oauthUrl', aN.authenticateService);
+  app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.verify);
 
   // /**
   //  * Paypal Preapproval.
@@ -367,10 +290,7 @@ export default app => {
    * TODO: we need to consolidate all 3rd party services within the /services/* routes
    */
   app.get('/services/email/approve', email.approve);
-  app.get(
-    '/services/email/unsubscribe/:email/:slug/:type/:token',
-    email.unsubscribe,
-  );
+  app.get('/services/email/unsubscribe/:email/:slug/:type/:token', email.unsubscribe);
 
   /**
    * Github API - fetch all repositories using the user's access_token

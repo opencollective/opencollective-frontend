@@ -14,10 +14,7 @@ export const Individual = new GraphQLObjectType({
         type: GraphQLString,
         resolve(userCollective, args, req) {
           return (
-            userCollective &&
-            req.loaders.getUserDetailsByCollectiveId
-              .load(userCollective.id)
-              .then(u => u.firstName)
+            userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(u => u.firstName)
           );
         },
       },
@@ -25,10 +22,7 @@ export const Individual = new GraphQLObjectType({
         type: GraphQLString,
         resolve(userCollective, args, req) {
           return (
-            userCollective &&
-            req.loaders.getUserDetailsByCollectiveId
-              .load(userCollective.id)
-              .then(u => u.lastName)
+            userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(u => u.lastName)
           );
         },
       },
@@ -37,10 +31,7 @@ export const Individual = new GraphQLObjectType({
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
           return (
-            userCollective &&
-            req.loaders.getUserDetailsByCollectiveId
-              .load(userCollective.id)
-              .then(user => user.email)
+            userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email)
           );
         },
       },

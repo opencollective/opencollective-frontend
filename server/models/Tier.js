@@ -180,10 +180,7 @@ export default function(Sequelize, DataTypes) {
    * If this tier has an interval, returns true if the membership started within the month/year
    * or if the last transaction happened wihtin the month/year
    */
-  Tier.prototype.isBackerActive = function(
-    backerCollective,
-    until = new Date(),
-  ) {
+  Tier.prototype.isBackerActive = function(backerCollective, until = new Date()) {
     return models.Member.findOne({
       where: {
         CollectiveId: this.CollectiveId,
@@ -194,10 +191,8 @@ export default function(Sequelize, DataTypes) {
     }).then(membership => {
       if (!membership) return false;
       if (!this.interval) return true;
-      if (this.interval === 'month' && days(membership.createdAt, until) <= 31)
-        return true;
-      if (this.interval === 'year' && days(membership.createdAt, until) <= 365)
-        return true;
+      if (this.interval === 'month' && days(membership.createdAt, until) <= 31) return true;
+      if (this.interval === 'year' && days(membership.createdAt, until) <= 365) return true;
       return models.Order.findOne({
         where: {
           CollectiveId: this.CollectiveId,
@@ -214,16 +209,8 @@ export default function(Sequelize, DataTypes) {
             debug('No transaction found for order', order.dataValues);
             return false;
           }
-          if (
-            this.interval === 'month' &&
-            days(transaction.createdAt, until) <= 31
-          )
-            return true;
-          if (
-            this.interval === 'year' &&
-            days(transaction.createdAt, until) <= 365
-          )
-            return true;
+          if (this.interval === 'month' && days(transaction.createdAt, until) <= 31) return true;
+          if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) return true;
           return false;
         });
       });
@@ -238,13 +225,7 @@ export default function(Sequelize, DataTypes) {
         processedAt: { [Op.ne]: null },
       },
     }).then(usedQuantity => {
-      debug(
-        'availableQuantity',
-        'usedQuantity:',
-        usedQuantity,
-        'maxQuantity',
-        this.maxQuantity,
-      );
+      debug('availableQuantity', 'usedQuantity:', usedQuantity, 'maxQuantity', this.maxQuantity);
       if (this.maxQuantity && usedQuantity) {
         return this.maxQuantity - usedQuantity;
       } else if (this.maxQuantity) {
@@ -256,20 +237,14 @@ export default function(Sequelize, DataTypes) {
   };
 
   Tier.prototype.checkAvailableQuantity = function(quantityNeeded = 1) {
-    return this.availableQuantity().then(
-      available => available - quantityNeeded >= 0,
-    );
+    return this.availableQuantity().then(available => available - quantityNeeded >= 0);
   };
 
   /**
    * Class Methods
    */
   Tier.createMany = (tiers, defaultValues = {}) => {
-    return Promise.map(
-      tiers,
-      t => Tier.create(_.defaults({}, t, defaultValues)),
-      { concurrency: 1 },
-    );
+    return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), { concurrency: 1 });
   };
 
   /**
@@ -290,14 +265,8 @@ export default function(Sequelize, DataTypes) {
         membershipsForBackerCollective[m.MemberCollectiveId] = m.Tier;
       });
       return backerCollectives.map(backerCollective => {
-        backerCollective.tier =
-          membershipsForBackerCollective[backerCollective.id];
-        debug(
-          'appendTier for',
-          backerCollective.name,
-          ':',
-          backerCollective.tier && backerCollective.tier.slug,
-        );
+        backerCollective.tier = membershipsForBackerCollective[backerCollective.id];
+        debug('appendTier for', backerCollective.name, ':', backerCollective.tier && backerCollective.tier.slug);
         return backerCollective;
       });
     });

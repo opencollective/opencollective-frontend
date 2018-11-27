@@ -29,21 +29,16 @@ export const getOrCreatePlan = (stripeAccount, plan) => {
   plan.id = id;
   plan.name = id;
 
-  return appStripe.plans
-    .retrieve(plan.id, { stripe_account: stripeAccount.username })
-    .catch(err => {
-      if (
-        err.type === 'StripeInvalidRequestError' &&
-        includes(err.message.toLowerCase(), 'no such plan')
-      ) {
-        return appStripe.plans.create(plan, {
-          stripe_account: stripeAccount.username,
-        });
-      }
+  return appStripe.plans.retrieve(plan.id, { stripe_account: stripeAccount.username }).catch(err => {
+    if (err.type === 'StripeInvalidRequestError' && includes(err.message.toLowerCase(), 'no such plan')) {
+      return appStripe.plans.create(plan, {
+        stripe_account: stripeAccount.username,
+      });
+    }
 
-      console.error(err);
-      return Promise.reject(err);
-    });
+    console.error(err);
+    return Promise.reject(err);
+  });
 };
 
 /**
@@ -60,13 +55,7 @@ export const createSubscription = (stripeAccount, customerId, subscription) => {
  * Retrieve stripe subscription
  */
 export const retrieveSubscription = (stripeAccount, stripeSubsriptionId) => {
-  debug(
-    'retrieveSubscription',
-    'account',
-    stripeAccount.username,
-    'stripeSubsriptionId',
-    stripeSubsriptionId,
-  );
+  debug('retrieveSubscription', 'account', stripeAccount.username, 'stripeSubsriptionId', stripeSubsriptionId);
   return appStripe.subscriptions.retrieve(stripeSubsriptionId, {
     stripe_account: stripeAccount.username,
   });
@@ -150,10 +139,7 @@ export const createToken = (stripeAccount, customerId) => {
     'for customerId:',
     customerId,
   );
-  return appStripe.tokens.create(
-    { customer: customerId },
-    { stripe_account: stripeAccount.username },
-  );
+  return appStripe.tokens.create({ customer: customerId }, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -214,7 +200,7 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
 export const retrieveChargeWithRefund = async (stripeAccount, chargeId) => {
   const charge = await retrieveCharge(stripeAccount, chargeId);
   if (!charge) {
-   throw Error(`charge id ${chargeId} not found`);
+    throw Error(`charge id ${chargeId} not found`);
   }
   const refundId = get(charge, 'refunds.data[0].id');
   const refund = await appStripe.refunds.retrieve(refundId, {

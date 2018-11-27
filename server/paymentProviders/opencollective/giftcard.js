@@ -16,11 +16,7 @@ import { get } from 'lodash';
  */
 export async function getBalance(paymentMethod) {
   if (!libpayments.isProvider('opencollective.giftcard', paymentMethod)) {
-    throw new Error(
-      `Expected opencollective.giftcard but got ${paymentMethod.service}.${
-        paymentMethod.type
-      }`,
-    );
+    throw new Error(`Expected opencollective.giftcard but got ${paymentMethod.service}.${paymentMethod.type}`);
   }
   return {
     amount: paymentMethod.monthlyLimitPerMember,
@@ -92,14 +88,8 @@ export async function processOrder(order) {
   });
 
   // Use the above payment method to donate to Collective
-  const hostFeeInHostCurrency = libpayments.calcFee(
-    order.totalAmount,
-    order.collective.hostFeePercent,
-  );
-  const platformFeeInHostCurrency = libpayments.calcFee(
-    order.totalAmount,
-    OC_FEE_PERCENT,
-  );
+  const hostFeeInHostCurrency = libpayments.calcFee(order.totalAmount, order.collective.hostFeePercent);
+  const platformFeeInHostCurrency = libpayments.calcFee(order.totalAmount, OC_FEE_PERCENT);
   const transactions = await models.Transaction.createFromPayload({
     CreatedByUserId: user.id,
     FromCollectiveId: order.FromCollectiveId,
@@ -121,14 +111,10 @@ export async function processOrder(order) {
   });
 
   // add roles
-  await order.collective.findOrAddUserWithRole(
-    { id: user.id, CollectiveId: order.fromCollective.id },
-    roles.BACKER,
-    {
-      CreatedByUserId: user.id,
-      TierId: order.TierId,
-    },
-  );
+  await order.collective.findOrAddUserWithRole({ id: user.id, CollectiveId: order.fromCollective.id }, roles.BACKER, {
+    CreatedByUserId: user.id,
+    TierId: order.TierId,
+  });
 
   // Mark order row as processed
   await order.update({ processedAt: new Date() });
@@ -165,10 +151,7 @@ function randomString(length, chars) {
 
 /** Generate the verification number of a token */
 function getVerificationNumber(str) {
-  const data =
-    Array.prototype.map
-      .call(str, c => c.charCodeAt(0))
-      .reduce((a, b) => a * b) % VERIFICATION_MODULO;
+  const data = Array.prototype.map.call(str, c => c.charCodeAt(0)).reduce((a, b) => a * b) % VERIFICATION_MODULO;
   return data.toString().substr(-1);
 }
 
@@ -182,11 +165,7 @@ function newToken(prefix) {
   const code = `${prefix}${letters}${numbers}`;
   const verification = getVerificationNumber(code);
 
-  if (
-    letters.length !== 3 ||
-    numbers.toString().length != 3 ||
-    verification.toString().length !== 1
-  ) {
+  if (letters.length !== 3 || numbers.toString().length != 3 || verification.toString().length !== 1) {
     throw new Error('Incorrect length found', letters, numbers, verification);
   }
   return `${code}${verification}`;
@@ -194,13 +173,7 @@ function newToken(prefix) {
 
 /** Create the data for batches of giftcards */
 function createGiftcardData(batches, opts) {
-  const {
-    name,
-    CollectiveId,
-    CreatedByUserId,
-    monthlyLimitPerMember,
-    currency,
-  } = opts;
+  const { name, CollectiveId, CreatedByUserId, monthlyLimitPerMember, currency } = opts;
 
   // Prefix for the token strings
   const prefix = name[0].toUpperCase().repeat(2);

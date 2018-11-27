@@ -19,8 +19,7 @@ describe('homepage.routes.test.js', () => {
     setTimeout(done, 1000);
   });
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(userData).tap(u => (user = u)));
+  beforeEach(() => models.User.createUserWithCollective(userData).tap(u => (user = u)));
   beforeEach(() =>
     models.Collective.create(collectiveData)
       .tap(g => {
@@ -47,7 +46,8 @@ describe('homepage.routes.test.js', () => {
           CreatedByUserId: user.id,
           HostCollectiveId: user.id,
         });
-      }));
+      }),
+  );
 
   /**
    * Get.
@@ -63,9 +63,7 @@ describe('homepage.routes.test.js', () => {
           expect(body.collectives).to.have.property('opensource');
           expect(body.collectives).to.have.property('meetup');
           expect(body.collectives.opensource.length).to.equal(1);
-          expect(body.collectives.opensource[0].name).to.equal(
-            collectiveData.name,
-          );
+          expect(body.collectives.opensource[0].name).to.equal(collectiveData.name);
         }));
   });
 });

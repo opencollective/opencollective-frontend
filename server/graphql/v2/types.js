@@ -13,18 +13,6 @@ import { Amount } from './object/Amount';
 
 import { Member, MemberOf } from './object/Member';
 
-const types = [
-  Account,
-  Individual,
-  Organization,
-  Collective,
-  Event,
-  Bot,
-  Debit,
-  Credit,
-  Amount,
-  Member,
-  MemberOf,
-];
+const types = [Account, Individual, Organization, Collective, Event, Bot, Debit, Credit, Amount, Member, MemberOf];
 
 export default types;

@@ -18,10 +18,7 @@ Collective.findAll({
   },
 })
   .tap(collectives => {
-    log.verbose(
-      'collectives',
-      `Found ${collectives.length} collective(s) to inspect`,
-    );
+    log.verbose('collectives', `Found ${collectives.length} collective(s) to inspect`);
   })
   .each(collective => {
     const org = _.get(collective, 'settings.githubOrg');
@@ -46,9 +43,7 @@ Collective.findAll({
               });
               return acc;
             }, {});
-          data.repoData = _.mapValues(repos, repo =>
-            _.omit(repo, 'contributors'),
-          );
+          data.repoData = _.mapValues(repos, repo => _.omit(repo, 'contributors'));
           data.stars = _(repos)
             .map('stars')
             .reduce((sum, n) => {
@@ -68,10 +63,7 @@ Collective.findAll({
       };
       fetchPromise = client.contributorsForRepo(options).then(data => {
         const contributorData = {};
-        data.map(
-          dataEntry =>
-            (contributorData[dataEntry.user] = dataEntry.contributions),
-        );
+        data.map(dataEntry => (contributorData[dataEntry.user] = dataEntry.contributions));
         return { contributorData };
       });
     }

@@ -20,27 +20,15 @@ describe('api.v1.test.js', () => {
   before(() => utils.resetTestDB());
 
   // Create users
-  before('create user', () =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ),
-  );
-  before('create host', () =>
-    models.User.createUserWithCollective(utils.data('host1')).tap(
-      u => (host = u),
-    ),
-  );
+  before('create user', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
+  before('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => (host = u)));
 
   // Create collectives
-  before('create collective', () =>
-    models.Collective.create(publicCollectiveData).tap(g => (collective = g)),
-  );
+  before('create collective', () => models.Collective.create(publicCollectiveData).tap(g => (collective = g)));
 
   // Add users to collectives
   before('add host to collective', () => collective.addHost(host.collective));
-  before('add user to collective as a member', () =>
-    collective.addUserWithRole(user, roles.ADMIN),
-  );
+  before('add user to collective as a member', () => collective.addUserWithRole(user, roles.ADMIN));
 
   let transaction, defaultAttributes;
 
@@ -67,11 +55,7 @@ describe('api.v1.test.js', () => {
   describe('#get', () => {
     it('get the latest transactions', done => {
       request(app)
-        .get(
-          `/v1/collectives/${collective.slug}/transactions?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/v1/collectives/${collective.slug}/transactions?api_key=${application.api_key}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -84,11 +68,7 @@ describe('api.v1.test.js', () => {
 
     it('get one transaction details by uuid', done => {
       request(app)
-        .get(
-          `/v1/collectives/${collective.slug}/transactions/${
-            transaction.uuid
-          }?api_key=${application.api_key}`,
-        )
+        .get(`/v1/collectives/${collective.slug}/transactions/${transaction.uuid}?api_key=${application.api_key}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;

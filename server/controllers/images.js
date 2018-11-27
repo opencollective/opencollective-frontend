@@ -19,17 +19,10 @@ export default function uploadImage(req, res, next) {
     );
   }
 
-  if (
-    !file.mimetype ||
-    !(
-      file.mimetype.match(/image\/.*/i) ||
-      file.mimetype.match(/application\/pdf/i)
-    )
-  ) {
+  if (!file.mimetype || !(file.mimetype.match(/image\/.*/i) || file.mimetype.match(/application\/pdf/i))) {
     return next(
       new errors.ValidationFailed('invalid mimetype', {
-        file:
-          'Mimetype of the file should be image/png, image/jpeg or application/pdf',
+        file: 'Mimetype of the file should be image/png, image/jpeg or application/pdf',
       }),
     );
   }

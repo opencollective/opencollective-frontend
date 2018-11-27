@@ -230,18 +230,11 @@ export default function(Sequelize, DataTypes) {
    * Makes sure that the user can use this payment method for such order
    */
   Order.prototype.validatePaymentMethod = function(paymentMethod) {
-    debug(
-      'validatePaymentMethod',
-      paymentMethod.dataValues,
-      'this.user',
-      this.CreatedByUserId,
-    );
-    return paymentMethod
-      .canBeUsedForOrder(this, this.createdByUser)
-      .then(canBeUsedForOrder => {
-        if (canBeUsedForOrder) return paymentMethod;
-        else return null;
-      });
+    debug('validatePaymentMethod', paymentMethod.dataValues, 'this.user', this.CreatedByUserId);
+    return paymentMethod.canBeUsedForOrder(this, this.createdByUser).then(canBeUsedForOrder => {
+      if (canBeUsedForOrder) return paymentMethod;
+      else return null;
+    });
   };
 
   Order.prototype.getUser = function() {
@@ -259,19 +252,10 @@ export default function(Sequelize, DataTypes) {
    * @param {*} order
    */
   Order.prototype.populate = function(
-    foreignKeys = [
-      'FromCollectiveId',
-      'CollectiveId',
-      'CreatedByUserId',
-      'TierId',
-      'PaymentMethodId',
-    ],
+    foreignKeys = ['FromCollectiveId', 'CollectiveId', 'CreatedByUserId', 'TierId', 'PaymentMethodId'],
   ) {
     return Promise.map(foreignKeys, fk => {
-      const attribute = (fk.substr(0, 1).toLowerCase() + fk.substr(1)).replace(
-        /Id$/,
-        '',
-      );
+      const attribute = (fk.substr(0, 1).toLowerCase() + fk.substr(1)).replace(/Id$/, '');
       const model = fk.replace(/(from|to|createdby)/i, '').replace(/Id$/, '');
       const promise = () => {
         if (this[attribute]) return Promise.resolve(this[attribute]);

@@ -37,11 +37,7 @@ describe('graphql.search.test.js', () => {
     // Given a random collective
     await store.newCollectiveWithHost('A random collective', 'USD', 'USD', 5);
     // Given the open source collective host
-    const { hostCollective } = await store.newHost(
-      'Open Source Collective',
-      'USD',
-      5,
-    );
+    const { hostCollective } = await store.newHost('Open Source Collective', 'USD', 5);
     await hostCollective.update({
       description: 'This is the Open Source Collective.',
     });

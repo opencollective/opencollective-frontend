@@ -13,9 +13,7 @@ pg.defaults.parseInt8 = true;
 /**
  * Database connection.
  */
-console.log(
-  `Connecting to postgres://${config.options.host}/${config.database}`,
-);
+console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
 
 // If we launch the process with DEBUG=psql, we log the postgres queries
 if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
@@ -26,12 +24,7 @@ if (config.options.logging) {
   if (process.env.NODE_ENV === 'production') {
     config.options.logging = (query, executionTime) => {
       if (executionTime > 50) {
-        debug('psql')(
-          query.replace(/(\n|\t| +)/g, ' ').slice(0, 100),
-          '|',
-          executionTime,
-          'ms',
-        );
+        debug('psql')(query.replace(/(\n|\t| +)/g, ' ').slice(0, 100), '|', executionTime, 'ms');
       }
     };
   } else {
@@ -47,12 +40,7 @@ if (config.options.logging) {
 
 config.options.operatorsAliases = false;
 
-export const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  config.options,
-);
+export const sequelize = new Sequelize(config.database, config.username, config.password, config.options);
 
 const models = setupModels(sequelize);
 export default models;
@@ -208,9 +196,7 @@ export function setupModels(client) {
   // Tier
   m.Tier.belongsTo(m.Collective);
 
-  Object.keys(m).forEach(
-    modelName => m[modelName].associate && m[modelName].associate(m),
-  );
+  Object.keys(m).forEach(modelName => m[modelName].associate && m[modelName].associate(m));
 
   return m;
 }

@@ -11,11 +11,7 @@ import debugLib from 'debug';
 
 const debug = debugLib('populate_search_index');
 
-const {
-  appId: ALGOLIA_APP_ID,
-  appKey: ALGOLIA_KEY,
-  index: ALGOLIA_INDEX,
-} = config.algolia;
+const { appId: ALGOLIA_APP_ID, appKey: ALGOLIA_KEY, index: ALGOLIA_INDEX } = config.algolia;
 const chunkSize = 10; // number of collectives to send at once
 
 const done = error => {

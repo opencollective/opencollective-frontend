@@ -16,11 +16,7 @@ export function getHostedCollectives(hostid, endDate = new Date()) {
   );
 }
 
-export function getBackersStats(
-  startDate = new Date('2015-01-01'),
-  endDate = new Date(),
-  collectiveids,
-) {
+export function getBackersStats(startDate = new Date('2015-01-01'), endDate = new Date(), collectiveids) {
   const getBackersIds = (startDate, endDate) => {
     const where = {
       type: 'CREDIT',
@@ -32,12 +28,7 @@ export function getBackersStats(
     }
 
     return models.Transaction.findAll({
-      attributes: [
-        [
-          sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')),
-          'CollectiveId',
-        ],
-      ],
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'CollectiveId']],
       where,
     }).then(rows => rows.map(r => r.dataValues.CollectiveId));
   };
@@ -59,10 +50,7 @@ export function getBackersStats(
 
 export function sumTransactionsBy(groupBy, attribute, query) {
   const findAllQuery = {
-    attributes: [
-      [sequelize.fn('SUM', sequelize.col(attribute)), 'amount'],
-      groupBy,
-    ],
+    attributes: [[sequelize.fn('SUM', sequelize.col(attribute)), 'amount'], groupBy],
     group: [`Transaction.${groupBy}`],
     ...query,
   };
@@ -76,10 +64,7 @@ export function sumTransactionsBy(groupBy, attribute, query) {
   });
 }
 
-export function sumTransactionsByCurrency(
-  attribute = 'netAmountInCollectiveCurrency',
-  query,
-) {
+export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurrency', query) {
   return sumTransactionsBy('currency', attribute, query);
 }
 
@@ -105,11 +90,7 @@ export function sumTransactions(attribute, query = {}, hostCurrency, date) {
     .tap(amounts => {
       res.byCurrency = amounts;
     })
-    .then(amounts =>
-      Promise.map(amounts, s =>
-        convertToCurrency(s.amount, s.currency, hostCurrency || 'USD', date),
-      ),
-    )
+    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.amount, s.currency, hostCurrency || 'USD', date)))
     .then(amounts => {
       let total = 0;
       amounts.map(a => (total += a));

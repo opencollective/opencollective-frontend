@@ -15,12 +15,7 @@ describe('lib.transactions.test.js', () => {
   it('exports transactions', async () => {
     // Given a host with a collective
     const currency = 'USD';
-    const { collective } = await store.newCollectiveWithHost(
-      'apex',
-      currency,
-      currency,
-      10,
-    );
+    const { collective } = await store.newCollectiveWithHost('apex', currency, currency, 10);
     const { user } = await store.newUser('a new user');
     // And given some transactions
     await store.stripeConnectedAccount(collective.HostCollectiveId);

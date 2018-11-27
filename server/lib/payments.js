@@ -70,10 +70,7 @@ export function findPaymentMethodProvider(paymentMethod) {
  */
 export async function processOrder(order, options) {
   const paymentMethodProvider = findPaymentMethodProvider(order.paymentMethod);
-  if (
-    get(paymentMethodProvider, 'features.waitToCharge') &&
-    !get(order, 'paymentMethod.paid')
-  ) {
+  if (get(paymentMethodProvider, 'features.waitToCharge') && !get(order, 'paymentMethod.paid')) {
     return;
   } else {
     return await paymentMethodProvider.processOrder(order, options);
@@ -146,12 +143,7 @@ export function calcFee(amount, fee) {
  *  method that should be saved within the *data* field of the
  *  transactions being created.
  */
-export async function createRefundTransaction(
-  transaction,
-  refundedPaymentProcessorFee,
-  data,
-  user,
-) {
+export async function createRefundTransaction(transaction, refundedPaymentProcessorFee, data, user) {
   /* If the transaction passed isn't the one from the collective
    * perspective, the opposite transaction is retrieved. */
   const collectiveLedger =
@@ -191,17 +183,14 @@ export async function createRefundTransaction(
    * of the fee will be transferred from the host to the user so the
    * user can get the full refund. */
   if (refundedPaymentProcessorFee === 0) {
-    userLedgerRefund.hostFeeInHostCurrency +=
-      userLedgerRefund.paymentProcessorFeeInHostCurrency;
+    userLedgerRefund.hostFeeInHostCurrency += userLedgerRefund.paymentProcessorFeeInHostCurrency;
     userLedgerRefund.paymentProcessorFeeInHostCurrency = 0;
   }
 
   /* Amount fields. Must be calculated after tweaking all the fees */
   userLedgerRefund.amount = -collectiveLedger.amount;
   userLedgerRefund.amountInHostCurrency = -collectiveLedger.amountInHostCurrency;
-  userLedgerRefund.netAmountInCollectiveCurrency = -libtransactions.netAmount(
-    collectiveLedger,
-  );
+  userLedgerRefund.netAmountInCollectiveCurrency = -libtransactions.netAmount(collectiveLedger);
 
   return models.Transaction.createDoubleEntry(userLedgerRefund);
 }
@@ -210,10 +199,7 @@ export async function associateTransactionRefundId(transaction, refund, data) {
   const [tr1, tr2, tr3, tr4] = await models.Transaction.findAll({
     order: ['id'],
     where: {
-      [Op.or]: [
-        { TransactionGroup: transaction.TransactionGroup },
-        { TransactionGroup: refund.TransactionGroup },
-      ],
+      [Op.or]: [{ TransactionGroup: transaction.TransactionGroup }, { TransactionGroup: refund.TransactionGroup }],
     },
   });
   // After refunding a transaction, in some cases the data may
@@ -259,9 +245,7 @@ export const addBackerToCollective = async (user, collective, TierId) => {
 };
 
 export const processMatchingFund = async (order, options) => {
-  const matchingFundCollective = await models.Collective.findById(
-    order.matchingFund.CollectiveId,
-  );
+  const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
   // if there is a matching fund, we execute the order
   // also adds the owner of the matching fund as a BACKER of collective
   const matchingOrder = {
@@ -270,18 +254,14 @@ export const processMatchingFund = async (order, options) => {
     paymentMethod: order.matchingFund,
     FromCollectiveId: order.matchingFund.CollectiveId,
     fromCollective: matchingFundCollective,
-    description: `Matching ${order.matchingFund.matching}x ${
-      order.fromCollective.name
-    }'s donation`,
+    description: `Matching ${order.matchingFund.matching}x ${order.fromCollective.name}'s donation`,
     createdByUser: await matchingFundCollective.getUser(),
   };
 
   // processOrder expects an update function to update `order.processedAt`
   matchingOrder.update = () => {};
 
-  return paymentProviders[order.paymentMethod.service].types[
-    order.paymentMethod.type || 'default'
-  ]
+  return paymentProviders[order.paymentMethod.service].types[order.paymentMethod.type || 'default']
     .processOrder(matchingOrder, options) // eslint-disable-line import/namespace
     .then(transaction => {
       sendOrderConfirmedEmail({ ...order, transaction }); // async
@@ -300,13 +280,9 @@ export const createSubscription = async order => {
   // included so we're doing that manually here. Not the
   // cutest but works.
   order.Subscription = subscription;
-  const updatedDates = libsubscription.getNextChargeAndPeriodStartDates(
-    'new',
-    order,
-  );
+  const updatedDates = libsubscription.getNextChargeAndPeriodStartDates('new', order);
   order.Subscription.nextChargeDate = updatedDates.nextChargeDate;
-  order.Subscription.nextPeriodStart =
-    updatedDates.nextPeriodStart || order.Subscription.nextPeriodStart;
+  order.Subscription.nextPeriodStart = updatedDates.nextPeriodStart || order.Subscription.nextPeriodStart;
 
   // Both subscriptions and one time donations are charged
   // immediatelly and there won't be a better time to update
@@ -329,26 +305,16 @@ export const createSubscription = async order => {
  */
 export const executeOrder = async (user, order, options) => {
   if (!(user instanceof models.User)) {
-    return Promise.reject(
-      new Error('user should be an instance of the User model'),
-    );
+    return Promise.reject(new Error('user should be an instance of the User model'));
   }
   if (!(order instanceof models.Order)) {
-    return Promise.reject(
-      new Error('order should be an instance of the Order model'),
-    );
+    return Promise.reject(new Error('order should be an instance of the Order model'));
   }
   if (!order) {
     return Promise.reject(new Error('No order provided'));
   }
   if (order.processedAt) {
-    return Promise.reject(
-      new Error(
-        `This order (#${order.id}) has already been processed at ${
-          order.processedAt
-        }`,
-      ),
-    );
+    return Promise.reject(new Error(`This order (#${order.id}) has already been processed at ${order.processedAt}`));
   }
 
   const payment = {
@@ -420,25 +386,14 @@ const sendOrderConfirmedEmail = async order => {
         EventCollectiveId: collective.id,
         UserId: user.id,
         recipient: { name: fromCollective.name },
-        order: pick(order, [
-          'totalAmount',
-          'currency',
-          'createdAt',
-          'quantity',
-        ]),
+        order: pick(order, ['totalAmount', 'currency', 'createdAt', 'quantity']),
         tier: tier && tier.info,
       },
     });
   } else {
     // normal order
-    const relatedCollectives = await order.collective.getRelatedCollectives(
-      3,
-      0,
-    );
-    const recommendedCollectives = await getRecommendedCollectives(
-      order.collective,
-      3,
-    );
+    const relatedCollectives = await order.collective.getRelatedCollectives(3, 0);
+    const recommendedCollectives = await getRecommendedCollectives(order.collective, 3);
     const emailOptions = {
       from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
     };
@@ -453,26 +408,19 @@ const sendOrderConfirmedEmail = async order => {
       recommendedCollectives,
       monthlyInterval: interval === 'month',
       firstPayment: true,
-      subscriptionsLink:
-        interval &&
-        user.generateLoginLink(`/${fromCollective.slug}/subscriptions`),
+      subscriptionsLink: interval && user.generateLoginLink(`/${fromCollective.slug}/subscriptions`),
     };
 
     let matchingFundCollective;
     if (order.matchingFund) {
-      matchingFundCollective = await models.Collective.findById(
-        order.matchingFund.CollectiveId,
-      );
+      matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
       data.matchingFund = {
         collective: pick(matchingFundCollective, ['slug', 'name', 'image']),
         matching: order.matchingFund.matching,
         amount: order.matchingFund.matching * order.totalAmount,
       };
       // sending the order confirmed email to the matching fund owner or to the donor
-      if (
-        get(order, 'transaction.FromCollectiveId') ===
-        get(order, 'matchingFund.CollectiveId')
-      ) {
+      if (get(order, 'transaction.FromCollectiveId') === get(order, 'matchingFund.CollectiveId')) {
         const recipients = await matchingFundCollective.getEmails();
         return emailLib.send('donationmatched', recipients, data, emailOptions);
       } else {
@@ -486,12 +434,9 @@ const sendOrderConfirmedEmail = async order => {
 
 const sendSupportEmailForManualIntervention = order => {
   const user = order.createdByUser;
-  return emailLib.sendMessage(
-    'support@opencollective.com',
-    'Gift card order needs manual attention',
-    null,
-    { text: `Order Id: ${order.id} by userId: ${user.id}` },
-  );
+  return emailLib.sendMessage('support@opencollective.com', 'Gift card order needs manual attention', null, {
+    text: `Order Id: ${order.id} by userId: ${user.id}`,
+  });
 };
 
 // Assumes one-time payments,
@@ -505,9 +450,7 @@ const sendOrderProcessingEmail = async order => {
     collective: collective.info,
     host: host.info,
     fromCollective: fromCollective.minimal,
-    subscriptionsLink: user.generateLoginLink(
-      `/${fromCollective.slug}/subscriptions`,
-    ),
+    subscriptionsLink: user.generateLoginLink(`/${fromCollective.slug}/subscriptions`),
   };
   const instructions = get(host, 'settings.paymentMethods.manual.instructions');
   if (instructions) {

@@ -2,14 +2,8 @@
 
 // Only run on the first of the month
 const today = new Date();
-if (
-  process.env.NODE_ENV === 'production' &&
-  today.getDate() !== 1 &&
-  today.getMonth() !== 0
-) {
-  console.log(
-    'NODE_ENV is production and today is not the first of the first month of the year, script aborted!',
-  );
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 1 && today.getMonth() !== 0) {
+  console.log('NODE_ENV is production and today is not the first of the first month of the year, script aborted!');
   process.exit();
 }
 

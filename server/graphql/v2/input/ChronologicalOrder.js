@@ -20,9 +20,7 @@ export const ChronologicalOrder = new GraphQLInputObjectType({
   },
 });
 
-ChronologicalOrder.defaultValue = Object.entries(
-  ChronologicalOrder.getFields(),
-).reduce(
+ChronologicalOrder.defaultValue = Object.entries(ChronologicalOrder.getFields()).reduce(
   (values, [key, value]) => ({
     ...values,
     [key]: value.defaultValue,

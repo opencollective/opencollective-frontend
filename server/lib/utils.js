@@ -58,9 +58,7 @@ export function getDomain(url = '') {
 
 export function strip_tags(str, allowedTags) {
   return sanitizeHtml(str, {
-    allowedTags:
-      allowedTags ||
-      sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2']),
+    allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2']),
     allowedAttributes: {
       a: ['href', 'name', 'target'],
       img: ['src'],
@@ -69,13 +67,11 @@ export function strip_tags(str, allowedTags) {
 }
 
 export const sanitizeObject = (obj, attributes, sanitizerFn) => {
-  const sanitizer =
-    typeof sanitizerFn === 'function' ? sanitizerFn : strip_tags;
+  const sanitizer = typeof sanitizerFn === 'function' ? sanitizerFn : strip_tags;
 
   attributes.forEach(attr => {
     if (!obj[attr]) return;
-    if (typeof obj[attr] === 'object')
-      return sanitizeObject(obj[attr], Object.keys(obj[attr]), sanitizerFn);
+    if (typeof obj[attr] === 'object') return sanitizeObject(obj[attr], Object.keys(obj[attr]), sanitizerFn);
     obj[attr] = sanitizer(obj[attr] || '');
   });
   return obj;
@@ -105,11 +101,7 @@ export const sanitizeForLogs = obj => {
 String.prototype.trunc = function(n, useWordBoundary) {
   if (this.length <= n) return this;
   const subString = this.substr(0, n - 1);
-  return `${
-    useWordBoundary
-      ? subString.substr(0, subString.lastIndexOf(' '))
-      : subString
-  }&hellip;`;
+  return `${useWordBoundary ? subString.substr(0, subString.lastIndexOf(' ')) : subString}&hellip;`;
 };
 
 /**
@@ -161,8 +153,7 @@ const paginatePage = (offset, limit) => {
  */
 export const getLinks = (url, options) => {
   const page = options.page || paginatePage(options.offset, options.limit).page;
-  const perPage =
-    options.perPage || paginatePage(options.offset, options.limit).perPage;
+  const perPage = options.perPage || paginatePage(options.offset, options.limit).perPage;
 
   if (!page && !perPage) return null;
 
@@ -230,9 +221,7 @@ export const days = (d1, d2 = new Date()) => {
 
 export const flattenArray = arr => {
   return arr.reduce((flat, toFlatten) => {
-    return flat.concat(
-      Array.isArray(toFlatten) ? flattenArray(toFlatten) : toFlatten,
-    );
+    return flat.concat(Array.isArray(toFlatten) ? flattenArray(toFlatten) : toFlatten);
   }, []);
 };
 
@@ -267,10 +256,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
 
   // We only keep the tiers that have at least one user
   tiers = tiers.filter(tier => {
-    if (
-      get(tier, 'dataValues.users') &&
-      get(tier, 'dataValues.users').length > 0
-    ) {
+    if (get(tier, 'dataValues.users') && get(tier, 'dataValues.users').length > 0) {
       return true;
     } else {
       debug('skipping tier', tier.dataValues, 'because it has no users');
@@ -284,13 +270,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
   return Promise.map(tiers, tier => {
     const backers = get(tier, 'dataValues.users');
     let index = 0;
-    debug(
-      '> processing tier ',
-      tier.name,
-      'total backers: ',
-      backers.length,
-      backers,
-    );
+    debug('> processing tier ', tier.name, 'total backers: ', backers.length, backers);
 
     // We sort backers by total donations DESC
     backers.sort((a, b) => b.totalDonations - a.totalDonations);
@@ -303,42 +283,36 @@ export const getTiersStats = (tiers, startDate, endDate) => {
       backersIds[backer.id] = true;
 
       backer.index = index++;
-      return Promise.all([
-        tier.isBackerActive(backer, endDate),
-        tier.isBackerActive(backer, startDate),
-      ]).then(results => {
-        backer.activeLastMonth = results[0];
-        backer.activePreviousMonth =
-          backer.firstDonation < startDate && results[1];
-        if (tier.name.match(/sponsor/i)) backer.isSponsor = true;
-        if (backer.firstDonation > startDate) {
-          backer.isNew = true;
-          stats.backers.new++;
-        }
-        if (backer.activePreviousMonth && !backer.activeLastMonth) {
-          backer.isLost = true;
-          stats.backers.lost++;
-        }
+      return Promise.all([tier.isBackerActive(backer, endDate), tier.isBackerActive(backer, startDate)]).then(
+        results => {
+          backer.activeLastMonth = results[0];
+          backer.activePreviousMonth = backer.firstDonation < startDate && results[1];
+          if (tier.name.match(/sponsor/i)) backer.isSponsor = true;
+          if (backer.firstDonation > startDate) {
+            backer.isNew = true;
+            stats.backers.new++;
+          }
+          if (backer.activePreviousMonth && !backer.activeLastMonth) {
+            backer.isLost = true;
+            stats.backers.lost++;
+          }
 
-        debug('----------- ', backer.slug, '----------');
-        debug(
-          'firstDonation',
-          backer.firstDonation &&
-            backer.firstDonation.toISOString().substr(0, 10),
-        );
-        debug('totalDonations', backer.totalDonations / 100);
-        debug('active last month?', backer.activeLastMonth);
-        debug('active previous month?', backer.activePreviousMonth);
-        debug('is new?', backer.isNew === true);
-        debug('is lost?', backer.isLost === true);
-        if (backer.activePreviousMonth) stats.backers.previousMonth++;
-        if (backer.activeLastMonth) {
-          stats.backers.lastMonth++;
-          return true;
-        } else if (backer.isLost) {
-          return true;
-        }
-      });
+          debug('----------- ', backer.slug, '----------');
+          debug('firstDonation', backer.firstDonation && backer.firstDonation.toISOString().substr(0, 10));
+          debug('totalDonations', backer.totalDonations / 100);
+          debug('active last month?', backer.activeLastMonth);
+          debug('active previous month?', backer.activePreviousMonth);
+          debug('is new?', backer.isNew === true);
+          debug('is lost?', backer.isLost === true);
+          if (backer.activePreviousMonth) stats.backers.previousMonth++;
+          if (backer.activeLastMonth) {
+            stats.backers.lastMonth++;
+            return true;
+          } else if (backer.isLost) {
+            return true;
+          }
+        },
+      );
     }).then(backers => {
       backers.sort((a, b) => {
         if (rank(a) > rank(b)) return 1;
@@ -362,12 +336,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
  * @param {*} getColumnName
  * @param {*} processValue
  */
-export function exportToCSV(
-  data,
-  attributes,
-  getColumnName = attr => attr,
-  processValue = (attr, val) => val,
-) {
+export function exportToCSV(data, attributes, getColumnName = attr => attr, processValue = (attr, val) => val) {
   const lines = [];
 
   lines.push(`"${attributes.map(getColumnName).join('","')}"`); // Header
@@ -375,9 +344,7 @@ export function exportToCSV(
   const getLine = row => {
     const cols = [];
     attributes.map(attr => {
-      cols.push(
-        `${processValue(attr, get(row, attr) || '')}`.replace(/\"/g, '"'),
-      );
+      cols.push(`${processValue(attr, get(row, attr) || '')}`.replace(/\"/g, '"'));
     });
     return `"${cols.join('","')}"`;
   };
@@ -424,10 +391,7 @@ export function exportToPDF(template, data, options) {
   data.paperSize = paperSize;
   options.paperSize = paperSize;
 
-  const templateFilepath = path.resolve(
-    __dirname,
-    `../../templates/pdf/${template}.hbs`,
-  );
+  const templateFilepath = path.resolve(__dirname, `../../templates/pdf/${template}.hbs`);
   const source = fs.readFileSync(templateFilepath, 'utf8');
   const render = handlebars.compile(source);
 
@@ -450,10 +414,7 @@ export function exportToPDF(template, data, options) {
  * Default host id, set this for new collectives created through our flow
  */
 export const defaultHostCollective = tag => {
-  if (
-    process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'staging'
-  ) {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     if (tag === 'opensource') {
       return { id: 772, CollectiveId: 11004, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
@@ -467,10 +428,7 @@ export const defaultHostCollective = tag => {
  * Demo host id, set this for new collectives created through the flow
  */
 export const demoHostId = () => {
-  if (
-    process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'staging'
-  ) {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     return 254;
   }
   return 1;
@@ -516,10 +474,7 @@ export function pluralize(str, count) {
 export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
   if (!imageUrl) {
     if (defaultImage) {
-      imageUrl =
-        defaultImage.substr(0, 1) === '/'
-          ? `${config.host.website}${defaultImage}`
-          : defaultImage;
+      imageUrl = defaultImage.substr(0, 1) === '/' ? `${config.host.website}${defaultImage}` : defaultImage;
     } else {
       return null;
     }
@@ -534,17 +489,13 @@ export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
     if (width) queryurl += `&width=${width}`;
     if (height) queryurl += `&height=${height}`;
   }
-  return `${config.host.images}/proxy/images/?src=${encodeURIComponent(
-    imageUrl,
-  )}${queryurl}`;
+  return `${config.host.images}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function formatArrayToString(arr, conjonction = 'and') {
   if (arr.length === 1) return arr[0];
   if (!arr.slice) return '';
-  return `${arr.slice(0, arr.length - 1).join(', ')} ${conjonction} ${arr.slice(
-    -1,
-  )}`;
+  return `${arr.slice(0, arr.length - 1).join(', ')} ${conjonction} ${arr.slice(-1)}`;
 }
 
 export function formatCurrency(amount, currency, precision = 0) {
@@ -573,10 +524,7 @@ export function formatCurrency(amount, currency, precision = 0) {
  * @PRE: { USD: 1000, EUR: 6000 }
  * @POST: "€60 and $10"
  */
-export function formatCurrencyObject(
-  currencyObj,
-  options = { precision: 0, conjonction: 'and' },
-) {
+export function formatCurrencyObject(currencyObj, options = { precision: 0, conjonction: 'and' }) {
   const array = [];
   for (const currency in currencyObj) {
     if (currencyObj[currency] > 0) {
@@ -592,12 +540,7 @@ export function formatCurrencyObject(
 }
 
 export function isUUID(str) {
-  return (
-    str.length === 36 &&
-    str.match(
-      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
-    )
-  );
+  return str.length === 36 && str.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
 }
 
 export function hashCode(str) {

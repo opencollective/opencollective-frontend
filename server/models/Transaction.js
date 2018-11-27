@@ -90,8 +90,7 @@ export default (Sequelize, DataTypes) => {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
         allowNull: true,
-        description:
-          'References the collective that created the virtual card used for this order',
+        description: 'References the collective that created the virtual card used for this order',
       },
 
       OrderId: {
@@ -174,11 +173,7 @@ export default (Sequelize, DataTypes) => {
         },
 
         amountSentToHostInHostCurrency() {
-          return (
-            this.amountInHostCurrency +
-            this.paymentProcessorFeeInHostCurrency +
-            this.platformFeeInHostCurrency
-          );
+          return this.amountInHostCurrency + this.paymentProcessorFeeInHostCurrency + this.platformFeeInHostCurrency;
         },
 
         // Info.
@@ -194,12 +189,10 @@ export default (Sequelize, DataTypes) => {
             CreatedByUserId: this.CreatedByUserId,
             FromCollectiveId: this.FromCollectiveId,
             CollectiveId: this.CollectiveId,
-            UsingVirtualCardFromCollectiveId: this
-              .UsingVirtualCardFromCollectiveId,
+            UsingVirtualCardFromCollectiveId: this.UsingVirtualCardFromCollectiveId,
             platformFee: this.platformFee,
             hostFee: this.hostFee,
-            paymentProcessorFeeInHostCurrency: this
-              .paymentProcessorFeeInHostCurrency,
+            paymentProcessorFeeInHostCurrency: this.paymentProcessorFeeInHostCurrency,
             amountInHostCurrency: this.amountInHostCurrency,
             netAmountInCollectiveCurrency: this.netAmountInCollectiveCurrency,
             netAmountInHostCurrency: this.netAmountInHostCurrency,
@@ -236,23 +229,19 @@ export default (Sequelize, DataTypes) => {
     let HostCollectiveId = this.HostCollectiveId;
     // if the transaction is from the perspective of the fromCollective
     if (!HostCollectiveId) {
-      const fromCollective = await models.Collective.findById(
-        this.FromCollectiveId,
-      );
+      const fromCollective = await models.Collective.findById(this.FromCollectiveId);
       HostCollectiveId = await fromCollective.getHostCollectiveId();
     }
     return models.Collective.findById(HostCollectiveId);
   };
 
   Transaction.prototype.getExpenseForViewer = function(viewer) {
-    return models.Expense.findOne({ where: { id: this.ExpenseId } }).then(
-      expense => {
-        if (!expense) return null;
-        if (viewer && viewer.isAdmin(this.CollectiveId)) return expense.info;
-        if (viewer && viewer.id === expense.UserId) return expense.info;
-        return expense.public;
-      },
-    );
+    return models.Expense.findOne({ where: { id: this.ExpenseId } }).then(expense => {
+      if (!expense) return null;
+      if (viewer && viewer.isAdmin(this.CollectiveId)) return expense.info;
+      if (viewer && viewer.id === expense.UserId) return expense.info;
+      return expense.public;
+    });
   };
 
   Transaction.prototype.getSource = function() {
@@ -262,11 +251,7 @@ export default (Sequelize, DataTypes) => {
 
   Transaction.prototype.getDetailsForUser = function(user) {
     return user.populateRoles().then(() => {
-      if (
-        user.isAdmin(this.FromCollectiveId) ||
-        user.isAdmin(this.CollectiveId) ||
-        user.isRoot()
-      ) {
+      if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(this.CollectiveId) || user.isRoot()) {
         return this.uuid;
       } else {
         return null;
@@ -383,33 +368,23 @@ export default (Sequelize, DataTypes) => {
    */
 
   Transaction.createDoubleEntry = async transaction => {
-    transaction.type =
-      transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
-    transaction.netAmountInCollectiveCurrency =
-      transaction.netAmountInCollectiveCurrency || transaction.amount;
+    transaction.type = transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
+    transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
     transaction.TransactionGroup = uuidv4();
     transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;
 
     const oppositeTransaction = {
       ...transaction,
-      type:
-        -transaction.amount > 0
-          ? TransactionTypes.CREDIT
-          : TransactionTypes.DEBIT,
+      type: -transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT,
       FromCollectiveId: transaction.CollectiveId,
       CollectiveId: transaction.FromCollectiveId,
-      HostCollectiveId: await models.Collective.getHostCollectiveId(
-        transaction.FromCollectiveId,
-      ), // see https://github.com/opencollective/opencollective/issues/1154
+      HostCollectiveId: await models.Collective.getHostCollectiveId(transaction.FromCollectiveId), // see https://github.com/opencollective/opencollective/issues/1154
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
-      amountInHostCurrency:
-        -transaction.netAmountInCollectiveCurrency *
-        transaction.hostCurrencyFxRate,
+      amountInHostCurrency: -transaction.netAmountInCollectiveCurrency * transaction.hostCurrencyFxRate,
       hostFeeInHostCurrency: transaction.hostFeeInHostCurrency,
       platformFeeInHostCurrency: transaction.platformFeeInHostCurrency,
-      paymentProcessorFeeInHostCurrency:
-        transaction.paymentProcessorFeeInHostCurrency,
+      paymentProcessorFeeInHostCurrency: transaction.paymentProcessorFeeInHostCurrency,
     };
 
     debug('createDoubleEntry', transaction, 'opposite', oppositeTransaction);
@@ -427,9 +402,7 @@ export default (Sequelize, DataTypes) => {
       transactions.push(oppositeTransaction);
       transactions.push(transaction);
     }
-    return Promise.mapSeries(transactions, t => Transaction.create(t)).then(
-      results => results[index],
-    );
+    return Promise.mapSeries(transactions, t => Transaction.create(t)).then(results => results[index]);
   };
 
   Transaction.createFromPayload = ({
@@ -440,40 +413,25 @@ export default (Sequelize, DataTypes) => {
     PaymentMethodId,
   }) => {
     if (!transaction.amount) {
-      return Promise.reject(
-        new Error('transaction.amount cannot be null or zero'),
-      );
+      return Promise.reject(new Error('transaction.amount cannot be null or zero'));
     }
 
     return models.Collective.findById(CollectiveId)
       .then(c => c.getHostCollectiveId())
       .then(HostCollectiveId => {
         if (!HostCollectiveId && !transaction.HostCollectiveId) {
-          throw new Error(
-            `Cannot create a transaction: collective id ${CollectiveId} doesn't have a host`,
-          );
+          throw new Error(`Cannot create a transaction: collective id ${CollectiveId} doesn't have a host`);
         }
-        transaction.HostCollectiveId =
-          HostCollectiveId || transaction.HostCollectiveId;
+        transaction.HostCollectiveId = HostCollectiveId || transaction.HostCollectiveId;
         // attach other objects manually. Needed for afterCreate hook to work properly
         transaction.CreatedByUserId = CreatedByUserId;
         transaction.FromCollectiveId = FromCollectiveId;
         transaction.CollectiveId = CollectiveId;
-        transaction.PaymentMethodId =
-          transaction.PaymentMethodId || PaymentMethodId;
-        transaction.type =
-          transaction.amount > 0
-            ? TransactionTypes.CREDIT
-            : TransactionTypes.DEBIT;
-        transaction.platformFeeInHostCurrency = toNegative(
-          transaction.platformFeeInHostCurrency,
-        );
-        transaction.hostFeeInHostCurrency = toNegative(
-          transaction.hostFeeInHostCurrency,
-        );
-        transaction.paymentProcessorFeeInHostCurrency = toNegative(
-          transaction.paymentProcessorFeeInHostCurrency,
-        );
+        transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
+        transaction.type = transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
+        transaction.platformFeeInHostCurrency = toNegative(transaction.platformFeeInHostCurrency);
+        transaction.hostFeeInHostCurrency = toNegative(transaction.hostFeeInHostCurrency);
+        transaction.paymentProcessorFeeInHostCurrency = toNegative(transaction.paymentProcessorFeeInHostCurrency);
 
         if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
           // populate netAmountInCollectiveCurrency for donations
@@ -482,8 +440,7 @@ export default (Sequelize, DataTypes) => {
             transaction.hostFeeInHostCurrency +
             transaction.paymentProcessorFeeInHostCurrency;
           transaction.netAmountInCollectiveCurrency = Math.round(
-            (transaction.amountInHostCurrency + fees) /
-              transaction.hostCurrencyFxRate,
+            (transaction.amountInHostCurrency + fees) / transaction.hostCurrencyFxRate,
           );
         }
         return Transaction.createDoubleEntry(transaction);
@@ -513,11 +470,8 @@ export default (Sequelize, DataTypes) => {
             data: {
               transaction: transaction.info,
               user: transaction.User && transaction.User.minimal,
-              fromCollective:
-                transaction.fromCollective &&
-                transaction.fromCollective.minimal,
-              collective:
-                transaction.collective && transaction.collective.minimal,
+              fromCollective: transaction.fromCollective && transaction.fromCollective.minimal,
+              collective: transaction.collective && transaction.collective.minimal,
             },
           };
           if (transaction.createdByUser) {
@@ -530,9 +484,9 @@ export default (Sequelize, DataTypes) => {
         })
         .catch(err =>
           console.error(
-            `Error creating activity of type ${
-              activities.COLLECTIVE_TRANSACTION_CREATED
-            } for transaction ID ${transaction.id}`,
+            `Error creating activity of type ${activities.COLLECTIVE_TRANSACTION_CREATED} for transaction ID ${
+              transaction.id
+            }`,
             err,
           ),
         )

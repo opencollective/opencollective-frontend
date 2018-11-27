@@ -38,23 +38,19 @@ describe('user.models.test.js', () => {
       ));
 
     it('fails if invalid email', () =>
-      User.create({ firstName: userData.firstName, email: 'johndoe' }).catch(
-        err => expect(err).to.exist,
-      ));
+      User.create({ firstName: userData.firstName, email: 'johndoe' }).catch(err => expect(err).to.exist));
 
     it('fails if no email is given', () => {
       User.create({ firstName: 'blah' }).catch(err => expect(err).to.exist);
     });
 
     it('successfully creates a user and lowercase email', () =>
-      User.create({ firstName: userData.firstName, email: userData.email }).tap(
-        user => {
-          expect(user).to.have.property('firstName', userData.firstName);
-          expect(user).to.have.property('email', userData.email.toLowerCase());
-          expect(user).to.have.property('createdAt');
-          expect(user).to.have.property('updatedAt');
-        },
-      ));
+      User.create({ firstName: userData.firstName, email: userData.email }).tap(user => {
+        expect(user).to.have.property('firstName', userData.firstName);
+        expect(user).to.have.property('email', userData.email.toLowerCase());
+        expect(user).to.have.property('createdAt');
+        expect(user).to.have.property('updatedAt');
+      }));
 
     it('successfully creates a user with a password that is a number', () => {
       const email = 'john.doe@doe.com';
@@ -109,9 +105,7 @@ describe('user.models.test.js', () => {
         firstName: '很棒的用户',
         lastName: 'awesome',
       }).then(user => {
-        expect(user.collective.slug).to.equal(
-          'hen3-bang4-de-yong4-hu4-awesome',
-        );
+        expect(user.collective.slug).to.equal('hen3-bang4-de-yong4-hu4-awesome');
       });
     });
   });
@@ -178,9 +172,7 @@ describe('user.models.test.js', () => {
 
       // Then the link should contain the right url
       const parsed = url.parse(link);
-      expect(`${parsed.protocol}//${parsed.host}`).to.equal(
-        config.host.website,
-      );
+      expect(`${parsed.protocol}//${parsed.host}`).to.equal(config.host.website);
       expect(parsed.query).to.equal('next=/path/to/redirect');
       expect(parsed.pathname).to.equal('/signin/foo');
 
@@ -196,17 +188,13 @@ describe('user.models.test.js', () => {
         email: 'foo@oc.com',
         password: '123456',
       });
-      const mockUser = sinon
-        .stub(user, 'jwt')
-        .callsFake((payload, expiration) => ({ payload, expiration }));
+      const mockUser = sinon.stub(user, 'jwt').callsFake((payload, expiration) => ({ payload, expiration }));
 
       // When an account verification link is created
       const output = user.generateConnectedAccountVerifiedToken(1, 'user');
 
       // Then the expiration time should match with a constant
-      expect(output.expiration).to.equal(
-        auth.TOKEN_EXPIRATION_CONNECTED_ACCOUNT,
-      );
+      expect(output.expiration).to.equal(auth.TOKEN_EXPIRATION_CONNECTED_ACCOUNT);
 
       // And then restore the mocked object
       mockUser.restore();

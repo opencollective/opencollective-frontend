@@ -18,18 +18,9 @@ const getConfig = connectedAccount => ({
 });
 
 const getCallbackUrl = (collective, transaction) =>
-  `${config.host.api}/collectives/${collective.id}/transactions/${
-    transaction.id
-  }/callback`;
+  `${config.host.api}/collectives/${collective.id}/transactions/${transaction.id}/callback`;
 
-const createBillingPlan = (
-  planDescription,
-  collective,
-  transaction,
-  subscription,
-  paypalConfig,
-  cb,
-) => {
+const createBillingPlan = (planDescription, collective, transaction, subscription, paypalConfig, cb) => {
   const callbackUrl = getCallbackUrl(collective, transaction);
 
   const { amount } = transaction;
@@ -64,12 +55,7 @@ const createBillingPlan = (
   paypal.billingPlan.create(billingPlan, paypalConfig, cb);
 };
 
-const createBillingAgreement = (
-  agreementDescription,
-  planId,
-  paypalConfig,
-  cb,
-) => {
+const createBillingAgreement = (agreementDescription, planId, paypalConfig, cb) => {
   // From paypal example, fails with moment js, TO REFACTOR
   const isoDate = new Date();
   isoDate.setSeconds(isoDate.getSeconds() + 4);
@@ -93,51 +79,29 @@ const createBillingAgreement = (
 /**
  * Create a subscription payment and return the links to the paypal approval
  */
-const createSubscription = (
-  connectedAccount,
-  collective,
-  transaction,
-  subscription,
-  callback,
-) => {
+const createSubscription = (connectedAccount, collective, transaction, subscription, callback) => {
   const paypalConfig = getConfig(connectedAccount);
-  const description = `donation of ${transaction.currency} ${
-    transaction.amount
-  } / ${subscription.interval} to ${collective.name}`;
+  const description = `donation of ${transaction.currency} ${transaction.amount} / ${subscription.interval} to ${
+    collective.name
+  }`;
 
   async.auto(
     {
       createBillingPlan: cb => {
-        createBillingPlan(
-          description,
-          collective,
-          transaction,
-          subscription,
-          paypalConfig,
-          cb,
-        );
+        createBillingPlan(description, collective, transaction, subscription, paypalConfig, cb);
       },
 
       activatePlan: [
         'createBillingPlan',
         (cb, results) => {
-          paypal.billingPlan.activate(
-            results.createBillingPlan.id,
-            paypalConfig,
-            cb,
-          );
+          paypal.billingPlan.activate(results.createBillingPlan.id, paypalConfig, cb);
         },
       ],
 
       createBillingAgreement: [
         'activatePlan',
         (cb, results) => {
-          createBillingAgreement(
-            description,
-            results.createBillingPlan.id,
-            paypalConfig,
-            cb,
-          );
+          createBillingAgreement(description, results.createBillingPlan.id, paypalConfig, cb);
         },
       ],
     },

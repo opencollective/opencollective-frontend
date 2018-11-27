@@ -29,17 +29,13 @@ describe('paypal.payment', () => {
     }); /* End of `afterEach()' */
 
     it('should use Sandbox API when config says so', () => {
-      configStub = sinon
-        .stub(config.paypal.payment, 'environment')
-        .get(() => 'sandbox');
+      configStub = sinon.stub(config.paypal.payment, 'environment').get(() => 'sandbox');
       const url = paypalPayment.paypalUrl('foo');
       expect(url).to.equal('https://api.sandbox.paypal.com/v1/foo');
     }); /* End of `should use Sandbox API when config says so' */
 
     it('should use Production API when config says so', () => {
-      configStub = sinon
-        .stub(config.paypal.payment, 'environment')
-        .get(() => 'production');
+      configStub = sinon.stub(config.paypal.payment, 'environment').get(() => 'production');
       const url = paypalPayment.paypalUrl('foo');
       expect(url).to.equal('https://api.paypal.com/v1/foo');
     }); /* End of `should use Production API when config says so' */
@@ -104,9 +100,7 @@ describe('paypal.payment', () => {
 
       it('should call payments/payment endpoint of the PayPal API', async () => {
         const output = await request(app)
-          .post(
-            `/services/paypal/create-payment?api_key=${application.api_key}`,
-          )
+          .post(`/services/paypal/create-payment?api_key=${application.api_key}`)
           .send({ amount: '50', currency: 'USD' })
           .expect(200);
         expect(output.body.id).to.equal('a very legit payment id');
@@ -138,12 +132,7 @@ describe('paypal.payment', () => {
       it('should create new transactions reflecting the PayPal charges', async () => {
         const { user } = await store.newUser('itsa-mi-mario');
 
-        const { collective } = await store.newCollectiveWithHost(
-          'hoodie',
-          'USD',
-          'USD',
-          10,
-        );
+        const { collective } = await store.newCollectiveWithHost('hoodie', 'USD', 'USD', 10);
 
         const paymentMethod = await models.PaymentMethod.create({
           name: 'test paypal',

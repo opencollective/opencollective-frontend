@@ -46,9 +46,7 @@ const services = {
 export default service => {
   const s = services[service];
   if (!s) {
-    throw new errors.NotImplemented(
-      'This service is not implemented yet for payment.',
-    );
+    throw new errors.NotImplemented('This service is not implemented yet for payment.');
   }
   return s;
 };

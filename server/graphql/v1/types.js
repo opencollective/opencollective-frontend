@@ -12,15 +12,9 @@ import {
 import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
 
-import {
-  CollectiveInterfaceType,
-  CollectiveSearchResultsType,
-} from './CollectiveInterface';
+import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
 
-import {
-  TransactionInterfaceType,
-  OrderDirectionType,
-} from './TransactionInterface';
+import { TransactionInterfaceType, OrderDirectionType } from './TransactionInterface';
 
 import models, { Op, sequelize } from '../../models';
 import dataloaderSequelize from 'dataloader-sequelize';
@@ -57,12 +51,7 @@ export const UserType = new GraphQLObjectType({
         type: CollectiveInterfaceType,
         resolve(user, args, req) {
           if (!user.CollectiveId) {
-            return console.error(
-              '>>> user',
-              user.id,
-              'does not have a CollectiveId',
-              user.CollectiveId,
-            );
+            return console.error('>>> user', user.id, 'does not have a CollectiveId', user.CollectiveId);
           }
           return req.loaders.collective.findById.load(user.CollectiveId);
         },
@@ -100,9 +89,7 @@ export const UserType = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         resolve(user, args, req) {
-          return user
-            .getPersonalDetails(req.remoteUser)
-            .then(user => user.email);
+          return user.getPersonalDetails(req.remoteUser).then(user => user.email);
         },
       },
       memberOf: {
@@ -110,9 +97,7 @@ export const UserType = new GraphQLObjectType({
         resolve(user) {
           return models.Member.findAll({
             where: { MemberCollectiveId: user.CollectiveId },
-            include: [
-              { model: models.Collective, as: 'collective', required: true },
-            ],
+            include: [{ model: models.Collective, as: 'collective', required: true }],
           });
         },
       },
@@ -125,9 +110,7 @@ export const UserType = new GraphQLObjectType({
       paypalEmail: {
         type: GraphQLString,
         resolve(user, args, req) {
-          return user
-            .getPersonalDetails(req.remoteUser)
-            .then(user => user.paypalEmail);
+          return user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
         },
       },
     };
@@ -165,19 +148,16 @@ export const StatsMemberType = new GraphQLObjectType({
         resolve(member, args, req) {
           return (
             member.donationsThroughEmittedVirtualCards ||
-            req.loaders.transactions.donationsThroughEmittedVirtualCardsFromTo.load(
-              {
-                FromCollectiveId: member.MemberCollectiveId,
-                CollectiveId: member.CollectiveId,
-              },
-            )
+            req.loaders.transactions.donationsThroughEmittedVirtualCardsFromTo.load({
+              FromCollectiveId: member.MemberCollectiveId,
+              CollectiveId: member.CollectiveId,
+            })
           );
         },
       },
       totalDonations: {
         type: GraphQLInt,
-        description:
-          'total amount donated by this member either directly or using a virtual card it has emitted',
+        description: 'total amount donated by this member either directly or using a virtual card it has emitted',
         resolve(member, args, req) {
           return (
             member.totalDonations ||
@@ -270,19 +250,13 @@ export const MemberType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return (
-            member.collective ||
-            req.loaders.collective.findById.load(member.CollectiveId)
-          );
+          return member.collective || req.loaders.collective.findById.load(member.CollectiveId);
         },
       },
       member: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return (
-            member.memberCollective ||
-            req.loaders.collective.findById.load(member.MemberCollectiveId)
-          );
+          return member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
         },
       },
       role: {
@@ -300,9 +274,7 @@ export const MemberType = new GraphQLObjectType({
       tier: {
         type: TierType,
         resolve(member, args, req) {
-          return (
-            member.TierId && req.loaders.tiers.findById.load(member.TierId)
-          );
+          return member.TierId && req.loaders.tiers.findById.load(member.TierId);
         },
       },
       stats: {
@@ -472,45 +444,35 @@ export const ExpenseType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(expense, args, req) {
           if (!req.remoteUser) return null;
-          if (
-            req.remoteUser.isAdmin(expense.CollectiveId) ||
-            req.remoteUser.id === expense.UserId
-          ) {
+          if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.privateMessage;
           }
-          return req.loaders.collective.findById
-            .load(expense.CollectiveId)
-            .then(collective => {
-              if (req.remoteUser.isAdmin(collective.HostCollectiveId)) {
-                return expense.privateMessage;
-              } else {
-                return null;
-              }
-            });
+          return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
+            if (req.remoteUser.isAdmin(collective.HostCollectiveId)) {
+              return expense.privateMessage;
+            } else {
+              return null;
+            }
+          });
         },
       },
       attachment: {
         type: GraphQLString,
         resolve(expense, args, req) {
           if (!req.remoteUser) return null;
-          if (
-            req.remoteUser.isAdmin(expense.CollectiveId) ||
-            req.remoteUser.id === expense.UserId
-          ) {
+          if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.attachment;
           }
-          return req.loaders.collective.findById
-            .load(expense.CollectiveId)
-            .then(collective => {
-              if (
-                req.remoteUser.isAdmin(collective.HostCollectiveId) ||
-                req.remoteUser.isAdmin(collective.ParentCollectiveId)
-              ) {
-                return expense.attachment;
-              } else {
-                return null;
-              }
-            });
+          return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
+            if (
+              req.remoteUser.isAdmin(collective.HostCollectiveId) ||
+              req.remoteUser.isAdmin(collective.ParentCollectiveId)
+            ) {
+              return expense.attachment;
+            } else {
+              return null;
+            }
+          });
         },
       },
       user: {
@@ -525,9 +487,7 @@ export const ExpenseType = new GraphQLObjectType({
           return expense.getUser().then(u => {
             if (!u) {
               return console.error(
-                `Cannot fetch the UserId ${
-                  expense.UserId
-                } referenced in ExpenseId ${
+                `Cannot fetch the UserId ${expense.UserId} referenced in ExpenseId ${
                   expense.id
                 } -- has the user been deleted?`,
               );
@@ -711,14 +671,10 @@ export const CommentListType = new GraphQLObjectType({
       async resolve(query, args, req) {
         let rows;
         if (query.where.ExpenseId) {
-          rows = await req.loaders.comments
-            .findAllByAttribute('ExpenseId')
-            .load(query.where.ExpenseId);
+          rows = await req.loaders.comments.findAllByAttribute('ExpenseId').load(query.where.ExpenseId);
         }
         if (query.where.UpdateId) {
-          rows = await req.loaders.comments
-            .findAllByAttribute('UpdateId')
-            .load(query.where.UpdateId);
+          rows = await req.loaders.comments.findAllByAttribute('UpdateId').load(query.where.UpdateId);
         }
         return rows.splice(query.offset, query.limit);
       },
@@ -739,9 +695,7 @@ export const CommentListType = new GraphQLObjectType({
       type: GraphQLInt,
       async resolve(query, args, req) {
         if (query.where.ExpenseId) {
-          return req.loaders.comments.countByExpenseId.load(
-            query.where.ExpenseId,
-          );
+          return req.loaders.comments.countByExpenseId.load(query.where.ExpenseId);
         }
       },
     },
@@ -850,10 +804,7 @@ export const TierStatsType = new GraphQLObjectType({
             tier
               .availableQuantity()
               // graphql doesn't like infinity value
-              .then(
-                availableQuantity =>
-                  availableQuantity === Infinity ? 10000000 : availableQuantity,
-              )
+              .then(availableQuantity => (availableQuantity === Infinity ? 10000000 : availableQuantity))
           );
         },
       },
@@ -980,8 +931,7 @@ export const TierType = new GraphQLObjectType({
           isActive: { type: GraphQLBoolean },
           isProcessed: {
             type: GraphQLBoolean,
-            description:
-              'only return orders that have been processed (fulfilled)',
+            description: 'only return orders that have been processed (fulfilled)',
           },
           limit: { type: GraphQLInt },
         },
@@ -993,9 +943,7 @@ export const TierType = new GraphQLObjectType({
             query.where = { processedAt: { [Op.ne]: null } };
           }
           if (args.isActive) {
-            query.include = [
-              { model: models.Subscription, where: { isActive: true } },
-            ];
+            query.include = [{ model: models.Subscription, where: { isActive: true } }];
           }
           return tier.getOrders(query);
         },
@@ -1023,16 +971,14 @@ export const StatsOrderType = new GraphQLObjectType({
         },
       },
       transactions: {
-        description:
-          'number of transactions for this order (includes past recurring transactions)',
+        description: 'number of transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
         resolve(order, args, req) {
           return req.loaders.orders.stats.transactions.load(order.id);
         },
       },
       totalTransactions: {
-        description:
-          'total amount of all the transactions for this order (includes past recurring transactions)',
+        description: 'total amount of all the transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
         resolve(order, args, req) {
           return req.loaders.orders.stats.totalTransactions.load(order.id);
@@ -1045,16 +991,12 @@ export const StatsOrderType = new GraphQLObjectType({
 export const OrderStatusType = new GraphQLEnumType({
   name: 'OrderStatus',
   description: 'Possible statuses for an Order',
-  values: Object.keys(orderStatus).reduce(
-    (values, key) => ({ ...values, [key]: {} }),
-    {},
-  ),
+  values: Object.keys(orderStatus).reduce((values, key) => ({ ...values, [key]: {} }), {}),
 });
 
 export const OrderType = new GraphQLObjectType({
   name: 'OrderType',
-  description:
-    'This is an order (for donations, buying tickets, subscribing to a Tier, pledging to a Collective)',
+  description: 'This is an order (for donations, buying tickets, subscribing to a Tier, pledging to a Collective)',
   fields: () => {
     return {
       id: {
@@ -1071,16 +1013,14 @@ export const OrderType = new GraphQLObjectType({
         },
       },
       totalAmount: {
-        description:
-          "total amount for this order (doesn't include recurring transactions)",
+        description: "total amount for this order (doesn't include recurring transactions)",
         type: GraphQLInt,
         resolve(order) {
           return order.totalAmount;
         },
       },
       interval: {
-        description:
-          "frequency of the subscription if any (could be either null, 'month' or 'year')",
+        description: "frequency of the subscription if any (could be either null, 'month' or 'year')",
         type: GraphQLString,
         resolve(order) {
           return order.getSubscription().then(s => (s ? s.interval : null));
@@ -1105,8 +1045,7 @@ export const OrderType = new GraphQLObjectType({
         },
       },
       description: {
-        description:
-          'Description of the order that will show up in the invoice',
+        description: 'Description of the order that will show up in the invoice',
         type: GraphQLString,
         resolve(order) {
           return order.description;
@@ -1121,16 +1060,14 @@ export const OrderType = new GraphQLObjectType({
         },
       },
       privateMessage: {
-        description:
-          'Private message for the admins and the host of the collective',
+        description: 'Private message for the admins and the host of the collective',
         type: GraphQLString,
         resolve(order) {
           return order.privateMessage; // TODO: should be behind a login check
         },
       },
       fromCollective: {
-        description:
-          'Collective ordering (most of the time it will be the collective of the createdByUser)',
+        description: 'Collective ordering (most of the time it will be the collective of the createdByUser)',
         type: CollectiveInterfaceType,
         resolve(order, args, req) {
           if (!order.FromCollectiveId) {
@@ -1151,9 +1088,7 @@ export const OrderType = new GraphQLObjectType({
         description: 'Referral user collective',
         type: CollectiveInterfaceType,
         resolve(order, args, req) {
-          return req.loaders.collective.findById.load(
-            order.ReferralCollectiveId,
-          );
+          return req.loaders.collective.findById.load(order.ReferralCollectiveId);
         },
       },
       tier: {
@@ -1174,8 +1109,7 @@ export const OrderType = new GraphQLObjectType({
         },
       },
       matchingFund: {
-        description:
-          'Payment method used if this order was matched by a matching fund.',
+        description: 'Payment method used if this order was matched by a matching fund.',
         type: PaymentMethodType,
         resolve(order) {
           return order.getMatchingPaymentMethod();
@@ -1233,12 +1167,7 @@ export const OrderType = new GraphQLObjectType({
           // otherwise, check if this user has permission
           return order
             .getSubscriptionForUser(req.remoteUser)
-            .then(
-              subscription =>
-                subscription &&
-                subscription.isActive &&
-                subscription.chargeRetryCount > 0,
-            );
+            .then(subscription => subscription && subscription.isActive && subscription.chargeRetryCount > 0);
         },
       },
       // Note this field is public
@@ -1332,8 +1261,7 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       isConfirmed: {
         type: GraphQLBoolean,
-        description:
-          'Will be true for virtual card if claimed. Always true for other payment methods.',
+        description: 'Will be true for virtual card if claimed. Always true for other payment methods.',
         resolve(paymentMethod) {
           return paymentMethod.isConfirmed();
         },
@@ -1421,8 +1349,7 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       balance: {
         type: GraphQLInt,
-        description:
-          'Returns the balance in the currency of this paymentMethod',
+        description: 'Returns the balance in the currency of this paymentMethod',
         async resolve(paymentMethod, args, req) {
           const balance = await paymentMethod.getBalanceForUser(req.remoteUser);
           return balance.amount;
@@ -1431,9 +1358,7 @@ export const PaymentMethodType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(paymentMethod, args, req) {
-          return req.loaders.collective.findById.load(
-            paymentMethod.CollectiveId,
-          );
+          return req.loaders.collective.findById.load(paymentMethod.CollectiveId);
         },
       },
       emitter: {
@@ -1441,13 +1366,9 @@ export const PaymentMethodType = new GraphQLObjectType({
         async resolve(paymentMethod, args, req) {
           // TODO: could we have a getter for SourcePaymentMethod?
           if (paymentMethod.SourcePaymentMethodId) {
-            const sourcePaymentMethod = await models.PaymentMethod.findById(
-              paymentMethod.SourcePaymentMethodId,
-            );
+            const sourcePaymentMethod = await models.PaymentMethod.findById(paymentMethod.SourcePaymentMethodId);
             if (sourcePaymentMethod) {
-              return req.loaders.collective.findById.load(
-                sourcePaymentMethod.CollectiveId,
-              );
+              return req.loaders.collective.findById.load(sourcePaymentMethod.CollectiveId);
             }
           }
         },
@@ -1475,8 +1396,7 @@ export const PaymentMethodType = new GraphQLObjectType({
         args: {
           hasActiveSubscription: {
             type: GraphQLBoolean,
-            description:
-              'Only returns orders that have an active subscription (monthly/yearly)',
+            description: 'Only returns orders that have an active subscription (monthly/yearly)',
           },
         },
         resolve(paymentMethod, args) {
@@ -1503,12 +1423,7 @@ export const PaymentMethodType = new GraphQLObjectType({
           'Get the list of collectives that used this payment method. Useful to select the list of a backers for which the host has manually added funds or to get the list of backers that used a matching fund',
         async resolve(paymentMethod, args) {
           const res = await models.Transaction.findAll({
-            attributes: [
-              [
-                sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')),
-                'FromCollectiveId',
-              ],
-            ],
+            attributes: [[sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId']],
             where: { PaymentMethodId: paymentMethod.id, type: 'CREDIT' },
             logging: console.log,
           });
@@ -1585,10 +1500,7 @@ export const SubscriptionType = new GraphQLObjectType({
 export const ExpenseStatusType = new GraphQLEnumType({
   name: 'ExpenseStatus',
   description: 'Possible statuses for an Expense',
-  values: Object.keys(status).reduce(
-    (values, key) => ({ ...values, [key]: {} }),
-    {},
-  ),
+  values: Object.keys(status).reduce((values, key) => ({ ...values, [key]: {} }), {}),
 });
 
 export const OrderByType = new GraphQLInputObjectType({

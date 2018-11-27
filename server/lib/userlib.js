@@ -12,14 +12,11 @@ export default {
   clearbit,
 
   fetchAvatar(email) {
-    return this.getUserData(email).then(
-      userData => (userData && userData.avatar ? userData.avatar : null),
-    );
+    return this.getUserData(email).then(userData => (userData && userData.avatar ? userData.avatar : null));
   },
 
   getUserData(email) {
-    if (!config.clearbit || config.clearbit.match(/x+/))
-      return Promise.resolve();
+    if (!config.clearbit || config.clearbit.match(/x+/)) return Promise.resolve();
 
     if (!email || !email.match(/.+@.+\..+/)) {
       return Promise.resolve();
@@ -32,10 +29,7 @@ export default {
     return this.clearbit.Enrichment.find({ email, stream: true })
       .tap(res => (this.memory[email] = res.person))
       .then(res => res.person)
-      .catch(
-        clearbit.Enrichment.NotFoundError,
-        () => (this.memory[email] = null),
-      )
+      .catch(clearbit.Enrichment.NotFoundError, () => (this.memory[email] = null))
       .catch(err => debugClearbit('Clearbit error', err));
   },
 
@@ -77,12 +71,7 @@ export default {
         const sources = [];
 
         if (person) {
-          const personAvatarSources = [
-            'twitter',
-            'aboutme',
-            'grimage',
-            'github',
-          ];
+          const personAvatarSources = ['twitter', 'aboutme', 'grimage', 'github'];
           personAvatarSources.forEach(source => {
             if (person[source] && person[source].image) {
               sources.push({ src: person[source].image, source });

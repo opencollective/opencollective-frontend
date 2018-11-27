@@ -145,21 +145,13 @@ export const signin = (req, res, next) => {
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       loginLink = u.generateLoginLink(redirect || '/');
-      return emailLib.send(
-        'user.new.token',
-        u.email,
-        { loginLink },
-        { bcc: 'ops@opencollective.com' },
-      ); // allows us to log in as users to debug issue
+      return emailLib.send('user.new.token', u.email, { loginLink }, { bcc: 'ops@opencollective.com' }); // allows us to log in as users to debug issue
     })
     .then(() => {
       const response = { success: true };
 
       // For e2e testing, we enable testuser+(admin|member)@opencollective.com to automatically receive the login link
-      if (
-        process.env.NODE_ENV !== 'production' &&
-        user.email.match(/.*test.*@opencollective.com$/)
-      ) {
+      if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
         response.redirect = loginLink;
       }
       return response;
@@ -202,11 +194,7 @@ export const show = (req, res, next) => {
           avatar: results[0].image,
           stripeAccount: results[1],
         };
-        const response = Object.assign(
-          userData,
-          req.user.info,
-          userExtendedData,
-        );
+        const response = Object.assign(userData, req.user.info, userExtendedData);
         res.send(response);
       })
       .catch(next);
@@ -222,11 +210,7 @@ export const token = async (req, res) => {
   const userId = req.remoteUser.id;
   const appId = req.clientApp.id;
 
-  const sessionToken = auth.createJwt(
-    userId,
-    { app: appId, scope: 'session' },
-    auth.TOKEN_EXPIRATION_SESSION,
-  );
+  const sessionToken = auth.createJwt(userId, { app: appId, scope: 'session' }, auth.TOKEN_EXPIRATION_SESSION);
 
   res.send({ token: sessionToken });
 };

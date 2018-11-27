@@ -6,15 +6,10 @@ export function createMember(_, args, req) {
   let collective;
 
   const checkPermission = () => {
-    if (!req.remoteUser)
-      throw new errors.Unauthorized(
-        'You need to be logged in to create a member',
-      );
+    if (!req.remoteUser) throw new errors.Unauthorized('You need to be logged in to create a member');
     if (req.remoteUser.isAdmin(collective.id)) return true;
     throw new errors.Unauthorized(
-      `You need to be logged in as a core contributor or as a host of the ${
-        collective.slug
-      } collective`,
+      `You need to be logged in as a core contributor or as a host of the ${collective.slug} collective`,
     );
   };
 
@@ -22,8 +17,7 @@ export function createMember(_, args, req) {
     req.loaders.collective.findById
       .load(args.collective.id)
       .then(c => {
-        if (!c)
-          throw new Error(`Collective with id ${args.collective.id} not found`);
+        if (!c) throw new Error(`Collective with id ${args.collective.id} not found`);
         collective = c;
       })
       .then(() => {
@@ -36,20 +30,15 @@ export function createMember(_, args, req) {
       // find or create user
       .then(() => {
         if (args.member.id) {
-          return req.loaders.collective.findById
-            .load(args.member.id)
-            .then(memberCollective => {
-              return {
-                id: memberCollective.CreatedByUserId,
-                CollectiveId: memberCollective.id,
-              };
-            });
+          return req.loaders.collective.findById.load(args.member.id).then(memberCollective => {
+            return {
+              id: memberCollective.CreatedByUserId,
+              CollectiveId: memberCollective.id,
+            };
+          });
         }
       })
-      .then(
-        u =>
-          u || models.User.findOrCreateByEmail(args.member.email, args.member),
-      )
+      .then(u => u || models.User.findOrCreateByEmail(args.member.email, args.member))
       // add user as member of the collective
       .then(user =>
         models.Member.create({
@@ -66,10 +55,7 @@ export function removeMember(_, args, req) {
   let membership;
 
   const checkPermission = () => {
-    if (!req.remoteUser)
-      throw new errors.Unauthorized(
-        'You need to be logged in to remove a member',
-      );
+    if (!req.remoteUser) throw new errors.Unauthorized('You need to be logged in to remove a member');
     if (req.remoteUser.id === membership.CreatedByUserId) return true;
     if (req.remoteUser.isAdmin(membership.CollectiveId)) return true;
 

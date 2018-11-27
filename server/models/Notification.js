@@ -43,9 +43,7 @@ export default function(Sequelize, DataTypes) {
   );
 
   Notification.createMany = (notifications, defaultValues) => {
-    return Promise.map(notifications, u =>
-      Notification.create(_.defaults({}, u, defaultValues)),
-    ).catch(console.error);
+    return Promise.map(notifications, u => Notification.create(_.defaults({}, u, defaultValues))).catch(console.error);
   };
 
   /**
@@ -66,31 +64,14 @@ export default function(Sequelize, DataTypes) {
         return event.getMembers();
       });
 
-    debug(
-      'getSubscribers',
-      findByAttribute,
-      collectiveSlug,
-      'found:',
-      collective.slug,
-      'mailinglist:',
-      mailinglist,
-    );
+    debug('getSubscribers', findByAttribute, collectiveSlug, 'found:', collective.slug, 'mailinglist:', mailinglist);
     const excludeUnsubscribed = members => {
-      debug(
-        'excludeUnsubscribed: need to filter',
-        members && members.length,
-        'members',
-      );
+      debug('excludeUnsubscribed: need to filter', members && members.length, 'members');
       if (!members || members.length === 0) return [];
 
-      return Notification.getUnsubscribersUserIds(
-        `mailinglist.${mailinglist}`,
-        collective.id,
-      ).then(excludeIds => {
+      return Notification.getUnsubscribersUserIds(`mailinglist.${mailinglist}`, collective.id).then(excludeIds => {
         debug('excluding', excludeIds.length, 'members');
-        return members.filter(
-          m => excludeIds.indexOf(m.CreatedByUserId) === -1,
-        );
+        return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1);
       });
     };
 
@@ -119,15 +100,10 @@ export default function(Sequelize, DataTypes) {
       });
     };
 
-    return await Notification.getSubscribers(collectiveSlug, mailinglist).then(
-      getUsers,
-    );
+    return await Notification.getSubscribers(collectiveSlug, mailinglist).then(getUsers);
   };
 
-  Notification.getSubscribersCollectives = async (
-    collectiveSlug,
-    mailinglist,
-  ) => {
+  Notification.getSubscribersCollectives = async (collectiveSlug, mailinglist) => {
     debug('getSubscribersCollectives', collectiveSlug, mailinglist);
     const getCollectives = memberships => {
       if (!memberships || memberships.length === 0) return [];
@@ -138,9 +114,7 @@ export default function(Sequelize, DataTypes) {
       });
     };
 
-    return await Notification.getSubscribers(collectiveSlug, mailinglist).then(
-      getCollectives,
-    );
+    return await Notification.getSubscribers(collectiveSlug, mailinglist).then(getCollectives);
   };
 
   /**

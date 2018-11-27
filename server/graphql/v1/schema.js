@@ -10,11 +10,7 @@ import {
   EventCollectiveType,
 } from './CollectiveInterface';
 
-import {
-  TransactionInterfaceType,
-  TransactionOrderType,
-  TransactionExpenseType,
-} from './TransactionInterface';
+import { TransactionInterfaceType, TransactionOrderType, TransactionExpenseType } from './TransactionInterface';
 
 import { ApplicationType, ApplicationInputType } from './Application';
 

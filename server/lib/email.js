@@ -14,10 +14,7 @@ const debug = debugLib('email');
 
 const render = (template, data) => {
   let text;
-  data.imageNotSvg =
-    data.collective &&
-    data.collective.image &&
-    !data.collective.image.endsWith('.svg');
+  data.imageNotSvg = data.collective && data.collective.image && !data.collective.image.endsWith('.svg');
   data = merge({}, data);
   delete data.config;
   data.config = { host: config.host };
@@ -40,9 +37,7 @@ const render = (template, data) => {
 };
 
 const generateUnsubscribeToken = (email, collectiveSlug, type) => {
-  const uid = `${email}.${collectiveSlug || 'any'}.${type}.${
-    config.keys.opencollective.secret
-  }`;
+  const uid = `${email}.${collectiveSlug || 'any'}.${type}.${config.keys.opencollective.secret}`;
   const token = crypto
     .createHash('md5')
     .update(uid)
@@ -61,9 +56,7 @@ const getTemplateAttributes = str => {
   do {
     tokens = lines[index++].match(/^([a-z]+):(.+)/i);
     if (tokens) {
-      attributes[tokens[1].toLowerCase()] = tokens[2]
-        .replace(/<br( \/)?>/g, '\n')
-        .trim();
+      attributes[tokens[1].toLowerCase()] = tokens[2].replace(/<br( \/)?>/g, '\n').trim();
     }
   } while (tokens);
 
@@ -89,9 +82,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     }
     // if not in production, only send out emails to bcc'd opencollective address
     if (process.env.NODE_ENV !== 'production' && !isEmailInternal(recipient)) {
-      debug(
-        `${recipient} is an external email address, skipping in development environment`,
-      );
+      debug(`${recipient} is an external email address, skipping in development environment`);
       return false;
     } else {
       return true;
@@ -100,10 +91,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
 
   if (process.env.NODE_ENV === 'staging') {
     subject = `[STAGING] ${subject}`;
-  } else if (
-    process.env.NODE_ENV !== 'production' &&
-    process.env.WEBSITE_URL !== 'https://opencollective.com'
-  ) {
+  } else if (process.env.NODE_ENV !== 'production' && process.env.WEBSITE_URL !== 'https://opencollective.com') {
     subject = `[TESTING] ${subject}`;
   }
 
@@ -139,19 +127,14 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     to = process.env.ONLY;
   } else if (process.env.NODE_ENV !== 'production') {
     if (!to) {
-      return Promise.reject(
-        new Error('emailLib.sendMessage error: No recipient defined'),
-      );
+      return Promise.reject(new Error('emailLib.sendMessage error: No recipient defined'));
     }
     to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
   }
 
   debug(`sending email to ${to}`);
   if (recipients.length === 0) {
-    debug(
-      'emailLib.sendMessage error: No recipient to send to, only sending to bcc',
-      options.bcc,
-    );
+    debug('emailLib.sendMessage error: No recipient to send to, only sending to bcc', options.bcc);
   }
 
   if (config.mailgun.user || process.env.MAILDEV) {
@@ -177,23 +160,19 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       const attachments = options.attachments;
 
       // only attach tag in production to keep data clean
-      const tag =
-        process.env.NODE_ENV === 'production' ? options.tag : 'internal';
+      const tag = process.env.NODE_ENV === 'production' ? options.tag : 'internal';
       const headers = { 'X-Mailgun-Tag': tag, 'X-Mailgun-Dkim': 'yes' };
       debug('mailgun> sending email to ', to, 'bcc', bcc);
 
-      return mailgun.sendMail(
-        { from, cc, to, bcc, subject, text, html, headers, attachments },
-        (err, info) => {
-          if (err) {
-            debug('>>> mailgun.sendMail error', err);
-            return reject(err);
-          } else {
-            debug('>>> mailgun.sendMail success', info);
-            return resolve(info);
-          }
-        },
-      );
+      return mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+        if (err) {
+          debug('>>> mailgun.sendMail error', err);
+          return reject(err);
+        } else {
+          debug('>>> mailgun.sendMail success', info);
+          return resolve(info);
+        }
+      });
     });
   } else {
     debug('>>> mailgun not configured');
@@ -214,28 +193,18 @@ const getNotificationLabel = (template, recipients) => {
 
   const notificationTypeLabels = {
     'email.approve': 'notifications of new emails pending approval',
-    'email.message': `the ${recipients[0].substr(
-      0,
-      recipients[0].indexOf('@'),
-    )} mailing list`,
-    'collective.order.created':
-      'notifications of new donations for this collective',
-    'collective.comment.created':
-      'notifications of new comments submitted to this collective',
-    'collective.expense.created':
-      'notifications of new expenses submitted to this collective',
-    'collective.expense.approved.for.host':
-      'notifications of new expenses approved under this host',
-    'collective.expense.paid.for.host':
-      'notifications of new expenses paid under this host',
+    'email.message': `the ${recipients[0].substr(0, recipients[0].indexOf('@'))} mailing list`,
+    'collective.order.created': 'notifications of new donations for this collective',
+    'collective.comment.created': 'notifications of new comments submitted to this collective',
+    'collective.expense.created': 'notifications of new expenses submitted to this collective',
+    'collective.expense.approved.for.host': 'notifications of new expenses approved under this host',
+    'collective.expense.paid.for.host': 'notifications of new expenses paid under this host',
     'collective.monthlyreport': 'monthly reports for collectives',
     'collective.member.created': 'notifications of new members',
-    'collective.update.published':
-      'notifications of new updates from this collective',
+    'collective.update.published': 'notifications of new updates from this collective',
     'host.monthlyreport': 'monthly reports for host',
     'host.yearlyreport': 'yearly reports for host',
-    'collective.transaction.created':
-      'notifications of new transactions for this collective',
+    'collective.transaction.created': 'notifications of new transactions for this collective',
     onboarding: 'onboarding emails',
     'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports',
@@ -247,26 +216,13 @@ const getNotificationLabel = (template, recipients) => {
 /*
  * Given a template, recipient and data, generates email.
  */
-const generateEmailFromTemplate = (
-  template,
-  recipient,
-  data = {},
-  options = {},
-) => {
-  const slug =
-    get(options, 'collective.slug') ||
-    get(data, 'collective.slug') ||
-    'undefined';
+const generateEmailFromTemplate = (template, recipient, data = {}, options = {}) => {
+  const slug = get(options, 'collective.slug') || get(data, 'collective.slug') || 'undefined';
 
   // If we are sending the same email to multiple recipients, it doesn't make sense to allow them to unsubscribe
   if (!isArray(recipient)) {
-    data.notificationTypeLabel = getNotificationLabel(
-      options.type || template,
-      recipient,
-    );
-    data.unsubscribeUrl = `${
-      config.host.website
-    }/api/services/email/unsubscribe/${encodeURIComponent(
+    data.notificationTypeLabel = getNotificationLabel(options.type || template, recipient);
+    data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(
       recipient || options.bcc,
     )}/${slug}/${options.type || template}/${generateUnsubscribeToken(
       recipient || options.bcc,
@@ -277,8 +233,7 @@ const generateEmailFromTemplate = (
 
   if (template === 'ticket.confirmed') {
     if (slug === 'sustainoss') template += '.sustainoss';
-    if (slug === 'fearlesscitiesbrussels')
-      template += '.fearlesscitiesbrussels';
+    if (slug === 'fearlesscitiesbrussels') template += '.fearlesscitiesbrussels';
   }
   if (template.match(/^host\.(monthly|yearly)report$/)) {
     template = 'host.report';
@@ -289,27 +244,11 @@ const generateEmailFromTemplate = (
   if (template === 'thankyou') {
     if (slug.match(/wwcode/)) template += '.wwcode';
 
-    if (
-      includes(
-        ['chsf', 'kendraio', 'brusselstogether', 'sustainoss', 'ispcwa'],
-        slug,
-      )
-    ) {
+    if (includes(['chsf', 'kendraio', 'brusselstogether', 'sustainoss', 'ispcwa'], slug)) {
       template = `thankyou.${slug}`;
     }
 
-    if (
-      includes(
-        [
-          'laprimaire',
-          'lesbarbares',
-          'nuitdebout',
-          'enmarchebe',
-          'monnaie-libre',
-        ],
-        slug,
-      )
-    ) {
+    if (includes(['laprimaire', 'lesbarbares', 'nuitdebout', 'enmarchebe', 'monnaie-libre'], slug)) {
       template += '.fr';
 
       if (slug === 'laprimaire') {
@@ -329,18 +268,13 @@ const generateEmailFromTemplate = (
   }
 
   if (template === 'collective.member.created') {
-    if (
-      get(data, 'member.memberCollective.twitterHandle') &&
-      get(data, 'member.role') === 'BACKER'
-    ) {
+    if (get(data, 'member.memberCollective.twitterHandle') && get(data, 'member.role') === 'BACKER') {
       const collectiveMention = get(data, 'collective.twitterHandle')
         ? `@${data.collective.twitterHandle}`
         : data.collective.name;
       const text = `Hi @${
         data.member.memberCollective.twitterHandle
-      } thanks for your donation to ${collectiveMention} ${
-        config.host.website
-      }${get(data, 'collective.urlPath')} 🎉😊`;
+      } thanks for your donation to ${collectiveMention} ${config.host.website}${get(data, 'collective.urlPath')} 🎉😊`;
       data.tweet = {
         text,
         encoded: encodeURIComponent(text),
@@ -363,28 +297,16 @@ const generateEmailFromTemplate = (
 /*
  * Given a template, recipient and data, generates email and sends it.
  */
-const generateEmailFromTemplateAndSend = (
-  template,
-  recipient,
-  data,
-  options = {},
-) => {
+const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
   if (!recipient) {
     return Promise.reject('No recipient');
   }
-  return generateEmailFromTemplate(template, recipient, data, options).then(
-    renderedTemplate => {
-      const attributes = getTemplateAttributes(renderedTemplate.html);
-      options.text = renderedTemplate.text;
-      options.tag = template;
-      return emailLib.sendMessage(
-        recipient,
-        attributes.subject,
-        attributes.body,
-        options,
-      );
-    },
-  );
+  return generateEmailFromTemplate(template, recipient, data, options).then(renderedTemplate => {
+    const attributes = getTemplateAttributes(renderedTemplate.html);
+    options.text = renderedTemplate.text;
+    options.tag = template;
+    return emailLib.sendMessage(recipient, attributes.subject, attributes.body, options);
+  });
 };
 
 const emailLib = {

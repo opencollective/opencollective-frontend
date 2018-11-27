@@ -19,12 +19,7 @@ function canUpdateExpenseStatus(remoteUser, expense) {
   if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.CollectiveId)) {
     return true;
   }
-  if (
-    remoteUser.hasRole(
-      [roles.HOST, roles.ADMIN],
-      expense.collective.HostCollectiveId,
-    )
-  ) {
+  if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.collective.HostCollectiveId)) {
     return true;
   }
   return false;
@@ -43,16 +38,11 @@ function canEditExpense(remoteUser, expense) {
 
 export async function updateExpenseStatus(remoteUser, expenseId, status) {
   if (!remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be logged in to update the status of an expense',
-    );
+    throw new errors.Unauthorized('You need to be logged in to update the status of an expense');
   }
 
   if (Object.keys(statuses).indexOf(status) === -1) {
-    throw new errors.ValidationFailed(
-      'Invalid status, status must be one of ',
-      Object.keys(statuses).join(', '),
-    );
+    throw new errors.ValidationFailed('Invalid status, status must be one of ', Object.keys(statuses).join(', '));
   }
 
   const expense = await models.Expense.findById(expenseId, {
@@ -64,30 +54,22 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   }
 
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
-    throw new errors.Unauthorized(
-      "You don't have permission to approve this expense",
-    );
+    throw new errors.Unauthorized("You don't have permission to approve this expense");
   }
   switch (status) {
     case statuses.APPROVED:
       if (expense.status === statuses.PAID) {
-        throw new errors.Unauthorized(
-          "You can't reject an expense that is already paid",
-        );
+        throw new errors.Unauthorized("You can't reject an expense that is already paid");
       }
       break;
     case statuses.REJECTED:
       if (expense.status === statuses.PAID) {
-        throw new errors.Unauthorized(
-          "You can't approve an expense that is already paid",
-        );
+        throw new errors.Unauthorized("You can't approve an expense that is already paid");
       }
       break;
     case statuses.PAID:
       if (expense.status !== statuses.APPROVED) {
-        throw new errors.Unauthorized(
-          'The expense must be approved before you can set it to paid',
-        );
+        throw new errors.Unauthorized('The expense must be approved before you can set it to paid');
       }
       break;
   }
@@ -97,9 +79,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
 
 export async function createExpense(remoteUser, expenseData) {
   if (!remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be logged in to create an expense',
-    );
+    throw new errors.Unauthorized('You need to be logged in to create an expense');
   }
   if (!get(expenseData, 'collective.id')) {
     throw new errors.Unauthorized('Missing expense.collective.id');
@@ -112,15 +92,11 @@ export async function createExpense(remoteUser, expenseData) {
   }
   expenseData.UserId = remoteUser.id;
 
-  const collective = await models.Collective.findById(
-    expenseData.collective.id,
-  );
+  const collective = await models.Collective.findById(expenseData.collective.id);
 
   if (expenseData.currency && expenseData.currency !== collective.currency) {
     throw new errors.ValidationFailed(
-      `The currency of the expense (${
-        expenseData.currency
-      }) needs to be the same as the currency of the collective (${
+      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${
         expenseData.collective.currency
       })`,
     );
@@ -132,9 +108,7 @@ export async function createExpense(remoteUser, expenseData) {
 
   if (expenseData.currency && expenseData.currency !== collective.currency) {
     throw new errors.ValidationFailed(
-      `The currency of the expense (${
-        expenseData.currency
-      }) needs to be the same as the currency of the collective (${
+      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${
         collective.currency
       })`,
     );
@@ -164,9 +138,7 @@ export async function createExpense(remoteUser, expenseData) {
 
 export async function editExpense(remoteUser, expenseData) {
   if (!remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be logged in to edit an expense',
-    );
+    throw new errors.Unauthorized('You need to be logged in to edit an expense');
   }
 
   const expense = await models.Expense.findById(expenseData.id, {
@@ -178,19 +150,12 @@ export async function editExpense(remoteUser, expenseData) {
   }
 
   if (!canEditExpense(remoteUser, expense)) {
-    throw new errors.Unauthorized(
-      "You don't have permission to edit this expense",
-    );
+    throw new errors.Unauthorized("You don't have permission to edit this expense");
   }
 
-  if (
-    expenseData.currency &&
-    expenseData.currency !== expense.collective.currency
-  ) {
+  if (expenseData.currency && expenseData.currency !== expense.collective.currency) {
     throw new errors.ValidationFailed(
-      `The currency of the expense (${
-        expenseData.currency
-      }) needs to be the same as the currency of the collective (${
+      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${
         expense.collective.currency
       })`,
     );
@@ -216,9 +181,7 @@ export async function editExpense(remoteUser, expenseData) {
 
 export async function deleteExpense(remoteUser, expenseId) {
   if (!remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be logged in to delete an expense',
-    );
+    throw new errors.Unauthorized('You need to be logged in to delete an expense');
   }
 
   const expense = await models.Expense.findById(expenseId, {
@@ -230,9 +193,7 @@ export async function deleteExpense(remoteUser, expenseId) {
   }
 
   if (!canEditExpense(remoteUser, expense)) {
-    throw new errors.Unauthorized(
-      "You don't have permission to delete this expense",
-    );
+    throw new errors.Unauthorized("You don't have permission to delete this expense");
   }
 
   const res = await expense.destroy();
@@ -260,17 +221,13 @@ async function markAsPaid(host, expense, options = {}) {
 
 async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod) {
   try {
-    const paymentResponse = await paymentProviders[expense.payoutMethod].types[
-      'adaptive'
-    ].pay(
+    const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(
       expense.collective,
       expense,
       expense.paypalEmail,
       paymentMethod.token,
     );
-    const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(
-      paymentMethod.token,
-    );
+    const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
     await createTransactionFromPaidExpense(
       host,
       paymentMethod,
@@ -282,9 +239,7 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod) {
     expense.setPaid(remoteUser.id);
   } catch (err) {
     if (
-      err.message.indexOf(
-        'The total amount of all payments exceeds the maximum total amount for all payments',
-      ) !== -1
+      err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !== -1
     ) {
       return new errors.BadRequest(
         'Not enough funds in your existing Paypal preapproval. Please refill your PayPal payment balance.',
@@ -309,30 +264,17 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
     throw new errors.Unauthorized('Expense has already been paid');
   }
   if (expense.status !== statuses.APPROVED) {
-    throw new errors.Unauthorized(
-      `Expense needs to be approved. Current status of the expense: ${
-        expense.status
-      }.`,
-    );
+    throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }
   if (!canUpdateExpenseStatus(remoteUser, expense)) {
-    throw new errors.Unauthorized(
-      "You don't have permission to pay this expense",
-    );
+    throw new errors.Unauthorized("You don't have permission to pay this expense");
   }
   const host = await expense.collective.getHostCollective();
 
   // Expenses in kind can be made for collectives without any
   // funds. That's why we skip earlier here.
   if (expense.payoutMethod === 'donation') {
-    const transaction = await createTransactionFromPaidExpense(
-      host,
-      null,
-      expense,
-      null,
-      null,
-      expense.UserId,
-    );
+    const transaction = await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId);
     await createTransactionFromInKindDonation(transaction);
     const user = await models.User.findById(expense.UserId);
     await expense.collective.addUserWithRole(user, 'BACKER');
@@ -345,19 +287,14 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
       `You don't have enough funds to pay this expense. Current balance: ${formatCurrency(
         balance,
         expense.collective.currency,
-      )}, Expense amount: ${formatCurrency(
-        expense.amount,
-        expense.collective.currency,
-      )}`,
+      )}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}`,
     );
   }
 
   // TODO: Need to make sure that paymentProcessorFee is in the currency of the host (need to create tests for it)
   // also need to make that clear on the frontend
   if (paymentProviders[expense.payoutMethod]) {
-    paymentProcessorFee = await paymentProviders[expense.payoutMethod].types[
-      'adaptive'
-    ].fees({
+    paymentProcessorFee = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
       host,
@@ -369,13 +306,9 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
       `You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(
         balance,
         expense.collective.currency,
-      )}, Expense amount: ${formatCurrency(
-        expense.amount,
-        expense.collective.currency,
-      )}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(
-        paymentProcessorFee,
-        expense.collective.currency,
-      )}`,
+      )}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${
+        expense.payoutMethod
+      } fees: ${formatCurrency(paymentProcessorFee, expense.collective.currency)}`,
     );
   }
   if (expense.payoutMethod === 'paypal') {

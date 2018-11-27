@@ -70,15 +70,9 @@ export function getPaymentMethods(req, res, next) {
 }
 
 async function createVirtualCardThroughGraphQL(args, user) {
-  const gqlResult = await utils.graphqlQuery(
-    createPaymentMethodQuery,
-    args,
-    user,
-  );
+  const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user);
   if (!get(gqlResult, 'data.createPaymentMethod')) {
-    const error = gqlResult.errors
-      ? gqlResult.errors[0]
-      : Error('Graphql Query did not return a result');
+    const error = gqlResult.errors ? gqlResult.errors[0] : Error('Graphql Query did not return a result');
     throw error;
   }
   const paymentMethod = gqlResult.data.createPaymentMethod;
@@ -94,9 +88,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
     limitedToHostCollectiveIds: paymentMethod.limitedToHostCollectiveIds,
     code: paymentMethod.uuid.substring(0, 8),
     expiryDate: moment(paymentMethod.expiryDate).format(),
-    redeemUrl: `${
-      config.host.website
-    }/redeem?code=${paymentMethod.uuid.substring(0, 8)}`,
+    redeemUrl: `${config.host.website}/redeem?code=${paymentMethod.uuid.substring(0, 8)}`,
   };
 }
 
@@ -137,12 +129,7 @@ export function createVirtualCard(req, res) {
 export function createPaymentMethod(req, res, next) {
   // We only support creation of "virtualcard" payment methods
   if (get(req, 'body.type') && get(req, 'body.type') !== 'virtualcard') {
-    throw Error(
-      `Creation of payment methods with type ${get(
-        req,
-        'body.type',
-      )} not Allowed`,
-    );
+    throw Error(`Creation of payment methods with type ${get(req, 'body.type')} not Allowed`);
   }
   return createVirtualCard(req, res, next);
 }

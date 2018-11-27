@@ -28,17 +28,12 @@ const parseIdOrUUID = param => {
  */
 function getByKeyValue(model, key, value) {
   return model.find({ where: { [key]: value.toLowerCase() } }).tap(result => {
-    if (!result)
-      throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
+    if (!result) throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
   });
 }
 
 export function uuid(req, res, next, uuid) {
-  if (
-    uuid.match(
-      /^[A-F\d]{8}-[A-F\d]{4}-4[A-F\d]{3}-[89AB][A-F\d]{3}-[A-F\d]{12}$/i,
-    )
-  ) {
+  if (uuid.match(/^[A-F\d]{8}-[A-F\d]{4}-4[A-F\d]{3}-[89AB][A-F\d]{3}-[A-F\d]{12}$/i)) {
     req.params.uuid = uuid;
   } else {
     const id = parseInt(uuid);
@@ -60,11 +55,7 @@ export function userid(req, res, next, userIdOrName) {
  * collectiveid
  */
 export function collectiveid(req, res, next, collectiveIdOrSlug) {
-  getByKeyValue(
-    Collective,
-    isNaN(collectiveIdOrSlug) ? 'slug' : 'id',
-    collectiveIdOrSlug,
-  )
+  getByKeyValue(Collective, isNaN(collectiveIdOrSlug) ? 'slug' : 'id', collectiveIdOrSlug)
     .then(collective => (req.collective = collective))
     .asCallback(next);
 }
@@ -130,19 +121,12 @@ export function expenseid(req, res, next, expenseid) {
     .then(where =>
       Expense.findOne({
         where: Object.assign({}, where, queryInCollective),
-        include: [
-          { model: models.Collective, as: 'collective' },
-          { model: models.User },
-        ],
+        include: [{ model: models.Collective, as: 'collective' }, { model: models.User }],
       }),
     )
     .then(expense => {
       if (!expense) {
-        next(
-          new errors.NotFound(
-            `Expense '${expenseid}' not found ${NotFoundInCollective}`,
-          ),
-        );
+        next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInCollective}`));
         return null;
       } else {
         req.expense = expense;

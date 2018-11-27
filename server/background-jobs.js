@@ -62,10 +62,7 @@ export default () => {
   console.log('Starting Background Jobs.');
   if (!config.cache.homepage.disabled) {
     console.log('- starting cacheHomepageRefresh');
-    setInterval(
-      cacheHomepageRefresh,
-      config.cache.homepage.refreshInterval * 1000,
-    );
+    setInterval(cacheHomepageRefresh, config.cache.homepage.refreshInterval * 1000);
     cacheHomepageRefresh();
   }
 };

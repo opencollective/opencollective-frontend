@@ -22,9 +22,7 @@ const done = err => {
   console.log(result);
   console.log('\ndone!\n');
   ('');
-  const subject = `${
-    issuesFound ? '❌' : '✅'
-  } Daily ledger health report - ${new Date().toLocaleDateString()}`;
+  const subject = `${issuesFound ? '❌' : '✅'} Daily ledger health report - ${new Date().toLocaleDateString()}`;
   return emailLib
     .sendMessage('ops@opencollective.com', subject, '', {
       bcc: ' ',
@@ -85,9 +83,7 @@ const fetchAll = (func, options) => {
     }
     // otherwise, keep fetching from the end of last set of results
     options.startingAfter = results.data.slice(-1)[0].id;
-    return fetchAll(func, options).then(result2 =>
-      results.data.concat(result2),
-    );
+    return fetchAll(func, options).then(result2 => results.data.concat(result2));
   });
 };
 
@@ -114,18 +110,13 @@ const checkHostsUserOrOrg = () => {
       return hostCollectives;
     })
     .each(hostCollective => {
-      if (
-        hostCollective.type !== 'USER' &&
-        hostCollective.type !== 'ORGANIZATION'
-      ) {
+      if (hostCollective.type !== 'USER' && hostCollective.type !== 'ORGANIZATION') {
         hostErrors.push(hostCollective);
       }
     })
     .then(() => {
       subHeader('Hosts found with incorrect type', hostErrors.length);
-      verboseData(hostErrors, h =>
-        Object.assign({ slug: h.slug, type: h.type }),
-      );
+      verboseData(hostErrors, h => Object.assign({ slug: h.slug, type: h.type }));
     });
 };
 
@@ -142,9 +133,7 @@ const checkHostCollectives = () => {
     },
   }).then(selfReferencingHosts => {
     subHeader('Self-referencing Hosts found', selfReferencingHosts.length);
-    verboseData(selfReferencingHosts, h =>
-      Object.assign({ slug: h.slug, id: h.id }),
-    );
+    verboseData(selfReferencingHosts, h => Object.assign({ slug: h.slug, id: h.id }));
   });
 };
 
@@ -164,13 +153,8 @@ const checkUsersAndOrgs = () => {
       },
     })
       .then(collectives => {
-        subHeader(
-          'USER or ORGs found with HostCollectiveId',
-          collectives.length,
-        );
-        verboseData(collectives, c =>
-          Object.assign({ slug: c.slug, HostCollectiveId: c.HostCollectiveId }),
-        );
+        subHeader('USER or ORGs found with HostCollectiveId', collectives.length);
+        verboseData(collectives, c => Object.assign({ slug: c.slug, HostCollectiveId: c.HostCollectiveId }));
       })
       // TODO: Check that no non-USER Collective is directly linked to a USER
       .then(() =>
@@ -191,13 +175,8 @@ const checkUsersAndOrgs = () => {
         }),
       )
       .then(improperlyLinkedCollectives => {
-        subHeader(
-          'Non-User collectives that are linked to a USER',
-          improperlyLinkedCollectives.length,
-        );
-        verboseData(improperlyLinkedCollectives, c =>
-          Object.assign({ id: c.id, slug: c.slug }),
-        );
+        subHeader('Non-User collectives that are linked to a USER', improperlyLinkedCollectives.length);
+        verboseData(improperlyLinkedCollectives, c => Object.assign({ id: c.id, slug: c.slug }));
       })
   );
 };
@@ -212,10 +191,7 @@ const checkMembers = () => {
       },
     },
   }).then(circularMembers => {
-    subHeader(
-      'Members with CollectiveId = MemberCollectiveId',
-      circularMembers.length,
-    );
+    subHeader('Members with CollectiveId = MemberCollectiveId', circularMembers.length);
     verboseData(circularMembers, cm => cm.id);
   });
 };
@@ -303,10 +279,7 @@ const checkTransactions = () => {
       },
     })
       .then(txsWithoutFromCollectiveId => {
-        subHeader(
-          'Transactions without `FromCollectiveId`',
-          txsWithoutFromCollectiveId,
-        );
+        subHeader('Transactions without `FromCollectiveId`', txsWithoutFromCollectiveId);
       })
 
       // Check no transaction has same "FromCollectiveId" and "CollectiveId"
@@ -320,10 +293,7 @@ const checkTransactions = () => {
         }),
       )
       .then(circularTxs => {
-        subHeader(
-          'Transactions with same source and destination',
-          circularTxs.length,
-        );
+        subHeader('Transactions with same source and destination', circularTxs.length);
         verboseData(circularTxs, t => Object.assign({ id: t.id }));
       })
 
@@ -338,10 +308,7 @@ const checkTransactions = () => {
         }),
       )
       .then(txnsWithoutTransactionGroup => {
-        subHeader(
-          'Transactions without `TransactionGroup`',
-          txnsWithoutTransactionGroup,
-        );
+        subHeader('Transactions without `TransactionGroup`', txnsWithoutTransactionGroup);
       })
 
       // Check every Order has even number of entries
@@ -357,10 +324,7 @@ const checkTransactions = () => {
         ),
       )
       .then(oddOrderIds => {
-        subHeader(
-          'Orders with odd (not multiple of 2) number of transactions',
-          oddOrderIds.length,
-        );
+        subHeader('Orders with odd (not multiple of 2) number of transactions', oddOrderIds.length);
       })
 
       // Check every Expense has a double Entry, excluding  ExpenseId (1740, 1737, 1956) (cheeselab known issue)
@@ -385,10 +349,7 @@ const checkTransactions = () => {
         ),
       )
       .then(invalidExpenses => {
-        subHeader(
-          'Expenses with invalid number of transactions',
-          invalidExpenses.length,
-        );
+        subHeader('Expenses with invalid number of transactions', invalidExpenses.length);
         verboseData(invalidExpenses);
       })
 
@@ -423,10 +384,7 @@ const checkTransactions = () => {
         }),
       )
       .then(txnsWithoutOrderOrExpenses => {
-        subHeader(
-          'Transactions without OrderId or ExpenseId',
-          txnsWithoutOrderOrExpenses.length,
-        );
+        subHeader('Transactions without OrderId or ExpenseId', txnsWithoutOrderOrExpenses.length);
         // if (VERBOSE)
         // txnsWithoutOrderOrExpenses.map(t => Object.assign({id: t.id}));
       })
@@ -483,9 +441,7 @@ const checkTransactions = () => {
         ];
         if (funkyTransactions.length > 0) {
           attachments.push({
-            filename: `${moment(new Date()).format(
-              'YYYYMMDD',
-            )}-invalid-transactions.csv`,
+            filename: `${moment(new Date()).format('YYYYMMDD')}-invalid-transactions.csv`,
             content: await Promise.promisify(json2csv)({
               data: funkyTransactions,
               fields,
@@ -523,10 +479,7 @@ const checkCollectiveBalance = () => {
       });
     })
     .then(() => {
-      subHeader(
-        'Collectives with negative balance: ',
-        brokenCollectives.length,
-      );
+      subHeader('Collectives with negative balance: ', brokenCollectives.length);
       verboseData(brokenCollectives, c =>
         Object.assign({
           id: c.id,

@@ -38,22 +38,17 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
 
 export const loaders = req => {
   const cache = {};
-  const createDataLoaderWithOptions = (
-    batchFunction,
-    options = {},
-    cacheKeyPrefix = '',
-  ) => {
+  const createDataLoaderWithOptions = (batchFunction, options = {}, cacheKeyPrefix = '') => {
     const cacheKey = `${cacheKeyPrefix}:${JSON.stringify(options)}`;
-    cache[cacheKey] =
-      cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
+    cache[cacheKey] = cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
     return cache[cacheKey];
   };
 
   return {
     collective: {
       findById: new DataLoader(ids =>
-        models.Collective.findAll({ where: { id: { [Op.in]: ids } } }).then(
-          collectives => sortResults(ids, collectives),
+        models.Collective.findAll({ where: { id: { [Op.in]: ids } } }).then(collectives =>
+          sortResults(ids, collectives),
         ),
       ),
       balance: new DataLoader(ids =>
@@ -61,14 +56,7 @@ export const loaders = req => {
           attributes: [
             'CollectiveId',
             [
-              sequelize.fn(
-                'COALESCE',
-                sequelize.fn(
-                  'SUM',
-                  sequelize.col('netAmountInCollectiveCurrency'),
-                ),
-                0,
-              ),
+              sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0),
               'balance',
             ],
           ],
@@ -88,14 +76,7 @@ export const loaders = req => {
           models.Collective.findAll({
             attributes: [
               'HostCollectiveId',
-              [
-                sequelize.fn(
-                  'COALESCE',
-                  sequelize.fn('COUNT', sequelize.col('id')),
-                  0,
-                ),
-                'count',
-              ],
+              [sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count'],
             ],
             where: { HostCollectiveId: { [Op.in]: ids } },
             group: ['HostCollectiveId'],
@@ -107,13 +88,7 @@ export const loaders = req => {
           const query = {
             attributes: [
               'CollectiveId',
-              [
-                sequelize.fn(
-                  'COUNT',
-                  sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')),
-                ),
-                'count',
-              ],
+              [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))), 'count'],
             ],
             where: {
               CollectiveId: { [Op.in]: ids },
@@ -149,14 +124,7 @@ export const loaders = req => {
             attributes: [
               'CollectiveId',
               'status',
-              [
-                sequelize.fn(
-                  'COALESCE',
-                  sequelize.fn('COUNT', sequelize.col('id')),
-                  0,
-                ),
-                'count',
-              ],
+              [sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count'],
             ],
             where: { CollectiveId: { [Op.in]: ids } },
             group: ['CollectiveId', 'status'],
@@ -186,9 +154,7 @@ export const loaders = req => {
             where: { CollectiveId: { [Op.in]: accessibleUserCollectiveIds } },
           }),
         )
-        .then(results =>
-          sortResults(UserCollectiveIds, results, 'CollectiveId', {}),
-        ),
+        .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId', {})),
     ),
     getOrgDetailsByCollectiveId: new DataLoader(OrgCollectiveIds =>
       getListOfAccessibleMembers(req.remoteUser, OrgCollectiveIds)
@@ -220,9 +186,7 @@ export const loaders = req => {
           console.error(e);
           return [];
         })
-        .then(results =>
-          sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {}),
-        ),
+        .then(results => sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {})),
     ),
     comments: {
       findAllByAttribute: attribute =>
@@ -250,9 +214,7 @@ export const loaders = req => {
     },
     tiers: {
       findById: new DataLoader(ids =>
-        models.Tier.findAll({ where: { id: { [Op.in]: ids } } }).then(results =>
-          sortResults(ids, results, 'id'),
-        ),
+        models.Tier.findAll({ where: { id: { [Op.in]: ids } } }).then(results => sortResults(ids, results, 'id')),
       ),
       totalDistinctOrders: new DataLoader(ids =>
         models.Order.findAll({
@@ -261,10 +223,7 @@ export const loaders = req => {
             [
               sequelize.fn(
                 'COALESCE',
-                sequelize.fn(
-                  'COUNT',
-                  sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')),
-                ),
+                sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))),
                 0,
               ),
               'count',
@@ -278,17 +237,7 @@ export const loaders = req => {
       ),
       totalOrders: new DataLoader(ids =>
         models.Order.findAll({
-          attributes: [
-            'TierId',
-            [
-              sequelize.fn(
-                'COALESCE',
-                sequelize.fn('COUNT', sequelize.col('id')),
-                0,
-              ),
-              'count',
-            ],
-          ],
+          attributes: ['TierId', [sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count']],
           where: { TierId: { [Op.in]: ids }, processedAt: { [Op.ne]: null } },
           group: ['TierId'],
         })
@@ -298,8 +247,8 @@ export const loaders = req => {
     },
     paymentMethods: {
       findById: new DataLoader(ids =>
-        models.PaymentMethod.findAll({ where: { id: { [Op.in]: ids } } }).then(
-          results => sortResults(ids, results, 'id'),
+        models.PaymentMethod.findAll({ where: { id: { [Op.in]: ids } } }).then(results =>
+          sortResults(ids, results, 'id'),
         ),
       ),
       findByCollectiveId: new DataLoader(CollectiveIds =>
@@ -310,9 +259,7 @@ export const loaders = req => {
             expiryDate: { [Op.or]: [null, { [Op.gte]: new Date() }] },
             archivedAt: null,
           },
-        }).then(results =>
-          sortResults(CollectiveIds, results, 'CollectiveId', []),
-        ),
+        }).then(results => sortResults(CollectiveIds, results, 'CollectiveId', [])),
       ),
     },
     orders: {
@@ -325,29 +272,12 @@ export const loaders = req => {
             },
           },
           order: [['createdAt', 'DESC']],
-        }).then(results =>
-          sortResults(
-            combinedKeys,
-            results,
-            'CollectiveId:FromCollectiveId',
-            [],
-          ),
-        ),
+        }).then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', [])),
       ),
       stats: {
         transactions: new DataLoader(ids =>
           models.Transaction.findAll({
-            attributes: [
-              'OrderId',
-              [
-                sequelize.fn(
-                  'COALESCE',
-                  sequelize.fn('COUNT', sequelize.col('id')),
-                  0,
-                ),
-                'count',
-              ],
-            ],
+            attributes: ['OrderId', [sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count']],
             where: { OrderId: { [Op.in]: ids } },
             group: ['OrderId'],
           })
@@ -356,10 +286,7 @@ export const loaders = req => {
         ),
         totalTransactions: new DataLoader(keys =>
           models.Transaction.findAll({
-            attributes: [
-              'OrderId',
-              [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'],
-            ],
+            attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount']],
             where: { OrderId: { [Op.in]: keys } },
             group: ['OrderId'],
           })
@@ -378,14 +305,7 @@ export const loaders = req => {
             },
           },
           order: [['createdAt', 'DESC']],
-        }).then(results =>
-          sortResults(
-            combinedKeys,
-            results,
-            'CollectiveId:FromCollectiveId',
-            [],
-          ),
-        ),
+        }).then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', [])),
       ),
       totalAmountRaised: new DataLoader(keys =>
         models.Order.findAll({
@@ -404,14 +324,10 @@ export const loaders = req => {
         }).then(results => {
           const resultsByKey = {};
           results.forEach(r => {
-            resultsByKey[`${r.ReferralCollectiveId}-${r.CollectiveId}`] =
-              r.dataValues.totalAmount;
+            resultsByKey[`${r.ReferralCollectiveId}-${r.CollectiveId}`] = r.dataValues.totalAmount;
           });
           return keys.map(key => {
-            return (
-              resultsByKey[`${key.ReferralCollectiveId}-${key.CollectiveId}`] ||
-              0
-            );
+            return resultsByKey[`${key.ReferralCollectiveId}-${key.CollectiveId}`] || 0;
           });
         }),
       ),
@@ -447,13 +363,10 @@ export const loaders = req => {
         }).then(results => {
           const resultsByKey = {};
           results.forEach(r => {
-            resultsByKey[`${r.FromCollectiveId}-${r.CollectiveId}`] =
-              r.dataValues.totalAmount;
+            resultsByKey[`${r.FromCollectiveId}-${r.CollectiveId}`] = r.dataValues.totalAmount;
           });
           return keys.map(key => {
-            return (
-              resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0
-            );
+            return resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0;
           });
         }),
       ),
@@ -475,14 +388,10 @@ export const loaders = req => {
         }).then(results => {
           const resultsByKey = {};
           results.forEach(r => {
-            resultsByKey[
-              `${r.UsingVirtualCardFromCollectiveId}-${r.CollectiveId}`
-            ] = r.dataValues.totalAmount;
+            resultsByKey[`${r.UsingVirtualCardFromCollectiveId}-${r.CollectiveId}`] = r.dataValues.totalAmount;
           });
           return keys.map(key => {
-            return (
-              resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0
-            );
+            return resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0;
           });
         }),
       ),
@@ -506,36 +415,23 @@ export const loaders = req => {
             CollectiveId: { [Op.in]: keys.map(k => k.CollectiveId) },
             type: TransactionTypes.CREDIT,
           },
-          group: [
-            'FromCollectiveId',
-            'UsingVirtualCardFromCollectiveId',
-            'CollectiveId',
-          ],
+          group: ['FromCollectiveId', 'UsingVirtualCardFromCollectiveId', 'CollectiveId'],
         }).then(results => {
           const resultsByKey = {};
-          results.forEach(
-            ({
-              CollectiveId,
-              FromCollectiveId,
-              UsingVirtualCardFromCollectiveId,
-              dataValues,
-            }) => {
-              // Credit collective that emitted the virtual card (if any)
-              if (UsingVirtualCardFromCollectiveId) {
-                const key = `${UsingVirtualCardFromCollectiveId}-${CollectiveId}`;
-                const donated = resultsByKey[key] || 0;
-                resultsByKey[key] = donated + dataValues.totalAmount;
-              }
-              // Credit collective who actually made the transaction
-              const key = `${FromCollectiveId}-${CollectiveId}`;
+          results.forEach(({ CollectiveId, FromCollectiveId, UsingVirtualCardFromCollectiveId, dataValues }) => {
+            // Credit collective that emitted the virtual card (if any)
+            if (UsingVirtualCardFromCollectiveId) {
+              const key = `${UsingVirtualCardFromCollectiveId}-${CollectiveId}`;
               const donated = resultsByKey[key] || 0;
               resultsByKey[key] = donated + dataValues.totalAmount;
-            },
-          );
+            }
+            // Credit collective who actually made the transaction
+            const key = `${FromCollectiveId}-${CollectiveId}`;
+            const donated = resultsByKey[key] || 0;
+            resultsByKey[key] = donated + dataValues.totalAmount;
+          });
           return keys.map(key => {
-            return (
-              resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0
-            );
+            return resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0;
           });
         }),
       ),

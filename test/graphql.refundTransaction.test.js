@@ -26,9 +26,7 @@ async function setupTestObjects() {
   const collective = await models.Collective.create(utils.data('collective1'));
   await collective.addHost(host.collective);
   const tier = await models.Tier.create(utils.data('tier1'));
-  const paymentMethod = await models.PaymentMethod.create(
-    utils.data('paymentMethod2'),
-  );
+  const paymentMethod = await models.PaymentMethod.create(utils.data('paymentMethod2'));
   await models.ConnectedAccount.create({
     service: 'stripe',
     token: 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j',
@@ -86,10 +84,7 @@ async function setupTestObjects() {
       hostCurrency: balanceTransaction.currency,
       amountInHostCurrency: balanceTransaction.amount,
       hostCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
-      hostFeeInHostCurrency: paymentsLib.calcFee(
-        balanceTransaction.amount,
-        collective.hostFeePercent,
-      ),
+      hostFeeInHostCurrency: paymentsLib.calcFee(balanceTransaction.amount, collective.hostFeePercent),
       platformFeeInHostCurrency: fees.applicationFee,
       paymentProcessorFeeInHostCurrency: fees.stripeFee,
       description: order.description,
@@ -127,9 +122,7 @@ function initStripeNock({ amount, fee, fee_details, net }) {
       fee_details,
       refunds: {
         object: 'list',
-        data: [
-          refund,
-        ],
+        data: [refund],
       },
     });
 }
@@ -159,16 +152,10 @@ describe('Refund Transaction', () => {
     const { transaction } = await setupTestObjects();
 
     // And a newly created user
-    const anotherUser = await models.User.createUserWithCollective(
-      utils.data('user2'),
-    );
+    const anotherUser = await models.User.createUserWithCollective(utils.data('user2'));
 
     // When a refunded attempt happens from another user
-    const result = await utils.graphqlQuery(
-      refundQuery,
-      { id: transaction.id },
-      anotherUser,
-    );
+    const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, anotherUser);
 
     // Then it should error out with the right error
     const [{ message }] = result.errors;
@@ -178,14 +165,11 @@ describe('Refund Transaction', () => {
   describe('Save CreatedByUserId', () => {
     let userStub;
     beforeEach(() => {
-      userStub = sinon
-        .stub(models.User.prototype, 'isRoot')
-        .callsFake(() => true);
+      userStub = sinon.stub(models.User.prototype, 'isRoot').callsFake(() => true);
     });
     afterEach(() => userStub.restore());
 
-    beforeEach(() =>
-      initStripeNock({ amount: -5000, fee: 0, fee_details: [], net: -5000 }));
+    beforeEach(() => initStripeNock({ amount: -5000, fee: 0, fee_details: [], net: -5000 }));
 
     afterEach(nock.cleanAll);
 
@@ -195,16 +179,10 @@ describe('Refund Transaction', () => {
       const { user, transaction } = await setupTestObjects();
 
       // And a newly created user that's also a site admin
-      const anotherUser = await models.User.createUserWithCollective(
-        utils.data('user3'),
-      );
+      const anotherUser = await models.User.createUserWithCollective(utils.data('user3'));
 
       // When a refunded attempt happens from the above user
-      const result = await utils.graphqlQuery(
-        refundQuery,
-        { id: transaction.id },
-        anotherUser,
-      );
+      const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, anotherUser);
 
       // Then there should be no errors
       if (result.errors) throw result.errors;
@@ -235,9 +213,7 @@ describe('Refund Transaction', () => {
   describe('Stripe Transaction - for hosts created before September 17th 2017', () => {
     let userStub;
     beforeEach(() => {
-      userStub = sinon
-        .stub(models.User.prototype, 'isRoot')
-        .callsFake(() => true);
+      userStub = sinon.stub(models.User.prototype, 'isRoot').callsFake(() => true);
     });
     afterEach(() => userStub.restore());
 
@@ -247,7 +223,8 @@ describe('Refund Transaction', () => {
         fee: -175,
         fee_details: [{ amount: -175, type: 'stripe_fee' }],
         net: -4825,
-      }));
+      }),
+    );
 
     afterEach(nock.cleanAll);
 
@@ -257,11 +234,7 @@ describe('Refund Transaction', () => {
       const { user, collective, host, transaction } = await setupTestObjects();
 
       // When the above transaction is refunded
-      const result = await utils.graphqlQuery(
-        refundQuery,
-        { id: transaction.id },
-        host,
-      );
+      const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, host);
 
       // Then there should be no errors
       if (result.errors) throw result.errors;
@@ -340,14 +313,11 @@ describe('Refund Transaction', () => {
   describe('Stripe Transaction - for hosts created after September 17th 2017', () => {
     let userStub;
     beforeEach(() => {
-      userStub = sinon
-        .stub(models.User.prototype, 'isRoot')
-        .callsFake(() => true);
+      userStub = sinon.stub(models.User.prototype, 'isRoot').callsFake(() => true);
     });
     afterEach(() => userStub.restore());
 
-    beforeEach(() =>
-      initStripeNock({ amount: -5000, fee: 0, fee_details: [], net: -5000 }));
+    beforeEach(() => initStripeNock({ amount: -5000, fee: 0, fee_details: [], net: -5000 }));
 
     afterEach(nock.cleanAll);
 
@@ -357,11 +327,7 @@ describe('Refund Transaction', () => {
       const { user, collective, host, transaction } = await setupTestObjects();
 
       // When the above transaction is refunded
-      const result = await utils.graphqlQuery(
-        refundQuery,
-        { id: transaction.id },
-        host,
-      );
+      const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, host);
 
       // Then there should be no errors
       if (result.errors) throw result.errors;
