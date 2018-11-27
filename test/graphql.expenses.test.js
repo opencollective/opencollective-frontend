@@ -845,7 +845,9 @@ describe('GraphQL Expenses API', () => {
         ));
 
         // And given a user to file expenses
-        ({ user, userCollective } = await store.newUser('someone cool'));
+        ({ user, userCollective } = await store.newUser('someone cool', {
+          paypalEmail: 'paypal@user.com',
+        }));
 
         // And given the above collective has one expense (in PENDING
         // state)
@@ -917,6 +919,45 @@ describe('GraphQL Expenses API', () => {
         });
         expect(membership).to.exist;
         expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
+      });
+
+      it('Mark expense as paid if expense paypal is the same as host paypal', async () => {
+        emailSendMessageSpy.resetHistory();
+
+        // payout the expense using paypal
+        expense.CollectiveId = collective.id;
+        expense.payoutMethod = 'paypal';
+        await expense.save();
+
+        // Make sure the host is using the same paypal email
+        await models.PaymentMethod.create({
+          CollectiveId: hostCollective.id,
+          service: 'paypal',
+          name: user.paypalEmail,
+          token: 'xxx',
+          confirmedAt: new Date(),
+        });
+        // And then add funds to the collective
+        const initialBalance = 1500;
+        await addFunds(user, hostCollective, collective, initialBalance);
+
+        // When the expense is paid by the host admin
+        let balance = await collective.getBalance();
+        expect(balance).to.equal(1500);
+        const res = await utils.graphqlQuery(
+          payExpenseQuery,
+          { id: expense.id, fee: 0 },
+          hostAdmin,
+        );
+        res.errors && console.log(res.errors);
+        expect(res.errors).to.not.exist;
+        expect(res.data.payExpense.status).to.equal('PAID');
+        balance = await collective.getBalance();
+        expect(balance).to.equal(initialBalance - expense.amount);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, {
+          delay: 500,
+        });
+        expect(emailSendMessageSpy.callCount).to.equal(4);
       });
     });
   }); /* End of #payExpense */
