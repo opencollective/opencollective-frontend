@@ -9,6 +9,7 @@ import Expense from './Expense';
 class Expenses extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     expenses: PropTypes.array,
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
@@ -48,6 +49,7 @@ class Expenses extends React.Component {
   render() {
     const {
       collective,
+      host,
       expenses,
       LoggedInUser,
       editable,
@@ -176,6 +178,7 @@ class Expenses extends React.Component {
             <div className="item" key={expense.id}>
               <Expense
                 collective={expense.collective || collective}
+                host={host}
                 expense={expense}
                 editable={editable}
                 view={view}
