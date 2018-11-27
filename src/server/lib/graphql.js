@@ -218,6 +218,16 @@ export async function fetchInvoice(invoiceSlug, accessToken) {
         description
         amount
         currency
+        fromCollective {
+          id
+          slug
+          name
+        }
+        usingVirtualCardFromCollective {
+          id
+          slug
+          name
+        }
         collective {
           id
           slug

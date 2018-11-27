@@ -76,7 +76,7 @@ class InvoicePage extends React.Component {
       const createdAt = new Date(transaction.createdAt);
       this.data.push({
         date: moment(createdAt).format('l'),
-        description: transaction.description,
+        description: this.transactionDescription(transaction),
         collective: (
           <a href={`https://opencollective.com/${transaction.collective.slug}`}>{transaction.collective.name}</a>
         ),
@@ -98,6 +98,20 @@ class InvoicePage extends React.Component {
         '<br />',
       ),
     };
+  }
+
+  transactionDescription(transaction) {
+    if (!transaction.usingVirtualCardFromCollective) {
+      return transaction.description;
+    }
+
+    const userCollective = transaction.fromCollective;
+    return (
+      <span>
+        {transaction.description} (gift card used by{' '}
+        <a href={`https://opencollective.com/${userCollective.slug}`}>{userCollective.name}</a>)
+      </span>
+    );
   }
 
   renderPage = () => {
