@@ -10,6 +10,7 @@ import Expenses from './Expenses';
 class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     limit: PropTypes.number,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
@@ -28,6 +29,7 @@ class ExpensesWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
+      host,
       view,
       includeHostedCollectives,
       filters,
@@ -44,6 +46,7 @@ class ExpensesWithData extends React.Component {
       <div className="ExpensesWithData">
         <Expenses
           collective={collective}
+          host={host}
           expenses={expenses}
           refetch={data.refetch}
           editable={view !== 'compact'}

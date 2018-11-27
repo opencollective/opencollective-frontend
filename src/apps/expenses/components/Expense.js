@@ -21,6 +21,7 @@ import colors from '../../../constants/colors';
 class Expense extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     expense: PropTypes.object,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
     editable: PropTypes.bool,
@@ -103,6 +104,7 @@ class Expense extends React.Component {
     const {
       intl,
       collective,
+      host,
       expense,
       includeHostedCollectives,
       LoggedInUser,
@@ -402,6 +404,7 @@ class Expense extends React.Component {
                         <PayExpenseBtn
                           expense={expense}
                           collective={collective}
+                          paymentMethods={host.paymentMethods}
                           disabled={!this.props.allowPayAction}
                           lock={this.props.lockPayAction}
                           unlock={this.props.unlockPayAction}

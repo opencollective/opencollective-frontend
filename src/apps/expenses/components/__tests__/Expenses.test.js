@@ -13,6 +13,16 @@ import initClient from '../../../../lib/initClient';
 const apolloClient = initClient();
 
 describe('Expenses component', () => {
+  const host = {
+    slug: 'opensourcecollective',
+    currency: 'USD',
+    paymentMethods: [
+      {
+        service: 'paypal',
+        name: 'paypal@host.com',
+      },
+    ],
+  };
   const collective = {
     slug: 'test',
     id: 1,
@@ -56,6 +66,7 @@ describe('Expenses component', () => {
       <ApolloProvider client={apolloClient}>
         <Expenses
           expenses={expenses}
+          host={host}
           editable={true}
           LoggedInUser={loggedInUser}
           payExpense={() => setTimeout(() => Promise.resolve(), 2000)}

@@ -89,7 +89,7 @@ class MarkOrderAsPaidBtn extends React.Component {
         </style>
 
         <SmallButton
-          className="MarkOrderAsPaidSmallBtn"
+          className="MarkOrderAsPaidSmallBtn pay"
           onClick={this.onClick}
           disabled={this.props.disabled || disabled}
           title={title}

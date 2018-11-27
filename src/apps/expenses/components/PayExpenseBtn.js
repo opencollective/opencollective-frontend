@@ -15,6 +15,7 @@ class PayExpenseBtn extends React.Component {
   static propTypes = {
     expense: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
+    paymentMethods: PropTypes.arrayOf(PropTypes.object),
     disabled: PropTypes.bool,
     lock: PropTypes.func,
     unlock: PropTypes.func,
@@ -58,17 +59,28 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { collective, expense, intl } = this.props;
+    const { collective, expense, intl, paymentMethods } = this.props;
     let disabled = this.state.loading,
+      selectedPayoutMethod = expense.payoutMethod,
       title = '',
       error = this.state.error;
-    if (
-      expense.payoutMethod === 'paypal' &&
-      !isValidEmail(get(expense, 'user.paypalEmail')) &&
-      !isValidEmail(get(expense, 'user.email'))
-    ) {
-      disabled = true;
-      title = intl.formatMessage(this.messages['paypal.missing']);
+
+    if (expense.payoutMethod === 'paypal') {
+      if (
+        !isValidEmail(get(expense, 'user.paypalEmail')) &&
+        !isValidEmail(get(expense, 'user.email'))
+      ) {
+        disabled = true;
+        title = intl.formatMessage(this.messages['paypal.missing']);
+      } else {
+        const paypalPaymentMethod =
+          paymentMethods && paymentMethods.find(pm => pm.service === 'paypal');
+        if (
+          get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')
+        ) {
+          selectedPayoutMethod = 'other';
+        }
+      }
     }
     if (get(collective, 'stats.balance') < expense.amount) {
       disabled = true;
@@ -144,13 +156,13 @@ class PayExpenseBtn extends React.Component {
           disabled={this.props.disabled || disabled}
           title={title}
         >
-          {expense.payoutMethod === 'other' && (
+          {selectedPayoutMethod === 'other' && (
             <FormattedMessage
               id="expense.pay.manual.btn"
               defaultMessage="record as paid"
             />
           )}
-          {expense.payoutMethod !== 'other' && (
+          {selectedPayoutMethod !== 'other' && (
             <FormattedMessage
               id="expense.pay.btn"
               defaultMessage="pay with {paymentMethod}"

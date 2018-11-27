@@ -9,6 +9,7 @@ import Expense from './Expense';
 class Expenses extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     expenses: PropTypes.array,
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
@@ -48,6 +49,7 @@ class Expenses extends React.Component {
   render() {
     const {
       collective,
+      host,
       expenses,
       LoggedInUser,
       editable,
@@ -176,6 +178,7 @@ class Expenses extends React.Component {
             <div className="item" key={expense.id}>
               <Expense
                 collective={expense.collective || collective}
+                host={host}
                 expense={expense}
                 editable={editable}
                 view={view}
@@ -195,22 +198,18 @@ class Expenses extends React.Component {
               />
             </div>
           )}
-          {expenses.length >= 10 &&
-            expenses.length % 10 === 0 && (
-              <div className="loadMoreBtn">
-                <Button bsStyle="default" onClick={this.fetchMore}>
-                  {this.state.loading && (
-                    <FormattedMessage id="loading" defaultMessage="loading" />
-                  )}
-                  {!this.state.loading && (
-                    <FormattedMessage
-                      id="loadMore"
-                      defaultMessage="load more"
-                    />
-                  )}
-                </Button>
-              </div>
-            )}
+          {expenses.length >= 10 && expenses.length % 10 === 0 && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && (
+                  <FormattedMessage id="loading" defaultMessage="loading" />
+                )}
+                {!this.state.loading && (
+                  <FormattedMessage id="loadMore" defaultMessage="load more" />
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

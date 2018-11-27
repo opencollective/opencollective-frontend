@@ -112,9 +112,10 @@ class ConnectPaypal extends React.Component {
               <div className="description">
                 <FormattedMessage
                   id="collective.connectedAccounts.paypal.connected"
-                  defaultMessage="Paypal account connected on {createdAt, date, short}"
+                  defaultMessage="Paypal account ({paypalEmail}) connected on {createdAt, date, short}"
                   values={{
                     createdAt: new Date(paypalPaymentMethod.createdAt),
+                    paypalEmail: paypalPaymentMethod.name,
                   }}
                 />
               </div>
