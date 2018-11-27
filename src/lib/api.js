@@ -3,7 +3,7 @@ import { isValidEmail } from './utils';
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
 
-const queryString = params => {
+export const queryString = params => {
   return Object.keys(params)
     .map(k => `${k}=${encodeURIComponent(params[k])}`)
     .join('&');

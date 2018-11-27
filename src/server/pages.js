@@ -55,7 +55,8 @@ pages
   .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
-  );
+  )
+  .add('discover', '/discover');
 
 if (USE_PLEDGES) {
   pages

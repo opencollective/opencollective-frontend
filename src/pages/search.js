@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { Box, Flex } from 'grid-styled';
 import { withRouter } from 'next/router';
-import classNames from 'classnames';
 import styled from 'styled-components';
 
-import { Link } from '../server/pages';
+import { Link, Router } from '../server/pages';
 
 import Body from '../components/Body';
 import Button from '../components/Button';
@@ -16,6 +15,8 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LoadingGrid from '../components/LoadingGrid';
 import StyledLink from '../components/StyledLink';
+import Pagination from '../components/Pagination';
+import Container from '../components/Container';
 import colors from '../constants/colors';
 
 import { addSearchQueryData } from '../graphql/queries';
@@ -44,10 +45,6 @@ const SearchButton = styled(Button).attrs({
   && {
     padding: 0 2rem;
   }
-`;
-
-const Container = styled(Box)`
-  max-width: 1200px;
 `;
 
 class SearchPage extends React.Component {
@@ -102,6 +99,11 @@ class SearchPage extends React.Component {
     router.push({ pathname: router.pathname, query: { q: q.value } });
   };
 
+  changePage = offset => {
+    const { router } = this.props;
+    Router.pushRoute('search', { ...router.query, offset });
+  };
+
   render() {
     const {
       data: { error, loading, search },
@@ -127,7 +129,7 @@ class SearchPage extends React.Component {
           showSearch={false}
         />
         <Body>
-          <Container mx="auto" px={3} width={[1, 0.85]}>
+          <Container mx="auto" px={3} width={[1, 0.85]} maxWidth={1200}>
             <Box width={1}>
               <form method="GET" onSubmit={this.refetch}>
                 <FormGroup controlId="search" bsSize="large">
@@ -184,32 +186,9 @@ class SearchPage extends React.Component {
               )}
             </Flex>
             {showCollectives && collectives.length !== 0 && total > limit && (
-              <Flex justifyContent="center">
-                <ul className="pagination">
-                  {Array(Math.ceil(total / limit))
-                    .fill(1)
-                    .map((n, i) => (
-                      <li
-                        key={i * limit}
-                        className={classNames({
-                          active: i * limit === offset,
-                        })}
-                      >
-                        <Link
-                          href={{
-                            query: {
-                              limit,
-                              offset: i * limit,
-                              q: term,
-                            },
-                          }}
-                        >
-                          <a>{`${n + i}`}</a>
-                        </Link>
-                      </li>
-                    ))}
-                </ul>
-              </Flex>
+              <Container display="flex" justifyContent="center" fontSize="Paragraph" my={3}>
+                <Pagination offset={offset} total={total} limit={limit} />
+              </Container>
             )}
 
             {showCollectives && collectives.length !== 0 && (
