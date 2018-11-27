@@ -199,7 +199,7 @@
   "comment.post.to.host": "Note: Your comment will be public and we will notify the administrators of the host of this collective",
   "comment.post.to.collective": "Note: Your comment will be public and we will notify the administrators of this collective",
   "host.dashboard.paypal.balance": "PayPal card balance:",
-  "collective.connectedAccounts.paypal.connected": "Paypal account connected on {createdAt, date, short}",
+  "collective.connectedAccounts.paypal.connected": "Paypal account ({paypalEmail}) connected on {createdAt, date, short}",
   "collective.connectedAccounts.paypal.description": "Connect a PayPal account to reimburse approved expenses in one click",
   "host.apply.title": "Apply to create a new {hostname} collective",
   "collective.create.title": "Create an Open Collective",
