@@ -53,7 +53,7 @@ class OrderForm extends React.Component {
       loginSent: false,
       user: {},
       fromCollective: {},
-      paymentMethod: {},
+      paymentMethod: { type: 'creditcard' }, // the default payment method is "creditcard"
       creditcard: {
         show: !this.props.redeemFlow,
         save: true,
@@ -543,6 +543,8 @@ class OrderForm extends React.Component {
       if (newState.order.tier.quantity) {
         newState.order.quantity = newState.order.tier.quantity;
       }
+      // when the user selects a tier with an interval, we set the default payment method type to credit card
+      // which is the only one that supports recurring payments
       if (newState.order.tier.hasOwnProperty('interval')) {
         newState.order.interval = newState.order.tier.interval;
         if (newState.order.interval) {
