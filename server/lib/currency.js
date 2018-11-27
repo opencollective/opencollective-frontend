@@ -11,11 +11,7 @@ function getDate(date = 'latest') {
     date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
     const mm = date.getMonth() + 1; // getMonth() is zero-based
     const dd = date.getDate();
-    date = [
-      date.getFullYear(),
-      (mm > 9 ? '' : '0') + mm,
-      (dd > 9 ? '' : '0') + dd,
-    ].join('-');
+    date = [date.getFullYear(), (mm > 9 ? '' : '0') + mm, (dd > 9 ? '' : '0') + dd].join('-');
   }
   return date;
 }
@@ -59,14 +55,8 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
       .catch(e => {
         console.error('Unable to fetch fxrate', e.message);
         // for testing in airplane mode
-        if (
-          !process.env.NODE_ENV ||
-          ['test', 'development'].includes(process.env.NODE_ENV)
-        ) {
-          console.log(
-            '>>> development environment -> returning 1.1 instead of throwing the error',
-            e,
-          );
+        if (!process.env.NODE_ENV || ['test', 'development'].includes(process.env.NODE_ENV)) {
+          console.log('>>> development environment -> returning 1.1 instead of throwing the error', e);
           return resolve(1.1);
         } else {
           reject(e);
@@ -75,12 +65,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
   });
 }
 
-export function convertToCurrency(
-  amount,
-  fromCurrency,
-  toCurrency,
-  date = 'latest',
-) {
+export function convertToCurrency(amount, fromCurrency, toCurrency, date = 'latest') {
   if (amount === 0) return 0;
   if (fromCurrency === toCurrency) return Promise.resolve(amount);
   if (!fromCurrency || !toCurrency) return Promise.resolve(amount);
@@ -96,12 +81,9 @@ export function convertToCurrency(
  * @param {*} array [ { currency, amount[, date] }]
  */
 export function reduceArrayToCurrency(array, currency) {
-  return Promise.map(array, entry =>
-    convertToCurrency(entry.amount, entry.currency, currency, entry.date),
-  ).then(arrayInBaseCurrency => {
-    return arrayInBaseCurrency.reduce(
-      (accumulator, amount) => accumulator + amount,
-      0,
-    );
-  });
+  return Promise.map(array, entry => convertToCurrency(entry.amount, entry.currency, currency, entry.date)).then(
+    arrayInBaseCurrency => {
+      return arrayInBaseCurrency.reduce((accumulator, amount) => accumulator + amount, 0);
+    },
+  );
 }

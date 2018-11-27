@@ -43,18 +43,10 @@ describe('lib.payments.test.js', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox
-      .stub(stripe, 'createCustomer')
-      .callsFake(() => Promise.resolve({ id: 'cus_BM7mGwp1Ea8RtL' }));
-    sandbox
-      .stub(stripe, 'createToken')
-      .callsFake(() => Promise.resolve({ id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' }));
-    sandbox
-      .stub(stripe, 'createCharge')
-      .callsFake(() => Promise.resolve({ id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' }));
-    sandbox
-      .stub(stripe, 'retrieveBalanceTransaction')
-      .callsFake(() => Promise.resolve(stripeMocks.balance));
+    sandbox.stub(stripe, 'createCustomer').callsFake(() => Promise.resolve({ id: 'cus_BM7mGwp1Ea8RtL' }));
+    sandbox.stub(stripe, 'createToken').callsFake(() => Promise.resolve({ id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' }));
+    sandbox.stub(stripe, 'createCharge').callsFake(() => Promise.resolve({ id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' }));
+    sandbox.stub(stripe, 'retrieveBalanceTransaction').callsFake(() => Promise.resolve(stripeMocks.balance));
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 
@@ -66,9 +58,7 @@ describe('lib.payments.test.js', () => {
     done();
   });
 
-  beforeEach('create a user', () =>
-    models.User.createUserWithCollective(userData).then(u => (user = u)),
-  );
+  beforeEach('create a user', () => models.User.createUserWithCollective(userData).then(u => (user = u)));
   beforeEach('create a user', () =>
     models.User.createUserWithCollective({
       email: EMAIL,
@@ -82,14 +72,10 @@ describe('lib.payments.test.js', () => {
     }).then(u => (host = u)),
   );
   beforeEach('create a collective', () =>
-    models.Collective.create(utils.data('collective1')).then(
-      g => (collective = g),
-    ),
+    models.Collective.create(utils.data('collective1')).then(g => (collective = g)),
   );
   beforeEach('create a collective', () =>
-    models.Collective.create(utils.data('collective2')).then(
-      g => (collective2 = g),
-    ),
+    models.Collective.create(utils.data('collective2')).then(g => (collective2 = g)),
   );
   beforeEach('create an order', () =>
     models.Order.create({
@@ -102,12 +88,8 @@ describe('lib.payments.test.js', () => {
       .then(o => o.setPaymentMethod({ token: STRIPE_TOKEN }))
       .then(t => (order = t)),
   );
-  beforeEach('add host to collective', () =>
-    collective.addHost(host.collective, host),
-  );
-  beforeEach('add host to collective2', () =>
-    collective2.addHost(host.collective, host),
-  );
+  beforeEach('add host to collective', () => collective.addHost(host.collective, host));
+  beforeEach('add host to collective2', () => collective2.addHost(host.collective, host));
 
   beforeEach('create stripe account', done => {
     models.ConnectedAccount.create({
@@ -132,40 +114,26 @@ describe('lib.payments.test.js', () => {
         order.interval = 'something';
         return payments
           .executeOrder(user, order)
-          .catch(err =>
-            expect(err.message).to.equal(
-              'Interval should be null, month or year.',
-            ),
-          );
+          .catch(err => expect(err.message).to.equal('Interval should be null, month or year.'));
       });
 
       it('payment amount is missing', () => {
         order.totalAmount = null;
-        return payments
-          .executeOrder(user, order)
-          .catch(err => expect(err.message).to.equal('payment.amount missing'));
+        return payments.executeOrder(user, order).catch(err => expect(err.message).to.equal('payment.amount missing'));
       });
 
       it('payment amount is less than 50', () => {
         order.totalAmount = 49;
         return payments
           .executeOrder(user, order)
-          .catch(err =>
-            expect(err.message).to.equal(
-              'payment.amount must be at least $0.50',
-            ),
-          );
+          .catch(err => expect(err.message).to.equal('payment.amount must be at least $0.50'));
       });
 
       it('stripe token is missing', () => {
         order.PaymentMethodId = null;
         return payments
           .executeOrder(user, order)
-          .catch(err =>
-            expect(err.message).to.equal(
-              'PaymentMethodId missing in the order',
-            ),
-          );
+          .catch(err => expect(err.message).to.equal('PaymentMethodId missing in the order'));
       });
     });
 
@@ -188,9 +156,7 @@ describe('lib.payments.test.js', () => {
             { where: { CollectiveId: host.CollectiveId } },
           )
             .then(() => payments.executeOrder(user, order))
-            .catch(err =>
-              expect(err.message).to.contain("You can't use a Stripe live key"),
-            ));
+            .catch(err => expect(err.message).to.contain("You can't use a Stripe live key")));
       });
 
       describe('and payment succeeds', () => {
@@ -208,9 +174,7 @@ describe('lib.payments.test.js', () => {
                 HostCollectiveId: host.CollectiveId,
               }),
             );
-            beforeEach('execute order', () =>
-              payments.executeOrder(user, order),
-            );
+            beforeEach('execute order', () => payments.executeOrder(user, order));
 
             it('successfully creates a paymentMethod with the CreatedByUserId', () =>
               models.PaymentMethod.findAndCountAll({
@@ -247,19 +211,13 @@ describe('lib.payments.test.js', () => {
               await utils.waitForCondition(() => emailSendSpy.callCount > 0);
               expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
               expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
-              expect(
-                emailSendSpy.lastCall.args[2].relatedCollectives,
-              ).to.have.length(1);
-              expect(
-                emailSendSpy.lastCall.args[2].relatedCollectives[0],
-              ).to.have.property('settings');
+              expect(emailSendSpy.lastCall.args[2].relatedCollectives).to.have.length(1);
+              expect(emailSendSpy.lastCall.args[2].relatedCollectives[0]).to.have.property('settings');
             });
           });
 
           describe('2nd payment with same stripeToken', () => {
-            beforeEach('create first payment', () =>
-              payments.executeOrder(user, order),
-            );
+            beforeEach('create first payment', () => payments.executeOrder(user, order));
 
             beforeEach('create 2nd payment', () => {
               order.totalAmount = AMOUNT2;
@@ -292,7 +250,8 @@ describe('lib.payments.test.js', () => {
               currency: collective2.currency,
             })
               .then(o => o.setPaymentMethod({ token: STRIPE_TOKEN }))
-              .then(o => (order2 = o)));
+              .then(o => (order2 = o)),
+          );
 
           beforeEach('execute order', () => {
             order2.interval = 'month';
@@ -310,10 +269,7 @@ describe('lib.payments.test.js', () => {
             models.Order.findAndCountAll({}).then(res => {
               expect(res.count).to.equal(2);
               expect(res.rows[1]).to.have.property('CreatedByUserId', user2.id);
-              expect(res.rows[1]).to.have.property(
-                'CollectiveId',
-                collective2.id,
-              );
+              expect(res.rows[1]).to.have.property('CollectiveId', collective2.id);
               expect(res.rows[1]).to.have.property('currency', CURRENCY);
               expect(res.rows[1]).to.have.property('totalAmount', AMOUNT2);
               expect(res.rows[1]).to.have.property('SubscriptionId');
@@ -369,12 +325,7 @@ describe('lib.payments.test.js', () => {
       });
 
       // When the refund transaction is created
-      await payments.createRefundTransaction(
-        transaction,
-        0,
-        { dataField: 'foo' },
-        user,
-      );
+      await payments.createRefundTransaction(transaction, 0, { dataField: 'foo' }, user);
 
       // And when transactions for that order are retrieved
       const allTransactions = await models.Transaction.findAll({
@@ -394,23 +345,15 @@ describe('lib.payments.test.js', () => {
 
       // And then the values for the transaction from the collective
       // to the donor are correct
-      const [creditRefundTransaction] = refundTransactions.filter(
-        t => t.type === 'CREDIT',
-      );
+      const [creditRefundTransaction] = refundTransactions.filter(t => t.type === 'CREDIT');
       expect(creditRefundTransaction.FromCollectiveId).to.equal(collective.id);
-      expect(creditRefundTransaction.CollectiveId).to.equal(
-        order.FromCollectiveId,
-      );
+      expect(creditRefundTransaction.CollectiveId).to.equal(order.FromCollectiveId);
       expect(creditRefundTransaction.data).to.deep.equal({ dataField: 'foo' });
 
       // And then the values for the transaction from the donor to the
       // collective also look correct
-      const [debitRefundTransaction] = refundTransactions.filter(
-        t => t.type === 'DEBIT',
-      );
-      expect(debitRefundTransaction.FromCollectiveId).to.equal(
-        order.FromCollectiveId,
-      );
+      const [debitRefundTransaction] = refundTransactions.filter(t => t.type === 'DEBIT');
+      expect(debitRefundTransaction.FromCollectiveId).to.equal(order.FromCollectiveId);
       expect(debitRefundTransaction.CollectiveId).to.equal(collective.id);
       expect(debitRefundTransaction.data).to.deep.equal({ dataField: 'foo' });
     });

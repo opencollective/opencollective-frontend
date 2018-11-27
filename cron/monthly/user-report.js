@@ -3,9 +3,7 @@
 // Only run on the first of the month
 const today = new Date();
 if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
-  console.log(
-    'NODE_ENV is production and today is not the first of month, script aborted!',
-  );
+  console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
 
@@ -20,17 +18,12 @@ import debugLib from 'debug';
 import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
-import {
-  formatCurrencyObject,
-  formatArrayToString,
-} from '../../server/lib/utils';
+import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
 import { convertToCurrency } from '../../server/lib/currency';
 import path from 'path';
 import fs from 'fs';
 
-const d = process.env.START_DATE
-  ? new Date(process.env.START_DATE)
-  : new Date();
+const d = process.env.START_DATE ? new Date(process.env.START_DATE) : new Date();
 d.setMonth(d.getMonth() - 1);
 const year = d.getFullYear();
 const month = moment(d).format('MMMM');
@@ -59,17 +52,13 @@ const fetchUserSubscribers = async (notificationType, backerCollective) => {
   });
   const unsubscribedUserIds = unsubscriptions.map(n => n.UserId);
   console.log(
-    `${
-      unsubscribedUserIds.length
-    } users have unsubscribed from the ${notificationType} report for ${
+    `${unsubscribedUserIds.length} users have unsubscribed from the ${notificationType} report for ${
       backerCollective.type
     } ${backerCollective.slug}`,
   );
 
   const admins = await backerCollective.getAdminUsers();
-  const subscribers = admins.filter(
-    a => unsubscribedUserIds.indexOf(a.id) === -1,
-  );
+  const subscribers = admins.filter(a => unsubscribedUserIds.indexOf(a.id) === -1);
 
   return subscribers;
 };
@@ -108,9 +97,7 @@ const init = async () => {
     FromCollectiveIds = uniq(transactions.map(t => t.FromCollectiveId));
   }
 
-  console.log(
-    `Preparing the ${month} report for ${FromCollectiveIds.length} backers`,
-  );
+  console.log(`Preparing the ${month} report for ${FromCollectiveIds.length} backers`);
 
   await Promise.each(FromCollectiveIds, processBacker);
 
@@ -154,21 +141,12 @@ const processBacker = async FromCollectiveId => {
     return;
   }
 
-  console.log(
-    `>>> Collective ${FromCollectiveId} has backed ${
-      distinctTransactions.length
-    } collectives`,
-  );
+  console.log(`>>> Collective ${FromCollectiveId} has backed ${distinctTransactions.length} collectives`);
   const collectives = await Promise.map(distinctTransactions, transaction =>
     processCollective(transaction.CollectiveId),
   );
-  const subscribers = await fetchUserSubscribers(
-    'user.monthlyreport',
-    backerCollective,
-  );
-  console.log(
-    `>>> Collective ${FromCollectiveId} has ${subscribers.length} subscribers`,
-  );
+  const subscribers = await fetchUserSubscribers('user.monthlyreport', backerCollective);
+  console.log(`>>> Collective ${FromCollectiveId} has ${subscribers.length} subscribers`);
 
   if (subscribers.length === 0) {
     console.log('>>> no subscriber');
@@ -177,15 +155,11 @@ const processBacker = async FromCollectiveId => {
 
   const attachments = [];
   if (get(backerCollective, 'settings.sendInvoiceByEmail')) {
-    const distinctHostCollectiveIds = uniq(
-      distinctTransactions.map(t => t.dataValues.HostCollectiveId),
-    );
-    const hosts = await Promise.map(
-      distinctHostCollectiveIds,
-      HostCollectiveId =>
-        models.Collective.findById(HostCollectiveId, {
-          attributes: ['id', 'slug'],
-        }),
+    const distinctHostCollectiveIds = uniq(distinctTransactions.map(t => t.dataValues.HostCollectiveId));
+    const hosts = await Promise.map(distinctHostCollectiveIds, HostCollectiveId =>
+      models.Collective.findById(HostCollectiveId, {
+        attributes: ['id', 'slug'],
+      }),
     );
 
     const token = subscribers[0].jwt();
@@ -193,12 +167,8 @@ const processBacker = async FromCollectiveId => {
     await Promise.map(
       hosts,
       async host => {
-        const filename = `${year}${month2digit}-${host.slug}-${
-          backerCollective.slug
-        }.pdf`;
-        const invoiceUrl = `${config.host.website}/${
-          backerCollective.slug
-        }/invoices/${filename}`;
+        const filename = `${year}${month2digit}-${host.slug}-${backerCollective.slug}.pdf`;
+        const invoiceUrl = `${config.host.website}/${backerCollective.slug}/invoices/${filename}`;
         console.log('>>> downloading', invoiceUrl);
         await fetch(invoiceUrl, { headers })
           .then(response => {
@@ -247,10 +217,7 @@ const processBacker = async FromCollectiveId => {
     else return 1;
   });
 
-  const stats = await computeStats(
-    collectivesWithOrders,
-    backerCollective.currency,
-  );
+  const stats = await computeStats(collectivesWithOrders, backerCollective.currency);
   const relatedCollectives = await models.Collective.getCollectivesSummaryByTag(
     stats.topTags,
     3,
@@ -354,10 +321,7 @@ const processCollective = async CollectiveId => {
     collective.getEvents({
       where: { startsAt: { [Op.gte]: startDate } },
       order: [['startsAt', 'DESC']],
-      include: [
-        { model: models.Member, as: 'members' },
-        { model: models.Order, as: 'orders' },
-      ],
+      include: [{ model: models.Member, as: 'members' }, { model: models.Order, as: 'orders' }],
     }),
     models.Update.findAll({
       where: {
@@ -402,13 +366,9 @@ const processCollective = async CollectiveId => {
   data.collective.stats.updates = results[8].length;
   const nextGoal = results[9];
   if (nextGoal) {
-    nextGoal.tweet = `🚀 ${
-      collective.twitterHandle
-        ? `@${collective.twitterHandle}`
-        : collective.name
-    } is at ${nextGoal.percentage} of their next goal: ${
-      nextGoal.title
-    }.\nJoin me in helping them get there! 🙌\nhttps://opencollective.com/${
+    nextGoal.tweet = `🚀 ${collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name} is at ${
+      nextGoal.percentage
+    } of their next goal: ${nextGoal.title}.\nJoin me in helping them get there! 🙌\nhttps://opencollective.com/${
       collective.slug
     }`;
     data.collective.nextGoal = nextGoal;
@@ -457,17 +417,12 @@ const computeStats = async (collectives, currency = 'USD') => {
     if (collective.order) {
       stats.totalDonatedPerCurrency[collective.order.currency] =
         stats.totalDonatedPerCurrency[collective.order.currency] || 0;
-      stats.totalDonatedPerCurrency[collective.order.currency] +=
-        collective.order.totalAmount;
+      stats.totalDonatedPerCurrency[collective.order.currency] += collective.order.totalAmount;
     }
     if (expenses && expenses.length > 0) {
       stats.expenses += expenses.length;
       await Promise.map(expenses, async expense => {
-        const amountInBackerCurrency = await convertToCurrency(
-          expense.amount,
-          expense.currency,
-          currency,
-        );
+        const amountInBackerCurrency = await convertToCurrency(expense.amount, expense.currency, currency);
         categories[expense.category] = categories[expense.category] || {
           occurences: 0,
           totalAmountPerCurrency: {},
@@ -475,42 +430,27 @@ const computeStats = async (collectives, currency = 'USD') => {
         };
         categories[expense.category].occurences++;
         categories[expense.category].totalAmountPerCurrency[expense.currency] =
-          categories[expense.category].totalAmountPerCurrency[
-            expense.currency
-          ] || 0;
-        categories[expense.category].totalAmountPerCurrency[expense.currency] +=
-          expense.amount;
-        categories[
-          expense.category
-        ].totalAmountInBackerCurrency += amountInBackerCurrency;
-        stats.totalSpentPerCurrency[expense.currency] =
-          stats.totalSpentPerCurrency[expense.currency] || 0;
+          categories[expense.category].totalAmountPerCurrency[expense.currency] || 0;
+        categories[expense.category].totalAmountPerCurrency[expense.currency] += expense.amount;
+        categories[expense.category].totalAmountInBackerCurrency += amountInBackerCurrency;
+        stats.totalSpentPerCurrency[expense.currency] = stats.totalSpentPerCurrency[expense.currency] || 0;
         stats.totalSpentPerCurrency[expense.currency] += expense.amount;
       });
     }
   });
   stats.topTags = getTopKeysFromObject(tagsIndex);
   stats.allTags = tagsIndex;
-  stats.topCategories = getTopKeysFromObject(
-    categories,
-    'totalAmountInBackerCurrency',
-  );
+  stats.topCategories = getTopKeysFromObject(categories, 'totalAmountInBackerCurrency');
   stats.categories = categories;
   stats.totalSpentString = formatCurrencyObject(stats.totalSpentPerCurrency);
-  stats.totalDonatedString = formatCurrencyObject(
-    stats.totalDonatedPerCurrency,
-  );
+  stats.totalDonatedString = formatCurrencyObject(stats.totalDonatedPerCurrency);
   const ar = [];
   stats.topCategories.map(category => {
-    ar.push(
-      `${category} (${formatCurrencyObject(
-        categories[category].totalAmountPerCurrency,
-      )})`,
-    );
+    ar.push(`${category} (${formatCurrencyObject(categories[category].totalAmountPerCurrency)})`);
   });
-  stats.expensesBreakdownString = `${
-    Object.keys(categories).length > 3 ? ', mostly in' : ' in'
-  } ${formatArrayToString(ar)}`;
+  stats.expensesBreakdownString = `${Object.keys(categories).length > 3 ? ', mostly in' : ' in'} ${formatArrayToString(
+    ar,
+  )}`;
   return stats;
 };
 
@@ -526,11 +466,7 @@ const sendEmail = (recipient, data, options = {}) => {
     recipient.email = process.env.SEND_EMAIL_TO;
   }
 
-  if (
-    process.env.DEBUG &&
-    process.env.DEBUG.match(/preview/) &&
-    options.attachments
-  ) {
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/) && options.attachments) {
     options.attachments.map(attachment => {
       const filepath = path.resolve(`/tmp/${attachment.filename}`);
       fs.writeFileSync(filepath, attachment.content);

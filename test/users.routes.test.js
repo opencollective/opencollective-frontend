@@ -66,8 +66,7 @@ describe('users.routes.test.js', () => {
   });
 
   // stub the transport
-  beforeEach(() =>
-    sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
+  beforeEach(() => sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
 
   afterEach(() => nm.sendMail.restore());
 
@@ -81,9 +80,7 @@ describe('users.routes.test.js', () => {
     it('returns true', done => {
       models.User.create({ email: 'john@smith.com' }).then(() => {
         request(app)
-          .get(
-            `/users/exists?email=john@smith.com&api_key=${application.api_key}`,
-          )
+          .get(`/users/exists?email=john@smith.com&api_key=${application.api_key}`)
           .end((e, res) => {
             expect(res.body.exists).to.be.true;
             done();
@@ -93,9 +90,7 @@ describe('users.routes.test.js', () => {
 
     it('returns false', done => {
       request(app)
-        .get(
-          `/users/exists?email=john2@smith.com&api_key=${application.api_key}`,
-        )
+        .get(`/users/exists?email=john2@smith.com&api_key=${application.api_key}`)
         .end((e, res) => {
           expect(res.body.exists).to.be.false;
           done();
@@ -169,10 +164,7 @@ describe('users.routes.test.js', () => {
         })
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property(
-            'email',
-            userData.email.toLowerCase(),
-          );
+          expect(res.body).to.have.property('email', userData.email.toLowerCase());
           expect(res.body).to.not.have.property('_salt');
           expect(res.body).to.not.have.property('password');
           expect(res.body).to.not.have.property('password_hash');
@@ -202,10 +194,7 @@ describe('users.routes.test.js', () => {
   describe('#update paypal email', () => {
     let user;
 
-    beforeEach(() =>
-      models.User.createUserWithCollective(utils.data('user1')).tap(
-        u => (user = u),
-      ));
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
 
     it('should update the paypal email', done => {
       const email = 'test+paypal@email.com';
@@ -248,10 +237,7 @@ describe('users.routes.test.js', () => {
   describe('#sendNewTokenByEmail', () => {
     let user;
 
-    beforeEach(() =>
-      models.User.createUserWithCollective(utils.data('user1')).tap(
-        u => (user = u),
-      ));
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
 
     it('fails if there is no email', done => {
       request(app)
@@ -298,9 +284,7 @@ describe('users.routes.test.js', () => {
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
           expect(href).to.contain(`${config.host.website}/signin/`);
-          expect(options.to).to.equal(
-            'emailbcc+user1-at-opencollective.com@opencollective.com',
-          );
+          expect(options.to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         }));
   });
 
@@ -311,10 +295,7 @@ describe('users.routes.test.js', () => {
   describe('#refreshTokenByEmail', () => {
     let user;
 
-    beforeEach(() =>
-      models.User.createUserWithCollective(utils.data('user1')).tap(
-        u => (user = u),
-      ));
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
 
     it('fails if there is no auth', () =>
       request(app)
@@ -323,16 +304,12 @@ describe('users.routes.test.js', () => {
 
     it('fails if the user does not exist', done => {
       const fakeUser = { id: 12312312 };
-      const expiredToken = jwt.sign(
-        { user: fakeUser },
-        config.keys.opencollective.secret,
-        {
-          expiresIn: 100,
-          subject: fakeUser.id,
-          issuer: config.host.api,
-          audience: application.id,
-        },
-      );
+      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
+        expiresIn: 100,
+        subject: fakeUser.id,
+        issuer: config.host.api,
+        audience: application.id,
+      });
 
       request(app)
         .post(`/users/refresh_login_token?api_key=${application.api_key}`)
@@ -348,16 +325,12 @@ describe('users.routes.test.js', () => {
     });
 
     it('sends an email with the new valid token', () => {
-      const expiredToken = jwt.sign(
-        { user },
-        config.keys.opencollective.secret,
-        {
-          expiresIn: -1,
-          subject: user.id,
-          issuer: config.host.api,
-          audience: application.id,
-        },
-      );
+      const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
+        expiresIn: -1,
+        subject: user.id,
+        issuer: config.host.api,
+        audience: application.id,
+      });
 
       return request(app)
         .post(`/users/refresh_login_token?api_key=${application.api_key}`)
@@ -369,9 +342,7 @@ describe('users.routes.test.js', () => {
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
           expect(href).to.contain(`${config.host.website}/signin/`);
-          expect(options.to).to.equal(
-            'emailbcc+user1-at-opencollective.com@opencollective.com',
-          );
+          expect(options.to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         });
     });
   });
@@ -417,9 +388,7 @@ describe('users.routes.test.js', () => {
       expect(parsedToken).to.be.exist;
 
       // And then the token should have a long expiration
-      expect(moment(parsedToken.exp).diff(parsedToken.iat)).to.equal(
-        auth.TOKEN_EXPIRATION_SESSION,
-      );
+      expect(moment(parsedToken.exp).diff(parsedToken.iat)).to.equal(auth.TOKEN_EXPIRATION_SESSION);
     });
   });
 });

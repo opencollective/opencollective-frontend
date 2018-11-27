@@ -27,20 +27,11 @@ describe('graphql.cancelSubscriptions.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective = g)));
 
   beforeEach(() => collective.addHost(user.collective));
 
@@ -54,10 +45,7 @@ describe('graphql.cancelSubscriptions.test.js', () => {
   });
 
   // Create a paymentMethod.
-  beforeEach(() =>
-    models.PaymentMethod.create(utils.data('paymentMethod2')).tap(
-      c => (paymentMethod = c),
-    ));
+  beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => (paymentMethod = c)));
 
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
@@ -87,8 +75,7 @@ describe('graphql.cancelSubscriptions.test.js', () => {
     });
 
     // stub the transport
-    beforeEach(() =>
-      sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
+    beforeEach(() => sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
 
     afterEach(() => nm.sendMail.restore());
 
@@ -120,32 +107,20 @@ describe('graphql.cancelSubscriptions.test.js', () => {
       });
 
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal(
-        'You need to be logged in to cancel a subscription',
-      );
+      expect(res.errors[0].message).to.equal('You need to be logged in to cancel a subscription');
     });
 
     it('fails if the subscription does not exist', async () => {
-      const res = await utils.graphqlQuery(
-        cancelSubscriptionQuery,
-        { id: 2 },
-        user,
-      );
+      const res = await utils.graphqlQuery(cancelSubscriptionQuery, { id: 2 }, user);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('Subscription not found');
     });
 
     it("fails if user isn't an admin of the collective", async () => {
-      const res = await utils.graphqlQuery(
-        cancelSubscriptionQuery,
-        { id: order.id },
-        user2,
-      );
+      const res = await utils.graphqlQuery(cancelSubscriptionQuery, { id: order.id }, user2);
 
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal(
-        "You don't have permission to cancel this subscription",
-      );
+      expect(res.errors[0].message).to.equal("You don't have permission to cancel this subscription");
     });
 
     it('fails if the subscription is already canceled', async () => {
@@ -166,22 +141,14 @@ describe('graphql.cancelSubscriptions.test.js', () => {
         }),
       );
 
-      const res = await utils.graphqlQuery(
-        cancelSubscriptionQuery,
-        { id: order2.id },
-        user,
-      );
+      const res = await utils.graphqlQuery(cancelSubscriptionQuery, { id: order2.id }, user);
 
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('Subscription already canceled');
     });
 
     it('succeeds in canceling the subscription', async () => {
-      const res = await utils.graphqlQuery(
-        cancelSubscriptionQuery,
-        { id: order.id },
-        user,
-      );
+      const res = await utils.graphqlQuery(cancelSubscriptionQuery, { id: order.id }, user);
 
       expect(res.errors).to.not.exist;
 

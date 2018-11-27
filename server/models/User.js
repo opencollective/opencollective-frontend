@@ -90,10 +90,7 @@ export default (Sequelize, DataTypes) => {
         set(val) {
           const password = String(val);
           this.setDataValue('password', password);
-          this.setDataValue(
-            'password_hash',
-            bcrypt.hashSync(password, this._salt),
-          );
+          this.setDataValue('password_hash', bcrypt.hashSync(password, this._salt));
         },
         validate: {
           len: {
@@ -109,10 +106,7 @@ export default (Sequelize, DataTypes) => {
         type: DataTypes.VIRTUAL,
         set(val) {
           this.setDataValue('resetPasswordToken', val);
-          this.setDataValue(
-            'resetPasswordTokenHash',
-            bcrypt.hashSync(val, this._salt),
-          );
+          this.setDataValue('resetPasswordTokenHash', bcrypt.hashSync(val, this._salt));
         },
       },
 
@@ -142,19 +136,15 @@ export default (Sequelize, DataTypes) => {
       getterMethods: {
         // Collective of type USER corresponding to this user
         userCollective() {
-          return models.Collective.findById(this.CollectiveId).then(
-            userCollective => {
-              if (!userCollective) {
-                console.error(
-                  `No Collective attached to this user id ${
-                    this.id
-                  } (User.CollectiveId: ${this.CollectiveId})`,
-                );
-                return {};
-              }
-              return userCollective;
-            },
-          );
+          return models.Collective.findById(this.CollectiveId).then(userCollective => {
+            if (!userCollective) {
+              console.error(
+                `No Collective attached to this user id ${this.id} (User.CollectiveId: ${this.CollectiveId})`,
+              );
+              return {};
+            }
+            return userCollective;
+          });
         },
 
         username() {
@@ -166,15 +156,11 @@ export default (Sequelize, DataTypes) => {
         },
 
         twitterHandle() {
-          return this.userCollective.then(
-            collective => collective.twitterHandle,
-          );
+          return this.userCollective.then(collective => collective.twitterHandle);
         },
 
         githubHandle() {
-          return this.userCollective.then(
-            collective => collective.githubHandle,
-          );
+          return this.userCollective.then(collective => collective.githubHandle);
         },
 
         website() {
@@ -186,9 +172,7 @@ export default (Sequelize, DataTypes) => {
         },
 
         longDescription() {
-          return this.userCollective.then(
-            collective => collective.longDescription,
-          );
+          return this.userCollective.then(collective => collective.longDescription);
         },
 
         image() {
@@ -270,10 +254,7 @@ export default (Sequelize, DataTypes) => {
     return `${config.host.website}/signin/${token}?next=${redirect}`;
   };
 
-  User.prototype.generateConnectedAccountVerifiedToken = function(
-    connectedAccountId,
-    username,
-  ) {
+  User.prototype.generateConnectedAccountVerifiedToken = function(connectedAccountId, username) {
     const payload = {
       scope: 'connected-account',
       connectedAccountId,
@@ -333,31 +314,20 @@ export default (Sequelize, DataTypes) => {
 
     return Promise.map(allowedFields, attr => {
       if (attributes[attr]) {
-        const model =
-          userAttributes.indexOf(attr) !== -1 ? 'User' : 'Collective';
+        const model = userAttributes.indexOf(attr) !== -1 ? 'User' : 'Collective';
         updatedAttributes[model][attr] = attributes[attr];
       }
 
       if (attr === 'slug') {
-        return Sequelize.query(
-          `SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[attr]}'`,
-          {
-            type: Sequelize.QueryTypes.SELECT,
-          },
-        ).then(res => {
+        return Sequelize.query(`SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[attr]}'`, {
+          type: Sequelize.QueryTypes.SELECT,
+        }).then(res => {
           const count = res[0].count;
-          if (count > 0)
-            throw new errors.BadRequest(
-              `slug ${attributes[attr]} is already taken`,
-            );
+          if (count > 0) throw new errors.BadRequest(`slug ${attributes[attr]} is already taken`);
         });
       }
     })
-      .then(
-        () =>
-          updatedAttributes.User.image ||
-          (this.firstName && userLib.fetchAvatar(this.email)),
-      ) // don't try to fetch avatar if user hasn't provided a first name (i.e. if they wanted to remain anonymous)
+      .then(() => updatedAttributes.User.image || (this.firstName && userLib.fetchAvatar(this.email))) // don't try to fetch avatar if user hasn't provided a first name (i.e. if they wanted to remain anonymous)
       .then(image => {
         if (
           process.env.NODE_ENV === 'development' ||
@@ -371,9 +341,7 @@ export default (Sequelize, DataTypes) => {
         return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, {
           context: imageUrlLib,
         })(knox, image).then((aws_src, error) => {
-          updatedAttributes.User.image = error
-            ? updatedAttributes.User.image
-            : aws_src;
+          updatedAttributes.User.image = error ? updatedAttributes.User.image : aws_src;
         });
       })
       .then(() => {
@@ -401,8 +369,7 @@ export default (Sequelize, DataTypes) => {
       where: { MemberCollectiveId: this.CollectiveId },
     });
     memberships.map(m => {
-      rolesByCollectiveId[m.CollectiveId] =
-        rolesByCollectiveId[m.CollectiveId] || [];
+      rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
       rolesByCollectiveId[m.CollectiveId].push(m.role);
       if (m.role === roles.ADMIN) {
         adminOf.push(m.CollectiveId);
@@ -417,8 +384,7 @@ export default (Sequelize, DataTypes) => {
         },
       });
       hostedMemberships.map(m => {
-        rolesByCollectiveId[m.CollectiveId] =
-          rolesByCollectiveId[m.CollectiveId] || [];
+        rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
         rolesByCollectiveId[m.CollectiveId].push(roles.ADMIN);
       });
     }
@@ -431,37 +397,20 @@ export default (Sequelize, DataTypes) => {
     if (!CollectiveId) return false;
     if (this.CollectiveId === Number(CollectiveId)) return true;
     if (!this.rolesByCollectiveId) {
-      console.error(
-        ">>> User model error: User.rolesByCollectiveId hasn't been populated.",
-        new Error().stack,
-      );
+      console.error(">>> User model error: User.rolesByCollectiveId hasn't been populated.", new Error().stack);
       return false;
     }
     if (typeof roles === 'string') {
       roles = [roles];
     }
-    const result =
-      intersection(this.rolesByCollectiveId[Number(CollectiveId)], roles)
-        .length > 0;
-    debug(
-      'hasRole',
-      'userid:',
-      this.id,
-      'has role',
-      roles,
-      ' in CollectiveId',
-      CollectiveId,
-      '?',
-      result,
-    );
+    const result = intersection(this.rolesByCollectiveId[Number(CollectiveId)], roles).length > 0;
+    debug('hasRole', 'userid:', this.id, 'has role', roles, ' in CollectiveId', CollectiveId, '?', result);
     return result;
   };
 
   // Adding some sugars
   User.prototype.isAdmin = function(CollectiveId) {
-    const result =
-      this.CollectiveId === Number(CollectiveId) ||
-      this.hasRole([roles.HOST, roles.ADMIN], CollectiveId);
+    const result = this.CollectiveId === Number(CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN], CollectiveId);
     debug('isAdmin of CollectiveId', CollectiveId, '?', result);
     return result;
   };
@@ -474,8 +423,7 @@ export default (Sequelize, DataTypes) => {
 
   User.prototype.isMember = function(CollectiveId) {
     const result =
-      this.CollectiveId === CollectiveId ||
-      this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
+      this.CollectiveId === CollectiveId || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
     debug('isMember of CollectiveId', CollectiveId, '?', result);
     return result;
   };
@@ -492,12 +440,11 @@ export default (Sequelize, DataTypes) => {
       .then(() => {
         if (this.id === remoteUser.id) return true;
         // all the CollectiveIds that the remoteUser is admin of.
-        const adminOfCollectives = Object.keys(
-          remoteUser.rolesByCollectiveId,
-        ).filter(CollectiveId => remoteUser.isAdmin(CollectiveId));
+        const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId =>
+          remoteUser.isAdmin(CollectiveId),
+        );
         const memberOfCollectives = Object.keys(this.rolesByCollectiveId);
-        const canAccess =
-          intersection(adminOfCollectives, memberOfCollectives).length > 0;
+        const canAccess = intersection(adminOfCollectives, memberOfCollectives).length > 0;
         debug(
           'getPersonalDetails',
           'remoteUser id:',
@@ -522,11 +469,7 @@ export default (Sequelize, DataTypes) => {
    * Class Methods
    */
   User.createMany = (users, defaultValues = {}) => {
-    return Promise.map(
-      users,
-      u => User.create(defaults({}, u, defaultValues)),
-      { concurrency: 1 },
-    );
+    return Promise.map(users, u => User.create(defaults({}, u, defaultValues)), { concurrency: 1 });
   };
 
   User.auth = (email, password, cb) => {
@@ -563,11 +506,7 @@ export default (Sequelize, DataTypes) => {
     }
     debug('findOrCreateByEmail', email, 'other attributes: ', otherAttributes);
     return User.findByEmailOrPaypalEmail(email).then(
-      user =>
-        user ||
-        models.User.createUserWithCollective(
-          Object.assign({}, { email }, otherAttributes),
-        ),
+      user => user || models.User.createUserWithCollective(Object.assign({}, { email }, otherAttributes)),
     );
   };
 
@@ -583,10 +522,7 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.createUserWithCollective = userData => {
-    if (!userData)
-      return Promise.reject(
-        new Error('Cannot create a user: no user data provided'),
-      );
+    if (!userData) return Promise.reject(new Error('Cannot create a user: no user data provided'));
 
     let user;
     debug('createUserWithCollective', userData);

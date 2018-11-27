@@ -16,8 +16,7 @@ import { TransactionType } from '../enum/TransactionType';
 
 export const Transaction = new GraphQLInterfaceType({
   name: 'Transaction',
-  description:
-    'Transaction interface shared by all kind of transactions (Debit, Credit)',
+  description: 'Transaction interface shared by all kind of transactions (Debit, Credit)',
   fields: () => {
     return {
       // _internal_id: {

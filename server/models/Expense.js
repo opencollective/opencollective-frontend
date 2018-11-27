@@ -162,8 +162,7 @@ export default function(Sequelize, DataTypes) {
         afterUpdate(expense) {
           switch (expense.status) {
             case status.PAID:
-              expense._previousDataValues.status === status.APPROVED &&
-                expense.addUserIdToHostW9ReceivedList();
+              expense._previousDataValues.status === status.APPROVED && expense.addUserIdToHostW9ReceivedList();
               break;
             case status.APPROVED:
               expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
@@ -207,18 +206,12 @@ export default function(Sequelize, DataTypes) {
   Expense.prototype.addUserIdToHostW9ReceivedList = async function() {
     const host = await this.collective.getHostCollective();
     // If user is already included in Host data List, don't do anything
-    if (
-      get(host, 'data.W9.receivedFromUserIds') &&
-      host.data.W9.receivedFromUserIds.includes(this.UserId)
-    ) {
+    if (get(host, 'data.W9.receivedFromUserIds') && host.data.W9.receivedFromUserIds.includes(this.UserId)) {
       return false;
     }
     // Only Inserts User in W9 Received list if he is already present on
     // the W9.requestSentToUserIds (which means this user already overstepped the W9 Threshold)
-    if (
-      get(host, 'data.W9.requestSentToUserIds') &&
-      host.data.W9.requestSentToUserIds.includes(this.UserId)
-    ) {
+    if (get(host, 'data.W9.requestSentToUserIds') && host.data.W9.requestSentToUserIds.includes(this.UserId)) {
       const receivedFromUserIds = get(host, 'data.W9.receivedFromUserIds', []);
       receivedFromUserIds.push(this.UserId);
       set(host, 'data.W9.receivedFromUserIds', receivedFromUserIds);
@@ -264,12 +257,7 @@ export default function(Sequelize, DataTypes) {
    * @param {*} since
    * @param {*} until
    */
-  Expense.getTotalExpensesFromUserIdInBaseCurrency = async function(
-    userId,
-    baseCurrency,
-    since,
-    until = new Date(),
-  ) {
+  Expense.getTotalExpensesFromUserIdInBaseCurrency = async function(userId, baseCurrency, since, until = new Date()) {
     const userExpenses = await Expense.findAll({
       attributes: ['currency', 'amount', 'status', 'updatedAt'],
       where: {

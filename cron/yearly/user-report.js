@@ -2,14 +2,8 @@
 
 // Only run on the first of the year
 const today = new Date();
-if (
-  process.env.NODE_ENV === 'production' &&
-  today.getDate() !== 1 &&
-  today.getMonth() !== 0
-) {
-  console.log(
-    'NODE_ENV is production and today is not the first of year, script aborted!',
-  );
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 1 && today.getMonth() !== 0) {
+  console.log('NODE_ENV is production and today is not the first of year, script aborted!');
   process.exit();
 }
 
@@ -18,11 +12,7 @@ process.env.PORT = 3066;
 import models, { sequelize, Op } from '../../server/models';
 import _ from 'lodash';
 import Promise from 'bluebird';
-import {
-  formatCurrency,
-  formatArrayToString,
-  formatCurrencyObject,
-} from '../../server/lib/utils';
+import { formatCurrency, formatArrayToString, formatCurrencyObject } from '../../server/lib/utils';
 import emailLib from '../../server/lib/email';
 import queries from '../../server/lib/queries';
 
@@ -69,15 +59,10 @@ const buildTweet = (fromCollective, collectives, totalDonations) => {
     collectivesDonationsNames = [];
   for (const slug in collectives) {
     const collective = collectives[slug];
-    const collectiveName = collective.twitterHandle
-      ? `@${collective.twitterHandle}`
-      : collective.name;
+    const collectiveName = collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name;
     collectivesNames.push(collectiveName);
     collectivesDonationsNames.push(
-      `${formatCurrency(
-        collective.totalDonations,
-        collective.currency,
-      )} across ${collectiveName}`,
+      `${formatCurrency(collective.totalDonations, collective.currency)} across ${collectiveName}`,
     );
   }
   const pronoun = fromCollective.type === 'USER' ? 'I' : 'we';
@@ -86,17 +71,14 @@ const buildTweet = (fromCollective, collectives, totalDonations) => {
       totalDonations,
     )} across ${totalCollectives} collectives`;
     const listCollectives = formatArrayToString(collectivesNames);
-    if (`${tweet}: ${listCollectives}`.length < 120)
-      tweet = `${tweet}: ${listCollectives}`;
+    if (`${tweet}: ${listCollectives}`.length < 120) tweet = `${tweet}: ${listCollectives}`;
   } else if (totalCollectives === 1) {
     tweet = `🎁 In ${year}, ${pronoun} have contributed ${collectivesDonationsNames[0].replace(
       ' to ',
       ' to the ',
     )} collective`;
   } else {
-    tweet = `🎁 In ${year}, ${pronoun} have contributed ${formatArrayToString(
-      collectivesDonationsNames,
-    )}'s collective`;
+    tweet = `🎁 In ${year}, ${pronoun} have contributed ${formatArrayToString(collectivesDonationsNames)}'s collective`;
   }
 
   return tweet;
@@ -104,10 +86,7 @@ const buildTweet = (fromCollective, collectives, totalDonations) => {
 
 const getPlatformStats = () => {
   return Promise.props({
-    totalCollectives: queries.getTotalNumberOfActiveCollectives(
-      startDate,
-      endDate,
-    ),
+    totalCollectives: queries.getTotalNumberOfActiveCollectives(startDate, endDate),
     totalAnnualBudget: queries.getTotalAnnualBudget(),
   });
 };
@@ -121,9 +100,7 @@ const processCollective = collective => {
     .then(transactions => {
       if (!transactions || transactions.length === 0) {
         totalUsersSkipped++;
-        return Promise.reject(
-          `No transaction for ${collective.slug}, skipping`,
-        );
+        return Promise.reject(`No transaction for ${collective.slug}, skipping`);
       }
       console.log('>>> processing collective', collective.slug);
       totalUsersProcessed++;
@@ -155,8 +132,7 @@ const processCollective = collective => {
           mission: row.mission,
           image: row.image,
           backgroundImage:
-            row.backgroundImage ||
-            'https://opencollective.com/public/images/collectives/default-header-bg.jpg',
+            row.backgroundImage || 'https://opencollective.com/public/images/collectives/default-header-bg.jpg',
           twitterHandle: row.twitterHandle,
           settings: row.settings,
           data: row.data,
@@ -164,35 +140,25 @@ const processCollective = collective => {
           currency: row.hostCurrency,
         };
 
-        hosts[row.hostSlug].collectivesBySlug[row.slug] =
-          collectivesBySlug[row.slug];
+        hosts[row.hostSlug].collectivesBySlug[row.slug] = collectivesBySlug[row.slug];
 
-        if (typeof totalDonations[row.hostCurrency] === 'undefined')
-          totalDonations[row.hostCurrency] = 0;
+        if (typeof totalDonations[row.hostCurrency] === 'undefined') totalDonations[row.hostCurrency] = 0;
 
         _.set(hosts, [row.hostSlug, 'totalFees', row.hostCurrency], 0);
         _.set(hosts, ['stripe', 'totalFees', row.hostCurrency], 0);
         _.set(hosts, ['opencollective', 'totalFees', row.hostCurrency], 0);
 
         totalDonations[row.hostCurrency] += Number(row.amountInHostCurrency);
-        hosts[row.hostSlug]['totalFees'][row.hostCurrency] += Number(
-          row.hostFeeInHostCurrency,
-        );
-        hosts['opencollective']['totalFees'][row.hostCurrency] += Number(
-          row.platformFeeInHostCurrency,
-        );
-        hosts['stripe']['totalFees'][row.hostCurrency] += Number(
-          row.paymentProcessorFeeInHostCurrency,
-        );
+        hosts[row.hostSlug]['totalFees'][row.hostCurrency] += Number(row.hostFeeInHostCurrency);
+        hosts['opencollective']['totalFees'][row.hostCurrency] += Number(row.platformFeeInHostCurrency);
+        hosts['stripe']['totalFees'][row.hostCurrency] += Number(row.paymentProcessorFeeInHostCurrency);
       });
 
       for (const hostSlug in hosts) {
         if (!hosts[hostSlug].collectivesBySlug) continue;
         for (const collectiveSlug in hosts[hostSlug].collectivesBySlug) {
           hosts[hostSlug].collectives = hosts[hostSlug].collectives || [];
-          hosts[hostSlug].collectives.push(
-            hosts[hostSlug].collectivesBySlug[collectiveSlug],
-          );
+          hosts[hostSlug].collectives.push(hosts[hostSlug].collectivesBySlug[collectiveSlug]);
         }
         hosts[hostSlug].collectives.sort((a, b) => {
           if (a.totalDonations > b.totalDonations) return -1;
@@ -209,14 +175,8 @@ const processCollective = collective => {
       delete hosts['opencollective'];
 
       const profileUrl = `https://opencollective.com/${collective.slug}`;
-      const tweetText = buildTweet(
-        collective,
-        collectivesBySlug,
-        totalDonations,
-      );
-      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        tweetText,
-      )}&url=${profileUrl}`;
+      const tweetText = buildTweet(collective, collectivesBySlug, totalDonations);
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${profileUrl}`;
       return {
         stats: {
           totalCollectives,
@@ -225,9 +185,7 @@ const processCollective = collective => {
         },
         tweet: { text: tweetText.substr(2), url: tweetUrl },
         fburl: `https://facebook.com/sharer.php?url=${encodeURIComponent(
-          `https://opencollective.com/${
-            collective.slug
-          }?description=${encodeURIComponent(tweetText.substr(2))}`,
+          `https://opencollective.com/${collective.slug}?description=${encodeURIComponent(tweetText.substr(2))}`,
         )}`,
         fees,
         hosts,
@@ -240,13 +198,7 @@ const processCollective = collective => {
         data.platformStats = platformStats;
         data.recipients = users.map(u => u.email);
         if (data.recipients.length > 1) {
-          console.log(
-            '>>> recipients for ',
-            collective.type.toLowerCase(),
-            collective.slug,
-            ':',
-            data.recipients,
-          );
+          console.log('>>> recipients for ', collective.type.toLowerCase(), collective.slug, ':', data.recipients);
         }
         if (data.recipients.length > 0) {
           return emailLib.send('user.yearlyreport', data.recipients, data);
@@ -258,12 +210,7 @@ const processCollective = collective => {
 
 const getHosts = () => {
   return models.Member.findAll({
-    attributes: [
-      [
-        sequelize.fn('DISTINCT', sequelize.col('MemberCollectiveId')),
-        'MemberCollectiveId',
-      ],
-    ],
+    attributes: [[sequelize.fn('DISTINCT', sequelize.col('MemberCollectiveId')), 'MemberCollectiveId']],
     where: { role: 'HOST' },
   }).map(m => m.MemberCollectiveId);
 };
@@ -272,14 +219,7 @@ const getCollectives = () => {
   const where = {};
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
     where.slug = {
-      [Op.in]: [
-        'xdamman',
-        'digitalocean',
-        'fbopensource',
-        'piamancini',
-        'brusselstogether',
-        'wwcode',
-      ],
+      [Op.in]: ['xdamman', 'digitalocean', 'fbopensource', 'piamancini', 'brusselstogether', 'wwcode'],
     };
   }
 
@@ -306,9 +246,7 @@ const getUsers = collective => {
     const unsubscribedUserIds = unsubscriptions.map(u => u.UserId);
     if (unsubscribedUserIds.length > 0) {
       console.log(
-        `${
-          unsubscribedUserIds.length
-        } users have unsubscribed from the user.yearlyreport report for collective ${
+        `${unsubscribedUserIds.length} users have unsubscribed from the user.yearlyreport report for collective ${
           collective.slug
         }`,
       );

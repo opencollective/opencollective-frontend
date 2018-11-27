@@ -10,11 +10,7 @@ import debugLib from 'debug';
 
 const debug = debugLib('clean_search_index');
 
-const {
-  appId: ALGOLIA_APP_ID,
-  appKey: ALGOLIA_KEY,
-  index: ALGOLIA_INDEX,
-} = config.algolia;
+const { appId: ALGOLIA_APP_ID, appKey: ALGOLIA_KEY, index: ALGOLIA_INDEX } = config.algolia;
 
 const yesterday = moment()
   .tz('America/New_York')
@@ -27,15 +23,10 @@ const done = error => {
     debug('Error when cleaning index', error);
 
     return emailLib
-      .sendMessage(
-        'ops@opencollective.com',
-        'Error when cleaning search index',
-        '',
-        {
-          bcc: ' ',
-          text: error,
-        },
-      )
+      .sendMessage('ops@opencollective.com', 'Error when cleaning search index', '', {
+        bcc: ' ',
+        text: error,
+      })
       .then(process.exit)
       .catch(console.error);
   }

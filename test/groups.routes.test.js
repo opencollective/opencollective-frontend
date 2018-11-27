@@ -51,15 +51,9 @@ describe('groups.routes.test.js', () => {
       email: 'finance2+wwcode@opencollective.com',
     }).tap(u => (hostAdmin2 = u)),
   );
-  beforeEach('create user', () =>
-    models.User.createUserWithCollective(userData).tap(u => (user = u)),
-  );
-  beforeEach('add host admin1', () =>
-    hostCollective.addUserWithRole(hostAdmin1, 'ADMIN'),
-  );
-  beforeEach('add host admin2', () =>
-    hostCollective.addUserWithRole(hostAdmin2, 'ADMIN'),
-  );
+  beforeEach('create user', () => models.User.createUserWithCollective(userData).tap(u => (user = u)));
+  beforeEach('add host admin1', () => hostCollective.addUserWithRole(hostAdmin1, 'ADMIN'));
+  beforeEach('add host admin2', () => hostCollective.addUserWithRole(hostAdmin2, 'ADMIN'));
   beforeEach('unsubscribe admin2', () =>
     models.Notification.create({
       UserId: hostAdmin2.id,
@@ -165,9 +159,7 @@ describe('groups.routes.test.js', () => {
             expect(res.body).to.have.property('description');
             expect(res.body).to.have.property('longDescription');
             expect(res.body).to.have.property('isActive', true);
-            expect(emailLib.send.lastCall.args[1]).to.equal(
-              'githubuser@gmail.com',
-            );
+            expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
             return models.Member.findAll({
               where: { CollectiveId: res.body.id },
             });
@@ -178,9 +170,7 @@ describe('groups.routes.test.js', () => {
             expect(members[1]).to.have.property('role', roles.HOST);
             return null;
           })
-          .then(() =>
-            ConnectedAccount.findOne({ where: { username: 'asood123' } }),
-          )
+          .then(() => ConnectedAccount.findOne({ where: { username: 'asood123' } }))
           .then(ca => {
             expect(ca).to.have.property('service', 'github');
             return ca.getCollective();
@@ -238,9 +228,8 @@ describe('groups.routes.test.js', () => {
       data: { publishableKey: stripeMock.accounts.create.keys.publishable },
     };
     beforeEach(() =>
-      hostCollective
-        .setStripeAccount(stripeAccount)
-        .then(() => user.collective.setStripeAccount(stripeAccount)));
+      hostCollective.setStripeAccount(stripeAccount).then(() => user.collective.setStripeAccount(stripeAccount)),
+    );
 
     beforeEach('create a new payment method for user', () =>
       models.PaymentMethod.create({
@@ -295,11 +284,7 @@ describe('groups.routes.test.js', () => {
 
     it('successfully get a group by its slug (case insensitive)', done => {
       request(app)
-        .get(
-          `/groups/${publicCollective.slug.toUpperCase()}?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${publicCollective.slug.toUpperCase()}?api_key=${application.api_key}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -364,7 +349,8 @@ describe('groups.routes.test.js', () => {
               FromCollectiveId: user.CollectiveId,
               CollectiveId: publicCollective.id,
             }),
-          ));
+          ),
+      );
 
       it('successfully get a group with remaining budget and yearlyIncome', done => {
         request(app)
@@ -379,39 +365,25 @@ describe('groups.routes.test.js', () => {
             expect(g).to.have.property(
               'balance',
               parseInt(
-                (
-                  totDonations +
-                  totTransactions +
-                  transactionsData[7].amount +
-                  transactionsData[8].amount
-                ).toFixed(0),
+                (totDonations + totTransactions + transactionsData[7].amount + transactionsData[8].amount).toFixed(0),
                 10,
               ),
             );
-            expect(g).to.have.property(
-              'yearlyIncome',
-              transactionsData[7].amount + transactionsData[7].amount * 12,
-            ); // one is a single payment and other is a subscription
+            expect(g).to.have.property('yearlyIncome', transactionsData[7].amount + transactionsData[7].amount * 12); // one is a single payment and other is a subscription
             done();
           });
       });
 
       it("successfully get a group's backers", done => {
         request(app)
-          .get(
-            `/groups/${publicCollective.id}/backers?api_key=${
-              application.api_key
-            }`,
-          )
+          .get(`/groups/${publicCollective.id}/backers?api_key=${application.api_key}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
             const userData = res.body[0];
             expect(userData.firstName).to.equal(user.public.firstName);
             expect(userData.lastName).to.equal(user.public.lastName);
-            expect(userData.name).to.equal(
-              `${user.public.firstName} ${user.public.lastName}`,
-            );
+            expect(userData.name).to.equal(`${user.public.firstName} ${user.public.lastName}`);
             expect(userData.role).to.equal(roles.BACKER);
             done();
           });
@@ -467,22 +439,21 @@ describe('groups.routes.test.js', () => {
     });
 
     // Create another user.
-    beforeEach(() =>
-      models.User.createUserWithCollective(utils.data('user2')).then(
-        u => (user2 = u),
-      ));
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).then(u => (user2 = u)));
 
     // Create another user that is a backer.
     beforeEach(() =>
       models.User.createUserWithCollective(utils.data('user3'))
         .tap(u => (user3 = u))
-        .then(() => group.addUserWithRole(user3, roles.BACKER)));
+        .then(() => group.addUserWithRole(user3, roles.BACKER)),
+    );
 
     // Create another user that is a member.
     beforeEach(() =>
       models.User.createUserWithCollective(utils.data('user4'))
         .tap(u => (user4 = u))
-        .then(() => group.addUserWithRole(user4, roles.ADMIN)));
+        .then(() => group.addUserWithRole(user4, roles.ADMIN)),
+    );
 
     it('fails updating a group if not authenticated', done => {
       request(app)
@@ -553,31 +524,15 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('id', group.id);
           expect(res.body).to.have.property('name', groupNew.name);
           expect(res.body).to.have.property('mission', groupNew.mission);
-          expect(res.body).to.have.property(
-            'description',
-            groupNew.description,
-          );
-          expect(res.body).to.have.property(
-            'longDescription',
-            groupNew.longDescription,
-          );
-          expect(res.body.settings).to.have.property(
-            'lang',
-            groupNew.settings.lang,
-          );
+          expect(res.body).to.have.property('description', groupNew.description);
+          expect(res.body).to.have.property('longDescription', groupNew.longDescription);
+          expect(res.body.settings).to.have.property('lang', groupNew.settings.lang);
           expect(res.body).to.have.property('image', groupNew.image);
-          expect(res.body).to.have.property(
-            'backgroundImage',
-            groupNew.backgroundImage,
-          );
+          expect(res.body).to.have.property('backgroundImage', groupNew.backgroundImage);
           expect(res.body).to.have.property('isActive', groupNew.isActive);
           expect(res.body).to.not.have.property('otherprop');
-          expect(new Date(res.body.createdAt).getTime()).to.equal(
-            new Date(group.createdAt).getTime(),
-          );
-          expect(new Date(res.body.updatedAt).getTime()).to.not.equal(
-            new Date(group.updatedAt).getTime(),
-          );
+          expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(group.createdAt).getTime());
+          expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());
           done();
         });
     });

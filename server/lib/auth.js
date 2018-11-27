@@ -31,8 +31,8 @@ export function getListOfAccessibleMembers(remoteUser, CollectiveIds) {
   if (!remoteUser) return Promise.resolve([]);
   if (!remoteUser.rolesByCollectiveId) return Promise.resolve([]);
   // all the CollectiveIds that the remoteUser is admin of.
-  const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(
-    CollectiveId => remoteUser.isAdmin(CollectiveId),
+  const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId =>
+    remoteUser.isAdmin(CollectiveId),
   );
   return models.Member.findAll({
     attributes: ['MemberCollectiveId'],
@@ -52,12 +52,7 @@ export function mustBeLoggedInTo(remoteUser, action = 'do this') {
   }
 }
 
-export function mustHaveRole(
-  remoteUser,
-  roles,
-  CollectiveId,
-  action = 'perform this action',
-) {
+export function mustHaveRole(remoteUser, roles, CollectiveId, action = 'perform this action') {
   mustBeLoggedInTo(remoteUser, action);
   if (!CollectiveId || !remoteUser.hasRole(roles, CollectiveId)) {
     throw new errors.Unauthorized({

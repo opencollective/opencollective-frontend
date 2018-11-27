@@ -1,11 +1,6 @@
 import handlebars from 'handlebars';
 import moment from 'moment-timezone';
-import {
-  resizeImage,
-  capitalize,
-  formatCurrencyObject,
-  pluralize,
-} from './utils';
+import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './utils';
 
 // from https://stackoverflow.com/questions/8853396/logical-operator-in-a-handlebars-js-if-conditional
 handlebars.registerHelper('ifCond', (v1, operator, v2, options) => {
@@ -129,21 +124,15 @@ handlebars.registerHelper('number', (value, props) => {
   });
 });
 
-handlebars.registerHelper('resizeImage', (imageUrl, props) =>
-  resizeImage(imageUrl, props.hash),
-);
+handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));
 handlebars.registerHelper('capitalize', str => capitalize(str));
-handlebars.registerHelper('pluralize', (str, props) =>
-  pluralize(str, props.hash.n || props.hash.count),
-);
+handlebars.registerHelper('pluralize', (str, props) => pluralize(str, props.hash.n || props.hash.count));
 
 handlebars.registerHelper('encodeURIComponent', str => {
   return encodeURIComponent(str);
 });
 
-handlebars.registerHelper('formatCurrencyObject', (obj, props) =>
-  formatCurrencyObject(obj, props.hash),
-);
+handlebars.registerHelper('formatCurrencyObject', (obj, props) => formatCurrencyObject(obj, props.hash));
 
 handlebars.registerHelper('debug', console.log);
 

@@ -24,8 +24,7 @@ export default {
     bio:
       'Entrepreneur. Working on a new lightweight and transparent organization structure for the new economy @opencollect. Previously cofounder/CEO of @Storify.',
     site: 'http://xdamman.com',
-    avatar:
-      'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764',
+    avatar: 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764',
     employment: {
       domain: null,
       name: 'Storify.com',
@@ -56,8 +55,7 @@ export default {
       favorites: 10139,
       location: 'San Francisco',
       site: 'http://xdamman.com',
-      avatar:
-        'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
+      avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
     },
     linkedin: {
       handle: 'in/xavierdamman',
@@ -67,8 +65,7 @@ export default {
     },
     aboutme: {
       handle: 'xdamman',
-      bio:
-        'CS Engineer and entrepreneur born and raised in Belgium.\nPassionate about new media & democracy.',
+      bio: 'CS Engineer and entrepreneur born and raised in Belgium.\nPassionate about new media & democracy.',
       avatar:
         'http://o.aolcdn.com/dims-global/dims/ABOUTME/5/803/408/80/http://thumbs.about.me/thumb2/x/d/a/xdamman/xdamman-840x560.jpg',
     },

@@ -10,13 +10,11 @@ const IndividualQuery = {
   args: {
     id: {
       type: GraphQLString,
-      description:
-        'The public id identifying the individual (ie: ggnxdwzj-3le5mpwa-5eqy8rvb-ko04a97b)',
+      description: 'The public id identifying the individual (ie: ggnxdwzj-3le5mpwa-5eqy8rvb-ko04a97b)',
     },
     slug: {
       type: GraphQLString,
-      description:
-        'The slug identifying the individual (ie: piamancini for https://opencollective.com/piamancini)',
+      description: 'The slug identifying the individual (ie: piamancini for https://opencollective.com/piamancini)',
     },
   },
   async resolve(_, args) {

@@ -73,12 +73,8 @@ describe('LibSubscription', () => {
 
       // Then both dates should be advanced to the first day of the
       // next month
-      expect(updatedDates.nextPeriodStart.getTime()).to.equal(
-        new Date('2018-02-01 0:0').getTime(),
-      );
-      expect(updatedDates.nextChargeDate.getTime()).to.equal(
-        new Date('2018-02-01 0:0').getTime(),
-      );
+      expect(updatedDates.nextPeriodStart.getTime()).to.equal(new Date('2018-02-01 0:0').getTime());
+      expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2018-02-01 0:0').getTime());
     });
 
     it('should use first day of the same month next year for yearly subscriptions', () => {
@@ -95,12 +91,8 @@ describe('LibSubscription', () => {
       const updatedDates = getNextChargeAndPeriodStartDates('new', order);
 
       // Then both dates should be advanced
-      expect(updatedDates.nextPeriodStart.getTime()).to.equal(
-        new Date('2019-01-01 0:0').getTime(),
-      );
-      expect(updatedDates.nextChargeDate.getTime()).to.equal(
-        new Date('2019-01-01 0:0').getTime(),
-      );
+      expect(updatedDates.nextPeriodStart.getTime()).to.equal(new Date('2019-01-01 0:0').getTime());
+      expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2019-01-01 0:0').getTime());
     });
 
     it('should bump the nextChargeDate by two days from today on failure', () => {
@@ -123,9 +115,7 @@ describe('LibSubscription', () => {
         // Then just the nextCharge date should be updated. The date
         // that saves the last period's start should keep the same value
         expect(updatedDates.nextPeriodStart).to.equal(undefined);
-        expect(updatedDates.nextChargeDate.getTime()).to.equal(
-          new Date('2018-01-30 0:0').getTime(),
-        );
+        expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2018-01-30 0:0').getTime());
       } finally {
         clock.restore();
       }
@@ -146,12 +136,8 @@ describe('LibSubscription', () => {
 
       // Then both dates should be updated based on nextPeriodStart
       // rather than nextChargeDate
-      expect(updatedDates.nextPeriodStart.getTime()).to.equal(
-        new Date('2018-02-20 0:0').getTime(),
-      );
-      expect(updatedDates.nextChargeDate.getTime()).to.equal(
-        new Date('2018-02-20 0:0').getTime(),
-      );
+      expect(updatedDates.nextPeriodStart.getTime()).to.equal(new Date('2018-02-20 0:0').getTime());
+      expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2018-02-20 0:0').getTime());
     });
 
     it('should use the createdAt field when `nextChargeDate` is null', () => {
@@ -169,12 +155,8 @@ describe('LibSubscription', () => {
       const updatedDates = getNextChargeAndPeriodStartDates('new', order);
 
       // Then both dates should be updated according to createdAt
-      expect(updatedDates.nextPeriodStart.getTime()).to.equal(
-        new Date('2018-02-01 0:0').getTime(),
-      );
-      expect(updatedDates.nextChargeDate.getTime()).to.equal(
-        new Date('2018-02-01 0:0').getTime(),
-      );
+      expect(updatedDates.nextPeriodStart.getTime()).to.equal(new Date('2018-02-01 0:0').getTime());
+      expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2018-02-01 0:0').getTime());
     });
 
     it("should set the nextChargeDate to today and not modify nextPeriodStart when status is 'updated'", () => {
@@ -195,9 +177,7 @@ describe('LibSubscription', () => {
 
       try {
         // Then only nextChargeDate should be set to today;
-        expect(updatedDates.nextChargeDate.getTime()).to.equal(
-          new Date().getTime(),
-        );
+        expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date().getTime());
       } finally {
         clock.restore();
       }
@@ -355,10 +335,7 @@ describe('LibSubscription', () => {
 
       it('should update dates after successfuly processing monthly ', async () => {
         // Given an order with a subscription
-        const { order } = await createOrderWithSubscription(
-          'month',
-          '2018-01-27',
-        );
+        const { order } = await createOrderWithSubscription('month', '2018-01-27');
 
         // And given that an email should be sent afterwards
         emailMock
@@ -371,10 +348,7 @@ describe('LibSubscription', () => {
         paymentsStub.resolves({ info: 'Transaction' });
 
         // When the order is processed
-        const entry = await processOrderWithSubscription(
-          { dryRun: false },
-          order,
-        );
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
 
         // Expect the mock expectations to be verified. The right
         // email was sent.
@@ -386,20 +360,13 @@ describe('LibSubscription', () => {
         expect(entry.status).to.equal('success');
 
         // And then the dates are incremented by one month
-        expect(order.Subscription.nextChargeDate.getTime()).to.equal(
-          new Date('2018-02-27 0:0').getTime(),
-        );
-        expect(order.Subscription.nextPeriodStart.getTime()).to.equal(
-          new Date('2018-02-27 0:0').getTime(),
-        );
+        expect(order.Subscription.nextChargeDate.getTime()).to.equal(new Date('2018-02-27 0:0').getTime());
+        expect(order.Subscription.nextPeriodStart.getTime()).to.equal(new Date('2018-02-27 0:0').getTime());
       });
 
       it('should update dates after successfuly processing yearly ', async () => {
         // Given an order with a subscription
-        const { order } = await createOrderWithSubscription(
-          'year',
-          '2018-01-27',
-        );
+        const { order } = await createOrderWithSubscription('year', '2018-01-27');
 
         // And given that an email should be sent afterwards
         emailMock
@@ -412,10 +379,7 @@ describe('LibSubscription', () => {
         paymentsStub.resolves({ info: 'Transaction' });
 
         // When the order is processed
-        const entry = await processOrderWithSubscription(
-          { dryRun: false },
-          order,
-        );
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
 
         // Expect the mock expectations to be verified. The right
         // email was sent.
@@ -427,20 +391,13 @@ describe('LibSubscription', () => {
         expect(entry.status).to.equal('success');
 
         // And then the dates are incremented by one month
-        expect(order.Subscription.nextChargeDate.getTime()).to.equal(
-          new Date('2019-01-27 0:0').getTime(),
-        );
-        expect(order.Subscription.nextPeriodStart.getTime()).to.equal(
-          new Date('2019-01-27 0:0').getTime(),
-        );
+        expect(order.Subscription.nextChargeDate.getTime()).to.equal(new Date('2019-01-27 0:0').getTime());
+        expect(order.Subscription.nextPeriodStart.getTime()).to.equal(new Date('2019-01-27 0:0').getTime());
       });
 
       it('should update nextChargeDate after failed processing yearly ', async () => {
         // Given an order with a subscription
-        const { order } = await createOrderWithSubscription(
-          'year',
-          '2018-01-27',
-        );
+        const { order } = await createOrderWithSubscription('year', '2018-01-27');
 
         // And given that an email should be sent afterwards
         emailMock
@@ -452,10 +409,7 @@ describe('LibSubscription', () => {
         paymentsStub.rejects('TypeError -- Whatever');
 
         // When the order is processed
-        const entry = await processOrderWithSubscription(
-          { dryRun: false },
-          order,
-        );
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
 
         // Expect the mock expectations to be verified. The right
         // email was sent.
@@ -468,31 +422,21 @@ describe('LibSubscription', () => {
         expect(entry.status).to.equal('failure');
 
         // And then the nextChargeDate is ajusted for two days later
-        expect(order.Subscription.nextChargeDate.getTime()).to.equal(
-          new Date('2018-01-30 0:0').getTime(),
-        );
+        expect(order.Subscription.nextChargeDate.getTime()).to.equal(new Date('2018-01-30 0:0').getTime());
 
         // And the nextPeriodStart doesn't change for a failed
         // processing
-        expect(order.Subscription.nextPeriodStart.getTime()).to.equal(
-          new Date('2018-01-27 0:0').getTime(),
-        );
+        expect(order.Subscription.nextPeriodStart.getTime()).to.equal(new Date('2018-01-27 0:0').getTime());
       });
 
       it('should increment chargeNumber after successfuly processing the order', async () => {
         // Given an order with a subscription
-        const { order } = await createOrderWithSubscription(
-          'month',
-          '2018-04-17',
-        );
+        const { order } = await createOrderWithSubscription('month', '2018-04-17');
 
         paymentsStub.resolves({});
 
         // When the order is processed
-        const entry = await processOrderWithSubscription(
-          { dryRun: false },
-          order,
-        );
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
 
         // Then expect the stub of the payment lib to be called
         expect(paymentsStub.called).to.be.true;
@@ -506,19 +450,13 @@ describe('LibSubscription', () => {
 
       it('should NOT increment chargeNumber after failure processing order', async () => {
         // Given an order with a subscription
-        const { order } = await createOrderWithSubscription(
-          'month',
-          '2018-04-17',
-        );
+        const { order } = await createOrderWithSubscription('month', '2018-04-17');
 
         // And that the payments library will throw an error
         paymentsStub.rejects('TypeError -- Whatever');
 
         // When the order is processed
-        const entry = await processOrderWithSubscription(
-          { dryRun: false },
-          order,
-        );
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
 
         // Then expect the stub of the payment lib to be called
         expect(paymentsStub.called).to.be.true;
@@ -535,20 +473,13 @@ describe('LibSubscription', () => {
 
       it('should cancel the subscription if chargeNumber === quantity', async () => {
         // Given an order with a subscription valid for two months
-        const { order, subscription } = await createOrderWithSubscription(
-          'month',
-          '2018-04-17',
-          2,
-        );
+        const { order, subscription } = await createOrderWithSubscription('month', '2018-04-17', 2);
         // And given that we'll tweak its chargeNumber field to the
         // quantity of intervals
         await subscription.update({ chargeNumber: 2 });
 
         // When the order is processed
-        const entry = await processOrderWithSubscription(
-          { dryRun: false },
-          order,
-        );
+        const entry = await processOrderWithSubscription({ dryRun: false }, order);
 
         // Then expect the stub of the payment lib to NOT be called!
         // No charge should happen!!!
@@ -562,9 +493,7 @@ describe('LibSubscription', () => {
 
         // And the subscription should be marked as deactivated
         expect(order.Subscription.isActive).to.be.false;
-        expect(order.Subscription.deactivatedAt.getTime()).to.be.at.most(
-          new Date().getTime(),
-        );
+        expect(order.Subscription.deactivatedAt.getTime()).to.be.at.most(new Date().getTime());
         expect(order.status).to.eql(status.CANCELLED);
       });
     });
@@ -657,11 +586,7 @@ describe('LibSubscription', () => {
       const groupedOrders = groupProcessedOrders(data);
 
       // Then we see 3 groups in the iterator output
-      expect([...groupedOrders.keys()]).to.deep.equal([
-        'charged',
-        'past_due',
-        'canceled',
-      ]);
+      expect([...groupedOrders.keys()]).to.deep.equal(['charged', 'past_due', 'canceled']);
 
       // And then we see that transaction OrderId=1 was successfuly charged
       expect(groupedOrders.get('charged').total).to.equal(2000);

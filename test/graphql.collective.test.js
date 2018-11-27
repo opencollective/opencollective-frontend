@@ -23,9 +23,7 @@ describe('graphql.collective.test.js', () => {
     const result = await utils.graphqlQuery(query, { slug: 'apex' });
     // Than we're supposed to see some errors
     expect(result.errors).to.exist;
-    expect(result.errors[0].message).to.equal(
-      'No collective found with slug apex',
-    );
+    expect(result.errors[0].message).to.equal('No collective found with slug apex');
   });
 
   it('gets the collective info for the collective page', async () => {
@@ -33,11 +31,7 @@ describe('graphql.collective.test.js', () => {
     const currency = 'USD';
     const { admuser } = await store.newUser('admuser');
     const { orgadm0 } = await store.newUser('orgadm0');
-    const {
-      hostAdmin,
-      hostCollective,
-      apex,
-    } = await store.newCollectiveWithHost(
+    const { hostAdmin, hostCollective, apex } = await store.newCollectiveWithHost(
       'apex',
       currency,
       currency,
@@ -49,10 +43,7 @@ describe('graphql.collective.test.js', () => {
     // And given the host has a stripe account
     await store.stripeConnectedAccount(hostCollective.id);
     // And given a donation from an organization
-    const org0 = await store.newOrganization(
-      { name: 'org0', currency },
-      orgadm0,
-    );
+    const org0 = await store.newOrganization({ name: 'org0', currency }, orgadm0);
     await store.stripeOneTimeDonation({
       remoteUser: orgadm0,
       fromCollective: org0,
@@ -240,23 +231,11 @@ describe('graphql.collective.test.js', () => {
 
   it('gets the url path and the host collective for an event', async () => {
     // Given a host
-    const { hostCollective } = await store.newHost(
-      'brusselstogether',
-      'EUR',
-      5,
-    );
+    const { hostCollective } = await store.newHost('brusselstogether', 'EUR', 5);
     // And given a collective
-    const { collective } = await store.newCollectiveInHost(
-      'brusselstogether collective',
-      'EUR',
-      hostCollective,
-    );
+    const { collective } = await store.newCollectiveInHost('brusselstogether collective', 'EUR', hostCollective);
     // and an event in that collective
-    const event = (await store.newCollectiveInHost(
-      'meetup 5',
-      'EUR',
-      hostCollective,
-    )).collective;
+    const event = (await store.newCollectiveInHost('meetup 5', 'EUR', hostCollective)).collective;
     await event.update({ type: 'EVENT', ParentCollectiveId: collective.id });
 
     // When the following query is executed
@@ -281,9 +260,7 @@ describe('graphql.collective.test.js', () => {
     // And then data should match what we have above
     expect(result.data.Collective.host.id).to.equal(hostCollective.id);
     expect(result.data.Collective.host.slug).to.equal(hostCollective.slug);
-    expect(result.data.Collective.path).to.equal(
-      '/brusselstogether-collective/events/meetup-5',
-    );
+    expect(result.data.Collective.path).to.equal('/brusselstogether-collective/events/meetup-5');
     expect(result.data.Collective.host.path).to.equal('/brusselstogether');
   });
 
@@ -291,26 +268,14 @@ describe('graphql.collective.test.js', () => {
     // Given a user
     const { user } = await store.newUser('user');
     // And given a host
-    const { hostCollective } = await store.newHost(
-      'brusselstogether',
-      'EUR',
-      5,
-    );
+    const { hostCollective } = await store.newHost('brusselstogether', 'EUR', 5);
     // And given two collectives under the above host
-    const { collective } = await store.newCollectiveInHost(
-      'brusselstogether collective',
-      'EUR',
-      hostCollective,
-      null,
-      { isActive: true },
-    );
-    const { veganizerbxl } = await store.newCollectiveInHost(
-      'veganizerbxl',
-      'EUR',
-      hostCollective,
-      null,
-      { isActive: true },
-    );
+    const { collective } = await store.newCollectiveInHost('brusselstogether collective', 'EUR', hostCollective, null, {
+      isActive: true,
+    });
+    const { veganizerbxl } = await store.newCollectiveInHost('veganizerbxl', 'EUR', hostCollective, null, {
+      isActive: true,
+    });
 
     // And given a helper to create data for expenses
     const d = (amount, description, cid) => ({
@@ -327,57 +292,21 @@ describe('graphql.collective.test.js', () => {
     await store.createPaidExpense(user, d(1000, 'Lunch', collective.id));
     await store.createPaidExpense(user, d(1000, 'Lunch', collective.id));
     await store.createPaidExpense(user, d(2000, 'Tickets', collective.id));
-    await store.createRejectedExpense(
-      user,
-      d(50000, '10 T-Shirts', collective.id),
-    );
-    await store.createRejectedExpense(
-      user,
-      d(50000, '10 T-Shirts', collective.id),
-    );
-    await store.createRejectedExpense(
-      user,
-      d(50000, '10 T-Shirts', collective.id),
-    );
+    await store.createRejectedExpense(user, d(50000, '10 T-Shirts', collective.id));
+    await store.createRejectedExpense(user, d(50000, '10 T-Shirts', collective.id));
+    await store.createRejectedExpense(user, d(50000, '10 T-Shirts', collective.id));
 
     // And given that we add some expenses for the collective veganizerbxl
-    await store.createPaidExpense(
-      user,
-      d(2000, 'Vegan Pizza', veganizerbxl.id),
-    );
-    await store.createPaidExpense(
-      user,
-      d(1000, 'Vegan Lunch', veganizerbxl.id),
-    );
-    await store.createPaidExpense(
-      user,
-      d(1000, 'Vegan Lunch', veganizerbxl.id),
-    );
-    await store.createPaidExpense(
-      user,
-      d(1000, 'Vegan Treats', veganizerbxl.id),
-    );
+    await store.createPaidExpense(user, d(2000, 'Vegan Pizza', veganizerbxl.id));
+    await store.createPaidExpense(user, d(1000, 'Vegan Lunch', veganizerbxl.id));
+    await store.createPaidExpense(user, d(1000, 'Vegan Lunch', veganizerbxl.id));
+    await store.createPaidExpense(user, d(1000, 'Vegan Treats', veganizerbxl.id));
     await store.createPaidExpense(user, d(2000, 'Tickets', veganizerbxl.id));
-    await store.createApprovedExpense(
-      user,
-      d(50000, 'Vegan stuff', veganizerbxl.id),
-    );
-    await store.createRejectedExpense(
-      user,
-      d(50000, 'Non vegan thing', veganizerbxl.id),
-    );
-    await store.createRejectedExpense(
-      user,
-      d(50000, 'Non vegan biscuit', veganizerbxl.id),
-    );
-    await store.createRejectedExpense(
-      user,
-      d(50000, 'Non vegan stuff', veganizerbxl.id),
-    );
-    await store.createRejectedExpense(
-      user,
-      d(50000, 'Non vegan t-shirts', veganizerbxl.id),
-    );
+    await store.createApprovedExpense(user, d(50000, 'Vegan stuff', veganizerbxl.id));
+    await store.createRejectedExpense(user, d(50000, 'Non vegan thing', veganizerbxl.id));
+    await store.createRejectedExpense(user, d(50000, 'Non vegan biscuit', veganizerbxl.id));
+    await store.createRejectedExpense(user, d(50000, 'Non vegan stuff', veganizerbxl.id));
+    await store.createRejectedExpense(user, d(50000, 'Non vegan t-shirts', veganizerbxl.id));
 
     // When the following query is executed
     const query = `
@@ -466,14 +395,9 @@ describe('graphql.collective.test.js', () => {
     const { orgadm1 } = await store.newUser('orgadm1');
     const currency = 'USD';
     // And given the following collective with a host
-    const { collective, hostCollective } = await store.newCollectiveWithHost(
-      'apex',
-      currency,
-      currency,
-      10,
-      theadmin,
-      { isActive: true },
-    );
+    const { collective, hostCollective } = await store.newCollectiveWithHost('apex', currency, currency, 10, theadmin, {
+      isActive: true,
+    });
     // And given the host has a stripe account
     await store.stripeConnectedAccount(hostCollective.id);
     // And given some purchases from users to the collective
@@ -508,14 +432,8 @@ describe('graphql.collective.test.js', () => {
       amount: 5000,
     });
     // And given the following organizations
-    const org0 = await store.newOrganization(
-      { name: 'org0', currency },
-      orgadm0,
-    );
-    const org1 = await store.newOrganization(
-      { name: 'org1', currency },
-      orgadm1,
-    );
+    const org0 = await store.newOrganization({ name: 'org0', currency }, orgadm0);
+    const org1 = await store.newOrganization({ name: 'org1', currency }, orgadm1);
     // And given some donations from the above orgs
     await store.stripeOneTimeDonation({
       remoteUser: orgadm0,
@@ -637,11 +555,7 @@ describe('graphql.collective.test.js', () => {
       const { user0 } = await store.newUser('user0', { currency });
       const { user1 } = await store.newUser('user1', { currency });
       // And given a collective with a host that has stripe enabled
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost(
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
         'brusselstogether collective',
         currency,
         currency,
@@ -679,20 +593,12 @@ describe('graphql.collective.test.js', () => {
 
       // And given some other collectives under the same host and some
       // donations made by xdamman
-      const { veganizerbxl } = await store.newCollectiveInHost(
-        'veganizerbxl',
-        currency,
-        hostCollective,
-        null,
-        { isActive: true },
-      );
-      const { another } = await store.newCollectiveInHost(
-        'another',
-        currency,
-        hostCollective,
-        null,
-        { isActive: true },
-      );
+      const { veganizerbxl } = await store.newCollectiveInHost('veganizerbxl', currency, hostCollective, null, {
+        isActive: true,
+      });
+      const { another } = await store.newCollectiveInHost('another', currency, hostCollective, null, {
+        isActive: true,
+      });
       await store.stripeOneTimeDonation({
         remoteUser: xdamman,
         collective: veganizerbxl,
@@ -707,13 +613,9 @@ describe('graphql.collective.test.js', () => {
       });
 
       // And given another collective and another purchase but now for Pia's user
-      const { opensource } = await store.newCollectiveInHost(
-        'opensource',
-        currency,
-        hostCollective,
-        null,
-        { isActive: true },
-      );
+      const { opensource } = await store.newCollectiveInHost('opensource', currency, hostCollective, null, {
+        isActive: true,
+      });
       await store.stripeOneTimeDonation({
         remoteUser: piamancini,
         collective: opensource,
@@ -732,9 +634,7 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
       expect(members).to.have.length(5);
-      expect(members[0].collective.slug).to.equal(
-        'brusselstogether-collective',
-      );
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
       members.map(m => {
         m.tier && expect(m.tier.interval).to.be.null;
@@ -749,9 +649,7 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
       expect(members).to.have.length(4);
-      expect(members[0].collective.slug).to.equal(
-        'brusselstogether-collective',
-      );
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('alexandrasaveljeva');
       members.map(m => {
         expect(m.member.email).to.be.null;
@@ -797,9 +695,7 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
       expect(members[1].role).to.equal('BACKER');
-      expect(members[1].collective.slug).to.equal(
-        'brusselstogether-collective',
-      );
+      expect(members[1].collective.slug).to.equal('brusselstogether-collective');
       expect(members[1].member.slug).to.equal('xdamman');
       expect(members).to.have.length(3);
     });
@@ -812,9 +708,7 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      expect(members[0].collective.slug).to.equal(
-        'brusselstogether-collective',
-      );
+      expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
       expect(members).to.have.length(3);
     });
@@ -838,14 +732,9 @@ describe('graphql.collective.test.js', () => {
 
     beforeEach(async () => {
       pubnubAdmin = (await store.newUser('pubnub admin')).user;
-      pubnubCollective = (await store.newCollectiveWithHost(
-        'pubnub',
-        'USD',
-        'USD',
-        10,
-        pubnubAdmin,
-        { isActive: true },
-      )).collective;
+      pubnubCollective = (await store.newCollectiveWithHost('pubnub', 'USD', 'USD', 10, pubnubAdmin, {
+        isActive: true,
+      })).collective;
       adminMembership = await models.Member.findOne({
         where: {
           MemberCollectiveId: pubnubAdmin.id,
@@ -914,9 +803,7 @@ describe('graphql.collective.test.js', () => {
       expect(members[2].member.name).to.equal('member1');
       expect(members[2].member.email).to.equal('member1@hail.com');
 
-      const member = await models.User.findById(
-        members[2].member.createdByUser.id,
-      );
+      const member = await models.User.findById(members[2].member.createdByUser.id);
       const res2 = await utils.graphqlQuery(query, { collective }, member);
       expect(res2.errors).to.exist;
       expect(res2.errors[0].message).to.equal(
@@ -927,9 +814,7 @@ describe('graphql.collective.test.js', () => {
     it('edit payment methods', async () => {
       let query, res, paymentMethods;
 
-      sinon
-        .stub(appStripe.customers, 'create')
-        .callsFake(() => Promise.resolve(stripeMock.customers.create));
+      sinon.stub(appStripe.customers, 'create').callsFake(() => Promise.resolve(stripeMock.customers.create));
 
       const collective = {
         id: pubnubCollective.id,
@@ -1040,11 +925,7 @@ describe('graphql.collective.test.js', () => {
     });
 
     it('apply to host', async () => {
-      const { hostCollective } = await store.newHost(
-        'brusselstogether',
-        'EUR',
-        5,
-      );
+      const { hostCollective } = await store.newHost('brusselstogether', 'EUR', 5);
 
       const collective = {
         id: pubnubCollective.id,

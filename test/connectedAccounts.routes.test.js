@@ -89,8 +89,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
 
   describe('WHEN calling /connected-accounts/github/verify', () => {
     // Create user.
-    beforeEach(() =>
-      models.User.create(utils.data('user1')).tap(u => (user = u)));
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => (user = u)));
 
     beforeEach(done => {
       req = request(app).get('/connected-accounts/github/verify');

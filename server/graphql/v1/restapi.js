@@ -121,10 +121,7 @@ export const getLatestTransactions = async (req, res) => {
  */
 export const getTransaction = async (req, res) => {
   try {
-    const response = await utils.graphqlQuery(
-      getTransactionQuery,
-      pick(req.params, ['id', 'uuid']),
-    );
+    const response = await utils.graphqlQuery(getTransactionQuery, pick(req.params, ['id', 'uuid']));
     if (response.errors) {
       throw new Error(response.errors[0]);
     }

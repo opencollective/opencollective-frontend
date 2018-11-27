@@ -5,8 +5,7 @@ import { get } from 'lodash';
 import { strip_tags } from '../../../lib/utils';
 
 function require(args, path) {
-  if (!get(args, path))
-    throw new errors.ValidationFailed({ message: `${path} required` });
+  if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
 }
 
 export async function createComment(_, args, req) {
@@ -43,8 +42,7 @@ export async function createComment(_, args, req) {
 
 async function fetchComment(id) {
   const comment = await models.Comment.findById(id);
-  if (!comment)
-    throw new errors.NotFound({ message: `Comment with id ${id} not found` });
+  if (!comment) throw new errors.NotFound({ message: `Comment with id ${id} not found` });
   return comment;
 }
 

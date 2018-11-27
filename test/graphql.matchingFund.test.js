@@ -169,12 +169,8 @@ describe('graphql.matchingFund.test.js', () => {
     expect(transactions[0].CollectiveId).to.equal(user2.CollectiveId);
     expect(transactions[0].description).to.equal('Donation to tipbox');
     expect(transactions[2].CollectiveId).to.equal(user1.CollectiveId);
-    expect(transactions[2].description).to.equal(
-      "Matching 2x user2's donation",
-    );
-    expect(transactions[3].amount).to.equal(
-      user1.paymentMethod.matching * order.totalAmount,
-    );
+    expect(transactions[2].description).to.equal("Matching 2x user2's donation");
+    expect(transactions[3].amount).to.equal(user1.paymentMethod.matching * order.totalAmount);
 
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
     expect(balance.amount).to.equal(141621); // €1,500 - $100
@@ -211,12 +207,8 @@ describe('graphql.matchingFund.test.js', () => {
     expect(transactions[0].CollectiveId).to.equal(user2.CollectiveId);
     expect(transactions[0].description).to.equal('Monthly donation to tipbox');
     expect(transactions[2].CollectiveId).to.equal(user1.CollectiveId);
-    expect(transactions[2].description).to.equal(
-      "Matching 2x user2's donation",
-    );
-    expect(transactions[3].amount).to.equal(
-      user1.paymentMethod.matching * order.totalAmount,
-    );
+    expect(transactions[2].description).to.equal("Matching 2x user2's donation");
+    expect(transactions[3].amount).to.equal(user1.paymentMethod.matching * order.totalAmount);
 
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
     expect(balance.amount).to.equal(141621); // €1,500 - $100
@@ -240,17 +232,11 @@ describe('graphql.matchingFund.test.js', () => {
     expect(emailSendSpy.callCount).to.equal(2);
     expect(emailSendSpy.firstCall.args[0]).to.equal('donationmatched');
     expect(emailSendSpy.firstCall.args[1][0]).to.equal(user1.email);
-    expect(emailSendSpy.firstCall.args[2].fromCollective.slug).to.equal(
-      user2.collective.slug,
-    );
-    expect(emailSendSpy.firstCall.args[2].transaction.uuid).to.equal(
-      matchingTransaction.uuid,
-    );
+    expect(emailSendSpy.firstCall.args[2].fromCollective.slug).to.equal(user2.collective.slug);
+    expect(emailSendSpy.firstCall.args[2].transaction.uuid).to.equal(matchingTransaction.uuid);
     expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
     expect(emailSendSpy.secondCall.args[1]).to.equal(user2.email);
-    expect(
-      emailSendSpy.secondCall.args[2].matchingFund.collective.slug,
-    ).to.equal(user1.collective.slug);
+    expect(emailSendSpy.secondCall.args[2].matchingFund.collective.slug).to.equal(user1.collective.slug);
   });
 
   it('fails if not enough funds available in matching fund', async () => {

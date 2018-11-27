@@ -36,8 +36,7 @@ const { secret } = config.keys.opencollective;
  * decodes the token (expected behaviour).
  */
 export const parseJwtNoExpiryCheck = (req, res, next) => {
-  let token =
-    req.params.access_token || req.query.access_token || req.body.access_token;
+  let token = req.params.access_token || req.query.access_token || req.body.access_token;
   if (!token) {
     const header = req.headers && req.headers.authorization;
     if (!header) return next();
@@ -93,24 +92,12 @@ export const _authenticateUserByJwt = (req, res, next) => {
       return user.populateRoles();
     })
     .then(() => {
-      debug('auth')(
-        'logged in user',
-        req.remoteUser.id,
-        'roles:',
-        req.remoteUser.rolesByCollectiveId,
-      );
+      debug('auth')('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
 
       // Populates req.remoteUser.canEditCurrentCollective, used for GraphQL to keep track whether the remoteUser can see members' details
-      const CollectiveId =
-        get(req, 'body.variables.collective.id') || req.params.collectiveid;
-      req.remoteUser.canEditCurrentCollective =
-        CollectiveId && req.remoteUser.isAdmin(CollectiveId);
-      debug('auth')(
-        'Can edit current collective',
-        CollectiveId,
-        '?',
-        req.remoteUser.canEditCollective,
-      );
+      const CollectiveId = get(req, 'body.variables.collective.id') || req.params.collectiveid;
+      req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
+      debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
       next();
       return null;
     })
@@ -170,10 +157,7 @@ export function authenticateInternalUserByJwt() {
 }
 
 export const _authenticateInternalUserById = (req, res, next) => {
-  if (
-    req.jwtPayload &&
-    contains([1, 2, 4, 5, 6, 7, 8, 30, 40, 212, 772], req.jwtPayload.sub)
-  ) {
+  if (req.jwtPayload && contains([1, 2, 4, 5, 6, 7, 8, 30, 40, 212, 772], req.jwtPayload.sub)) {
     next();
   } else {
     throw new Unauthorized();
@@ -201,17 +185,11 @@ export const authenticateService = (req, res, next) => {
   }
 
   if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
-    throw new errors.Unauthorized(
-      'Please login as an admin of this collective to add a connected account',
-    );
+    throw new errors.Unauthorized('Please login as an admin of this collective to add a connected account');
   }
 
   if (!req.query.CollectiveId) {
-    return next(
-      new errors.ValidationFailed(
-        'Please provide a CollectiveId as a query parameter',
-      ),
-    );
+    return next(new errors.ValidationFailed('Please provide a CollectiveId as a query parameter'));
   }
 
   if (paymentProviders[service]) {
@@ -252,16 +230,7 @@ export const authenticateServiceCallback = (req, res, next) => {
         json: true,
       })
         .then(json => json.map(entry => entry.email))
-        .then(emails =>
-          createOrUpdateConnectedAccount(
-            req,
-            res,
-            next,
-            accessToken,
-            data,
-            emails,
-          ),
-        )
+        .then(emails => createOrUpdateConnectedAccount(req, res, next, accessToken, data, emails))
         .catch(next);
     } else {
       createOrUpdateConnectedAccount(req, res, next, accessToken, data);
@@ -278,7 +247,5 @@ function getOAuthCallbackUrl(req) {
     redirect,
   });
   const { service } = req.params;
-  return `${
-    config.host.website
-  }/api/connected-accounts/${service}/callback?${params}`;
+  return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
 }

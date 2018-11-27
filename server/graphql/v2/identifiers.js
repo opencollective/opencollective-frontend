@@ -22,12 +22,7 @@ const getInstance = type => {
 
 export const idEncode = (integer, type) => {
   const string = getInstance(type).encode(integer);
-  const sliced = [
-    string.substring(0, 8),
-    string.substring(8, 16),
-    string.substring(16, 24),
-    string.substring(24, 32),
-  ];
+  const sliced = [string.substring(0, 8), string.substring(8, 16), string.substring(16, 24), string.substring(24, 32)];
   return sliced.join('-');
 };
 

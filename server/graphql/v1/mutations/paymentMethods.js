@@ -44,11 +44,7 @@ async function createVirtualPaymentMethod(args, remoteUser) {
   // making sure it's a string, trim and uppercase it.
   args.currency = args.currency.toString().toUpperCase();
   if (!['USD', 'EUR'].includes(args.currency)) {
-    throw new Error(
-      `Currency ${
-        args.currency
-      } not supported. We only support USD and EUR at the moment.`,
-    );
+    throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
   }
   const paymentMethod = await virtualcard.create(args, remoteUser);
   return paymentMethod;
@@ -65,17 +61,9 @@ export async function claimPaymentMethod(args, remoteUser) {
   const user = await models.User.findOne({
     where: { CollectiveId: paymentMethod.CollectiveId },
   });
-  const {
-    initialBalance,
-    monthlyLimitPerMember,
-    currency,
-    name,
-    expiryDate,
-  } = paymentMethod;
+  const { initialBalance, monthlyLimitPerMember, currency, name, expiryDate } = paymentMethod;
   const amount = initialBalance || monthlyLimitPerMember;
-  const emitter = await models.Collective.findById(
-    paymentMethod.sourcePaymentMethod.CollectiveId,
-  );
+  const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
 
   const qs = queryString.stringify({
     code: paymentMethod.uuid.substring(0, 8),

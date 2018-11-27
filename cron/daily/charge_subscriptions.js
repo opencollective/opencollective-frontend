@@ -38,9 +38,9 @@ async function run(options) {
   const orders = options.limit ? allOrders.slice(0, options.limit) : allOrders;
   vprint(
     options,
-    `${allOrders.length} subscriptions pending charges. Charging ${
-      orders.length
-    } subscriptions right now. dryRun: ${options.dryRun}`,
+    `${allOrders.length} subscriptions pending charges. Charging ${orders.length} subscriptions right now. dryRun: ${
+      options.dryRun
+    }`,
   );
   const data = [];
   await promiseSeq(
@@ -73,12 +73,7 @@ async function run(options) {
                 content: csv,
               },
             ];
-            await emailReport(
-              start,
-              orders,
-              groupProcessedOrders(data),
-              attachments,
-            );
+            await emailReport(start, orders, groupProcessedOrders(data), attachments);
           }
         }
       }
@@ -105,22 +100,15 @@ async function emailReportNoCharges(start) {
 /** Send an email with details of the subscriptions processed */
 async function emailReport(start, orders, data, attachments) {
   const icon = err => (err ? '❌' : '✅');
-  let result = [
-    `Total Subscriptions pending charges found: ${orders.length}`,
-    '',
-  ];
+  let result = [`Total Subscriptions pending charges found: ${orders.length}`, ''];
 
   // Add entries of each group to the result list
   const printGroup = ([name, { total, entries }]) => {
-    result.push(
-      `>>> ${entries.length} orders ${name} (sum of amounts: ${total})`,
-    );
+    result.push(`>>> ${entries.length} orders ${name} (sum of amounts: ${total})`);
     result = result.concat(
       entries.map(i =>
         [
-          ` ${i.status !== 'unattempted' ? icon(i.error) : ''} order: ${
-            i.orderId
-          }`,
+          ` ${i.status !== 'unattempted' ? icon(i.error) : ''} order: ${i.orderId}`,
           `subscription: ${i.subscriptionId}`,
           `amount: ${i.amount}`,
           `from: ${i.from}`,
@@ -144,9 +132,7 @@ async function emailReport(start, orders, data, attachments) {
 
   // Subject line of the email
   const issuesFound = data.get('canceled') || data.get('past_due');
-  const subject = `${icon(
-    issuesFound,
-  )} Daily Subscription Report - ${now.toLocaleDateString()}`;
+  const subject = `${icon(issuesFound)} Daily Subscription Report - ${now.toLocaleDateString()}`;
 
   // Actual send
   return emailLib.sendMessage(REPORT_EMAIL, subject, '', {

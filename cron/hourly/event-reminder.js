@@ -10,11 +10,9 @@ Date.prototype.toString = function() {
   const hours = this.getHours();
   const minutes = this.getMinutes();
 
-  return `${[
-    this.getFullYear(),
-    (mm > 9 ? '' : '0') + mm,
-    (dd > 9 ? '' : '0') + dd,
-  ].join('-')} ${hours > 9 ? hours : `${hours}0`}:${minutes}`;
+  return `${[this.getFullYear(), (mm > 9 ? '' : '0') + mm, (dd > 9 ? '' : '0') + dd].join('-')} ${
+    hours > 9 ? hours : `${hours}0`
+  }:${minutes}`;
 };
 
 const nextWeekStartsAt = new Date();
@@ -81,9 +79,7 @@ function processEvent(event, template) {
       const user = await models.User.findOne({
         where: { CollectiveId: get(order, 'fromCollective.id') },
       });
-      const fromCollective = await models.Collective.findById(
-        get(order, 'fromCollective.id'),
-      );
+      const fromCollective = await models.Collective.findById(get(order, 'fromCollective.id'));
       event.path = await event.getUrlPath();
       const recipient = user.email;
       const data = {
@@ -92,13 +88,7 @@ function processEvent(event, template) {
         order: order.info,
       };
       return emailLib.send(template, recipient, data).catch(e => {
-        console.warn(
-          'Unable to send email to ',
-          event.slug,
-          recipient,
-          'error:',
-          e,
-        );
+        console.warn('Unable to send email to ', event.slug, recipient, 'error:', e);
       });
     });
 }

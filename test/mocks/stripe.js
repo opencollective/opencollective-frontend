@@ -128,8 +128,7 @@ export default {
           amount_charged: 11855000,
           amount_received: 11855000,
           amount_returned: 0,
-          uri:
-            'bitcoin:test_1MBhWS3uv4ynCfQXF3xQjJkzFPukr4K56N?amount=0.11855000',
+          uri: 'bitcoin:test_1MBhWS3uv4ynCfQXF3xQjJkzFPukr4K56N?amount=0.11855000',
           refund_address: null,
         },
       },
@@ -505,8 +504,7 @@ export default {
           amount_charged: 0,
           amount_received: 11855000,
           amount_returned: 0,
-          uri:
-            'bitcoin:test_1MBhWS3uv4ynCfQXF3xQjJkzFPukr4K56N?amount=0.11855000',
+          uri: 'bitcoin:test_1MBhWS3uv4ynCfQXF3xQjJkzFPukr4K56N?amount=0.11855000',
           refund_address: null,
         },
       },
@@ -559,8 +557,7 @@ export default {
           amount_charged: 0,
           amount_received: 11855000,
           amount_returned: 0,
-          uri:
-            'bitcoin:test_1MBhWS3uv4ynCfQXF3xQjJkzFPukr4K56N?amount=0.11855000',
+          uri: 'bitcoin:test_1MBhWS3uv4ynCfQXF3xQjJkzFPukr4K56N?amount=0.11855000',
           refund_address: null,
         },
       },

@@ -122,12 +122,8 @@ export default {
           const { address } = account.legal_entity;
           const addressLines = [address.line1];
           if (address.line2) addressLines.push(address.line2);
-          if (address.country === 'US')
-            addressLines.push(
-              `${address.city} ${address.state} ${address.postal_code}`,
-            );
-          else if (address.country === 'UK')
-            addressLines.push(`${address.city} ${address.postal_code}`);
+          if (address.country === 'US') addressLines.push(`${address.city} ${address.state} ${address.postal_code}`);
+          else if (address.country === 'UK') addressLines.push(`${address.city} ${address.postal_code}`);
           else addressLines.push(`${address.postal_code} ${address.city}`);
 
           addressLines.push(address.country);
@@ -142,8 +138,7 @@ export default {
       return models.Collective.findById(CollectiveId)
         .then(c => {
           collective = c;
-          redirectUrl =
-            redirectUrl || `${config.host.website}/${collective.slug}`;
+          redirectUrl = redirectUrl || `${config.host.website}/${collective.slug}`;
         })
         .then(getToken(req.query.code))
         .then(getAccountInformation)
@@ -187,10 +182,7 @@ export default {
      * We check the event on stripe directly to be sure we don't get a fake event from
      * someone else
      */
-    return retrieveEvent(
-      { username: requestBody.user_id },
-      requestBody.id,
-    ).then(event => {
+    return retrieveEvent({ username: requestBody.user_id }, requestBody.id).then(event => {
       if (!event || (event && !event.type)) {
         throw new errors.BadRequest('Event not found');
       }
@@ -198,8 +190,8 @@ export default {
         return creditcard.webhook(requestBody, event);
       } else if (event.type === 'source.chargeable') {
         /* This will cause stripe to send us email alerts, saying
-           * that our stuff is broken. But that should never happen
-           * since they discontinued the support. */
+         * that our stuff is broken. But that should never happen
+         * since they discontinued the support. */
         throw new errors.BadRequest('Stripe-Bitcoin not supported anymore :(');
       } else {
         throw new errors.BadRequest('Wrong event type received');

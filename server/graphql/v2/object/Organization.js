@@ -15,10 +15,7 @@ export const Organization = new GraphQLObjectType({
         resolve(orgCollective, args, req) {
           if (!req.remoteUser) return null;
           return (
-            orgCollective &&
-            req.loaders.getOrgDetailsByCollectiveId
-              .load(orgCollective.id)
-              .then(user => user.email)
+            orgCollective && req.loaders.getOrgDetailsByCollectiveId.load(orgCollective.id).then(user => user.email)
           );
         },
       },

@@ -168,13 +168,9 @@ export default function(Sequelize, DataTypes) {
   // Edit a comment
   Comment.prototype.edit = async function(remoteUser, newCommentData) {
     mustBeLoggedInTo(remoteUser, 'edit this comment');
-    if (
-      remoteUser.id !== this.CreatedByUserId ||
-      !remoteUser.isAdmin(this.CollectiveId)
-    ) {
+    if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
       throw new errors.Unauthorized({
-        message:
-          'You must be the author or an admin of this collective to edit this comment',
+        message: 'You must be the author or an admin of this collective to edit this comment',
       });
     }
     const editableAttributes = ['FromCollectiveId', 'markdown', 'html'];
@@ -186,13 +182,9 @@ export default function(Sequelize, DataTypes) {
 
   Comment.prototype.delete = async function(remoteUser) {
     mustBeLoggedInTo(remoteUser, 'delete this comment');
-    if (
-      remoteUser.id !== this.CreatedByUserId ||
-      !remoteUser.isAdmin(this.CollectiveId)
-    ) {
+    if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
       throw new errors.Unauthorized({
-        message:
-          'You need to be logged in as a core contributor or as a host to delete this comment',
+        message: 'You need to be logged in as a core contributor or as a host to delete this comment',
       });
     }
     return this.destroy();
@@ -204,11 +196,9 @@ export default function(Sequelize, DataTypes) {
   };
 
   Comment.createMany = (comments, defaultValues) => {
-    return Promise.map(
-      comments,
-      u => Comment.create(_.defaults({}, u, defaultValues)),
-      { concurrency: 1 },
-    ).catch(console.error);
+    return Promise.map(comments, u => Comment.create(_.defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
+      console.error,
+    );
   };
 
   Comment.associate = m => {

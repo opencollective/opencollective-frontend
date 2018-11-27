@@ -32,43 +32,21 @@ describe('libhost', () => {
     await utils.resetTestDB();
     // Given that we stub the currency conversion machinery
     sandbox = sinon.createSandbox();
-    sandbox
-      .stub(libcurrency, 'getFxRate')
-      .callsFake(() => Promise.resolve(0.75779));
+    sandbox.stub(libcurrency, 'getFxRate').callsFake(() => Promise.resolve(0.75779));
     sandbox.stub(libcurrency, 'convertToCurrency').callsFake(a => a * 2);
 
     // Given a host with a collective
     const currency = 'USD';
-    const { hostCollective } = await store.newHost(
-      'Open Source Collective',
-      currency,
-      10,
-    );
+    const { hostCollective } = await store.newHost('Open Source Collective', currency, 10);
 
     // Add stripe accounts to the newly created host colective
     await store.stripeConnectedAccount(hostCollective.id);
 
     // And a few collectives
-    const { apex } = await store.newCollectiveInHost(
-      'apex',
-      currency,
-      hostCollective,
-    );
-    const { babel } = await store.newCollectiveInHost(
-      'babel',
-      currency,
-      hostCollective,
-    );
-    const { rollup } = await store.newCollectiveInHost(
-      'rollup',
-      currency,
-      hostCollective,
-    );
-    const { parcel } = await store.newCollectiveInHost(
-      'parcel',
-      currency,
-      hostCollective,
-    );
+    const { apex } = await store.newCollectiveInHost('apex', currency, hostCollective);
+    const { babel } = await store.newCollectiveInHost('babel', currency, hostCollective);
+    const { rollup } = await store.newCollectiveInHost('rollup', currency, hostCollective);
+    const { parcel } = await store.newCollectiveInHost('parcel', currency, hostCollective);
 
     // And a few users
     const { user1 } = await store.newUser('user1');
@@ -104,11 +82,7 @@ describe('libhost', () => {
   });
 
   it('get the backers stats', async () => {
-    const stats = await libhost.getBackersStats(
-      startDate,
-      endDate,
-      collectiveids,
-    );
+    const stats = await libhost.getBackersStats(startDate, endDate, collectiveids);
     expect(stats.total).to.equal(4);
     expect(stats.new).to.equal(2);
     expect(stats.repeat).to.equal(1);
@@ -116,10 +90,7 @@ describe('libhost', () => {
   });
 
   it('get the total amount of funds held by the host', async () => {
-    const res = await libhost.sumTransactionsByCurrency(
-      'netAmountInCollectiveCurrency',
-      { where },
-    );
+    const res = await libhost.sumTransactionsByCurrency('netAmountInCollectiveCurrency', { where });
     const usd = res.find(a => a.currency === 'USD');
     expect(usd.amount).to.equal(315000);
     expect(res.length).to.equal(2);

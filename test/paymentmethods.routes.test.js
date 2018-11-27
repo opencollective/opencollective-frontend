@@ -17,15 +17,9 @@ describe('paymentMethods.routes.test.js', () => {
   beforeEach(() => utils.resetTestDB());
 
   // Create users.
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
 
   // Create paymentMethod.
   beforeEach(() => {

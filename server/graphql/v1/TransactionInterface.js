@@ -9,17 +9,9 @@ import {
   GraphQLInputObjectType,
 } from 'graphql';
 
-import {
-  CollectiveInterfaceType,
-  UserCollectiveType,
-} from './CollectiveInterface';
+import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
-import {
-  SubscriptionType,
-  OrderType,
-  PaymentMethodType,
-  UserType,
-} from './types';
+import { SubscriptionType, OrderType, PaymentMethodType, UserType } from './types';
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: 'Transaction',
@@ -119,8 +111,7 @@ const TransactionFields = () => {
     },
     hostFeeInHostCurrency: {
       type: GraphQLInt,
-      description:
-        'Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)',
+      description: 'Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)',
       resolve(transaction) {
         return transaction.hostFeeInHostCurrency;
       },
@@ -135,16 +126,14 @@ const TransactionFields = () => {
     },
     paymentProcessorFeeInHostCurrency: {
       type: GraphQLInt,
-      description:
-        'Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)',
+      description: 'Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)',
       resolve(transaction) {
         return transaction.paymentProcessorFeeInHostCurrency;
       },
     },
     netAmountInCollectiveCurrency: {
       type: GraphQLInt,
-      description:
-        'Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)',
+      description: 'Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)',
       resolve(transaction) {
         return transaction.netAmountInCollectiveCurrency;
       },
@@ -196,9 +185,7 @@ const TransactionFields = () => {
       resolve(transaction, args, req) {
         if (!transaction.PaymentMethodId) return null;
         // TODO: put behind a login check
-        return req.loaders.paymentMethods.findById.load(
-          transaction.PaymentMethodId,
-        );
+        return req.loaders.paymentMethods.findById.load(transaction.PaymentMethodId);
       },
     },
   };
@@ -213,36 +200,25 @@ export const TransactionExpenseType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
-          return (
-            transaction.description ||
-            transaction
-              .getExpense()
-              .then(expense => expense && expense.description)
-          );
+          return transaction.description || transaction.getExpense().then(expense => expense && expense.description);
         },
       },
       privateMessage: {
         type: GraphQLString,
         resolve(transaction, args, req) {
-          return transaction
-            .getExpenseForViewer(req.remoteUser)
-            .then(expense => expense && expense.privateMessage);
+          return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage);
         },
       },
       category: {
         type: GraphQLString,
         resolve(transaction, args, req) {
-          return transaction
-            .getExpenseForViewer(req.remoteUser)
-            .then(expense => expense && expense.category);
+          return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category);
         },
       },
       attachment: {
         type: GraphQLString,
         resolve(transaction, args, req) {
-          return transaction
-            .getExpenseForViewer(req.remoteUser)
-            .then(expense => expense && expense.attachment);
+          return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment);
         },
       },
     };
@@ -259,27 +235,20 @@ export const TransactionOrderType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
-          return (
-            transaction.description ||
-            transaction.getOrder().then(order => order && order.description)
-          );
+          return transaction.description || transaction.getOrder().then(order => order && order.description);
         },
       },
       privateMessage: {
         type: GraphQLString,
         resolve(transaction) {
           // TODO: Put behind a login check
-          return transaction
-            .getOrder()
-            .then(order => order && order.privateMessage);
+          return transaction.getOrder().then(order => order && order.privateMessage);
         },
       },
       publicMessage: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction
-            .getOrder()
-            .then(order => order && order.publicMessage);
+          return transaction.getOrder().then(order => order && order.publicMessage);
         },
       },
       order: {
@@ -291,9 +260,7 @@ export const TransactionOrderType = new GraphQLObjectType({
       subscription: {
         type: SubscriptionType,
         resolve(transaction) {
-          return transaction
-            .getOrder()
-            .then(order => order && order.getSubscription());
+          return transaction.getOrder().then(order => order && order.getSubscription());
         },
       },
     };
@@ -311,8 +278,7 @@ export const TransactionType = new GraphQLEnumType({
 
 export const OrderDirectionType = new GraphQLEnumType({
   name: 'OrderDirection',
-  description:
-    'Possible directions in which to order a list of items when provided an orderBy argument.',
+  description: 'Possible directions in which to order a list of items when provided an orderBy argument.',
   values: {
     ASC: {},
     DESC: {},
@@ -345,9 +311,7 @@ export const TransactionOrder = new GraphQLInputObjectType({
   },
 });
 
-TransactionOrder.defaultValue = Object.entries(
-  TransactionOrder.getFields(),
-).reduce(
+TransactionOrder.defaultValue = Object.entries(TransactionOrder.getFields()).reduce(
   (values, [key, value]) => ({
     ...values,
     [key]: value.defaultValue,

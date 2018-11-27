@@ -10,13 +10,11 @@ const CollectiveQuery = {
   args: {
     id: {
       type: GraphQLString,
-      description:
-        'The public id identifying the collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)',
+      description: 'The public id identifying the collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)',
     },
     slug: {
       type: GraphQLString,
-      description:
-        'The slug identifying the collective (ie: babel for https://opencollective.com/babel)',
+      description: 'The slug identifying the collective (ie: babel for https://opencollective.com/babel)',
     },
   },
   async resolve(_, args) {

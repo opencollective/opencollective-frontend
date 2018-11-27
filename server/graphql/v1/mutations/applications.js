@@ -5,15 +5,12 @@ import { get } from 'lodash';
 const { Application } = models;
 
 function requireArgs(args, path) {
-  if (!get(args, path))
-    throw new errors.ValidationFailed({ message: `${path} required` });
+  if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
 }
 
 export async function createApplication(_, args, req) {
   if (!req.remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be authenticated to create an application.',
-    );
+    throw new errors.Unauthorized('You need to be authenticated to create an application.');
   }
 
   requireArgs(args, 'application.type');
@@ -40,13 +37,9 @@ export async function updateApplication(_, args, req) {
   }
 
   if (!req.remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be authenticated to update an application.',
-    );
+    throw new errors.Unauthorized('You need to be authenticated to update an application.');
   } else if (req.remoteUser.id !== app.CreatedByUserId) {
-    throw new errors.Forbidden(
-      'Authenticated user is not the application owner.',
-    );
+    throw new errors.Forbidden('Authenticated user is not the application owner.');
   }
 
   return await app.update(args.application);
@@ -61,13 +54,9 @@ export async function deleteApplication(_, args, req) {
   }
 
   if (!req.remoteUser) {
-    throw new errors.Unauthorized(
-      'You need to be authenticated to update an application.',
-    );
+    throw new errors.Unauthorized('You need to be authenticated to update an application.');
   } else if (req.remoteUser.id !== app.CreatedByUserId) {
-    throw new errors.Forbidden(
-      'Authenticated user is not the application owner.',
-    );
+    throw new errors.Forbidden('Authenticated user is not the application owner.');
   }
 
   return await app.destroy();

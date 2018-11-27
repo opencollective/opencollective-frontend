@@ -32,11 +32,7 @@ describe('paymentmethod.model.test.js', () => {
   });
 
   describe('instance methods', () => {
-    before('create a user', () =>
-      models.User.createUserWithCollective({ name: 'Xavier' }).then(
-        u => (user = u),
-      ),
-    );
+    before('create a user', () => models.User.createUserWithCollective({ name: 'Xavier' }).then(u => (user = u)));
     before('create a collective', () =>
       models.Collective.create({
         name: 'BrusselsTogether',
@@ -44,9 +40,7 @@ describe('paymentmethod.model.test.js', () => {
       }).then(c => (collective = c)),
     );
     before('create an organization', () =>
-      models.Collective.create({ name: 'pubnub', currency: 'USD' }).then(
-        o => (organization = o),
-      ),
+      models.Collective.create({ name: 'pubnub', currency: 'USD' }).then(o => (organization = o)),
     );
     before('create a payment method', () =>
       models.PaymentMethod.create({

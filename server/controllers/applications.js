@@ -38,9 +38,7 @@ export const read = async (req, res, next) => {
   getApp(req.params.id)
     .then(app => {
       if (req.remoteUser.id !== app.CreatedByUserId) {
-        throw new errors.Forbidden(
-          'Authenticated user is not the application owner.',
-        );
+        throw new errors.Forbidden('Authenticated user is not the application owner.');
       }
       res.send(app.info);
     })
@@ -53,9 +51,7 @@ export const update = async (req, res, next) => {
   try {
     const app = await getApp(req.params.id);
     if (req.remoteUser.id !== app.CreatedByUserId) {
-      throw new errors.Forbidden(
-        'Authenticated user is not the application owner.',
-      );
+      throw new errors.Forbidden('Authenticated user is not the application owner.');
     }
     const props = {};
     if (has(req, 'body.name')) {
@@ -81,9 +77,7 @@ export const del = async (req, res, next) => {
   try {
     const app = await getApp(req.params.id);
     if (req.remoteUser.id !== app.CreatedByUserId) {
-      throw new errors.Forbidden(
-        'Authenticated user is not the application owner.',
-      );
+      throw new errors.Forbidden('Authenticated user is not the application owner.');
     }
     await app.destroy();
     res.send({ success: true });

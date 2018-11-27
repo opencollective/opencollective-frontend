@@ -8,11 +8,7 @@ export default function(param, value) {
     // if param doesn't exist, go to next route
     if (!req.query[param] && !req.headers[param] && !req.body[param]) {
       next('route');
-    } else if (
-      req.query[param] === value ||
-      req.headers[param] === value ||
-      req.body[param] === value
-    ) {
+    } else if (req.query[param] === value || req.headers[param] === value || req.body[param] === value) {
       // if it exists and value is right, proceed
       next();
     } else {

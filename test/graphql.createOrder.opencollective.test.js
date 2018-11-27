@@ -24,9 +24,7 @@ describe('grahpql.createOrder.opencollective', () => {
       before(utils.resetTestDB);
 
       it('should error if payment method is not a prepaid', async () => {
-        expect(
-          prepaid.getBalance({ service: 'opencollective', type: 'giftcard' }),
-        ).to.be.eventually.rejectedWith(
+        expect(prepaid.getBalance({ service: 'opencollective', type: 'giftcard' })).to.be.eventually.rejectedWith(
           Error,
           'Expected opencollective.prepaid but got opencollective.giftcard',
         );
@@ -48,10 +46,7 @@ describe('grahpql.createOrder.opencollective', () => {
       it('should return initial balance of payment method minus credit already spent', async () => {
         // Given a user & collective
         const { user, userCollective } = await store.newUser('new user');
-        const {
-          hostCollective,
-          collective,
-        } = await store.newCollectiveWithHost('test', 'USD', 'USD', 0);
+        const { hostCollective, collective } = await store.newCollectiveWithHost('test', 'USD', 'USD', 0);
 
         // And given the following order with a payment method
         const { order } = await store.newOrder({
@@ -91,12 +86,7 @@ describe('grahpql.createOrder.opencollective', () => {
         user2 = await models.User.createUserWithCollective({
           name: 'new user 2',
         });
-        ({ hostCollective, collective } = await store.newCollectiveWithHost(
-          'test',
-          'USD',
-          'USD',
-          10,
-        ));
+        ({ hostCollective, collective } = await store.newCollectiveWithHost('test', 'USD', 'USD', 10));
       }); /* End of "beforeEach" */
 
       it('should fail if payment method does not have a host id', async () => {
@@ -117,9 +107,7 @@ describe('grahpql.createOrder.opencollective', () => {
 
         // When the above order is executed; Then the transaction
         // should be unsuccessful.
-        await expect(
-          libpayments.executeOrder(user, order),
-        ).to.be.eventually.rejectedWith(
+        await expect(libpayments.executeOrder(user, order)).to.be.eventually.rejectedWith(
           Error,
           'Prepaid payment method must have a value for `data.HostCollectiveId`',
         );
@@ -174,9 +162,7 @@ describe('grahpql.createOrder.opencollective', () => {
 
         // When the above order is executed; Then the transaction
         // should be unsuccessful.
-        await expect(
-          libpayments.executeOrder(user, order),
-        ).to.be.eventually.rejectedWith(
+        await expect(libpayments.executeOrder(user, order)).to.be.eventually.rejectedWith(
           Error,
           'Prepaid method can only be used in collectives from the same host',
         );
@@ -189,9 +175,7 @@ describe('grahpql.createOrder.opencollective', () => {
   describe('giftcard', () => {
     describe('#getBalance', () => {
       it('should error if payment method is not a giftcard', async () => {
-        expect(
-          giftcard.getBalance({ service: 'opencollective', type: 'prepaid' }),
-        ).to.be.rejectedWith(
+        expect(giftcard.getBalance({ service: 'opencollective', type: 'prepaid' })).to.be.rejectedWith(
           Error,
           'Expected opencollective.giftcard but got opencollective.prepaid',
         );
@@ -220,11 +204,7 @@ describe('grahpql.createOrder.opencollective', () => {
       beforeEach(async () => {
         // Given a user and an active collective
         ({ user, userCollective } = await store.newUser('user'));
-        ({
-          collective,
-          hostCollective,
-          hostAdmin,
-        } = await store.newCollectiveWithHost('test', 'BRL', 'BRL', 5));
+        ({ collective, hostCollective, hostAdmin } = await store.newCollectiveWithHost('test', 'BRL', 'BRL', 5));
         await collective.update({ isActive: true });
       }); /* End of "beforeEach" */
 
@@ -260,11 +240,7 @@ describe('grahpql.createOrder.opencollective', () => {
           totalAmount: 5000,
         };
 
-        const result = await utils.graphqlQuery(
-          createOrderQuery,
-          { order },
-          user,
-        );
+        const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
 
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal(
@@ -305,11 +281,7 @@ describe('grahpql.createOrder.opencollective', () => {
           totalAmount: 5000,
         };
 
-        const result = await utils.graphqlQuery(
-          createOrderQuery,
-          { order },
-          user,
-        );
+        const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
         result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
 

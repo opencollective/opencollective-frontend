@@ -1,9 +1,4 @@
-import {
-  GraphQLInt,
-  GraphQLString,
-  GraphQLList,
-  GraphQLInterfaceType,
-} from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -12,10 +7,7 @@ import { idEncode } from '../identifiers';
 import { HasMembersFields } from '../interface/HasMembers';
 import { IsMemberOfFields } from '../interface/IsMemberOf';
 
-import {
-  MemberCollection,
-  MemberOfCollection,
-} from '../collection/MemberCollection';
+import { MemberCollection, MemberOfCollection } from '../collection/MemberCollection';
 import { TransactionCollection } from '../collection/TransactionCollection';
 
 import { AccountType } from '../enum/AccountType';
@@ -111,8 +103,7 @@ export const AccountFields = {
 
 export const Account = new GraphQLInterfaceType({
   name: 'Account',
-  description:
-    'Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)',
+  description: 'Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)',
   fields: () => {
     return {
       // _internal_id: {
@@ -121,8 +112,7 @@ export const Account = new GraphQLInterfaceType({
       // },
       id: {
         type: GraphQLString,
-        description:
-          'The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)',
+        description: 'The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)',
       },
       slug: {
         type: GraphQLString,
@@ -162,8 +152,7 @@ export const Account = new GraphQLInterfaceType({
           role: { type: new GraphQLList(MemberRole) },
           accountType: {
             type: new GraphQLList(AccountType),
-            description:
-              'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
+            description: 'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
           },
         },
       },

@@ -16,23 +16,13 @@ describe('graphql.transaction.test.js', () => {
     // Given a host
     const { hostCollective } = await store.newHost('wwcode', 'USD', 5);
     // Given a collective
-    const { collective } = await store.newCollectiveInHost(
-      'wwcodeaustin',
-      'USD',
-      hostCollective,
-      null,
-      { isActive: true },
-    );
+    const { collective } = await store.newCollectiveInHost('wwcodeaustin', 'USD', hostCollective, null, {
+      isActive: true,
+    });
     // And given the host has a stripe account
     await store.stripeConnectedAccount(hostCollective.id);
     // And given that we have 5 users making one purchase each
-    const userNames = [
-      'Craft Work',
-      'Geoff Frey',
-      'Holly Day',
-      'Max Point',
-      'Praxent',
-    ];
+    const userNames = ['Craft Work', 'Geoff Frey', 'Holly Day', 'Max Point', 'Praxent'];
     // Not using Promise.all because I want the entries to be created
     // in sequence, not in parallel since stripeOneTimeDonation can't
     // patch the same object more than once at a time.

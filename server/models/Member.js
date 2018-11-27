@@ -71,8 +71,7 @@ export default function(Sequelize, DataTypes) {
                 roles.FUNDRAISER,
               ],
             ],
-            msg:
-              'Must be host, admin, member, backer, contributor, attendee, fundraiser or follower',
+            msg: 'Must be host, admin, member, backer, contributor, attendee, fundraiser or follower',
           },
         },
       },
@@ -122,16 +121,8 @@ export default function(Sequelize, DataTypes) {
   Member.isActive = member => {
     if (!member.tier || !member.tier.interval) return true;
     if (!member.lastDonation) return false;
-    if (
-      member.tier.interval === 'month' &&
-      days(new Date(member.lastDonation)) <= 31
-    )
-      return true;
-    if (
-      member.tier.interval === 'year' &&
-      days(new Date(member.lastDonation)) <= 365
-    )
-      return true;
+    if (member.tier.interval === 'month' && days(new Date(member.lastDonation)) <= 31) return true;
+    if (member.tier.interval === 'year' && days(new Date(member.lastDonation)) <= 365) return true;
     return false;
   };
 

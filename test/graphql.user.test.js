@@ -14,10 +14,7 @@ describe('Query Tests', () => {
 
   before(() => {
     sandbox.stub(payments, 'executeOrder').callsFake((user, order) => {
-      return models.Order.update(
-        { processedAt: new Date() },
-        { where: { id: order.id } },
-      );
+      return models.Order.update({ processedAt: new Date() }, { where: { id: order.id } });
     });
   });
 
@@ -25,33 +22,16 @@ describe('Query Tests', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user1 = u),
-    ));
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ));
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('host1')).tap(
-      u => (host = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user1 = u)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => (host = u)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective1 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective2')).tap(
-      g => (collective2 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => (collective2 = g)));
 
-  beforeEach(() =>
-    collective1.createTier(utils.data('tier1')).tap(t => (tier1 = t)));
-  beforeEach(() =>
-    collective1.createTier(utils.data('ticket1')).tap(t => (ticket1 = t)));
+  beforeEach(() => collective1.createTier(utils.data('tier1')).tap(t => (tier1 = t)));
+  beforeEach(() => collective1.createTier(utils.data('ticket1')).tap(t => (ticket1 = t)));
 
   beforeEach(() => collective1.addUserWithRole(user1, 'BACKER'));
   beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
@@ -148,11 +128,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        const result = await utils.graphqlQuery(
-          query,
-          { order: generateLoggedInOrder() },
-          user1,
-        );
+        const result = await utils.graphqlQuery(query, { order: generateLoggedInOrder() }, user1);
         result.errors && console.error(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({
@@ -161,9 +137,7 @@ describe('Query Tests', () => {
         paymentMethods.errors && console.error(paymentMethods.errors);
         expect(paymentMethods).to.have.length(1);
         expect(paymentMethods[0].name).to.equal('4242');
-        expect(paymentMethods[0].CollectiveId).to.equal(
-          result.data.createOrder.fromCollective.id,
-        );
+        expect(paymentMethods[0].CollectiveId).to.equal(result.data.createOrder.fromCollective.id);
       });
 
       it('does not save a payment method to the user', async () => {
@@ -201,10 +175,7 @@ describe('Query Tests', () => {
         }`;
 
         await utils.graphqlQuery(createOrderQuery, {
-          order: generateLoggedOutOrder(
-            { email: store.randEmail('user@opencollective.com') },
-            ticket1,
-          ),
+          order: generateLoggedOutOrder({ email: store.randEmail('user@opencollective.com') }, ticket1),
         });
 
         const query = `
@@ -231,11 +202,7 @@ describe('Query Tests', () => {
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
         expect(orders[0].paymentMethod).to.be.null;
-        const result2 = await utils.graphqlQuery(
-          query,
-          { id: ticket1.id },
-          user2,
-        );
+        const result2 = await utils.graphqlQuery(query, { id: ticket1.id }, user2);
         result2.errors && console.error(result2.errors);
         const orders2 = result2.data.Tier.orders;
         expect(orders2).to.have.length(1);
@@ -252,10 +219,7 @@ describe('Query Tests', () => {
         }`;
 
         await utils.graphqlQuery(createOrderQuery, { order }, user1);
-        await models.PaymentMethod.update(
-          { confirmedAt: new Date() },
-          { where: { CreatedByUserId: user1.id } },
-        );
+        await models.PaymentMethod.update({ confirmedAt: new Date() }, { where: { CreatedByUserId: user1.id } });
 
         const query = `
           query Tier($id: Int!) {

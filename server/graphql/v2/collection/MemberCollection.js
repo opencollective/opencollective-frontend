@@ -4,8 +4,7 @@ import { Member, MemberOf } from '../object/Member';
 
 export const MemberCollection = new GraphQLObjectType({
   name: 'MemberCollection',
-  description:
-    'A collection of "Members" (ie: Organization backing a Collective)',
+  description: 'A collection of "Members" (ie: Organization backing a Collective)',
   fields: () => {
     return {
       totalCount: {
@@ -26,8 +25,7 @@ export const MemberCollection = new GraphQLObjectType({
 
 export const MemberOfCollection = new GraphQLObjectType({
   name: 'MemberOfCollection',
-  description:
-    'A collection of "MemberOf" (ie: Collective backed by an Organization)',
+  description: 'A collection of "MemberOf" (ie: Collective backed by an Organization)',
   fields: () => {
     return {
       totalCount: {

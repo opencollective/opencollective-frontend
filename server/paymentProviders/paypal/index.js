@@ -23,11 +23,7 @@ const debugPaypal = debug('paypal');
  */
 const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
   if (!paymentMethod) {
-    return Promise.reject(
-      new Error(
-        'No payment method provided to getPreapprovalDetailsAndUpdatePaymentMethod',
-      ),
-    );
+    return Promise.reject(new Error('No payment method provided to getPreapprovalDetailsAndUpdatePaymentMethod'));
   }
 
   let preapprovalDetailsResponse;
@@ -68,9 +64,7 @@ export default {
       // TODO: The cancel URL doesn't work - no routes right now.
       const { redirect } = options;
       if (!redirect) {
-        throw new Error(
-          'Please provide a redirect url as a query parameter (?redirect=)',
-        );
+        throw new Error('Please provide a redirect url as a query parameter (?redirect=)');
       }
       const expiryDate = moment().add(1, 'years');
 
@@ -79,33 +73,27 @@ export default {
       return models.Collective.findById(CollectiveId)
         .then(c => {
           collective = c;
-          return convertToCurrency(2000, 'USD', collective.currency).then(
-            limit => {
-              // We can request a paykey for up to $2,000 equivalent (minus 5%)
-              const lowerLimit =
-                collective.currency === 'USD' ? 2000 : Math.floor(0.95 * limit);
-              debugPaypal(
-                '>>> requesting a paykey for ',
-                formatCurrency(lowerLimit * 100, collective.currency),
-              );
-              return {
-                currencyCode: 'USD', // collective.currency, // we should use the currency of the host collective but still waiting on PayPal to resolve that issue.
-                startingDate: new Date().toISOString(),
-                endingDate: expiryDate.toISOString(),
-                returnUrl: `${
-                  config.host.api
-                }/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
-                cancelUrl: `${
-                  config.host.api
-                }/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
-                displayMaxTotalAmount: false,
-                feesPayer: 'SENDER',
-                maxAmountPerPayment: 2000.0, // lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
-                maxTotalAmountOfAllPayments: 2000.0, // , // PayPal claims this isn't needed but Live errors out if we don't send it.
-                clientDetails: CollectiveId,
-              };
-            },
-          );
+          return convertToCurrency(2000, 'USD', collective.currency).then(limit => {
+            // We can request a paykey for up to $2,000 equivalent (minus 5%)
+            const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.95 * limit);
+            debugPaypal('>>> requesting a paykey for ', formatCurrency(lowerLimit * 100, collective.currency));
+            return {
+              currencyCode: 'USD', // collective.currency, // we should use the currency of the host collective but still waiting on PayPal to resolve that issue.
+              startingDate: new Date().toISOString(),
+              endingDate: expiryDate.toISOString(),
+              returnUrl: `${
+                config.host.api
+              }/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
+              cancelUrl: `${
+                config.host.api
+              }/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
+              displayMaxTotalAmount: false,
+              feesPayer: 'SENDER',
+              maxAmountPerPayment: 2000.0, // lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
+              maxTotalAmountOfAllPayments: 2000.0, // , // PayPal claims this isn't needed but Live errors out if we don't send it.
+              clientDetails: CollectiveId,
+            };
+          });
         })
         .then(payload => paypalAdaptive.preapproval(payload))
         .then(r => (response = r))
@@ -139,11 +127,7 @@ export default {
 
           if (!pm) {
             return next(
-              new errors.BadRequest(
-                `No paymentMethod found with this preapproval key: ${
-                  req.query.preapprovalKey
-                }`,
-              ),
+              new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`),
             );
           }
 
@@ -194,9 +178,7 @@ export default {
               .then(oldPMs => oldPMs && oldPMs.map(pm => pm.destroy()))
 
               .then(() => {
-                const redirect = `${
-                  paymentMethod.data.redirect
-                }?status=success&service=paypal`;
+                const redirect = `${paymentMethod.data.redirect}?status=success&service=paypal`;
                 return res.redirect(redirect);
               })
           );
@@ -218,11 +200,7 @@ export default {
         .then(pm => {
           if (!pm) {
             return next(
-              new errors.BadRequest(
-                `No paymentMethod found with this preapproval key: ${
-                  req.query.preapprovalKey
-                }`,
-              ),
+              new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`),
             );
           }
           if (!req.remoteUser.isAdmin(pm.CollectiveId)) {
@@ -232,9 +210,7 @@ export default {
               ),
             );
           }
-          return getPreapprovalDetailsAndUpdatePaymentMethod(pm).then(pm =>
-            res.json(pm.info),
-          );
+          return getPreapprovalDetailsAndUpdatePaymentMethod(pm).then(pm => res.json(pm.info));
         })
         .catch(next);
     },

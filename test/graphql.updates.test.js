@@ -28,27 +28,11 @@ describe('graphql.updates.test', () => {
 
   before(() => utils.resetTestDB());
 
-  before(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user1 = u),
-    ),
-  );
-  before(() =>
-    models.User.createUserWithCollective(utils.data('host1')).tap(
-      u => (host = u),
-    ),
-  );
+  before(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user1 = u)));
+  before(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => (host = u)));
 
-  before(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ),
-  );
-  before(() =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective1 = g),
-    ),
-  );
+  before(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
+  before(() => models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)));
   before(() => collective1.addUserWithRole(host, roles.HOST));
   before(() => collective1.addUserWithRole(user1, roles.ADMIN));
 
@@ -58,8 +42,7 @@ describe('graphql.updates.test', () => {
       FromCollectiveId: user1.CollectiveId,
       CreatedByUserId: user1.id,
       title: 'first update & "love"',
-      html:
-        'long text for the update #1 <a href="https://google.com">here is a link</a>',
+      html: 'long text for the update #1 <a href="https://google.com">here is a link</a>',
     }).then(u => (update1 = u));
   });
 
@@ -98,29 +81,17 @@ describe('graphql.updates.test', () => {
     it('fails if not authenticated', async () => {
       const result = await utils.graphqlQuery(createUpdateQuery, { update });
       expect(result.errors).to.have.length(1);
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to create an update',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to create an update');
     });
 
     it('fails if authenticated but cannot edit collective', async () => {
-      const result = await utils.graphqlQuery(
-        createUpdateQuery,
-        { update },
-        user2,
-      );
+      const result = await utils.graphqlQuery(createUpdateQuery, { update }, user2);
       expect(result.errors).to.have.length(1);
-      expect(result.errors[0].message).to.equal(
-        "You don't have sufficient permissions to create an update",
-      );
+      expect(result.errors[0].message).to.equal("You don't have sufficient permissions to create an update");
     });
 
     it('creates an update', async () => {
-      const result = await utils.graphqlQuery(
-        createUpdateQuery,
-        { update },
-        user1,
-      );
+      const result = await utils.graphqlQuery(createUpdateQuery, { update }, user1);
       result.errors && console.error(result.errors[0]);
       const createdUpdate = result.data.createUpdate;
       expect(createdUpdate.slug).to.equal('monthly-update-2');
@@ -144,21 +115,13 @@ describe('graphql.updates.test', () => {
         id: update1.id,
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to publish this update',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to publish this update');
     });
 
     it('fails if not authenticated as admin of collective', async () => {
-      const result = await utils.graphqlQuery(
-        publishUpdateQuery,
-        { id: update1.id },
-        user2,
-      );
+      const result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user2);
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        "You don't have sufficient permissions to publish this update",
-      );
+      expect(result.errors[0].message).to.equal("You don't have sufficient permissions to publish this update");
     });
 
     describe('publishes an update', async () => {
@@ -183,11 +146,7 @@ describe('graphql.updates.test', () => {
           service: 'twitter',
           settings: { updatePublished: { active: true } },
         });
-        result = await utils.graphqlQuery(
-          publishUpdateQuery,
-          { id: update1.id },
-          user1,
-        );
+        result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
       });
 
       beforeEach(() => {
@@ -196,9 +155,7 @@ describe('graphql.updates.test', () => {
 
       it('published the update successfully', async () => {
         expect(result.errors).to.not.exist;
-        expect(result.data.publishUpdate.slug).to.equal(
-          'first-update-and-love',
-        );
+        expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
         expect(result.data.publishUpdate.publishedAt).to.not.be.null;
       });
 
@@ -215,20 +172,13 @@ describe('graphql.updates.test', () => {
 
       it('sends a tweet', async () => {
         expect(sendTweetSpy.callCount).to.equal(1);
-        expect(sendTweetSpy.firstCall.args[1]).to.equal(
-          'Latest update from the collective: first update & "love"',
-        );
-        expect(sendTweetSpy.firstCall.args[2]).to.contain(
-          '/scouts/updates/first-update-and-love',
-        );
+        expect(sendTweetSpy.firstCall.args[1]).to.equal('Latest update from the collective: first update & "love"');
+        expect(sendTweetSpy.firstCall.args[2]).to.contain('/scouts/updates/first-update-and-love');
       });
     });
 
     it('unpublishes an update successfully', async () => {
-      await models.Update.update(
-        { publishedAt: new Date() },
-        { where: { id: update1.id } },
-      );
+      await models.Update.update({ publishedAt: new Date() }, { where: { id: update1.id } });
       const result = await utils.graphqlQuery(
         publishUpdateQuery.replace(/publish\(/g, 'unpublish('),
         { id: update1.id },
@@ -237,10 +187,7 @@ describe('graphql.updates.test', () => {
       expect(result.errors).to.not.exist;
       expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
       expect(result.data.publishUpdate.publishedAt).to.not.be.null;
-      await models.Update.update(
-        { publishedAt: null },
-        { where: { id: update1.id } },
-      );
+      await models.Update.update({ publishedAt: null }, { where: { id: update1.id } });
     });
   });
 
@@ -260,28 +207,17 @@ describe('graphql.updates.test', () => {
         update: { id: update1.id },
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to edit this update',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to edit this update');
     });
 
     it('fails if not authenticated as admin of collective', async () => {
-      const result = await utils.graphqlQuery(
-        editUpdateQuery,
-        { update: { id: update1.id } },
-        user2,
-      );
+      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id } }, user2);
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        "You don't have sufficient permissions to edit this update",
-      );
+      expect(result.errors[0].message).to.equal("You don't have sufficient permissions to edit this update");
     });
 
     it('edits an update successfully and changes the slug if not published', async () => {
-      await models.Update.update(
-        { publishedAt: null },
-        { where: { id: update1.id } },
-      );
+      await models.Update.update({ publishedAt: null }, { where: { id: update1.id } });
       const result = await utils.graphqlQuery(
         editUpdateQuery,
         { update: { id: update1.id, title: 'new title' } },
@@ -303,21 +239,12 @@ describe('graphql.updates.test', () => {
       );
       expect(result.errors).to.not.exist;
       expect(result.data.editUpdate.slug).to.equal('first-update-and-love');
-      await models.Update.update(
-        { publishedAt: null },
-        { where: { id: update1.id } },
-      );
+      await models.Update.update({ publishedAt: null }, { where: { id: update1.id } });
     });
 
     it('fails if update title is not set', async () => {
-      const result = await utils.graphqlQuery(
-        editUpdateQuery,
-        { update: { id: update1.id, title: '' } },
-        user1,
-      );
-      expect(result.errors[0].message).to.equal(
-        'Validation error: Validation len on title failed',
-      );
+      const result = await utils.graphqlQuery(editUpdateQuery, { update: { id: update1.id, title: '' } }, user1);
+      expect(result.errors[0].message).to.equal('Validation error: Validation len on title failed');
     });
   });
   describe('delete Update', () => {
@@ -334,35 +261,23 @@ describe('graphql.updates.test', () => {
         id: update1.id,
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to delete this update',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to delete this update');
       return models.Update.findById(update1.id).then(updateFound => {
         expect(updateFound).to.not.be.null;
       });
     });
 
     it('fails to delete an update if logged in as another user', async () => {
-      const result = await utils.graphqlQuery(
-        deleteUpdateQuery,
-        { id: update1.id },
-        user2,
-      );
+      const result = await utils.graphqlQuery(deleteUpdateQuery, { id: update1.id }, user2);
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        "You don't have sufficient permissions to delete this update",
-      );
+      expect(result.errors[0].message).to.equal("You don't have sufficient permissions to delete this update");
       return models.Update.findById(update1.id).then(updateFound => {
         expect(updateFound).to.not.be.null;
       });
     });
 
     it('deletes an update', async () => {
-      const res = await utils.graphqlQuery(
-        deleteUpdateQuery,
-        { id: update1.id },
-        user1,
-      );
+      const res = await utils.graphqlQuery(deleteUpdateQuery, { id: update1.id }, user1);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
       return models.Update.findById(update1.id).then(updateFound => {

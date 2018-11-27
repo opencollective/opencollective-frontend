@@ -7,13 +7,11 @@ import emailLib from '../lib/email';
 const debug = libdebug('express');
 
 const sendErrorByEmail = (req, err) => {
-  let errorHTML =
-    'To reproduce this error, run this CURL command:<br />\n<br />\n';
+  let errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
 
   if (req.body.password) req.body.password = '***********';
 
-  if (req.body.passwordConfirmation)
-    req.body.passwordConfirmation = '***********';
+  if (req.body.passwordConfirmation) req.body.passwordConfirmation = '***********';
 
   errorHTML += curlify(req, req.body);
   errorHTML += '<br />\n<br />\n';
@@ -51,17 +49,9 @@ export default (err, req, res, next) => {
   const e = name && name.toLowerCase ? name.toLowerCase() : '';
 
   if (e.indexOf('validation') !== -1) {
-    err = new errors.ValidationFailed(
-      null,
-      _.map(err.errors, e => e.path),
-      err.message,
-    );
+    err = new errors.ValidationFailed(null, _.map(err.errors, e => e.path), err.message);
   } else if (e.indexOf('uniqueconstraint') !== -1) {
-    err = new errors.ValidationFailed(
-      null,
-      _.map(err.errors, e => e.path),
-      'Unique Constraint Error.',
-    );
+    err = new errors.ValidationFailed(null, _.map(err.errors, e => e.path), 'Unique Constraint Error.');
   }
 
   if (!err.code || !Number.isInteger(err.code)) {

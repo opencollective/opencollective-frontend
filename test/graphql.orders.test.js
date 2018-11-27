@@ -133,9 +133,7 @@ describe('graphql.orders.test.js', () => {
       const result = await utils.graphqlQuery(mutation, {
         id: orders[0].id,
       });
-      expect(result.errors[0].message).to.equal(
-        'You need to be authenticated to perform this action',
-      );
+      expect(result.errors[0].message).to.equal('You need to be authenticated to perform this action');
     });
     it('fails if not authenticated as an admin of the host', async () => {
       const result = await utils.graphqlQuery(
@@ -145,9 +143,7 @@ describe('graphql.orders.test.js', () => {
         },
         backers[0],
       );
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in as an admin of the host of the collective',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in as an admin of the host of the collective');
     });
     it('fails if order not found', async () => {
       const result = await utils.graphqlQuery(
@@ -184,15 +180,11 @@ describe('graphql.orders.test.js', () => {
       expect(transactions[1].HostCollectiveId).to.equal(host.id);
       expect(transactions[1].PaymentMethodId).to.be.null;
       expect(transactions[1].platformFeeInHostCurrency).to.equal(0);
-      expect(transactions[1].hostFeeInHostCurrency).to.equal(
-        -0.05 * orders[0].totalAmount,
-      );
+      expect(transactions[1].hostFeeInHostCurrency).to.equal(-0.05 * orders[0].totalAmount);
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
       expect(emailSendMessageSpy.callCount).to.equal(3);
       expect(emailSendMessageSpy.thirdCall.args[0]).to.equal(backers[1].email);
-      expect(emailSendMessageSpy.thirdCall.args[1]).to.equal(
-        'Thank you for your €150 donation to codenplay',
-      );
+      expect(emailSendMessageSpy.thirdCall.args[1]).to.equal('Thank you for your €150 donation to codenplay');
     });
   });
 });

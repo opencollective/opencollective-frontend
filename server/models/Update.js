@@ -182,12 +182,10 @@ export default function(Sequelize, DataTypes) {
 
       hooks: {
         beforeValidate: instance => {
-          if (!instance.publishedAt || !instance.slug)
-            return instance.generateSlug();
+          if (!instance.publishedAt || !instance.slug) return instance.generateSlug();
         },
         beforeUpdate: instance => {
-          if (!instance.publishedAt || !instance.slug)
-            return instance.generateSlug();
+          if (!instance.publishedAt || !instance.slug) return instance.generateSlug();
         },
         afterCreate: instance => {
           models.Activity.create({
@@ -217,20 +215,11 @@ export default function(Sequelize, DataTypes) {
       }
       if (tier.CollectiveId !== this.CollectiveId) {
         throw new errors.ValidationFailed({
-          message:
-            "Cannot link this update to a Tier that doesn't belong to this collective",
+          message: "Cannot link this update to a Tier that doesn't belong to this collective",
         });
       }
     }
-    const editableAttributes = [
-      'TierId',
-      'FromCollectiveId',
-      'title',
-      'html',
-      'markdown',
-      'image',
-      'tags',
-    ];
+    const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'html', 'markdown', 'image', 'tags'];
     sanitizeObject(newUpdateData, ['html', 'markdown']);
     return await this.update({
       ...pick(newUpdateData, editableAttributes),
@@ -242,8 +231,7 @@ export default function(Sequelize, DataTypes) {
   Update.prototype.publish = async function(remoteUser) {
     mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'publish this update');
     this.publishedAt = new Date();
-    this.collective =
-      this.collective || (await models.Collective.findById(this.CollectiveId));
+    this.collective = this.collective || (await models.Collective.findById(this.CollectiveId));
     models.Activity.create({
       type: activities.COLLECTIVE_UPDATE_PUBLISHED,
       UserId: remoteUser.id,
@@ -251,9 +239,7 @@ export default function(Sequelize, DataTypes) {
       data: {
         collective: this.collective.activity,
         update: this.activity,
-        url: `${config.host.website}/${this.collective.slug}/updates/${
-          this.slug
-        }`,
+        url: `${config.host.website}/${this.collective.slug}/updates/${this.slug}`,
       },
     });
     return await this.save();
@@ -261,12 +247,7 @@ export default function(Sequelize, DataTypes) {
 
   // Unpublish update
   Update.prototype.unpublish = async function(remoteUser) {
-    mustHaveRole(
-      remoteUser,
-      'ADMIN',
-      this.CollectiveId,
-      'unpublish this update',
-    );
+    mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'unpublish this update');
     this.publishedAt = null;
     return await this.save();
   };
@@ -282,16 +263,16 @@ export default function(Sequelize, DataTypes) {
   };
 
   /*
-  * If there is a username suggested, we'll check that it's valid or increase it's count
-  * Otherwise, we'll suggest something.
-  */
+   * If there is a username suggested, we'll check that it's valid or increase it's count
+   * Otherwise, we'll suggest something.
+   */
   Update.prototype.generateSlug = function() {
     if (!this.title) return;
     const suggestion = slugify(this.title.trim()).toLowerCase(/\./g, '');
 
     /*
-    * Checks a given slug in a list and if found, increments count and recursively checks again
-    */
+     * Checks a given slug in a list and if found, increments count and recursively checks again
+     */
     const slugSuggestionHelper = (slugToCheck, slugList, count) => {
       const slug = count > 0 ? `${slugToCheck}${count}` : slugToCheck;
       if (slugList.indexOf(slug) === -1) {
@@ -304,9 +285,7 @@ export default function(Sequelize, DataTypes) {
     // fetch any matching slugs or slugs for the top choice in the list above
     return Sequelize.query(
       `
-        SELECT slug FROM "Updates" WHERE "CollectiveId"=${
-          this.CollectiveId
-        } AND slug like '${suggestion}%'
+        SELECT slug FROM "Updates" WHERE "CollectiveId"=${this.CollectiveId} AND slug like '${suggestion}%'
       `,
       {
         type: Sequelize.QueryTypes.SELECT,
@@ -315,20 +294,15 @@ export default function(Sequelize, DataTypes) {
       .then(updateObjectList => updateObjectList.map(update => update.slug))
       .then(slugList => slugSuggestionHelper(suggestion, slugList, 0))
       .then(slug => {
-        if (!slug)
-          return Promise.reject(
-            new Error("We couldn't generate a unique slug for this Update"),
-          );
+        if (!slug) return Promise.reject(new Error("We couldn't generate a unique slug for this Update"));
         this.slug = slug;
       });
   };
 
   Update.createMany = (updates, defaultValues) => {
-    return Promise.map(
-      updates,
-      u => Update.create(_.defaults({}, u, defaultValues)),
-      { concurrency: 1 },
-    ).catch(console.error);
+    return Promise.map(updates, u => Update.create(_.defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
+      console.error,
+    );
   };
 
   Update.findBySlug = (slug, options = {}) => {

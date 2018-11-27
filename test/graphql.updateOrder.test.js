@@ -102,9 +102,7 @@ describe('updateOrder', () => {
     });
 
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal(
-      'You need to be logged in to update an order',
-    );
+    expect(res.errors[0].message).to.equal('You need to be logged in to update an order');
   });
 
   it('fails if no order exists yet', async () => {
@@ -133,30 +131,16 @@ describe('updateOrder', () => {
     );
 
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal(
-      'This order requires a payment method',
-    );
+    expect(res.errors[0].message).to.equal('This order requires a payment method');
   });
 
   it('pay a PENDING order with a credit card', async () => {
     expect(existingOrder.status).to.equal('PENDING');
     order.id = existingOrder.id;
     order.totalAmount = existingOrder.totalAmount;
-    order.paymentMethod = pick(paymentMethod, [
-      'id',
-      'uuid',
-      'service',
-      'token',
-      'name',
-    ]);
+    order.paymentMethod = pick(paymentMethod, ['id', 'uuid', 'service', 'token', 'name']);
 
-    utils.stubStripeBalance(
-      sandbox,
-      order.totalAmount,
-      'eur',
-      Math.round(order.totalAmount * 0.05),
-      4500,
-    ); // This is the payment processor fee.
+    utils.stubStripeBalance(sandbox, order.totalAmount, 'eur', Math.round(order.totalAmount * 0.05), 4500); // This is the payment processor fee.
 
     // When the query is executed
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
@@ -176,20 +160,13 @@ describe('updateOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(user2.CollectiveId);
     expect(transaction.CollectiveId).to.equal(orderForCollective.id);
     expect(transaction.currency).to.equal(orderForCollective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(
-      -(0.1 * order.totalAmount),
-    );
-    expect(transaction.platformFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.data.charge.currency).to.equal(
-      orderForCollective.currency.toLowerCase(),
-    );
+    expect(transaction.hostFeeInHostCurrency).to.equal(-(0.1 * order.totalAmount));
+    expect(transaction.platformFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.data.charge.currency).to.equal(orderForCollective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(
-      transaction.data.balanceTransaction.net +
-        transaction.hostFeeInHostCurrency,
-    ).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net + transaction.hostFeeInHostCurrency).to.equal(
+      transaction.netAmountInCollectiveCurrency,
+    );
     expect(transaction.data.charge.currency).to.equal('eur');
   });
 
@@ -197,21 +174,9 @@ describe('updateOrder', () => {
     order.id = existingOrder.id;
     order.interval = 'month';
     order.totalAmount = existingOrder.totalAmount;
-    order.paymentMethod = pick(paymentMethod, [
-      'id',
-      'uuid',
-      'service',
-      'token',
-      'name',
-    ]);
+    order.paymentMethod = pick(paymentMethod, ['id', 'uuid', 'service', 'token', 'name']);
 
-    utils.stubStripeBalance(
-      sandbox,
-      order.totalAmount,
-      'eur',
-      Math.round(order.totalAmount * 0.05),
-      4500,
-    ); // This is the payment processor fee.
+    utils.stubStripeBalance(sandbox, order.totalAmount, 'eur', Math.round(order.totalAmount * 0.05), 4500); // This is the payment processor fee.
 
     // When the query is executed
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
@@ -239,21 +204,9 @@ describe('updateOrder', () => {
     order.id = existingOrder.id;
     order.interval = 'month';
     order.totalAmount = existingOrder.totalAmount;
-    order.paymentMethod = pick(paymentMethod, [
-      'id',
-      'uuid',
-      'service',
-      'token',
-      'name',
-    ]);
+    order.paymentMethod = pick(paymentMethod, ['id', 'uuid', 'service', 'token', 'name']);
 
-    utils.stubStripeBalance(
-      sandbox,
-      order.totalAmount,
-      'eur',
-      Math.round(order.totalAmount * 0.05),
-      4500,
-    ); // This is the payment processor fee.
+    utils.stubStripeBalance(sandbox, order.totalAmount, 'eur', Math.round(order.totalAmount * 0.05), 4500); // This is the payment processor fee.
 
     // When the query is executed
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);

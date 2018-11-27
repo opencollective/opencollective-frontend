@@ -24,9 +24,7 @@ describe('userlib', () => {
       return new Bluebird((resolve, reject) => {
         switch (opts.email) {
           case userData1.email: {
-            const NotFound = new userlib.clearbit.Enrichment.NotFoundError(
-              ' NotFound',
-            );
+            const NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
             reject(NotFound);
             break;
           }
@@ -42,9 +40,7 @@ describe('userlib', () => {
   afterEach(() => sandbox.restore());
 
   it("doesn't call clearbit if email invalid", () =>
-    userlib
-      .fetchAvatar('email.com')
-      .then(() => expect(stub.called).to.be.false));
+    userlib.fetchAvatar('email.com').then(() => expect(stub.called).to.be.false));
 
   it("can't fetch the image of an unknown email", () =>
     userlib.fetchAvatar(userData1.email).then(image => {

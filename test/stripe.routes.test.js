@@ -16,25 +16,13 @@ describe('stripe.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create a host', () =>
-    models.User.createUserWithCollective(utils.data('host1')).tap(
-      u => (host = u),
-    ),
-  );
-  beforeEach('create a user', () =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ),
-  );
+  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => (host = u)));
+  beforeEach('create a user', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
   beforeEach('create a collective', () =>
-    models.Collective.create(utils.data('collective1')).tap(
-      c => (collective = c),
-    ),
+    models.Collective.create(utils.data('collective1')).tap(c => (collective = c)),
   );
   beforeEach('add host', () => collective.addHost(host.collective));
-  beforeEach('add backer', () =>
-    collective.addUserWithRole(user, roles.BACKER),
-  );
+  beforeEach('add backer', () => collective.addUserWithRole(user, roles.BACKER));
 
   afterEach(() => {
     nock.cleanAll();
@@ -43,9 +31,7 @@ describe('stripe.routes.test.js', () => {
   describe('authorize', () => {
     it('should return an error if the user is not logged in', done => {
       request(app)
-        .get(
-          '/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}',
-        )
+        .get('/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}')
         .expect(401)
         .end(done);
     });
@@ -56,19 +42,13 @@ describe('stripe.routes.test.js', () => {
         CollectiveId: collective.id,
       }).then(() =>
         request(app)
-          .get(
-            `/connected-accounts/stripe/oauthUrl?api_key=${
-              application.api_key
-            }&CollectiveId=${collective.id}`,
-          )
+          .get(`/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}&CollectiveId=${collective.id}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .then(response => {
             const error = response.body.error;
             expect(error.code).to.equal(401);
             expect(error.type).to.equal('unauthorized');
-            expect(error.message).to.equal(
-              'Please login as an admin of this collective to add a connected account',
-            );
+            expect(error.message).to.equal('Please login as an admin of this collective to add a connected account');
             done();
           }),
       );
@@ -76,18 +56,12 @@ describe('stripe.routes.test.js', () => {
 
     it('should redirect to stripe', done => {
       request(app)
-        .get(
-          `/connected-accounts/stripe/oauthUrl?api_key=${
-            application.api_key
-          }&CollectiveId=${collective.id}`,
-        )
+        .get(`/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}&CollectiveId=${collective.id}`)
         .set('Authorization', `Bearer ${host.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body.redirectUrl).to.contain(
-            'https://connect.stripe.com/oauth/authorize',
-          );
+          expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize');
           expect(res.body.redirectUrl).to.contain('&state=');
           done();
         });
@@ -159,20 +133,14 @@ describe('stripe.routes.test.js', () => {
 
     it('should fail if the state is empty', done => {
       request(app)
-        .get(
-          `/connected-accounts/stripe/callback?api_key=${application.api_key}`,
-        )
+        .get(`/connected-accounts/stripe/callback?api_key=${application.api_key}`)
         .expect(400)
         .end(done);
     });
 
     it('should fail if the state is not a valid JWT', done => {
       request(app)
-        .get(
-          `/connected-accounts/stripe/callback?api_key=${
-            application.api_key
-          }&state=123412312`,
-        )
+        .get(`/connected-accounts/stripe/callback?api_key=${application.api_key}&state=123412312`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -196,11 +164,7 @@ describe('stripe.routes.test.js', () => {
         {
           request: cb => {
             request(app)
-              .get(
-                `/connected-accounts/stripe/callback?state=${encodedJWT}&code=abc&api_key=${
-                  application.api_key
-                }`,
-              )
+              .get(`/connected-accounts/stripe/callback?state=${encodedJWT}&code=abc&api_key=${application.api_key}`)
               .expect(302)
               .end(() => cb());
           },
@@ -212,30 +176,12 @@ describe('stripe.routes.test.js', () => {
                 .then(res => {
                   expect(res.count).to.be.equal(1);
                   const account = res.rows[0];
-                  expect(account).to.have.property(
-                    'token',
-                    stripeResponse.access_token,
-                  );
-                  expect(account).to.have.property(
-                    'refreshToken',
-                    stripeResponse.refresh_token,
-                  );
-                  expect(account).to.have.property(
-                    'username',
-                    stripeResponse.stripe_user_id,
-                  );
-                  expect(account.data).to.have.property(
-                    'tokenType',
-                    stripeResponse.token_type,
-                  );
-                  expect(account.data).to.have.property(
-                    'publishableKey',
-                    stripeResponse.stripe_publishable_key,
-                  );
-                  expect(account.data).to.have.property(
-                    'scope',
-                    stripeResponse.scope,
-                  );
+                  expect(account).to.have.property('token', stripeResponse.access_token);
+                  expect(account).to.have.property('refreshToken', stripeResponse.refresh_token);
+                  expect(account).to.have.property('username', stripeResponse.stripe_user_id);
+                  expect(account.data).to.have.property('tokenType', stripeResponse.token_type);
+                  expect(account.data).to.have.property('publishableKey', stripeResponse.stripe_publishable_key);
+                  expect(account.data).to.have.property('scope', stripeResponse.scope);
                   expect(account.data).to.have.property('account');
                   expect(account.data.account.default_currency).to.equal('eur');
                   cb(null, account);
@@ -247,9 +193,7 @@ describe('stripe.routes.test.js', () => {
           checkHost: [
             'checkStripeAccount',
             (cb, results) => {
-              return models.Collective.findById(
-                results.checkStripeAccount.CollectiveId,
-              )
+              return models.Collective.findById(results.checkStripeAccount.CollectiveId)
                 .then(collective => {
                   expect(collective.id).to.be.equal(collective.id);
                   expect(collective.currency).to.equal('EUR');

@@ -21,43 +21,35 @@ describe('Mutation Tests', () => {
     sandbox = sinon.createSandbox();
     emailSendSpy = sandbox.spy(emailLib, 'send');
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
-    executeOrderStub = sandbox
-      .stub(payments, 'executeOrder')
-      .callsFake((user, order) => {
-        // assumes payment goes through and marks Order as confirmedAt
-        return models.Tier.findById(order.TierId)
-          .then(tier => {
-            if (tier.interval) {
-              return models.Subscription.create({
-                amount: tier.amount,
-                currency: tier.currency,
-                interval: tier.interval,
-                isActive: true,
-              }).then(s => s.id);
-            }
-          })
-          .then(SubscriptionId =>
-            order.update({ SubscriptionId, processedAt: new Date() }),
-          )
-          .then(() => models.Collective.findById(order.CollectiveId))
-          .then(collective =>
-            collective.addUserWithRole(user, roles.BACKER, {
-              MemberCollectiveId: order.FromCollectiveId,
-              TierId: order.TierId,
-            }),
-          );
-      });
+    executeOrderStub = sandbox.stub(payments, 'executeOrder').callsFake((user, order) => {
+      // assumes payment goes through and marks Order as confirmedAt
+      return models.Tier.findById(order.TierId)
+        .then(tier => {
+          if (tier.interval) {
+            return models.Subscription.create({
+              amount: tier.amount,
+              currency: tier.currency,
+              interval: tier.interval,
+              isActive: true,
+            }).then(s => s.id);
+          }
+        })
+        .then(SubscriptionId => order.update({ SubscriptionId, processedAt: new Date() }))
+        .then(() => models.Collective.findById(order.CollectiveId))
+        .then(collective =>
+          collective.addUserWithRole(user, roles.BACKER, {
+            MemberCollectiveId: order.FromCollectiveId,
+            TierId: order.TierId,
+          }),
+        );
+    });
   });
 
   after(() => sandbox.restore());
 
   beforeEach('reset db', () => utils.resetTestDB());
 
-  beforeEach('create user1', () =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user1 = u),
-    ),
-  );
+  beforeEach('create user1', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user1 = u)));
   beforeEach('create host user 1', () =>
     models.User.createUserWithCollective({
       ...utils.data('host1'),
@@ -65,20 +57,12 @@ describe('Mutation Tests', () => {
     }).tap(u => (host = u)),
   );
 
-  beforeEach('create user2', () =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ),
-  );
+  beforeEach('create user2', () => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
   beforeEach('create collective1', () =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective1 = g),
-    ),
+    models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)),
   );
   beforeEach('add host', () => collective1.addHost(host.collective, host));
-  beforeEach('add user1 as admin to collective1', () =>
-    collective1.addUserWithRole(user1, roles.ADMIN),
-  );
+  beforeEach('add user1 as admin to collective1', () => collective1.addUserWithRole(user1, roles.ADMIN));
 
   beforeEach('create stripe account', done => {
     models.ConnectedAccount.create({
@@ -98,9 +82,7 @@ describe('Mutation Tests', () => {
       }),
     ).tap(e => (event1 = e)),
   );
-  beforeEach('add user1 as admin of event1', () =>
-    event1.addUserWithRole(user1, roles.ADMIN),
-  );
+  beforeEach('add user1 as admin of event1', () => event1.addUserWithRole(user1, roles.ADMIN));
 
   describe('createCollective tests', () => {
     const createCollectiveQuery = `
@@ -142,8 +124,7 @@ describe('Mutation Tests', () => {
             { name: 'free ticket', description: 'Free ticket', amount: 0 },
             {
               name: 'sponsor',
-              description:
-                'Sponsor the drinks. Pretty sure everyone will love you.',
+              description: 'Sponsor the drinks. Pretty sure everyone will love you.',
               amount: 15000,
             },
           ],
@@ -155,9 +136,7 @@ describe('Mutation Tests', () => {
           collective: getEventData(collective1),
         });
         expect(result.errors).to.have.length(1);
-        expect(result.errors[0].message).to.equal(
-          'You need to be logged in to create a collective',
-        );
+        expect(result.errors[0].message).to.equal('You need to be logged in to create a collective');
       });
 
       it('fails if authenticated but cannot edit parent collective', async () => {
@@ -177,11 +156,7 @@ describe('Mutation Tests', () => {
         await host.collective.update({ settings: { apply: true } });
         const event = getEventData(collective1);
 
-        const result = await utils.graphqlQuery(
-          createCollectiveQuery,
-          { collective: event },
-          user1,
-        );
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
         result.errors && console.error(result.errors[0]);
         const createdEvent = result.data.createCollective;
         expect(createdEvent.slug).to.equal('brusselstogether-meetup-3-4ev');
@@ -202,9 +177,7 @@ describe('Mutation Tests', () => {
         expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
         expect(members[0].role).to.equal(roles.ADMIN);
         expect(members[1].role).to.equal(roles.HOST);
-        expect(members[1].MemberCollectiveId).to.equal(
-          collective1.HostCollectiveId,
-        );
+        expect(members[1].MemberCollectiveId).to.equal(collective1.HostCollectiveId);
 
         // We remove the first tier
         event.tiers.shift();
@@ -228,29 +201,17 @@ describe('Mutation Tests', () => {
 
         const r2 = await utils.graphqlQuery(updateQuery, { collective: event });
         expect(r2.errors).to.have.length(1);
-        expect(r2.errors[0].message).to.equal(
-          'You need to be logged in to edit a collective',
-        );
+        expect(r2.errors[0].message).to.equal('You need to be logged in to edit a collective');
 
-        const r3 = await utils.graphqlQuery(
-          updateQuery,
-          { collective: event },
-          user2,
-        );
+        const r3 = await utils.graphqlQuery(updateQuery, { collective: event }, user2);
         expect(r3.errors).to.have.length(1);
         expect(r3.errors[0].message).to.equal(
           'You must be logged in as the creator of this Event or as an admin of the scouts collective to edit this Event Collective',
         );
 
-        const r4 = await utils.graphqlQuery(
-          updateQuery,
-          { collective: event },
-          user1,
-        );
+        const r4 = await utils.graphqlQuery(updateQuery, { collective: event }, user1);
         const updatedEvent = r4.data.editCollective;
-        expect(updatedEvent.slug).to.equal(
-          `${event.slug}-${event.ParentCollectiveId}ev`,
-        );
+        expect(updatedEvent.slug).to.equal(`${event.slug}-${event.ParentCollectiveId}ev`);
         expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
         expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
       });
@@ -275,9 +236,7 @@ describe('Mutation Tests', () => {
           collective: newCollectiveData,
         });
         expect(res.errors).to.exist;
-        expect(res.errors[0].message).to.contain(
-          'You need to be logged in to create a collective',
-        );
+        expect(res.errors[0].message).to.contain('You need to be logged in to create a collective');
       });
 
       it("fails to create a collective on a host that doesn't accept applications", async () => {
@@ -285,24 +244,14 @@ describe('Mutation Tests', () => {
           name: 'new collective',
           HostCollectiveId: host.CollectiveId,
         };
-        const result = await utils.graphqlQuery(
-          createCollectiveQuery,
-          { collective },
-          user1,
-        );
-        expect(result.errors[0].message).to.equal(
-          'This host does not accept applications for new collectives',
-        );
+        const result = await utils.graphqlQuery(createCollectiveQuery, { collective }, user1);
+        expect(result.errors[0].message).to.equal('This host does not accept applications for new collectives');
       });
 
       it('creates a collective', async () => {
         emailSendMessageSpy.resetHistory();
         await host.collective.update({ settings: { apply: true } });
-        const res = await utils.graphqlQuery(
-          createCollectiveQuery,
-          { collective: newCollectiveData },
-          user1,
-        );
+        const res = await utils.graphqlQuery(createCollectiveQuery, { collective: newCollectiveData }, user1);
         res.errors && console.error(res.errors[0]);
         const newCollective = res.data.createCollective;
         const hostMembership = await models.Member.findOne({
@@ -323,16 +272,10 @@ describe('Mutation Tests', () => {
         await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
         expect(emailSendMessageSpy.callCount).to.equal(4);
         expect(emailSendMessageSpy.firstCall.args[0]).to.equal(host.email);
-        expect(emailSendMessageSpy.firstCall.args[1]).to.contain(
-          'new collective would love to be hosted by WWCode',
-        );
+        expect(emailSendMessageSpy.firstCall.args[1]).to.contain('new collective would love to be hosted by WWCode');
         expect(emailSendMessageSpy.secondCall.args[0]).to.equal(user1.email);
-        expect(emailSendMessageSpy.secondCall.args[1]).to.contain(
-          'Thanks for applying to WWCode',
-        );
-        expect(emailSendMessageSpy.args[3][1]).to.contain(
-          'Welcome to Open Collective!',
-        );
+        expect(emailSendMessageSpy.secondCall.args[1]).to.contain('Thanks for applying to WWCode');
+        expect(emailSendMessageSpy.args[3][1]).to.contain('Welcome to Open Collective!');
       });
     });
 
@@ -361,17 +304,11 @@ describe('Mutation Tests', () => {
           tiers,
         });
         expect(result.errors).to.exist;
-        expect(result.errors[0].message).to.equal(
-          'You need to be logged in to edit tiers',
-        );
+        expect(result.errors[0].message).to.equal('You need to be logged in to edit tiers');
       });
 
       it('fails if not authenticated as host or member of collective', async () => {
-        const result = await utils.graphqlQuery(
-          editTiersQuery,
-          { id: collective1.id },
-          user2,
-        );
+        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id }, user2);
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal(
           "You need to be logged in as a core contributor or as a host of the Scouts d'Arlon collective",
@@ -379,11 +316,7 @@ describe('Mutation Tests', () => {
       });
 
       it('add new tiers and update existing', async () => {
-        const result = await utils.graphqlQuery(
-          editTiersQuery,
-          { id: collective1.id, tiers },
-          user1,
-        );
+        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers }, user1);
         result.errors && console.error(result.errors[0]);
         expect(tiers).to.have.length(2);
         tiers.sort((a, b) => b.amount - a.amount);
@@ -392,11 +325,7 @@ describe('Mutation Tests', () => {
         tiers[0].goal = 20000;
         tiers[1].amount = 100000;
         tiers.push({ name: 'free ticket', type: 'TICKET', amount: 0 });
-        const result2 = await utils.graphqlQuery(
-          editTiersQuery,
-          { id: collective1.id, tiers },
-          user1,
-        );
+        const result2 = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers }, user1);
         result2.errors && console.error(result2.errors[0]);
         const updatedTiers = result2.data.editTiers;
         updatedTiers.sort((a, b) => b.amount - a.amount);
@@ -421,20 +350,14 @@ describe('Mutation Tests', () => {
         id: event1.id,
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        'You need to be logged in to delete a collective',
-      );
+      expect(result.errors[0].message).to.equal('You need to be logged in to delete a collective');
       return models.Collective.findById(event1.id).then(event => {
         expect(event).to.not.be.null;
       });
     });
 
     it('fails to delete a collective if logged in as another user', async () => {
-      const result = await utils.graphqlQuery(
-        deleteCollectiveQuery,
-        { id: event1.id },
-        user2,
-      );
+      const result = await utils.graphqlQuery(deleteCollectiveQuery, { id: event1.id }, user2);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
         'You need to be logged in as a core contributor or as a host to delete this collective',
@@ -445,11 +368,7 @@ describe('Mutation Tests', () => {
     });
 
     it('deletes a collective', async () => {
-      const res = await utils.graphqlQuery(
-        deleteCollectiveQuery,
-        { id: event1.id },
-        user1,
-      );
+      const res = await utils.graphqlQuery(deleteCollectiveQuery, { id: event1.id }, user1);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
       return models.Collective.findById(event1.id).then(event => {
@@ -460,21 +379,15 @@ describe('Mutation Tests', () => {
 
   describe('createOrder tests', () => {
     beforeEach('create ticket 1', () =>
-      models.Tier.create(
-        Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }),
-      ).tap(t => (ticket1 = t)),
+      models.Tier.create(Object.assign(utils.data('ticket1'), { CollectiveId: event1.id })).tap(t => (ticket1 = t)),
     );
 
     beforeEach('create ticket 2', () =>
-      models.Tier.create(
-        Object.assign(utils.data('ticket2'), { CollectiveId: event1.id }),
-      ),
+      models.Tier.create(Object.assign(utils.data('ticket2'), { CollectiveId: event1.id })),
     );
 
     beforeEach('create tier 1', () =>
-      models.Tier.create(
-        Object.assign(utils.data('tier1'), { CollectiveId: collective1.id }),
-      ),
+      models.Tier.create(Object.assign(utils.data('tier1'), { CollectiveId: collective1.id })),
     );
 
     describe('throws an error', () => {
@@ -525,9 +438,7 @@ describe('Mutation Tests', () => {
           };
           const result = await utils.graphqlQuery(query, { order });
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal(
-            `No collective found: ${order.collective.id}`,
-          );
+          expect(result.errors[0].message).to.equal(`No collective found: ${order.collective.id}`);
         });
 
         it("when tier doesn't exist", async () => {
@@ -556,9 +467,7 @@ describe('Mutation Tests', () => {
           const result = await utils.graphqlQuery(query, { order });
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].message).to.equal(
-            `No tier found with tier id: 1002 for collective slug ${
-              event1.slug
-            }`,
+            `No tier found with tier id: 1002 for collective slug ${event1.slug}`,
           );
         });
       });
@@ -588,9 +497,7 @@ describe('Mutation Tests', () => {
             quantity: 101,
           };
           const result = await utils.graphqlQuery(query, { order });
-          expect(result.errors[0].message).to.equal(
-            `No more tickets left for ${ticket1.name}`,
-          );
+          expect(result.errors[0].message).to.equal(`No more tickets left for ${ticket1.name}`);
         });
       });
 
@@ -619,9 +526,7 @@ describe('Mutation Tests', () => {
             quantity: 2,
           };
           const result = await utils.graphqlQuery(query, { order });
-          expect(result.errors[0].message).to.equal(
-            'This order requires a payment method',
-          );
+          expect(result.errors[0].message).to.equal('This order requires a payment method');
         });
       });
     });
@@ -803,24 +708,12 @@ describe('Mutation Tests', () => {
           // Make sure we send the collective.member.created email notification to core contributor of collective1
           expect(emailSendMessageSpy.callCount).to.equal(2);
           // utils.inspectSpy(emailSendMessageSpy, 2);
-          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(
-            'user2@opencollective.com',
-          );
-          expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
-            'Welcome to Open Collective 🙌',
-          );
-          expect(emailSendMessageSpy.secondCall.args[0]).to.equal(
-            'user1@opencollective.com',
-          );
-          expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
-            "Google joined Scouts d'Arlon as backer",
-          );
-          expect(emailSendMessageSpy.secondCall.args[2]).to.contain(
-            'Looking forward!',
-          ); // publicMessage
-          expect(emailSendMessageSpy.secondCall.args[2]).to.contain(
-            '@google thanks for your donation to @scouts',
-          );
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal('user2@opencollective.com');
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal('Welcome to Open Collective 🙌');
+          expect(emailSendMessageSpy.secondCall.args[0]).to.equal('user1@opencollective.com');
+          expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Google joined Scouts d'Arlon as backer");
+          expect(emailSendMessageSpy.secondCall.args[2]).to.contain('Looking forward!'); // publicMessage
+          expect(emailSendMessageSpy.secondCall.args[2]).to.contain('@google thanks for your donation to @scouts');
         });
 
         it('as an existing organization', async () => {
@@ -830,8 +723,7 @@ describe('Mutation Tests', () => {
             website: 'https://slack.com',
             description: 'Supporting open source since 1999',
             twitterHandle: 'slack',
-            image:
-              'http://www.endowmentwm.com/wp-content/uploads/2017/07/slack-logo.png',
+            image: 'http://www.endowmentwm.com/wp-content/uploads/2017/07/slack-logo.png',
           });
 
           await org.addUserWithRole(user2, roles.ADMIN);
@@ -890,9 +782,7 @@ describe('Mutation Tests', () => {
           expect(activityData.order.subscription.interval).to.equal('month');
           expect(activityData.collective.slug).to.equal(collective1.slug);
           expect(activityData.member.memberCollective.slug).to.equal('slack');
-          expect(emailSendSpy.lastCall.args[0]).to.equal(
-            'collective.member.created',
-          );
+          expect(emailSendSpy.lastCall.args[0]).to.equal('collective.member.created');
           expect(emailSendMessageSpy.lastCall.args[0]).to.equal(user1.email);
         });
       });
@@ -980,26 +870,14 @@ describe('Mutation Tests', () => {
           expect(activityData.collective.type).to.equal('EVENT');
           expect(activityData.order.publicMessage).to.equal('Looking forward!');
           expect(activityData.collective.slug).to.equal(event1.slug);
-          expect(activityData.member.memberCollective.slug).to.equal(
-            user2.collective.slug,
-          );
-          expect(emailSendSpy.firstCall.args[0]).to.equal(
-            'collective.member.created',
-          );
+          expect(activityData.member.memberCollective.slug).to.equal(user2.collective.slug);
+          expect(emailSendSpy.firstCall.args[0]).to.equal('collective.member.created');
           expect(emailSendSpy.secondCall.args[0]).to.equal('ticket.confirmed');
           expect(emailSendMessageSpy.callCount).to.equal(2);
-          expect(emailSendMessageSpy.firstCall.args[0]).to.equal(
-            'user1@opencollective.com',
-          );
-          expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
-            'Anish Bas joined January meetup as attendee',
-          );
-          expect(emailSendMessageSpy.secondCall.args[0]).to.equal(
-            'user2@opencollective.com',
-          );
-          expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
-            '2 tickets confirmed for January meetup',
-          );
+          expect(emailSendMessageSpy.firstCall.args[0]).to.equal('user1@opencollective.com');
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal('Anish Bas joined January meetup as attendee');
+          expect(emailSendMessageSpy.secondCall.args[0]).to.equal('user2@opencollective.com');
+          expect(emailSendMessageSpy.secondCall.args[1]).to.equal('2 tickets confirmed for January meetup');
         });
 
         it('from a new user', async () => {
@@ -1138,18 +1016,12 @@ describe('Mutation Tests', () => {
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(3);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
-          expect(executeOrderArgument[1].paymentMethod.token).to.equal(
-            'tok_123456781234567812345678',
-          );
+          expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(emailSendMessageSpy.callCount).to.equal(1);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
-          expect(emailSendMessageSpy.firstCall.args[1]).to.contain(
-            `Anish Bas joined ${event1.name} as backer`,
-          );
-          expect(emailSendMessageSpy.firstCall.args[2]).to.contain(
-            '/scouts/events/jan-meetup',
-          );
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain(`Anish Bas joined ${event1.name} as backer`);
+          expect(emailSendMessageSpy.firstCall.args[2]).to.contain('/scouts/events/jan-meetup');
         });
 
         it('from an existing but logged out user (should fail)', async () => {
@@ -1195,16 +1067,10 @@ describe('Mutation Tests', () => {
           };
 
           const loggedInUser = null;
-          const result = await utils.graphqlQuery(
-            query,
-            { order },
-            loggedInUser,
-          );
+          const result = await utils.graphqlQuery(query, { order }, loggedInUser);
           result.errors && console.error(result.errors[0]);
           expect(result.errors).to.exist;
-          expect(result.errors[0].message).to.equal(
-            'An account already exists for this email address. Please login.',
-          );
+          expect(result.errors[0].message).to.equal('An account already exists for this email address. Please login.');
         });
 
         it('from a new user', async () => {
@@ -1284,15 +1150,11 @@ describe('Mutation Tests', () => {
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(4);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
-          expect(executeOrderArgument[1].paymentMethod.token).to.equal(
-            'tok_123456781234567812345678',
-          );
+          expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(emailSendMessageSpy.callCount).to.equal(1);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
-          expect(emailSendMessageSpy.firstCall.args[1]).to.contain(
-            'anonymous joined January meetup as backer',
-          );
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain('anonymous joined January meetup as backer');
         });
       });
     });

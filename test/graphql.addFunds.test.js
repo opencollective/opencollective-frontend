@@ -21,12 +21,7 @@ describe('graphql.addFunds', () => {
   beforeEach(async () => {
     await utils.resetTestDB();
     ({ user } = await store.newUser('a user'));
-    ({ collective, hostCollective } = await store.newCollectiveWithHost(
-      'test-collective',
-      'USD',
-      'USD',
-      10,
-    ));
+    ({ collective, hostCollective } = await store.newCollectiveWithHost('test-collective', 'USD', 'USD', 10));
   }); /* End of "before" */
 
   it('should create a new prepaid payment method', async () => {

@@ -98,10 +98,7 @@ describe('createOrder', () => {
         base: 'EUR',
         symbols: 'USD',
       })
-      .reply(200, { base: 'EUR', date: '2017-09-22', rates: { USD: 1.1961 } }, [
-        'Server',
-        'nosniff',
-      ]);
+      .reply(200, { base: 'EUR', date: '2017-09-22', rates: { USD: 1.1961 } }, ['Server', 'nosniff']);
   });
 
   after(() => nock.cleanAll());
@@ -113,12 +110,7 @@ describe('createOrder', () => {
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
 
     // Given a collective (with a host)
-    ({ fearlesscitiesbrussels } = await store.newCollectiveWithHost(
-      'fearlesscitiesbrussels',
-      'EUR',
-      'EUR',
-      5,
-    ));
+    ({ fearlesscitiesbrussels } = await store.newCollectiveWithHost('fearlesscitiesbrussels', 'EUR', 'EUR', 5));
     // And the above collective's host has a stripe account
     await store.stripeConnectedAccount(fearlesscitiesbrussels.HostCollectiveId);
     // And given that the above collective is active
@@ -131,13 +123,7 @@ describe('createOrder', () => {
     // And given the stripe stuff that depends on values in the
     // order struct is patch. It's here and not on each test because
     // the `totalAmount' field doesn't change throught the tests.
-    utils.stubStripeBalance(
-      sandbox,
-      baseOrder.totalAmount,
-      'eur',
-      Math.round(baseOrder.totalAmount * 0.05),
-      4500,
-    ); // This is the payment processor fee.
+    utils.stubStripeBalance(sandbox, baseOrder.totalAmount, 'eur', Math.round(baseOrder.totalAmount * 0.05), 4500); // This is the payment processor fee.
   });
 
   afterEach(() => sandbox.restore());
@@ -242,15 +228,11 @@ describe('createOrder', () => {
     expect(transactionsCount).to.equal(0);
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
     expect(emailSendMessageSpy.callCount).to.equal(2);
-    expect(emailSendMessageSpy.secondCall.args[0]).to.equal(
-      thisOrder.user.email,
-    );
+    expect(emailSendMessageSpy.secondCall.args[0]).to.equal(thisOrder.user.email);
     expect(emailSendMessageSpy.secondCall.args[2]).to.match(
       /Please send a wire to XXXX for the amount of \$1,543 with the mention: webpack backer order: [0-9]+/,
     );
-    expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
-      'ACTION REQUIRED: your $1,543 donation to test is pending',
-    );
+    expect(emailSendMessageSpy.secondCall.args[1]).to.equal('ACTION REQUIRED: your $1,543 donation to test is pending');
   });
 
   it('creates an order as new user and sends a tweet', async () => {
@@ -293,20 +275,13 @@ describe('createOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(fromCollective.id);
     expect(transaction.CollectiveId).to.equal(collective.id);
     expect(transaction.currency).to.equal(collective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.platformFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.data.charge.currency).to.equal(
-      collective.currency.toLowerCase(),
-    );
+    expect(transaction.hostFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.platformFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(
-      transaction.data.balanceTransaction.net +
-        transaction.hostFeeInHostCurrency,
-    ).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net + transaction.hostFeeInHostCurrency).to.equal(
+      transaction.netAmountInCollectiveCurrency,
+    );
     // we create a customer on the host stripe account even for one time charges
     expect(transaction.data.charge.customer).to.not.be.null;
 
@@ -320,9 +295,7 @@ describe('createOrder', () => {
     expect(transaction.data.charge.currency).to.equal('eur');
 
     await utils.waitForCondition(() => tweetStatusSpy.callCount > 0);
-    expect(tweetStatusSpy.firstCall.args[1]).to.contain(
-      '@johnsmith thank you for your €1,543 donation!',
-    );
+    expect(tweetStatusSpy.firstCall.args[1]).to.contain('@johnsmith thank you for your €1,543 donation!');
   });
 
   it('creates an order for an event ticket and receives the ticket confirmation by email with iCal.ics attached', async () => {
@@ -360,16 +333,12 @@ describe('createOrder', () => {
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
     expect(emailSendMessageSpy.callCount).to.equal(1);
     expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
-    expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
-      `1 ticket confirmed for ${event.name}`,
-    );
+    expect(emailSendMessageSpy.firstCall.args[1]).to.equal(`1 ticket confirmed for ${event.name}`);
     expect(emailSendMessageSpy.firstCall.args[2]).to.contain('kaaitheater'); // double check that we use the custom email for fearlesscitiesbrussels
-    expect(
-      emailSendMessageSpy.firstCall.args[3].attachments[0].filename,
-    ).to.equal(`${event.slug}.ics`);
-    expect(
-      emailSendMessageSpy.firstCall.args[3].attachments[0].content,
-    ).to.contain('/fearlesscitiesbrussels/events/sustainoss-london');
+    expect(emailSendMessageSpy.firstCall.args[3].attachments[0].filename).to.equal(`${event.slug}.ics`);
+    expect(emailSendMessageSpy.firstCall.args[3].attachments[0].content).to.contain(
+      '/fearlesscitiesbrussels/events/sustainoss-london',
+    );
 
     // also test the different path for free tickets
     newOrder.totalAmount = 0;
@@ -430,20 +399,13 @@ describe('createOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
     expect(transaction.CollectiveId).to.equal(collective.id);
     expect(transaction.currency).to.equal(collective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.platformFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.data.charge.currency).to.equal(
-      collective.currency.toLowerCase(),
-    );
+    expect(transaction.hostFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.platformFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(
-      transaction.data.balanceTransaction.net +
-        transaction.hostFeeInHostCurrency,
-    ).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net + transaction.hostFeeInHostCurrency).to.equal(
+      transaction.netAmountInCollectiveCurrency,
+    );
     // make sure the payment has been recorded in the connected
     // Stripe Account of the host
     expect(transaction.data.charge.currency).to.equal('eur');
@@ -478,11 +440,7 @@ describe('createOrder', () => {
         }
       }
       `;
-    res = await utils.graphqlQuery(
-      query,
-      { collective: collectiveToEdit },
-      xdamman,
-    );
+    res = await utils.graphqlQuery(query, { collective: collectiveToEdit }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
@@ -510,20 +468,13 @@ describe('createOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
     expect(transaction.CollectiveId).to.equal(collective.id);
     expect(transaction.currency).to.equal(collective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.platformFeeInHostCurrency).to.equal(
-      -(0.05 * order.totalAmount),
-    );
-    expect(transaction.data.charge.currency).to.equal(
-      collective.currency.toLowerCase(),
-    );
+    expect(transaction.hostFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.platformFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
+    expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(
-      transaction.data.balanceTransaction.net +
-        transaction.hostFeeInHostCurrency,
-    ).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net + transaction.hostFeeInHostCurrency).to.equal(
+      transaction.netAmountInCollectiveCurrency,
+    );
     // make sure the payment has been recorded in the connected
     // Stripe Account of the host
     expect(transaction.data.charge.currency).to.equal('eur');
@@ -670,9 +621,7 @@ describe('createOrder', () => {
     );
 
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal(
-      'An account already exists for this email address. Please login.',
-    );
+    expect(res.errors[0].message).to.equal('An account already exists for this email address. Please login.');
   });
 
   it('fails if trying to donate using an existing paypal email without being logged in', async () => {
@@ -690,9 +639,7 @@ describe('createOrder', () => {
     );
 
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal(
-      'An account already exists for this email address. Please login.',
-    );
+    expect(res.errors[0].message).to.equal('An account already exists for this email address. Please login.');
   });
 
   it("creates an order as a logged in user for an existing collective using the collective's payment method", async () => {
@@ -780,17 +727,9 @@ describe('createOrder', () => {
       // And the above collective's host has a stripe account
       await store.stripeConnectedAccount(hostCollective.id);
       // And given two collectives in that host
-      const fromCollective = (await store.newCollectiveInHost(
-        'opensource',
-        'USD',
-        hostCollective,
-      )).collective;
+      const fromCollective = (await store.newCollectiveInHost('opensource', 'USD', hostCollective)).collective;
       await fromCollective.update({ isActive: true });
-      const { collective } = await store.newCollectiveInHost(
-        'apex',
-        'USD',
-        hostCollective,
-      );
+      const { collective } = await store.newCollectiveInHost('apex', 'USD', hostCollective);
       await collective.update({ isActive: true });
       // And given a payment method for the host
       const paymentMethod = await models.PaymentMethod.create({
@@ -816,11 +755,7 @@ describe('createOrder', () => {
     });
 
     it('Should fail if not enough funds in the fromCollective', async () => {
-      const res = await utils.graphqlQuery(
-        createOrderQuery,
-        { order },
-        hostAdmin,
-      );
+      const res = await utils.graphqlQuery(createOrderQuery, { order }, hostAdmin);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal(
         "You don't have enough funds available ($7,461 left) to execute this order ($100,000)",
@@ -829,11 +764,7 @@ describe('createOrder', () => {
 
     it('succeeds', async () => {
       order.totalAmount = 20000;
-      const res = await utils.graphqlQuery(
-        createOrderQuery,
-        { order },
-        hostAdmin,
-      );
+      const res = await utils.graphqlQuery(createOrderQuery, { order }, hostAdmin);
       expect(res.errors).to.not.exist;
     });
   });
@@ -841,22 +772,10 @@ describe('createOrder', () => {
   it("creates an order as a logged in user for an existing collective using the collective's balance", async () => {
     const xdamman = (await store.newUser('xdamman')).user;
     const order = cloneDeep(baseOrder);
-    const { hostCollective } = await store.newHost(
-      'Host Collective',
-      'USD',
-      10,
-    );
-    const fromCollective = (await store.newCollectiveInHost(
-      'opensource',
-      'USD',
-      hostCollective,
-    )).collective;
+    const { hostCollective } = await store.newHost('Host Collective', 'USD', 10);
+    const fromCollective = (await store.newCollectiveInHost('opensource', 'USD', hostCollective)).collective;
     await fromCollective.update({ isActive: true });
-    const collective = (await store.newCollectiveInHost(
-      'apex',
-      'USD',
-      hostCollective,
-    )).collective;
+    const collective = (await store.newCollectiveInHost('apex', 'USD', hostCollective)).collective;
     await collective.update({ isActive: true });
 
     await models.Member.create({

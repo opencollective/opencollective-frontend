@@ -7,8 +7,7 @@ describe('Migration', () => {
   // JSON key that contains the date the change happened. So to test
   // it properly here time has to be frozen.
   let clock;
-  beforeEach(() =>
-    (clock = sinon.useFakeTimers(new Date('2018-03-20 0:0').getTime())));
+  beforeEach(() => (clock = sinon.useFakeTimers(new Date('2018-03-20 0:0').getTime())));
   afterEach(() => clock.restore());
 
   describe('#saveTransactionChange', () => {
@@ -17,22 +16,13 @@ describe('Migration', () => {
       const transaction = { data: null, changed: sinon.spy() };
 
       // When a new change is added
-      new Migration().saveTransactionChange(
-        transaction,
-        'hostCurrencyFxRate',
-        null,
-        1,
-      );
+      new Migration().saveTransactionChange(transaction, 'hostCurrencyFxRate', null, 1);
 
       // Then the data field should reflect that update
       expect(transaction.data).to.have.property('migration');
       expect(transaction.data.migration).to.have.property('20180320');
-      expect(transaction.data.migration['20180320']).to.have.property(
-        'hostCurrencyFxRate',
-      );
-      expect(
-        transaction.data.migration['20180320'].hostCurrencyFxRate,
-      ).to.deep.equal({ oldValue: null, newValue: 1 });
+      expect(transaction.data.migration['20180320']).to.have.property('hostCurrencyFxRate');
+      expect(transaction.data.migration['20180320'].hostCurrencyFxRate).to.deep.equal({ oldValue: null, newValue: 1 });
 
       // And then the spy was properly called
       expect(transaction.changed.called).to.be.true;
@@ -51,28 +41,18 @@ describe('Migration', () => {
       };
 
       // When a new field is added
-      new Migration().saveTransactionChange(
-        transaction,
-        'platformFeeInHostCurrency',
-        1082,
-        1083,
-      );
+      new Migration().saveTransactionChange(transaction, 'platformFeeInHostCurrency', 1082, 1083);
 
       // Then both fields should be saved in the data.migration property
       expect(transaction.data).to.have.property('migration');
       expect(transaction.data.migration).to.have.property('20180320');
-      expect(transaction.data.migration['20180320']).to.have.property(
-        'hostCurrencyFxRate',
-      );
-      expect(
-        transaction.data.migration['20180320'].hostCurrencyFxRate,
-      ).to.deep.equal({ oldValue: null, newValue: 1 });
-      expect(transaction.data.migration['20180320']).to.have.property(
-        'platformFeeInHostCurrency',
-      );
-      expect(
-        transaction.data.migration['20180320'].platformFeeInHostCurrency,
-      ).to.deep.equal({ oldValue: 1082, newValue: 1083 });
+      expect(transaction.data.migration['20180320']).to.have.property('hostCurrencyFxRate');
+      expect(transaction.data.migration['20180320'].hostCurrencyFxRate).to.deep.equal({ oldValue: null, newValue: 1 });
+      expect(transaction.data.migration['20180320']).to.have.property('platformFeeInHostCurrency');
+      expect(transaction.data.migration['20180320'].platformFeeInHostCurrency).to.deep.equal({
+        oldValue: 1082,
+        newValue: 1083,
+      });
     });
   });
   describe('#ensureHostCurrencyFxRate', () => {
