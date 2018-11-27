@@ -55,9 +55,7 @@ class CreateUpdatePage extends React.Component {
       const res = await this.props.createUpdate(update);
       console.log('>>> createUpdate res', res);
       this.setState({ isModified: false });
-      return Router.pushRoute(
-        `/${Collective.slug}/updates/${res.data.createUpdate.slug}`,
-      );
+      return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       console.error(e);
     }
@@ -78,8 +76,7 @@ class CreateUpdatePage extends React.Component {
     }
 
     const collective = data.Collective;
-    const canCreateUpdate =
-      LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canCreateUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="CreateUpdatePage">
@@ -103,12 +100,7 @@ class CreateUpdatePage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={
-              <FormattedMessage
-                id="updates.new.title"
-                defaultMessage="New update"
-              />
-            }
+            title={<FormattedMessage id="updates.new.title" defaultMessage="New update" />}
             className="small"
             style={get(collective, 'settings.style.hero.cover')}
           />
@@ -123,24 +115,13 @@ class CreateUpdatePage extends React.Component {
                   />
                 </p>
                 <p>
-                  <Button
-                    className="blue"
-                    href={`/signin?next=/${collective.slug}/updates/new`}
-                  >
-                    <FormattedMessage
-                      id="login.button"
-                      defaultMessage="login"
-                    />
+                  <Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}>
+                    <FormattedMessage id="login.button" defaultMessage="login" />
                   </Button>
                 </p>
               </div>
             )}
-            {canCreateUpdate && (
-              <EditUpdateForm
-                collective={collective}
-                onSubmit={this.createUpdate}
-              />
-            )}
+            {canCreateUpdate && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
           </div>
         </Body>
 
@@ -191,6 +172,4 @@ const addGraphQL = compose(
   addMutation,
 );
 
-export default withData(
-  withIntl(withLoggedInUser(addGraphQL(CreateUpdatePage))),
-);
+export default withData(withIntl(withLoggedInUser(addGraphQL(CreateUpdatePage))));

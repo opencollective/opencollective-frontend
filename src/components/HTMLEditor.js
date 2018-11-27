@@ -28,9 +28,9 @@ class HTMLEditor extends React.Component {
     }
 
     /*
-    * Quill modules to attach to editor
-    * See https://quilljs.com/docs/modules/ for complete options
-    */
+     * Quill modules to attach to editor
+     * See https://quilljs.com/docs/modules/ for complete options
+     */
     this.modules = {
       toolbar: {
         container: [
@@ -52,9 +52,9 @@ class HTMLEditor extends React.Component {
       },
     };
     /*
-    * Quill editor formats
-    * See https://quilljs.com/docs/formats/
-    */
+     * Quill editor formats
+     * See https://quilljs.com/docs/formats/
+     */
     this.formats = [
       'header',
       'font',

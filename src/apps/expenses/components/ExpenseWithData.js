@@ -28,15 +28,7 @@ class ExpenseWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      view,
-      allowPayAction,
-      lockPayAction,
-      unlockPayAction,
-    } = this.props;
+    const { data, LoggedInUser, collective, view, allowPayAction, lockPayAction, unlockPayAction } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -68,11 +60,7 @@ class ExpenseWithData extends React.Component {
         />
 
         {view === 'details' && (
-          <CommentsWithData
-            expense={expense}
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-          />
+          <CommentsWithData expense={expense} collective={collective} LoggedInUser={LoggedInUser} />
         )}
       </div>
     );

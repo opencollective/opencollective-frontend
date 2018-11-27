@@ -49,9 +49,7 @@ class EditCollectiveForm extends React.Component {
     this.showSection = this.showSection.bind(this);
 
     const collective = { ...(props.collective || {}) };
-    collective.slug = collective.slug
-      ? collective.slug.replace(/.*\//, '')
-      : '';
+    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
 
     this.state = {
       modified: false,
@@ -68,15 +66,9 @@ class EditCollectiveForm extends React.Component {
     this.showEditGoals = collective.type === 'COLLECTIVE';
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
-    this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(
-      collective.type,
-    );
-    this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(
-      collective.type,
-    );
-    this.members =
-      collective.members &&
-      collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
+    this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
+    this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
+    this.members = collective.members && collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
@@ -99,13 +91,11 @@ class EditCollectiveForm extends React.Component {
       },
       'tos.description': {
         id: 'collective.tos.description',
-        defaultMessage:
-          'Link to the terms by which this host will collect money on behalf of their collectives',
+        defaultMessage: 'Link to the terms by which this host will collect money on behalf of their collectives',
       },
       'tags.description': {
         id: 'collective.tags.description',
-        defaultMessage:
-          'Make your collective discoverable in search and related collectives (comma separated)',
+        defaultMessage: 'Make your collective discoverable in search and related collectives (comma separated)',
       },
       'company.label': {
         id: 'collective.company.label',
@@ -113,8 +103,7 @@ class EditCollectiveForm extends React.Component {
       },
       'company.description': {
         id: 'collective.company.description',
-        defaultMessage:
-          'Start with a @ to reference an organization (e.g. @airbnb)',
+        defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
         id: 'collective.amount.label',
@@ -177,8 +166,7 @@ class EditCollectiveForm extends React.Component {
       },
       'sendInvoiceByEmail.description': {
         id: 'collective.sendInvoiceByEmail.description',
-        defaultMessage:
-          'Automatically attach the PDF of your receipts to the monthly report email',
+        defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email',
       },
       'location.label': {
         id: 'collective.location.label',
@@ -186,8 +174,7 @@ class EditCollectiveForm extends React.Component {
       },
     });
 
-    collective.backgroundImage =
-      collective.backgroundImage || defaultBackgroundImage[collective.type];
+    collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
 
     window.OC = { collective, state: this.state };
   }
@@ -250,9 +237,7 @@ class EditCollectiveForm extends React.Component {
       submitBtnMessageId = status;
     }
     console.log('>>> submitBtnMessageId', submitBtnMessageId);
-    const submitBtnLabel =
-      this.messages[submitBtnMessageId] &&
-      intl.formatMessage(this.messages[submitBtnMessageId]);
+    const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
@@ -358,22 +343,16 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'sendInvoiceByEmail',
           type: 'switch',
-          defaultValue: get(
-            this.state.collective,
-            'settings.sendInvoiceByEmail',
-          ),
+          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
           when: () =>
-            this.state.section === 'advanced' &&
-            (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
+            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
         {
           name: 'markdown',
           type: 'switch',
-          defaultValue:
-            get(this.state.collective, 'settings.editor') === 'markdown',
+          defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
           when: () =>
-            this.state.section === 'advanced' &&
-            (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
+            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
         },
       ],
     };
@@ -381,20 +360,13 @@ class EditCollectiveForm extends React.Component {
     Object.keys(this.fields).map(fieldname => {
       this.fields[fieldname] = this.fields[fieldname].map(field => {
         if (this.messages[`${field.name}.label`]) {
-          field.label = intl.formatMessage(
-            this.messages[`${field.name}.label`],
-          );
+          field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
         }
         if (this.messages[`${field.name}.description`]) {
-          field.description = intl.formatMessage(
-            this.messages[`${field.name}.description`],
-            collective,
-          );
+          field.description = intl.formatMessage(this.messages[`${field.name}.description`], collective);
         }
         if (this.messages[`${field.name}.placeholder`]) {
-          field.placeholder = intl.formatMessage(
-            this.messages[`${field.name}.placeholder`],
-          );
+          field.placeholder = intl.formatMessage(this.messages[`${field.name}.placeholder`]);
         }
         return field;
       });
@@ -477,20 +449,14 @@ class EditCollectiveForm extends React.Component {
               onClick={() => this.showSection('info')}
               className="MenuItem info"
             >
-              <FormattedMessage
-                id="editCollective.menu.info"
-                defaultMessage="Info"
-              />
+              <FormattedMessage id="editCollective.menu.info" defaultMessage="Info" />
             </MenuItem>
             <MenuItem
               selected={this.state.section === 'images'}
               onClick={() => this.showSection('images')}
               className="MenuItem images"
             >
-              <FormattedMessage
-                id="editCollective.menu."
-                defaultMessage="Images"
-              />
+              <FormattedMessage id="editCollective.menu." defaultMessage="Images" />
             </MenuItem>
             {this.showEditMembers && (
               <MenuItem
@@ -498,10 +464,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('members')}
                 className="MenuItem members"
               >
-                <FormattedMessage
-                  id="editCollective.menu.members"
-                  defaultMessage="Members"
-                />
+                <FormattedMessage id="editCollective.menu.members" defaultMessage="Members" />
               </MenuItem>
             )}
             {this.showEditGoals && (
@@ -510,10 +473,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('goals')}
                 className="MenuItem goals"
               >
-                <FormattedMessage
-                  id="editCollective.menu.goals"
-                  defaultMessage="Goals"
-                />
+                <FormattedMessage id="editCollective.menu.goals" defaultMessage="Goals" />
               </MenuItem>
             )}
             {this.showHost && (
@@ -522,10 +482,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('host')}
                 className="MenuItem host"
               >
-                <FormattedMessage
-                  id="editCollective.menu.host"
-                  defaultMessage="Fiscal Host"
-                />
+                <FormattedMessage id="editCollective.menu.host" defaultMessage="Fiscal Host" />
               </MenuItem>
             )}
             {this.showEditTiers && (
@@ -534,10 +491,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('tiers')}
                 className="MenuItem tiers"
               >
-                <FormattedMessage
-                  id="editCollective.menu.tiers"
-                  defaultMessage="Tiers"
-                />
+                <FormattedMessage id="editCollective.menu.tiers" defaultMessage="Tiers" />
               </MenuItem>
             )}
             {this.showExpenses && (
@@ -546,10 +500,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('expenses')}
                 className="MenuItem expenses"
               >
-                <FormattedMessage
-                  id="editCollective.menu.expenses"
-                  defaultMessage="Expenses"
-                />
+                <FormattedMessage id="editCollective.menu.expenses" defaultMessage="Expenses" />
               </MenuItem>
             )}
             {this.showPaymentMethods && (
@@ -558,10 +509,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('paymentMethods')}
                 className="MenuItem paymentMethods"
               >
-                <FormattedMessage
-                  id="editCollective.menu.paymentMethods"
-                  defaultMessage="Payment Methods"
-                />
+                <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
               </MenuItem>
             )}
             <MenuItem
@@ -569,10 +517,7 @@ class EditCollectiveForm extends React.Component {
               onClick={() => this.showSection('connectedAccounts')}
               className="MenuItem connectedAccounts"
             >
-              <FormattedMessage
-                id="editCollective.menu.connectedAccounts"
-                defaultMessage="Connected Accounts"
-              />
+              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
             {collective.type === 'COLLECTIVE' && (
               <MenuItem
@@ -580,10 +525,7 @@ class EditCollectiveForm extends React.Component {
                 onClick={() => this.showSection('export')}
                 className="MenuItem export"
               >
-                <FormattedMessage
-                  id="editCollective.menu.export"
-                  defaultMessage="Export"
-                />
+                <FormattedMessage id="editCollective.menu.export" defaultMessage="Export" />
               </MenuItem>
             )}
             <MenuItem
@@ -591,10 +533,7 @@ class EditCollectiveForm extends React.Component {
               onClick={() => this.showSection('advanced')}
               className="MenuItem advanced"
             >
-              <FormattedMessage
-                id="editCollective.menu.advanced"
-                defaultMessage="Advanced"
-              />
+              <FormattedMessage id="editCollective.menu.advanced" defaultMessage="Advanced" />
             </MenuItem>
           </Box>
 
@@ -610,10 +549,7 @@ class EditCollectiveForm extends React.Component {
                             <InputField
                               key={field.name}
                               className={field.className}
-                              defaultValue={
-                                field.defaultValue ||
-                                this.state.collective[field.name]
-                              }
+                              defaultValue={field.defaultValue || this.state.collective[field.name]}
                               validate={field.validate}
                               ref={field.name}
                               name={field.name}
@@ -624,9 +560,7 @@ class EditCollectiveForm extends React.Component {
                               type={field.type}
                               pre={field.pre}
                               context={this.state.collective}
-                              onChange={value =>
-                                this.handleChange(field.name, value)
-                              }
+                              onChange={value => this.handleChange(field.name, value)}
                             />
                           ),
                       )}
@@ -644,13 +578,7 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'tiers' && (
                 <EditTiers
                   title="Tiers"
-                  types={[
-                    'TIER',
-                    'MEMBERSHIP',
-                    'SERVICE',
-                    'PRODUCT',
-                    'DONATION',
-                  ]}
+                  types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
                   tiers={this.state.tiers}
                   collective={collective}
                   currency={collective.currency}
@@ -682,19 +610,12 @@ class EditCollectiveForm extends React.Component {
                 />
               )}
               {this.state.section === 'connectedAccounts' && (
-                <EditConnectedAccounts
-                  collective={collective}
-                  connectedAccounts={collective.connectedAccounts}
-                />
+                <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
-              {this.state.section === 'export' && (
-                <ExportData collective={collective} />
-              )}
+              {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
-            {['export', 'connectedAccounts', 'host'].indexOf(
-              this.state.section,
-            ) === -1 && (
+            {['export', 'connectedAccounts', 'host'].indexOf(this.state.section) === -1 && (
               <div className="actions">
                 <Button
                   bsStyle="primary"

@@ -31,10 +31,7 @@ class MarkOrderAsPaidBtn extends React.Component {
     }
     this.setState({ loading: true });
     try {
-      await this.props.markOrderAsPaid(
-        order.id,
-        this.state.paymentProcessorFeeInHostCurrency,
-      );
+      await this.props.markOrderAsPaid(order.id, this.state.paymentProcessorFeeInHostCurrency);
       this.setState({ loading: false });
     } catch (e) {
       console.log('>>> markOrderAsPaid error: ', e);
@@ -94,10 +91,7 @@ class MarkOrderAsPaidBtn extends React.Component {
           disabled={this.props.disabled || disabled}
           title={title}
         >
-          <FormattedMessage
-            id="order.markAsPaid.btn"
-            defaultMessage="mark as paid"
-          />
+          <FormattedMessage id="order.markAsPaid.btn" defaultMessage="mark as paid" />
         </SmallButton>
         <div className="error">{error}</div>
       </div>

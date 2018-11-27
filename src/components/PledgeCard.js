@@ -11,38 +11,17 @@ import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import Currency from './Currency';
 
-const PledgeCard = ({
-  currency,
-  fromCollective,
-  interval,
-  publicMessage,
-  totalAmount,
-}) => (
-  <Container
-    bg="white"
-    borderRadius="8px"
-    border="1px solid"
-    borderColor="black.transparent.20"
-    minHeight="100%"
-  >
-    <Container
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      pt={4}
-    >
+const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAmount }) => (
+  <Container bg="white" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
+    <Container display="flex" justifyContent="space-between" alignItems="center" pt={4}>
       <Container bg="black.200" height="1px" width={0.25} />
 
       <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
         <a>
           <Container
-            backgroundImage={`url(${imagePreview(
-              fromCollective.image,
-              defaultImage[fromCollective.type],
-              {
-                width: 65,
-              },
-            )})`}
+            backgroundImage={`url(${imagePreview(fromCollective.image, defaultImage[fromCollective.type], {
+              width: 65,
+            })})`}
             backgroundSize="contain"
             backgroundRepeat="no-repeat"
             backgroundPosition="center center"
@@ -67,13 +46,7 @@ const PledgeCard = ({
       Has pledged:
       <br />
       <Span fontSize="Caption">
-        <Currency
-          fontWeight="bold"
-          value={totalAmount}
-          currency={currency}
-          precision={0}
-          abbreviate
-        />
+        <Currency fontWeight="bold" value={totalAmount} currency={currency} precision={0} abbreviate />
 
         {interval && (
           <FormattedMessage

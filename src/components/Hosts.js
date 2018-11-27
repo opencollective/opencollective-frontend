@@ -66,12 +66,7 @@ class Hosts extends React.Component {
         />
 
         <Body>
-          <HostsCover
-            title={title}
-            description={description}
-            href="/hosts"
-            className="small"
-          />
+          <HostsCover title={title} description={description} href="/hosts" className="small" />
 
           <div className="content">
             <HostsWithData LoggedInUser={LoggedInUser} />

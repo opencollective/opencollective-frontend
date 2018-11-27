@@ -28,10 +28,7 @@ export default class LoginBtn extends React.Component {
 
   componentDidMount() {
     if (typeof window !== 'undefined') {
-      this.redirectAfterSignin = window.location.href.replace(
-        /^https?:\/\/[^/]+/,
-        '',
-      );
+      this.redirectAfterSignin = window.location.href.replace(/^https?:\/\/[^/]+/, '');
     }
   }
 
@@ -47,9 +44,7 @@ export default class LoginBtn extends React.Component {
           px={3}
           py={2}
         >
-          {this.props.children || (
-            <FormattedMessage id="login.button" defaultMessage="Login" />
-          )}
+          {this.props.children || <FormattedMessage id="login.button" defaultMessage="Login" />}
         </StyledLink>
       </Link>
     );

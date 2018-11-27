@@ -11,9 +11,7 @@ import glob from 'glob';
 import { logger } from './logger';
 
 // Get the supported languages by looking for translations in the `lang/` dir.
-export const languages = glob
-  .sync(path.join(__dirname, '../lang/*.json'))
-  .map(f => path.basename(f, '.json'));
+export const languages = glob.sync(path.join(__dirname, '../lang/*.json')).map(f => path.basename(f, '.json'));
 
 logger.info(`loading languages: ${JSON.stringify(languages)}`);
 

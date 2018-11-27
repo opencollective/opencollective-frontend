@@ -42,15 +42,7 @@ class Orders extends React.Component {
   }
 
   render() {
-    const {
-      collective,
-      orders,
-      LoggedInUser,
-      editable,
-      view,
-      includeHostedCollectives,
-      filters,
-    } = this.props;
+    const { collective, orders, LoggedInUser, editable, view, includeHostedCollectives, filters } = this.props;
 
     if (!orders) {
       return <div />;
@@ -127,15 +119,10 @@ class Orders extends React.Component {
               <Button
                 className="filterBtn pending"
                 bsSize="small"
-                bsStyle={
-                  this.state.status === 'PENDING' ? 'primary' : 'default'
-                }
+                bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PENDING')}
               >
-                <FormattedMessage
-                  id="orders.pending"
-                  defaultMessage="pending"
-                />
+                <FormattedMessage id="orders.pending" defaultMessage="pending" />
               </Button>
               <Button
                 className="filterBtn paid"
@@ -148,15 +135,10 @@ class Orders extends React.Component {
               <Button
                 className="filterBtn cancelled"
                 bsSize="small"
-                bsStyle={
-                  this.state.status === 'CANCELLED' ? 'primary' : 'default'
-                }
+                bsStyle={this.state.status === 'CANCELLED' ? 'primary' : 'default'}
                 onClick={() => this.refetch('CANCELLED')}
               >
-                <FormattedMessage
-                  id="orders.cancelled"
-                  defaultMessage="cancelled"
-                />
+                <FormattedMessage id="orders.cancelled" defaultMessage="cancelled" />
               </Button>
               <Button
                 className="filterBtn error"
@@ -196,12 +178,8 @@ class Orders extends React.Component {
           {orders.length >= 10 && orders.length % 10 === 0 && (
             <div className="loadMoreBtn">
               <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && (
-                  <FormattedMessage id="loading" defaultMessage="loading" />
-                )}
-                {!this.state.loading && (
-                  <FormattedMessage id="loadMore" defaultMessage="load more" />
-                )}
+                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
               </Button>
             </div>
           )}

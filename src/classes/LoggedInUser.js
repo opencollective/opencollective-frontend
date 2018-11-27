@@ -47,8 +47,7 @@ LoggedInUser.prototype.canEditComment = function(comment) {
   if (!comment) return false;
   return (
     get(comment, 'createdByUser.id') === this.id ||
-    intersection(this.roles[get(comment, 'collective.slug')], ['HOST', 'ADMIN'])
-      .length > 0
+    intersection(this.roles[get(comment, 'collective.slug')], ['HOST', 'ADMIN']).length > 0
   );
 };
 
@@ -67,17 +66,13 @@ LoggedInUser.prototype.canCreateCommentOnExpense = function(expense) {
 LoggedInUser.prototype.canEditEvent = function(eventCollective) {
   if (!eventCollective) return false;
   if (eventCollective.type !== 'EVENT') {
-    console.error(
-      `LoggedInUser.canEditEvent: ${eventCollective.slug} is not of type EVENT`,
-    );
+    console.error(`LoggedInUser.canEditEvent: ${eventCollective.slug} is not of type EVENT`);
     return false;
   }
   return (
     get(eventCollective, 'createdByUser.id') === this.id ||
     intersection(this.roles[eventCollective.slug], ['ADMIN']).length > 0 ||
-    intersection(this.roles[get(eventCollective, 'parentCollective.slug')], [
-      'ADMIN',
-    ]).length > 0
+    intersection(this.roles[get(eventCollective, 'parentCollective.slug')], ['ADMIN']).length > 0
   );
 };
 
@@ -89,14 +84,9 @@ LoggedInUser.prototype.canEditEvent = function(eventCollective) {
 LoggedInUser.prototype.canApproveExpense = function(expense) {
   if (!expense) return false;
   if (expense.collective) {
-    if (
-      intersection(this.roles[expense.collective.slug], ['HOST', 'ADMIN'])
-        .length > 0
-    )
-      return true;
+    if (intersection(this.roles[expense.collective.slug], ['HOST', 'ADMIN']).length > 0) return true;
     const hostSlug = get(expense, 'collective.host.slug');
-    if (intersection(this.roles[hostSlug], ['HOST', 'ADMIN']).length > 0)
-      return true;
+    if (intersection(this.roles[hostSlug], ['HOST', 'ADMIN']).length > 0) return true;
   }
   return false;
 };
@@ -109,11 +99,7 @@ LoggedInUser.prototype.canApproveExpense = function(expense) {
 LoggedInUser.prototype.canEditExpense = function(expense) {
   if (!expense) return false;
   if (expense.status === 'PAID') return false;
-  if (
-    expense.status === 'PENDING' &&
-    expense.fromCollective &&
-    expense.fromCollective.id === this.collective.id
-  )
+  if (expense.status === 'PENDING' && expense.fromCollective && expense.fromCollective.id === this.collective.id)
     return true;
   return this.canApproveExpense(expense);
 };
@@ -123,11 +109,7 @@ LoggedInUser.prototype.canEditUpdate = function(update) {
   if (get(update, 'createdByUser.id') === this.id) return true; // if author
   if (this.canEditCollective(update.fromCollective)) return true; // if admin of collective author
   if (this.canEditCollective(update.collective)) return true; // if admin of collective
-  if (
-    intersection(this.roles[get(update, 'collective.slug')], ['ADMIN']).length >
-    0
-  )
-    return true;
+  if (intersection(this.roles[get(update, 'collective.slug')], ['ADMIN']).length > 0) return true;
   return false;
 };
 
@@ -137,10 +119,7 @@ LoggedInUser.prototype.canEditUpdate = function(update) {
 LoggedInUser.prototype.canPayExpense = function(expense) {
   const hostSlug = get(expense, 'collective.host.slug');
   // second part of if statement is a hack, in case this User's Collective is the Host
-  if (
-    intersection(this.roles[hostSlug], ['HOST', 'ADMIN']).length > 0 ||
-    this.collective.slug === hostSlug
-  ) {
+  if (intersection(this.roles[hostSlug], ['HOST', 'ADMIN']).length > 0 || this.collective.slug === hostSlug) {
     return true;
   }
   return false;
@@ -152,10 +131,8 @@ LoggedInUser.prototype.canPayExpense = function(expense) {
 LoggedInUser.prototype.canEditSubscription = function(order) {
   if (!order) return false;
   if (
-    (this.roles[order.fromCollective.slug] &&
-      this.roles[order.fromCollective.slug].includes('ADMIN')) ||
-    (order.fromCollective.createdByUser &&
-      order.fromCollective.createdByUser.id === this.id)
+    (this.roles[order.fromCollective.slug] && this.roles[order.fromCollective.slug].includes('ADMIN')) ||
+    (order.fromCollective.createdByUser && order.fromCollective.createdByUser.id === this.id)
   ) {
     return true;
   }
@@ -163,9 +140,7 @@ LoggedInUser.prototype.canEditSubscription = function(order) {
 };
 
 LoggedInUser.prototype.isRoot = function() {
-  return (
-    intersection(this.roles['opencollective-company'], ['ADMIN']).length > 0
-  );
+  return intersection(this.roles['opencollective-company'], ['ADMIN']).length > 0;
 };
 
 LoggedInUser.prototype.hostsUserIsAdminOf = function() {

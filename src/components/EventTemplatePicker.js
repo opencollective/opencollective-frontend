@@ -22,9 +22,7 @@ class EventTemplatePicker extends React.Component {
 
   handleTemplateChange(e) {
     const eventId = Number(e.target.value);
-    const template = eventId
-      ? this.props.data.allEvents.find(event => event.id === eventId)
-      : {};
+    const template = eventId ? this.props.data.allEvents.find(event => event.id === eventId) : {};
     this.props.onChange(Object.assign({}, template));
   }
 
@@ -44,12 +42,7 @@ class EventTemplatePicker extends React.Component {
     return (
       <FormGroup className="EventTemplatePicker">
         <ControlLabel>{this.props.label}</ControlLabel>
-        <FormControl
-          name="template"
-          componentClass="select"
-          placeholder="select"
-          onChange={this.handleTemplateChange}
-        >
+        <FormControl name="template" componentClass="select" placeholder="select" onChange={this.handleTemplateChange}>
           <option value="">Use a previous event as a template</option>
           {allEvents.map(this.renderEventEntry)}
         </FormControl>

@@ -39,11 +39,7 @@ const MenuLink = styled(StyledLink)`
   padding: 0;
 `;
 
-const FlexList = styled.ul(
-  [],
-  ...Box.componentStyle.rules,
-  ...Flex.componentStyle.rules,
-);
+const FlexList = styled.ul([], ...Box.componentStyle.rules, ...Flex.componentStyle.rules);
 
 const navigation = {
   PLATFORM: {
@@ -59,8 +55,7 @@ const navigation = {
   },
   COMMUNITY: {
     'Open Source': '/opensource',
-    'Report an issue':
-      'https://github.com/opencollective/opencollective/issues',
+    'Report an issue': 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     Wiki: 'https://github.com/opencollective/opencollective/wiki',
     'Email Support': 'mailto:support@opencollective.com',
@@ -84,15 +79,7 @@ const routesWithoutRouter = ['/learn-more', '/discover'];
 class Footer extends React.Component {
   render() {
     return (
-      <Container
-        id="footer"
-        bg="white"
-        borderTop="1px solid #aaaaaa"
-        bottom={0}
-        minHeight="7.5rem"
-        p="1rem"
-        width={1}
-      >
+      <Container id="footer" bg="white" borderTop="1px solid #aaaaaa" bottom={0} minHeight="7.5rem" p="1rem" width={1}>
         <Flex
           p={2}
           justifyContent="space-between"
@@ -101,26 +88,11 @@ class Footer extends React.Component {
           flexDirection={['column', null, 'row']}
           css="max-width: 1300px;"
         >
-          <Container
-            display="flex"
-            mt={3}
-            width={[1, null, 1 / 3]}
-            flexDirection="column"
-            maxWidth="300px"
-          >
+          <Container display="flex" mt={3} width={[1, null, 1 / 3]} flexDirection="column" maxWidth="300px">
             <Flex justifyContent={['center', null, 'flex-start']}>
-              <object
-                type="image/svg+xml"
-                data="/static/images/opencollectivelogo-footer.svg"
-                height="20"
-              />
+              <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height="20" />
             </Flex>
-            <P
-              textAlign={['center', null, 'left']}
-              color="#6E747A"
-              fontSize="1.4rem"
-              py={2}
-            >
+            <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>
               An organization for your community, transparent by design.
             </P>
           </Container>
@@ -149,37 +121,15 @@ class Footer extends React.Component {
               <Mail size={19} color="#9399A3" />
             </SocialLink>
           </Container>
-          <Flex
-            is="nav"
-            flexWrap="wrap"
-            justifyContent="center"
-            mt={3}
-            flex="1 1 auto"
-            order={['3', null, '2']}
-          >
+          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto" order={['3', null, '2']}>
             {Object.keys(navigation).map(key => (
               <Box key={key} width={[0.5, null, 0.25]} mb={3}>
-                <P
-                  textAlign={['center', null, 'left']}
-                  fontSize="1.2rem"
-                  color="#C2C6CC"
-                  letterSpacing="1px"
-                  pb={3}
-                >
+                <P textAlign={['center', null, 'left']} fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={3}>
                   {key}
                 </P>
-                <FlexList
-                  justifyContent="center"
-                  flexDirection="column"
-                  pl={0}
-                  pr={2}
-                >
+                <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
                   {Object.keys(navigation[key]).map(item => (
-                    <ListItem
-                      key={item}
-                      textAlign={['center', null, 'left']}
-                      mb={2}
-                    >
+                    <ListItem key={item} textAlign={['center', null, 'left']} mb={2}>
                       {routesWithoutRouter.includes(navigation[key][item]) ? (
                         <MenuLink href={navigation[key][item]}>{item}</MenuLink>
                       ) : (

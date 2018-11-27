@@ -11,7 +11,7 @@ export const colors = {
     300: '#DCDEE0',
     200: '#E8E9EB',
     100: '#F2F3F5',
-    50:  '#F7F8FA',
+    50: '#F7F8FA',
     transparent: {
       88: 'rgba(19, 20, 20, 0.88)',
       40: 'rgba(19, 20, 20, 0.4)',
@@ -180,6 +180,6 @@ export const buttonSize = variant({
 
 export default theme;
 
-function toPx (value) {
+function toPx(value) {
   return `${value}px`;
 }

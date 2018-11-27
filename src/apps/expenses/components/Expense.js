@@ -101,16 +101,7 @@ class Expense extends React.Component {
   }
 
   render() {
-    const {
-      intl,
-      collective,
-      host,
-      expense,
-      includeHostedCollectives,
-      LoggedInUser,
-      editable,
-      view,
-    } = this.props;
+    const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable, view } = this.props;
 
     if (!expense.fromCollective) {
       console.error('No FromCollective for expense', expense);
@@ -122,16 +113,10 @@ class Expense extends React.Component {
 
     let { mode } = this.state;
     if (editable && LoggedInUser && !mode) {
-      if (
-        expense.status === 'PENDING' &&
-        LoggedInUser.canApproveExpense(expense)
-      ) {
+      if (expense.status === 'PENDING' && LoggedInUser.canApproveExpense(expense)) {
         mode = 'details';
       }
-      if (
-        expense.status === 'APPROVED' &&
-        LoggedInUser.canPayExpense(expense)
-      ) {
+      if (expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense)) {
         mode = 'details';
       }
     }
@@ -142,16 +127,14 @@ class Expense extends React.Component {
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
         (expense.status === 'APPROVED' &&
-          (Date.now() - new Date(expense.updatedAt).getTime() <
-            60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
+          (Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
             LoggedInUser.canEditCollective(collective.host))));
 
     const canApprove =
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
-        (expense.status === 'REJECTED' &&
-          Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
+        (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
     return (
       <div className={`expense ${status} ${this.state.mode}View`}>
@@ -294,20 +277,12 @@ class Expense extends React.Component {
         <div className="body">
           <div className="header">
             <div className="amount pullRight">
-              <AmountCurrency
-                amount={-expense.amount}
-                currency={expense.currency}
-              />
+              <AmountCurrency amount={-expense.amount} currency={expense.currency} />
             </div>
             <div className="description">
-              <Link
-                route={`/${collective.slug}/expenses/${expense.id}`}
-                title={capitalize(title)}
-              >
+              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
                 {capitalize(title)}
-                {view !== 'compact' && (
-                  <span className="ExpenseId">#{expense.id}</span>
-                )}
+                {view !== 'compact' && <span className="ExpenseId">#{expense.id}</span>}
               </Link>
             </div>
             <div className="meta">
@@ -315,20 +290,11 @@ class Expense extends React.Component {
               {' | '}
               {includeHostedCollectives && (
                 <span className="collective">
-                  <Link route={`/${expense.collective.slug}`}>
-                    {expense.collective.slug}
-                  </Link>
-                  (balance:{' '}
-                  {formatCurrency(
-                    expense.collective.stats.balance,
-                    expense.collective.currency,
-                  )}
-                  ){' | '}
+                  <Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link>
+                  (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
                 </span>
               )}
-              <span className="status">
-                {intl.formatMessage(this.messages[status])}
-              </span>
+              <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
               <span className="metaItem">
                 <Link
@@ -343,29 +309,19 @@ class Expense extends React.Component {
                   {capitalize(expense.category)}
                 </Link>
               </span>
-              {editable &&
-                LoggedInUser &&
-                LoggedInUser.canEditExpense(expense) && (
-                  <span>
-                    {' | '}
-                    <a className="toggleEditExpense" onClick={this.toggleEdit}>
-                      {intl.formatMessage(
-                        this.messages[
-                          `${mode === 'edit' ? 'cancelEdit' : 'edit'}`
-                        ],
-                      )}
-                    </a>
-                  </span>
-                )}
+              {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
+                <span>
+                  {' | '}
+                  <a className="toggleEditExpense" onClick={this.toggleEdit}>
+                    {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                  </a>
+                </span>
+              )}
               {mode !== 'edit' && view === 'list' && (
                 <span>
                   {' | '}
                   <a className="toggleDetails" onClick={this.toggleDetails}>
-                    {intl.formatMessage(
-                      this.messages[
-                        `${mode === 'details' ? 'closeDetails' : 'viewDetails'}`
-                      ],
-                    )}
+                    {intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}
                   </a>
                 </span>
               )}
@@ -387,33 +343,27 @@ class Expense extends React.Component {
                   <div className="leftColumn" />
                   <div className="rightColumn">
                     <SmallButton className="primary save" onClick={this.save}>
-                      <FormattedMessage
-                        id="expense.save"
-                        defaultMessage="save"
-                      />
+                      <FormattedMessage id="expense.save" defaultMessage="save" />
                     </SmallButton>
                   </div>
                 </div>
               )}
-              {mode !== 'edit' &&
-                LoggedInUser &&
-                LoggedInUser.canApproveExpense(expense) && (
-                  <div className="expenseActions">
-                    {expense.status === 'APPROVED' &&
-                      LoggedInUser.canPayExpense(expense) && (
-                        <PayExpenseBtn
-                          expense={expense}
-                          collective={collective}
-                          paymentMethods={host.paymentMethods}
-                          disabled={!this.props.allowPayAction}
-                          lock={this.props.lockPayAction}
-                          unlock={this.props.unlockPayAction}
-                        />
-                      )}
-                    {canApprove && <ApproveExpenseBtn id={expense.id} />}
-                    {canReject && <RejectExpenseBtn id={expense.id} />}
-                  </div>
-                )}
+              {mode !== 'edit' && LoggedInUser && LoggedInUser.canApproveExpense(expense) && (
+                <div className="expenseActions">
+                  {expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) && (
+                    <PayExpenseBtn
+                      expense={expense}
+                      collective={collective}
+                      paymentMethods={host.paymentMethods}
+                      disabled={!this.props.allowPayAction}
+                      lock={this.props.lockPayAction}
+                      unlock={this.props.unlockPayAction}
+                    />
+                  )}
+                  {canApprove && <ApproveExpenseBtn id={expense.id} />}
+                  {canReject && <RejectExpenseBtn id={expense.id} />}
+                </div>
+              )}
             </div>
           )}
         </div>

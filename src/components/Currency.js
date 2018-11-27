@@ -5,13 +5,7 @@ import { abbreviateNumber } from '../lib/utils';
 
 import { Span } from './Text';
 
-const Currency = ({
-  abbreviate = false,
-  currency,
-  precision = 0,
-  value,
-  ...styles
-}) => (
+const Currency = ({ abbreviate = false, currency, precision = 0, value, ...styles }) => (
   <FormattedNumber
     value={value / 100}
     currency={currency}

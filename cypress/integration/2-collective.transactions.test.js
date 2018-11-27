@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 describe('collective.transactions.exportCsv', () => {
   it("shows the 'Download CSV' button", () => {
@@ -47,8 +44,6 @@ describe('collective.transactions.exportCsv', () => {
     cy.get('#csv-date-range .popover-content button').click();
 
     // Then it should show an error message
-    cy.get('.empty-search-error').contains(
-      'There are no transactions in this date range.',
-    );
+    cy.get('.empty-search-error').contains('There are no transactions in this date range.');
   });
 });

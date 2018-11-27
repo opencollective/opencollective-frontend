@@ -27,9 +27,7 @@ class CreateCollectiveForm extends React.Component {
     this.handleObjectChange = this.handleObjectChange.bind(this);
 
     const collective = { ...(props.collective || {}) };
-    collective.slug = collective.slug
-      ? collective.slug.replace(/.*\//, '')
-      : '';
+    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
@@ -41,8 +39,7 @@ class CreateCollectiveForm extends React.Component {
       },
       'company.description': {
         id: 'collective.company.description',
-        defaultMessage:
-          'Start with a @ to reference an organization (e.g. @airbnb)',
+        defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
         id: 'collective.amount.label',
@@ -100,8 +97,7 @@ class CreateCollectiveForm extends React.Component {
       },
     });
 
-    collective.backgroundImage =
-      collective.backgroundImage || defaultBackgroundImage[collective.type];
+    collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
 
     this.masterKey = '';
     this.state = {
@@ -138,8 +134,7 @@ class CreateCollectiveForm extends React.Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (
       nextProps.collective &&
-      (!this.props.collective ||
-        get(nextProps, 'collective.name') != get(this.props, 'collective.name'))
+      (!this.props.collective || get(nextProps, 'collective.name') != get(this.props, 'collective.name'))
     ) {
       this.setState({
         collective: nextProps.collective,
@@ -219,17 +214,12 @@ class CreateCollectiveForm extends React.Component {
     Object.keys(this.fields).map(key => {
       this.fields[key] = this.fields[key].map(field => {
         if (this.messages[`${field.name}.label`]) {
-          field.label = intl.formatMessage(
-            this.messages[`${field.name}.label`],
-          );
+          field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
         }
         if (this.messages[`${field.name}.description`]) {
-          field.description = intl.formatMessage(
-            this.messages[`${field.name}.description`],
-          );
+          field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
         }
-        this.state.collective[field.name] =
-          this.state.collective[field.name] || field.defaultValue;
+        this.state.collective[field.name] = this.state.collective[field.name] || field.defaultValue;
         return field;
       });
     });
@@ -246,9 +236,7 @@ class CreateCollectiveForm extends React.Component {
 
     const collective = {};
     if (fieldname === 'meetup') {
-      fetch(
-        `https://api.meetup.com/${value}?fields=plain_text_description,topics`,
-      )
+      fetch(`https://api.meetup.com/${value}?fields=plain_text_description,topics`)
         .then(response => {
           if (response.ok) {
             return response.json();
@@ -315,9 +303,7 @@ class CreateCollectiveForm extends React.Component {
   render() {
     const { host, collective, loading, intl } = this.props;
 
-    const showForm = Boolean(
-      this.categories.length === 0 || this.state.collective.category,
-    );
+    const showForm = Boolean(this.categories.length === 0 || this.state.collective.category);
     const defaultStartsAt = new Date();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
@@ -407,10 +393,7 @@ class CreateCollectiveForm extends React.Component {
                         key={`${this.masterKey}-${field.name}`}
                         value={this.state.collective[field.name]}
                         className={field.className}
-                        defaultValue={
-                          this.state.collective[field.name] ||
-                          field.defaultValue
-                        }
+                        defaultValue={this.state.collective[field.name] || field.defaultValue}
                         validate={field.validate}
                         ref={field.name}
                         name={field.name}
@@ -437,9 +420,7 @@ class CreateCollectiveForm extends React.Component {
                   type="checkbox"
                   name="tos"
                   required
-                  onChange={({ target }) =>
-                    this.handleChange('tos', target.checked)
-                  }
+                  onChange={({ target }) => this.handleChange('tos', target.checked)}
                 />
                 <span>
                   I agree with the{' '}
@@ -454,25 +435,15 @@ class CreateCollectiveForm extends React.Component {
                     type="checkbox"
                     name="hostTos"
                     required
-                    onChange={({ target }) =>
-                      this.handleChange('hostTos', target.checked)
-                    }
+                    onChange={({ target }) => this.handleChange('hostTos', target.checked)}
                   />
                   <span>
                     I agree with the{' '}
-                    <a
-                      href={get(host, 'settings.tos')}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
                       terms of service of the host
                     </a>{' '}
                     (
-                    <a
-                      href={`/${host.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">
                       {host.name}
                     </a>
                     ) that will collect money on behalf of our collective
@@ -488,23 +459,13 @@ class CreateCollectiveForm extends React.Component {
                 onClick={this.handleSubmit}
                 disabled={loading || !this.state.modified}
               >
-                {loading && (
-                  <FormattedMessage id="loading" defaultMessage="loading" />
+                {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!loading && collective.type === 'COLLECTIVE' && (
+                  <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" />
                 )}
-                {!loading &&
-                  collective.type === 'COLLECTIVE' && (
-                    <FormattedMessage
-                      id="collective.create.button"
-                      defaultMessage="Create Collective"
-                    />
-                  )}
-                {!loading &&
-                  collective.type === 'ORGANIZATION' && (
-                    <FormattedMessage
-                      id="organization.create"
-                      defaultMessage="Create organization"
-                    />
-                  )}
+                {!loading && collective.type === 'ORGANIZATION' && (
+                  <FormattedMessage id="organization.create" defaultMessage="Create organization" />
+                )}
               </Button>
             </div>
           </div>

@@ -8,9 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const { JSDOM } = jsdom;
-const { document } = new JSDOM(
-  '<!doctype html><html><body></body></html>',
-).window;
+const { document } = new JSDOM('<!doctype html><html><body></body></html>').window;
 global.document = document;
 global.window = document.defaultView;
 global.window.localStorage = {

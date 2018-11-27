@@ -57,9 +57,7 @@ class CreateOrganizationForm extends React.Component {
               className="horizontal"
               type="text"
               name="organization_name"
-              label={intl.formatMessage(
-                this.messages['order.organization.name'],
-              )}
+              label={intl.formatMessage(this.messages['order.organization.name'])}
               onChange={value => this.handleChange('name', value)}
             />
           </Col>
@@ -70,9 +68,7 @@ class CreateOrganizationForm extends React.Component {
               className="horizontal"
               type="text"
               name="organization_website"
-              label={intl.formatMessage(
-                this.messages['order.organization.website'],
-              )}
+              label={intl.formatMessage(this.messages['order.organization.website'])}
               onChange={value => this.handleChange('website', value)}
             />
           </Col>
@@ -84,12 +80,8 @@ class CreateOrganizationForm extends React.Component {
               type="text"
               name="organization_twitterHandle"
               pre="@"
-              label={intl.formatMessage(
-                this.messages['order.organization.twitterHandle'],
-              )}
-              help={intl.formatMessage(
-                this.messages['order.organization.twitterHandle.description'],
-              )}
+              label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
+              help={intl.formatMessage(this.messages['order.organization.twitterHandle.description'])}
               onChange={value => this.handleChange('twitterHandle', value)}
             />
           </Col>

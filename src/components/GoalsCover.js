@@ -95,8 +95,7 @@ class GoalsCover extends React.Component {
       });
     }
 
-    const maxGoalsToShow =
-      window.screen.availWidth < 400 ? this.goals.length + 1 : 10;
+    const maxGoalsToShow = window.screen.availWidth < 400 ? this.goals.length + 1 : 10;
 
     (get(collective, 'settings.goals') || []).map(g => {
       if (g.title) {
@@ -132,16 +131,12 @@ class GoalsCover extends React.Component {
         pos.height = '20px';
       }
       // if the previous item's position is overlapping, we change the level
-      if (
-        previous[position] &&
-        pos.posX < previous[position].posX + previous[position].width
-      ) {
+      if (previous[position] && pos.posX < previous[position].posX + previous[position].width) {
         pos.level = previous[position].level === 1 ? 0 : 1;
 
         // Make sure we don't overlap with previous goal on the same level (previous' previous)
         if (previous[position].previous) {
-          const overlap =
-            previous[position].previous.posX - pos.posX + pos.width;
+          const overlap = previous[position].previous.posX - pos.posX + pos.width;
           if (overlap > 0) {
             pos.opacity = 0.2;
             pos.posX = pos.posX + overlap;
@@ -169,9 +164,7 @@ class GoalsCover extends React.Component {
   renderGoal(goal, index, state) {
     if (!goal.title) return;
     const { collective } = this.props;
-    const posX = goal.animate
-      ? 0
-      : `${Math.round((goal.amount / this.maxAmount) * 100)}%`;
+    const posX = goal.animate ? 0 : `${Math.round((goal.amount / this.maxAmount) * 100)}%`;
     const slug = goal.slug || `goal${index}`;
     const zIndex = (20 - index) * 10;
     const amount = formatCurrency(
@@ -193,12 +186,7 @@ class GoalsCover extends React.Component {
     }
 
     return (
-      <div
-        key={slug}
-        className={`goal bar ${slug} ${position}`}
-        style={style}
-        ref={node => (this.nodes[slug] = node)}
-      >
+      <div key={slug} className={`goal bar ${slug} ${position}`} style={style} ref={node => (this.nodes[slug] = node)}>
         <style jsx>
           {`
             .bar {
@@ -335,11 +323,7 @@ class GoalsCover extends React.Component {
                 defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of"
               />
               <span className="annualBudget">
-                {formatCurrency(
-                  get(collective, 'stats.yearlyBudget'),
-                  collective.currency,
-                  { precision: 0 },
-                )}
+                {formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}
               </span>
             </div>
           )}
@@ -349,10 +333,7 @@ class GoalsCover extends React.Component {
             ref={node => (this.nodes.barContainer = node)}
           >
             <div className="bars">
-              {this.goals &&
-                this.goals.map((goal, index) =>
-                  this.renderGoal(goal, index, this.state),
-                )}
+              {this.goals && this.goals.map((goal, index) => this.renderGoal(goal, index, this.state))}
             </div>
           </div>
         </div>

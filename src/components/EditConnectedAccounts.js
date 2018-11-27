@@ -58,10 +58,7 @@ class EditConnectedAccounts extends React.Component {
             <EditConnectedAccount
               collective={collective}
               service={service}
-              connectedAccount={
-                this.connectedAccounts[service] &&
-                this.connectedAccounts[service][0]
-              }
+              connectedAccount={this.connectedAccounts[service] && this.connectedAccounts[service][0]}
             />
           </div>
         ))}

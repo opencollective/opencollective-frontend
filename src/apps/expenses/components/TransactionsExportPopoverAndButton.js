@@ -43,9 +43,7 @@ export const transformResultInCSV = json => {
 
   const lines = json.map(i => {
     const profile = `http://opencollective.com/${i.fromCollective.slug}`;
-    const subscriptionInterval = i.subscription
-      ? i.subscription.interval
-      : 'one time';
+    const subscriptionInterval = i.subscription ? i.subscription.interval : 'one time';
     return [
       q(i.description) /* Transaction Description */,
       q(i.fromCollective.name) /* User Name  */,
@@ -76,11 +74,7 @@ class ExportForm extends React.Component {
 
     // Calculate the start: first day of previous month & end date: today.
     const oneMonthAgo = moment().subtract(1, 'months')._d;
-    const defaultStartDate = new Date(
-      oneMonthAgo.getFullYear(),
-      oneMonthAgo.getMonth(),
-      1,
-    );
+    const defaultStartDate = new Date(oneMonthAgo.getFullYear(), oneMonthAgo.getMonth(), 1);
     const defaultEndDate = new Date();
 
     this.state = {
@@ -155,12 +149,7 @@ class ExportForm extends React.Component {
           closeOnSelect
           onChange={dateTo => this.updateSearchProps({ dateTo })}
         />
-        <Button
-          disabled={this.state.disabled}
-          bsSize="small"
-          bsStyle="primary"
-          onClick={this.download.bind(this)}
-        >
+        <Button disabled={this.state.disabled} bsSize="small" bsStyle="primary" onClick={this.download.bind(this)}>
           Download
         </Button>
         {this.state.searchReturnedEmpty && (
@@ -182,25 +171,10 @@ class PopoverButton extends React.Component {
   render() {
     const form = <ExportFormWithClient collective={this.props.collective} />;
     return (
-      <OverlayTrigger
-        trigger="click"
-        placement="bottom"
-        overlay={form}
-        rootClose
-      >
-        <a
-          className="download-csv"
-          role="button"
-          style={{ float: 'right', fontSize: '12px', padding: 7 }}
-        >
-          <img
-            src="/static/images/icons/download.svg"
-            style={{ paddingRight: 5 }}
-          />
-          <FormattedMessage
-            id="transactions.downloadcsvbutton"
-            defaultMessage="Download CSV"
-          />
+      <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
+        <a className="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
+          <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
+          <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
         </a>
       </OverlayTrigger>
     );

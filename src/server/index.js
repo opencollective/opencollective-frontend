@@ -13,10 +13,7 @@ import { getLocaleDataScript, getMessages, languages } from './intl';
 
 const server = express();
 
-server.set(
-  'trust proxy',
-  ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps),
-);
+server.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
 const env = process.env.NODE_ENV || 'development';
 const dev = env === 'development' || env === 'docker';
@@ -46,10 +43,7 @@ app.prepare().then(() => {
   const httpServer = http.createServer(server);
 
   httpServer.on('error', err => {
-    logger.error(
-      `Can't start server on http://localhost:${port} in ${env} environment. %s`,
-      err,
-    );
+    logger.error(`Can't start server on http://localhost:${port} in ${env} environment. %s`, err);
   });
 
   httpServer.listen(port, () => {

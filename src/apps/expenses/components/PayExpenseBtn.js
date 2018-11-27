@@ -44,10 +44,7 @@ class PayExpenseBtn extends React.Component {
     lock();
     this.setState({ loading: true });
     try {
-      await this.props.payExpense(
-        expense.id,
-        this.state.paymentProcessorFeeInHostCurrency,
-      );
+      await this.props.payExpense(expense.id, this.state.paymentProcessorFeeInHostCurrency);
       this.setState({ loading: false });
       unlock();
     } catch (e) {
@@ -66,30 +63,19 @@ class PayExpenseBtn extends React.Component {
       error = this.state.error;
 
     if (expense.payoutMethod === 'paypal') {
-      if (
-        !isValidEmail(get(expense, 'user.paypalEmail')) &&
-        !isValidEmail(get(expense, 'user.email'))
-      ) {
+      if (!isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
         disabled = true;
         title = intl.formatMessage(this.messages['paypal.missing']);
       } else {
-        const paypalPaymentMethod =
-          paymentMethods && paymentMethods.find(pm => pm.service === 'paypal');
-        if (
-          get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')
-        ) {
+        const paypalPaymentMethod = paymentMethods && paymentMethods.find(pm => pm.service === 'paypal');
+        if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
           selectedPayoutMethod = 'other';
         }
       }
     }
     if (get(collective, 'stats.balance') < expense.amount) {
       disabled = true;
-      error = (
-        <FormattedMessage
-          id="expense.pay.error.insufficientBalance"
-          defaultMessage="Insufficient balance"
-        />
-      );
+      error = <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
     }
     return (
       <div className="PayExpenseBtn">
@@ -133,34 +119,21 @@ class PayExpenseBtn extends React.Component {
         {expense.payoutMethod === 'other' && (
           <div className="processorFee">
             <label htmlFor="processorFee">
-              <FormattedMessage
-                id="expense.paymentProcessorFeeInHostCurrency"
-                defaultMessage="payment processor fee"
-              />
+              <FormattedMessage id="expense.paymentProcessorFeeInHostCurrency" defaultMessage="payment processor fee" />
             </label>
             <InputField
               defaultValue={0}
               id="paymentProcessorFeeInHostCurrency"
               name="paymentProcessorFeeInHostCurrency"
-              onChange={fee =>
-                this.setState({ paymentProcessorFeeInHostCurrency: fee })
-              }
+              onChange={fee => this.setState({ paymentProcessorFeeInHostCurrency: fee })}
               pre={getCurrencySymbol(expense.currency)}
               type="currency"
             />
           </div>
         )}
-        <SmallButton
-          className="pay"
-          onClick={this.onClick}
-          disabled={this.props.disabled || disabled}
-          title={title}
-        >
+        <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
           {selectedPayoutMethod === 'other' && (
-            <FormattedMessage
-              id="expense.pay.manual.btn"
-              defaultMessage="record as paid"
-            />
+            <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />
           )}
           {selectedPayoutMethod !== 'other' && (
             <FormattedMessage

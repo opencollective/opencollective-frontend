@@ -16,8 +16,7 @@ export function json2csv(json) {
     lines.push(
       `"${Object.values(row)
         .map(td => {
-          if (typeof td === 'string')
-            return td.replace(/"/g, '""').replace(/\n/g, '  ');
+          if (typeof td === 'string') return td.replace(/"/g, '""').replace(/\n/g, '  ');
           else return `${td || ''}`;
         })
         .join('","')}"`,
@@ -29,11 +28,7 @@ export function json2csv(json) {
 function formatDate(d) {
   const mm = d.getMonth() + 1;
   const dd = d.getDate();
-  return [
-    d.getFullYear(),
-    mm < 10 ? `0${mm}` : mm,
-    dd < 10 ? `0${dd}` : dd,
-  ].join('-');
+  return [d.getFullYear(), mm < 10 ? `0${mm}` : mm, dd < 10 ? `0${dd}` : dd].join('-');
 }
 
 export async function exportRSVPs(event) {
@@ -47,9 +42,7 @@ export async function exportRSVPs(event) {
       name: r.fromCollective.name,
       company: r.fromCollective.company,
       email: r.fromCollective.email,
-      twitter:
-        r.fromCollective.twitterHandle &&
-        `https://twitter.com/${r.fromCollective.twitterHandle}`,
+      twitter: r.fromCollective.twitterHandle && `https://twitter.com/${r.fromCollective.twitterHandle}`,
       description: r.description || r.fromCollective.description,
     };
   });
@@ -61,11 +54,7 @@ export async function exportRSVPs(event) {
   );
 }
 
-export async function exportMembers(
-  collectiveSlug,
-  tierSlug,
-  options = { type: 'all' },
-) {
+export async function exportMembers(collectiveSlug, tierSlug, options = { type: 'all' }) {
   let path = `/${collectiveSlug}`;
   path += tierSlug ? `/tiers/${tierSlug}/` : '/members/';
 
@@ -79,9 +68,5 @@ export async function exportMembers(
 
   const csv = await get(path, options);
   const date = formatDate(new Date());
-  return exportFile(
-    'text/plain;charset=utf-8',
-    `${date.replace(/-/g, '')}${path.replace(/\//g, '-')}`,
-    csv,
-  );
+  return exportFile('text/plain;charset=utf-8', `${date.replace(/-/g, '')}${path.replace(/\//g, '-')}`, csv);
 }

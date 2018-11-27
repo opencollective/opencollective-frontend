@@ -47,16 +47,7 @@ class Expenses extends React.Component {
   }
 
   render() {
-    const {
-      collective,
-      host,
-      expenses,
-      LoggedInUser,
-      editable,
-      view,
-      includeHostedCollectives,
-      filters,
-    } = this.props;
+    const { collective, host, expenses, LoggedInUser, editable, view, includeHostedCollectives, filters } = this.props;
 
     if (!expenses) {
       return <div />;
@@ -133,28 +124,18 @@ class Expenses extends React.Component {
               <Button
                 className="filterBtn pending"
                 bsSize="small"
-                bsStyle={
-                  this.state.status === 'PENDING' ? 'primary' : 'default'
-                }
+                bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PENDING')}
               >
-                <FormattedMessage
-                  id="expenses.pending"
-                  defaultMessage="pending"
-                />
+                <FormattedMessage id="expenses.pending" defaultMessage="pending" />
               </Button>
               <Button
                 className="filterBtn approved"
                 bsSize="small"
-                bsStyle={
-                  this.state.status === 'APPROVED' ? 'primary' : 'default'
-                }
+                bsStyle={this.state.status === 'APPROVED' ? 'primary' : 'default'}
                 onClick={() => this.refetch('APPROVED')}
               >
-                <FormattedMessage
-                  id="expenses.approved"
-                  defaultMessage="approved"
-                />
+                <FormattedMessage id="expenses.approved" defaultMessage="approved" />
               </Button>
               <Button
                 className="filterBtn paid"
@@ -192,21 +173,14 @@ class Expenses extends React.Component {
           ))}
           {expenses.length === 0 && (
             <div className="empty">
-              <FormattedMessage
-                id="expenses.empty"
-                defaultMessage="No expenses"
-              />
+              <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
             </div>
           )}
           {expenses.length >= 10 && expenses.length % 10 === 0 && (
             <div className="loadMoreBtn">
               <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && (
-                  <FormattedMessage id="loading" defaultMessage="loading" />
-                )}
-                {!this.state.loading && (
-                  <FormattedMessage id="loadMore" defaultMessage="load more" />
-                )}
+                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
               </Button>
             </div>
           )}

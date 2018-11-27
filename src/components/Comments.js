@@ -104,22 +104,14 @@ class Comments extends React.Component {
               LoggedInUser={LoggedInUser}
             />
           ))}
-          {comments.length >= 10 &&
-            comments.length % 10 === 0 && (
-              <div className="loadMoreBtn">
-                <Button bsStyle="default" onClick={this.fetchMore}>
-                  {this.state.loading && (
-                    <FormattedMessage id="loading" defaultMessage="loading" />
-                  )}
-                  {!this.state.loading && (
-                    <FormattedMessage
-                      id="loadMore"
-                      defaultMessage="load more"
-                    />
-                  )}
-                </Button>
-              </div>
-            )}
+          {comments.length >= 10 && comments.length % 10 === 0 && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

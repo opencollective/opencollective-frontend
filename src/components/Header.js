@@ -38,9 +38,7 @@ class Header extends React.Component {
 
   render() {
     const { css, className } = this.props;
-    let title =
-      this.props.title ||
-      'Open Collective - open your finances to your community';
+    let title = this.props.title || 'Open Collective - open your finances to your community';
     if (!title.match(/open collective/i)) {
       title += ' - Open Collective';
     }
@@ -48,26 +46,10 @@ class Header extends React.Component {
       <header>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectiveicon240x240"
-            size="240x240"
-          />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectiveicon48x48"
-            size="48x48"
-          />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectivelogo480x80"
-            size="480x80"
-          />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectivelogo480x80@2x"
-            size="960x160"
-          />
+          <meta property="og:logo" content="/static/images/opencollectiveicon240x240" size="240x240" />
+          <meta property="og:logo" content="/static/images/opencollectiveicon48x48" size="48x48" />
+          <meta property="og:logo" content="/static/images/opencollectivelogo480x80" size="480x80" />
+          <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
           {css && <link rel="stylesheet" href={css} />}
           <title>{title}</title>
           {this.meta.map(({ name, content }, index) => (
@@ -75,11 +57,7 @@ class Header extends React.Component {
           ))}
         </Head>
         <div id="top" />
-        <TopBar
-          className={className}
-          LoggedInUser={this.props.LoggedInUser}
-          showSearch={this.props.showSearch}
-        />
+        <TopBar className={className} LoggedInUser={this.props.LoggedInUser} showSearch={this.props.showSearch} />
       </header>
     );
   }

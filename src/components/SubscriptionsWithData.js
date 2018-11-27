@@ -56,9 +56,7 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
       subscriptions = cloneDeep(data.Collective.ordersFromCollective);
 
       subscriptions.map(s => {
-        const memberInfo = data.Collective.memberOf.filter(
-          member => member.collective.id === s.collective.id,
-        )[0];
+        const memberInfo = data.Collective.memberOf.filter(member => member.collective.id === s.collective.id)[0];
         if (memberInfo) {
           s.stats = memberInfo.stats || {};
         }

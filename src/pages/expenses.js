@@ -53,12 +53,7 @@ class ExpensesPage extends React.Component {
     let action, subtitle, filter;
     if (this.props.value) {
       action = {
-        label: (
-          <FormattedMessage
-            id="expenses.viewAll"
-            defaultMessage="View All Expenses"
-          />
-        ),
+        label: <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />,
         href: `/${collective.slug}/expenses`,
       };
 
@@ -66,22 +61,14 @@ class ExpensesPage extends React.Component {
         const category = decodeURIComponent(this.props.value);
         filter = { category };
         subtitle = (
-          <FormattedMessage
-            id="expenses.byCategory"
-            defaultMessage="Expenses in {category}"
-            values={{ category }}
-          />
+          <FormattedMessage id="expenses.byCategory" defaultMessage="Expenses in {category}" values={{ category }} />
         );
       }
       if (this.props.filter === 'recipients') {
         const recipient = decodeURIComponent(this.props.value);
         filter = { recipient };
         subtitle = (
-          <FormattedMessage
-            id="expenses.byRecipient"
-            defaultMessage="Expenses by {recipient}"
-            values={{ recipient }}
-          />
+          <FormattedMessage id="expenses.byRecipient" defaultMessage="Expenses by {recipient}" values={{ recipient }} />
         );
       }
     }
@@ -138,19 +125,11 @@ class ExpensesPage extends React.Component {
           />
 
           <div className="content">
-            <SectionTitle
-              section="expenses"
-              subtitle={subtitle}
-              action={action}
-            />
+            <SectionTitle section="expenses" subtitle={subtitle} action={action} />
 
             <div className=" columns">
               <div className="col large">
-                <ExpensesWithData
-                  collective={collective}
-                  LoggedInUser={this.state.LoggedInUser}
-                  filter={filter}
-                />
+                <ExpensesWithData collective={collective} LoggedInUser={this.state.LoggedInUser} filter={filter} />
               </div>
 
               <div className="col side">
@@ -166,6 +145,4 @@ class ExpensesPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(ExpensesPage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensesPage))));

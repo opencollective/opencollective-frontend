@@ -74,12 +74,7 @@ export default WrappedComponent => {
     };
 
     render() {
-      return (
-        <WrappedComponent
-          getLoggedInUser={this.getLoggedInUser}
-          {...this.props}
-        />
-      );
+      return <WrappedComponent getLoggedInUser={this.getLoggedInUser} {...this.props} />;
     }
   };
 };

@@ -123,13 +123,11 @@ class CreateOrderPage extends React.Component {
       },
       'order.successRedirect': {
         id: 'tier.order.successRedirect',
-        defaultMessage:
-          'Order processed successfully. Redirecting you to {domain}...',
+        defaultMessage: 'Order processed successfully. Redirecting you to {domain}...',
       },
       'order.error': {
         id: 'tier.order.error',
-        defaultMessage:
-          "An error occured 😳. The order didn't go through. Please try again in a few.",
+        defaultMessage: "An error occured 😳. The order didn't go through. Please try again in a few.",
       },
       'tier.donation.button': {
         id: 'tier.donation.button',
@@ -195,16 +193,12 @@ class CreateOrderPage extends React.Component {
           loading: false,
           order,
           result: {
-            success: intl.formatMessage(
-              this.messages['order.successRedirect'],
-              { domain },
-            ),
+            success: intl.formatMessage(this.messages['order.successRedirect'], { domain }),
           },
         });
-        const redirectTo = `${redirect}?transactionid=${get(
-          orderCreated,
-          'transactions[0].id',
-        )}&status=${orderCreated.status}`;
+        const redirectTo = `${redirect}?transactionid=${get(orderCreated, 'transactions[0].id')}&status=${
+          orderCreated.status
+        }`;
         window.location.href = redirectTo;
       } else {
         await Router.pushRoute('collective', {
@@ -257,17 +251,13 @@ class CreateOrderPage extends React.Component {
     }
 
     tier = tier || {
-      name: intl.formatMessage(
-        this.messages[`${this.defaultType.toLowerCase()}.title`],
-      ),
+      name: intl.formatMessage(this.messages[`${this.defaultType.toLowerCase()}.title`]),
       presets: !this.order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
       type: this.defaultType,
       currency: collective.currency,
       interval: this.order.interval,
       button: intl.formatMessage(this.messages['tier.donation.button']),
-      description:
-        description ||
-        intl.formatMessage(this.messages['tier.donation.description']),
+      description: description || intl.formatMessage(this.messages['tier.donation.description']),
     };
 
     this.order.tier = tier;
@@ -320,9 +310,7 @@ class CreateOrderPage extends React.Component {
               <div className="col-sm-2" />
               <div className="col-sm-10">
                 <div className="success">{this.state.result.success}</div>
-                {this.state.result.error && (
-                  <div className="error">{this.state.result.error}</div>
-                )}
+                {this.state.result.error && <div className="error">{this.state.result.error}</div>}
               </div>
             </div>
           </div>
@@ -411,6 +399,4 @@ const addData = graphql(gql`
   }
 `);
 
-export default withData(
-  withIntl(withLoggedInUser(addData(addCreateOrderMutation(CreateOrderPage)))),
-);
+export default withData(withIntl(withLoggedInUser(addData(addCreateOrderMutation(CreateOrderPage)))));

@@ -24,8 +24,7 @@ const getStripeToken = (type = 'cc', data) => {
   const TEST_ENVIRONMENT =
     typeof window !== 'undefined' &&
     window.location.search.match(/test=e2e/) &&
-    (window.location.hostname === 'staging.opencollective.com' ||
-      window.location.hostname === 'localhost');
+    (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost');
   if (TEST_ENVIRONMENT) {
     return Promise.resolve({
       token: 'tok_bypassPending',

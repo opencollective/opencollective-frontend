@@ -64,8 +64,7 @@ class Update extends React.Component {
   }
 
   async deleteUpdate() {
-    if (!confirm('😱 Are you really sure you want to delete this update?'))
-      return;
+    if (!confirm('😱 Are you really sure you want to delete this update?')) return;
 
     try {
       await this.props.deleteUpdate(this.props.update.id);
@@ -92,12 +91,8 @@ class Update extends React.Component {
 
     const { mode } = this.state;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
-    const canPublishUpdate =
-      LoggedInUser &&
-      LoggedInUser.canEditCollective(collective) &&
-      !update.publishedAt;
-    const editable =
-      !this.props.compact && this.props.editable && canEditUpdate;
+    const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
+    const editable = !this.props.compact && this.props.editable && canEditUpdate;
     return (
       <div className={`Update ${this.state.mode}View`}>
         <style jsx>
@@ -168,10 +163,7 @@ class Update extends React.Component {
           `}
         </style>
         <div className="fromCollective">
-          <a
-            href={`/${update.fromCollective.slug}`}
-            title={update.fromCollective.name}
-          >
+          <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
             <Avatar
               src={update.fromCollective.image}
               type={update.fromCollective.type}
@@ -190,9 +182,7 @@ class Update extends React.Component {
             </div>
           )}
 
-          {mode === 'details' && (
-            <div className="title">{capitalize(update.title)}</div>
-          )}
+          {mode === 'details' && <div className="title">{capitalize(update.title)}</div>}
 
           <div className="meta">
             <div className="author">
@@ -229,70 +219,46 @@ class Update extends React.Component {
               <React.Fragment>
                 <div>
                   <a className="toggleEditUpdate" onClick={this.toggleEdit}>
-                    {intl.formatMessage(
-                      this.messages[
-                        `${mode === 'edit' ? 'cancelEdit' : 'edit'}`
-                      ],
-                    )}
+                    {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
                   </a>
                 </div>
                 <div>
                   <a className="deleteUpdateUpdate" onClick={this.deleteUpdate}>
-                    <FormattedMessage
-                      id="update.delete"
-                      defaultMessage="delete"
-                    />
+                    <FormattedMessage id="update.delete" defaultMessage="delete" />
                   </a>
                 </div>
               </React.Fragment>
             )}
           </div>
 
-          {mode === 'summary' && (
-            <div
-              className="summary"
-              dangerouslySetInnerHTML={{ __html: update.summary }}
-            />
-          )}
+          {mode === 'summary' && <div className="summary" dangerouslySetInnerHTML={{ __html: update.summary }} />}
 
-          {mode === 'details' &&
-            !this.props.compact && (
-              <div>
-                {update.html && (
-                  <div dangerouslySetInnerHTML={{ __html: update.html }} />
-                )}
-                {!update.html && <UpdateTextWithData id={update.id} />}
-                {update.publishedAt && (
-                  <Link
-                    route={`/${collective.slug}/updates`}
-                    className="viewLatestUpdates"
-                  >
-                    {intl.formatMessage(this.messages['viewLatestUpdates'])}
-                  </Link>
-                )}
-              </div>
-            )}
+          {mode === 'details' && !this.props.compact && (
+            <div>
+              {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
+              {!update.html && <UpdateTextWithData id={update.id} />}
+              {update.publishedAt && (
+                <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
+                  {intl.formatMessage(this.messages['viewLatestUpdates'])}
+                </Link>
+              )}
+            </div>
+          )}
 
           {mode === 'edit' && (
             <div className="edit">
-              <EditUpdateForm
-                collective={collective}
-                update={update}
-                onSubmit={this.save}
-              />
+              <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
             </div>
           )}
 
           {mode !== 'summary' && (
             <div className="actions">
-              {mode === 'edit' &&
-                this.state.modified && (
-                  <SmallButton className="primary save" onClick={this.save}>
-                    <FormattedMessage id="save" defaultMessage="save" />
-                  </SmallButton>
-                )}
-              {mode === 'details' &&
-                canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
+              {mode === 'edit' && this.state.modified && (
+                <SmallButton className="primary save" onClick={this.save}>
+                  <FormattedMessage id="save" defaultMessage="save" />
+                </SmallButton>
+              )}
+              {mode === 'details' && canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
             </div>
           )}
         </div>

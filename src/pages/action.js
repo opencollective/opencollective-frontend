@@ -33,10 +33,7 @@ class ActionPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = { loading: true };
-    this.mutation = `${props.action}${capitalize(props.table).replace(
-      /s$/,
-      '',
-    )}`;
+    this.mutation = `${props.action}${capitalize(props.table).replace(/s$/, '')}`;
   }
 
   async componentDidMount() {
@@ -59,39 +56,20 @@ class ActionPage extends React.Component {
 
     return (
       <div className="ActionPage">
-        <Header
-          title={action}
-          className={this.state.loading ? 'loading' : ''}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header title={action} className={this.state.loading ? 'loading' : ''} LoggedInUser={LoggedInUser} />
 
         <Body>
           <div className="content">
-            {loading &&
-              this.mutation === 'approveCollective' && (
-                <FormattedMessage
-                  id="actions.approveCollective.processing"
-                  defaultMessage="Approving collective"
-                />
-              )}
-            {loading &&
-              this.mutation === 'approveExpense' && (
-                <FormattedMessage
-                  id="actions.approveExpense.processing"
-                  defaultMessage="Approving expense"
-                />
-              )}
-            {loading &&
-              this.mutation === 'rejectExpense' && (
-                <FormattedMessage
-                  id="actions.rejectExpense.processing"
-                  defaultMessage="Rejecting expense"
-                />
-              )}
-            {!loading &&
-              !this.state.error && (
-                <FormattedMessage id="actions.done" defaultMessage="done " />
-              )}
+            {loading && this.mutation === 'approveCollective' && (
+              <FormattedMessage id="actions.approveCollective.processing" defaultMessage="Approving collective" />
+            )}
+            {loading && this.mutation === 'approveExpense' && (
+              <FormattedMessage id="actions.approveExpense.processing" defaultMessage="Approving expense" />
+            )}
+            {loading && this.mutation === 'rejectExpense' && (
+              <FormattedMessage id="actions.rejectExpense.processing" defaultMessage="Rejecting expense" />
+            )}
+            {!loading && !this.state.error && <FormattedMessage id="actions.done" defaultMessage="done " />}
             {this.state.error && (
               <div className="error">
                 <h2>
@@ -129,9 +107,6 @@ const addMutationForAction = action =>
   });
 
 const actions = ['approveCollective', 'approveExpense', 'rejectExpense'];
-const addMutations = compose.apply(
-  this,
-  actions.map(action => addMutationForAction(action)),
-);
+const addMutations = compose.apply(this, actions.map(action => addMutationForAction(action)));
 
 export default withData(withIntl(withLoggedInUser(addMutations(ActionPage))));

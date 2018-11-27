@@ -84,10 +84,7 @@ class TopBarProfileMenu extends React.Component {
     });
     const pendingExpenses = get(collective, 'stats.expenses.pending');
     if (pendingExpenses > 0) {
-      str += ` - ${intl.formatMessage(
-        this.messages['tooltip.pendingExpenses'],
-        { n: pendingExpenses },
-      )}`;
+      str += ` - ${intl.formatMessage(this.messages['tooltip.pendingExpenses'], { n: pendingExpenses })}`;
     }
     return str;
   }
@@ -107,31 +104,17 @@ class TopBarProfileMenu extends React.Component {
       }
     };
     const collectives = uniqBy(
-      [
-        ...LoggedInUser.memberOf.filter(
-          m => m.collective.type === 'COLLECTIVE',
-        ),
-      ],
+      [...LoggedInUser.memberOf.filter(m => m.collective.type === 'COLLECTIVE')],
       m => m.collective.id,
     ).sort((a, b) => {
-      return `${score(a)}-${a.collective.slug}` >
-        `${score(b)}-${b.collective.slug}`
-        ? 1
-        : -1;
+      return `${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}` ? 1 : -1;
     }); // order by role then az
 
     const orgs = uniqBy(
-      [
-        ...LoggedInUser.memberOf.filter(
-          m => m.collective.type === 'ORGANIZATION',
-        ),
-      ],
+      [...LoggedInUser.memberOf.filter(m => m.collective.type === 'ORGANIZATION')],
       m => m.collective.id,
     ).sort((a, b) => {
-      return `${score(a)}-${a.collective.slug}` >
-        `${score(b)}-${b.collective.slug}`
-        ? 1
-        : -1;
+      return `${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}` ? 1 : -1;
     }); // order by role then az
 
     return (
@@ -160,33 +143,18 @@ class TopBarProfileMenu extends React.Component {
               textTransform="uppercase"
               whiteSpace="nowrap"
             >
-              <FormattedMessage
-                id="collective"
-                defaultMessage="my collectives"
-              />
+              <FormattedMessage id="collective" defaultMessage="my collectives" />
             </P>
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/create" passHref>
-              <StyledLink
-                buttonStyle="standard"
-                buttonSize="small"
-                display="inline-block"
-                ml={2}
-                whiteSpace="nowrap"
-              >
+              <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
                 + New
               </StyledLink>
             </Link>
           </Flex>
           <Box is="ul" p={0} my={2}>
             {collectives.map(membership => (
-              <ListItem
-                py={1}
-                key={`LoggedInMenu-Collective-${get(
-                  membership,
-                  'collective.slug',
-                )}`}
-              >
+              <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
                 <Link route={`/${get(membership, 'collective.slug')}`} passHref>
                   <StyledLink
                     title={this.tooltip(membership)}
@@ -197,10 +165,7 @@ class TopBarProfileMenu extends React.Component {
                   >
                     <Flex alignItems="center">
                       <Avatar
-                        src={get(
-                          membership,
-                          'collective.image',
-                        )}
+                        src={get(membership, 'collective.image')}
                         type={get(membership, 'collective.type')}
                         name={get(membership, 'collective.name')}
                         radius="2.8rem"
@@ -211,9 +176,7 @@ class TopBarProfileMenu extends React.Component {
                   </StyledLink>
                 </Link>
                 {get(membership, 'collective.stats.expenses.pending') > 0 && (
-                  <Badge>
-                    {get(membership, 'collective.stats.expenses.pending')}
-                  </Badge>
+                  <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge>
                 )}
               </ListItem>
             ))}
@@ -230,33 +193,18 @@ class TopBarProfileMenu extends React.Component {
               textTransform="uppercase"
               whiteSpace="nowrap"
             >
-              <FormattedMessage
-                id="organization"
-                defaultMessage="my organizations"
-              />
+              <FormattedMessage id="organization" defaultMessage="my organizations" />
             </P>
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/organizations/new" passHref>
-              <StyledLink
-                buttonStyle="standard"
-                buttonSize="small"
-                display="inline-block"
-                ml={2}
-                whiteSpace="nowrap"
-              >
+              <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
                 + New
               </StyledLink>
             </Link>
           </Flex>
           <Box is="ul" p={0} my={2}>
             {orgs.map(membership => (
-              <ListItem
-                py={1}
-                key={`LoggedInMenu-Collective-${get(
-                  membership,
-                  'collective.slug',
-                )}`}
-              >
+              <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
                 <Link route={`/${get(membership, 'collective.slug')}`} passHref>
                   <StyledLink
                     title={this.tooltip(membership)}
@@ -267,10 +215,7 @@ class TopBarProfileMenu extends React.Component {
                   >
                     <Flex alignItems="center">
                       <Avatar
-                        src={get(
-                          membership,
-                          'collective.image',
-                        )}
+                        src={get(membership, 'collective.image')}
                         type={get(membership, 'collective.type')}
                         name={get(membership, 'collective.name')}
                         radius="2.8rem"
@@ -281,9 +226,7 @@ class TopBarProfileMenu extends React.Component {
                   </StyledLink>
                 </Link>
                 {get(membership, 'collective.stats.expenses.pending') > 0 && (
-                  <Badge>
-                    {get(membership, 'collective.stats.expenses.pending')}
-                  </Badge>
+                  <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge>
                 )}
               </ListItem>
             ))}
@@ -310,82 +253,35 @@ class TopBarProfileMenu extends React.Component {
           </P>
           <Box is="ul" p={0} my={2}>
             <ListItem py={1}>
-              <Link
-                route="collective"
-                params={{ slug: LoggedInUser.username }}
-                passHref
-              >
-                <StyledLink
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                >
-                  <FormattedMessage
-                    id="menu.profile"
-                    defaultMessage="Profile"
-                  />
+              <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                 </StyledLink>
               </Link>
             </ListItem>
             <ListItem py={1}>
-              <Link
-                route="subscriptions"
-                params={{ collectiveSlug: LoggedInUser.username }}
-                passHref
-              >
-                <StyledLink
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                >
-                  <FormattedMessage
-                    id="menu.subscriptions"
-                    defaultMessage="Subscriptions"
-                  />
+              <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" />
                 </StyledLink>
               </Link>
             </ListItem>
             <ListItem py={1}>
-              <Link
-                route="transactions"
-                params={{ collectiveSlug: LoggedInUser.username }}
-                passHref
-              >
-                <StyledLink
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                >
-                  {capitalize(
-                    intl.formatMessage(this.messages['menu.transactions']),
-                  )}
+              <Link route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
                 </StyledLink>
               </Link>
             </ListItem>
             <ListItem py={1}>
-              <Link
-                route="applications"
-                params={{ collectiveSlug: LoggedInUser.username }}
-                passHref
-              >
-                <StyledLink
-                  color="#494D52"
-                  fontSize="1.2rem"
-                  fontFamily="montserratlight, arial"
-                >
-                  {capitalize(
-                    intl.formatMessage(this.messages['menu.applications']),
-                  )}
+              <Link route="applications" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                  {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                 </StyledLink>
               </Link>
             </ListItem>
             <ListItem py={1}>
-              <StyledLink
-                color="#494D52"
-                fontSize="1.2rem"
-                fontFamily="montserratlight, arial"
-                onClick={this.logout}
-              >
+              <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" onClick={this.logout}>
                 <FormattedMessage id="menu.logout" defaultMessage="Log out" />
               </StyledLink>
             </ListItem>
@@ -455,26 +351,14 @@ class TopBarProfileMenu extends React.Component {
     return (
       <div className="LoginTopBarProfileButton">
         {status === 'loading' && (
-          <P
-            color="#D5DAE0"
-            fontSize="1.4rem"
-            px={3}
-            py={2}
-            display="inline-block"
-          >
+          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />
             &hellip;
           </P>
         )}
 
         {status === 'loggingout' && (
-          <P
-            color="#D5DAE0"
-            fontSize="1.4rem"
-            px={3}
-            py={2}
-            display="inline-block"
-          >
+          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loggingout" defaultMessage="logging out" />
             &hellip;
           </P>

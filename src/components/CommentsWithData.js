@@ -38,11 +38,7 @@ class CommentsWithData extends React.Component {
     try {
       res = await this.props.createComment(CommentInputType);
     } catch (e) {
-      console.error(
-        '>>> error while trying to create the comment',
-        CommentInputType,
-        e,
-      );
+      console.error('>>> error while trying to create the comment', CommentInputType, e);
     }
     return res;
   }
@@ -53,10 +49,7 @@ class CommentsWithData extends React.Component {
         <div>
           <hr />
           <LoginBtn>
-            <FormattedMessage
-              id="comment.login"
-              defaultMessage="Login to comment"
-            />
+            <FormattedMessage id="comment.login" defaultMessage="Login to comment" />
           </LoginBtn>
         </div>
       );
@@ -70,13 +63,7 @@ class CommentsWithData extends React.Component {
           />
         </div>
       );
-    return (
-      <CommentForm
-        onSubmit={this.createComment}
-        LoggedInUser={LoggedInUser}
-        notice={notice}
-      />
-    );
+    return <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} notice={notice} />;
   }
 
   render() {
@@ -93,17 +80,11 @@ class CommentsWithData extends React.Component {
       notice = (
         <FormattedMessage
           id="comment.post.to.author"
-          defaultMessage={
-            'Note: Your comment will be public and we will notify the person who submitted the expense'
-          }
+          defaultMessage={'Note: Your comment will be public and we will notify the person who submitted the expense'}
         />
       );
     }
-    if (
-      LoggedInUser &&
-      LoggedInUser.id === get(expense, 'user.id') &&
-      expense.status === 'APPROVED'
-    ) {
+    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status === 'APPROVED') {
       notice = (
         <FormattedMessage
           id="comment.post.to.host"
@@ -113,17 +94,11 @@ class CommentsWithData extends React.Component {
         />
       );
     }
-    if (
-      LoggedInUser &&
-      LoggedInUser.id === get(expense, 'user.id') &&
-      expense.status !== 'APPROVED'
-    ) {
+    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status !== 'APPROVED') {
       notice = (
         <FormattedMessage
           id="comment.post.to.collective"
-          defaultMessage={
-            'Note: Your comment will be public and we will notify the administrators of this collective'
-          }
+          defaultMessage={'Note: Your comment will be public and we will notify the administrators of this collective'}
         />
       );
     }
@@ -207,10 +182,7 @@ export const addCommentsData = graphql(getCommentsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allComments: [
-              ...previousResult.allComments,
-              ...fetchMoreResult.allComments,
-            ],
+            allComments: [...previousResult.allComments, ...fetchMoreResult.allComments],
           });
         },
       });

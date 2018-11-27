@@ -26,9 +26,4 @@ const getRecaptcha = async () => {
   return window.grecaptcha;
 };
 
-export {
-  getRecaptchaScriptUrl,
-  loadRecaptcha,
-  getRecaptcha,
-  getRecaptchaSiteKey,
-};
+export { getRecaptchaScriptUrl, loadRecaptcha, getRecaptcha, getRecaptchaSiteKey };

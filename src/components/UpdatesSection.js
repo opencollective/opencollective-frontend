@@ -22,24 +22,14 @@ class UpdatesSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/updates/new`,
-        label: (
-          <FormattedMessage
-            id="sections.update.new"
-            defaultMessage="Create an Update"
-          />
-        ),
+        label: <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />,
       };
     }
 
     return (
       <section id="updates">
         <SectionTitle section="updates" action={action} />
-        <UpdatesWithData
-          collective={collective}
-          compact={true}
-          limit={3}
-          LoggedInUser={LoggedInUser}
-        />
+        <UpdatesWithData collective={collective} compact={true} limit={3} LoggedInUser={LoggedInUser} />
       </section>
     );
   }

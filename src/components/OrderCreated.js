@@ -25,8 +25,7 @@ class OrderCreated extends React.Component {
     this.messages = defineMessages({
       tweet: {
         id: 'order.created.tweet',
-        defaultMessage:
-          "I've just donated {amount} to {collective}. Consider donating too, every little helps!",
+        defaultMessage: "I've just donated {amount} to {collective}. Consider donating too, every little helps!",
       },
       'tweet.event': {
         id: 'order.created.tweet.event',
@@ -36,9 +35,7 @@ class OrderCreated extends React.Component {
     if (collective) {
       let tweetId = 'tweet';
       const values = {
-        collective: collective.twitterHandle
-          ? `@${collective.twitterHandle}`
-          : collective.name,
+        collective: collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name,
         amount: formatCurrency(totalAmount, collective.currency, {
           precision: 0,
         }),
@@ -48,23 +45,17 @@ class OrderCreated extends React.Component {
         values.event = collective.name;
       }
       const tweetText = intl.formatMessage(this.messages[tweetId], values);
-      const url = `https://opencollective.com${collective.path}?referral=${
-        fromCollective.id
-      }`;
-      this.tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        tweetText,
-      )}&url=${encodeURIComponent(url)}`;
-      this.fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      const url = `https://opencollective.com${collective.path}?referral=${fromCollective.id}`;
+      this.tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(
         url,
       )}`;
+      this.fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
     }
   }
 
   open(url, w = 500, h = 300) {
-    const dualScreenLeft =
-      window.screenLeft != undefined ? window.screenLeft : screen.left;
-    const dualScreenTop =
-      window.screenTop != undefined ? window.screenTop : screen.top;
+    const dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+    const dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
 
     const width = window.innerWidth
       ? window.innerWidth
@@ -79,11 +70,7 @@ class OrderCreated extends React.Component {
 
     const left = width / 2 - w / 2 + dualScreenLeft;
     const top = height / 2 - h / 2 + dualScreenTop;
-    const newWindow = window.open(
-      url,
-      'share',
-      `scrollbars=yes, width=${w}, height=${h}, top=${top}, left=${left}`,
-    );
+    const newWindow = window.open(url, 'share', `scrollbars=yes, width=${w}, height=${h}, top=${top}, left=${left}`);
 
     // Puts focus on the newWindow
     if (window.focus) {
@@ -162,9 +149,7 @@ class OrderCreated extends React.Component {
         </style>
 
         <div className="content">
-          {collective && (
-            <CollectiveCard collective={collective} membership={membership} />
-          )}
+          {collective && <CollectiveCard collective={collective} membership={membership} />}
 
           <div className="message">
             <p className="thankyou">
@@ -226,14 +211,8 @@ class OrderCreated extends React.Component {
                     defaultMessage="Share this URL:"
                   />
                   <br />
-                  <a
-                    href={`https://opencollective.com${
-                      collective.path
-                    }?referral=${fromCollective.id}`}
-                  >
-                    {`https://opencollective.com${collective.path}?referral=${
-                      fromCollective.id
-                    }`}
+                  <a href={`https://opencollective.com${collective.path}?referral=${fromCollective.id}`}>
+                    {`https://opencollective.com${collective.path}?referral=${fromCollective.id}`}
                   </a>
                   <br />
                   {collectiveType === 'COLLECTIVE' && (

@@ -40,8 +40,7 @@ class HostDashboard extends React.Component {
     const { LoggedInUser, data } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
-    if (!data.Collective.isHost)
-      return <ErrorPage message="collective.is.not.host" />;
+    if (!data.Collective.isHost) return <ErrorPage message="collective.is.not.host" />;
 
     const host = data.Collective;
     const selectedCollective = this.state.selectedCollective || host;
@@ -120,9 +119,7 @@ class HostDashboard extends React.Component {
             <CollectivePicker
               host={host}
               LoggedInUser={LoggedInUser}
-              onChange={selectedCollective =>
-                this.pickCollective(selectedCollective)
-              }
+              onChange={selectedCollective => this.pickCollective(selectedCollective)}
             />
           )}
 
@@ -181,11 +178,7 @@ class HostDashboard extends React.Component {
 }
 
 const getDataQuery = gql`
-  query Collective(
-    $hostCollectiveSlug: String
-    $orderBy: CollectiveOrderField
-    $orderDirection: OrderDirection
-  ) {
+  query Collective($hostCollectiveSlug: String, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
     Collective(slug: $hostCollectiveSlug) {
       id
       slug
@@ -255,10 +248,7 @@ export const addData = graphql(getDataQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allCollectives: [
-              ...previousResult.allCollectives,
-              ...fetchMoreResult.allCollectives,
-            ],
+            allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives],
           });
         },
       });

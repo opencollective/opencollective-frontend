@@ -36,21 +36,16 @@ class Location extends React.Component {
           {this.props.showTitle && <h1>Location</h1>}
           <div className="name">{name}</div>
           <div className="address" style={{ color: colors.darkgray }}>
-            <a
-              href={`http://maps.apple.com/?q=${lat},${long}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank" rel="noopener noreferrer">
               {address}
             </a>
           </div>
         </div>
-        {lat &&
-          long && (
-            <div className="map">
-              <Map lat={lat} long={long} />
-            </div>
-          )}
+        {lat && long && (
+          <div className="map">
+            <Map lat={lat} long={long} />
+          </div>
+        )}
       </section>
     );
   }

@@ -41,8 +41,7 @@ class SignInUp extends React.Component {
       },
       'description.help': {
         id: 'signinup.description.description',
-        defaultMessage:
-          'Present yourself in 60 characters or less, if you can!',
+        defaultMessage: 'Present yourself in 60 characters or less, if you can!',
       },
       'twitterHandle.label': {
         id: 'signinup.twitterHandle.label',
@@ -82,26 +81,17 @@ class SignInUp extends React.Component {
 
     return (
       <div className="field" key={field.name}>
-        {this.props.showLabels &&
-          this.messages[`${field.name}.label`] && (
-            <label>
-              {`${capitalize(
-                intl.formatMessage(this.messages[`${field.name}.label`]),
-              )}:`}
-            </label>
-          )}
+        {this.props.showLabels && this.messages[`${field.name}.label`] && (
+          <label>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</label>
+        )}
         <input
           type="text"
           ref={ref => (this.nodes[field.name] = ref)}
           placeholder={field.placeholder}
-          onChange={event =>
-            debouncedHandleEvent(field.name, event.target.value)
-          }
+          onChange={event => debouncedHandleEvent(field.name, event.target.value)}
         />
         {this.messages[`${field.name}.help`] && (
-          <span className="description">
-            {intl.formatMessage(this.messages[`${field.name}.help`])}
-          </span>
+          <span className="description">{intl.formatMessage(this.messages[`${field.name}.help`])}</span>
         )}
       </div>
     );
@@ -127,9 +117,7 @@ class SignInUp extends React.Component {
   render() {
     const { description } = this.props;
 
-    const isFormValid =
-      isValidEmail(this.state.user.email) &&
-      (!this.props.requireCreditCard || this.state.user.card);
+    const isFormValid = isValidEmail(this.state.user.email) && (!this.props.requireCreditCard || this.state.user.card);
     const isLoading = this.state.loading;
 
     const submitBtnLabel = isLoading ? 'loading' : this.props.label;
@@ -169,11 +157,7 @@ class SignInUp extends React.Component {
             placeholder: 'youare@wesome.com',
             description,
           })}
-          {!this.props.emailOnly && (
-            <div className="signup">
-              {this.fields.map(this.renderInputField)}
-            </div>
-          )}
+          {!this.props.emailOnly && <div className="signup">{this.fields.map(this.renderInputField)}</div>}
 
           <div id="actions" className="actions">
             <Button

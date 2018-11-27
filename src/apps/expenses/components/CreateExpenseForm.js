@@ -29,8 +29,7 @@ class CreateExpenseForm extends React.Component {
     this.messages = defineMessages({
       paypal: {
         id: 'expense.payoutMethod.paypal',
-        defaultMessage:
-          'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})',
+        defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})',
       },
       'newExpense.paypal.label': {
         id: 'newExpense.paypal.label',
@@ -54,13 +53,11 @@ class CreateExpenseForm extends React.Component {
       },
       'error.privateMessageMissing': {
         id: 'expense.error.privateMessageMissing',
-        defaultMessage:
-          "Please provide instructions on how you'd like to be reimbursed as a private note",
+        defaultMessage: "Please provide instructions on how you'd like to be reimbursed as a private note",
       },
       'error.paypalEmailMissing': {
         id: 'expense.error.paypalEmailMissing',
-        defaultMessage:
-          'Please provide your PayPal email address (or change the payout method)',
+        defaultMessage: 'Please provide your PayPal email address (or change the payout method)',
       },
       'error.attachmentMissing': {
         id: 'expense.error.attachmentMissing',
@@ -77,8 +74,7 @@ class CreateExpenseForm extends React.Component {
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
         payoutMethod: 'paypal',
-        paypalEmail:
-          (props.LoggedInUser && props.LoggedInUser.paypalEmail) || null,
+        paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || null,
       },
       isExpenseValid: false,
       loading: false,
@@ -144,11 +140,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(newProps) {
-    if (
-      !this.props.LoggedInUser &&
-      newProps.LoggedInUser &&
-      !this.state.expense.paypalEmail
-    ) {
+    if (!this.props.LoggedInUser && newProps.LoggedInUser && !this.state.expense.paypalEmail) {
       this.handleChange('paypalEmail', newProps.LoggedInUser.paypalEmail);
     }
   }
@@ -177,9 +169,7 @@ class CreateExpenseForm extends React.Component {
     const { expense } = this.state;
 
     const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], {
-      paypalEmail:
-        get(expense, 'user.paypalEmail') ||
-        intl.formatMessage(this.messages['newExpense.paypal.label']),
+      paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']),
     });
 
     return (
@@ -308,48 +298,29 @@ class CreateExpenseForm extends React.Component {
         </style>
 
         <form onSubmit={this.onSubmit}>
-          {!collective.expensePolicy &&
-            LoggedInUser &&
-            LoggedInUser.canEditCollective(collective) && (
-              <div className="expensePolicy">
-                <h2>
-                  <FormattedMessage
-                    id="collective.expensePolicy.label"
-                    defaultMessage="Expense policy"
-                  />
-                </h2>
-                <p>
-                  <FormattedMessage
-                    id="collective.expensePolicy.description"
-                    defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense."
-                  />
-                </p>
-                <Button
-                  className="blue"
-                  href={`/${collective.slug}/edit#expenses`}
-                >
-                  <FormattedMessage
-                    id="expense.expensePolicy.add"
-                    defaultMessage="add an expense policy"
-                  />
-                </Button>
-              </div>
-            )}
-          {(collective.expensePolicy ||
-            get(collective, 'host.expensePolicy')) && (
+          {!collective.expensePolicy && LoggedInUser && LoggedInUser.canEditCollective(collective) && (
             <div className="expensePolicy">
               <h2>
-                <FormattedMessage
-                  id="expense.expensePolicy"
-                  defaultMessage="Expense policy"
-                />
+                <FormattedMessage id="collective.expensePolicy.label" defaultMessage="Expense policy" />
               </h2>
-              {collective.expensePolicy && (
-                <Markdown source={collective.expensePolicy} />
-              )}
-              {get(collective, 'host.expensePolicy') && (
-                <Markdown source={get(collective, 'host.expensePolicy')} />
-              )}
+              <p>
+                <FormattedMessage
+                  id="collective.expensePolicy.description"
+                  defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense."
+                />
+              </p>
+              <Button className="blue" href={`/${collective.slug}/edit#expenses`}>
+                <FormattedMessage id="expense.expensePolicy.add" defaultMessage="add an expense policy" />
+              </Button>
+            </div>
+          )}
+          {(collective.expensePolicy || get(collective, 'host.expensePolicy')) && (
+            <div className="expensePolicy">
+              <h2>
+                <FormattedMessage id="expense.expensePolicy" defaultMessage="Expense policy" />
+              </h2>
+              {collective.expensePolicy && <Markdown source={collective.expensePolicy} />}
+              {get(collective, 'host.expensePolicy') && <Markdown source={get(collective, 'host.expensePolicy')} />}
             </div>
           )}
           <div className="disclaimer">
@@ -369,9 +340,7 @@ class CreateExpenseForm extends React.Component {
                 options={{ accept: 'image/jpeg, image/png, application/pdf' }}
                 name="attachment"
                 className="attachmentField"
-                onChange={attachment =>
-                  this.handleChange('attachment', attachment)
-                }
+                onChange={attachment => this.handleChange('attachment', attachment)}
                 defaultValue={expense.attachment}
                 placeholder={'/static/images/receipt.svg'}
                 description={
@@ -388,10 +357,7 @@ class CreateExpenseForm extends React.Component {
             <div className="row">
               <div className="col large">
                 <label>
-                  <FormattedMessage
-                    id="expense.description"
-                    defaultMessage="description"
-                  />
+                  <FormattedMessage id="expense.description" defaultMessage="description" />
                 </label>
                 <div className="description">
                   <span className="description">
@@ -401,9 +367,7 @@ class CreateExpenseForm extends React.Component {
                       defaultValue={expense.description}
                       className="descriptionField"
                       maxLength={255}
-                      onChange={description =>
-                        this.handleChange('description', description)
-                      }
+                      onChange={description => this.handleChange('description', description)}
                     />
                   </span>
                 </div>
@@ -430,10 +394,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col incurredAt">
               <label>
-                <FormattedMessage
-                  id="expense.incurredAt"
-                  defaultMessage="Date"
-                />
+                <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
               </label>
               <div className="incurredAt">
                 <span className="incurredAt">
@@ -442,9 +403,7 @@ class CreateExpenseForm extends React.Component {
                     type="date"
                     name="incurredAt"
                     className="incurredAtField"
-                    onChange={incurredAt =>
-                      this.handleChange('incurredAt', incurredAt)
-                    }
+                    onChange={incurredAt => this.handleChange('incurredAt', incurredAt)}
                   />
                 </span>
               </div>
@@ -452,10 +411,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage
-                  id="expense.category"
-                  defaultMessage="category"
-                />
+                <FormattedMessage id="expense.category" defaultMessage="category" />
               </label>
               <div className="category">
                 <span className="category">
@@ -465,9 +421,7 @@ class CreateExpenseForm extends React.Component {
                     defaultValue={expense.category}
                     name="category"
                     className="categoryField"
-                    onChange={category =>
-                      this.handleChange('category', category)
-                    }
+                    onChange={category => this.handleChange('category', category)}
                   />
                 </span>
               </div>
@@ -475,55 +429,40 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage
-                  id="expense.payoutMethod"
-                  defaultMessage="payout method"
-                />
+                <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
               </label>
               <InputField
                 type="select"
                 name="payoutMethod"
                 options={payoutMethods}
                 defaultValue={expense.payoutMethod}
-                onChange={payoutMethod =>
-                  this.handleChange('payoutMethod', payoutMethod)
-                }
+                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
               />
             </div>
 
             {this.state.expense.payoutMethod === 'paypal' && (
               <div className="col emailInput">
                 <label>
-                  <FormattedMessage
-                    id="expense.payoutMethod.paypal.label"
-                    defaultMessage="PayPal address"
-                  />
+                  <FormattedMessage id="expense.payoutMethod.paypal.label" defaultMessage="PayPal address" />
                 </label>
                 <InputField
                   type="email"
                   name="paypalEmail"
                   key={`paypalEmail-${get(LoggedInUser, 'id')}`}
                   defaultValue={this.state.expense.paypalEmail}
-                  onChange={paypalEmail =>
-                    this.handleChange('paypalEmail', paypalEmail)
-                  }
+                  onChange={paypalEmail => this.handleChange('paypalEmail', paypalEmail)}
                 />
               </div>
             )}
 
             <div className="col privateMessage">
               <label>
-                <FormattedMessage
-                  id="expense.privateMessage"
-                  defaultMessage="Private instructions"
-                />
+                <FormattedMessage id="expense.privateMessage" defaultMessage="Private instructions" />
               </label>
               <InputField
                 type="textarea"
                 name="privateMessage"
-                onChange={privateMessage =>
-                  this.handleChange('privateMessage', privateMessage)
-                }
+                onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
                 defaultValue={expense.privateMessage}
                 description={
                   <FormattedMessage
@@ -536,29 +475,13 @@ class CreateExpenseForm extends React.Component {
 
             <div className="row">
               <div>
-                <Button
-                  className="blue"
-                  type="submit"
-                  disabled={this.state.loading || !this.state.isExpenseValid}
-                >
-                  {this.state.loading && (
-                    <FormattedMessage
-                      id="form.processing"
-                      defaultMessage="processing"
-                    />
-                  )}
-                  {!this.state.loading && (
-                    <FormattedMessage
-                      id="expense.new.submit"
-                      defaultMessage="Submit Expense"
-                    />
-                  )}
+                <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
+                  {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+                  {!this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />}
                 </Button>
               </div>
 
-              {this.state.error && (
-                <div className="error">{this.state.error}</div>
-              )}
+              {this.state.error && <div className="error">{this.state.error}</div>}
             </div>
           </div>
         </form>
@@ -573,10 +496,7 @@ class CreateExpenseForm extends React.Component {
       return (
         <div className="CreateExpenseForm">
           <p>
-            <FormattedMessage
-              id="expenses.create.login"
-              defaultMessage="Sign up or login to submit an expense."
-            />
+            <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
           </p>
           <SignInForm next={`/${collective.slug}/expenses/new`} />
         </div>

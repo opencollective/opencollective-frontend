@@ -39,14 +39,12 @@ const carouselContent = [
   {
     image: '/static/images/home-slide-01.svg',
     heading: 'Raise money online with recurring subscriptions.',
-    details:
-      'Connect with the Open Collective community and raise the funds required to sustain your community.',
+    details: 'Connect with the Open Collective community and raise the funds required to sustain your community.',
   },
   {
     image: '/static/images/home-slide-02.svg',
     heading: 'All are welcome to join & contribute.',
-    details:
-      'Everyone can contribute to your open collective. All you need is for people to believe in your mission.',
+    details: 'Everyone can contribute to your open collective. All you need is for people to believe in your mission.',
   },
   {
     image: '/static/images/home-slide-03.svg',
@@ -57,8 +55,7 @@ const carouselContent = [
   {
     image: '/static/images/home-slide-04.svg',
     heading: 'A bottom - up group where anyone can become a core contributor.',
-    details:
-      'The mission is what persists and unites you with your community. Leaders can change over time.',
+    details: 'The mission is what persists and unites you with your community. Leaders can change over time.',
   },
 ];
 
@@ -165,9 +162,7 @@ class HomePage extends React.Component {
     this.setState({ LoggedInUser });
 
     // separate request to not block showing LoggedInUser
-    const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(
-      response => response.json(),
-    );
+    const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
     this.setState({ stats });
   }
 
@@ -193,14 +188,12 @@ class HomePage extends React.Component {
       stats: { totalAnnualBudget, totalCollectives, totalDonors },
     } = this.state;
 
-    const filteredTransactions = transactions.filter(
-      ({ type, order, category }) => {
-        if (type === 'CREDIT') {
-          return !!order;
-        }
-        return !!category;
-      },
-    );
+    const filteredTransactions = transactions.filter(({ type, order, category }) => {
+      if (type === 'CREDIT') {
+        return !!order;
+      }
+      return !!category;
+    });
 
     return (
       <Fragment>
@@ -216,36 +209,27 @@ class HomePage extends React.Component {
             px={3}
             py="5rem"
           >
-            <Container
-              alignItems="center"
-              maxWidth={1200}
-              display="flex"
-              justifyContent="space-between"
-              mx="auto"
-            >
-              <Container
-                width={[1, null, 0.6]}
-                pr={[0, null, 4]}
-              >
-                <H1 fontSize={['H3', null, 'H1']} lineHeight={['H3', null, 'H1']} fontWeight="normal" textAlign="left" mb={4}>
-                  A new form of association, <br />{' '}
-                  <strong>transparent by design.</strong>
+            <Container alignItems="center" maxWidth={1200} display="flex" justifyContent="space-between" mx="auto">
+              <Container width={[1, null, 0.6]} pr={[0, null, 4]}>
+                <H1
+                  fontSize={['H3', null, 'H1']}
+                  lineHeight={['H3', null, 'H1']}
+                  fontWeight="normal"
+                  textAlign="left"
+                  mb={4}
+                >
+                  A new form of association, <br /> <strong>transparent by design.</strong>
                 </H1>
 
                 <Container maxWidth={500}>
                   <P fontSize="LeadParagraph" lineHeight="LeadParagraph" my={3} color="black.700">
-                    The Internet generation needs organizations that reflect who
-                    we are; where anybody can contribute to a shared mission;
-                    where leaders can easily change; and where money flows in full
-                    transparency. Create an Open Collective for your community.
+                    The Internet generation needs organizations that reflect who we are; where anybody can contribute to
+                    a shared mission; where leaders can easily change; and where money flows in full transparency.
+                    Create an Open Collective for your community.
                   </P>
                 </Container>
 
-                <Flex
-                  alignItems="center"
-                  flexDirection={['column', null, 'row']}
-                  my={4}
-                >
+                <Flex alignItems="center" flexDirection={['column', null, 'row']} my={4}>
                   <StyledLink
                     href="#movement"
                     buttonStyle="primary"
@@ -258,11 +242,7 @@ class HomePage extends React.Component {
                     Join the movement
                   </StyledLink>
 
-                  <StyledLink
-                    href="/learn-more"
-                    mt={[3, null, 0]}
-                    ml={[0, null, 3]}
-                  >
+                  <StyledLink href="/learn-more" mt={[3, null, 0]} ml={[0, null, 3]}>
                     How it works &gt;
                   </StyledLink>
                 </Flex>
@@ -300,19 +280,9 @@ class HomePage extends React.Component {
                 <H5 textAlign="left">Recently created</H5>
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
-              <Container
-                display="flex"
-                flexWrap="wrap"
-                justifyContent="space-between"
-              >
+              <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {collectives.map(c => (
-                  <Container
-                    key={c.id}
-                    width={[0.5, null, 0.25]}
-                    mb={2}
-                    px={1}
-                    maxWidth={224}
-                  >
+                  <Container key={c.id} width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224}>
                     <CollectiveStatsCard {...c} />
                   </Container>
                 ))}
@@ -324,19 +294,9 @@ class HomePage extends React.Component {
                 <H5 textAlign="left">Most active</H5>
                 <StyledLink href="/discover">See all &gt;</StyledLink>
               </Flex>
-              <Container
-                display="flex"
-                flexWrap="wrap"
-                justifyContent="space-between"
-              >
+              <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {topSpenders.map(c => (
-                  <Container
-                    width={[0.5, null, 0.25]}
-                    mb={2}
-                    px={1}
-                    maxWidth={224}
-                    key={c.id}
-                  >
+                  <Container width={[0.5, null, 0.25]} mb={2} px={1} maxWidth={224} key={c.id}>
                     <CollectiveStatsCard {...c} />
                   </Container>
                 ))}
@@ -368,8 +328,7 @@ class HomePage extends React.Component {
                 fontSize={['H2', null, 'H1']}
                 lineHeight={['H2', null, 'H1']}
               >
-                Join the movement for a world with more open, transparent, and
-                sustainable communities.
+                Join the movement for a world with more open, transparent, and sustainable communities.
               </H1>
               <P
                 color="black.700"
@@ -379,20 +338,13 @@ class HomePage extends React.Component {
                 px={3}
                 my={[3, null, 4]}
               >
-                There are many ways to participate: create an open collective,
-                become a host, make a financial contribution, attend an event or
-                simply share the love by showing others how they can benefit
-                from operating as an open community. Here’s how:
+                There are many ways to participate: create an open collective, become a host, make a financial
+                contribution, attend an event or simply share the love by showing others how they can benefit from
+                operating as an open community. Here’s how:
               </P>
             </Container>
 
-            <Container
-              bg={['primary.500', null, 'transparent']}
-              height={2}
-              width={32}
-              mx="auto"
-              my={[5, null, 3]}
-            />
+            <Container bg={['primary.500', null, 'transparent']} height={2} width={32} mx="auto" my={[5, null, 3]} />
 
             <Container
               display="flex"
@@ -405,14 +357,12 @@ class HomePage extends React.Component {
                 <H2 {...sectionHeadingStyles}>Create an open collective</H2>
 
                 <H4 {...sectionSubHeadingStyles}>
-                  A group of people with a shared mission that operates in full
-                  transparency 👀
+                  A group of people with a shared mission that operates in full transparency 👀
                 </H4>
 
                 <P {...sectionDetailStyles}>
-                  Create an open collective for your group and leverage the
-                  power of the community to live up to your mission.{' '}
-                  <a href="/discover">Learn more.</a>
+                  Create an open collective for your group and leverage the power of the community to live up to your
+                  mission. <a href="/discover">Learn more.</a>
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -435,44 +385,30 @@ class HomePage extends React.Component {
               </Container>
             </Container>
 
-            <Container
-              bg={['primary.500', null, 'transparent']}
-              height={2}
-              width={32}
-              mx="auto"
-              my={[5]}
-            />
+            <Container bg={['primary.500', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
-            <Container
-              display="flex"
-              flexDirection={['column', null, 'row']}
-              maxWidth={1200}
-              mx="auto"
-            >
+            <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>Become a sponsor</H2>
 
-                <H4 {...sectionSubHeadingStyles}>
-                  Great companies supporting great collectives with 💙
-                </H4>
+                <H4 {...sectionSubHeadingStyles}>Great companies supporting great collectives with 💙</H4>
 
                 <P {...sectionDetailStyles}>
                   Support collectives on behalf of your organization.{' '}
                   <strong>
-                    You&apos;ll get an invoice for every financial contribution
-                    your company makes as well as a monthly report.
+                    You&apos;ll get an invoice for every financial contribution your company makes as well as a monthly
+                    report.
                   </strong>
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
-                  If you’re looking to onboard and financially support an
-                  initiative through Open Collective,{' '}
-                  <a href="mailto:info@opencollective.com">let us know</a> and
-                  we’ll gladly set them up and get them going.
+                  If you’re looking to onboard and financially support an initiative through Open Collective,{' '}
+                  <a href="mailto:info@opencollective.com">let us know</a> and we’ll gladly set them up and get them
+                  going.
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
-                    <Link route="marketing" params={{ pageSlug: 'become-a-sponsor' }} passHref>
+                  <Link route="marketing" params={{ pageSlug: 'become-a-sponsor' }} passHref>
                     <StyledLink
                       buttonStyle="primary"
                       buttonSize="large"
@@ -493,44 +429,24 @@ class HomePage extends React.Component {
                 px={[1, null, 4]}
               >
                 {sponsors.map(c => (
-                  <Container
-                    width={[0.5, null, 0.33]}
-                    mb={2}
-                    px={1}
-                    maxWidth={224}
-                    key={c.id}
-                  >
+                  <Container width={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}>
                     <HomepageSponsorCard {...c} />
                   </Container>
                 ))}
               </Container>
             </Container>
 
-            <Container
-              bg={['primary.500', null, 'transparent']}
-              height={2}
-              width={32}
-              mx="auto"
-              my={[5]}
-            />
+            <Container bg={['primary.500', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
-            <Container
-              display="flex"
-              flexDirection={['column', null, 'row']}
-              maxWidth={1200}
-              mx="auto"
-            >
+            <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container width={[1, null, 0.5]} mb={4}>
                 <H2 {...sectionHeadingStyles}>Become a backer</H2>
 
-                <H4 {...sectionSubHeadingStyles}>
-                  For those who believe in giving back
-                </H4>
+                <H4 {...sectionSubHeadingStyles}>For those who believe in giving back</H4>
 
                 <P {...sectionDetailStyles}>
-                  Join Open Collective and discover the different initiatives
-                  that need your support. Embrace the mission that drives them
-                  and contribute to their group effort.{' '}
+                  Join Open Collective and discover the different initiatives that need your support. Embrace the
+                  mission that drives them and contribute to their group effort.{' '}
                   <strong>Become part of the movement.</strong>
                 </P>
 
@@ -547,11 +463,7 @@ class HomePage extends React.Component {
                   </StyledLink>
                 </Flex>
               </Container>
-              <Container
-                width={[1, null, 0.5]}
-                overflow="hidden"
-                position="relative"
-              >
+              <Container width={[1, null, 0.5]} overflow="hidden" position="relative">
                 <Container
                   width={['100%', null, '160%']}
                   display="flex"
@@ -560,22 +472,15 @@ class HomePage extends React.Component {
                   alignItems="center"
                   position="relative"
                 >
-                  {backers.filter(({ image }) => !!image).map(c => (
-                    <Container px={1} key={c.id}>
-                      <BackerAvatar {...c} />
-                    </Container>
-                  ))}
+                  {backers
+                    .filter(({ image }) => !!image)
+                    .map(c => (
+                      <Container px={1} key={c.id}>
+                        <BackerAvatar {...c} />
+                      </Container>
+                    ))}
                 </Container>
-                <Hide
-                  xs
-                  sm
-                  position="absolute"
-                  top={0}
-                  left={0}
-                  width="100%"
-                  height="100%"
-                  pointerEvents="none"
-                >
+                <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%" pointerEvents="none">
                   <Container
                     background={`linear-gradient(to left, ${colors.primary[200]}, rgba(255, 255, 255, 0) 50%)`}
                     width="100%"
@@ -585,13 +490,7 @@ class HomePage extends React.Component {
               </Container>
             </Container>
 
-            <Container
-              bg={['primary.500', null, 'transparent']}
-              height={2}
-              width={32}
-              mx="auto"
-              my={[5]}
-            />
+            <Container bg={['primary.500', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container
               display="flex"
@@ -603,27 +502,21 @@ class HomePage extends React.Component {
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>Contribute code 👩🏻‍💻👨🏿‍💻</H2>
 
-                <H4 {...sectionSubHeadingStyles}>
-                  Building Open Collective together to get further, faster 🚀
-                </H4>
+                <H4 {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster 🚀</H4>
 
                 <P {...sectionDetailStyles}>
-                  Are you a developer who believes in supporting open and
-                  welcoming communities? Open Collective is open source (MIT
-                  License) so anyone can contribute code or report issues
-                  publicly.
+                  Are you a developer who believes in supporting open and welcoming communities? Open Collective is open
+                  source (MIT License) so anyone can contribute code or report issues publicly.
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
-                  Our goal is to provide all communities around the world the
-                  software that they need to operate as open and transparent
-                  collectives. We want to enable them to thrive in the same way
-                  that WordPress enabled millions of blogs to exist.
+                  Our goal is to provide all communities around the world the software that they need to operate as open
+                  and transparent collectives. We want to enable them to thrive in the same way that WordPress enabled
+                  millions of blogs to exist.
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
-                  Special thanks to all of you who already contributed in some
-                  way! 🙏
+                  Special thanks to all of you who already contributed in some way! 🙏
                 </P>
 
                 <StyledLink
@@ -636,12 +529,7 @@ class HomePage extends React.Component {
                   Check out our Github organization to find out more
                 </StyledLink>
               </Container>
-              <Container
-                width={[1, null, 0.5]}
-                textAlign="center"
-                px={2}
-                maxWidth={600}
-              >
+              <Container width={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
                 <img
                   src="/static/images/home-contributors.png"
                   alt="Open Collective Contribution Commits"
@@ -651,13 +539,7 @@ class HomePage extends React.Component {
               </Container>
             </Container>
 
-            <Container
-              bg={['primary.500', null, 'transparent']}
-              height={2}
-              width={32}
-              mx="auto"
-              my={[5]}
-            />
+            <Container bg={['primary.500', null, 'transparent']} height={2} width={32} mx="auto" my={[5]} />
 
             <Container
               display="flex"
@@ -670,18 +552,15 @@ class HomePage extends React.Component {
                 <H2 {...sectionHeadingStyles}>Become a host</H2>
 
                 <H4 {...sectionSubHeadingStyles}>
-                  Help provide the umbrella legal entities open collectives need
-                  to raise funds ⚖️
+                  Help provide the umbrella legal entities open collectives need to raise funds ⚖️
                 </H4>
 
                 <P {...sectionDetailStyles}>
-                  <strong>Grow the movement</strong> by becoming a
-                  host of open collectives in your city or your industry. Hosts
-                  are acting as fiscal sponsors. They collect the money on
-                  behalf of the collectives and enable them to issue invoices.
-                  They are mutualising the legal and accounting overhead that
-                  come with creating and maintaining a legal entity so that the
-                  open collectives that they host can focus on their mission.
+                  <strong>Grow the movement</strong> by becoming a host of open collectives in your city or your
+                  industry. Hosts are acting as fiscal sponsors. They collect the money on behalf of the collectives and
+                  enable them to issue invoices. They are mutualising the legal and accounting overhead that come with
+                  creating and maintaining a legal entity so that the open collectives that they host can focus on their
+                  mission.
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -698,13 +577,7 @@ class HomePage extends React.Component {
                   </Link>
                 </Flex>
               </Container>
-              <Container
-                width={[1, null, 0.5]}
-                textAlign="center"
-                px={4}
-                maxWidth={600}
-                mt={[5, null, 0]}
-              >
+              <Container width={[1, null, 0.5]} textAlign="center" px={4} maxWidth={600} mt={[5, null, 0]}>
                 <img
                   src="/static/images/home-local-chapter.svg"
                   alt="Open Collective Local Chapter"
@@ -719,20 +592,13 @@ class HomePage extends React.Component {
                 Today we are:
               </P>
               {totalCollectives && (
-                <Container
-                  display="flex"
-                  flexWrap="wrap"
-                  alignItems="center"
-                  justifyContent="center"
-                >
+                <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
                       <FormattedNumber value={totalCollectives} />
                     </P>
                     <P>
-                      <a href="https://opencollective.com/discover">
-                        collectives
-                      </a>
+                      <a href="https://opencollective.com/discover">collectives</a>
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>
@@ -753,11 +619,7 @@ class HomePage extends React.Component {
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
-                      <Currency
-                        value={totalAnnualBudget}
-                        abbreviate
-                        currency="USD"
-                      />
+                      <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
                     <P>raised</P>
                   </Container>
@@ -778,25 +640,17 @@ class HomePage extends React.Component {
                   color="black.700"
                   mb={4}
                 >
-                  Do you know people or organizations that will benefit from an
-                  open structure and a transparent operation? Let them know that
-                  Open Collective exists!
+                  Do you know people or organizations that will benefit from an open structure and a transparent
+                  operation? Let them know that Open Collective exists!
                 </P>
               </Container>
 
-              <Flex
-                flexDirection={['column', null, 'row']}
-                justifyContent="center"
-              >
+              <Flex flexDirection={['column', null, 'row']} justifyContent="center">
                 <StyledLink
                   {...socialButtonStyles}
                   href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collection%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
                 >
-                  <Container
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-evenly"
-                  >
+                  <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Twitter size={18} color={colors.primary[500]} />
                     <Span>Share on Twitter</Span>
                   </Container>
@@ -806,11 +660,7 @@ class HomePage extends React.Component {
                   {...socialButtonStyles}
                   href="https://www.facebook.com/sharer/sharer.php?u=https%3A//opencollective.com"
                 >
-                  <Container
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-evenly"
-                  >
+                  <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Facebook size={18} color={colors.primary[500]} />
                     <Span>Share on Facebook</Span>
                   </Container>
@@ -820,11 +670,7 @@ class HomePage extends React.Component {
                   {...socialButtonStyles}
                   href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A//opencollective.com&title=Check%20out%20Open%20Collective&summary=Open%20Collection%20is%20a%20platform%20for%20organizations,%20communities,%20and%20projects%20to%20operate%20transparently&source="
                 >
-                  <Container
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-evenly"
-                  >
+                  <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Linkedin size={18} color={colors.primary[500]} />
                     <Span>Share on LinkedIn</Span>
                   </Container>
@@ -833,11 +679,7 @@ class HomePage extends React.Component {
             </Container>
           </Container>
 
-          <Container
-            background="linear-gradient(182.45deg, #222584 4.38%, #6266EC 118.14%)"
-            position="relative"
-            py={6}
-          >
+          <Container background="linear-gradient(182.45deg, #222584 4.38%, #6266EC 118.14%)" position="relative" py={6}>
             <Container
               bg="primary.200"
               height="15rem"
@@ -860,20 +702,15 @@ class HomePage extends React.Component {
                 </P>
 
                 <Box mb={3}>
-                  <img
-                    src="/static/images/backyourstack.svg"
-                    alt="Back Your Stack"
-                  />
+                  <img src="/static/images/backyourstack.svg" alt="Back Your Stack" />
                 </Box>
 
                 <H4 color="white.full" mb={4}>
-                  Discover the Open Source projects your organization is using
-                  that need financial support.
+                  Discover the Open Source projects your organization is using that need financial support.
                 </H4>
 
                 <P color="white.full" fontSize="LeadParagraph" lineHeight="24px">
-                  BackYourStack is a community project initiated by Open
-                  Collective.
+                  BackYourStack is a community project initiated by Open Collective.
                   <StyledLink
                     href="https://backyourstack.com/contributing"
                     color="white.full"
@@ -977,13 +814,7 @@ const query = gql`
         }
       }
     }
-    topSpenders: allCollectives(
-      type: COLLECTIVE
-      limit: 4
-      orderBy: monthlySpending
-      orderDirection: DESC
-      offset: 0
-    ) {
+    topSpenders: allCollectives(type: COLLECTIVE, limit: 4, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         type
@@ -1005,13 +836,7 @@ const query = gql`
         }
       }
     }
-    sponsors: allCollectives(
-      type: ORGANIZATION
-      limit: 6
-      orderBy: monthlySpending
-      orderDirection: DESC
-      offset: 0
-    ) {
+    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         currency
@@ -1024,13 +849,7 @@ const query = gql`
         }
       }
     }
-    backers: allCollectives(
-      type: USER
-      limit: 30
-      orderBy: monthlySpending
-      orderDirection: DESC
-      offset: 0
-    ) {
+    backers: allCollectives(type: USER, limit: 30, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
         currency

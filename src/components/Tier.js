@@ -69,24 +69,15 @@ class Tier extends React.Component {
 
     switch (props.tier.type) {
       case 'DONATION':
-        this.buttonLabel = (
-          <FormattedMessage id="tier.donation.button" defaultMessage="donate" />
-        );
+        this.buttonLabel = <FormattedMessage id="tier.donation.button" defaultMessage="donate" />;
         this.defaultDescription = (
-          <FormattedMessage
-            id="tier.donation.description"
-            defaultMessage="Thank you for your kind donation 🙏"
-          />
+          <FormattedMessage id="tier.donation.description" defaultMessage="Thank you for your kind donation 🙏" />
         );
         break;
       case 'TIER':
       default:
         this.buttonLabel = (
-          <FormattedMessage
-            id="tier.button"
-            values={{ name: this.props.tier.name }}
-            defaultMessage="become a {name}"
-          />
+          <FormattedMessage id="tier.button" values={{ name: this.props.tier.name }} defaultMessage="become a {name}" />
         );
         break;
     }
@@ -114,8 +105,7 @@ class Tier extends React.Component {
     if (tier.presets) {
       presets = tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
       interval = (values && values.interval) || null;
-      amount =
-        (values && values.amount) || presets[Math.floor(presets.length / 2)];
+      amount = (values && values.amount) || presets[Math.floor(presets.length / 2)];
       quantity = 1;
     } else if (tier.type === 'TICKET') {
       // Case 2: handle quantity. Can't be active at same time as presets
@@ -160,10 +150,9 @@ class Tier extends React.Component {
       if (tier.presets && tier.presets[0] > value) {
         value = tier.presets[0];
         this.setState({
-          customAmountError: intl.formatMessage(
-            this.messages['customAmount.error.minimumAmount'],
-            { minimumAmount: formatCurrency(value, tier.currency) },
-          ),
+          customAmountError: intl.formatMessage(this.messages['customAmount.error.minimumAmount'], {
+            minimumAmount: formatCurrency(value, tier.currency),
+          }),
         });
       } else {
         this.setState({ customAmountError: null });
@@ -177,12 +166,7 @@ class Tier extends React.Component {
   handleSubmit() {
     const { tier } = this.props;
 
-    const {
-      quantity,
-      amount,
-      singleAmount,
-      interval,
-    } = this.calcCurrentValues();
+    const { quantity, amount, singleAmount, interval } = this.calcCurrentValues();
 
     this.onClick({ id: tier.id, amount, singleAmount, quantity, interval });
   }
@@ -207,12 +191,7 @@ class Tier extends React.Component {
     }
 
     return (
-      <div
-        className={`${this.props.className} tier ${
-          this.props.onClick ? 'withCTA' : ''
-        }`}
-        id={anchor}
-      >
+      <div className={`${this.props.className} tier ${this.props.onClick ? 'withCTA' : ''}`} id={anchor}>
         <style jsx global>
           {`
             .tier .inputAmount .form-group {
@@ -368,10 +347,7 @@ class Tier extends React.Component {
             <div className="title">{capitalize(name)}</div>
             {!presets && (
               <div className="title amount">
-                {!amount &&
-                  tier.type !== 'DONATION' && (
-                    <FormattedMessage id="amount.free" defaultMessage="free" />
-                  )}
+                {!amount && tier.type !== 'DONATION' && <FormattedMessage id="amount.free" defaultMessage="free" />}
                 {amount > 0 && <Currency value={amount} currency={currency} />}
                 {interval && (
                   <div className="interval">
@@ -419,18 +395,10 @@ class Tier extends React.Component {
                             <Button
                               key={`presetBtn-${preset}`}
                               className="presetBtn"
-                              bsStyle={
-                                amount === preset ? 'primary' : 'default'
-                              }
-                              onClick={() =>
-                                this.handleChange('amount', preset)
-                              }
+                              bsStyle={amount === preset ? 'primary' : 'default'}
+                              onClick={() => this.handleChange('amount', preset)}
                             >
-                              <FormattedNumber
-                                value={preset / 100}
-                                currency={currency}
-                                {...this.currencyStyle}
-                              />
+                              <FormattedNumber value={preset / 100} currency={currency} {...this.currencyStyle} />
                             </Button>
                           ),
                       )}
@@ -446,21 +414,14 @@ class Tier extends React.Component {
                         value={amount}
                         onChange={amount => this.handleChange('amount', amount)}
                       />
-                      {this.state.customAmountError && (
-                        <div className="error">
-                          {this.state.customAmountError}
-                        </div>
-                      )}
+                      {this.state.customAmountError && <div className="error">{this.state.customAmountError}</div>}
                     </div>
                   </div>
                 </div>
                 {type === 'DONATION' && (
                   <div className="selectInterval inputRow">
                     <label>
-                      <FormattedMessage
-                        id="tier.interval.select"
-                        defaultMessage="Select frequency"
-                      />
+                      <FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" />
                     </label>
                     <ButtonGroup className="intervalBtnGroup">
                       {intervals.map(i => (
@@ -470,9 +431,7 @@ class Tier extends React.Component {
                           bsStyle={interval === i ? 'primary' : 'default'}
                           onClick={() => this.handleChange('interval', i)}
                         >
-                          {intl.formatMessage(
-                            this.messages[`interval.${i || 'onetime'}`],
-                          )}
+                          {intl.formatMessage(this.messages[`interval.${i || 'onetime'}`])}
                         </Button>
                       ))}
                     </ButtonGroup>
@@ -483,29 +442,17 @@ class Tier extends React.Component {
           </div>
           {type === 'TICKET' && (
             <div id="actions" className="actions">
-              <TicketController
-                value={quantity}
-                onChange={value => this.handleTicketsChange(value)}
-              />
+              <TicketController value={quantity} onChange={value => this.handleTicketsChange(value)} />
               {this.props.onClick && (
-                <CTAButton
-                  className="ctabtn blue ticket"
-                  label={this.buttonLabel}
-                  onClick={this.handleSubmit}
-                />
+                <CTAButton className="ctabtn blue ticket" label={this.buttonLabel} onClick={this.handleSubmit} />
               )}
             </div>
           )}
-          {type !== 'TICKET' &&
-            this.props.onClick && (
-              <div id="actions" className="actions">
-                <CTAButton
-                  className="ctabtn blue"
-                  label={tier.button || this.buttonLabel}
-                  onClick={this.handleSubmit}
-                />
-              </div>
-            )}
+          {type !== 'TICKET' && this.props.onClick && (
+            <div id="actions" className="actions">
+              <CTAButton className="ctabtn blue" label={tier.button || this.buttonLabel} onClick={this.handleSubmit} />
+            </div>
+          )}
         </div>
       </div>
     );

@@ -58,8 +58,7 @@ class NotificationBar extends React.Component {
             }
             .loading .oc-bar {
               display: block;
-              animation: oc-cssload-width 3.45s cubic-bezier(0.45, 0, 1, 1)
-                infinite;
+              animation: oc-cssload-width 3.45s cubic-bezier(0.45, 0, 1, 1) infinite;
             }
             .error .oc-message {
               display: flex;
@@ -105,13 +104,7 @@ class NotificationBar extends React.Component {
           `}
         </style>
         <div className="oc-message">
-          <img
-            src={logo}
-            width="40"
-            height="40"
-            className="logo"
-            alt="Open Collective logo"
-          />
+          <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
           {error && <p>{error}</p>}
         </div>
         {title && (

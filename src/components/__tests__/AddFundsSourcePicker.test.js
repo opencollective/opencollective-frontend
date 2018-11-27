@@ -3,10 +3,7 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'jest-styled-components';
 
-import {
-  MockAddFundsSourcePicker,
-  MockAddFundsSourcePickerForUser,
-} from '../AddFundsSourcePicker';
+import { MockAddFundsSourcePicker, MockAddFundsSourcePickerForUser } from '../AddFundsSourcePicker';
 
 describe('AddFundsSourcePicker component', () => {
   const defaultProps = {
@@ -18,9 +15,7 @@ describe('AddFundsSourcePicker component', () => {
   };
 
   it('renders default options', () => {
-    const tree = renderer
-      .create(<MockAddFundsSourcePicker {...defaultProps} />)
-      .toJSON();
+    const tree = renderer.create(<MockAddFundsSourcePicker {...defaultProps} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -31,9 +26,7 @@ describe('AddFundsSourcePicker component', () => {
         loading: true,
       },
     };
-    const tree = renderer
-      .create(<MockAddFundsSourcePicker {...props} />)
-      .toJSON();
+    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -46,9 +39,7 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    const tree = renderer
-      .create(<MockAddFundsSourcePicker {...props} />)
-      .toJSON();
+    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -80,9 +71,7 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    const tree = renderer
-      .create(<MockAddFundsSourcePicker {...props} />)
-      .toJSON();
+    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -110,9 +99,7 @@ describe('AddFundsSourcePickerForUser component', () => {
   };
 
   it('renders default options', () => {
-    const tree = renderer
-      .create(<MockAddFundsSourcePickerForUser {...defaultProps} />)
-      .toJSON();
+    const tree = renderer.create(<MockAddFundsSourcePickerForUser {...defaultProps} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -129,9 +116,7 @@ describe('AddFundsSourcePickerForUser component', () => {
       },
     };
 
-    const tree = renderer
-      .create(<MockAddFundsSourcePickerForUser {...props} />)
-      .toJSON();
+    const tree = renderer.create(<MockAddFundsSourcePickerForUser {...props} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 });

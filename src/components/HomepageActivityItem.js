@@ -9,15 +9,7 @@ import { P, Span } from './Text';
 
 import { Link } from '../server/pages';
 
-const HomepageActivityItem = ({
-  amount,
-  createdAt,
-  currency,
-  fromCollective,
-  collective,
-  subscription,
-  type,
-}) => {
+const HomepageActivityItem = ({ amount, createdAt, currency, fromCollective, collective, subscription, type }) => {
   const formattedCreatedAt = new Date(createdAt).toISOString();
   return (
     <Container display="flex" alignItems="center">

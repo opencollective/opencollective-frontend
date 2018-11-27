@@ -65,10 +65,7 @@ class EditPaymentMethods extends React.Component {
   removePaymentMethod(index) {
     let paymentMethods = this.props.paymentMethods;
     if (index < 0 || index > paymentMethods.length) return;
-    paymentMethods = [
-      ...paymentMethods.slice(0, index),
-      ...paymentMethods.slice(index + 1),
-    ];
+    paymentMethods = [...paymentMethods.slice(0, index), ...paymentMethods.slice(index + 1)];
     this.onChange({ paymentMethods });
   }
 
@@ -91,9 +88,7 @@ class EditPaymentMethods extends React.Component {
 
   render() {
     const { intl, paymentMethods = [] } = this.props;
-    const hasNewPaymentMethod = Boolean(
-      this.props.paymentMethods.find(pm => !pm.id),
-    );
+    const hasNewPaymentMethod = Boolean(this.props.paymentMethods.find(pm => !pm.id));
 
     return (
       <div className="EditPaymentMethods">
@@ -115,9 +110,7 @@ class EditPaymentMethods extends React.Component {
           `}
         </style>
 
-        <div className="paymentMethods">
-          {paymentMethods.map(this.renderPaymentMethod)}
-        </div>
+        <div className="paymentMethods">{paymentMethods.map(this.renderPaymentMethod)}</div>
         {!hasNewPaymentMethod && (
           <div className="editPaymentMethodsActions">
             <Button bsStyle="primary" onClick={() => this.addPaymentMethod()}>

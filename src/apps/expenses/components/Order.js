@@ -50,21 +50,11 @@ class Order extends React.Component {
   }
 
   render() {
-    const {
-      intl,
-      collective,
-      order,
-      includeHostedCollectives,
-      LoggedInUser,
-      view,
-    } = this.props;
+    const { intl, collective, order, includeHostedCollectives, LoggedInUser, view } = this.props;
 
     const title = order.description;
     const status = order.status.toLowerCase();
-    const canMarkOrderAsPaid =
-      LoggedInUser &&
-      collective.host &&
-      LoggedInUser.canEditCollective(collective.host);
+    const canMarkOrderAsPaid = LoggedInUser && collective.host && LoggedInUser.canEditCollective(collective.host);
     return (
       <div className={`order ${status} ${this.state.mode}View`}>
         <style jsx>
@@ -206,20 +196,12 @@ class Order extends React.Component {
         <div className="body">
           <div className="header">
             <div className="amount pullRight">
-              <AmountCurrency
-                amount={order.totalAmount}
-                currency={order.currency}
-              />
+              <AmountCurrency amount={order.totalAmount} currency={order.currency} />
             </div>
             <div className="description">
-              <Link
-                route={`/${collective.slug}/orders/${order.id}`}
-                title={capitalize(title)}
-              >
+              <Link route={`/${collective.slug}/orders/${order.id}`} title={capitalize(title)}>
                 {capitalize(title)}
-                {view !== 'compact' && (
-                  <span className="OrderId">#{order.id}</span>
-                )}
+                {view !== 'compact' && <span className="OrderId">#{order.id}</span>}
               </Link>
             </div>
             <div className="meta">
@@ -227,15 +209,11 @@ class Order extends React.Component {
               {' | '}
               {includeHostedCollectives && (
                 <span className="collective">
-                  <Link route={`/${order.collective.slug}`}>
-                    {order.collective.slug}
-                  </Link>
+                  <Link route={`/${order.collective.slug}`}>{order.collective.slug}</Link>
                 </span>
               )}
               {' | '}
-              <span className="status">
-                {intl.formatMessage(this.messages[status])}
-              </span>
+              <span className="status">{intl.formatMessage(this.messages[status])}</span>
             </div>
           </div>
           <OrderDetails order={order} />

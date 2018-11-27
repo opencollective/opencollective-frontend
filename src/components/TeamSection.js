@@ -22,18 +22,11 @@ class TeamSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/edit#members`,
-        label: (
-          <FormattedMessage
-            id="sections.team.edit"
-            defaultMessage="Edit team members"
-          />
-        ),
+        label: <FormattedMessage id="sections.team.edit" defaultMessage="Edit team members" />,
       };
     }
 
-    const members = collective.members.filter(
-      m => m.role === 'ADMIN' || m.role === 'MEMBER',
-    );
+    const members = collective.members.filter(m => m.role === 'ADMIN' || m.role === 'MEMBER');
 
     return (
       <section id="team">
@@ -48,12 +41,7 @@ class TeamSection extends React.Component {
         <SectionTitle section="team" action={action} />
         <div className="Members cardsList">
           {members.map(member => (
-            <Member
-              key={member.id}
-              member={member}
-              collective={collective}
-              LoggedInUser={LoggedInUser}
-            />
+            <Member key={member.id} member={member} collective={collective} LoggedInUser={LoggedInUser} />
           ))}
         </div>
       </section>

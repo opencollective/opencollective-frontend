@@ -41,17 +41,14 @@ export default ComposedComponent => {
         };
 
         // Run all GraphQL queries
-        await getDataFromTree(
-          <ComposedComponent ctx={ctx} url={url} {...composedInitialProps} />,
-          {
-            router: {
-              asPath: ctx.asPath,
-              pathname: ctx.pathname,
-              query: ctx.query,
-            },
-            client: apollo,
+        await getDataFromTree(<ComposedComponent ctx={ctx} url={url} {...composedInitialProps} />, {
+          router: {
+            asPath: ctx.asPath,
+            pathname: ctx.pathname,
+            query: ctx.query,
           },
-        );
+          client: apollo,
+        });
       } catch (error) {
         // Prevent Apollo Client GraphQL errors from crashing SSR.
         // Handle them in components via the data.error prop:
@@ -79,9 +76,7 @@ export default ComposedComponent => {
       };
     }
 
-    static displayName = `WithData(${getComponentDisplayName(
-      ComposedComponent,
-    )})`;
+    static displayName = `WithData(${getComponentDisplayName(ComposedComponent)})`;
 
     static propTypes = {
       serverState: PropTypes.object.isRequired,
@@ -90,10 +85,7 @@ export default ComposedComponent => {
 
     constructor(props) {
       super(props);
-      this.apollo = initClient(
-        this.props.serverState.apollo.data,
-        this.props.options,
-      );
+      this.apollo = initClient(this.props.serverState.apollo.data, this.props.options);
     }
 
     render() {

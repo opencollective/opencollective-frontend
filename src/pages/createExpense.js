@@ -129,20 +129,11 @@ class CreateExpensePage extends React.Component {
                         })
                       }
                     >
-                      <FormattedMessage
-                        id="expenses.sendAnotherExpense"
-                        defaultMessage="Submit Another Expense"
-                      />
+                      <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                     </Button>
                     <Box ml={[0, null, 3]}>
-                      <Button
-                        className="whiteblue viewAllExpenses"
-                        href={`/${collective.slug}/expenses`}
-                      >
-                        <FormattedMessage
-                          id="expenses.viewAll"
-                          defaultMessage="View All Expenses"
-                        />
+                      <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
+                        <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                       </Button>
                     </Box>
                   </Flex>
@@ -150,11 +141,7 @@ class CreateExpensePage extends React.Component {
               )}
 
               {showNewExpenseForm && (
-                <CreateExpenseForm
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  onSubmit={this.createExpense}
-                />
+                <CreateExpenseForm collective={collective} LoggedInUser={LoggedInUser} onSubmit={this.createExpense} />
               )}
             </Box>
 
@@ -163,10 +150,7 @@ class CreateExpensePage extends React.Component {
 
               <Flex mt="5rem" justifyContent={['center', null, 'flex-start']}>
                 <Button href={`/${collective.slug}/expenses`}>
-                  <FormattedMessage
-                    id="expenses.viewAll"
-                    defaultMessage="View All Expenses"
-                  />
+                  <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                 </Button>
               </Flex>
             </Box>

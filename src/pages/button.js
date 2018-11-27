@@ -4,8 +4,7 @@ import styled from 'styled-components';
 
 const CollectButton = styled.a`
   background-color: transparent;
-  background-image: ${({ color, verb }) =>
-    `url(/static/images/buttons/${verb}-button-${color}.svg)`};
+  background-image: ${({ color, verb }) => `url(/static/images/buttons/${verb}-button-${color}.svg)`};
   background-repeat: no-repeat;
   cursor: pointer;
   display: block;

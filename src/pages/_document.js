@@ -15,9 +15,7 @@ export default class IntlDocument extends Document {
     } = context;
 
     const sheet = new ServerStyleSheet();
-    const page = renderPage(App => props =>
-      sheet.collectStyles(<App {...props} />),
-    );
+    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />));
     const styleTags = sheet.getStyleElement();
     const styles = flush();
 
@@ -37,12 +35,8 @@ export default class IntlDocument extends Document {
       IMAGES_URL: process.env.IMAGES_URL || 'https://images.opencollective.com',
       PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
       STRIPE_KEY: process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
-      GOOGLE_MAPS_API_KEY:
-        process.env.GOOGLE_MAPS_API_KEY ||
-        'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
-      RECAPTCHA_SITE_KEY:
-        process.env.RECAPTCHA_SITE_KEY ||
-        '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
+      GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
+      RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY || '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
     };
   }
 

@@ -26,9 +26,7 @@ export function trimObject(obj) {
  */
 export const days = (d1, d2 = new Date()) => {
   const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  return Math.round(
-    Math.abs((new Date(d1).getTime() - new Date(d2).getTime()) / oneDay),
-  );
+  return Math.round(Math.abs((new Date(d1).getTime() - new Date(d2).getTime()) / oneDay));
 };
 
 export function filterCollection(array, cond, inverse) {
@@ -50,9 +48,7 @@ export function filterCollection(array, cond, inverse) {
 export const isValidUrl = url => {
   if (typeof url !== 'string') return false;
   return Boolean(
-    url.match(
-      /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/,
-    ),
+    url.match(/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/),
   );
 };
 
@@ -79,10 +75,7 @@ export function getCurrencySymbol(currency) {
 }
 
 /** Retrieve variables set in the environment */
-export const getEnvVar = v =>
-  process.browser
-    ? get(window, ['__NEXT_DATA__', 'env', v])
-    : get(process, ['env', v]);
+export const getEnvVar = v => (process.browser ? get(window, ['__NEXT_DATA__', 'env', v]) : get(process, ['env', v]));
 
 export const getBaseImagesUrl = () => getEnvVar('IMAGES_URL');
 
@@ -99,16 +92,11 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
     if (height) queryurl += `&height=${height}`;
   }
 
-  return `${getBaseImagesUrl() ||
-    baseUrl ||
-    ''}/proxy/images?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+  return `${getBaseImagesUrl() || baseUrl || ''}/proxy/images?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function isValidImageUrl(src) {
-  return (
-    src &&
-    (src.substr(0, 1) === '/' || src.substr(0, 4).toLowerCase() === 'http')
-  );
+  return src && (src.substr(0, 1) === '/' || src.substr(0, 4).toLowerCase() === 'http');
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
@@ -203,10 +191,7 @@ export function getDomain(url = '') {
 
 export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
   const d = new Date(date);
-  const locale =
-    typeof window !== 'undefined'
-      ? window.navigator.language
-      : options.locale || 'en-US';
+  const locale = typeof window !== 'undefined' ? window.navigator.language : options.locale || 'en-US';
   return d.toLocaleDateString(locale, options);
 }
 
@@ -256,13 +241,10 @@ export const getGraphqlUrl = () => {
 };
 
 export const translateApiUrl = url => {
-  const withoutParams =
-    getBaseApiUrl({ internal: true }) + url.replace('/api/', '/');
+  const withoutParams = getBaseApiUrl({ internal: true }) + url.replace('/api/', '/');
   const hasParams = `${url}`.match(/\?/);
   if (process.env.API_KEY) {
-    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${
-      process.env.API_KEY
-    }`;
+    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
   } else {
     return withoutParams;
   }

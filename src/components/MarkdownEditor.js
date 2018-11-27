@@ -43,11 +43,7 @@ class MarkdownEditor extends React.Component {
     this.converter = new Showdown.Converter();
     this.commands = [
       {
-        commands: [
-          Commands.headerCommand,
-          Commands.boldCommand,
-          Commands.italicCommand,
-        ],
+        commands: [Commands.headerCommand, Commands.boldCommand, Commands.italicCommand],
       },
       {
         commands: [Commands.linkCommand, Commands.imageCommand],

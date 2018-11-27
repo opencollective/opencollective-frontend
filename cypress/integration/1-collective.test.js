@@ -1,7 +1,4 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
+const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 
 describe('collective page', () => {
   before(() => {
@@ -16,10 +13,7 @@ describe('collective page', () => {
       .find('.totalDonations')
       .contains('$1,700');
     cy.get('#budget .subtitle').contains('Current balance: $4.71');
-    cy.get('#contributors .Members.cardsList .Member').should(
-      'have.length',
-      26,
-    );
+    cy.get('#contributors .Members.cardsList .Member').should('have.length', 26);
   });
 
   it('loads the latest expenses', () => {
@@ -38,37 +32,25 @@ describe('collective page', () => {
   it('opens new expense page', () => {
     cy.get('.desktopOnly button.submitExpense').click();
     cy.wait(500);
-    cy.get('.ExpensesPage .CreateExpenseForm').contains(
-      'Sign up or login to submit an expense',
-    );
+    cy.get('.ExpensesPage .CreateExpenseForm').contains('Sign up or login to submit an expense');
     cy.get('.ExpensesPage .desktopOnly .menu .item.budget').click();
   });
 
   it('loads the latest transactions', () => {
     cy.get('#transactions .itemsList .transaction').should('have.length', 5);
-    cy.get(
-      '#transactions .itemsList .transaction:first .AmountCurrency',
-    ).contains('$2');
-    cy.get(
-      '#transactions .itemsList .transaction:first .AmountCurrency .currency',
-    ).contains('USD');
+    cy.get('#transactions .itemsList .transaction:first .AmountCurrency').contains('$2');
+    cy.get('#transactions .itemsList .transaction:first .AmountCurrency .currency').contains('USD');
   });
 
   it('opens all transactions page', () => {
     cy.get('#transactions .ViewAllTransactionsBtn a').click();
     cy.wait(500);
-    cy.get('.TransactionsPage .itemsList .transaction').should(
-      'have.length',
-      20,
-    );
+    cy.get('.TransactionsPage .itemsList .transaction').should('have.length', 20);
     cy.get('.TransactionsPage .loadMoreBtn');
     cy.get('.TransactionsPage .filterBtnGroup button')
       .last()
       .click();
-    cy.get('.TransactionsPage .itemsList .transaction').should(
-      'have.length',
-      6,
-    );
+    cy.get('.TransactionsPage .itemsList .transaction').should('have.length', 6);
     cy.get('.TransactionsPage .desktopOnly .menu .item.about').click();
   });
 });

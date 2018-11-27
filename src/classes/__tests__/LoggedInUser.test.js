@@ -16,9 +16,7 @@ const VALID_USER = {
   id: 9000,
   CollectiveId: 19000,
   collective: { id: 19000 },
-  memberOf: [
-    { collective: COLLECTIVE_WITH_VALID_USER_AS_ADMIN, role: 'ADMIN' },
-  ],
+  memberOf: [{ collective: COLLECTIVE_WITH_VALID_USER_AS_ADMIN, role: 'ADMIN' }],
 };
 
 const OTHER_USER = {

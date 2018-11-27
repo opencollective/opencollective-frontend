@@ -138,10 +138,7 @@ const editCollectiveQuery = gql`
         currency
         maxQuantity
       }
-      paymentMethods(
-        types: ["creditcard", "virtualcard"]
-        hasBalanceAboveZero: true
-      ) {
+      paymentMethods(types: ["creditcard", "virtualcard"], hasBalanceAboveZero: true) {
         id
         uuid
         name
@@ -208,15 +205,13 @@ export const addCreateOrderMutation = graphql(createOrderQuery, {
 
 export const addCreateMemberMutation = graphql(createMemberQuery, {
   props: ({ mutate }) => ({
-    createMember: (member, collective, role) =>
-      mutate({ variables: { member, collective, role } }),
+    createMember: (member, collective, role) => mutate({ variables: { member, collective, role } }),
   }),
 });
 
 export const addRemoveMemberMutation = graphql(removeMemberQuery, {
   props: ({ mutate }) => ({
-    removeMember: (member, collective, role) =>
-      mutate({ variables: { member, collective, role } }),
+    removeMember: (member, collective, role) => mutate({ variables: { member, collective, role } }),
   }),
 });
 
@@ -252,21 +247,9 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'data',
       ]);
       CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
-        pick(tier, [
-          'type',
-          'name',
-          'description',
-          'amount',
-          'maxQuantity',
-          'maxQuantityPerUser',
-        ]),
+        pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
       );
-      CollectiveInputType.location = pick(collective.location, [
-        'name',
-        'address',
-        'lat',
-        'long',
-      ]);
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
       return await mutate({ variables: { collective: CollectiveInputType } });
     },
   }),
@@ -303,14 +286,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
       ]);
       if (collective.paymentMethods && collective.paymentMethods.length > 0) {
         CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm =>
-          pick(pm, [
-            'id',
-            'name',
-            'token',
-            'data',
-            'monthlyLimitPerMember',
-            'currency',
-          ]),
+          pick(pm, ['id', 'name', 'token', 'data', 'monthlyLimitPerMember', 'currency']),
         );
       } else {
         CollectiveInputType.paymentMethods = []; // force removing existing payment methods
@@ -343,12 +319,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
           };
         });
       }
-      CollectiveInputType.location = pick(collective.location, [
-        'name',
-        'address',
-        'lat',
-        'long',
-      ]);
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
       return await mutate({ variables: { collective: CollectiveInputType } });
     },
   }),

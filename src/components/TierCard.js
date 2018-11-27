@@ -23,9 +23,7 @@ class TierCard extends React.Component {
 
   constructor(props) {
     super(props);
-    this.anchor =
-      get(props.tier, 'slug') ||
-      (get(props.tier, 'name') || '').toLowerCase().replace(/ /g, '-');
+    this.anchor = get(props.tier, 'slug') || (get(props.tier, 'name') || '').toLowerCase().replace(/ /g, '-');
 
     this.messages = defineMessages({
       contribution: {
@@ -46,18 +44,15 @@ class TierCard extends React.Component {
       },
       'tier.error.hostMissing': {
         id: 'tier.error.hostMissing',
-        defaultMessage:
-          'Your collective needs a host before you can start accepting money.',
+        defaultMessage: 'Your collective needs a host before you can start accepting money.',
       },
       'tier.error.collectiveInactive': {
         id: 'tier.error.collectiveInactive',
-        defaultMessage:
-          'Your collective needs to be activated by your host before you can start accepting money.',
+        defaultMessage: 'Your collective needs to be activated by your host before you can start accepting money.',
       },
       'tier.error.outOfStock': {
         id: 'tier.error.outOfStock',
-        defaultMessage:
-          'This tier already ran out! ({availableQuantity} available out of {maxQuantity})',
+        defaultMessage: 'This tier already ran out! ({availableQuantity} available out of {maxQuantity})',
       },
     });
   }
@@ -65,9 +60,7 @@ class TierCard extends React.Component {
   showLastOrders(fromCollectiveTypeArray, limit) {
     const { tier } = this.props;
     const fromCollectives = uniqBy(
-      tier.orders
-        .map(o => o.fromCollective)
-        .filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1),
+      tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1),
       c => c.id,
     );
     if (fromCollectives.length === 0) return;
@@ -81,19 +74,10 @@ class TierCard extends React.Component {
             }
           `}
         </style>
-        <div
-          className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}
-        >
+        <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
           {fromCollectives.slice(0, limit).map(fromCollective => (
-            <div
-              className="image"
-              key={`${tier.slug}-fromCollective-${fromCollective.id}`}
-            >
-              <Link
-                route="collective"
-                params={{ slug: fromCollective.slug }}
-                passHref
-              >
+            <div className="image" key={`${tier.slug}-fromCollective-${fromCollective.id}`}>
+              <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
                 <a title={fromCollective.name}>
                   {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
                     <Avatar
@@ -123,12 +107,8 @@ class TierCard extends React.Component {
 
   render() {
     const { collective, tier, referral, intl } = this.props;
-    const amount = tier.presets
-      ? Math.min(tier.presets[0], tier.amount)
-      : tier.amount;
-    const disabled =
-      (amount > 0 && !collective.isActive) ||
-      tier.stats.availableQuantity === 0;
+    const amount = tier.presets ? Math.min(tier.presets[0], tier.amount) : tier.amount;
+    const disabled = (amount > 0 && !collective.isActive) || tier.stats.availableQuantity === 0;
     const totalOrders = tier.stats.totalOrders;
     let errorMsg;
     if (!collective.host) {
@@ -144,12 +124,7 @@ class TierCard extends React.Component {
       availableQuantity: tier.stats.availableQuantity,
     };
 
-    const tooltip = disabled
-      ? intl.formatMessage(
-          this.messages[`tier.error.${errorMsg}`],
-          formatValues,
-        )
-      : '';
+    const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`], formatValues) : '';
 
     const linkRoute = {
       name: 'orderCollectiveTier',
@@ -172,9 +147,7 @@ class TierCard extends React.Component {
     };
 
     return (
-      <div
-        className={classNames('TierCard', this.props.className, this.anchor)}
-      >
+      <div className={classNames('TierCard', this.props.className, this.anchor)}>
         <style jsx global>
           {`
             .image img {
@@ -295,11 +268,7 @@ class TierCard extends React.Component {
         <div className="name">{tier.name}</div>
         {amount > 0 && (
           <div className="amount">
-            <Currency
-              value={amount}
-              currency={tier.currency || collective.currency}
-              precision={0}
-            />
+            <Currency value={amount} currency={tier.currency || collective.currency} precision={0} />
             {tier.presets && <span>+</span>}
             {tier.interval && (
               <div className="interval">
@@ -330,10 +299,7 @@ class TierCard extends React.Component {
                 defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!"
                 values={{
                   name: tier.name,
-                  amount: formatCurrency(
-                    amount,
-                    tier.currency || collective.currency,
-                  ),
+                  amount: formatCurrency(amount, tier.currency || collective.currency),
                   interval: tier.interval,
                 }}
               />
@@ -360,19 +326,8 @@ class TierCard extends React.Component {
           </div>
         )}
         <Link route={linkRoute.name} params={linkRoute.params}>
-          <a
-            className={`action ${disabled ? 'disabled' : ''}`}
-            title={tooltip}
-            onClick={onClick}
-          >
-            {tier.button ? (
-              tier.button
-            ) : (
-              <FormattedMessage
-                id="tier.contribute"
-                defaultMessage="contribute"
-              />
-            )}
+          <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick}>
+            {tier.button ? tier.button : <FormattedMessage id="tier.contribute" defaultMessage="contribute" />}
           </a>
         </Link>
       </div>

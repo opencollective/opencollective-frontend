@@ -68,17 +68,10 @@ class SigninPage extends React.Component {
         </style>
         <Body>
           <div className="signin">
-            {this.state.error && (
-              <h1>
-                Authentication Failed. Please try to generate a new token.
-              </h1>
-            )}
+            {this.state.error && <h1>Authentication Failed. Please try to generate a new token.</h1>}
 
             <h2>
-              <FormattedMessage
-                id="loginform.title"
-                defaultMessage="Sign in or Create an Account"
-              />
+              <FormattedMessage id="loginform.title" defaultMessage="Sign in or Create an Account" />
             </h2>
             <SignInForm next={this.props.next} />
           </div>

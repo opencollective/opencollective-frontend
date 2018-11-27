@@ -21,27 +21,15 @@ class Link extends React.Component {
   }
 
   componentDidMount() {
-    this.isIframe =
-      window.self !== window.top && window.location.hostname !== 'localhost'; // cypress is using an iframe for e2e testing
+    this.isIframe = window.self !== window.top && window.location.hostname !== 'localhost'; // cypress is using an iframe for e2e testing
   }
 
   render() {
-    const {
-      route,
-      params,
-      children,
-      className,
-      title,
-      ...otherProps
-    } = this.props;
+    const { route, params, children, className, title, ...otherProps } = this.props;
     if (this.isHash) {
       const afterAnimate = () => {
         if (window.history) {
-          history.pushState(
-            { ...history.state, as: location.pathname + route },
-            undefined,
-            route,
-          );
+          history.pushState({ ...history.state, as: location.pathname + route }, undefined, route);
         }
       };
       return (
@@ -57,25 +45,15 @@ class Link extends React.Component {
       );
     } else if (this.isIframe) {
       const routeFromRouter = router.findByName(route);
-      const path = routeFromRouter
-        ? routeFromRouter.getAs(params)
-        : `https://opencollective.com${route}`;
+      const path = routeFromRouter ? routeFromRouter.getAs(params) : `https://opencollective.com${route}`;
       return (
-        <a
-          href={path}
-          title={title}
-          target="_top"
-          className={className}
-          {...otherProps}
-        >
+        <a href={path} title={title} target="_top" className={className} {...otherProps}>
           {children}
         </a>
       );
     } else {
       return (
-        <router.Link
-          {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}
-        >
+        <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
           <a className={className} title={title}>
             {children}
           </a>

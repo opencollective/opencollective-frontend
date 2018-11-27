@@ -82,6 +82,4 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(UpdatesPage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatesPage))));

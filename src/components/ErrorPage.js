@@ -39,8 +39,7 @@ class ErrorPage extends React.Component {
       },
       networkError: {
         id: 'page.error.networkError',
-        defaultMessage:
-          'The Open Collective Server is momentarily unreachable 🙀',
+        defaultMessage: 'The Open Collective Server is momentarily unreachable 🙀',
       },
       'networkError.description': {
         id: 'page.error.networkError.description',
@@ -102,9 +101,7 @@ class ErrorPage extends React.Component {
         <h1>{intl.formatMessage(this.messages[this.message])}</h1>
         {this.component}
         {this.messages[`${this.message}.description`] && (
-          <p>
-            {intl.formatMessage(this.messages[`${this.message}.description`])}
-          </p>
+          <p>{intl.formatMessage(this.messages[`${this.message}.description`])}</p>
         )}
         {this.message === 'graphQLError' && <p>{message}</p>}
       </div>

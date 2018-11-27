@@ -276,10 +276,7 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      paymentMethods(
-        types: ["creditcard", "virtualcard"]
-        hasBalanceAboveZero: true
-      ) {
+      paymentMethods(types: ["creditcard", "virtualcard"], hasBalanceAboveZero: true) {
         id
         uuid
         name

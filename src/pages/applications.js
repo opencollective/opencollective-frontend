@@ -58,9 +58,7 @@ class Apps extends React.Component {
       return <ErrorPage data={data} />;
     }
 
-    const apiKeys = Collective.applications.filter(
-      app => app.type === 'API_KEY',
-    );
+    const apiKeys = Collective.applications.filter(app => app.type === 'API_KEY');
 
     return (
       <div>
@@ -91,10 +89,7 @@ class Apps extends React.Component {
             <div className="apps">
               <h3>API Keys</h3>
 
-              <p>
-                Use API Keys to interact with the Open Collective GraphQL API
-                with your own account.
-              </p>
+              <p>Use API Keys to interact with the Open Collective GraphQL API with your own account.</p>
 
               {(!apiKeys || apiKeys.length === 0) && (
                 <p style={{ padding: '10px 0' }}>
@@ -102,35 +97,30 @@ class Apps extends React.Component {
                 </p>
               )}
 
-              {apiKeys &&
-                apiKeys.length > 0 && (
-                  <Fragment>
-                    {apiKeys.map(application => (
-                      <div className="app" key={application.id}>
-                        <div className="keys">
-                          API Key: <code>{application.apiKey}</code>
-                          &nbsp; - &nbsp;
-                          <Link
-                            route="editApplication"
-                            params={{
-                              collectiveSlug,
-                              applicationId: application.id,
-                            }}
-                          >
-                            <a>Delete</a>
-                          </Link>
-                        </div>
+              {apiKeys && apiKeys.length > 0 && (
+                <Fragment>
+                  {apiKeys.map(application => (
+                    <div className="app" key={application.id}>
+                      <div className="keys">
+                        API Key: <code>{application.apiKey}</code>
+                        &nbsp; - &nbsp;
+                        <Link
+                          route="editApplication"
+                          params={{
+                            collectiveSlug,
+                            applicationId: application.id,
+                          }}
+                        >
+                          <a>Delete</a>
+                        </Link>
                       </div>
-                    ))}
-                  </Fragment>
-                )}
+                    </div>
+                  ))}
+                </Fragment>
+              )}
 
               <div className="actions separator">
-                <Link
-                  route="createApplication"
-                  params={{ collectiveSlug, type: 'apiKey' }}
-                  passHref
-                >
+                <Link route="createApplication" params={{ collectiveSlug, type: 'apiKey' }} passHref>
                   <Button bsStyle="primary">New API Key</Button>
                 </Link>
               </div>
@@ -159,8 +149,6 @@ class Apps extends React.Component {
   }
 }
 
-export const addCollectiveApplicationsData = graphql(
-  getCollectiveApplicationsQuery,
-);
+export const addCollectiveApplicationsData = graphql(getCollectiveApplicationsQuery);
 
 export default withData(withLoggedInUser(addCollectiveApplicationsData(Apps)));

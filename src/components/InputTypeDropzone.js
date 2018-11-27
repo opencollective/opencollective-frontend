@@ -190,8 +190,7 @@ class InputTypeDropzone extends React.Component {
         <Dropzone
           multiple={false}
           onDrop={this.handleChange}
-          className={`${this.props.name}-dropzone dropzone ${!this.state
-            .value && 'empty'}`}
+          className={`${this.props.name}-dropzone dropzone ${!this.state.value && 'empty'}`}
           style={{}}
           {...options}
         >

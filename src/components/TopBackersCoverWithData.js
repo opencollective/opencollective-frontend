@@ -32,11 +32,7 @@ class TopBackersCoverWithData extends React.Component {
 
   renderMemberTitle(memberObj) {
     const member = memberObj.member;
-    const amount = formatCurrency(
-      memberObj.stats.totalDonations,
-      this.props.collective.currency,
-      { precision: 0 },
-    );
+    const amount = formatCurrency(memberObj.stats.totalDonations, this.props.collective.currency, { precision: 0 });
 
     const title = member.name;
     const subtitle = member.description ? `\n${member.description}\n` : '';
@@ -82,17 +78,22 @@ class TopBackersCoverWithData extends React.Component {
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
         <Link route="collective" params={{ slug: user.slug }} title={this.renderMemberTitle(member)} passHref>
-          <Avatar src={user.image} name={user.name} type={user.type} radius={48} size={[30, null, 48]} className="noFrame" />
+          <Avatar
+            src={user.image}
+            name={user.name}
+            type={user.type}
+            radius={48}
+            size={[30, null, 48]}
+            className="noFrame"
+          />
         </Link>
       </div>
     );
   }
 
   renderMember(member, index) {
-    if (member.member.type === 'ORGANIZATION')
-      return this.renderOrganization(member, index);
-    if (member.member.type === 'COLLECTIVE')
-      return this.renderOrganization(member, index);
+    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member, index);
+    if (member.member.type === 'COLLECTIVE') return this.renderOrganization(member, index);
     if (member.member.type === 'USER') return this.renderUser(member, index);
   }
 
@@ -111,8 +112,7 @@ class TopBackersCoverWithData extends React.Component {
     if (members.length === 0) {
       return <div />;
     }
-    const additionalBackers =
-      get(collective, 'stats.backers.all') - members.length;
+    const additionalBackers = get(collective, 'stats.backers.all') - members.length;
 
     return (
       <div className="TopBackersCover" ref={node => (this.node = node)}>
@@ -190,20 +190,8 @@ class TopBackersCoverWithData extends React.Component {
 }
 
 const getTopBackersQuery = gql`
-  query getTopBackersQuery(
-    $CollectiveId: Int!
-    $TierId: Int
-    $role: String
-    $limit: Int
-    $orderBy: String
-  ) {
-    allMembers(
-      CollectiveId: $CollectiveId
-      TierId: $TierId
-      role: $role
-      limit: $limit
-      orderBy: $orderBy
-    ) {
+  query getTopBackersQuery($CollectiveId: Int!, $TierId: Int, $role: String, $limit: Int, $orderBy: String) {
+    allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, limit: $limit, orderBy: $orderBy) {
       id
       role
       createdAt

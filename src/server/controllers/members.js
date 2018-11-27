@@ -97,16 +97,8 @@ export async function list(req, res) {
   const isActive = r => {
     if (!r.tier || !r.tier.interval) return true;
     if (!r.transactions[0] || !r.transactions[0].createdAt) return false;
-    if (
-      r.tier.interval === 'month' &&
-      days(new Date(r.transactions[0].createdAt)) <= 31
-    )
-      return true;
-    if (
-      r.tier.interval === 'year' &&
-      days(new Date(r.transactions[0].createdAt)) <= 365
-    )
-      return true;
+    if (r.tier.interval === 'month' && days(new Date(r.transactions[0].createdAt)) <= 31) return true;
+    if (r.tier.interval === 'year' && days(new Date(r.transactions[0].createdAt)) <= 365) return true;
     return false;
   };
 
@@ -120,9 +112,7 @@ export async function list(req, res) {
     totalAmountDonated: r => (get(r, 'stats.totalDonations') || 0) / 100,
     currency: 'transactions[0].currency',
     lastTransactionAt: r => {
-      return moment(
-        r.transactions[0] && new Date(r.transactions[0].createdAt),
-      ).format('YYYY-MM-DD HH:mm');
+      return moment(r.transactions[0] && new Date(r.transactions[0].createdAt)).format('YYYY-MM-DD HH:mm');
     },
     lastTransactionAmount: r => (get(r, 'transactions[0].amount') || 0) / 100,
     profile: r => `${process.env.WEBSITE_URL}/${r.member.slug}`,
@@ -132,17 +122,11 @@ export async function list(req, res) {
     image: 'member.image',
     email: 'member.email',
     twitter: r => {
-      return r.member.twitterHandle
-        ? `https://twitter.com/${r.member.twitterHandle}`
-        : null;
+      return r.member.twitterHandle ? `https://twitter.com/${r.member.twitterHandle}` : null;
     },
     github: r => {
-      const githubAccount = r.member.connectedAccounts.find(
-        c => c.service === 'github',
-      );
-      return githubAccount
-        ? `https://github.com/${githubAccount.username}`
-        : null;
+      const githubAccount = r.member.connectedAccounts.find(c => c.service === 'github');
+      return githubAccount ? `https://github.com/${githubAccount.username}` : null;
     },
     website: 'member.website',
   };

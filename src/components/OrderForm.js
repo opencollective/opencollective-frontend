@@ -13,18 +13,8 @@ import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import CreateOrganizationForm from './CreateOrganizationForm';
 import withIntl from '../lib/withIntl';
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedDate,
-  FormattedTime,
-} from 'react-intl';
-import {
-  capitalize,
-  formatCurrency,
-  isValidEmail,
-  getEnvVar,
-} from '../lib/utils';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getPaypal } from '../lib/paypal';
 import { getStripeToken } from '../lib/stripe';
 import { getRecaptcha, getRecaptchaSiteKey } from '../lib/recaptcha';
@@ -70,8 +60,7 @@ class OrderForm extends React.Component {
       recaptchaToken: null,
     };
 
-    this.state.order.totalAmount =
-      this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
+    this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
     this.paymentMethodsOptions = [];
     this.allowOrganizations = order.tier.type !== 'TICKET';
 
@@ -91,8 +80,7 @@ class OrderForm extends React.Component {
       },
       'order.error': {
         id: 'tier.order.error',
-        defaultMessage:
-          "An error occured 😳. The order didn't go through. Please try again in a few.",
+        defaultMessage: "An error occured 😳. The order didn't go through. Please try again in a few.",
       },
       'order.button': {
         id: 'tier.order.button',
@@ -120,8 +108,7 @@ class OrderForm extends React.Component {
       },
       'creditcard.save': {
         id: 'creditcard.save',
-        defaultMessage:
-          'Save credit card to {type, select, user {my account} other {{type} account}}',
+        defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}',
       },
       'creditcard.missing': {
         id: 'creditcard.missing',
@@ -190,13 +177,11 @@ class OrderForm extends React.Component {
       },
       'email.description.login': {
         id: 'signin.login.description',
-        defaultMessage:
-          'Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.',
+        defaultMessage: 'Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.',
       },
       'email.description.signup': {
         id: 'signin.emailSent.description',
-        defaultMessage:
-          'Login email sent. Please follow the instructions in that email to proceed.',
+        defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.',
       },
       'description.label': {
         id: 'user.description.label',
@@ -204,8 +189,7 @@ class OrderForm extends React.Component {
       },
       'description.description': {
         id: 'user.description.description',
-        defaultMessage:
-          'Present yourself in 60 characters or less, if you can!',
+        defaultMessage: 'Present yourself in 60 characters or less, if you can!',
       },
       'totalAmount.label': {
         id: 'tier.totalAmount.label',
@@ -271,9 +255,7 @@ class OrderForm extends React.Component {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
       if (this.messages[`${field.name}.description`]) {
-        field.description = intl.formatMessage(
-          this.messages[`${field.name}.description`],
-        );
+        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
       return field;
     });
@@ -303,11 +285,9 @@ class OrderForm extends React.Component {
     getRecaptcha()
       .then(recaptcha => {
         recaptcha.ready(() => {
-          recaptcha
-            .execute(getRecaptchaSiteKey(), { action: 'OrderForm' })
-            .then(recaptchaToken => {
-              this.setState({ recaptchaToken });
-            });
+          recaptcha.execute(getRecaptchaSiteKey(), { action: 'OrderForm' }).then(recaptchaToken => {
+            this.setState({ recaptchaToken });
+          });
         });
       })
       .catch(err => {
@@ -316,17 +296,14 @@ class OrderForm extends React.Component {
   };
 
   /** Interval set either in the tier or in the order object */
-  interval = () =>
-    this.state.order.interval || get(this.state, 'order.tier.interval');
+  interval = () => this.state.order.interval || get(this.state, 'order.tier.interval');
 
   /** Populate the combo of payment methods */
   populatePaymentMethodTypes = host => {
     const { intl } = this.props;
     const paymentMethodTypeOptions = [
       {
-        creditcard: intl.formatMessage(
-          this.messages['paymentMethod.creditcardOrGiftcard'],
-        ),
+        creditcard: intl.formatMessage(this.messages['paymentMethod.creditcardOrGiftcard']),
       },
     ];
     /* We only support paypal for one time donations to the open
@@ -368,16 +345,12 @@ class OrderForm extends React.Component {
         pm =>
           pm.service === 'stripe' ||
           pm.service === 'paypal' ||
-          (pm.service === 'opencollective' &&
-            ['prepaid', 'collective', 'virtualcard'].includes(pm.type)),
+          (pm.service === 'opencollective' && ['prepaid', 'collective', 'virtualcard'].includes(pm.type)),
       );
 
     if (collective) {
       const paymentMethods = filterPMs(collective.paymentMethods);
-      paymentMethodsOptions = this.paymentMethodsOptionsForCollective(
-        paymentMethods,
-        collective,
-      );
+      paymentMethodsOptions = this.paymentMethodsOptionsForCollective(paymentMethods, collective);
     }
 
     if (LoggedInUser && CollectiveId !== LoggedInUser.CollectiveId) {
@@ -385,10 +358,7 @@ class OrderForm extends React.Component {
       const paymentMethods = filterPMs(LoggedInUser.collective.paymentMethods);
       paymentMethodsOptions = [
         ...paymentMethodsOptions,
-        ...this.paymentMethodsOptionsForCollective(
-          paymentMethods,
-          userCollective,
-        ),
+        ...this.paymentMethodsOptionsForCollective(paymentMethods, userCollective),
       ];
     }
 
@@ -416,26 +386,13 @@ class OrderForm extends React.Component {
       });
       collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
       LoggedInUser.memberOf.map(membership => {
-        if (
-          membership.collective.type === 'COLLECTIVE' &&
-          membership.role !== 'ADMIN'
-        )
-          return;
+        if (membership.collective.type === 'COLLECTIVE' && membership.role !== 'ADMIN') return;
         if (membership.collective.type === 'EVENT') return;
-        if (
-          membership.collective.type === 'ORGANIZATION' &&
-          !this.allowOrganizations
-        )
-          return;
+        if (membership.collective.type === 'ORGANIZATION' && !this.allowOrganizations) return;
         if (['ADMIN', 'HOST'].indexOf(membership.role) === -1) return;
         const value = get(membership, 'collective.id');
         const label = get(membership, 'collective.name');
-        collectivesById[value] = pick(membership.collective, [
-          'id',
-          'type',
-          'name',
-          'paymentMethods',
-        ]);
+        collectivesById[value] = pick(membership.collective, ['id', 'type', 'name', 'paymentMethods']);
         fromCollectiveOptions.push({ [value]: label });
       });
     } else {
@@ -446,9 +403,7 @@ class OrderForm extends React.Component {
 
     if (this.allowOrganizations) {
       fromCollectiveOptions.push({
-        organization: intl.formatMessage(
-          this.messages['order.organization.create'],
-        ),
+        organization: intl.formatMessage(this.messages['order.organization.create']),
       });
     } else if (LoggedInUser) {
       fromCollectiveOptions.push({
@@ -538,8 +493,7 @@ class OrderForm extends React.Component {
     }
 
     if (attr === 'tier') {
-      newState.order.totalAmount =
-        newState.order.tier.amount * (newState.order.tier.quantity || 1);
+      newState.order.totalAmount = newState.order.tier.amount * (newState.order.tier.quantity || 1);
       if (newState.order.tier.quantity) {
         newState.order.quantity = newState.order.tier.quantity;
       }
@@ -649,13 +603,7 @@ class OrderForm extends React.Component {
   };
 
   prepareOrderRequest = () => {
-    const {
-      paymentMethod,
-      order,
-      fromCollective,
-      user,
-      recaptchaToken,
-    } = this.state;
+    const { paymentMethod, order, fromCollective, user, recaptchaToken } = this.state;
     const { currency } = order.tier || this.props.collective;
     const quantity = get(order, 'tier.quantity') || order.quantity || 1;
     const orderRequest = {
@@ -686,8 +634,7 @@ class OrderForm extends React.Component {
   };
 
   /** Submit order built with PayPal payment method */
-  submitPayPalOrder = async () =>
-    this.submitOrder(this.state.paypalOrderRequest);
+  submitPayPalOrder = async () => this.submitOrder(this.state.paypalOrderRequest);
 
   handleSubmit = async () => {
     if (!(await this.validate())) return false;
@@ -712,8 +659,7 @@ class OrderForm extends React.Component {
     const TEST_ENVIRONMENT =
       typeof window !== 'undefined' &&
       window.location.search.match(/test=e2e/) &&
-      (window.location.hostname === 'staging.opencollective.com' ||
-        window.location.hostname === 'localhost');
+      (window.location.hostname === 'staging.opencollective.com' || window.location.hostname === 'localhost');
 
     const { intl } = this.props;
     const { order, user, paymentMethod, creditcard } = this.state;
@@ -738,16 +684,8 @@ class OrderForm extends React.Component {
     // validate new org
     if (this.state.orgDetails.show) {
       try {
-        required(
-          this.state,
-          'fromCollective.name',
-          'order.error.organization.name.required',
-        );
-        required(
-          this.state,
-          'fromCollective.website',
-          'order.error.organization.website.required',
-        );
+        required(this.state, 'fromCollective.name', 'order.error.organization.name.required');
+        required(this.state, 'fromCollective.website', 'order.error.organization.website.required');
       } catch (e) {
         this.setState({ result: { error: e.message } });
         return false;
@@ -805,10 +743,7 @@ class OrderForm extends React.Component {
   };
 
   signin = () => {
-    signin(
-      this.state.user,
-      `${window.location.pathname}${window.location.search}`,
-    ).then(() => {
+    signin(this.state.user, `${window.location.pathname}${window.location.search}`).then(() => {
       this.setState({ loginSent: true });
     });
   };
@@ -844,10 +779,7 @@ class OrderForm extends React.Component {
 
         {values.interval && (
           <div>
-            <FormattedMessage
-              id="collective.host.cancelanytime"
-              defaultMessage="You can cancel anytime."
-            />
+            <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
           </div>
         )}
       </div>
@@ -857,23 +789,21 @@ class OrderForm extends React.Component {
   renderCreditCard = () => {
     const { intl } = this.props;
     const { creditcard } = this.state;
-    const showNewCreditCardForm =
-      creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
+    const showNewCreditCardForm = creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
 
     return (
       <Row>
         <Col sm={12}>
-          {this.paymentMethodsOptions &&
-            this.paymentMethodsOptions.length > 1 && (
-              <InputField
-                type="select"
-                className="horizontal"
-                label={intl.formatMessage(this.messages['paymentmethod.label'])}
-                name="creditcardSelector"
-                onChange={uuid => this.handleChange('creditcard', { uuid })}
-                options={this.paymentMethodsOptions}
-              />
-            )}
+          {this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 && (
+            <InputField
+              type="select"
+              className="horizontal"
+              label={intl.formatMessage(this.messages['paymentmethod.label'])}
+              name="creditcardSelector"
+              onChange={uuid => this.handleChange('creditcard', { uuid })}
+              options={this.paymentMethodsOptions}
+            />
+          )}
           {showNewCreditCardForm && (
             <div>
               <InputField
@@ -881,9 +811,7 @@ class OrderForm extends React.Component {
                 type="creditcard"
                 name="creditcard"
                 className="horizontal"
-                onChange={creditcardObject =>
-                  this.handleChange('creditcard', creditcardObject)
-                }
+                onChange={creditcardObject => this.handleChange('creditcard', creditcardObject)}
               />
             </div>
           )}
@@ -917,14 +845,10 @@ class OrderForm extends React.Component {
         </Button>
       );
       if (!this.state.loginSent) {
-        inputEmail.description = intl.formatMessage(
-          this.messages['email.description.login'],
-        );
+        inputEmail.description = intl.formatMessage(this.messages['email.description.login']);
       } else {
         inputEmail.button = <Button disabled={true}>Login</Button>;
-        inputEmail.description = intl.formatMessage(
-          this.messages['email.description.signup'],
-        );
+        inputEmail.description = intl.formatMessage(this.messages['email.description.signup']);
       }
     }
 
@@ -1050,9 +974,7 @@ class OrderForm extends React.Component {
                       className="horizontal"
                       {...field}
                       defaultValue={this.state.user[field.name]}
-                      onChange={value =>
-                        this.handleChange('user', field.name, value)
-                      }
+                      onChange={value => this.handleChange('user', field.name, value)}
                     />
                   </Col>
                 </Row>
@@ -1063,11 +985,7 @@ class OrderForm extends React.Component {
                 className="horizontal"
                 type="select"
                 label={intl.formatMessage(
-                  this.messages[
-                    order.tier.type === 'TICKET'
-                      ? 'order.rsvpAs'
-                      : 'order.contributeAs'
-                  ],
+                  this.messages[order.tier.type === 'TICKET' ? 'order.rsvpAs' : 'order.contributeAs'],
                 )}
                 name="fromCollectiveSelector"
                 onChange={CollectiveId => this.selectProfile(CollectiveId)}
@@ -1076,41 +994,31 @@ class OrderForm extends React.Component {
               />
             )}
 
-            {!LoggedInUser &&
-              this.state.isNewUser &&
-              (get(collective, 'tags') || []).includes('open source') && (
-                <Row key="newsletterOptIn.input">
-                  <Col sm={12}>
-                    <InputField
-                      className="horizontal"
-                      name="newsletterOptIn"
-                      type="checkbox"
-                      help="Receive our monthly newsletter with updates about new collectives and features. Stay in the know with the latest sponsor and backer funding leaderboard, open source inspiration, and upcoming events."
-                      description={intl.formatMessage(
-                        this.messages['newsletterOptIn.description'],
-                      )}
-                      defaultValue={this.state.user['newsletterOptIn']}
-                      onChange={value =>
-                        this.handleChange('user', 'newsletterOptIn', value)
-                      }
-                    />
-                  </Col>
-                </Row>
-              )}
+            {!LoggedInUser && this.state.isNewUser && (get(collective, 'tags') || []).includes('open source') && (
+              <Row key="newsletterOptIn.input">
+                <Col sm={12}>
+                  <InputField
+                    className="horizontal"
+                    name="newsletterOptIn"
+                    type="checkbox"
+                    help="Receive our monthly newsletter with updates about new collectives and features. Stay in the know with the latest sponsor and backer funding leaderboard, open source inspiration, and upcoming events."
+                    description={intl.formatMessage(this.messages['newsletterOptIn.description'])}
+                    defaultValue={this.state.user['newsletterOptIn']}
+                    onChange={value => this.handleChange('user', 'newsletterOptIn', value)}
+                  />
+                </Col>
+              </Row>
+            )}
           </section>
 
           {!fromCollective.id && this.state.orgDetails.show && (
-            <CreateOrganizationForm
-              onChange={org => this.handleChange('fromCollective', org)}
-            />
+            <CreateOrganizationForm onChange={org => this.handleChange('fromCollective', org)} />
           )}
 
           {!requireLogin && (
             <div>
               <section className="order">
-                {order.tier.type !== 'TICKET' && (
-                  <SectionTitle section="contributionDetails" />
-                )}
+                {order.tier.type !== 'TICKET' && <SectionTitle section="contributionDetails" />}
                 {order.tier.type === 'TICKET' && (
                   <div>
                     <SectionTitle section="ticketDetails" />
@@ -1118,18 +1026,13 @@ class OrderForm extends React.Component {
                       <Col sm={12}>
                         <div className="form-group">
                           <label className="col-sm-2 control-label">
-                            <FormattedMessage
-                              id="tier.order.ticket.info"
-                              defaultMessage="Event info"
-                            />
+                            <FormattedMessage id="tier.order.ticket.info" defaultMessage="Event info" />
                           </label>
                           <Col sm={10}>
                             <div className="info">
                               {!collective.startsAt &&
                                 console.warn(
-                                  `OrderForm: collective.startsAt should not be empty. collective.id: ${
-                                    collective.id
-                                  }`,
+                                  `OrderForm: collective.startsAt should not be empty. collective.id: ${collective.id}`,
                                 )}
                               {collective.startsAt && (
                                 <React.Fragment>
@@ -1141,10 +1044,7 @@ class OrderForm extends React.Component {
                                     month="long"
                                   />
                                   , &nbsp;
-                                  <FormattedTime
-                                    value={collective.startsAt}
-                                    timeZone={collective.timezone}
-                                  />
+                                  <FormattedTime value={collective.startsAt} timeZone={collective.timezone} />
                                   &nbsp; - &nbsp;
                                 </React.Fragment>
                               )}
@@ -1161,16 +1061,10 @@ class OrderForm extends React.Component {
                     <div className="form-group">
                       <label className="col-sm-2 control-label">
                         {order.tier.type !== 'TICKET' && (
-                          <FormattedMessage
-                            id="tier.order.contribution"
-                            defaultMessage="Contribution"
-                          />
+                          <FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" />
                         )}
                         {order.tier.type === 'TICKET' && (
-                          <FormattedMessage
-                            id="tier.order.ticket"
-                            defaultMessage="Ticket"
-                          />
+                          <FormattedMessage id="tier.order.ticket" defaultMessage="Ticket" />
                         )}
                       </label>
                       <Col sm={10}>
@@ -1181,9 +1075,7 @@ class OrderForm extends React.Component {
                             interval: order.interval || order.tier.interval,
                             amount: order.totalAmount,
                           }}
-                          onChange={tier =>
-                            this.handleChange('order', 'tier', tier)
-                          }
+                          onChange={tier => this.handleChange('order', 'tier', tier)}
                         />
                       </Col>
                     </div>
@@ -1196,13 +1088,7 @@ class OrderForm extends React.Component {
                         collective={collective}
                         order={order}
                         uuid={this.props.matchingFund}
-                        onChange={matchingFund =>
-                          this.handleChange(
-                            'order',
-                            'matchingFund',
-                            matchingFund,
-                          )
-                        }
+                        onChange={matchingFund => this.handleChange('order', 'matchingFund', matchingFund)}
                       />
                     </Col>
                   </Row>
@@ -1214,14 +1100,10 @@ class OrderForm extends React.Component {
                       type="textarea"
                       name="publicMessage"
                       className="horizontal"
-                      placeholder={intl.formatMessage(
-                        this.messages['order.publicMessage.placeholder'],
-                      )}
+                      placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
                       defaultValue={order.publicMessage}
                       maxLength={255}
-                      onChange={value =>
-                        this.handleChange('order', 'publicMessage', value)
-                      }
+                      onChange={value => this.handleChange('order', 'publicMessage', value)}
                     />
                   </Col>
                 </Row>
@@ -1239,21 +1121,15 @@ class OrderForm extends React.Component {
                           type="select"
                           name="paymentMethodTypeSelector"
                           options={this.paymentMethodTypeOptions}
-                          label={intl.formatMessage(
-                            this.messages['paymentMethod.type'],
-                          )}
-                          onChange={value =>
-                            this.handleChange('paymentMethod', 'type', value)
-                          }
+                          label={intl.formatMessage(this.messages['paymentMethod.type'])}
+                          onChange={value => this.handleChange('paymentMethod', 'type', value)}
                         />
                       </Col>
                     </Row>
                   )}
 
-                  {this.state.paymentMethod.type === 'creditcard' &&
-                    this.renderCreditCard()}
-                  {this.state.paymentMethod.type === 'payment' &&
-                    this.renderPayPalButton()}
+                  {this.state.paymentMethod.type === 'creditcard' && this.renderCreditCard()}
+                  {this.state.paymentMethod.type === 'payment' && this.renderPayPalButton()}
                   {this.state.paymentMethod.type === 'manual' && (
                     <div className="horizontal form-group manualPaymentMethod ">
                       <label className="col-sm-2 control-label" />
@@ -1267,13 +1143,8 @@ class OrderForm extends React.Component {
                                 'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
                             },
                             {
-                              amount: formatCurrency(
-                                order.totalAmount,
-                                order.tier.currency,
-                              ),
-                              email:
-                                get(this.state, 'user.email', '') ||
-                                get(LoggedInUser, 'email', ''),
+                              amount: formatCurrency(order.totalAmount, order.tier.currency),
+                              email: get(this.state, 'user.email', '') || get(LoggedInUser, 'email', ''),
                               collective: collective.slug,
                               host: get(collective, 'host.name'),
                               TierId: order.tier.id,
@@ -1298,62 +1169,38 @@ class OrderForm extends React.Component {
                     </div>
                   )}
 
-                  {(collective.host || order.totalAmount === 0) &&
-                    !this.isPayPalSelected() && (
-                      <div className="actions">
-                        <div className="submit">
-                          <ActionButton
-                            className="blue"
-                            onClick={this.handleSubmit}
-                            disabled={this.state.loading}
-                          >
-                            {this.state.loading ? (
-                              <FormattedMessage
-                                id="form.processing"
-                                defaultMessage="processing"
-                              />
-                            ) : (
-                              order.tier.button ||
-                              capitalize(
-                                intl.formatMessage(
-                                  this.messages['order.button'],
-                                ),
-                              )
-                            )}
-                          </ActionButton>
-                          {this.state.loading && (
-                            <div className="pleasewait">
-                              <FormattedMessage
-                                id="pleasewait"
-                                defaultMessage="Please wait..."
-                              />
-                              ...
-                            </div>
+                  {(collective.host || order.totalAmount === 0) && !this.isPayPalSelected() && (
+                    <div className="actions">
+                      <div className="submit">
+                        <ActionButton className="blue" onClick={this.handleSubmit} disabled={this.state.loading}>
+                          {this.state.loading ? (
+                            <FormattedMessage id="form.processing" defaultMessage="processing" />
+                          ) : (
+                            order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))
                           )}
-                        </div>
-
-                        {order.totalAmount > 0 &&
-                          this.renderDisclaimer({
-                            hostname: collective.host.name,
-                            amount: formatCurrency(order.totalAmount, currency),
-                            interval: order.interval || order.tier.interval,
-                            collective: collective.name,
-                          })}
-
-                        <div className="result">
-                          {this.state.result.success && (
-                            <div className="success">
-                              {this.state.result.success}
-                            </div>
-                          )}
-                          {this.state.result.error && (
-                            <div className="error">
-                              {this.state.result.error}
-                            </div>
-                          )}
-                        </div>
+                        </ActionButton>
+                        {this.state.loading && (
+                          <div className="pleasewait">
+                            <FormattedMessage id="pleasewait" defaultMessage="Please wait..." />
+                            ...
+                          </div>
+                        )}
                       </div>
-                    )}
+
+                      {order.totalAmount > 0 &&
+                        this.renderDisclaimer({
+                          hostname: collective.host.name,
+                          amount: formatCurrency(order.totalAmount, currency),
+                          interval: order.interval || order.tier.interval,
+                          collective: collective.name,
+                        })}
+
+                      <div className="result">
+                        {this.state.result.success && <div className="success">{this.state.result.success}</div>}
+                        {this.state.result.error && <div className="error">{this.state.result.error}</div>}
+                      </div>
+                    </div>
+                  )}
                 </Col>
               </Row>
             </div>

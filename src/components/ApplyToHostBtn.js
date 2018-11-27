@@ -29,15 +29,10 @@ class ApplyToHostBtn extends React.Component {
         </style>
         {!LoggedInUser && (
           <Button className="blue" href={`/${host.slug}/apply`}>
-            <FormattedMessage
-              id="host.apply.create.btn"
-              defaultMessage="Apply to create a collective"
-            />
+            <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
           </Button>
         )}
-        {LoggedInUser && (
-          <ApplyToHostBtnLoggedIn LoggedInUser={LoggedInUser} host={host} />
-        )}
+        {LoggedInUser && <ApplyToHostBtnLoggedIn LoggedInUser={LoggedInUser} host={host} />}
         <div className="hostConditions">
           <FormattedMessage
             id="transaction.hostFeeInHostCurrency"
@@ -54,10 +49,7 @@ class ApplyToHostBtn extends React.Component {
             <span>
               &nbsp; - &nbsp;
               <a href={get(host, 'settings.tos')}>
-                <FormattedMessage
-                  id="host.tos"
-                  defaultMessage="Terms of Service"
-                />
+                <FormattedMessage id="host.tos" defaultMessage="Terms of Service" />
               </a>
             </span>
           )}

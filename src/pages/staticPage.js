@@ -30,18 +30,12 @@ class StaticPage extends React.Component {
 
     // we rewrite the links to be relative to root /
     if (path === 'faq') {
-      content = content.replace(
-        /href="(?!['"]?(?:data|http|\/))['"]?([^'")\s>]+)/g,
-        'href="/faq/$1',
-      );
+      content = content.replace(/href="(?!['"]?(?:data|http|\/))['"]?([^'")\s>]+)/g, 'href="/faq/$1');
     }
 
     // get the title from the html of the markdown
     // e.g. <h1 id="about-open-collective">About Open Collective</h1> => About Open Collective
-    let title = content.substr(
-      content.indexOf('<h1'),
-      content.indexOf('</h1>'),
-    );
+    let title = content.substr(content.indexOf('<h1'), content.indexOf('</h1>'));
     title = title.substr(title.indexOf('>') + 1);
 
     return { title, content, path, pageSlug };
@@ -138,12 +132,11 @@ class StaticPage extends React.Component {
         <Header title={title} LoggedInUser={this.state.LoggedInUser} />
         <Body>
           <div className="content">
-            {path &&
-              pageSlug && (
-                <div className="path">
-                  <Link route={`/${path}`}>{path}</Link>
-                </div>
-              )}
+            {path && pageSlug && (
+              <div className="path">
+                <Link route={`/${path}`}>{path}</Link>
+              </div>
+            )}
             <div dangerouslySetInnerHTML={{ __html: this.props.content }} />
           </div>
           <NewsletterContainer />

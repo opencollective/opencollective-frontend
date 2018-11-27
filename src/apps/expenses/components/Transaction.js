@@ -93,10 +93,7 @@ class Transaction extends React.Component {
           defaultMessage="using a gift card from {collectiveLink}"
           values={{
             collectiveLink: (
-              <Link
-                route="collective"
-                params={{ slug: usingVirtualCardFromCollective.slug }}
-              >
+              <Link route="collective" params={{ slug: usingVirtualCardFromCollective.slug }}>
                 {usingVirtualCardFromCollective.name}
               </Link>
             ),
@@ -124,19 +121,12 @@ class Transaction extends React.Component {
       return <div />;
     }
 
-    const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type)
-      ? netAmountInCollectiveCurrency
-      : amount;
+    const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type) ? netAmountInCollectiveCurrency : amount;
 
     return (
       <Flex my={4}>
         <Container alignSelf="flex-start">
-          <Link
-            route="collective"
-            params={{ slug: fromCollective.slug }}
-            title={fromCollective.name}
-            passHref
-          >
+          <Link route="collective" params={{ slug: fromCollective.slug }} title={fromCollective.name} passHref>
             <Avatar
               src={fromCollective.image}
               type={fromCollective.type}
@@ -164,29 +154,17 @@ class Transaction extends React.Component {
             {paymentProcessorFeeInHostCurrency !== undefined && (
               <Fragment>
                 {' | '}
-                <a
-                  onClick={() =>
-                    this.setState({ viewDetails: !this.state.viewDetails })
-                  }
-                >
+                <a onClick={() => this.setState({ viewDetails: !this.state.viewDetails })}>
                   {this.state.viewDetails ? (
-                    <FormattedMessage
-                      id="transaction.closeDetails"
-                      defaultMessage="Close Details"
-                    />
+                    <FormattedMessage id="transaction.closeDetails" defaultMessage="Close Details" />
                   ) : (
-                    <FormattedMessage
-                      id="transaction.viewDetails"
-                      defaultMessage="View Details"
-                    />
+                    <FormattedMessage id="transaction.viewDetails" defaultMessage="View Details" />
                   )}
                 </a>
               </Fragment>
             )}
           </Container>
-          {this.state.viewDetails && (
-            <TransactionDetails {...this.props} mode="open" />
-          )}
+          {this.state.viewDetails && <TransactionDetails {...this.props} mode="open" />}
         </Container>
       </Flex>
     );

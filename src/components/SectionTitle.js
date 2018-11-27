@@ -27,8 +27,7 @@ class SectionTitle extends React.Component {
       },
       'updates.subtitle': {
         id: 'section.updates.subtitle',
-        defaultMessage:
-          'Stay up to dates with our latest activities and progress.',
+        defaultMessage: 'Stay up to dates with our latest activities and progress.',
       },
       'events.title': { id: 'section.events.title', defaultMessage: 'Events' },
       'events.subtitle': {
@@ -38,8 +37,7 @@ class SectionTitle extends React.Component {
       'team.title': { id: 'section.team.title', defaultMessage: 'Team' },
       'team.subtitle': {
         id: 'section.team.subtitle',
-        defaultMessage:
-          'Meet the awesome people that are bringing the community together! 🙌',
+        defaultMessage: 'Meet the awesome people that are bringing the community together! 🙌',
       },
       'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
       'budget.subtitle': {
@@ -89,8 +87,7 @@ class SectionTitle extends React.Component {
       },
       'organizationDetails.subtitle': {
         id: 'tier.order.organizationDetails.description',
-        defaultMessage:
-          'Create an organization. You can edit it later to add other members.',
+        defaultMessage: 'Create an organization. You can edit it later to add other members.',
       },
       'paymentDetails.title': {
         id: 'tier.order.paymentDetails',
@@ -104,14 +101,10 @@ class SectionTitle extends React.Component {
 
     const title =
       this.props.title ||
-      (this.messages[`${section}.title`]
-        ? intl.formatMessage(this.messages[`${section}.title`])
-        : section);
+      (this.messages[`${section}.title`] ? intl.formatMessage(this.messages[`${section}.title`]) : section);
     const subtitle =
       this.props.subtitle ||
-      (this.messages[`${section}.subtitle`]
-        ? intl.formatMessage(this.messages[`${section}.subtitle`], values)
-        : '');
+      (this.messages[`${section}.subtitle`] ? intl.formatMessage(this.messages[`${section}.subtitle`], values) : '');
 
     return (
       <div className="SectionTitle">

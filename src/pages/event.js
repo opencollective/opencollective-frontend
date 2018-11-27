@@ -65,6 +65,4 @@ class EventPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addEventCollectiveData(EventPage))),
-);
+export default withData(withIntl(withLoggedInUser(addEventCollectiveData(EventPage))));

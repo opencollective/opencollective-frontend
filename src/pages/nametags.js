@@ -12,16 +12,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class NametagsPage extends React.Component {
-  static getInitialProps({
-    query: {
-      collectiveSlug,
-      eventSlug,
-      template,
-      format,
-      nametagWidth,
-      nametagHeight,
-    },
-  }) {
+  static getInitialProps({ query: { collectiveSlug, eventSlug, template, format, nametagWidth, nametagHeight } }) {
     return {
       collectiveSlug,
       eventSlug,
@@ -83,9 +74,7 @@ class NametagsPage extends React.Component {
 
     this.nametagsPerPage = this.cols * this.rows;
 
-    this.page.paddingTop = Math.floor(
-      (this.page.height - this.rows * this.dimensions.nametag.height) / 2,
-    );
+    this.page.paddingTop = Math.floor((this.page.height - this.rows * this.dimensions.nametag.height) / 2);
   }
 
   renderNametag = (order, index) => {
@@ -95,15 +84,9 @@ class NametagsPage extends React.Component {
         <h1>
           <span className="firstName">{userCollective.name}</span>
         </h1>
-        {userCollective.company && (
-          <h2 className="company">{userCollective.company}</h2>
-        )}
-        {userCollective.twitterHandle && (
-          <h2 className="twitterHandle">@{userCollective.twitterHandle}</h2>
-        )}
-        <p className="description">
-          {firstSentence(order.description || userCollective.description, 60)}
-        </p>
+        {userCollective.company && <h2 className="company">{userCollective.company}</h2>}
+        {userCollective.twitterHandle && <h2 className="twitterHandle">@{userCollective.twitterHandle}</h2>}
+        <p className="description">{firstSentence(order.description || userCollective.description, 60)}</p>
         <div className="eventInfo">
           <FormattedDate
             value={this.event.startsAt}
@@ -137,59 +120,46 @@ class NametagsPage extends React.Component {
     this.props.data.Collective.orders.map(r => orders.push(r));
 
     return (
-      <div
-        className={`NametagsPages ${this.props.collectiveSlug} ${
-          this.props.eventSlug
-        } ${this.props.template}`}
-      >
+      <div className={`NametagsPages ${this.props.collectiveSlug} ${this.props.eventSlug} ${this.props.template}`}>
         <style jsx global>
           {`
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Regular.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Italic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Medium.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2')
-                  format('woff2'),
+              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2') format('woff2'),
                 url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
             }
 
@@ -197,18 +167,15 @@ class NametagsPage extends React.Component {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff') format('woff');
             }
 
             @font-face {
               font-family: 'Inter UI';
               font-style: normal;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2')
-                  format('woff2'),
+              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2') format('woff2'),
                 url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
             }
 
@@ -216,10 +183,8 @@ class NametagsPage extends React.Component {
               font-family: 'Inter UI';
               font-style: italic;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2')
-                  format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff')
-                  format('woff');
+              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
             }
 
             html {
@@ -248,8 +213,7 @@ class NametagsPage extends React.Component {
 
             .nametags {
               margin: 0 auto;
-              width: ${this.cols * this.dimensions.nametag.width}
-                ${this.dimensions.unit};
+              width: ${this.cols * this.dimensions.nametag.width} ${this.dimensions.unit};
             }
 
             .nametag {
@@ -257,8 +221,7 @@ class NametagsPage extends React.Component {
               height: ${this.dimensions.nametag.height} ${this.dimensions.unit};
               text-align: center;
               float: left;
-              padding: ${this.dimensions.nametag.padding}
-                ${this.dimensions.unit};
+              padding: ${this.dimensions.nametag.padding} ${this.dimensions.unit};
               box-sizing: border-box;
               overflow: hidden;
               display: flex;

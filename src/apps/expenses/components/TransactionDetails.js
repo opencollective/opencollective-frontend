@@ -100,9 +100,7 @@ class TransactionDetails extends React.Component {
 
     const hostFeePercent = host && `${host.hostFeePercent}%`;
 
-    const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type)
-      ? -netAmountInCollectiveCurrency
-      : amount;
+    const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type) ? -netAmountInCollectiveCurrency : amount;
 
     const amountDetails = [
       intl.formatNumber(initialAmount / 100, {
@@ -134,19 +132,11 @@ class TransactionDetails extends React.Component {
       });
     };
 
-    addFees([
-      'hostFeeInHostCurrency',
-      'platformFeeInHostCurrency',
-      'paymentProcessorFeeInHostCurrency',
-    ]);
+    addFees(['hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
-    let amountDetailsStr =
-      amountDetails.length > 1 ? amountDetails.join(' ') : '';
+    let amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : '';
 
-    if (
-      ['ORGANIZATION', 'USER'].includes(collective.type) &&
-      type === 'CREDIT'
-    ) {
+    if (['ORGANIZATION', 'USER'].includes(collective.type) && type === 'CREDIT') {
       amountDetailsStr = amountDetailsStr.replace(/-/g, '+');
     }
 
@@ -235,12 +225,7 @@ class TransactionDetails extends React.Component {
         {type === 'DEBIT' && (
           <div className="frame">
             {attachment && (
-              <a
-                href={attachment}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Open receipt in a new window"
-              >
+              <a href={attachment} target="_blank" rel="noopener noreferrer" title="Open receipt in a new window">
                 <img src={imagePreview(attachment)} />
               </a>
             )}
@@ -257,71 +242,45 @@ class TransactionDetails extends React.Component {
         )}
         <div className="col">
           <label>
-            <FormattedMessage
-              id="transaction.paymentMethod"
-              defaultMessage="payment method"
-            />
+            <FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" />
           </label>
           {paymentMethod && this.paymentMethodName(paymentMethod)}
         </div>
-        {hostCurrencyFxRate &&
-          hostCurrencyFxRate !== 1 && (
-            <div className="col">
-              <label>
-                <FormattedMessage
-                  id="transaction.fxrate"
-                  defaultMessage="fx rate"
-                />
-              </label>
-              {hostCurrencyFxRate}
-            </div>
-          )}
+        {hostCurrencyFxRate && hostCurrencyFxRate !== 1 && (
+          <div className="col">
+            <label>
+              <FormattedMessage id="transaction.fxrate" defaultMessage="fx rate" />
+            </label>
+            {hostCurrencyFxRate}
+          </div>
+        )}
 
-        {type === 'DEBIT' &&
-          canDownloadInvoice &&
-          !isRefund && (
-            <div className="col invoice">
-              <label>
-                <FormattedMessage
-                  id="transaction.invoice"
-                  defaultMessage="invoice"
-                />
-              </label>
-              <div>
-                <a
-                  href={`/${collective.slug}/transactions/${uuid}/invoice.pdf`}
-                >
-                  <FormattedMessage
-                    id="transaction.downloadPDF"
-                    defaultMessage="Download (pdf)"
-                  />
-                </a>
-              </div>
+        {type === 'DEBIT' && canDownloadInvoice && !isRefund && (
+          <div className="col invoice">
+            <label>
+              <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
+            </label>
+            <div>
+              <a href={`/${collective.slug}/transactions/${uuid}/invoice.pdf`}>
+                <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+              </a>
             </div>
-          )}
+          </div>
+        )}
 
         <div className="col">
           <label>
-            <FormattedMessage
-              id="transaction.amountDetails"
-              defaultMessage="amount details"
-            />
+            <FormattedMessage id="transaction.amountDetails" defaultMessage="amount details" />
           </label>
           <div className="amountDetails">
             {amountDetailsStr && (
               <span>
                 <span>{amountDetailsStr}</span>
-                <span className="netAmountInCollectiveCurrency">
-                  &nbsp;=&nbsp;
-                </span>
+                <span className="netAmountInCollectiveCurrency">&nbsp;=&nbsp;</span>
               </span>
             )}
             <span className="netAmountInCollectiveCurrency">
-              <FormattedNumber
-                value={finalAmount / 100}
-                currency={currency}
-                {...this.currencyStyle}
-              />
+              <FormattedNumber value={finalAmount / 100} currency={currency} {...this.currencyStyle} />
             </span>
             &nbsp;
             <span className="netAmountInCollectiveCurrencyDescription">
@@ -339,11 +298,7 @@ class TransactionDetails extends React.Component {
         <div className="actions">
           {canRefund && (
             <div className="transactionActions">
-              <RefundTransactionBtn
-                id={id}
-                isRefund={isRefund}
-                CollectiveId={collective.id}
-              />
+              <RefundTransactionBtn id={id} isRefund={isRefund} CollectiveId={collective.id} />
             </div>
           )}
         </div>

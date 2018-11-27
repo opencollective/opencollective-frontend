@@ -59,20 +59,15 @@ export function connectAccount(CollectiveId, service, options = {}) {
     ...options,
   };
 
-  return fetch(
-    `/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`,
-    {
-      method: 'get',
-      headers: addAuthTokenToHeader(),
-    },
-  ).then(checkResponseStatus);
+  return fetch(`/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
+    method: 'get',
+    headers: addAuthTokenToHeader(),
+  }).then(checkResponseStatus);
 }
 
 export async function getAccountClientToken(CollectiveId, service) {
   const params = { CollectiveId };
-  const url = `/api/connected-accounts/${service}/clientToken?${queryString(
-    params,
-  )}`;
+  const url = `/api/connected-accounts/${service}/clientToken?${queryString(params)}`;
   return checkResponseStatus(
     await fetch(url, {
       method: 'get',
@@ -135,8 +130,7 @@ export async function refreshToken(currentToken) {
 }
 
 export function get(path, options = {}) {
-  if (path.substr(0, 1) !== '/')
-    throw new Error('Can only get resources with a relative path');
+  if (path.substr(0, 1) !== '/') throw new Error('Can only get resources with a relative path');
 
   return fetch(path, {
     method: 'get',

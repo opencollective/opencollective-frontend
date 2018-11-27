@@ -70,11 +70,7 @@ class GiftCard extends React.Component {
 
     return (
       <ShadowCard width={['300px', '400px']} height={['168px', '224px']}>
-        <Container
-          position="absolute"
-          left={['12px', '24px']}
-          top={['12px', '24px']}
-        >
+        <Container position="absolute" left={['12px', '24px']} top={['12px', '24px']}>
           <Title fontSize={['18px', '24px']}>
             <FormattedMessage
               id="giftcard.user.name"
@@ -87,27 +83,14 @@ class GiftCard extends React.Component {
               id="giftcard.user.text"
               defaultMessage="You can now support open collectives with this amount, courtesy of {emitter}."
               values={{
-                emitter: (
-                  <WhiteLink route={`/${emitter.slug}`}>
-                    {emitter.name}
-                  </WhiteLink>
-                ),
+                emitter: <WhiteLink route={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
               }}
             />
           </Text>
         </Container>
-        <Container
-          position="absolute"
-          right={['12px', '24px']}
-          bottom={['12px', '24px']}
-        >
+        <Container position="absolute" right={['12px', '24px']} bottom={['12px', '24px']}>
           <Flex alignItems="top" className="AmountCurrency">
-            <Span
-              fontWeight="bold"
-              fontSize="4rem"
-              lineHeight="4rem"
-              color="#313233"
-            >
+            <Span fontWeight="bold" fontSize="4rem" lineHeight="4rem" color="#313233">
               <Currency value={amount} currency={currency} precision={0} />
             </Span>
             <Box ml={1}>

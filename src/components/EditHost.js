@@ -49,10 +49,7 @@ class EditHost extends React.Component {
     const queryParams = getQueryParams();
     const HostCollectiveId = Number(queryParams.CollectiveId);
     if (queryParams.message === 'StripeAccountConnected') {
-      if (
-        HostCollectiveId &&
-        HostCollectiveId !== get(this.props, 'collective.host.id')
-      ) {
+      if (HostCollectiveId && HostCollectiveId !== get(this.props, 'collective.host.id')) {
         this.changeHost({ id: HostCollectiveId });
       }
     }
@@ -81,18 +78,13 @@ class EditHost extends React.Component {
 
   render() {
     const { LoggedInUser, collective } = this.props;
-    const hostMembership = get(collective, 'members', []).find(
-      m => m.role === 'HOST',
-    );
+    const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
 
     if (get(collective, 'host.id')) {
       return (
         <Flex>
           <Box p={1} mr={3}>
-            <CollectiveCard
-              collective={collective.host}
-              membership={hostMembership}
-            />
+            <CollectiveCard collective={collective.host} membership={hostMembership} />
           </Box>
           <Box>
             {!collective.isActive && (
@@ -127,10 +119,7 @@ class EditHost extends React.Component {
                   id="editCollective.host.balance"
                   defaultMessage="Your host currently holds {balance} on behalf of your collective."
                   values={{
-                    balance: formatCurrency(
-                      collective.stats.balance,
-                      collective.currency,
-                    ),
+                    balance: formatCurrency(collective.stats.balance, collective.currency),
                   }}
                 />
                 <br />
@@ -143,16 +132,8 @@ class EditHost extends React.Component {
             {collective.stats.balance === 0 && (
               <div>
                 <p>
-                  <Button
-                    bsStyle="primary"
-                    type="submit"
-                    onClick={() => this.changeHost()}
-                    className="removeHostBtn"
-                  >
-                    <FormattedMessage
-                      id="editCollective.host.removeBtn"
-                      defaultMessage="Remove Host"
-                    />
+                  <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} className="removeHostBtn">
+                    <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
                   </Button>
                 </p>
                 <Fineprint>
@@ -199,10 +180,7 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage
-                  id="collective.edit.host.noHost.title"
-                  defaultMessage="No host"
-                />
+                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
@@ -217,17 +195,12 @@ class EditHost extends React.Component {
             <Box width="50px" mr={2}>
               <Radio
                 checked={this.state.selectedOption === 'createHost'}
-                onChange={() =>
-                  this.handleChange('selectedOption', 'createHost')
-                }
+                onChange={() => this.handleChange('selectedOption', 'createHost')}
               />
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage
-                  id="collective.edit.host.createHost.title"
-                  defaultMessage="Use your own host"
-                />
+                <FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Use your own host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.createHost.description"
@@ -238,14 +211,13 @@ class EditHost extends React.Component {
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
               .
-              {this.state.selectedOption === 'createHost' &&
-                LoggedInUser && (
-                  <CreateHostFormWithData
-                    collective={collective}
-                    LoggedInUser={LoggedInUser}
-                    onSubmit={hostCollective => this.changeHost(hostCollective)}
-                  />
-                )}
+              {this.state.selectedOption === 'createHost' && LoggedInUser && (
+                <CreateHostFormWithData
+                  collective={collective}
+                  LoggedInUser={LoggedInUser}
+                  onSubmit={hostCollective => this.changeHost(hostCollective)}
+                />
+              )}
             </Box>
           </Flex>
         </Option>
@@ -260,10 +232,7 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage
-                  id="collective.edit.host.findHost.title"
-                  defaultMessage="Apply to an existing host"
-                />
+                <FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to an existing host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
@@ -296,10 +265,7 @@ class EditHost extends React.Component {
                       />
                     </h3>
                     <Link route="/hosts">
-                      <FormattedMessage
-                        id="collective.edit.host.viewAllHosts"
-                        defaultMessage="View all hosts"
-                      />
+                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" />
                     </Link>
                   </div>
                   <div className="suggestedHostsDescription subtitle">
