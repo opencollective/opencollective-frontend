@@ -404,6 +404,7 @@ class Expense extends React.Component {
                         <PayExpenseBtn
                           expense={expense}
                           collective={collective}
+                          paymentMethods={host.paymentMethods}
                           disabled={!this.props.allowPayAction}
                           lock={this.props.lockPayAction}
                           unlock={this.props.unlockPayAction}
