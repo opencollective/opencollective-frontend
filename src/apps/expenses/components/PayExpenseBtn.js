@@ -16,6 +16,9 @@ class PayExpenseBtn extends React.Component {
     collective: PropTypes.object.isRequired,
     host: PropTypes.object,
     disabled: PropTypes.bool,
+    paymentProcessorFeeInCollectiveCurrency: PropTypes.number,
+    hostFeeInCollectiveCurrency: PropTypes.number,
+    platformFeeInCollectiveCurrency: PropTypes.number,
     lock: PropTypes.func,
     unlock: PropTypes.func,
   };
@@ -24,7 +27,7 @@ class PayExpenseBtn extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      paymentProcessorFeeInHostCurrency: 0,
+      paymentProcessorFeeInCollectiveCurrency: 0,
     };
     this.onClick = this.onClick.bind(this);
     this.messages = defineMessages({
@@ -43,7 +46,12 @@ class PayExpenseBtn extends React.Component {
     lock();
     this.setState({ loading: true });
     try {
-      await this.props.payExpense(expense.id, this.state.paymentProcessorFeeInHostCurrency);
+      await this.props.payExpense(
+        expense.id,
+        this.props.paymentProcessorFeeInCollectiveCurrency,
+        this.props.hostFeeInCollectiveCurrency,
+        this.props.platformFeeInCollectiveCurrency,
+      );
       this.setState({ loading: false });
       unlock();
     } catch (e) {
@@ -134,8 +142,18 @@ class PayExpenseBtn extends React.Component {
 }
 
 const payExpenseQuery = gql`
-  mutation payExpense($id: Int!, $fee: Int!) {
-    payExpense(id: $id, fee: $fee) {
+  mutation payExpense(
+    $id: Int!
+    $paymentProcessorFeeInCollectiveCurrency: Int
+    $hostFeeInCollectiveCurrency: Int
+    $platformFeeInCollectiveCurrency: Int
+  ) {
+    payExpense(
+      id: $id
+      paymentProcessorFeeInCollectiveCurrency: $paymentProcessorFeeInCollectiveCurrency
+      hostFeeInCollectiveCurrency: $hostFeeInCollectiveCurrency
+      platformFeeInCollectiveCurrency: $platformFeeInCollectiveCurrency
+    ) {
       id
       status
       collective {
@@ -151,8 +169,20 @@ const payExpenseQuery = gql`
 
 const addMutation = graphql(payExpenseQuery, {
   props: ({ mutate }) => ({
-    payExpense: async (id, fee) => {
-      return await mutate({ variables: { id, fee } });
+    payExpense: async (
+      id,
+      paymentProcessorFeeInCollectiveCurrency,
+      hostFeeInCollectiveCurrency,
+      platformFeeInCollectiveCurrency,
+    ) => {
+      return await mutate({
+        variables: {
+          id,
+          paymentProcessorFeeInCollectiveCurrency,
+          hostFeeInCollectiveCurrency,
+          platformFeeInCollectiveCurrency,
+        },
+      });
     },
   }),
 });
