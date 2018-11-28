@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Nov 23 2018 14:35:35 GMT+0800 (Central Indonesia Time)
+# timestamp: Wed Nov 28 2018 17:50:23 GMT+0800 (Central Indonesia Time)
 
 """Application model"""
 type Application {
@@ -124,7 +124,7 @@ type Collective implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -283,6 +283,9 @@ interface CollectiveInterface {
 
     """Filter on given types (creditcard, virtualcard...)"""
     types: [String]
+
+    """Order entries based on given column. Set to null for no ordering."""
+    orderBy: PaymenMethodOrderField
   ): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
 }
@@ -524,7 +527,7 @@ type Event implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -733,7 +736,7 @@ type Mutation {
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
-  payExpense(id: Int!, fee: Int!): ExpenseType
+  payExpense(id: Int!, paymentProcessorFeeInCollectiveCurrency: Int, hostFeeInCollectiveCurrency: Int, platformFeeInCollectiveCurrency: Int): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
@@ -1054,7 +1057,7 @@ type Organization implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   email: String
@@ -1074,6 +1077,12 @@ type PaginatedTransactions {
   limit: Int
   offset: Int
   total: Int
+}
+
+"""Properties by which PaymenMethods can be ordered"""
+enum PaymenMethodOrderField {
+  """Order payment methods by type (creditcard, virtualcard...)"""
+  type
 }
 
 """Input type for PaymentMethod (paypal/stripe)"""
@@ -1588,7 +1597,7 @@ type User implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String]): [PaymentMethodType]
+  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   firstName: String
