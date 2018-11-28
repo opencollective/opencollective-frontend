@@ -8,35 +8,29 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 
-class Page extends React.Component {
-  render() {
-    const { children, data = {}, loadingLoggedInUser, LoggedInUser, title, showSearch } = this.props;
-
-    if (data.error) {
-      return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
-    }
-
-    const childProps = { LoggedInUser, loadingLoggedInUser };
-
-    return (
-      <Fragment>
-        <Header
-          className={loadingLoggedInUser ? 'loading' : ''}
-          LoggedInUser={LoggedInUser}
-          showSearch={showSearch}
-          title={title}
-        />
-        <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
-        <Footer />
-      </Fragment>
-    );
+const Page = ({ children, data = {}, loadingLoggedInUser, LoggedInUser, title, showSearch }) => {
+  if (data.error) {
+    return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
   }
-}
+
+  const childProps = { LoggedInUser, loadingLoggedInUser };
+
+  return (
+    <Fragment>
+      <Header showSearch={showSearch} title={title} />
+      <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
+      <Footer />
+    </Fragment>
+  );
+};
+
+Page.displayName = 'Page';
 
 Page.propTypes = {
   data: PropTypes.shape({
     error: PropTypes.shape({}),
   }),
+  loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
   title: PropTypes.string,
