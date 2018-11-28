@@ -71,7 +71,7 @@ class Expense extends React.Component {
 
   toggleDetails() {
     this.setState({
-      mode: this.state.mode === 'details' ? 'list' : 'details',
+      mode: this.state.mode === 'details' ? 'summary' : 'details',
     });
   }
 
@@ -101,7 +101,7 @@ class Expense extends React.Component {
   }
 
   render() {
-    const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable, view } = this.props;
+    const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
 
     if (!expense.fromCollective) {
       console.error('No FromCollective for expense', expense);
@@ -111,16 +111,25 @@ class Expense extends React.Component {
     const title = expense.description;
     const status = expense.status.toLowerCase();
 
+    let view = this.props.view || 'list';
     let { mode } = this.state;
     if (editable && LoggedInUser && !mode) {
-      if (expense.status === 'PENDING' && LoggedInUser.canApproveExpense(expense)) {
-        mode = 'details';
-      }
-      if (expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense)) {
-        mode = 'details';
+      switch (expense.status) {
+        case 'PENDING':
+          mode = LoggedInUser.canApproveExpense(expense) && 'details';
+          break;
+        case 'APPROVED':
+          mode = LoggedInUser.canPayExpense(expense) && 'details';
+          break;
+        case 'PAID':
+          mode = 'summary';
+          view = 'list';
+          break;
       }
     }
-    mode = mode || view;
+    mode = mode || 'summary';
+
+    const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
 
     const canReject =
       LoggedInUser &&
