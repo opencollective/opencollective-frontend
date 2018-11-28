@@ -273,7 +273,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.interval) {
       defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
     } else {
-      defaultDescription = `Donation to ${collective.name}${tierNameInfo}`;
+      defaultDescription = `${totalAmount > 0 ? 'Donation' : 'Registration'} to ${collective.name}${tierNameInfo}`;
     }
 
     const orderData = {
@@ -324,7 +324,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         pick(order, ['hostFeePercent', 'platformFeePercent']),
       );
     } else if (!paymentRequired && order.interval && collective.type === types.COLLECTIVE) {
-      // create inactive subscription to hold the interval info
+      // create inactive subscription to hold the interval info for the pledge
       const subscription = await models.Subscription.create({
         amount: order.totalAmount,
         interval: order.interval,
