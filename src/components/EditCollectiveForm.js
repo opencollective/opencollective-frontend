@@ -15,7 +15,7 @@ import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
 import { get } from 'lodash';
 import styled, { css } from 'styled-components';
-import { Flex, Box } from 'grid-styled';
+import { Flex, Box } from '@rebass/grid';
 
 const selectedStyle = css`
   background-color: #eee;

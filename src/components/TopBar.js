@@ -9,7 +9,7 @@ import withIntl from '../lib/withIntl';
 import { Link } from '../server/pages';
 
 import Hide from './Hide';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../constants/animations';
@@ -67,7 +67,7 @@ class TopBar extends React.Component {
     return (
       <Flex px={3} py={showSearch ? 2 : 3} alignItems="center" flexDirection="row" justifyContent="space-around">
         <Link route="home" passHref>
-          <Flex is="a" alignItems="center">
+          <Flex as="a" alignItems="center">
             <Logo width="24" height="24" animate={shouldAnimate} />
             <Hide xs>
               <Box mx={2}>
@@ -91,7 +91,7 @@ class TopBar extends React.Component {
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="/search">
-                <Flex is="a">
+                <Flex as="a">
                   <SearchIcon fill="#aaaaaa" size={24} />
                 </Flex>
               </Link>
@@ -101,7 +101,7 @@ class TopBar extends React.Component {
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="#footer">
-                <Flex is="a">
+                <Flex as="a">
                   <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
               </Link>
@@ -109,20 +109,20 @@ class TopBar extends React.Component {
           </Hide>
 
           <Hide xs>
-            <NavList is="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-              <Box is="li" px={3}>
+            <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+              <Box as="li" px={3}>
                 <Link route="discover" passHref>
                   <NavLink>
                     <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                   </NavLink>
                 </Link>
               </Box>
-              <Box is="li" px={3}>
+              <Box as="li" px={3}>
                 <NavLink href="/learn-more">
                   <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                 </NavLink>
               </Box>
-              <Box is="li" px={3}>
+              <Box as="li" px={3}>
                 <NavLink href="https://medium.com/open-collective">
                   <FormattedMessage id="menu.blog" defaultMessage="Blog" />
                 </NavLink>

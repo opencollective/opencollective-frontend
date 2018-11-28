@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { borders, borderRadius } from 'styled-system';
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 
 const computeBorderRadius = ({ index, itemCount }) => {
   if (index === 0) {

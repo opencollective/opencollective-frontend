@@ -1,7 +1,7 @@
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 import colors from '../constants/colors';
 
-injectGlobal`
+export default createGlobalStyle`
   @font-face {
     font-family: 'Inter UI';
     font-style:  normal;

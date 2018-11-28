@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { H5 } from './Text';
 import Container from './Container';
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import StyledInput, { SubmitInput } from '../components/StyledInput';
 
 class NewsletterContainer extends React.Component {

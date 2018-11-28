@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Span } from '../../../components/Text';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import Currency from '../../../components/Currency';
 
 const AmountCurrency = ({ abbreviate = false, currency, precision = 0, amount, ...styles }) => (

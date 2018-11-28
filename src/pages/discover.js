@@ -9,7 +9,7 @@ import withIntl from '../lib/withIntl';
 import { getBaseApiUrl } from '../lib/utils';
 import { queryString } from '../lib/api';
 
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import Page from '../components/Page';
@@ -132,7 +132,7 @@ const DiscoverPage = ({ collectives, onChange, offset, total, show, sort, tags =
           >
             <Flex width={[1, 0.8, 0.6]} justifyContent="space-evenly" flexWrap="wrap" mb={4}>
               <Flex width={[1, null, 0.5]} justifyContent="center" alignItems="center" mb={[3, null, 0]}>
-                <P is="label" htmlFor="sort" color="white.full" fontSize="LeadParagraph" pr={2}>
+                <P as="label" htmlFor="sort" color="white.full" fontSize="LeadParagraph" pr={2}>
                   Sort By
                 </P>
                 <select name="sort" id="sort" value={sort} onChange={onChange}>
@@ -142,7 +142,7 @@ const DiscoverPage = ({ collectives, onChange, offset, total, show, sort, tags =
               </Flex>
 
               <Flex width={[1, null, 0.5]} justifyContent="center" alignItems="center">
-                <P is="label" htmlFor="show" color="white.full" fontSize="LeadParagraph" pr={2}>
+                <P as="label" htmlFor="show" color="white.full" fontSize="LeadParagraph" pr={2}>
                   Show
                 </P>
                 <select name="show" id="show" value={show} onChange={onChange}>

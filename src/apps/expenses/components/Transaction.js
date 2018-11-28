@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../../components/Avatar';

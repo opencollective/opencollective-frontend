@@ -6,7 +6,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 
 class CreateHostFormWithData extends React.Component {
   static propTypes = {

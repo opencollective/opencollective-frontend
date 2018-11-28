@@ -21,7 +21,7 @@ import Footer from '../components/Footer';
 import { H3, H4, H5, P, Span } from '../components/Text';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputGroup from '../components/StyledInputGroup';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import ButtonGroup from '../components/ButtonGroup';
 import StyledLink from '../components/StyledLink';
@@ -32,7 +32,7 @@ const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 const labelStyles = {
   color: 'black.600',
   fontWeight: 400,
-  is: 'label',
+  as: 'label',
   mb: 1,
 };
 
@@ -66,7 +66,7 @@ const WordCountTextarea = withState('wordCount', 'setWordCount', 140)(({ wordCou
       <P {...labelStyles} htmlFor="publicMessage">
         A message for the community <Span fontWeight="200">- Optional</Span>
       </P>
-      <P {...labelStyles} is="p">
+      <P {...labelStyles} as="p">
         {wordCount}
       </P>
     </Flex>
@@ -75,7 +75,7 @@ const WordCountTextarea = withState('wordCount', 'setWordCount', 140)(({ wordCou
       borderColor="black.300"
       borderRadius="4px"
       fontSize="Paragraph"
-      is="textarea"
+      as="textarea"
       id="publicMessage"
       name="publicMessage"
       placeholder="This will be public and it is also optional"
@@ -226,7 +226,7 @@ class CreatePledgePage extends React.Component {
               px={3}
               width={[1, null, 0.5]}
             >
-              <H3 is="h1" color="black.900" textAlign="left" mb={4}>
+              <H3 as="h1" color="black.900" textAlign="left" mb={4}>
                 Make a pledge
               </H3>
 

@@ -7,7 +7,7 @@ import { groupBy } from 'lodash';
 import { capitalize } from '../lib/utils';
 import InputField from './InputField';
 import colors from '../constants/colors';
-import { Flex, Box } from 'grid-styled';
+import { Flex, Box } from '@rebass/grid';
 import CreateOrganizationForm from './CreateOrganizationForm';
 import { Button } from 'react-bootstrap';
 

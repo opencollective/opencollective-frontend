@@ -15,7 +15,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import { H2, H5, P } from '../components/Text';
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
@@ -109,7 +109,7 @@ class ClaimCollectivePage extends React.Component {
           <Container background="linear-gradient(180deg, #DBECFF, #FFFFFF)" py={4}>
             <Container display="flex" flexDirection="column" alignItems="center" mx="auto" maxWidth={1200} py={4}>
               <img src={defaultPledgedLogo} alt="Pledged Collective" />
-              <H2 is="h1">{name}</H2>
+              <H2 as="h1">{name}</H2>
 
               <Container
                 bg="white.full"

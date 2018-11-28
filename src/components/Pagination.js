@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter } from 'next/router';
 import { Link } from '../server/pages';
 
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import StyledLink from './StyledLink';
 import { TextInput } from './StyledInput';
 import { Span } from './Text';

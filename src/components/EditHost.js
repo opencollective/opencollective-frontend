@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import styled from 'styled-components';
-import { Flex, Box } from 'grid-styled';
+import { Flex, Box } from '@rebass/grid';
 import { Radio } from '@material-ui/core';
 import CreateHostFormWithData from './CreateHostFormWithData';
 import HostsWithData from './HostsWithData';

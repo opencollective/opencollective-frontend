@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import { withRouter } from 'next/router';
 import styled from 'styled-components';
 
