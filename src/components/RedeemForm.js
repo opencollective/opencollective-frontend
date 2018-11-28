@@ -80,7 +80,7 @@ class RedeemForm extends React.Component {
           {!LoggedInUser && (
             <FormattedMessage
               id="redeem.card.info"
-              defaultMessage="It’s easy. Just provide your name and email address, enter your gift code and your open collective account will be created (if needed) and the gift card will be automatically attached to your account."
+              defaultMessage="It's easy! Just enter your name, email address and gift code. We will create an account for you if you don't already have one. You'll be able to select the gift card as the payment method when making a contribution."
             />
           )}
           {LoggedInUser && (

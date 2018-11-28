@@ -200,7 +200,7 @@ class RedeemPage extends React.Component {
                     <Box>
                       <FormattedMessage
                         id="redeem.subtitle.line1"
-                        defaultMessage="Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently."
+                        defaultMessage="Open Collective helps communities - like open source projects, meetups and social movements - raise funds spend them transparently."
                       />
                     </Box>
                   </Subtitle>
