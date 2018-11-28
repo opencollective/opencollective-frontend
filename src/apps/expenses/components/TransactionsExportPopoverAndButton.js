@@ -10,6 +10,8 @@ import { exportFile } from '../../../lib/export_file';
 import withIntl from '../../../lib/withIntl';
 import InputField from '../../../components/InputField';
 
+import { FileDownload } from 'styled-icons/material/FileDownload.cjs';
+
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
 export const transformResultInCSV = json => {
@@ -173,7 +175,7 @@ class PopoverButton extends React.Component {
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
         <a className="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
-          <img src="/static/images/icons/download.svg" style={{ paddingRight: 5 }} />
+          <FileDownload size="1.3em" />{' '}
           <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
         </a>
       </OverlayTrigger>
