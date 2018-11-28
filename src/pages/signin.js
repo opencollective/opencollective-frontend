@@ -2,16 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { Router } from '../server/pages';
+
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 import SignInForm from '../components/SignInForm';
 
-import * as api from '../lib/api';
 import { isValidUrl } from '../lib/utils';
 
 import withIntl from '../lib/withIntl';
+import { withUser } from '../components/UserProvider';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next } }) {
@@ -32,14 +34,9 @@ class SigninPage extends React.Component {
 
   async componentDidMount() {
     if (this.props.token) {
-      const { error, token } = await api.refreshToken(this.props.token);
-      if (error) {
-        this.setState({ error });
-        console.log(error);
-      } else {
-        window.localStorage.setItem('accessToken', token);
-        window.location.replace(this.props.next || '/');
-      }
+      window.localStorage.setItem('accessToken', this.props.token);
+      await this.props.login();
+      Router.replaceRoute(this.props.next || '/');
     }
   }
 
@@ -82,4 +79,4 @@ class SigninPage extends React.Component {
   }
 }
 
-export default withIntl(SigninPage);
+export default withIntl(withUser(SigninPage));

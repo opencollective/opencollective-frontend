@@ -98,6 +98,7 @@ class CreateUpdatePage extends React.Component {
 
         <Body>
           <CollectiveCover
+            key={collective.slug}
             collective={collective}
             href={`/${collective.slug}`}
             title={<FormattedMessage id="updates.new.title" defaultMessage="New update" />}

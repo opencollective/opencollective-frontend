@@ -13,6 +13,7 @@ import { Pencil } from 'styled-icons/octicons/Pencil.cjs';
 
 import colors from '../constants/colors';
 import withIntl from '../lib/withIntl';
+import { withUser } from './UserProvider';
 
 import Avatar from './Avatar';
 import Logo from './Logo';
@@ -541,6 +542,7 @@ class MenuBar extends React.Component {
                             src={collective.image}
                             type={collective.type}
                             name={collective.name}
+                            key={collective.image}
                             className="logo"
                             radius="4.8rem"
                           />
@@ -548,6 +550,7 @@ class MenuBar extends React.Component {
                         {collective.type !== 'USER' && (
                           <Logo
                             src={collective.image}
+                            key={collective.image}
                             className="logo"
                             type={collective.type}
                             website={collective.website}
@@ -619,4 +622,4 @@ const addMutationForAddFundsToOrg = graphql(addFundsToOrgQuery, {
   }),
 });
 
-export default addMutationForAddFundsToOrg(withIntl(MenuBar));
+export default addMutationForAddFundsToOrg(withIntl(withUser(MenuBar)));

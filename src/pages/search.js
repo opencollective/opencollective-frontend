@@ -7,12 +7,10 @@ import styled from 'styled-components';
 
 import { Link, Router } from '../server/pages';
 
-import Body from '../components/Body';
+import Page from '../components/Page';
 import Button from '../components/Button';
 import CollectiveCard from '../components/CollectiveCard';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
 import LoadingGrid from '../components/LoadingGrid';
 import StyledLink from '../components/StyledLink';
 import Pagination from '../components/Pagination';
@@ -21,9 +19,7 @@ import colors from '../constants/colors';
 
 import { addSearchQueryData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 const { USE_PLEDGES } = process.env;
 
@@ -63,31 +59,12 @@ class SearchPage extends React.Component {
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     usePledges: PropTypes.bool,
   };
 
   static defaultProps = {
     usePledges: false,
   };
-
-  state = {
-    loadingUserLogin: true,
-    LoggedInUser: undefined,
-  };
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    try {
-      const LoggedInUser = await getLoggedInUser();
-      this.setState({
-        loadingUserLogin: false,
-        LoggedInUser,
-      });
-    } catch (error) {
-      this.setState({ loadingUserLogin: false });
-    }
-  }
 
   refetch = event => {
     event.preventDefault();
@@ -110,93 +87,53 @@ class SearchPage extends React.Component {
       term = '',
       usePledges,
     } = this.props;
-    const { loadingUserLogin, LoggedInUser } = this.state;
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
     }
 
     const { collectives, limit = 20, offset, total = 0 } = search || {};
-
-    const showCollectives = !loading && term.trim() !== '' && !!collectives;
+    const showCollectives = term.trim() !== '' && !!collectives;
 
     return (
-      <div>
-        <Header
-          title="Search"
-          className={loadingUserLogin ? 'loading' : ''}
-          LoggedInUser={LoggedInUser}
-          showSearch={false}
-        />
-        <Body>
-          <Container mx="auto" px={3} width={[1, 0.85]} maxWidth={1200}>
-            <Box width={1}>
-              <form method="GET" onSubmit={this.refetch}>
-                <FormGroup controlId="search" bsSize="large">
-                  <ControlLabel className="h1">Search Open Collective</ControlLabel>
-                  <Flex alignItems="flex-end" my={3}>
-                    <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
-                    <SearchButton type="submit">
-                      <span className="fa fa-search" />
-                    </SearchButton>
-                  </Flex>
-                </FormGroup>
-              </form>
-            </Box>
-            <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-              {loading && (
-                <Flex py={3} width={1} justifyContent="center">
-                  <LoadingGrid />
+      <Page title="Search" showSearch={false}>
+        <Container mx="auto" px={3} width={[1, 0.85]} maxWidth={1200}>
+          <Box width={1}>
+            <form method="GET" onSubmit={this.refetch}>
+              <FormGroup controlId="search" bsSize="large">
+                <ControlLabel className="h1">Search Open Collective</ControlLabel>
+                <Flex alignItems="flex-end" my={3}>
+                  <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
+                  <SearchButton type="submit">
+                    <span className="fa fa-search" />
+                  </SearchButton>
                 </Flex>
-              )}
-              {showCollectives &&
-                collectives.map(collective => (
-                  <Flex key={collective.slug} my={3} mx={2}>
-                    <CollectiveCard collective={collective} />
-                  </Flex>
-                ))}
-
-              {/* TODO: add suggested collectives when the result is empty */}
-              {showCollectives && collectives.length === 0 && (
-                <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-                  <p>
-                    <em>
-                      No collectives found matching your query: &quot;
-                      {term}
-                      &quot;
-                    </em>
-                  </p>
-                  {usePledges && (
-                    <Link route="createPledge" params={{ name: term }} passHref>
-                      <StyledLink
-                        display="block"
-                        fontSize="Paragraph"
-                        fontWeight="bold"
-                        maxWidth="220px"
-                        py={2}
-                        px={4}
-                        textAlign="center"
-                        buttonStyle="primary"
-                      >
-                        Make a pledge
-                      </StyledLink>
-                    </Link>
-                  )}
-                </Flex>
-              )}
-            </Flex>
-            {showCollectives && collectives.length !== 0 && total > limit && (
-              <Container display="flex" justifyContent="center" fontSize="Paragraph" my={3}>
-                <Pagination offset={offset} total={total} limit={limit} />
-              </Container>
+              </FormGroup>
+            </form>
+          </Box>
+          <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
+            {loading && !collectives && (
+              <Flex py={3} width={1} justifyContent="center">
+                <LoadingGrid />
+              </Flex>
             )}
+            {showCollectives &&
+              collectives.map(collective => (
+                <Flex key={collective.slug} my={3} mx={2}>
+                  <CollectiveCard collective={collective} />
+                </Flex>
+              ))}
 
-            {showCollectives && collectives.length !== 0 && (
+            {/* TODO: add suggested collectives when the result is empty */}
+            {showCollectives && collectives.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <p>
-                  <em>If you don&apos;t see the collective you&apos;re searching for:</em>
+                  <em>
+                    No collectives found matching your query: &quot;
+                    {term}
+                    &quot;
+                  </em>
                 </p>
-
                 {usePledges && (
                   <Link route="createPledge" params={{ name: term }} passHref>
                     <StyledLink
@@ -215,14 +152,42 @@ class SearchPage extends React.Component {
                 )}
               </Flex>
             )}
-          </Container>
-        </Body>
-        <Footer />
-      </div>
+          </Flex>
+          {showCollectives && collectives.length !== 0 && total > limit && (
+            <Container display="flex" justifyContent="center" fontSize="Paragraph" my={3}>
+              <Pagination offset={offset} total={total} limit={limit} />
+            </Container>
+          )}
+
+          {showCollectives && collectives.length !== 0 && (
+            <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+              <p>
+                <em>If you don&apos;t see the collective you&apos;re searching for:</em>
+              </p>
+              {usePledges && (
+                <Link route="createPledge" params={{ name: term }} passHref>
+                  <StyledLink
+                    display="block"
+                    fontSize="Paragraph"
+                    fontWeight="bold"
+                    maxWidth="220px"
+                    py={2}
+                    px={4}
+                    textAlign="center"
+                    buttonStyle="primary"
+                  >
+                    Make a pledge
+                  </StyledLink>
+                </Link>
+              )}
+            </Flex>
+          )}
+        </Container>
+      </Page>
     );
   }
 }
 
 export { SearchPage as MockSearchPage };
 
-export default withData(withIntl(withLoggedInUser(addSearchQueryData(withRouter(SearchPage)))));
+export default withIntl(addSearchQueryData(withRouter(SearchPage)));
