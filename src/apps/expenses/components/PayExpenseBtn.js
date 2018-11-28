@@ -6,9 +6,8 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
-import { getCurrencySymbol, isValidEmail } from '../../../lib/utils';
+import { isValidEmail } from '../../../lib/utils';
 
-import InputField from '../../../components/InputField';
 import SmallButton from '../../../components/SmallButton';
 
 class PayExpenseBtn extends React.Component {
@@ -116,21 +115,6 @@ class PayExpenseBtn extends React.Component {
             }
           `}
         </style>
-        {expense.payoutMethod === 'other' && (
-          <div className="processorFee">
-            <label htmlFor="processorFee">
-              <FormattedMessage id="expense.paymentProcessorFeeInHostCurrency" defaultMessage="payment processor fee" />
-            </label>
-            <InputField
-              defaultValue={0}
-              id="paymentProcessorFeeInHostCurrency"
-              name="paymentProcessorFeeInHostCurrency"
-              onChange={fee => this.setState({ paymentProcessorFeeInHostCurrency: fee })}
-              pre={getCurrencySymbol(expense.currency)}
-              type="currency"
-            />
-          </div>
-        )}
         <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
           {selectedPayoutMethod === 'other' && (
             <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />
