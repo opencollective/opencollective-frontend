@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import { FormattedNumber } from 'react-intl';
 import { Facebook } from 'styled-icons/fa-brands/Facebook.cjs';
 import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
@@ -244,7 +244,7 @@ class HomePage extends React.Component {
 
               <Hide xs sm width={0.4}>
                 <Container maxHeight="50rem" overflow="scroll">
-                  <Box is="ul" p={0}>
+                  <Box as="ul" p={0}>
                     {filteredTransactions.map(transaction => (
                       <ListItem key={transaction.id} mb={1}>
                         <Container
@@ -265,7 +265,7 @@ class HomePage extends React.Component {
           </Container>
 
           <Container maxWidth={1200} mx="auto" px={2}>
-            <H3 is="h2" textAlign={['center', null, 'left']} pb={3}>
+            <H3 as="h2" textAlign={['center', null, 'left']} pb={3}>
               Active collectives
             </H3>
 
@@ -318,7 +318,7 @@ class HomePage extends React.Component {
                 textAlign="center"
                 fontWeight="900"
                 px={2}
-                is="h2"
+                as="h2"
                 fontSize={['H2', null, 'H1']}
                 lineHeight={['H2', null, 'H1']}
               >

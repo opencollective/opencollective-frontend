@@ -6,7 +6,7 @@ import { defaultImage, defaultBackgroundImage } from '../constants/collectives';
 
 import { imagePreview } from '../lib/utils';
 
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import Container from './Container';
 import { P, Span } from './Text';
 import { Link } from '../server/pages';

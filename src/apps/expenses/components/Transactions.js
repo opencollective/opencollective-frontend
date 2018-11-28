@@ -10,7 +10,7 @@ import Transaction from './Transaction';
 import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
 import DownloadInvoicesPopOver from './DownloadInvoicesPopOver';
 
-import { Box } from 'grid-styled';
+import { Box } from '@rebass/grid';
 
 class Transactions extends React.Component {
   static propTypes = {

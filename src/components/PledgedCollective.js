@@ -8,7 +8,7 @@ import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import Container from './Container';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import { H2, H3, H5, P } from './Text';
 import PledgeCard from './PledgeCard';
 import StyledLink from './StyledLink';
@@ -57,7 +57,7 @@ class PledgedCollective extends React.Component {
             <Flex alignItems="center" flexDirection="column">
               <img src={defaultPledgedLogo} alt="Pledged Collective" />
 
-              <H2 is="h1">{collective.name}</H2>
+              <H2 as="h1">{collective.name}</H2>
 
               <Box mb={4} mt={3}>
                 <StyledLink href={collective.website} color="primary.500" fontSize="Caption">

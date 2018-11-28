@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import { Github } from 'styled-icons/fa-brands/Github.cjs';
 import { MediumM } from 'styled-icons/fa-brands/MediumM.cjs';
 import { Slack } from 'styled-icons/fa-brands/Slack.cjs';
@@ -121,7 +121,7 @@ class Footer extends React.Component {
               <Mail size={19} color="#9399A3" />
             </SocialLink>
           </Container>
-          <Flex is="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto" order={['3', null, '2']}>
+          <Flex as="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto" order={['3', null, '2']}>
             {Object.keys(navigation).map(key => (
               <Box key={key} width={[0.5, null, 0.25]} mb={3}>
                 <P textAlign={['center', null, 'left']} fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={3}>

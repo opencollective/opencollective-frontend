@@ -7,7 +7,7 @@ import { withUser } from './UserProvider';
 import { formatCurrency, capitalize } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import Avatar from './Avatar';
 import Hide from './Hide';
 import { P } from './Text';
@@ -152,7 +152,7 @@ class TopBarProfileMenu extends React.Component {
               </StyledLink>
             </Link>
           </Flex>
-          <Box is="ul" p={0} my={2}>
+          <Box as="ul" p={0} my={2}>
             {collectives.map(membership => (
               <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
                 <Link route={`/${get(membership, 'collective.slug')}`} passHref>
@@ -202,7 +202,7 @@ class TopBarProfileMenu extends React.Component {
               </StyledLink>
             </Link>
           </Flex>
-          <Box is="ul" p={0} my={2}>
+          <Box as="ul" p={0} my={2}>
             {orgs.map(membership => (
               <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
                 <Link route={`/${get(membership, 'collective.slug')}`} passHref>
@@ -251,7 +251,7 @@ class TopBarProfileMenu extends React.Component {
           >
             <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
           </P>
-          <Box is="ul" p={0} my={2}>
+          <Box as="ul" p={0} my={2}>
             <ListItem py={1}>
               <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import withIntl from '../lib/withIntl';
 
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { P } from './Text';
 import InputField from './InputField';
