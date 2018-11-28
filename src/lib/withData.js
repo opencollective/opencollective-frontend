@@ -28,6 +28,7 @@ export default ComposedComponent => {
           data: {},
         },
       };
+      const { Component, router } = ctx;
 
       const options = {
         headers: ctx.req ? ctx.req.headers : {},
@@ -51,21 +52,30 @@ export default ComposedComponent => {
         };
 
         // Run all GraphQL queries
-        await getDataFromTree(<ComposedComponent ctx={ctx} url={url} {...composedInitialProps} />, {
-          router: {
-            asPath: ctx.asPath,
-            pathname: ctx.pathname,
-            query: ctx.query,
+        await getDataFromTree(
+          <ComposedComponent
+            ctx={ctx}
+            url={url}
+            client={apollo}
+            Component={Component}
+            router={router}
+            {...composedInitialProps}
+          />,
+          {
+            router: {
+              asPath: ctx.asPath,
+              pathname: ctx.pathname,
+              query: ctx.query,
+            },
+            client: apollo,
           },
-          client: apollo,
-        });
+        );
       } catch (error) {
         // Prevent Apollo Client GraphQL errors from crashing SSR.
         // Handle them in components via the data.error prop:
         // http://dev.apollodata.com/react/api-queries.html#graphql-query-data-error
         if (process.env.DEBUG) console.error('>>> apollo error: ', error);
       }
-
       if (!process.browser) {
         // getDataFromTree does not call componentWillUnmount
         // head side effect therefore need to be cleared manually
