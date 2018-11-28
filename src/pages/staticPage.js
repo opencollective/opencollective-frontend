@@ -72,7 +72,10 @@ class StaticPage extends React.Component {
       <div className="staticPage">
         <style global jsx>
           {`
-            .staticPage .path {
+            .staticPage .content {
+              max-width: 96rem;
+            }
+            .staticPage .content .path {
               color: #9399a3;
               font-size: 1.5rem;
               margin-bottom: -2rem;
@@ -80,7 +83,7 @@ class StaticPage extends React.Component {
               margin-top: 1rem;
               text-transform: uppercase;
             }
-            .staticPage h1 {
+            .staticPage .content h1 {
               margin: 4rem 0px 6rem;
               font-size: 4.8rem;
               color: #121314;
@@ -88,41 +91,39 @@ class StaticPage extends React.Component {
               font-weight: 300;
               text-align: left;
             }
-            .staticPage h2 {
+            .staticPage .content h2 {
               font-size: 2.4rem;
               color: #6e747a;
               font-weight: 500;
               line-height: 3.2rem;
               margin: 5rem 0 1rem;
             }
-            .staticPage h3 {
+            .staticPage .content h3 {
               margin-top: 2.5rem;
               line-height: 1.3;
             }
-            .staticPage h4 {
+            .staticPage .content h4 {
               margin-top: 1rem;
               line-height: 1.3;
             }
-            .staticPage .content {
-              max-width: 96rem;
-            }
-            .staticPage p,
-            .staticPage li,
-            .staticPage summary {
+
+            .staticPage .content p,
+            .staticPage .content li,
+            .staticPage .content summary {
               color: #6e747a;
               font-size: 16px;
               line-height: 24px;
             }
-            .staticPage th {
+            .staticPage .content th {
               min-width: 200px;
               text-align: left;
               vertical-align: top;
               padding-top: 1rem;
             }
-            .staticPage li {
+            .staticPage .content li {
               margin: 0.5rem;
             }
-            .staticPage code {
+            .staticPage .content code {
               padding: 0.5rem !important;
               margin: -7px 0;
               line-height: 1.5rem;
