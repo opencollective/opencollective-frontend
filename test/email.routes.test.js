@@ -14,9 +14,7 @@ import nock from 'nock';
 import initNock from './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
-  const uid = `${email}.${slug}.${template}.${
-    config.keys.opencollective.secret
-  }`;
+  const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
   return crypto
     .createHash('md5')
     .update(uid)
@@ -31,8 +29,7 @@ const usersData = [
     lastName: 'Damman',
     email: 'xdamman+test@gmail.com',
     role: 'ADMIN',
-    image:
-      'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
+    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
   },
   {
     firstName: 'Aseem',
@@ -50,8 +47,7 @@ const usersData = [
     firstName: 'github',
     lastName: '',
     email: 'github+test@opencollective.com',
-    image:
-      'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Logo.png',
+    image: 'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Logo.png',
     role: 'BACKER',
   },
 ];
@@ -123,13 +119,9 @@ describe('email.routes.test', () => {
       )
       .then(res => {
         expect(res.statusCode).to.equal(200);
-        expect(spy.lastCall.args[0]).to.equal(
-          'info@testcollective.opencollective.com',
-        );
+        expect(spy.lastCall.args[0]).to.equal('info@testcollective.opencollective.com');
         expect(spy.lastCall.args[1]).to.equal(webhookBodyPayload.subject);
-        expect(
-          usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1,
-        ).to.be.true;
+        expect(usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1).to.be.true;
       });
   });
 
@@ -144,12 +136,10 @@ describe('email.routes.test', () => {
         for (let i = 0; i < spy.args.length; i++) {
           if (spy.args[i][0] === 'email.approve') {
             // We expect that the email.to is admins@testcollective.opencollective.com
-            expect(spy.args[i][1]).to.equal(
-              'admins@testcollective.opencollective.com',
-            );
+            expect(spy.args[i][1]).to.equal('admins@testcollective.opencollective.com');
             // We check that latest subscribers are present with their avatar (or default avatar)
-            const latestSubscribers = spy.args[i][2].latestSubscribers.sort(
-              (a, b) => (a.name === b.name ? 0 : a.name < b.name ? 1 : -1),
+            const latestSubscribers = spy.args[i][2].latestSubscribers.sort((a, b) =>
+              a.name === b.name ? 0 : a.name < b.name ? 1 : -1,
             );
             expect(latestSubscribers[0].roundedAvatar).to.equal(
               'https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/https%3A%2F%2Fassets-cdn.github.com%2Fimages%2Fmodules%2Flogos_page%2FGitHub-Logo.png',
@@ -210,16 +200,10 @@ describe('email.routes.test', () => {
         expect(emailData.approver.email).to.equal(usersData[1].email);
         expect(emailData.approver.image).to.equal(usersData[1].image);
         expect(emailsSent.length).to.equal(2);
-        expect(emailsSent[0][1]).to.equal(
-          'admins@testcollective.opencollective.com',
-        );
+        expect(emailsSent[0][1]).to.equal('admins@testcollective.opencollective.com');
         expect(emailsSent[0][2].subject).to.equal('test collective admins');
-        expect([emailsSent[0][3].bcc, emailsSent[1][3].bcc]).to.contain(
-          usersData[0].email,
-        );
-        expect(emailsSent[0][3].from).to.equal(
-          'testcollective collective <hello@testcollective.opencollective.com>',
-        );
+        expect([emailsSent[0][3].bcc, emailsSent[1][3].bcc]).to.contain(usersData[0].email);
+        expect(emailsSent[0][3].from).to.equal('testcollective collective <hello@testcollective.opencollective.com>');
       });
   });
 
@@ -227,9 +211,7 @@ describe('email.routes.test', () => {
     const messageId =
       'eyJwIjpmYWxzZSwiayI6IjY5MTdlYTZlLWVhNzctNGQzOC04OGUxLWMzMTQwMzdmNGRhNiIsInMiOiIwMjNjMzgwYWFlIiwiYyI6InNhaWFkIn0=';
     return request(app)
-      .get(
-        `/services/email/approve?messageId=${messageId}&approver=xdamman%40gmail.com&mailserver=so`,
-      )
+      .get(`/services/email/approve?messageId=${messageId}&approver=xdamman%40gmail.com&mailserver=so`)
       .then(res => {
         expect(res.statusCode).to.equal(404);
         expect(res.body.error.message).to.contain(messageId);
@@ -276,12 +258,9 @@ describe('email.routes.test', () => {
         )
         .then(res => {
           expect(res.statusCode).to.equal(200);
-          expect(spy.args[0][0]).to.equal(
-            `admins@${collective.slug}.opencollective.com`,
-          );
+          expect(spy.args[0][0]).to.equal(`admins@${collective.slug}.opencollective.com`);
           expect(spy.args[0][1]).to.equal(`Please approve: ${subject}`);
-          expect(usersData.map(u => u.email).indexOf(spy.args[0][3].bcc) !== -1)
-            .to.be.true;
+          expect(usersData.map(u => u.email).indexOf(spy.args[0][3].bcc) !== -1).to.be.true;
         });
     });
 
@@ -294,12 +273,8 @@ describe('email.routes.test', () => {
           )}`,
         )
         .then(() => {
-          expect(
-            [users[0].email, users[1].email].indexOf(spy.args[0][3].bcc) !== -1,
-          ).to.be.true;
-          expect(
-            [users[0].email, users[1].email].indexOf(spy.args[1][3].bcc) !== -1,
-          ).to.be.true;
+          expect([users[0].email, users[1].email].indexOf(spy.args[0][3].bcc) !== -1).to.be.true;
+          expect([users[0].email, users[1].email].indexOf(spy.args[1][3].bcc) !== -1).to.be.true;
         });
     });
   });
@@ -309,17 +284,15 @@ describe('email.routes.test', () => {
 
     const generateUnsubscribeUrl = email => {
       const token = generateToken(email, collectiveData.slug, template);
-      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${
-        collectiveData.slug
-      }/${template}/${token}`;
+      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${collectiveData.slug}/${template}/${token}`;
     };
 
     it('returns an error if invalid token', () => {
       return request(app)
         .get(
-          `/services/email/unsubscribe/${encodeURIComponent(
-            usersData[0].email,
-          )}/${collectiveData.slug}/${template}/xxxxxxxxxx`,
+          `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${
+            collectiveData.slug
+          }/${template}/xxxxxxxxxx`,
         )
         .then(res => {
           expect(res.statusCode).to.equal(400);
@@ -339,12 +312,8 @@ describe('email.routes.test', () => {
         .then(() => {
           for (const i in spy.args) {
             const emailBody = spy.args[i][2];
-            expect(emailBody).to.contain(
-              generateUnsubscribeUrl(spy.args[i][3].bcc),
-            );
-            expect(emailBody).to.contain(
-              'To unsubscribe from the admins mailing list',
-            );
+            expect(emailBody).to.contain(generateUnsubscribeUrl(spy.args[i][3].bcc));
+            expect(emailBody).to.contain('To unsubscribe from the admins mailing list');
           }
         });
     });

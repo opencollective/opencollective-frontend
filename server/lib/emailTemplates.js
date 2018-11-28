@@ -2,8 +2,8 @@ import fs from 'fs';
 import handlebars from './handlebars';
 
 /*
-* Loads all the email templates
-*/
+ * Loads all the email templates
+ */
 
 const templates = {};
 
@@ -84,46 +84,16 @@ const templatesPath = `${__dirname}/../../templates`;
 // Register partials
 const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
 const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs`, 'utf8');
-const footertxt = fs.readFileSync(
-  `${templatesPath}/partials/footer.text.hbs`,
-  'utf8',
-);
-const toplogo = fs.readFileSync(
-  `${templatesPath}/partials/toplogo.hbs`,
-  'utf8',
-);
-const eventsnippet = fs.readFileSync(
-  `${templatesPath}/partials/eventsnippet.hbs`,
-  'utf8',
-);
-const eventdata = fs.readFileSync(
-  `${templatesPath}/partials/eventdata.hbs`,
-  'utf8',
-);
-const relatedcollectives = fs.readFileSync(
-  `${templatesPath}/partials/relatedcollectives.hbs`,
-  'utf8',
-);
-const recommendedcollectives = fs.readFileSync(
-  `${templatesPath}/partials/recommendedcollectives.hbs`,
-  'utf8',
-);
-const collectivecard = fs.readFileSync(
-  `${templatesPath}/partials/collectivecard.hbs`,
-  'utf8',
-);
-const chargeDateNotice = fs.readFileSync(
-  `${templatesPath}/partials/charge_date_notice.hbs`,
-  'utf8',
-);
-const mthReportFooter = fs.readFileSync(
-  `${templatesPath}/partials/monthlyreport.footer.hbs`,
-  'utf8',
-);
-const mthReportSubscription = fs.readFileSync(
-  `${templatesPath}/partials/monthlyreport.subscription.hbs`,
-  'utf8',
-);
+const footertxt = fs.readFileSync(`${templatesPath}/partials/footer.text.hbs`, 'utf8');
+const toplogo = fs.readFileSync(`${templatesPath}/partials/toplogo.hbs`, 'utf8');
+const eventsnippet = fs.readFileSync(`${templatesPath}/partials/eventsnippet.hbs`, 'utf8');
+const eventdata = fs.readFileSync(`${templatesPath}/partials/eventdata.hbs`, 'utf8');
+const relatedcollectives = fs.readFileSync(`${templatesPath}/partials/relatedcollectives.hbs`, 'utf8');
+const recommendedcollectives = fs.readFileSync(`${templatesPath}/partials/recommendedcollectives.hbs`, 'utf8');
+const collectivecard = fs.readFileSync(`${templatesPath}/partials/collectivecard.hbs`, 'utf8');
+const chargeDateNotice = fs.readFileSync(`${templatesPath}/partials/charge_date_notice.hbs`, 'utf8');
+const mthReportFooter = fs.readFileSync(`${templatesPath}/partials/monthlyreport.footer.hbs`, 'utf8');
+const mthReportSubscription = fs.readFileSync(`${templatesPath}/partials/monthlyreport.subscription.hbs`, 'utf8');
 
 handlebars.registerPartial('header', header);
 handlebars.registerPartial('footer', footer);
@@ -139,10 +109,7 @@ handlebars.registerPartial('mr-footer', mthReportFooter);
 handlebars.registerPartial('mr-subscription', mthReportSubscription);
 
 templateNames.forEach(template => {
-  const source = fs.readFileSync(
-    `${templatesPath}/emails/${template}.hbs`,
-    'utf8',
-  );
+  const source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
   templates[template] = handlebars.compile(source);
 });
 

@@ -37,14 +37,10 @@ describe('currencylib', () => {
   });
 
   it('converts EUR to USD', () =>
-    currencylib
-      .convertToCurrency(1, 'EUR', 'USD', new Date(startDate))
-      .then(amount => expect(amount).to.equal(1.079)));
+    currencylib.convertToCurrency(1, 'EUR', 'USD', new Date(startDate)).then(amount => expect(amount).to.equal(1.079)));
 
   it('converts EUR to USD for another date', () =>
-    currencylib
-      .convertToCurrency(1, 'EUR', 'USD', new Date(endDate))
-      .then(amount => expect(amount).to.equal(1.0533)));
+    currencylib.convertToCurrency(1, 'EUR', 'USD', new Date(endDate)).then(amount => expect(amount).to.equal(1.0533)));
 
   it('converts INR to USD', () =>
     currencylib

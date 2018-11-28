@@ -13,8 +13,7 @@ const TransactionQuery = {
   args: {
     id: {
       type: GraphQLString,
-      description:
-        'The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)',
+      description: 'The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)',
     },
   },
   async resolve(_, args) {

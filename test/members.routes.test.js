@@ -39,9 +39,7 @@ const createTransactions = () => {
 
   return collective
     .addUserWithRole(users[3], roles.BACKER)
-    .then(() =>
-      models.Transaction.createMany(transactions, { HostCollectiveId: 1 }),
-    );
+    .then(() => models.Transaction.createMany(transactions, { HostCollectiveId: 1 }));
 };
 
 describe('members.routes.test.js', () => {
@@ -49,15 +47,14 @@ describe('members.routes.test.js', () => {
 
   // Create users.
   beforeEach(() =>
-    Promise.map(['user1', 'user2', 'user3', 'user4'], u =>
-      models.User.createUserWithCollective(utils.data(u)),
-    ).tap(results => (users = results)));
+    Promise.map(['user1', 'user2', 'user3', 'user4'], u => models.User.createUserWithCollective(utils.data(u))).tap(
+      results => (users = results),
+    ),
+  );
 
   // Create collective.
   beforeEach('create a collective', () =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective = g),
-    ),
+    models.Collective.create(utils.data('collective1')).tap(g => (collective = g)),
   );
 
   // Add the host and a backer to the collective.
@@ -76,9 +73,7 @@ describe('members.routes.test.js', () => {
   describe('#addUser', () => {
     it('fails adding a non-existing user to a collective', done => {
       request(app)
-        .post(
-          `/groups/${collective.id}/users/98765?api_key=${application.api_key}`,
-        )
+        .post(`/groups/${collective.id}/users/98765?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -86,9 +81,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a user to a non-existing collective', done => {
       request(app)
-        .post(
-          `/groups/98765/users/${users[1].id}?api_key=${application.api_key}`,
-        )
+        .post(`/groups/98765/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -150,11 +143,7 @@ describe('members.routes.test.js', () => {
 
     it('successfully add a user to a collective', done => {
       request(app)
-        .post(
-          `/groups/${collective.id}/users/${users[1].id}?api_key=${
-            application.api_key
-          }`,
-        )
+        .post(`/groups/${collective.id}/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -271,9 +260,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers with their corresponding tier', () =>
       request(app)
-        .get(
-          `/groups/${collective.slug}/backers?api_key=${application.api_key}`,
-        )
+        .get(`/groups/${collective.slug}/backers?api_key=${application.api_key}`)
         .expect(200)
         .toPromise()
         .tap(res => {
@@ -288,11 +275,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of *active* backers with their corresponding tier', done => {
       request(app)
-        .get(
-          `/groups/${collective.slug}/backers?filter=active&api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${collective.slug}/backers?filter=active&api_key=${application.api_key}`)
         .expect(200)
         .expect(res => {
           const backers = res.body;
@@ -305,11 +288,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers in csv format without emails if not logged in as admin', done => {
       request(app)
-        .get(
-          `/groups/${collective.slug}/backers.csv?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${collective.slug}/backers.csv?api_key=${application.api_key}`)
         .expect(200)
         .expect(res => {
           const headers = res.text
@@ -331,10 +310,7 @@ describe('members.routes.test.js', () => {
             return res;
           };
           backers.sort((a, b) => {
-            return getColValue(a, 'name').substr(0, 1) <
-              getColValue(b, 'name').substr(0, 1)
-              ? -1
-              : 1;
+            return getColValue(a, 'name').substr(0, 1) < getColValue(b, 'name').substr(0, 1) ? -1 : 1;
           });
           expect(getValue(0, 'role')).to.equal('"BACKER"');
           expect(getValue(0, 'tier')).to.equal('"sponsors"');
@@ -347,11 +323,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers in csv format without emails if logged in as backer', done => {
       request(app)
-        .get(
-          `/groups/${collective.slug}/backers.csv?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${collective.slug}/backers.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`) // BACKER
         .expect(200)
         .expect(res => {
@@ -363,11 +335,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers in csv format with emails if logged in as admin', done => {
       request(app)
-        .get(
-          `/groups/${collective.slug}/backers.csv?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${collective.slug}/backers.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`) // ADMIN
         .expect(200)
         .expect(res => {

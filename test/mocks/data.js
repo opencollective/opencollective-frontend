@@ -7,8 +7,7 @@ export default {
     email: 'finance+wwcode@opencollective.com',
     paypalEmail: 'paypal+wwcode@opencollective.com',
     description: 'engineer',
-    longDescription:
-      'This is a long description with some *markdown* **style**',
+    longDescription: 'This is a long description with some *markdown* **style**',
     twitterHandle: 'wwcode',
     address: 'Paradize street\nSan Francisco CA 94100\nUSA',
     currency: 'USD',
@@ -21,8 +20,7 @@ export default {
     email: 'user1@opencollective.com',
     paypalEmail: 'User1+paypal@opencollective.com',
     description: 'engineer',
-    longDescription:
-      'This is a long description with some *markdown* **style**',
+    longDescription: 'This is a long description with some *markdown* **style**',
     twitterHandle: 'philmod',
     address: 'Paradize street\nSan Francisco CA 94100\nUSA',
   },
@@ -31,8 +29,7 @@ export default {
     firstName: 'Anish',
     lastName: 'Bas',
     username: 'abas',
-    image:
-      'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c_400x400.jpeg',
+    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c_400x400.jpeg',
     description: 'small guy',
     email: 'user2@opencollective.com',
     twitterHandle: 'abas',
@@ -125,10 +122,8 @@ export default {
     {
       name: 'Reinventing Brussels',
       slug: 'reinventingbrussels',
-      mission:
-        'connect all the initiatives that create a welcoming &amp; sustainable city with deep human values',
-      image:
-        'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
+      mission: 'connect all the initiatives that create a welcoming &amp; sustainable city with deep human values',
+      image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
       currency: 'EUR',
       settings: {
         style: { hero: { cover: { background: 'rgb(36,189,213)' } } },
@@ -139,8 +134,7 @@ export default {
     {
       name: 'Refugees Got Talent',
       slug: 'refugeesgottalent',
-      mission:
-        'offer a space and artistic material to refugees artists, so they can practice their art again.',
+      mission: 'offer a space and artistic material to refugees artists, so they can practice their art again.',
       image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
@@ -153,8 +147,7 @@ export default {
       image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
-      backgroundImage:
-        'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg',
+      backgroundImage: 'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg',
       isActive: true,
     },
   ],
@@ -585,8 +578,7 @@ export default {
       budget: 100000,
       burnrate: 1000,
       currency: 'USD',
-      image:
-        'http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg',
+      image: 'http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg',
       backgroundImage: null,
       createdAt: '2016-01-30T07:31:37.802Z',
       updatedAt: '2016-01-30T07:31:37.802Z',
@@ -607,16 +599,14 @@ export default {
   },
   expense1: {
     description: 'Expense 1: Lunch with Jenn',
-    privateMessage:
-      'Some very long and super interesting extra notes for the whole world to see',
+    privateMessage: 'Some very long and super interesting extra notes for the whole world to see',
     category: 'Engineering',
     amount: 12000,
     currency: 'EUR',
     paypalEmail: 'newPaypal2@gmail.com',
     incurredAt: '2016-03-06 UTC+0300',
     payoutMethod: 'paypal',
-    attachment:
-      'https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG',
+    attachment: 'https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG',
   },
   expense2: {
     description: 'tshirts',
@@ -630,15 +620,13 @@ export default {
   },
   expense3: {
     description: 'Expense 3: Lunch with Jenn',
-    privateMessage:
-      'Some very long and super interesting extra notes for the whole world to see',
+    privateMessage: 'Some very long and super interesting extra notes for the whole world to see',
     category: 'Engineering',
     amount: 12000,
     currency: 'USD',
     incurredAt: '2016-03-06 UTC+0300',
     payoutMethod: 'paypal',
-    attachment:
-      'https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG',
+    attachment: 'https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG',
   },
 
   event1: {

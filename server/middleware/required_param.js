@@ -5,10 +5,7 @@ import errors from '../lib/errors';
  */
 export default function required(properties) {
   properties = [].slice.call(arguments);
-  return _required_options(
-    { include: ['query', 'body', 'headers'] },
-    properties,
-  );
+  return _required_options({ include: ['query', 'body', 'headers'] }, properties);
 }
 
 /**
@@ -17,10 +14,7 @@ export default function required(properties) {
  */
 export function required_valid(properties) {
   properties = [].slice.call(arguments);
-  return _required_options(
-    { include: ['query', 'body', 'headers', 'params', ''] },
-    properties,
-  );
+  return _required_options({ include: ['query', 'body', 'headers', 'params', ''] }, properties);
 }
 
 function _required_options(options, properties) {
@@ -50,10 +44,8 @@ function _required_options(options, properties) {
 
     const missingProps = Object.keys(missing);
     if (missingProps.length) {
-      if (missingProps.indexOf('remoteUser') !== -1)
-        return next(new errors.Unauthorized('User is not authenticated'));
-      else
-        return next(new errors.ValidationFailed('missing_required', missing));
+      if (missingProps.indexOf('remoteUser') !== -1) return next(new errors.Unauthorized('User is not authenticated'));
+      else return next(new errors.ValidationFailed('missing_required', missing));
     }
 
     next();

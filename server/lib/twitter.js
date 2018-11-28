@@ -37,11 +37,7 @@ const tweetNewMember = async activity => {
   }
 
   if (!get(activity, 'data.member.memberCollective.twitterHandle')) {
-    debug(
-      'skipping',
-      'no twitter handle for ',
-      get(activity, 'data.member.memberCollective.slug'),
-    );
+    debug('skipping', 'no twitter handle for ', get(activity, 'data.member.memberCollective.slug'));
     return;
   }
 
@@ -64,21 +60,9 @@ const tweetNewMember = async activity => {
 
   // todo: we should use the handlebar templating system to support {{#if}}{{/if}}
   const status = template
-    .replace(
-      '{backerTwitterHandle}',
-      `@${get(activity, 'data.member.memberCollective.twitterHandle')}`,
-    )
-    .replace(
-      '{referralTwitterHandle}',
-      `@${get(activity, 'data.order.referral.twitterHandle')}`,
-    )
-    .replace(
-      '{amount}',
-      formatCurrency(
-        get(activity, 'data.order.totalAmount'),
-        get(activity, 'data.order.currency'),
-      ),
-    );
+    .replace('{backerTwitterHandle}', `@${get(activity, 'data.member.memberCollective.twitterHandle')}`)
+    .replace('{referralTwitterHandle}', `@${get(activity, 'data.order.referral.twitterHandle')}`)
+    .replace('{amount}', formatCurrency(get(activity, 'data.order.totalAmount'), get(activity, 'data.order.currency')));
 
   return await twitterLib.tweetStatus(
     twitterAccount,

@@ -18,37 +18,22 @@ describe('graphql.tiers.test', () => {
    * - User1 will become a backer of collective1
    * - Host is the host of both collective1 and collective2
    */
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user1 = u),
-    ));
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ));
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('host1')).tap(
-      u => (host = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user1 = u)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => (host = u)));
   beforeEach(() =>
     models.PaymentMethod.create({
       ...utils.data('paymentMethod2'),
       CreatedByUserId: user1.id,
       CollectiveId: user1.CollectiveId,
-    }).tap(c => (paymentMethod1 = c)));
+    }).tap(c => (paymentMethod1 = c)),
+  );
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective1 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective2')).tap(
-      g => (collective2 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => (collective2 = g)));
 
-  beforeEach(() =>
-    collective1.createTier(utils.data('tier1')).tap(t => (tier1 = t)));
+  beforeEach(() => collective1.createTier(utils.data('tier1')).tap(t => (tier1 = t)));
 
   beforeEach(() => collective1.addHost(host.collective, host));
   beforeEach(() => collective2.addHost(host.collective, host));
@@ -77,14 +62,12 @@ describe('graphql.tiers.test', () => {
     sandbox.stub(stripe, 'createCustomer').callsFake(() => {
       return Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' });
     });
-    sandbox
-      .stub(stripe, 'createCharge')
-      .callsFake((hostStripeAccount, data) => {
-        return Promise.resolve({
-          amount: data.amount,
-          balance_transaction: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
-        });
+    sandbox.stub(stripe, 'createCharge').callsFake((hostStripeAccount, data) => {
+      return Promise.resolve({
+        amount: data.amount,
+        balance_transaction: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
       });
+    });
     sandbox.stub(stripe, 'retrieveBalanceTransaction').callsFake(() => {
       return Promise.resolve({
         id: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
@@ -124,9 +107,9 @@ describe('graphql.tiers.test', () => {
         collective1.createTier({
           slug: 'bronze-sponsor',
           name: 'bronze sponsor',
-        }));
-      beforeEach(() =>
-        collective1.createTier({ slug: 'gold-sponsor', name: 'gold sponsor' }));
+        }),
+      );
+      beforeEach(() => collective1.createTier({ slug: 'gold-sponsor', name: 'gold sponsor' }));
 
       const getTiersQuery = `
       query Collective($collectiveSlug: String, $tierSlug: String, $tierId: Int) {
@@ -227,11 +210,7 @@ describe('graphql.tiers.test', () => {
         const order = generateLoggedInOrder();
         order.paymentMethod = { uuid: paymentMethod1.uuid };
 
-        const result = await utils.graphqlQuery(
-          createOrderQuery,
-          { order },
-          user2,
-        );
+        const result = await utils.graphqlQuery(createOrderQuery, { order }, user2);
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal(
           "You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)",
@@ -242,11 +221,7 @@ describe('graphql.tiers.test', () => {
         const orderInput = generateLoggedInOrder();
         orderInput.paymentMethod = { uuid: paymentMethod1.uuid };
 
-        const result = await utils.graphqlQuery(
-          createOrderQuery,
-          { order: orderInput },
-          user1,
-        );
+        const result = await utils.graphqlQuery(createOrderQuery, { order: orderInput }, user1);
         result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
 
@@ -281,11 +256,7 @@ describe('graphql.tiers.test', () => {
       });
 
       it('user1 becomes a backer of collective1 using a new payment method', async () => {
-        const result = await utils.graphqlQuery(
-          createOrderQuery,
-          { order: generateLoggedInOrder() },
-          user1,
-        );
+        const result = await utils.graphqlQuery(createOrderQuery, { order: generateLoggedInOrder() }, user1);
         result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
         const members = await models.Member.findAll({

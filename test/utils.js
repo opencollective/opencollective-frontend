@@ -49,10 +49,7 @@ export const resetCaches = () => cache.clear();
 
 export const resetTestDB = () =>
   sequelize.sync({ force: true }).catch(e => {
-    console.error(
-      "test/utils.js> Sequelize Error: Couldn't recreate the schema",
-      e,
-    );
+    console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
     process.exit(1);
   });
 
@@ -86,10 +83,7 @@ export const inspectSpy = (spy, argsCount) => {
  * @param {*} cond
  * @param {*} options: { timeout, delay }
  */
-export const waitForCondition = (
-  cond,
-  options = { timeout: 10000, delay: 0 },
-) =>
+export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) =>
   new Promise(resolve => {
     let hasConditionBeenMet = false;
     setTimeout(() => {
@@ -101,13 +95,7 @@ export const waitForCondition = (
     const isConditionMet = () => {
       hasConditionBeenMet = Boolean(cond());
       if (options.tag) {
-        console.log(
-          new Date().getTime(),
-          '>>> ',
-          options.tag,
-          'is condition met?',
-          hasConditionBeenMet,
-        );
+        console.log(new Date().getTime(), '>>> ', options.tag, 'is condition met?', hasConditionBeenMet);
       }
       if (hasConditionBeenMet) {
         return setTimeout(resolve, options.delay || 0);
@@ -230,30 +218,20 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
   sandbox.stub(stripeGateway, 'createCharge').callsFake(factory('charge'));
 }
 
-export function stubStripeBalance(
-  sandbox,
-  amount,
-  currency,
-  applicationFee = 0,
-  stripeFee = 0,
-) {
+export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0, stripeFee = 0) {
   const fee_details = [];
   const fee = applicationFee + stripeFee;
-  if (applicationFee && applicationFee > 0)
-    fee_details.push({ type: 'application_fee', amount: applicationFee });
-  if (stripeFee && stripeFee > 0)
-    fee_details.push({ type: 'stripe_fee', amount: stripeFee });
-  return sandbox
-    .stub(stripeGateway, 'retrieveBalanceTransaction')
-    .callsFake(async () => ({
-      id: 'txn_1Bs9EEBYycQg1OMfTR33Y5Xr',
-      object: 'balance_transaction',
-      amount,
-      currency: currency.toLowerCase(),
-      fee,
-      fee_details,
-      net: amount - fee,
-      status: 'pending',
-      type: 'charge',
-    }));
+  if (applicationFee && applicationFee > 0) fee_details.push({ type: 'application_fee', amount: applicationFee });
+  if (stripeFee && stripeFee > 0) fee_details.push({ type: 'stripe_fee', amount: stripeFee });
+  return sandbox.stub(stripeGateway, 'retrieveBalanceTransaction').callsFake(async () => ({
+    id: 'txn_1Bs9EEBYycQg1OMfTR33Y5Xr',
+    object: 'balance_transaction',
+    amount,
+    currency: currency.toLowerCase(),
+    fee,
+    fee_details,
+    net: amount - fee,
+    status: 'pending',
+    type: 'charge',
+  }));
 }

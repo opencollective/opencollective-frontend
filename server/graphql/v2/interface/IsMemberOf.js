@@ -24,9 +24,7 @@ export const IsMemberOfFields = {
       const collectiveConditions = { deletedAt: null };
       if (args.accountType && args.accountType.length > 0) {
         collectiveConditions.type = {
-          [Op.in]: args.accountType.map(
-            value => AccountTypeToModelMapping[value],
-          ),
+          [Op.in]: args.accountType.map(value => AccountTypeToModelMapping[value]),
         };
       }
       return models.Member.findAndCountAll({

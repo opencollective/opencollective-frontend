@@ -7,16 +7,7 @@ import * as utils from './utils';
 import models from '../server/models';
 
 describe('Query Tests', () => {
-  let user1,
-    user2,
-    user3,
-    collective1,
-    collective2,
-    collective3,
-    event1,
-    event2,
-    ticket1,
-    ticket2;
+  let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2;
 
   /* SETUP
     collective1: 2 events
@@ -32,45 +23,28 @@ describe('Query Tests', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user1 = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user1 = u)));
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user3')).tap(
-      u => (user3 = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user3')).tap(u => (user3 = u)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective1 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective2')).tap(
-      g => (collective2 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => (collective2 = g)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective4')).tap(
-      g => (collective3 = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective4')).tap(g => (collective3 = g)));
 
   describe('Root query tests', () => {
     beforeEach(() =>
-      models.Collective.createMany(
-        [utils.data('event1'), utils.data('event2')],
-        { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id },
-      ).then(events => {
+      models.Collective.createMany([utils.data('event1'), utils.data('event2')], {
+        CreatedByUserId: user1.id,
+        ParentCollectiveId: collective1.id,
+      }).then(events => {
         event1 = events[0];
         event2 = events[1];
-      }));
+      }),
+    );
 
     beforeEach(() =>
       models.Collective.create(
@@ -79,7 +53,8 @@ describe('Query Tests', () => {
           CreatedByUserId: user2.id,
           ParentCollectiveId: collective2.id,
         }),
-      ));
+      ),
+    );
     // .tap(e => event3 = e)); leaving it here, so setup above makes sense.
 
     describe('returns nothing', () => {
@@ -190,19 +165,14 @@ describe('Query Tests', () => {
 
       describe('returns multiple events with tiers and orders', () => {
         beforeEach(() =>
-          models.Tier.create(
-            Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }),
-          ).tap(t => (ticket1 = t)));
+          models.Tier.create(Object.assign(utils.data('ticket1'), { CollectiveId: event1.id })).tap(t => (ticket1 = t)),
+        );
 
         beforeEach(() =>
-          models.Tier.create(
-            Object.assign(utils.data('ticket2'), { CollectiveId: event1.id }),
-          ).tap(t => (ticket2 = t)));
+          models.Tier.create(Object.assign(utils.data('ticket2'), { CollectiveId: event1.id })).tap(t => (ticket2 = t)),
+        );
 
-        beforeEach(() =>
-          models.Tier.create(
-            Object.assign(utils.data('ticket1'), { CollectiveId: event2.id }),
-          ));
+        beforeEach(() => models.Tier.create(Object.assign(utils.data('ticket1'), { CollectiveId: event2.id })));
 
         beforeEach(() =>
           models.Order.create(
@@ -213,7 +183,8 @@ describe('Query Tests', () => {
               CreatedByUserId: user2.id,
               processedAt: new Date(),
             }),
-          ));
+          ),
+        );
 
         beforeEach(() =>
           models.Order.create(
@@ -224,7 +195,8 @@ describe('Query Tests', () => {
               CreatedByUserId: user3.id,
               processedAt: new Date(),
             }),
-          ));
+          ),
+        );
 
         // this order shouldn't show up in the query
         // because it's not confirmed
@@ -237,7 +209,8 @@ describe('Query Tests', () => {
               CreatedByUserId: user1.id,
               processedAt: null,
             }),
-          ));
+          ),
+        );
 
         beforeEach(() =>
           models.Order.create(
@@ -248,7 +221,8 @@ describe('Query Tests', () => {
               CreatedByUserId: user3.id,
               processedAt: new Date(),
             }),
-          ));
+          ),
+        );
 
         it('sends order data', async () => {
           const query = `
@@ -338,8 +312,7 @@ describe('Query Tests', () => {
                     name: 'Balanced NYC',
                     address: '547 Broadway, NY 10012',
                   },
-                  backgroundImage:
-                    'http://opencollective.com/backgroundimage.png',
+                  backgroundImage: 'http://opencollective.com/backgroundimage.png',
                   createdByUser: { id: 1, firstName: 'Phil' },
                   tiers: [
                     {
@@ -356,14 +329,12 @@ describe('Query Tests', () => {
                         },
                         {
                           id: 2,
-                          description:
-                            'I have been working on open source for over a decade',
+                          description: 'I have been working on open source for over a decade',
                           createdByUser: { id: 3, firstName: 'Xavier' },
                         },
                         {
                           id: 3,
-                          description:
-                            'I have been working on open source for over a decade',
+                          description: 'I have been working on open source for over a decade',
                           createdByUser: {
                             id: 1,
                             firstName: 'Phil',

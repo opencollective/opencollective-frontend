@@ -25,10 +25,7 @@ import { sanitizeForLogs } from '../lib/utils';
 const SequelizeStore = connectSessionSequelize(session.Store);
 
 export default function(app) {
-  app.set(
-    'trust proxy',
-    ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps),
-  );
+  app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
   app.use(helmet());
 
@@ -97,10 +94,7 @@ export default function(app) {
   app.use(multer());
 
   // Error handling.
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    process.env.NODE_ENV !== 'staging'
-  ) {
+  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
     app.use(errorHandler());
   }
 
@@ -112,8 +106,7 @@ export default function(app) {
   passport.serializeUser((user, cb) => cb(null, user));
   passport.deserializeUser((obj, cb) => cb(null, obj));
 
-  const verify = (accessToken, tokenSecret, profile, done) =>
-    done(null, accessToken, { tokenSecret, profile });
+  const verify = (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile });
   passport.use(new GitHubStrategy(config.github, verify));
   passport.use(new MeetupStrategy(config.meetup, verify));
   passport.use(new TwitterStrategy(config.twitter, verify));

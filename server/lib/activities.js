@@ -26,11 +26,7 @@ export default {
 
     // get user data
     if (activity.data.user) {
-      userString = getUserString(
-        format,
-        activity.data.fromCollective,
-        activity.data.user.email,
-      );
+      userString = getUserString(format, activity.data.fromCollective, activity.data.user.email);
     }
 
     if (activity.data.user) {
@@ -45,11 +41,7 @@ export default {
 
     // get host data
     if (activity.data.host) {
-      hostString = `on ${getUserString(
-        format,
-        activity.data.host,
-        activity.data.host.email,
-      )}`;
+      hostString = `on ${getUserString(format, activity.data.host, activity.data.host.email)}`;
     }
 
     // get donation data
@@ -86,11 +78,7 @@ export default {
       ({ service } = activity.data.connectedAccount);
       connectedAccountUsername = activity.data.connectedAccount.username;
       if (service === 'github') {
-        connectedAccountLink = linkify(
-          format,
-          `https://github.com/${connectedAccountUsername}`,
-          null,
-        );
+        connectedAccountLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
       }
     }
 
@@ -124,14 +112,8 @@ export default {
       case activities.COLLECTIVE_EXPENSE_PAID: {
         const details = activity.data.preapprovalDetails;
         let remainingClause = '';
-        if (
-          details &&
-          details.maxTotalAmountOfAllPayments &&
-          details.curPaymentsAmount
-        ) {
-          const remaining =
-            Number(details.maxTotalAmountOfAllPayments) -
-            Number(details.curPaymentsAmount);
+        if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
+          const remaining = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
           remainingClause = `(${remaining} ${currency} remaining on preapproval key)`;
         } else {
           remainingClause = '[Manual payment]';
@@ -247,9 +229,7 @@ export default {
           case TransactionTypes.CREDIT:
             if (userTwitter) {
               tweet = encodeURIComponent(
-                `@${userTwitter} thanks for your ${currencies[currency].format(
-                  recurringAmount,
-                )} donation to ${
+                `@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${
                   collectiveTwitter ? `@${collectiveTwitter}` : collectiveName
                 } 👍 ${publicUrl}`,
               );
@@ -283,9 +263,7 @@ export default {
       case activities.SUBSCRIPTION_CONFIRMED:
         if (userTwitter) {
           tweet = encodeURIComponent(
-            `@${userTwitter} thanks for your ${currencies[currency].format(
-              recurringAmount,
-            )} donation to ${
+            `@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${
               collectiveTwitter ? `@${collectiveTwitter}` : collectiveName
             } 👍 ${publicUrl}`,
           );
@@ -341,8 +319,7 @@ const linkify = (format, link, text) => {
  */
 const getUserString = (format, userCollective, email) => {
   userCollective = userCollective || {};
-  const userString =
-    userCollective.name || userCollective.twitterHandle || 'someone';
+  const userString = userCollective.name || userCollective.twitterHandle || 'someone';
   const link = userCollective.twitterHandle
     ? `https://twitter.com/${userCollective.twitterHandle}`
     : userCollective.website;

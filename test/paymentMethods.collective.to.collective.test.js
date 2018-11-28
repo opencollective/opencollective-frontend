@@ -70,16 +70,8 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
   });
 
   describe('Collective to Collective Transactions', () => {
-    before('creates User 1', () =>
-      models.User.createUserWithCollective({ name: 'User 1' }).then(
-        u => (user1 = u),
-      ),
-    );
-    before('creates User 2', () =>
-      models.User.createUserWithCollective({ name: 'User 2' }).then(
-        u => (user2 = u),
-      ),
-    );
+    before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
+    before('creates User 2', () => models.User.createUserWithCollective({ name: 'User 2' }).then(u => (user2 = u)));
     before('create Host 1(USD)', () =>
       models.Collective.create({
         name: 'Host 1',
@@ -157,9 +149,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       }).then(c => (collective6 = c)),
     );
     before('create an organization', () =>
-      models.Collective.create({ name: 'pubnub', currency: 'USD' }).then(
-        o => (organization = o),
-      ),
+      models.Collective.create({ name: 'pubnub', currency: 'USD' }).then(o => (organization = o)),
     );
     before('create a payment method', async () =>
       models.PaymentMethod.create({
@@ -171,52 +161,40 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
         monthlyLimitPerMember: 10000,
       }).then(pm => (stripePaymentMethod = pm)),
     );
-    beforeEach(
-      'create transactions for 3 donations from organization to collective1',
-      async () => {
-        transactions = [
-          { amount: 500, netAmountInCollectiveCurrency: 500 },
-          { amount: 200, netAmountInCollectiveCurrency: 200 },
-          { amount: 1000, netAmountInCollectiveCurrency: 1000 },
-        ];
-        const transactionsDefaultValue = {
-          CreatedByUserId: user1.id,
-          FromCollectiveId: organization.id,
-          CollectiveId: collective1.id,
-          PaymentMethodId: stripePaymentMethod.id,
-          currency: collective1.currency,
-          HostCollectiveId: collective1.HostCollectiveId,
-          type: 'DEBIT',
-        };
-        await models.Transaction.createManyDoubleEntry(
-          transactions,
-          transactionsDefaultValue,
-        );
-      },
-    );
-    beforeEach(
-      'create transactions for 3 donations from organization to collective5',
-      async () => {
-        transactions = [
-          { amount: 500, netAmountInCollectiveCurrency: 500 },
-          { amount: 200, netAmountInCollectiveCurrency: 200 },
-          { amount: 1000, netAmountInCollectiveCurrency: 1000 },
-        ];
-        const transactionsDefaultValue = {
-          CreatedByUserId: user1.id,
-          FromCollectiveId: organization.id,
-          CollectiveId: collective5.id,
-          PaymentMethodId: stripePaymentMethod.id,
-          currency: collective5.currency,
-          HostCollectiveId: collective5.HostCollectiveId,
-          type: 'DEBIT',
-        };
-        await models.Transaction.createManyDoubleEntry(
-          transactions,
-          transactionsDefaultValue,
-        );
-      },
-    );
+    beforeEach('create transactions for 3 donations from organization to collective1', async () => {
+      transactions = [
+        { amount: 500, netAmountInCollectiveCurrency: 500 },
+        { amount: 200, netAmountInCollectiveCurrency: 200 },
+        { amount: 1000, netAmountInCollectiveCurrency: 1000 },
+      ];
+      const transactionsDefaultValue = {
+        CreatedByUserId: user1.id,
+        FromCollectiveId: organization.id,
+        CollectiveId: collective1.id,
+        PaymentMethodId: stripePaymentMethod.id,
+        currency: collective1.currency,
+        HostCollectiveId: collective1.HostCollectiveId,
+        type: 'DEBIT',
+      };
+      await models.Transaction.createManyDoubleEntry(transactions, transactionsDefaultValue);
+    });
+    beforeEach('create transactions for 3 donations from organization to collective5', async () => {
+      transactions = [
+        { amount: 500, netAmountInCollectiveCurrency: 500 },
+        { amount: 200, netAmountInCollectiveCurrency: 200 },
+        { amount: 1000, netAmountInCollectiveCurrency: 1000 },
+      ];
+      const transactionsDefaultValue = {
+        CreatedByUserId: user1.id,
+        FromCollectiveId: organization.id,
+        CollectiveId: collective5.id,
+        PaymentMethodId: stripePaymentMethod.id,
+        currency: collective5.currency,
+        HostCollectiveId: collective5.HostCollectiveId,
+        type: 'DEBIT',
+      };
+      await models.Transaction.createManyDoubleEntry(transactions, transactionsDefaultValue);
+    });
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       // And given that the endpoint for creating customers on Stripe
@@ -227,13 +205,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       // And given the stripe stuff that depends on values in the
       // order struct is patch. It's here and not on each test because
       // the `totalAmount' field doesn't change throught the tests.
-      utils.stubStripeBalance(
-        sandbox,
-        ORDER_TOTAL_AMOUNT,
-        'usd',
-        0,
-        STRIPE_FEE_STUBBED_VALUE,
-      ); // This is the payment processor fee.
+      utils.stubStripeBalance(sandbox, ORDER_TOTAL_AMOUNT, 'usd', 0, STRIPE_FEE_STUBBED_VALUE); // This is the payment processor fee.
     });
 
     afterEach(() => sandbox.restore());
@@ -241,9 +213,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
     it('the available balance of the payment method of the collective should be equal to the balance of the collective', async () => {
       // getting balance of transactions that were just created
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      const balance = transactions
-        .map(t => t.netAmountInCollectiveCurrency)
-        .reduce(reducer, 0);
+      const balance = transactions.map(t => t.netAmountInCollectiveCurrency).reduce(reducer, 0);
 
       // finding opencollective payment method for collective1
       openCollectivePaymentMethod = await models.PaymentMethod.findOne({
@@ -251,9 +221,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       });
 
       // get Balance given the created user
-      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(
-        user1,
-      );
+      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
 
       expect(balance).to.equal(ocPaymentMethodBalance.amount);
       expect(collective1.currency).to.equal(ocPaymentMethodBalance.currency);
@@ -266,9 +234,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       });
 
       // get Balance given the created user
-      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(
-        user1,
-      );
+      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
 
       // Setting up order
       const order = {
@@ -279,11 +245,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       };
       // Executing queries
       const res = await utils.graphqlQuery(createOrderQuery, { order });
-      const resWithUserParam = await utils.graphqlQuery(
-        createOrderQuery,
-        { order },
-        user2,
-      );
+      const resWithUserParam = await utils.graphqlQuery(createOrderQuery, { order }, user2);
 
       // Then there should be Errors for the Result of the query without any user defined as param
       expect(res.errors).to.exist;
@@ -315,9 +277,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       });
 
       // get Balance given the created user
-      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(
-        user1,
-      );
+      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
 
       // Setting up order
       const order = {
@@ -365,9 +325,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       });
 
       // get Balance given the created user
-      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(
-        user1,
-      );
+      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
 
       // Setting up order
       const order = {
@@ -382,9 +340,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       // Then there should be Errors
       expect(res.errors).to.exist;
       expect(res.errors).to.not.be.empty;
-      expect(res.errors[0].message).to.contain(
-        'needs to add a credit card to send money',
-      );
+      expect(res.errors[0].message).to.contain('needs to add a credit card to send money');
     }); /** END OF "Cannot send money to a different host if the host of the collective doesn\'t have a credit card" */
 
     it('Cannot send money that exceeds Collective balance', async () => {
@@ -413,13 +369,10 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       });
 
       // get Balance given the created user
-      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(
-        user1,
-      );
+      const ocPaymentMethodBalance = await openCollectivePaymentMethod.getBalanceForUser(user1);
 
       // set an amount that's higher than the collective balance
-      const amountHigherThanCollectiveBalance =
-        ocPaymentMethodBalance.amount + 1;
+      const amountHigherThanCollectiveBalance = ocPaymentMethodBalance.amount + 1;
 
       // Setting up order with amount higher than collective1 balance
       const order = {
@@ -435,9 +388,7 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       // Then there should be errors
       expect(res.errors).to.exist;
       expect(res.errors).to.not.be.empty;
-      expect(res.errors[0].message).to.contain(
-        "don't have enough funds available ",
-      );
+      expect(res.errors[0].message).to.contain("don't have enough funds available ");
     }); /** END OF "Cannot send money that exceeds Collective balance" */
 
     it('Cannot send money if The Collectives have different currencies', async () => {
@@ -669,16 +620,11 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       // Then Check if transaction has NO Platform fees and has
       // Host and Payment Processor fees
       expect(transaction.platformFeeInHostCurrency).to.equal(0);
-      const hostFee =
-        -1 * (collective1.hostFeePercent / 100) * order.totalAmount;
+      const hostFee = -1 * (collective1.hostFeePercent / 100) * order.totalAmount;
       expect(transaction.hostFeeInHostCurrency).to.equal(hostFee);
       const paymentProcessorFee = -1 * STRIPE_FEE_STUBBED_VALUE;
-      expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(
-        paymentProcessorFee,
-      );
-      expect(transaction.netAmountInCollectiveCurrency).to.equal(
-        transaction.amount + hostFee + paymentProcessorFee,
-      );
+      expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(paymentProcessorFee);
+      expect(transaction.netAmountInCollectiveCurrency).to.equal(transaction.amount + hostFee + paymentProcessorFee);
     }); /** END OF "Transactions between Collectives through different hosts must have NO platform fees but still have stripe and host fees" */
 
     it('Recurring donations between Collectives with the same host must be allowed', async () => {

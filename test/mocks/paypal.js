@@ -34,8 +34,7 @@ export default {
         ],
       },
       httpStatusCode: 200,
-      paymentApprovalUrl:
-        'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A',
+      paymentApprovalUrl: 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A',
     },
 
     executePayment: {
@@ -119,8 +118,7 @@ export default {
             subdomain: 'Application',
             severity: 'Error',
             category: 'Application',
-            message:
-              'Invalid request parameter: payKey with value AP-7AR83715KM669105N',
+            message: 'Invalid request parameter: payKey with value AP-7AR83715KM669105N',
             parameter: [null],
           },
         ],
@@ -137,8 +135,7 @@ export default {
       },
       preapprovalKey: 'PA-94H23180P4099625W',
       httpStatusCode: 200,
-      preapprovalUrl:
-        'https://www.sandbox.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey=PA-94H23180P4099625W',
+      preapprovalUrl: 'https://www.sandbox.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey=PA-94H23180P4099625W',
     },
 
     preapprovalDetails: {

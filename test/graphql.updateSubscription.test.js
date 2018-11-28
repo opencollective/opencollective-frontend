@@ -52,20 +52,11 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
 
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user2')).tap(
-      u => (user2 = u),
-    ));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
 
-  beforeEach(() =>
-    models.Collective.create(utils.data('collective1')).tap(
-      g => (collective = g),
-    ));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective = g)));
 
   beforeEach(() => collective.addHost(user.collective));
 
@@ -79,10 +70,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
   });
 
   // Create a paymentMethod.
-  beforeEach(() =>
-    models.PaymentMethod.create(utils.data('paymentMethod2')).tap(
-      c => (paymentMethod = c),
-    ));
+  beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => (paymentMethod = c)));
 
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
@@ -112,8 +100,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
     });
 
     // stub the transport
-    beforeEach(() =>
-      sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
+    beforeEach(() => sinon.stub(nm, 'sendMail').callsFake((object, cb) => cb(null, object)));
 
     afterEach(() => nm.sendMail.restore());
 
@@ -153,32 +140,20 @@ describe('graphql.updateSubscriptions.test.js', () => {
       });
 
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal(
-        'You need to be logged in to update a subscription',
-      );
+      expect(res.errors[0].message).to.equal('You need to be logged in to update a subscription');
     });
 
     it('fails if the subscription does not exist', async () => {
-      const res = await utils.graphqlQuery(
-        updateSubscriptionQuery,
-        { id: 2 },
-        user,
-      );
+      const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: 2 }, user);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal('Subscription not found');
     });
 
     it("fails if user isn't an admin of the collective", async () => {
-      const res = await utils.graphqlQuery(
-        updateSubscriptionQuery,
-        { id: order.id },
-        user2,
-      );
+      const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id }, user2);
 
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal(
-        "You don't have permission to update this subscription",
-      );
+      expect(res.errors[0].message).to.equal("You don't have permission to update this subscription");
     });
 
     it('fails if the subscription is not active', async () => {
@@ -198,16 +173,10 @@ describe('graphql.updateSubscriptions.test.js', () => {
         }),
       );
 
-      const res = await utils.graphqlQuery(
-        updateSubscriptionQuery,
-        { id: order2.id },
-        user,
-      );
+      const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order2.id }, user);
 
       expect(res.errors).to.exist;
-      expect(res.errors[0].message).to.equal(
-        'Subscription must be active to be updated',
-      );
+      expect(res.errors[0].message).to.equal('Subscription must be active to be updated');
     });
 
     describe('updating payment method', async () => {
@@ -222,9 +191,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
         );
 
         expect(res.errors).to.exist;
-        expect(res.errors[0].message).to.equal(
-          'Payment method not found with this uuid',
-        );
+        expect(res.errors[0].message).to.equal('Payment method not found with this uuid');
       });
 
       describe('when the order was not past due', () => {
@@ -257,15 +224,9 @@ describe('graphql.updateSubscriptions.test.js', () => {
           });
 
           expect(updatedOrder.PaymentMethodId).to.equal(pm2.id);
-          expect(updatedOrder.Subscription.chargeRetryCount).to.equal(
-            originalChargeRetryCount,
-          );
-          expect(
-            updatedOrder.Subscription.nextChargeDate.toString(),
-          ).to.have.string(originalNextChargeDate);
-          expect(
-            updatedOrder.Subscription.nextPeriodStart.toString(),
-          ).to.have.string(originalNextPeriodStart);
+          expect(updatedOrder.Subscription.chargeRetryCount).to.equal(originalChargeRetryCount);
+          expect(updatedOrder.Subscription.nextChargeDate.toString()).to.have.string(originalNextChargeDate);
+          expect(updatedOrder.Subscription.nextPeriodStart.toString()).to.have.string(originalNextPeriodStart);
         });
 
         it("succeeds when it's a new payment method", async () => {
@@ -316,10 +277,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
           });
         });
 
-        before(
-          () =>
-            (clock = sinon.useFakeTimers(new Date('2018-01-28 0:0').getTime())),
-        );
+        before(() => (clock = sinon.useFakeTimers(new Date('2018-01-28 0:0').getTime())));
 
         after(() => clock.restore());
 
@@ -356,12 +314,8 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
           expect(updatedOrder.PaymentMethodId).to.equal(pm2.id);
           expect(updatedOrder.Subscription.chargeRetryCount).to.equal(0);
-          expect(updatedOrder.Subscription.nextChargeDate.getTime()).to.equal(
-            new Date('2018-01-28 0:0').getTime(),
-          );
-          expect(updatedOrder.Subscription.nextPeriodStart.getTime()).to.equal(
-            originalNextPeriodStart.getTime(),
-          );
+          expect(updatedOrder.Subscription.nextChargeDate.getTime()).to.equal(new Date('2018-01-28 0:0').getTime());
+          expect(updatedOrder.Subscription.nextPeriodStart.getTime()).to.equal(originalNextPeriodStart.getTime());
         });
 
         it("succeeds when it's a new payment method", async () => {
@@ -410,56 +364,36 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
           expect(updatedOrder.PaymentMethodId).to.equal(newPM.id);
           expect(updatedOrder.Subscription.chargeRetryCount).to.equal(0);
-          expect(updatedOrder.Subscription.nextChargeDate.getTime()).to.equal(
-            new Date('2018-01-28 0:0').getTime(),
-          );
-          expect(updatedOrder.Subscription.nextPeriodStart.getTime()).to.equal(
-            originalNextPeriodStart.getTime(),
-          );
+          expect(updatedOrder.Subscription.nextChargeDate.getTime()).to.equal(new Date('2018-01-28 0:0').getTime());
+          expect(updatedOrder.Subscription.nextPeriodStart.getTime()).to.equal(originalNextPeriodStart.getTime());
         });
       });
     });
 
     describe('updating amount', async () => {
       it('fails when the amount is the same', async () => {
-        const res = await utils.graphqlQuery(
-          updateSubscriptionQuery,
-          { id: order.id, amount: 2000 },
-          user,
-        );
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 2000 }, user);
 
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal('Same amount');
       });
 
       it('fails when the amount is invalid (too small)', async () => {
-        const res = await utils.graphqlQuery(
-          updateSubscriptionQuery,
-          { id: order.id, amount: 75 },
-          user,
-        );
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 75 }, user);
 
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal('Invalid amount');
       });
 
       it('fails when the amount is invalid (divisible by 100)', async () => {
-        const res = await utils.graphqlQuery(
-          updateSubscriptionQuery,
-          { id: order.id, amount: 125 },
-          user,
-        );
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 125 }, user);
 
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.equal('Invalid amount');
       });
 
       it('succeeds when the amount is valid', async () => {
-        const res = await utils.graphqlQuery(
-          updateSubscriptionQuery,
-          { id: order.id, amount: 4000 },
-          user,
-        );
+        const res = await utils.graphqlQuery(updateSubscriptionQuery, { id: order.id, amount: 4000 }, user);
 
         expect(res.errors).to.not.exist;
 
@@ -471,9 +405,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
           include: [{ model: models.Subscription }],
         });
 
-        const activeOrder = matchingOrders.find(
-          order => order.Subscription.isActive,
-        );
+        const activeOrder = matchingOrders.find(order => order.Subscription.isActive);
 
         expect(activeOrder.totalAmount).to.equal(4000);
         expect(activeOrder.Subscription.amount).to.equal(4000);

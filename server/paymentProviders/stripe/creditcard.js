@@ -37,9 +37,7 @@ export default {
             collective: order.fromCollective.info,
           })
           .then(customer => customer.id)
-          .then(platformCustomerId =>
-            paymentMethod.update({ customerId: platformCustomerId }),
-          );
+          .then(platformCustomerId => paymentMethod.update({ customerId: platformCustomerId }));
       }
       return Promise.resolve();
     };
@@ -104,19 +102,11 @@ export default {
           },
         })
         .tap(c => (charge = c))
-        .then(charge =>
-          stripeGateway.retrieveBalanceTransaction(
-            hostStripeAccount,
-            charge.balance_transaction,
-          ),
-        )
+        .then(charge => stripeGateway.retrieveBalanceTransaction(hostStripeAccount, charge.balance_transaction))
         .then(balanceTransaction => {
           // create a transaction
           const fees = stripeGateway.extractFees(balanceTransaction);
-          const hostFeeInHostCurrency = paymentsLib.calcFee(
-            balanceTransaction.amount,
-            collective.hostFeePercent,
-          );
+          const hostFeeInHostCurrency = paymentsLib.calcFee(balanceTransaction.amount, collective.hostFeePercent);
           const payload = {
             CreatedByUserId: user.id,
             FromCollectiveId: order.FromCollectiveId,
@@ -173,25 +163,14 @@ export default {
 
     /* From which stripe account it's going to be refunded */
     const collective = await models.Collective.findById(
-      transaction.type === 'CREDIT'
-        ? transaction.CollectiveId
-        : transaction.FromCollectiveId,
+      transaction.type === 'CREDIT' ? transaction.CollectiveId : transaction.FromCollectiveId,
     );
     const hostStripeAccount = await collective.getHostStripeAccount();
 
     /* Refund both charge & application fee */
-    const refund = await stripeGateway.refundCharge(
-      hostStripeAccount,
-      chargeId,
-    );
-    const charge = await stripeGateway.retrieveCharge(
-      hostStripeAccount,
-      chargeId,
-    );
-    const refundBalance = await stripeGateway.retrieveBalanceTransaction(
-      hostStripeAccount,
-      refund.balance_transaction,
-    );
+    const refund = await stripeGateway.refundCharge(hostStripeAccount, chargeId);
+    const charge = await stripeGateway.retrieveCharge(hostStripeAccount, chargeId);
+    const refundBalance = await stripeGateway.retrieveBalanceTransaction(hostStripeAccount, refund.balance_transaction);
     const fees = stripeGateway.extractFees(refundBalance);
 
     /* Create negative transactions for the received transaction */
@@ -206,14 +185,10 @@ export default {
     );
 
     /* Associate RefundTransactionId to all the transactions created */
-    return paymentsLib.associateTransactionRefundId(
-      transaction,
-      refundTransaction,
-      {
-        ...transaction.data,
-        charge,
-      }
-    );
+    return paymentsLib.associateTransactionRefundId(transaction, refundTransaction, {
+      ...transaction.data,
+      charge,
+    });
   },
 
   /** Refund a given transaction that was already refunded
@@ -225,9 +200,7 @@ export default {
 
     /* From which stripe account it's going to be refunded */
     const collective = await models.Collective.findById(
-      transaction.type === 'CREDIT'
-        ? transaction.CollectiveId
-        : transaction.FromCollectiveId,
+      transaction.type === 'CREDIT' ? transaction.CollectiveId : transaction.FromCollectiveId,
     );
     const hostStripeAccount = await collective.getHostStripeAccount();
 
@@ -236,10 +209,7 @@ export default {
     if (!refund) {
       throw new Error('No refunds found in stripe.');
     }
-    const refundBalance = await stripeGateway.retrieveBalanceTransaction(
-      hostStripeAccount,
-      refund.balance_transaction,
-    );
+    const refundBalance = await stripeGateway.retrieveBalanceTransaction(hostStripeAccount, refund.balance_transaction);
     const fees = stripeGateway.extractFees(refundBalance);
 
     /* Create negative transactions for the received transaction */
@@ -254,14 +224,10 @@ export default {
     );
 
     /* Associate RefundTransactionId to all the transactions created */
-    return paymentsLib.associateTransactionRefundId(
-      transaction,
-      refundTransaction,
-      {
-        ...transaction.data,
-        charge,
-      },
-    );
+    return paymentsLib.associateTransactionRefundId(transaction, refundTransaction, {
+      ...transaction.data,
+      charge,
+    });
   },
 
   webhook: (requestBody, event) => {
@@ -288,11 +254,7 @@ export default {
        this one because it could flag a subscription that wasn't
        migrated to the new system.  */
     if (planId(stripeSubscription.plan) === stripeSubscription.plan.id) {
-      return Promise.reject(
-        new errors.BadRequest(
-          'Subscription not migrated ${stripeSubscription.id}',
-        ),
-      );
+      return Promise.reject(new errors.BadRequest('Subscription not migrated ${stripeSubscription.id}'));
     }
     /* We return 200 because Stripe can keep pinging us if we don't do
        so for some events. */

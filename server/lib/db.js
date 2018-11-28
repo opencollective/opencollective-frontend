@@ -22,14 +22,7 @@ import { has, get } from 'lodash';
  * @param {string} name of the file under the `/dumps` directory.
  */
 export async function loadDB(name) {
-  const fullPath = path.join(
-    __dirname,
-    '..',
-    '..',
-    'test',
-    'dbdumps',
-    `${name}.pgsql`,
-  );
+  const fullPath = path.join(__dirname, '..', '..', 'test', 'dbdumps', `${name}.pgsql`);
   const { database, username, password, host, port } = getDBConf('database');
   const cmd = format(
     '/usr/bin/pg_restore --no-acl --no-owner --clean --schema=public --if-exists --role=%I --host=%I --port=%s --username=%I -w --dbname=%I %s',
@@ -91,10 +84,7 @@ export async function getConnectedClient(url) {
  * @param {string} owner of the database.
  */
 export async function createDatabaseQuery(client, database, owner) {
-  const exists = await client.query(
-    'SELECT 1 FROM pg_database WHERE datname=$1',
-    [database],
-  );
+  const exists = await client.query('SELECT 1 FROM pg_database WHERE datname=$1', [database]);
   if (!exists.rowCount) {
     await client.query(format('CREATE DATABASE %s OWNER %s;', database, owner));
     console.log(`database ${database} created`);
@@ -109,10 +99,7 @@ export async function createDatabaseQuery(client, database, owner) {
  * @param {string} database name to be destroyed.
  */
 export async function dropDatabaseQuery(client, database) {
-  const exists = await client.query(
-    'SELECT 1 FROM pg_database WHERE datname=$1',
-    [database],
-  );
+  const exists = await client.query('SELECT 1 FROM pg_database WHERE datname=$1', [database]);
   if (exists.rowCount) {
     await client.query(
       `UPDATE pg_database SET datallowconn = 'false'

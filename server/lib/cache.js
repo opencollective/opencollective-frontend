@@ -15,9 +15,7 @@ const oneDayInSeconds = 60 * 60 * 24;
 
 let memcache;
 if (has(config, 'memcache.servers')) {
-  debugCache(
-    'Memcache configuration detected, using memcache as cache backend.',
-  );
+  debugCache('Memcache configuration detected, using memcache as cache backend.');
   const options = {};
   if (has(config, 'memcache.username') && has(config, 'memcache.password')) {
     options.username = get(config, 'memcache.username');
@@ -43,12 +41,7 @@ async function cacheGet(key, { unserialize = JSON.parse } = {}) {
   }
 }
 
-async function cacheSet(
-  key,
-  value,
-  maxAgeInSeconds = 0,
-  { serialize = JSON.stringify } = {},
-) {
+async function cacheSet(key, value, maxAgeInSeconds = 0, { serialize = JSON.stringify } = {}) {
   debugCache(`set ${key}`);
   // debugCache(`set ${key} ${value}`);
   if (memcache) {

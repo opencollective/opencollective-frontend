@@ -50,8 +50,7 @@ describe('lib.twitter.test.js', () => {
 
     it('with long new backers list', () => {
       data.totalNewBackers = 20;
-      data.newBackersTwitterHandles =
-        '@xdamman, @piamancini, @asood123, @opencollect, @storify';
+      data.newBackersTwitterHandles = '@xdamman, @piamancini, @asood123, @opencollect, @storify';
       const tweet = twitter.compileTweet('monthlyStats', data);
       expect(tweet).to.not.contain('Thank you');
     });

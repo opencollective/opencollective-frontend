@@ -44,10 +44,7 @@ export async function ordersWithPendingCharges() {
 }
 
 function hasReachedQuantity(order) {
-  return (
-    order.Subscription.chargeNumber !== null &&
-    order.Subscription.chargeNumber === order.Subscription.quantity
-  );
+  return order.Subscription.chargeNumber !== null && order.Subscription.chargeNumber === order.Subscription.quantity;
 }
 
 /** Process order and trigger result handlers.
@@ -87,22 +84,16 @@ export async function processOrderWithSubscription(options, order) {
         status = 'failure';
         csvEntry.error = error.message;
       }
-      order.Subscription = Object.assign(
-        order.Subscription,
-        getNextChargeAndPeriodStartDates(status, order),
-      );
+      order.Subscription = Object.assign(order.Subscription, getNextChargeAndPeriodStartDates(status, order));
       order.Subscription.chargeRetryCount = getChargeRetryCount(status, order);
-      if (status === 'success' && order.Subscription.chargeNumber !== null)
-        order.Subscription.chargeNumber += 1;
+      if (status === 'success' && order.Subscription.chargeNumber !== null) order.Subscription.chargeNumber += 1;
     }
   }
 
   csvEntry.status = status;
   csvEntry.retriesAfter = order.Subscription.chargeRetryCount;
   csvEntry.chargeDateAfter = dateFormat(order.Subscription.nextChargeDate);
-  csvEntry.nextPeriodStartAfter = dateFormat(
-    order.Subscription.nextPeriodStart,
-  );
+  csvEntry.nextPeriodStartAfter = dateFormat(order.Subscription.nextPeriodStart);
 
   if (!options.dryRun) {
     try {
@@ -166,8 +157,7 @@ export async function handleRetryStatus(order, transaction) {
  *   2. failure: Two days after today.
  */
 export function getNextChargeAndPeriodStartDates(status, order) {
-  const initial =
-    order.Subscription.nextPeriodStart || order.Subscription.createdAt;
+  const initial = order.Subscription.nextPeriodStart || order.Subscription.createdAt;
   let nextChargeDate = moment(initial);
   const response = {};
   if (status === 'new' || status === 'success') {
@@ -197,9 +187,7 @@ export function getNextChargeAndPeriodStartDates(status, order) {
  * 'success'.
  */
 export function getChargeRetryCount(status, order) {
-  return status === 'success' || status === 'updated'
-    ? 0
-    : order.Subscription.chargeRetryCount + 1;
+  return status === 'success' || status === 'updated' ? 0 : order.Subscription.chargeRetryCount + 1;
 }
 
 /** Cancel subscription
@@ -238,12 +226,7 @@ export function cancelSubscription(order) {
  */
 export function groupProcessedOrders(orders) {
   return orders.reduce((map, value) => {
-    const key =
-      value.status === 'success'
-        ? 'charged'
-        : value.retriesAfter >= MAX_RETRIES
-          ? 'canceled'
-          : 'past_due';
+    const key = value.status === 'success' ? 'charged' : value.retriesAfter >= MAX_RETRIES ? 'canceled' : 'past_due';
     const group = map.get(key);
     if (group) {
       group.total += value.amount;
@@ -275,14 +258,10 @@ export async function sendFailedEmail(order, lastAttempt) {
       order: order.info,
       collective: order.collective.info,
       fromCollective: order.fromCollective.minimal,
-      subscriptionsLink: user.generateLoginLink(
-        `/${order.fromCollective.slug}/subscriptions`,
-      ),
+      subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
     },
     {
-      from: `${order.collective.name} <hello@${
-        order.collective.slug
-      }.opencollective.com>`,
+      from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
     },
   );
 }
@@ -290,10 +269,7 @@ export async function sendFailedEmail(order, lastAttempt) {
 /** Send `thankyou` email */
 export async function sendThankYouEmail(order, transaction) {
   const relatedCollectives = await order.collective.getRelatedCollectives(3, 0);
-  const recommendedCollectives = await getRecommendedCollectives(
-    order.collective,
-    3,
-  );
+  const recommendedCollectives = await getRecommendedCollectives(order.collective, 3);
   const user = order.createdByUser;
   return emailLib.send(
     'thankyou',
@@ -309,14 +285,10 @@ export async function sendThankYouEmail(order, transaction) {
       recommendedCollectives,
       config: { host: config.host },
       interval: order.Subscription.interval,
-      subscriptionsLink: user.generateLoginLink(
-        `/${order.fromCollective.slug}/subscriptions`,
-      ),
+      subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
     },
     {
-      from: `${order.collective.name} <hello@${
-        order.collective.slug
-      }.opencollective.com>`,
+      from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
     },
   );
 }

@@ -7,14 +7,7 @@ import models from '../server/models';
 import roles from '../server/constants/roles';
 import emailLib from '../server/lib/email';
 
-let host,
-  collectiveAdmin,
-  user1,
-  hostAdmin,
-  collective1,
-  event1,
-  expense1,
-  comment1;
+let host, collectiveAdmin, user1, hostAdmin, collective1, event1, expense1, comment1;
 let sandbox, sendEmailSpy;
 
 describe('graphql.comments.test', () => {
@@ -51,14 +44,8 @@ describe('graphql.comments.test', () => {
       email: 'hostadmin@opencollective.com',
     }).tap(u => (hostAdmin = u)),
   );
-  before(() =>
-    models.Collective.create({ name: 'webpack', slug: 'webpack' }).tap(
-      g => (collective1 = g),
-    ),
-  );
-  before(() =>
-    models.Collective.create(utils.data('host1')).tap(g => (host = g)),
-  );
+  before(() => models.Collective.create({ name: 'webpack', slug: 'webpack' }).tap(g => (collective1 = g)));
+  before(() => models.Collective.create(utils.data('host1')).tap(g => (host = g)));
   before(() =>
     models.Expense.create({
       CollectiveId: collective1.id,
@@ -125,49 +112,29 @@ describe('graphql.comments.test', () => {
     it('fails if not authenticated', async () => {
       const result = await utils.graphqlQuery(createCommentQuery, { comment });
       expect(result.errors).to.have.length(1);
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to create a comment',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to create a comment');
     });
 
     it('creates a comment', async () => {
-      const result = await utils.graphqlQuery(
-        createCommentQuery,
-        { comment },
-        user1,
-      );
+      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user1);
       result.errors && console.error(result.errors[0]);
       const createdComment = result.data.createComment;
-      expect(createdComment.html).to.equal(
-        '<p>This is the <strong>comment</strong></p>',
-      );
+      expect(createdComment.html).to.equal('<p>This is the <strong>comment</strong></p>');
       await utils.waitForCondition(() => sendEmailSpy.callCount === 3);
       utils.inspectSpy(sendEmailSpy, 2);
       expect(sendEmailSpy.callCount).to.equal(3);
       expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
       expect(sendEmailSpy.firstCall.args[1]).to.contain(
-        `webpack: New comment on your expense ${expense1.description} by ${
-          collectiveAdmin.firstName
-        }`,
+        `webpack: New comment on your expense ${expense1.description} by ${collectiveAdmin.firstName}`,
       );
       expect(sendEmailSpy.secondCall.args[1]).to.contain(
-        `webpack: New comment on expense ${expense1.description} by ${
-          user1.firstName
-        }`,
+        `webpack: New comment on expense ${expense1.description} by ${user1.firstName}`,
       );
       expect(sendEmailSpy.thirdCall.args[1]).to.contain(
-        `webpack: New comment on expense ${expense1.description} by ${
-          user1.firstName
-        }`,
+        `webpack: New comment on expense ${expense1.description} by ${user1.firstName}`,
       );
-      const firstRecipient =
-        sendEmailSpy.args[1][0] === hostAdmin.email
-          ? hostAdmin
-          : collectiveAdmin;
-      const secondRecipient =
-        sendEmailSpy.args[1][0] === hostAdmin.email
-          ? collectiveAdmin
-          : hostAdmin;
+      const firstRecipient = sendEmailSpy.args[1][0] === hostAdmin.email ? hostAdmin : collectiveAdmin;
+      const secondRecipient = sendEmailSpy.args[1][0] === hostAdmin.email ? collectiveAdmin : hostAdmin;
       expect(sendEmailSpy.args[1][0]).to.equal(firstRecipient.email);
       expect(sendEmailSpy.args[2][0]).to.equal(secondRecipient.email);
     });
@@ -189,17 +156,11 @@ describe('graphql.comments.test', () => {
         comment: { id: comment1.id },
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to edit this comment',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to edit this comment');
     });
 
     it('fails if not authenticated as author or admin of collective', async () => {
-      const result = await utils.graphqlQuery(
-        editCommentQuery,
-        { comment: { id: comment1.id } },
-        user1,
-      );
+      const result = await utils.graphqlQuery(editCommentQuery, { comment: { id: comment1.id } }, user1);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
         'You must be the author or an admin of this collective to edit this comment',
@@ -213,9 +174,7 @@ describe('graphql.comments.test', () => {
         collectiveAdmin,
       );
       expect(result.errors).to.not.exist;
-      expect(result.data.editComment.html).to.equal(
-        '<p>new <em>comment</em> text</p>',
-      );
+      expect(result.data.editComment.html).to.equal('<p>new <em>comment</em> text</p>');
     });
   });
 
@@ -232,20 +191,14 @@ describe('graphql.comments.test', () => {
         id: comment1.id,
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        'You must be logged in to delete this comment',
-      );
+      expect(result.errors[0].message).to.equal('You must be logged in to delete this comment');
       return models.Comment.findById(comment1.id).then(commentFound => {
         expect(commentFound).to.not.be.null;
       });
     });
 
     it('fails to delete a comment if logged in as another user', async () => {
-      const result = await utils.graphqlQuery(
-        deleteCommentQuery,
-        { id: comment1.id },
-        user1,
-      );
+      const result = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, user1);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
         'You need to be logged in as a core contributor or as a host to delete this comment',
@@ -256,11 +209,7 @@ describe('graphql.comments.test', () => {
     });
 
     it('deletes a comment', async () => {
-      const res = await utils.graphqlQuery(
-        deleteCommentQuery,
-        { id: comment1.id },
-        collectiveAdmin,
-      );
+      const res = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, collectiveAdmin);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
       return models.Comment.findById(comment1.id).then(commentFound => {

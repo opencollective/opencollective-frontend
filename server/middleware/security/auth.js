@@ -95,18 +95,10 @@ export function authorizeClientApp(req, res, next) {
   ];
 
   for (const i in exceptions) {
-    if (
-      req.method === exceptions[i].method &&
-      req.originalUrl.match(exceptions[i].regex)
-    )
-      return next();
+    if (req.method === exceptions[i].method && req.originalUrl.match(exceptions[i].regex)) return next();
   }
 
-  const apiKey =
-    req.get('Api-Key') ||
-    req.query.apiKey ||
-    req.query.api_key ||
-    req.body.api_key;
+  const apiKey = req.get('Api-Key') || req.query.apiKey || req.query.api_key || req.body.api_key;
   if (req.clientApp) {
     debug('auth')('Valid Client App');
     next();
@@ -129,8 +121,7 @@ export function authorizeClientApp(req, res, next) {
 export function mustBeLoggedIn(req, res, next) {
   authenticateUser(req, res, e => {
     if (e) return next(e);
-    if (!req.remoteUser)
-      return next(new Unauthorized('User is not authenticated'));
+    if (!req.remoteUser) return next(new Unauthorized('User is not authenticated'));
     else return next();
   });
 }
@@ -144,9 +135,7 @@ export function mustBeLoggedInAsUser(req, res, next) {
     if (req.remoteUser.id !== parseInt(req.params.userid, 10))
       return next(
         new Forbidden(
-          `The authenticated user (${
-            req.remoteUser.username
-          }) cannot edit this user id (${req.params.userid})`,
+          `The authenticated user (${req.remoteUser.username}) cannot edit this user id (${req.params.userid})`,
         ),
       );
     return next();
@@ -162,19 +151,10 @@ export function mustHaveRole(possibleRoles) {
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does
       // If must be HOST, the logged in user can also be an ADMIN of the HOST
       if (possibleRoles.indexOf(roles.HOST) !== -1) {
-        if (
-          req.remoteUser.hasRole([roles.ADMIN], req.collective.HostCollectiveId)
-        )
-          return next(null, true);
+        if (req.remoteUser.hasRole([roles.ADMIN], req.collective.HostCollectiveId)) return next(null, true);
       }
       if (!req.remoteUser.hasRole(possibleRoles, req.collective.id))
-        return next(
-          new Forbidden(
-            `Logged in user must be ${possibleRoles.join(
-              ' or ',
-            )} of this collective`,
-          ),
-        );
+        return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
       else return next(null, true);
     });
   };

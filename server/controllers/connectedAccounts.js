@@ -31,9 +31,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
     case 'github': {
       let fetchUserPromise, caId, user, userCollective;
       const profile = data.profile._json;
-      const image = `https://images.githubusercontent.com/${
-        data.profile.username
-      }`;
+      const image = `https://images.githubusercontent.com/${data.profile.username}`;
 
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
@@ -65,12 +63,9 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         })
         .then(c => {
           userCollective = c;
-          userCollective.description =
-            userCollective.description || profile.bio;
-          userCollective.locationName =
-            userCollective.locationName || profile.location;
-          userCollective.website =
-            userCollective.website || profile.blog || profile.html_url;
+          userCollective.description = userCollective.description || profile.bio;
+          userCollective.locationName = userCollective.locationName || profile.location;
+          userCollective.website = userCollective.website || profile.blog || profile.html_url;
           userCollective.image = userCollective.image || image;
           userCollective.save();
         })
@@ -88,15 +83,10 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
           });
         })
         .then(() => {
-          const token = user.generateConnectedAccountVerifiedToken(
-            caId,
-            data.profile.username,
-          );
+          const token = user.generateConnectedAccountVerifiedToken(caId, data.profile.username);
           const newLocation = redirect
             ? `${redirect}?token=${token}`
-            : `${
-                config.host.website
-              }/github/apply/${token}?utm_source=${utm_source}`;
+            : `${config.host.website}/github/apply/${token}?utm_source=${utm_source}`;
 
           res.redirect(newLocation);
         })
@@ -104,10 +94,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
     }
 
     case 'meetup':
-      return createConnectedAccountForCollective(
-        req.query.CollectiveId,
-        service,
-      )
+      return createConnectedAccountForCollective(req.query.CollectiveId, service)
         .then(ca =>
           ca.update({
             clientId: accessToken,
@@ -115,12 +102,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
             CreatedByUserId: req.remoteUser.id,
           }),
         )
-        .then(() =>
-          res.redirect(
-            redirect ||
-              `${config.host.website}/${req.query.slug}/edit#connectedAccounts`,
-          ),
-        )
+        .then(() => res.redirect(redirect || `${config.host.website}/${req.query.slug}/edit#connectedAccounts`))
         .catch(next);
 
     case 'twitter': {
@@ -132,24 +114,17 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
           collective = c;
           collective.image =
             collective.image ||
-            (profile.profile_image_url_https
-              ? profile.profile_image_url_https.replace(/_normal/, '')
-              : null);
-          collective.description =
-            collective.description || profile.description;
+            (profile.profile_image_url_https ? profile.profile_image_url_https.replace(/_normal/, '') : null);
+          collective.description = collective.description || profile.description;
           collective.backgroundImage =
             collective.backgroundImage ||
-            (profile.profile_banner_url
-              ? `${profile.profile_banner_url}/1500x500`
-              : null);
+            (profile.profile_banner_url ? `${profile.profile_banner_url}/1500x500` : null);
           collective.website = collective.website || profile.url;
           collective.locationName = collective.locationName || profile.location;
           collective.twitterHandle = profile.screen_name;
           collective.save();
         })
-        .then(() =>
-          createConnectedAccountForCollective(req.query.CollectiveId, service),
-        )
+        .then(() => createConnectedAccountForCollective(req.query.CollectiveId, service))
         .then(ca =>
           ca.update({
             username: data.profile.username,
@@ -159,14 +134,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
             CreatedByUserId: req.remoteUser.id,
           }),
         )
-        .then(() =>
-          res.redirect(
-            redirect ||
-              `${config.host.website}/${
-                collective.slug
-              }/edit#connectedAccounts`,
-          ),
-        )
+        .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}/edit#connectedAccounts`))
         .catch(next);
     }
 
@@ -217,9 +185,7 @@ export const fetchAllRepositories = (req, res, next) => {
         }),
       )
         .then(data => [].concat(...data))
-        .filter(
-          repo => repo.permissions && repo.permissions.push && !repo.private,
-        );
+        .filter(repo => repo.permissions && repo.permissions.push && !repo.private);
     })
     .then(body => res.json(body))
     .catch(next);

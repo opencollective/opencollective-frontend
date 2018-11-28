@@ -88,24 +88,13 @@ export async function executePayment(order) {
 export async function createTransaction(order, paymentInfo) {
   /* The `* 100` in the next lines convert from PayPal format in
      dollars to Open Collective format in cents */
-  const amountFromPayPal =
-    paymentInfo.transactions.map(t => parseFloat(t.amount.total)) * 100;
+  const amountFromPayPal = paymentInfo.transactions.map(t => parseFloat(t.amount.total)) * 100;
   const paypalFee =
-    paymentInfo.transactions.map(t =>
-      t.related_resources.map(r => parseFloat(r.sale.transaction_fee.value)),
-    ) * 100;
-  const currencyFromPayPal = paymentInfo.transactions.map(
-    t => t.amount.currency,
-  )[0];
+    paymentInfo.transactions.map(t => t.related_resources.map(r => parseFloat(r.sale.transaction_fee.value))) * 100;
+  const currencyFromPayPal = paymentInfo.transactions.map(t => t.amount.currency)[0];
 
-  const hostFeeInHostCurrency = libpayments.calcFee(
-    amountFromPayPal,
-    order.collective.hostFeePercent,
-  );
-  const platformFeeInHostCurrency = libpayments.calcFee(
-    amountFromPayPal,
-    constants.OC_FEE_PERCENT,
-  );
+  const hostFeeInHostCurrency = libpayments.calcFee(amountFromPayPal, order.collective.hostFeePercent);
+  const platformFeeInHostCurrency = libpayments.calcFee(amountFromPayPal, constants.OC_FEE_PERCENT);
 
   const payload = {
     CreatedByUserId: order.createdByUser.id,
@@ -135,11 +124,7 @@ export async function addUserToCollective(order) {
   const userId = order.createdByUser.id;
   const donorInfo = { id: userId, CollectiveId: order.FromCollectiveId };
   const tierInfo = { CreatedByUserId: userId, TierId: order.TierId };
-  return order.collective.findOrAddUserWithRole(
-    donorInfo,
-    roles.BACKER,
-    tierInfo,
-  );
+  return order.collective.findOrAddUserWithRole(donorInfo, roles.BACKER, tierInfo);
 }
 
 /** Process order in paypal and create transactions in our db */

@@ -3,9 +3,7 @@
 // Only run on the first of the month
 const today = new Date();
 if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
-  console.log(
-    'NODE_ENV is production and today is not the first of month, script aborted!',
-  );
+  console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
 
@@ -59,11 +57,7 @@ const init = () => {
 
   models.ConnectedAccount.findAll(query)
     .tap(connectedAccounts => {
-      console.log(
-        `Preparing the ${month} report for ${
-          connectedAccounts.length
-        } collectives`,
-      );
+      console.log(`Preparing the ${month} report for ${connectedAccounts.length} collectives`);
     })
     .map(connectedAccount => {
       const collective = connectedAccount.collective;
@@ -128,19 +122,9 @@ const processCollective = collective => {
     .then(results => {
       console.log('***', collective.slug, '***');
       const data = { month, year: startDate.getFullYear() };
-      data.topBackers = results[0].map(b =>
-        pick(b.dataValues, ['slug', 'twitterHandle', 'totalDonations', 'role']),
-      );
-      data.topNewBackers = results[1].map(b =>
-        pick(b.dataValues, ['slug', 'twitterHandle', 'totalDonations', 'role']),
-      );
-      data.collective = pick(collective, [
-        'id',
-        'name',
-        'slug',
-        'currency',
-        'publicUrl',
-      ]);
+      data.topBackers = results[0].map(b => pick(b.dataValues, ['slug', 'twitterHandle', 'totalDonations', 'role']));
+      data.topNewBackers = results[1].map(b => pick(b.dataValues, ['slug', 'twitterHandle', 'totalDonations', 'role']));
+      data.collective = pick(collective, ['id', 'name', 'slug', 'currency', 'publicUrl']);
       data.collective.stats = results[5];
       data.collective.stats.backers.totalActive = results[6];
       data.collective.stats.balance = results[2];
@@ -157,9 +141,7 @@ const processCollective = collective => {
 };
 
 const compileTwitterHandles = (userCollectives, total, limit) => {
-  const twitterHandles = userCollectives
-    .map(backer => backer.twitterHandle)
-    .filter(handle => Boolean(handle));
+  const twitterHandles = userCollectives.map(backer => backer.twitterHandle).filter(handle => Boolean(handle));
   const limitToShow = Math.min(twitterHandles.length, limit);
   let res = _.uniq(twitterHandles)
     .map(handle => `@${handle}`)
@@ -181,20 +163,10 @@ const sendTweet = async (twitterAccount, data) => {
     totalBackers: stats.backers.lastMonth,
     totalActiveBackers: stats.backers.totalActive,
     balance: formatCurrency(Math.abs(stats.balance), data.collective.currency),
-    totalAmountSpent: formatCurrency(
-      Math.abs(stats.totalSpent),
-      data.collective.currency,
-    ),
-    totalAmountReceived: formatCurrency(
-      stats.totalReceived,
-      data.collective.currency,
-    ),
+    totalAmountSpent: formatCurrency(Math.abs(stats.totalSpent), data.collective.currency),
+    totalAmountReceived: formatCurrency(stats.totalReceived, data.collective.currency),
     topBackersTwitterHandles: compileTwitterHandles(data.topBackers, 0, 3),
-    newBackersTwitterHandles: compileTwitterHandles(
-      data.topNewBackers,
-      stats.backers.new,
-      5,
-    ),
+    newBackersTwitterHandles: compileTwitterHandles(data.topNewBackers, stats.backers.new, 5),
     topExpenseCategories:
       stats.topExpenseCategories.length === 0
         ? 'none'
@@ -205,36 +177,23 @@ const sendTweet = async (twitterAccount, data) => {
             .toLowerCase(),
   };
 
-  const template =
-    stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
+  const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
   const tweet = twitter.compileTweet(template, replacements);
 
   // We thread the tweet with the previos monthly stats
-  const in_reply_to_status_id = get(
-    twitterAccount,
-    'settings.monthlyStats.lastTweetId',
-  );
+  const in_reply_to_status_id = get(twitterAccount, 'settings.monthlyStats.lastTweetId');
   try {
-    const res = await twitter.tweetStatus(
-      twitterAccount,
-      tweet,
-      `https://opencollective.com/${data.collective.slug}`,
-      { in_reply_to_status_id },
-    );
-    const tweetUrl = `https://twitter.com/${res.user.screen_name}/status/${
-      res.id_str
-    }`;
+    const res = await twitter.tweetStatus(twitterAccount, tweet, `https://opencollective.com/${data.collective.slug}`, {
+      in_reply_to_status_id,
+    });
+    const tweetUrl = `https://twitter.com/${res.user.screen_name}/status/${res.id_str}`;
     // publish to slack.opencollective.com
     await publishToSlack(tweetUrl, config.slack.webhookUrl, {
       channel: config.slack.publicActivityChannel,
     });
 
     set(twitterAccount, 'settings.monthlyStats.lastTweetId', res.id_str);
-    set(
-      twitterAccount,
-      'settings.monthlyStats.lastTweetSentAt',
-      new Date(res.created_at),
-    );
+    set(twitterAccount, 'settings.monthlyStats.lastTweetSentAt', new Date(res.created_at));
     twitterAccount.save();
     console.log('>>> sending tweet:', tweet.length);
     if (process.env.DEBUG) {

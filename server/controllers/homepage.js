@@ -23,10 +23,7 @@ const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget, {
 });
 
 const getTopCollectives = memoize(
-  tag =>
-    models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true).then(
-      ({ collectives }) => collectives,
-    ),
+  tag => models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true).then(({ collectives }) => collectives),
   { key: 'homepage_top_collectives' },
 );
 

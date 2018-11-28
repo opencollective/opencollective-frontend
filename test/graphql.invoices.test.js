@@ -42,12 +42,7 @@ describe('graphql.invoices.test.js', () => {
     const { user } = await store.newUser('xdamman');
     xdamman = user;
     // And given the collective (with their host)
-    const { collective } = await store.newCollectiveWithHost(
-      'brusselstogether',
-      'EUR',
-      'EUR',
-      10,
-    );
+    const { collective } = await store.newCollectiveWithHost('brusselstogether', 'EUR', 'EUR', 10);
     // And given some donations to that collective
     await donate(user, 'EUR', 1000, '2017-09-03 00:00', collective);
     await donate(user, 'EUR', 1000, '2017-10-05 00:00', collective);
@@ -74,9 +69,7 @@ describe('graphql.invoices.test.js', () => {
         fromCollectiveSlug: 'xdamman',
       });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.contain(
-        "You don't have permission to access invoices for this user",
-      );
+      expect(result.errors[0].message).to.contain("You don't have permission to access invoices for this user");
     });
 
     it('returns list of invoices for a given user', async () => {
@@ -98,11 +91,7 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(
-        query,
-        { fromCollectiveSlug: 'xdamman' },
-        xdamman,
-      );
+      const result = await utils.graphqlQuery(query, { fromCollectiveSlug: 'xdamman' }, xdamman);
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoices = result.data.allInvoices;
@@ -147,11 +136,7 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(
-        query,
-        { invoiceSlug: '201710-brusselstogether-host-xdamman' },
-        xdamman,
-      );
+      const result = await utils.graphqlQuery(query, { invoiceSlug: '201710-brusselstogether-host-xdamman' }, xdamman);
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoice = result.data.Invoice;

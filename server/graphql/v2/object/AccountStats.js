@@ -20,8 +20,7 @@ export const AccountStats = new GraphQLObjectType({
         },
       },
       balance: {
-        description:
-          'Amount of money in cents in the currency of the collective currently available to spend',
+        description: 'Amount of money in cents in the currency of the collective currently available to spend',
         type: Amount,
         resolve(collective, args, req) {
           return {

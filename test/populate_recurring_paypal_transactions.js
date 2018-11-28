@@ -48,8 +48,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach(() => models.User.create(data('user1')).tap(u => (user = u)));
 
-  beforeEach(() =>
-    models.Collective.create(data('collective1')).tap(g => (collective = g)));
+  beforeEach(() => models.Collective.create(data('collective1')).tap(g => (collective = g)));
 
   beforeEach(() => collective.addHost(user.collective));
 
@@ -58,7 +57,8 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
       service: 'paypal',
       clientId: 'abc',
       token: 'def',
-    }).then(account => account.setUser(user)));
+    }).then(account => account.setUser(user)),
+  );
 
   beforeEach(() => {
     const fixture = {
@@ -92,8 +92,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
       .tap(t => (transaction = t));
   });
 
-  beforeEach(() =>
-    script.findSubscriptions().tap(res => (subscription = res[0])));
+  beforeEach(() => script.findSubscriptions().tap(res => (subscription = res[0])));
 
   beforeEach(() => {
     runScript = paypalTransactions => {
@@ -101,12 +100,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
         .findSubscriptions()
         .get(0)
         .then(subscription => {
-          return script.handlePaypalTransactions(
-            paypalTransactions,
-            transaction,
-            subscription,
-            billingAgreementId,
-          );
+          return script.handlePaypalTransactions(paypalTransactions, transaction, subscription, billingAgreementId);
         });
     };
   });
@@ -153,9 +147,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
       .then(() => models.Transaction.findAndCountAll())
       .then(res => {
         expect(res.count).to.be.equal(2); // only adds one
-        expect(res.rows[0].data.transaction_id).to.be.equal(
-          paypalTransaction.completed.transaction_id,
-        );
+        expect(res.rows[0].data.transaction_id).to.be.equal(paypalTransaction.completed.transaction_id);
         expect(res.rows[1].data.transaction_id).to.be.equal(transaction_id); // new one
         expect(res.rows[1]).to.have.property('CreatedByUserId');
         expect(res.rows[1]).to.have.property('CollectiveId');
@@ -164,10 +156,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
   });
 
   it('does not create a new transaction if it is already created', () => {
-    const paypalTransactions = [
-      paypalTransaction.created,
-      paypalTransaction.completed,
-    ];
+    const paypalTransactions = [paypalTransaction.created, paypalTransaction.completed];
 
     return runScript(paypalTransactions)
       .then(() => runScript(paypalTransactions))
@@ -176,25 +165,15 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
   });
 
   it('ignores if it does not have a created event', () =>
-    runScript([]).then(message =>
-      expect(message).to.be.equal(
-        `No Created event, invalid: ${billingAgreementId}`,
-      ),
-    ));
+    runScript([]).then(message => expect(message).to.be.equal(`No Created event, invalid: ${billingAgreementId}`)));
 
   it('fails if it does not have a completed event', () =>
     runScript([paypalTransaction.created]).then(message => {
-      expect(message).to.be.equal(
-        `Billing agreement (${billingAgreementId}) not processed yet, no completed event`,
-      );
+      expect(message).to.be.equal(`Billing agreement (${billingAgreementId}) not processed yet, no completed event`);
     }));
 
   it('fails if it has more than 1 completed event', () =>
-    runScript([
-      paypalTransaction.created,
-      paypalTransaction.completed,
-      paypalTransaction.completed,
-    ]).then(message => {
+    runScript([paypalTransaction.created, paypalTransaction.completed, paypalTransaction.completed]).then(message => {
       expect(message).to.be.equal(
         `Invalid subscription ${
           subscription.id

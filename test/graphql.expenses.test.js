@@ -80,12 +80,7 @@ describe('GraphQL Expenses API', () => {
 
     it('gets no expenses if collective has no expenses', async () => {
       // Given that we have a collective with no expenses
-      const { collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // When we retrieve all its expenses
       const result = await utils.graphqlQuery(allExpensesQuery, {
         CollectiveId: collective.id,
@@ -99,12 +94,7 @@ describe('GraphQL Expenses API', () => {
 
     it('gets the latest expenses from one collective', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has some expenses
       const data = {
         currency: 'USD',
@@ -159,16 +149,8 @@ describe('GraphQL Expenses API', () => {
 
     it('gets the latest expenses from all the hosted collectives', async () => {
       // Given that we have two collectives within a host
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
-      const anotherCollective = (await store.newCollectiveInHost(
-        'brusselstogether',
-        'USD',
-        hostCollective,
-      )).collective;
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
+      const anotherCollective = (await store.newCollectiveInHost('brusselstogether', 'USD', hostCollective)).collective;
       // And given that the first collective created above have two expenses
       const data = {
         currency: 'USD',
@@ -210,23 +192,18 @@ describe('GraphQL Expenses API', () => {
       // And then there should be four expenses in total since we're
       // counting the two collectives hosted by `hostCollective`.
       expect(result.data.allExpenses).to.have.length(4);
-      expect(result.data.allExpenses.map(e => e.collective.slug)).to.deep.equal(
-        ['brusselstogether', 'brusselstogether', 'apex', 'apex'],
-      );
+      expect(result.data.allExpenses.map(e => e.collective.slug)).to.deep.equal([
+        'brusselstogether',
+        'brusselstogether',
+        'apex',
+        'apex',
+      ]);
     }); /* End of "gets the latest expenses from all the hosted collectives" */
 
     it('gets the latest expenses from all the hosted collectives for one category', async () => {
       // Given that we have two collectives within a host
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
-      const anotherCollective = (await store.newCollectiveInHost(
-        'babel',
-        'USD',
-        hostCollective,
-      )).collective;
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
+      const anotherCollective = (await store.newCollectiveInHost('babel', 'USD', hostCollective)).collective;
       // And given that the first collective created above have two
       // expenses but just one categorized as `legal`.
       const data = {
@@ -275,25 +252,15 @@ describe('GraphQL Expenses API', () => {
       // counting expenses from the two collectives hosted by
       // `hostCollective` that are under the `legal` category.
       expect(result.data.allExpenses).to.have.length(2);
-      result.data.allExpenses.forEach(e =>
-        expect(e.category).to.equal('legal'),
-      );
+      result.data.allExpenses.forEach(e => expect(e.category).to.equal('legal'));
     }); /* End of "gets the latest expenses from all the hosted collectives for one category" */
 
     it('gets the latest expenses from all the hosted collectives for one author', async () => {
       // Given a user that will file expenses
       const xdamman = (await store.newUser('xdamman')).user;
       // And given that we have two collectives within a host
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
-      const anotherCollective = (await store.newCollectiveInHost(
-        'babel',
-        'USD',
-        hostCollective,
-      )).collective;
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
+      const anotherCollective = (await store.newCollectiveInHost('babel', 'USD', hostCollective)).collective;
       // And given that the first collective created above have two
       // expenses but just one filed by our user
       const data = {
@@ -343,21 +310,14 @@ describe('GraphQL Expenses API', () => {
       // `hostCollective` that were created by xdamman and not by the
       // host owner.
       expect(result.data.allExpenses).to.have.length(2);
-      result.data.allExpenses.forEach(e =>
-        expect(e.user.collective.slug).to.equal('xdamman'),
-      );
+      result.data.allExpenses.forEach(e => expect(e.user.collective.slug).to.equal('xdamman'));
     }); /* End of "gets the latest expenses from all the hosted collectives for one author" */
   }); /* End of "#allExpenses" */
 
   describe('#expenses', () => {
     it('gets no expenses if collective has no expenses', async () => {
       // Given that we have a collective with no expenses
-      const { collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // When we retrieve all its expenses
       const {
         errors,
@@ -375,12 +335,7 @@ describe('GraphQL Expenses API', () => {
 
     it('gets the latest expenses', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has some expenses
       const data = {
         currency: 'USD',
@@ -427,13 +382,7 @@ describe('GraphQL Expenses API', () => {
       expect(expenses).to.have.length(5);
       // And then the expenses retrieved should come from the same
       // collective
-      expect(expenses.map(e => e.description)).to.deep.equal([
-        'T-shirts',
-        'Stickers',
-        'Banner',
-        'Beer',
-        'Pizza',
-      ]);
+      expect(expenses.map(e => e.description)).to.deep.equal(['T-shirts', 'Stickers', 'Banner', 'Beer', 'Pizza']);
     }); /* End of "gets the latest expenses from one collective" */
   });
 
@@ -450,12 +399,7 @@ describe('GraphQL Expenses API', () => {
     it('fails to create an expense if not logged in', async () => {
       emailSendMessageSpy.resetHistory();
       // Given a collective
-      const { collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // When it's attempted to create an expense with no user
       const data = {
         currency: 'USD',
@@ -468,19 +412,12 @@ describe('GraphQL Expenses API', () => {
       // Then there should be an error
       expect(result.errors).to.exist;
       // And then the error message should be clear
-      expect(result.errors[0].message).to.equal(
-        'You need to be logged in to create an expense',
-      );
+      expect(result.errors[0].message).to.equal('You need to be logged in to create an expense');
     }); /* End of "fails to create an expense if not logged in" */
 
     it('creates a new expense logged in and send email to collective admin for approval', async () => {
       // Given a collective
-      const { collective } = await store.newCollectiveWithHost(
-        'Test Collective',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given an admin for the above collective
       const admin = (await store.newUser('collectives-admin')).user;
       await collective.addUserWithRole(admin, 'ADMIN');
@@ -499,11 +436,7 @@ describe('GraphQL Expenses API', () => {
         collective: { id: collective.id },
       };
       emailSendMessageSpy.resetHistory();
-      const result = await utils.graphqlQuery(
-        createExpenseQuery,
-        { expense: data },
-        user,
-      );
+      const result = await utils.graphqlQuery(createExpenseQuery, { expense: data }, user);
       result.errors && console.log(result.errors);
 
       // Then there should be no errors in the response
@@ -531,18 +464,12 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
         'New expense on Test Collective: $10 for Test expense for pizza',
       );
-      expect(emailSendMessageSpy.firstCall.args[2]).to.contain(
-        '/test-collective/expenses/1/approve',
-      );
+      expect(emailSendMessageSpy.firstCall.args[2]).to.contain('/test-collective/expenses/1/approve');
 
       // XXX: This was just copied over. I don't know what this is
       // actually testing:
       // doesn't scream when adding another expense from same user
-      const res = await utils.graphqlQuery(
-        createExpenseQuery,
-        { expense: data },
-        user,
-      );
+      const res = await utils.graphqlQuery(createExpenseQuery, { expense: data }, user);
       expect(res.errors).to.not.exist;
     }); /* End of "creates a new expense logged in and send email to collective admin for approval" */
   }); /* End of "#createExpense" */
@@ -559,12 +486,7 @@ describe('GraphQL Expenses API', () => {
 
     it('fails to approve expense if expense.status is PAID', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'parcel',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('parcel', 'USD', 'USD', 10);
       // And given the above collective has some expenses
       const data = {
         currency: 'USD',
@@ -581,27 +503,16 @@ describe('GraphQL Expenses API', () => {
         status: 'PAID',
       });
       // When there's an attempt to approve an already paid expense
-      const result = await utils.graphqlQuery(
-        approveExpenseQuery,
-        { id: expense.id },
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
       // Then there should be an error
       expect(result.errors).to.exist;
       // And then the error message should be set accordingly
-      expect(result.errors[0].message).to.equal(
-        "You can't reject an expense that is already paid",
-      );
+      expect(result.errors[0].message).to.equal("You can't reject an expense that is already paid");
     }); /* End of "fails to approve expense if expense.status is PAID" */
 
     it('successfully approve expense if expense.status is PENDING and send notification email to author of expense and host admin (unless unsubscribed)', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'rollup',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user', {
         paypalEmail: 'testuser@paypal.com',
@@ -621,11 +532,7 @@ describe('GraphQL Expenses API', () => {
       });
       emailSendMessageSpy.resetHistory();
       // When the expense is approved by the admin of host
-      const result = await utils.graphqlQuery(
-        approveExpenseQuery,
-        { id: expense.id },
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
       result.errors && console.log(result.errors);
       // Then there should be no errors in the result
       expect(result.errors).to.not.exist;
@@ -639,19 +546,11 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.callCount).to.equal(2);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('Your expense');
-      expect(emailSendMessageSpy.firstCall.args[1]).to.contain(
-        'has been approved',
-      );
+      expect(emailSendMessageSpy.firstCall.args[1]).to.contain('has been approved');
       expect(emailSendMessageSpy.secondCall.args[0]).to.equal(hostAdmin.email);
-      expect(emailSendMessageSpy.secondCall.args[1]).to.contain(
-        'New expense approved on rollup: $10 for Pizza',
-      );
-      expect(emailSendMessageSpy.secondCall.args[2]).to.contain(
-        'PayPal (testuser@paypal.com)',
-      );
-      expect(emailSendMessageSpy.secondCall.args[2]).to.contain(
-        'Private instructions to reimburse this expense',
-      );
+      expect(emailSendMessageSpy.secondCall.args[1]).to.contain('New expense approved on rollup: $10 for Pizza');
+      expect(emailSendMessageSpy.secondCall.args[2]).to.contain('PayPal (testuser@paypal.com)');
+      expect(emailSendMessageSpy.secondCall.args[2]).to.contain('Private instructions to reimburse this expense');
     }); /* End of "successfully approve expense if expense.status is PENDING and send notification email to author of expense and host admin (unless unsubscribed)" */
   }); /* End of "#approveExpense" */
 
@@ -669,12 +568,7 @@ describe('GraphQL Expenses API', () => {
 
     it('fails if expense is not approved (PENDING)', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -688,11 +582,7 @@ describe('GraphQL Expenses API', () => {
       });
       // When the expense attempted to be paid
       const parameters = { id: expense.id, fee: 0 };
-      const result = await utils.graphqlQuery(
-        payExpenseQuery,
-        parameters,
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
       // And then the message of the error should be set accordingly
@@ -703,12 +593,7 @@ describe('GraphQL Expenses API', () => {
 
     it('fails if expense is not approved (REJECTED)', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -721,17 +606,10 @@ describe('GraphQL Expenses API', () => {
         collective: { id: collective.id },
       });
       // And the expense is rejected
-      await models.Expense.update(
-        { status: 'REJECTED' },
-        { where: { id: expense.id } },
-      );
+      await models.Expense.update({ status: 'REJECTED' }, { where: { id: expense.id } });
       // When the expense attempted to be paid
       const parameters = { id: expense.id, fee: 0 };
-      const result = await utils.graphqlQuery(
-        payExpenseQuery,
-        parameters,
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
       // And then the message of the error should be set accordingly
@@ -753,11 +631,12 @@ describe('GraphQL Expenses API', () => {
 
     it('fails if not enough funds', async () => {
       // Given that we have a host and a collective
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
+        'railsgirlsatl',
+        'USD',
+        'USD',
+        10,
+      );
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -776,11 +655,7 @@ describe('GraphQL Expenses API', () => {
       // And then add funds to the collective
       await addFunds(user, hostCollective, collective, 500);
       // When the expense is paid by the host admin
-      const result = await utils.graphqlQuery(
-        payExpenseQuery,
-        { id: expense.id, fee: 0 },
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
       // And then the error message should be set appropriately
@@ -791,11 +666,12 @@ describe('GraphQL Expenses API', () => {
 
     it('fails if not enough funds to cover the fees', async () => {
       // Given that we have a host and a collective
-      const {
-        hostAdmin,
-        hostCollective,
-        collective,
-      } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
+        'railsgirlsatl',
+        'USD',
+        'USD',
+        10,
+      );
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (in PENDING
@@ -815,11 +691,7 @@ describe('GraphQL Expenses API', () => {
       await addFunds(user, hostCollective, collective, 1000);
       // When the expense is paid by the host admin
       const parameters = { id: expense.id, fee: 0 };
-      const result = await utils.graphqlQuery(
-        payExpenseQuery,
-        parameters,
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
       // And then the error message should be set appropriately
@@ -833,11 +705,7 @@ describe('GraphQL Expenses API', () => {
 
       beforeEach(async () => {
         // Given that we have a host and a collective
-        ({
-          hostAdmin,
-          hostCollective,
-          collective,
-        } = await store.newCollectiveWithHost(
+        ({ hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
           'Test Collective',
           'USD',
           'USD',
@@ -874,11 +742,7 @@ describe('GraphQL Expenses API', () => {
         // When the expense is paid by the host admin
         let balance = await collective.getBalance();
         expect(balance).to.equal(1500);
-        const res = await utils.graphqlQuery(
-          payExpenseQuery,
-          { id: expense.id, fee },
-          hostAdmin,
-        );
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee }, hostAdmin);
         res.errors && console.log(res.errors);
         expect(res.errors).to.not.exist;
         expect(res.data.payExpense.status).to.equal('PAID');
@@ -896,11 +760,7 @@ describe('GraphQL Expenses API', () => {
         await expense.save();
         // When the expense is paid by the host admin
         const parameters = { id: expense.id, fee: 0 };
-        const result = await utils.graphqlQuery(
-          payExpenseQuery,
-          parameters,
-          hostAdmin,
-        );
+        const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
         result.errors && console.log(result.errors);
         // Then the collective's balance should stay 0
         expect(await collective.getBalance()).to.equal(0);
@@ -944,11 +804,7 @@ describe('GraphQL Expenses API', () => {
         // When the expense is paid by the host admin
         let balance = await collective.getBalance();
         expect(balance).to.equal(1500);
-        const res = await utils.graphqlQuery(
-          payExpenseQuery,
-          { id: expense.id, fee: 0 },
-          hostAdmin,
-        );
+        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
         res.errors && console.log(res.errors);
         expect(res.errors).to.not.exist;
         expect(res.data.payExpense.status).to.equal('PAID');
@@ -967,12 +823,7 @@ describe('GraphQL Expenses API', () => {
   describe('#deleteExpense', () => {
     it('fails if not logged in', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has one expense
       const data = {
         currency: 'USD',
@@ -991,19 +842,12 @@ describe('GraphQL Expenses API', () => {
       // Then there should be an error
       expect(result.errors).to.exist;
       // And then the error message should be set accordingly.
-      expect(result.errors[0].message).to.equal(
-        'You need to be logged in to delete an expense',
-      );
+      expect(result.errors[0].message).to.equal('You need to be logged in to delete an expense');
     }); /* End of "fails if not logged in" */
 
     it('fails if not logged in as author, admin or host', async () => {
       // Given that we have a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given the above collective has one expense
       const data = {
         currency: 'USD',
@@ -1019,27 +863,16 @@ describe('GraphQL Expenses API', () => {
       // above collective and expense.
       const { user } = await store.newUser('some random internet user');
       // When trying to delete the expense passing the user above
-      const result = await utils.graphqlQuery(
-        deleteExpenseQuery,
-        { id: expense.id },
-        user,
-      );
+      const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, user);
       // Then there should be an error
       expect(result.errors).to.exist;
       // And then the error message should be set accordingly.
-      expect(result.errors[0].message).to.equal(
-        "You don't have permission to delete this expense",
-      );
+      expect(result.errors[0].message).to.equal("You don't have permission to delete this expense");
     }); /* End of "fails if not logged in as author, admin or host" */
 
     it('fails if logged in as backer of collective', async () => {
       // Given that we have a collective
-      const { collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user to file an expense
       const { user } = await store.newUser('some random internet user');
       // And given the above collective has one expense (created by the host admin)
@@ -1063,27 +896,16 @@ describe('GraphQL Expenses API', () => {
         role: 'BACKER',
       });
       // When the above expense is attempted to be deleted by the backer
-      const result = await utils.graphqlQuery(
-        deleteExpenseQuery,
-        { id: expense.id },
-        backer,
-      );
+      const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, backer);
       // Then there should be an error
       expect(result.errors).to.exist;
       // And then the error message should be set accordingly.
-      expect(result.errors[0].message).to.equal(
-        "You don't have permission to delete this expense",
-      );
+      expect(result.errors[0].message).to.equal("You don't have permission to delete this expense");
     }); /* End of "fails if logged in as backer of collective" */
 
     it('works if logged in as author', async () => {
       // Given that we have a collective
-      const { collective } = await store.newCollectiveWithHost(
-        'railsgirlsatl',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user');
       // And given the above collective has one expense (created by the above user)
@@ -1098,11 +920,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       // When the above user tries to delete the expense
-      const result = await utils.graphqlQuery(
-        deleteExpenseQuery,
-        { id: expense.id },
-        user,
-      );
+      const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, user);
       result.errors && console.log(result.errors);
       // Then there should be no errors
       expect(result.errors).to.not.exist;
@@ -1112,12 +930,7 @@ describe('GraphQL Expenses API', () => {
 
     it('works if logged in as admin of collective', async () => {
       // Given a collective
-      const { collective } = await store.newCollectiveWithHost(
-        'Test Collective',
-        'USD',
-        'USD',
-        10,
-      );
+      const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given an admin for the above collective
       const admin = (await store.newUser('collectives-admin')).user;
       await collective.addUserWithRole(admin, 'ADMIN');
@@ -1136,11 +949,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       // When the admin of the collective tries to delete the expense
-      const result = await utils.graphqlQuery(
-        deleteExpenseQuery,
-        { id: expense.id },
-        admin,
-      );
+      const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, admin);
       result.errors && console.log(result.errors);
       // Then there should be no errors
       expect(result.errors).to.not.exist;
@@ -1150,12 +959,7 @@ describe('GraphQL Expenses API', () => {
 
     it('works if logged in as admin of host collective', async () => {
       // Given a collective
-      const { hostAdmin, collective } = await store.newCollectiveWithHost(
-        'Test Collective',
-        'USD',
-        'USD',
-        10,
-      );
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
       // And given the above collective has one expense (created by
@@ -1171,11 +975,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       // When the admin of the host collective tries to delete the expense
-      const result = await utils.graphqlQuery(
-        deleteExpenseQuery,
-        { id: expense.id },
-        hostAdmin,
-      );
+      const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, hostAdmin);
       result.errors && console.log(result.errors);
       // Then there should be no errors
       expect(result.errors).to.not.exist;

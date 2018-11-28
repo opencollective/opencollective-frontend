@@ -20,27 +20,13 @@ paymentMethodProvider.getBalance = paymentMethod => {
     if (paymentMethod.monthlyLimitPerMember) {
       return models.Transaction.find({
         attributes: [
-          [
-            sequelize.fn(
-              'COALESCE',
-              sequelize.fn(
-                'SUM',
-                sequelize.col('netAmountInCollectiveCurrency'),
-              ),
-              0,
-            ),
-            'amount',
-          ],
+          [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount'],
         ],
         where: {
           PaymentMethodId: paymentMethod.Id,
           FromCollectiveId: paymentMethod.CollectiveId,
         },
-      }).then(result =>
-        Promise.resolve(
-          paymentMethod.monthlyLimitPerMember - result.dataValues.amount,
-        ),
-      );
+      }).then(result => Promise.resolve(paymentMethod.monthlyLimitPerMember - result.dataValues.amount));
     }
 
     // If the collective is a host (USER or ORGANIZATION)
@@ -54,14 +40,7 @@ paymentMethodProvider.getBalance = paymentMethod => {
     // Otherwise we compute the balance based on all previous transactions for this collective
     return models.Transaction.find({
       attributes: [
-        [
-          sequelize.fn(
-            'COALESCE',
-            sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')),
-            0,
-          ),
-          'amount',
-        ],
+        [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount'],
       ],
       where: {
         CollectiveId: paymentMethod.CollectiveId,
@@ -94,21 +73,13 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
         `You don't have enough funds available (${formatCurrency(
           balance,
           order.paymentMethod.currency,
-        )} left) to execute this order (${formatCurrency(
-          order.totalAmount,
-          order.currency,
-        )})`,
+        )} left) to execute this order (${formatCurrency(order.totalAmount, order.currency)})`,
       );
     }
   }
 
-  if (
-    order.paymentMethod.CollectiveId !== order.fromCollective.id &&
-    order.fromCollective.type === 'COLLECTIVE'
-  ) {
-    throw new Error(
-      'Cannot use an opencollective payment method to make a payment on behalf of another collective',
-    );
+  if (order.paymentMethod.CollectiveId !== order.fromCollective.id && order.fromCollective.type === 'COLLECTIVE') {
+    throw new Error('Cannot use an opencollective payment method to make a payment on behalf of another collective');
   }
 
   const hostFeePercent = options.hostFeePercent || 0;
@@ -117,9 +88,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
   if (!fromCollectiveHost) {
     // If the fromCollective has no Host (ie. when we add fund on behalf of a user/organization),
     // we check if the payment method belongs to the Host of the Order.collective (aka add funds)
-    if (
-      order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId
-    ) {
+    if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
       throw new Error(
         `You need to use the payment method of the host (${
           order.collective.HostCollectiveId
@@ -138,10 +107,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       throw new Error(
         `Payments Across hosts are only allowed when both Collectives have the same currency. Collective ${
           order.collective.name
-        }` +
-          ` is ${order.collective.currency} and ${
-            order.fromCollective.name
-          } is ${order.fromCollective.currency}.`,
+        }` + ` is ${order.collective.currency} and ${order.fromCollective.name} is ${order.fromCollective.currency}.`,
       );
     }
     // Check if Hosts have the same currency as well
@@ -149,10 +115,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
       throw new Error(
         `Payment Across Hosts are only allowed when both Hosts have the same currency. Host ${
           fromCollectiveHost.name
-        }` +
-          ` is ${fromCollectiveHost.currency} and ${collectiveHost.name} is ${
-            collectiveHost.currency
-          }.`,
+        }` + ` is ${fromCollectiveHost.currency} and ${collectiveHost.name} is ${collectiveHost.currency}.`,
       );
     }
     // try to find a credit card for the fromCollectiveHost
@@ -168,9 +131,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     });
     if (!fromCollectiveHostPaymentMethod) {
       throw new Error(
-        `Host ${
-          fromCollectiveHost.name
-        } needs to add a credit card to send money to a different host (${
+        `Host ${fromCollectiveHost.name} needs to add a credit card to send money to a different host (${
           collectiveHost.name
         }).`,
       );
@@ -197,15 +158,9 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
   const fxrate = await getFxRate(order.currency, order.paymentMethod.currency);
   const totalAmountInPaymentMethodCurrency = order.totalAmount * fxrate;
 
-  const hostFeeInHostCurrency = paymentsLib.calcFee(
-    order.totalAmount * fxrate,
-    hostFeePercent,
-  );
+  const hostFeeInHostCurrency = paymentsLib.calcFee(order.totalAmount * fxrate, hostFeePercent);
 
-  const platformFeeInHostCurrency = paymentsLib.calcFee(
-    order.totalAmount * fxrate,
-    platformFeePercent,
-  );
+  const platformFeeInHostCurrency = paymentsLib.calcFee(order.totalAmount * fxrate, platformFeePercent);
 
   payload.transaction = {
     type: TransactionTypes.CREDIT,
@@ -214,8 +169,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     currency: order.currency,
     hostCurrency: collectiveHost.currency,
     hostCurrencyFxRate: fxrate,
-    netAmountInCollectiveCurrency:
-      order.totalAmount * (1 - hostFeePercent / 100),
+    netAmountInCollectiveCurrency: order.totalAmount * (1 - hostFeePercent / 100),
     amountInHostCurrency: totalAmountInPaymentMethodCurrency,
     hostFeeInHostCurrency,
     platformFeeInHostCurrency,

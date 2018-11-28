@@ -14,18 +14,10 @@ describe('discover', () => {
   let user, collective1, collective2, paymentMethod1;
 
   beforeEach(() => utils.resetTestDB());
-  beforeEach(() =>
-    models.PaymentMethod.create(paymentMethodData1).tap(
-      pm => (paymentMethod1 = pm),
-    ));
-  beforeEach(() =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ));
-  beforeEach(() =>
-    models.Collective.create(collectiveData1).tap(g => (collective1 = g)));
-  beforeEach(() =>
-    models.Collective.create(collectiveData2).tap(g => (collective2 = g)));
+  beforeEach(() => models.PaymentMethod.create(paymentMethodData1).tap(pm => (paymentMethod1 = pm)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
+  beforeEach(() => models.Collective.create(collectiveData1).tap(g => (collective1 = g)));
+  beforeEach(() => models.Collective.create(collectiveData2).tap(g => (collective2 = g)));
   beforeEach(done => {
     transactionsData[8].CreatedByUserId = user.id;
     transactionsData[8].HostCollectiveId = user.CollectiveId;

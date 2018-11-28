@@ -6,7 +6,7 @@
  * pending -> active -> cancelled (subscription)
  * pending -> cancelled
  * pending -> rejected
-*/
+ */
 
 export default {
   PENDING: 'PENDING',

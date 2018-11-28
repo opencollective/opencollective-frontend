@@ -16,10 +16,7 @@ export default {
    * This method can only publish to our webhookUrl and our private channel, so we don't leak info by mistake
    */
   postActivityOnPrivateChannel(activity) {
-    const message = activitiesLib.formatMessageForPrivateChannel(
-      activity,
-      'slack',
-    );
+    const message = activitiesLib.formatMessageForPrivateChannel(activity, 'slack');
     const options = {
       attachments: formatAttachment(activity),
       channel: config.slack.privateActivityChannel,
@@ -34,10 +31,7 @@ export default {
     if (!options) {
       options = {};
     }
-    const message = activitiesLib.formatMessageForPublicChannel(
-      activity,
-      'slack',
-    );
+    const message = activitiesLib.formatMessageForPublicChannel(activity, 'slack');
     return this.postMessage(message, webhookUrl, options);
   },
 

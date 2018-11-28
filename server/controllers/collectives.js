@@ -3,12 +3,7 @@
  */
 import { pick, omit } from 'lodash';
 import async from 'async';
-import {
-  defaultHostCollective,
-  getLinkHeader,
-  getRequestedUrl,
-  resizeImage,
-} from '../lib/utils';
+import { defaultHostCollective, getLinkHeader, getRequestedUrl, resizeImage } from '../lib/utils';
 import Promise from 'bluebird';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -35,16 +30,13 @@ const _addUserToCollective = (collective, user, options) => {
       },
     }).then(host => {
       if (host) {
-        return Promise.reject(
-          new errors.BadRequest('Collective already has a host'),
-        );
+        return Promise.reject(new errors.BadRequest('Collective already has a host'));
       }
       return Promise.resolve();
     });
   };
 
-  const addUserToCollective = () =>
-    collective.addUserWithRole(user, options.role);
+  const addUserToCollective = () => collective.addUserWithRole(user, options.role);
 
   const createActivity = () =>
     Activity.create({
@@ -68,15 +60,11 @@ const _getUsersData = (collective, tier) => {
     if (tier === 'backers') {
       return queries
         .getMembersWithTotalDonations({ CollectiveId: ids, role: 'BACKER' })
-        .then(backerCollectives =>
-          models.Tier.appendTier(collective, backerCollectives),
-        );
+        .then(backerCollectives => models.Tier.appendTier(collective, backerCollectives));
     } else {
       return queries
         .getMembersOfCollectiveWithRole(ids)
-        .then(backerCollectives =>
-          models.Tier.appendTier(collective, backerCollectives),
-        );
+        .then(backerCollectives => models.Tier.appendTier(collective, backerCollectives));
     }
   });
 };
@@ -93,9 +81,7 @@ export const getUsers = (req, res, next) => {
         include: [{ model: models.Subscription, where: { isActive: true } }],
       }).then(orders => {
         orders.map(o => {
-          activeUsersByCollectiveId[o.FromCollectiveId] = Boolean(
-            o.Subscription && o.Subscription.isActive,
-          );
+          activeUsersByCollectiveId[o.FromCollectiveId] = Boolean(o.Subscription && o.Subscription.isActive);
         });
         return userCollectives.filter(u => activeUsersByCollectiveId[u.id]);
       });
@@ -117,11 +103,7 @@ export const getUsers = (req, res, next) => {
       if (!u.tier) {
         u.tier = u.type === 'USER' ? 'backer' : 'sponsor';
       }
-      if (
-        !req.collective ||
-        !req.remoteUser ||
-        !req.remoteUser.isAdmin(req.collective.id)
-      ) {
+      if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
       }
       if (u.website) {
@@ -183,10 +165,7 @@ export const create = (req, res, next) => {
   const { users = [] } = collectiveData;
   let createdCollective, creator, host;
 
-  if (users.length < 1)
-    throw new errors.ValidationFailed(
-      'Need at least one user to create a collective',
-    );
+  if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a collective');
 
   if (!collectiveData.hostId) {
     collectiveData.hostId = defaultHostCollective().CollectiveId; // set it to our non-open-source host as default
@@ -250,9 +229,7 @@ export const create = (req, res, next) => {
     })
     .tap(() => {
       // find Host
-      return models.Collective.findById(
-        collectiveData.hostId || collectiveData.HostCollectiveId,
-      ).then(h => {
+      return models.Collective.findById(collectiveData.hostId || collectiveData.HostCollectiveId).then(h => {
         if (!h) {
           throw new Error('Host not found: ', collectiveData.hostId);
         }
@@ -360,13 +337,9 @@ export const createFromGithub = (req, res, next) => {
     )
     .then(existingCollective => {
       if (existingCollective) {
-        collectiveData.slug = `${collectiveData.slug}-${Math.floor(
-          Math.random() * 1000 + 1,
-        )}`;
+        collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
       }
-      collectiveData.ParentCollectiveId = defaultHostCollective(
-        'opensource',
-      ).ParentCollectiveId;
+      collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
       collectiveData.currency = 'USD';
       return Collective.create(
         Object.assign({}, collectiveData, {
@@ -378,14 +351,8 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => debug('createdCollective', g && g.dataValues))
     .tap(g => (createdCollective = g))
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
-    .then(() =>
-      models.Collective.findById(
-        defaultHostCollective('opensource').CollectiveId,
-      ),
-    )
-    .tap(hostCollective =>
-      createdCollective.addHost(hostCollective, creatorUser),
-    )
+    .then(() => models.Collective.findById(defaultHostCollective('opensource').CollectiveId))
+    .tap(hostCollective => createdCollective.addHost(hostCollective, creatorUser))
     .tap(host =>
       Activity.create({
         type: activities.COLLECTIVE_CREATED,
@@ -442,10 +409,7 @@ export const update = (req, res, next) => {
 
   // Need to handle settings separately, since it's an object
   if (req.required.group.settings) {
-    updatedCollectiveAttrs.settings = Object.assign(
-      req.collective.settings || {},
-      req.required.group.settings,
-    );
+    updatedCollectiveAttrs.settings = Object.assign(req.collective.settings || {}, req.required.group.settings);
   }
 
   return req.collective
@@ -455,10 +419,7 @@ export const update = (req, res, next) => {
 };
 
 export const updateSettings = (req, res, next) => {
-  putThankDonationOptInIntoNotifTable(
-    req.collective.id,
-    req.required.group.settings,
-  )
+  putThankDonationOptInIntoNotifTable(req.collective.id, req.required.group.settings)
     .then(() => doUpdate(['settings'], req, res, next))
     .catch(next);
 };
@@ -487,10 +448,7 @@ function doUpdate(whitelist, req, res, next) {
   whitelist.forEach(prop => {
     if (req.required.group[prop]) {
       if (req.collective[prop] && typeof req.collective[prop] === 'object') {
-        req.collective[prop] = Object.assign(
-          req.collective[prop],
-          req.required.group[prop],
-        );
+        req.collective[prop] = Object.assign(req.collective[prop], req.required.group[prop]);
       } else {
         req.collective[prop] = req.required.group[prop];
       }
@@ -522,8 +480,7 @@ export const getOne = (req, res, next) => {
       include: [{ model: models.Collective, as: 'memberCollective' }],
     }).map(member => {
       return {
-        UserId:
-          member.memberCollective.data && member.memberCollective.data.UserId,
+        UserId: member.memberCollective.data && member.memberCollective.data.UserId,
         UserCollectiveId: member.MemberCollectiveId,
         slug: member.memberCollective.slug,
       };
@@ -565,22 +522,10 @@ export const getOne = (req, res, next) => {
       }
       if (collective.superCollectiveData) {
         collective.collectivesCount = collective.superCollectiveData.length;
-        collective.contributorsCount += aggregate(
-          collective.superCollectiveData,
-          'contributorsCount',
-        );
-        collective.yearlyIncome += aggregate(
-          collective.superCollectiveData,
-          'yearlyIncome',
-        );
-        collective.backersCount += aggregate(
-          collective.superCollectiveData,
-          'backersCount',
-        );
-        collective.donationTotal += aggregate(
-          collective.superCollectiveData,
-          'donationTotal',
-        );
+        collective.contributorsCount += aggregate(collective.superCollectiveData, 'contributorsCount');
+        collective.yearlyIncome += aggregate(collective.superCollectiveData, 'yearlyIncome');
+        collective.backersCount += aggregate(collective.superCollectiveData, 'backersCount');
+        collective.donationTotal += aggregate(collective.superCollectiveData, 'donationTotal');
       }
       return collective;
     })
@@ -629,10 +574,7 @@ export const getTransactions = (req, res, next) => {
   }
 
   if (req.query.exclude) {
-    query.where[Op.or] = [
-      { type: { [Op.ne]: req.query.exclude } },
-      { type: { [Op.eq]: null } },
-    ];
+    query.where[Op.or] = [{ type: { [Op.ne]: req.query.exclude } }, { type: { [Op.eq]: null } }];
   }
 
   query.include = { model: models.Order };
@@ -650,9 +592,7 @@ export const getTransactions = (req, res, next) => {
       res.send(
         transactions.rows.map(transaction =>
           Object.assign({}, transaction.info, {
-            description:
-              (transaction.Order && transaction.Order.title) ||
-              transaction.description,
+            description: (transaction.Order && transaction.Order.title) || transaction.description,
           }),
         ),
       );

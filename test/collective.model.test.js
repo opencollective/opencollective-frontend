@@ -272,9 +272,7 @@ describe('Collective model', () => {
       try {
         await collective.changeHost();
       } catch (e) {
-        expect(e.message).to.contain(
-          'Unable to change host: you still have a balance of $965',
-        );
+        expect(e.message).to.contain('Unable to change host: you still have a balance of $965');
       }
     });
 
@@ -303,10 +301,7 @@ describe('Collective model', () => {
       // moving to a host where the user making the request is not an admin of turns isActive to false
       sendEmailSpy.resetHistory();
       await newCollective.changeHost(hostUser.collective.id, user2);
-      await assertCollectiveCurrency(
-        newCollective,
-        hostUser.collective.currency,
-      );
+      await assertCollectiveCurrency(newCollective, hostUser.collective.currency);
       expect(newCollective.HostCollectiveId).to.equal(hostUser.id);
       expect(newCollective.isActive).to.be.false;
       await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
@@ -315,13 +310,9 @@ describe('Collective model', () => {
         `New collective would love to be hosted by ${hostUser.collective.name}`,
       );
       expect(sendEmailSpy.secondCall.args[0]).to.equal(user1.email);
-      expect(sendEmailSpy.secondCall.args[1]).to.equal(
-        `Thanks for applying to ${hostUser.collective.name}`,
-      );
+      expect(sendEmailSpy.secondCall.args[1]).to.equal(`Thanks for applying to ${hostUser.collective.name}`);
       expect(sendEmailSpy.firstCall.args[2]).to.contain(user2.collective.name);
-      expect(sendEmailSpy.secondCall.args[3].from).to.equal(
-        'hello@wwcode.opencollective.com',
-      );
+      expect(sendEmailSpy.secondCall.args[3].from).to.equal('hello@wwcode.opencollective.com');
     });
   });
 
@@ -331,13 +322,9 @@ describe('Collective model', () => {
       type: 'ORGANIZATION',
       website: 'https://opencollective.com',
     }).then(collective => {
-      expect(collective.image).to.equal(
-        'https://logo.clearbit.com/opencollective.com',
-      );
+      expect(collective.image).to.equal('https://logo.clearbit.com/opencollective.com');
       models.Collective.findById(collective.id).then(c => {
-        expect(c.image).to.equal(
-          'https://logo.clearbit.com/opencollective.com',
-        );
+        expect(c.image).to.equal('https://logo.clearbit.com/opencollective.com');
         done();
       });
     });
@@ -353,9 +340,7 @@ describe('Collective model', () => {
     await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
     // utils.inspectSpy(sendEmailSpy, 3);
     expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
-    expect(sendEmailSpy.firstCall.args[1]).to.equal(
-      'Welcome to Open Collective 🙌',
-    );
+    expect(sendEmailSpy.firstCall.args[1]).to.equal('Welcome to Open Collective 🙌');
     expect(sendEmailSpy.firstCall.args[2]).to.contain('Discover');
   });
 
@@ -368,9 +353,7 @@ describe('Collective model', () => {
       expect(user.collective.image).to.equal(undefined);
       setTimeout(() => {
         models.Collective.findById(user.collective.id).then(c => {
-          expect(c.image).to.equal(
-            'https://www.gravatar.com/avatar/a97d0fcd96579015da610aa284f8d8df?default=404',
-          );
+          expect(c.image).to.equal('https://www.gravatar.com/avatar/a97d0fcd96579015da610aa284f8d8df?default=404');
           done();
         });
       }, 700);
@@ -406,8 +389,7 @@ describe('Collective model', () => {
     collective.getBackersCount({ until }).then(count => {
       const backers = {};
       transactions.map(t => {
-        if (t.amount > 0 && t.createdAt < until)
-          backers[t.CreatedByUserId] = t.amount;
+        if (t.amount > 0 && t.createdAt < until) backers[t.CreatedByUserId] = t.amount;
       });
       expect(count).to.equal(Object.keys(backers).length);
       done();
@@ -439,12 +421,7 @@ describe('Collective model', () => {
     let totalExpenses = 0;
 
     transactions.map(t => {
-      if (
-        t.netAmountInCollectiveCurrency < 0 &&
-        t.createdAt > startDate &&
-        t.createdAt < endDate
-      )
-        totalExpenses++;
+      if (t.netAmountInCollectiveCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate) totalExpenses++;
     });
 
     collective
@@ -489,10 +466,7 @@ describe('Collective model', () => {
     });
 
     it('gets the top backers in a given month', () => {
-      return Collective.getTopBackers(
-        new Date('2016-06-01'),
-        new Date('2016-07-01'),
-      ).then(backers => {
+      return Collective.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01')).then(backers => {
         backers = backers.map(g => g.dataValues);
         expect(backers.length).to.equal(2);
         expect(backers[0].totalDonations).to.equal(125000);
@@ -500,11 +474,7 @@ describe('Collective model', () => {
     });
 
     it('gets the top backers in open source', () => {
-      return Collective.getTopBackers(
-        new Date('2016-06-01'),
-        new Date('2016-07-01'),
-        ['open source'],
-      ).then(backers => {
+      return Collective.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'), ['open source']).then(backers => {
         backers = backers.map(g => g.dataValues);
         expect(backers.length).to.equal(1);
         expect(backers[0].totalDonations).to.equal(25000);
@@ -512,45 +482,32 @@ describe('Collective model', () => {
     });
 
     it('gets the latest transactions of a user collective', () => {
-      return Collective.findOne({ where: { type: 'USER' } }).then(
-        userCollective => {
-          return userCollective
-            .getLatestTransactions(
-              new Date('2016-06-01'),
-              new Date('2016-08-01'),
-            )
-            .then(transactions => {
-              expect(transactions.length).to.equal(8);
-            });
-        },
-      );
+      return Collective.findOne({ where: { type: 'USER' } }).then(userCollective => {
+        return userCollective
+          .getLatestTransactions(new Date('2016-06-01'), new Date('2016-08-01'))
+          .then(transactions => {
+            expect(transactions.length).to.equal(8);
+          });
+      });
     });
 
     it('gets the latest transactions of a user collective to open source', () => {
-      return Collective.findOne({ where: { type: 'USER' } }).then(
-        userCollective => {
-          return userCollective
-            .getLatestTransactions(
-              new Date('2016-06-01'),
-              new Date('2016-08-01'),
-              ['open source'],
-            )
-            .then(transactions => {
-              expect(transactions.length).to.equal(1);
-              expect(transactions[0]).to.have.property('amount');
-              expect(transactions[0]).to.have.property('currency');
-              expect(transactions[0]).to.have.property('collective');
-              expect(transactions[0].collective).to.have.property('name');
-            });
-        },
-      );
+      return Collective.findOne({ where: { type: 'USER' } }).then(userCollective => {
+        return userCollective
+          .getLatestTransactions(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
+          .then(transactions => {
+            expect(transactions.length).to.equal(1);
+            expect(transactions[0]).to.have.property('amount');
+            expect(transactions[0]).to.have.property('currency');
+            expect(transactions[0]).to.have.property('collective');
+            expect(transactions[0].collective).to.have.property('name');
+          });
+      });
     });
   });
 
   describe('tiers', () => {
-    before('adding user as backer', () =>
-      collective.addUserWithRole(user2, 'BACKER'),
-    );
+    before('adding user as backer', () => collective.addUserWithRole(user2, 'BACKER'));
     before('creating order for backer tier', () =>
       models.Order.create({
         CreatedByUserId: user1.id,
@@ -579,15 +536,10 @@ describe('Collective model', () => {
           expect(users).to.have.length(1);
           const backer = users[0];
           expect(parseInt(backer.totalDonations, 10)).to.equal(
-            transactions[2].amountInHostCurrency +
-              transactions[3].amountInHostCurrency,
+            transactions[2].amountInHostCurrency + transactions[3].amountInHostCurrency,
           );
-          expect(new Date(backer.firstDonation).getTime()).to.equal(
-            new Date(transactions[2].createdAt).getTime(),
-          );
-          expect(new Date(backer.lastDonation).getTime()).to.equal(
-            new Date(transactions[3].createdAt).getTime(),
-          );
+          expect(new Date(backer.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
+          expect(new Date(backer.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
           done();
         })
         .catch(e => {

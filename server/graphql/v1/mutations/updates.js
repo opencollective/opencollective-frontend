@@ -5,8 +5,7 @@ import { get } from 'lodash';
 import { strip_tags } from '../../../lib/utils';
 
 function require(args, path) {
-  if (!get(args, path))
-    throw new errors.ValidationFailed({ message: `${path} required` });
+  if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
 }
 
 export async function createUpdate(_, args, req) {
@@ -31,8 +30,7 @@ export async function createUpdate(_, args, req) {
 
 async function fetchUpdate(id) {
   const update = await models.Update.findById(id);
-  if (!update)
-    throw new errors.NotFound({ message: `Update with id ${id} not found` });
+  if (!update) throw new errors.NotFound({ message: `Update with id ${id} not found` });
   return update;
 }
 

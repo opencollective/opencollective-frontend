@@ -39,20 +39,13 @@ describe('notification.model.test.js', () => {
       host = results[0];
       collective = results[1];
       hostAdmin = results[2];
-      return Promise.all([
-        collective.addHost(host),
-        host.addUserWithRole(hostAdmin, 'ADMIN'),
-      ]);
+      return Promise.all([collective.addHost(host), host.addUserWithRole(hostAdmin, 'ADMIN')]);
     });
   });
 
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
-      .post(
-        `/groups/${collective.id}/activities/${
-          notificationData.type
-        }/unsubscribe`,
-      )
+      .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
       .set('Authorization', `Bearer ${hostAdmin.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
@@ -71,25 +64,18 @@ describe('notification.model.test.js', () => {
   describe('getSubscribers', () => {
     let users;
     beforeEach(() =>
-      Promise.map([utils.data('user3'), utils.data('user4')], user =>
-        models.User.createUserWithCollective(user),
-      ).then(result => (users = result)));
+      Promise.map([utils.data('user3'), utils.data('user4')], user => models.User.createUserWithCollective(user)).then(
+        result => (users = result),
+      ),
+    );
 
     it('getSubscribers to the backers mailinglist', async () => {
-      await Promise.map(users, user =>
-        collective.addUserWithRole(user, 'BACKER'),
-      );
-      const subscribers = await Notification.getSubscribersUsers(
-        collective.slug,
-        'backers',
-      );
+      await Promise.map(users, user => collective.addUserWithRole(user, 'BACKER'));
+      const subscribers = await Notification.getSubscribersUsers(collective.slug, 'backers');
       expect(subscribers.length).to.equal(2);
 
       await subscribers[0].unsubscribe(collective.id, 'mailinglist.backers');
-      const subscribers2 = await Notification.getSubscribers(
-        collective.slug,
-        'backers',
-      );
+      const subscribers2 = await Notification.getSubscribers(collective.slug, 'backers');
       expect(subscribers2.length).to.equal(1);
     });
 
@@ -122,17 +108,11 @@ describe('notification.model.test.js', () => {
         }),
       );
 
-      const subscribers = await Notification.getSubscribers(
-        event.slug,
-        event.slug,
-      );
+      const subscribers = await Notification.getSubscribers(event.slug, event.slug);
       expect(subscribers.length).to.equal(2);
 
       await users[0].unsubscribe(event.id, `mailinglist.${event.slug}`);
-      const subscribers2 = await Notification.getSubscribers(
-        event.slug,
-        event.slug,
-      );
+      const subscribers2 = await Notification.getSubscribers(event.slug, event.slug);
       expect(subscribers2.length).to.equal(1);
     });
   });

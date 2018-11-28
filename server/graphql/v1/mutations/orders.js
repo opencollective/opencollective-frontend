@@ -11,10 +11,7 @@ import cache from '../../../lib/cache';
 import recaptcha from '../../../lib/recaptcha';
 import * as libPayments from '../../../lib/payments';
 import { capitalize, pluralize } from '../../../lib/utils';
-import {
-  getNextChargeAndPeriodStartDates,
-  getChargeRetryCount,
-} from '../../../lib/subscriptions';
+import { getNextChargeAndPeriodStartDates, getChargeRetryCount } from '../../../lib/subscriptions';
 
 import roles from '../../../constants/roles';
 import status from '../../../constants/order_status';
@@ -76,9 +73,7 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
     cache.set(limit.key, count + 1, oneHourInSeconds);
     if (limitReached) {
       debugOrder(`Order limit reached for limit '${limit.key}'`);
-      throw new Error(
-        'Error while processing your request, please try again or contact support@opencollective.com',
-      );
+      throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
     }
   }
 }
@@ -111,21 +106,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
   checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
   try {
-    if (
-      order.paymentMethod &&
-      order.paymentMethod.service === 'stripe' &&
-      order.paymentMethod.uuid &&
-      !remoteUser
-    ) {
-      throw new Error(
-        'You need to be logged in to be able to use a payment method on file',
-      );
+    if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
+      throw new Error('You need to be logged in to be able to use a payment method on file');
     }
 
-    if (
-      !order.collective ||
-      (!order.collective.id && !order.collective.website)
-    ) {
+    if (!order.collective || (!order.collective.id && !order.collective.website)) {
       throw new Error('No collective id or website provided');
     }
 
@@ -145,24 +130,17 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     if (!collective) {
-      throw new Error(
-        `No collective found: ${order.collective.id ||
-          order.collective.website}`,
-      );
+      throw new Error(`No collective found: ${order.collective.id || order.collective.website}`);
     }
 
     if (order.fromCollective && order.fromCollective.id === collective.id) {
-      throw new Error(
-        'Orders cannot be created for a collective by that same collective.',
-      );
+      throw new Error('Orders cannot be created for a collective by that same collective.');
     }
     if (order.hostFeePercent) {
       const HostCollectiveId = await collective.getHostCollectiveId();
 
       if (!remoteUser.isAdmin(HostCollectiveId)) {
-        throw new Error(
-          'Only an admin of the host can change the hostFeePercent',
-        );
+        throw new Error('Only an admin of the host can change the hostFeePercent');
       }
     }
 
@@ -173,46 +151,27 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       tier = await models.Tier.findById(order.tier.id);
 
       if (!tier) {
-        throw new Error(
-          `No tier found with tier id: ${order.tier.id} for collective slug ${
-            order.collective.slug
-          }`,
-        );
+        throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${order.collective.slug}`);
       }
     }
 
-    const paymentRequired =
-      (order.totalAmount > 0 || (tier && tier.amount > 0)) &&
-      collective.isActive;
+    const paymentRequired = (order.totalAmount > 0 || (tier && tier.amount > 0)) && collective.isActive;
     if (
       paymentRequired &&
       (!order.paymentMethod ||
-        !(
-          order.paymentMethod.uuid ||
-          order.paymentMethod.token ||
-          order.paymentMethod.type === 'manual'
-        ))
+        !(order.paymentMethod.uuid || order.paymentMethod.token || order.paymentMethod.type === 'manual'))
     ) {
       throw new Error('This order requires a payment method');
     }
 
-    if (
-      tier &&
-      tier.maxQuantityPerUser > 0 &&
-      order.quantity > tier.maxQuantityPerUser
-    ) {
+    if (tier && tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
       throw new Error(
-        `You can buy up to ${tier.maxQuantityPerUser} ${pluralize(
-          'ticket',
-          tier.maxQuantityPerUser,
-        )} per person`,
+        `You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`,
       );
     }
 
     if (tier) {
-      const enoughQuantityAvailable = await tier.checkAvailableQuantity(
-        order.quantity,
-      );
+      const enoughQuantityAvailable = await tier.checkAvailableQuantity(order.quantity);
       if (!enoughQuantityAvailable) {
         throw new Error(`No more tickets left for ${tier.name}`);
       }
@@ -226,13 +185,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       // already exists, that could mean two things:
       // 1. Email is registered under another account as Paypal address.
       // 2. We got a bad payload trying to impersonate another user.
-      const existingUser = await models.User.findByEmailOrPaypalEmail(
-        order.user.email,
-      );
+      const existingUser = await models.User.findByEmailOrPaypalEmail(order.user.email);
       if (existingUser) {
-        throw new Error(
-          'An account already exists for this email address. Please login.',
-        );
+        throw new Error('An account already exists for this email address. Please login.');
       }
       user = await models.User.createUserWithCollective({
         ...order.user,
@@ -244,30 +199,19 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     let fromCollective;
-    if (
-      !order.fromCollective ||
-      (!order.fromCollective.id && !order.fromCollective.name)
-    ) {
-      fromCollective = await loaders.collective.findById.load(
-        user.CollectiveId,
-      );
+    if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
+      fromCollective = await loaders.collective.findById.load(user.CollectiveId);
     }
 
     // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
     if (order.fromCollective && order.fromCollective.id) {
       if (!remoteUser) {
-        throw new Error(
-          'You need to be logged in to create an order for an existing open collective',
-        );
+        throw new Error('You need to be logged in to create an order for an existing open collective');
       }
 
-      fromCollective = await loaders.collective.findById.load(
-        order.fromCollective.id,
-      );
+      fromCollective = await loaders.collective.findById.load(order.fromCollective.id);
       if (!fromCollective) {
-        throw new Error(
-          `From collective id ${order.fromCollective.id} not found`,
-        );
+        throw new Error(`From collective id ${order.fromCollective.id} not found`);
       }
 
       const possibleRoles = [roles.ADMIN, roles.HOST];
@@ -289,23 +233,13 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     if (!fromCollective) {
-      fromCollective = await models.Collective.createOrganization(
-        order.fromCollective,
-        user,
-        remoteUser,
-      );
+      fromCollective = await models.Collective.createOrganization(order.fromCollective, user, remoteUser);
     }
 
     let matchingFund;
     if (order.matchingFund) {
-      matchingFund = await models.PaymentMethod.getMatchingFund(
-        order.matchingFund,
-        { ForCollectiveId: collective.id },
-      );
-      const canBeUsedForOrder = await matchingFund.canBeUsedForOrder(
-        order,
-        user,
-      );
+      matchingFund = await models.PaymentMethod.getMatchingFund(order.matchingFund, { ForCollectiveId: collective.id });
+      const canBeUsedForOrder = await matchingFund.canBeUsedForOrder(order, user);
 
       if (!canBeUsedForOrder) {
         matchingFund = null;
@@ -337,9 +271,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     let defaultDescription;
     if (order.interval) {
-      defaultDescription = `${capitalize(order.interval)}ly donation to ${
-        collective.name
-      }${tierNameInfo}`;
+      defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
     } else {
       defaultDescription = `Donation to ${collective.name}${tierNameInfo}`;
     }
@@ -365,10 +297,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       status: status.PENDING, // default status, will get updated after the order is processed
     };
 
-    if (
-      order.referral &&
-      get(order, 'referral.id') !== orderData.FromCollectiveId
-    ) {
+    if (order.referral && get(order, 'referral.id') !== orderData.FromCollectiveId) {
       orderData.ReferralCollectiveId = order.referral.id;
     }
 
@@ -394,11 +323,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         orderCreated,
         pick(order, ['hostFeePercent', 'platformFeePercent']),
       );
-    } else if (
-      !paymentRequired &&
-      order.interval &&
-      collective.type === types.COLLECTIVE
-    ) {
+    } else if (!paymentRequired && order.interval && collective.type === types.COLLECTIVE) {
       // create inactive subscription to hold the interval info
       const subscription = await models.Subscription.create({
         amount: order.totalAmount,
@@ -426,14 +351,8 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     order = await models.Order.findById(orderCreated.id);
 
     // If there was a referral for this order, we add it as a FUNDRAISER role
-    if (
-      order.ReferralCollectiveId &&
-      order.ReferralCollectiveId !== user.CollectiveId
-    ) {
-      collective.addUserWithRole(
-        { id: user.id, CollectiveId: order.ReferralCollectiveId },
-        roles.FUNDRAISER,
-      );
+    if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
+      collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
     }
 
     return order;
@@ -458,10 +377,7 @@ export async function updateOrder(remoteUser, order) {
     where: {
       id: order.id,
     },
-    include: [
-      { model: models.Collective, as: 'collective' },
-      { model: models.Collective, as: 'fromCollective' },
-    ],
+    include: [{ model: models.Collective, as: 'collective' }, { model: models.Collective, as: 'fromCollective' }],
   });
 
   if (!existingOrder) {
@@ -470,17 +386,12 @@ export async function updateOrder(remoteUser, order) {
     });
   }
 
-  const paymentRequired =
-    order.totalAmount > 0 && existingOrder.collective.isActive;
+  const paymentRequired = order.totalAmount > 0 && existingOrder.collective.isActive;
 
   if (
     paymentRequired &&
     (!order.paymentMethod ||
-      !(
-        order.paymentMethod.uuid ||
-        order.paymentMethod.token ||
-        order.paymentMethod.type === 'manual'
-      ))
+      !(order.paymentMethod.uuid || order.paymentMethod.token || order.paymentMethod.type === 'manual'))
   ) {
     throw new Error('This order requires a payment method');
   }
@@ -497,11 +408,7 @@ export async function updateOrder(remoteUser, order) {
       await existingOrder.setPaymentMethod(order.paymentMethod);
     }
     // also adds the user as a BACKER of collective
-    await libPayments.executeOrder(
-      remoteUser,
-      existingOrder,
-      pick(order, ['hostFeePercent', 'platformFeePercent']),
-    );
+    await libPayments.executeOrder(remoteUser, existingOrder, pick(order, ['hostFeePercent', 'platformFeePercent']));
   }
   await existingOrder.reload();
   return existingOrder;
@@ -548,12 +455,7 @@ export function cancelSubscription(remoteUser, orderId) {
         }
         return Promise.resolve();
       })
-      .then(order =>
-        Promise.all([
-          order.update({ status: status.CANCELLED }),
-          order.Subscription.deactivate(),
-        ]),
-      )
+      .then(order => Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]))
 
       // createActivity - that sends out the email
       .then(() =>
@@ -586,10 +488,7 @@ export async function updateSubscription(remoteUser, args) {
     where: {
       id,
     },
-    include: [
-      { model: models.Subscription },
-      { model: models.PaymentMethod, as: 'paymentMethod' },
-    ],
+    include: [{ model: models.Subscription }, { model: models.PaymentMethod, as: 'paymentMethod' }],
   };
 
   let order = await models.Order.findOne(query);
@@ -618,10 +517,7 @@ export async function updateSubscription(remoteUser, args) {
         where: { uuid: paymentMethod.uuid },
       });
       if (!newPm) {
-        throw new Error(
-          'Payment method not found with this uuid',
-          paymentMethod.uuid,
-        );
+        throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
       }
     } else {
       // means it's a new paymentMethod
@@ -656,19 +552,14 @@ export async function updateSubscription(remoteUser, args) {
 
     order.Subscription.deactivate();
 
-    const newSubscriptionDataValues = Object.assign(
-      omit(order.Subscription.dataValues, ['id', 'deactivatedAt']),
-      {
-        amount: amount,
-        updatedAt: new Date(),
-        activatedAt: new Date(),
-        isActive: true,
-      },
-    );
+    const newSubscriptionDataValues = Object.assign(omit(order.Subscription.dataValues, ['id', 'deactivatedAt']), {
+      amount: amount,
+      updatedAt: new Date(),
+      activatedAt: new Date(),
+      isActive: true,
+    });
 
-    const newSubscription = await models.Subscription.create(
-      newSubscriptionDataValues,
-    );
+    const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
 
     const newOrderDataValues = Object.assign(omit(order.dataValues, ['id']), {
       totalAmount: amount,
@@ -701,10 +592,7 @@ export async function refundTransaction(_, args, req) {
 
   // 2. Refund via payment method
   // 3. Create new transactions with the refund value in our database
-  const result = await libPayments.refundTransaction(
-    transaction,
-    req.remoteUser,
-  );
+  const result = await libPayments.refundTransaction(transaction, req.remoteUser);
 
   // Return the transaction passed to the `refundTransaction` method
   // after it was updated.
@@ -727,8 +615,7 @@ export async function refundTransaction(_, args, req) {
  *  card. Right now only site admins can use this feature.
  */
 export async function addFundsToOrg(args, remoteUser) {
-  if (!remoteUser.isRoot())
-    throw new Error('Only site admins can perform this operation');
+  if (!remoteUser.isRoot()) throw new Error('Only site admins can perform this operation');
   const [fromCollective, hostCollective] = await Promise.all([
     models.Collective.findById(args.CollectiveId),
     models.Collective.findById(args.HostCollectiveId),
@@ -769,13 +656,10 @@ export async function markOrderAsPaid(remoteUser, id) {
       message: "The order's status must be PENDING",
     });
   }
-  const HostCollectiveId = await models.Collective.getHostCollectiveId(
-    order.CollectiveId,
-  );
+  const HostCollectiveId = await models.Collective.getHostCollectiveId(order.CollectiveId);
   if (!remoteUser.isAdmin(HostCollectiveId)) {
     throw new errors.Unauthorized({
-      message:
-        'You must be logged in as an admin of the host of the collective',
+      message: 'You must be logged in as an admin of the host of the collective',
     });
   }
 

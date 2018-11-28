@@ -1,8 +1,7 @@
 export default {
   domain: 'opencollective.com',
   From: 'OpenCollective <info@opencollective.com>',
-  'X-Envelope-From':
-    '<bounce+7cbbdd.1148dc-organizers=testcollective.opencollective.com@opencollective.com>',
+  'X-Envelope-From': '<bounce+7cbbdd.1148dc-organizers=testcollective.opencollective.com@opencollective.com>',
   To: 'organizers@testcollective.opencollective.com',
   'Dkim-Signature':
     'a=rsa-sha256; v=1; c=relaxed/relaxed; d=opencollective.com; q=dns/txt; s=krs; t=1492960562; h=Content-Transfer-Encoding: Mime-Version: Message-Id: Date: Subject: To: From: Content-Type: Sender; bh=dSCe1q2EaaUM2sLs88Gyqwm6zmmaOuio8rHvPUurBPg=; b=geYIbyYOy0X5q7w7SkUTEAgsVO2YU3RjFykFU3s8StoZB7BF6ohi1ETiWmmLbluyB0wKrmXi TyT77ZSlzXrZaqGKR2am2NWUruoWUhkq5+2+XBaMfnFz6sLxPD+2NWuzW/wiPG7wk6dzfKhJ r24Z/EGwPiK3K+AoAtYOFyjVFjQ=',
@@ -13,11 +12,9 @@ export default {
   'Content-Transfer-Encoding': 'quoted-printable',
   Date: 'Sun, 23 Apr 2017 15:16:00 +0000',
   'Message-Id': '<1492960561291-aef49534-02874219-3e32a412@opencollective.com>',
-  'X-Mailer':
-    'nodemailer (1.11.0; +http://www.nodemailer.com; SMTP/1.1.0[client:1.3.8])',
+  'X-Mailer': 'nodemailer (1.11.0; +http://www.nodemailer.com; SMTP/1.1.0[client:1.3.8])',
   'Mime-Version': '1.0',
-  'X-Mailgun-Sid':
-    'WyIxMjRmYSIsICJtZW1iZXJzQHRlc3Rjb2xsZWN0aXZlLm9wZW5jb2xsZWN0aXZlLmNvbSIsICIxMTQ4ZGMiXQ==',
+  'X-Mailgun-Sid': 'WyIxMjRmYSIsICJtZW1iZXJzQHRlc3Rjb2xsZWN0aXZlLm9wZW5jb2xsZWN0aXZlLmNvbSIsICIxMTQ4ZGMiXQ==',
   Received: [
     'from mail-s89.mailgun.info (mail-s89.mailgun.info [184.173.153.217]) by mxa.mailgun.org with ESMTP id 58fcc532.7f69fc56f7f0-smtp-in-n02; Sun, 23 Apr 2017 15:16:02 -0000 (UTC)',
     'from Xaviers-MacBook-Pro.local (cpe-68-173-154-69.nyc.res.rr.com [68.173.154.69]) by mxa.mailgun.org with ESMTP id 58fcc532.7f1c38513f30-smtp-out-n03; Sun, 23 Apr 2017 15:16:02 -0000 (UTC)',
@@ -31,8 +28,7 @@ export default {
   O: 'tag: email.approve',
   'X-Mailgun-Dkim': 'yes',
   recipient: 'organizers@testcollective.opencollective.com',
-  sender:
-    'bounce+7cbbdd.1148dc-organizers=testcollective.opencollective.com@opencollective.com',
+  sender: 'bounce+7cbbdd.1148dc-organizers=testcollective.opencollective.com@opencollective.com',
   'X-Mailgun-Incoming': 'Yes',
   'Content-Type': 'text/html; charset="utf-8"',
   Subject: '[TESTING] Please approve: test 3',

@@ -25,10 +25,7 @@ import {
   OrderStatusType,
 } from './types';
 
-import {
-  OrderDirectionType,
-  TransactionInterfaceType,
-} from './TransactionInterface';
+import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
 
 import { ApplicationType } from './Application';
 
@@ -53,8 +50,7 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
   description: 'Properties by which collectives can be ordered.',
   values: {
     monthlySpending: {
-      description:
-        'Order collectives by their average monthly spending (based on last 90 days)',
+      description: 'Order collectives by their average monthly spending (based on last 90 days)',
     },
     balance: {
       description: 'Order collectives by total balance.',
@@ -105,8 +101,7 @@ export const HostCollectiveOrderFieldType = new GraphQLEnumType({
 
 export const BackersStatsType = new GraphQLObjectType({
   name: 'BackersStatsType',
-  description:
-    'Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
+  description: 'Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
   fields: () => {
     return {
       // We always have to return an id for apollo's caching
@@ -117,32 +112,28 @@ export const BackersStatsType = new GraphQLObjectType({
         },
       },
       all: {
-        description:
-          'Total number of backers that have given money to this collective',
+        description: 'Total number of backers that have given money to this collective',
         type: GraphQLInt,
         resolve(stats) {
           return stats.all;
         },
       },
       users: {
-        description:
-          'Number of individuals that have given money to this collective',
+        description: 'Number of individuals that have given money to this collective',
         type: GraphQLInt,
         resolve(stats) {
           return stats.USER || 0;
         },
       },
       organizations: {
-        description:
-          'Number of organizations that have given money to this collective',
+        description: 'Number of organizations that have given money to this collective',
         type: GraphQLInt,
         resolve(stats) {
           return stats.ORGANIZATION || 0;
         },
       },
       collectives: {
-        description:
-          'Number of collectives that have given money to this collective',
+        description: 'Number of collectives that have given money to this collective',
         type: GraphQLInt,
         resolve(stats) {
           return stats.COLLECTIVE || 0;
@@ -154,8 +145,7 @@ export const BackersStatsType = new GraphQLObjectType({
 
 export const CollectivesStatsType = new GraphQLObjectType({
   name: 'CollectivesStatsType',
-  description:
-    'Breakdown of collectives under this collective by role (all/hosted/memberOf/events)',
+  description: 'Breakdown of collectives under this collective by role (all/hosted/memberOf/events)',
   fields: () => {
     return {
       // We always have to return an id for apollo's caching
@@ -200,8 +190,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
       },
       memberOf: {
         type: GraphQLInt,
-        description:
-          'Returns the number of collectives that have this collective has parent',
+        description: 'Returns the number of collectives that have this collective has parent',
         async resolve(collective) {
           return models.Collective.count({
             where: {
@@ -214,8 +203,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
       },
       events: {
         type: GraphQLInt,
-        description:
-          'Returns the number of events that have this collective has parent',
+        description: 'Returns the number of events that have this collective has parent',
         async resolve(collective) {
           return models.Collective.count({
             where: {
@@ -232,8 +220,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
 
 export const ExpensesStatsType = new GraphQLObjectType({
   name: 'ExpensesStatsType',
-  description:
-    'Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)',
+  description: 'Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)',
   fields: () => {
     return {
       // We always have to return an id for apollo's caching
@@ -246,14 +233,9 @@ export const ExpensesStatsType = new GraphQLObjectType({
       all: {
         type: GraphQLInt,
         async resolve(collective, args, req) {
-          const expenses =
-            (await req.loaders.collective.stats.expenses.load(collective.id)) ||
-            {};
+          const expenses = (await req.loaders.collective.stats.expenses.load(collective.id)) || {};
           let count = 0;
-          Object.keys(expenses).forEach(
-            status =>
-              (count += (status !== 'CollectiveId' && expenses[status]) || 0),
-          );
+          Object.keys(expenses).forEach(status => (count += (status !== 'CollectiveId' && expenses[status]) || 0));
           return count;
         },
       },
@@ -261,9 +243,7 @@ export const ExpensesStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: 'Returns the number of expenses that are pending',
         async resolve(collective, args, req) {
-          const expenses =
-            (await req.loaders.collective.stats.expenses.load(collective.id)) ||
-            {};
+          const expenses = (await req.loaders.collective.stats.expenses.load(collective.id)) || {};
           return expenses.PENDING || 0;
         },
       },
@@ -271,9 +251,7 @@ export const ExpensesStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: 'Returns the number of expenses that are approved',
         async resolve(collective, args, req) {
-          const expenses =
-            (await req.loaders.collective.stats.expenses.load(collective.id)) ||
-            {};
+          const expenses = (await req.loaders.collective.stats.expenses.load(collective.id)) || {};
           return expenses.APPROVED || 0;
         },
       },
@@ -281,9 +259,7 @@ export const ExpensesStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: 'Returns the number of expenses that are rejected',
         async resolve(collective, args, req) {
-          const expenses =
-            (await req.loaders.collective.stats.expenses.load(collective.id)) ||
-            {};
+          const expenses = (await req.loaders.collective.stats.expenses.load(collective.id)) || {};
           return expenses.REJECTED || 0;
         },
       },
@@ -291,9 +267,7 @@ export const ExpensesStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: 'Returns the number of expenses that are paid',
         async resolve(collective, args, req) {
-          const expenses =
-            (await req.loaders.collective.stats.expenses.load(collective.id)) ||
-            {};
+          const expenses = (await req.loaders.collective.stats.expenses.load(collective.id)) || {};
           return expenses.PAID || 0;
         },
       },
@@ -356,8 +330,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
         },
       },
       balance: {
-        description:
-          'Amount of money in cents in the currency of the collective currently available to spend',
+        description: 'Amount of money in cents in the currency of the collective currently available to spend',
         type: GraphQLInt,
         resolve(collective, args, req) {
           return req.loaders.collective.balance.load(collective.id);
@@ -399,8 +372,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
         },
       },
       expenses: {
-        description:
-          'Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)',
+        description: 'Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)',
         type: ExpensesStatsType,
         resolve(collective) {
           return collective;
@@ -671,8 +643,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           },
           orderBy: {
             type: PaymentMethodOrderFieldType,
-            description:
-              'Order entries based on given column. Set to null for no ordering.',
+            description: 'Order entries based on given column. Set to null for no ordering.',
           },
         },
       },
@@ -841,30 +812,25 @@ const CollectiveFields = () => {
       },
     },
     isHost: {
-      description:
-        'Returns whether this collective can host other collectives (ie. has a Stripe Account connected)',
+      description: 'Returns whether this collective can host other collectives (ie. has a Stripe Account connected)',
       type: GraphQLBoolean,
       resolve(collective) {
         return collective.isHost();
       },
     },
     canApply: {
-      description:
-        'Returns whether this host accepts applications for new collectives',
+      description: 'Returns whether this host accepts applications for new collectives',
       type: GraphQLBoolean,
       resolve(collective) {
         return Boolean(collective.settings && collective.settings.apply);
       },
     },
     host: {
-      description:
-        'Get the host collective that is receiving the money on behalf of this collective',
+      description: 'Get the host collective that is receiving the money on behalf of this collective',
       type: CollectiveInterfaceType,
       resolve(collective, args, req) {
         if (collective.HostCollectiveId) {
-          return req.loaders.collective.findById.load(
-            collective.HostCollectiveId,
-          );
+          return req.loaders.collective.findById.load(collective.HostCollectiveId);
         }
 
         if (collective.ParentCollectiveId) {
@@ -873,9 +839,7 @@ const CollectiveFields = () => {
             .then(
               parentCollective =>
                 parentCollective.HostCollectiveId &&
-                req.loaders.collective.findById.load(
-                  parentCollective.HostCollectiveId,
-                ),
+                req.loaders.collective.findById.load(parentCollective.HostCollectiveId),
             );
         }
 
@@ -883,8 +847,7 @@ const CollectiveFields = () => {
       },
     },
     members: {
-      description:
-        'Get all the members of this collective (admins, members, backers, followers)',
+      description: 'Get all the members of this collective (admins, members, backers, followers)',
       type: new GraphQLList(MemberType),
       args: {
         limit: { type: GraphQLInt },
@@ -935,8 +898,7 @@ const CollectiveFields = () => {
       },
     },
     memberOf: {
-      description:
-        'Get all the collective this collective is a member of (as a member, backer, follower, etc.)',
+      description: 'Get all the collective this collective is a member of (as a member, backer, follower, etc.)',
       type: new GraphQLList(MemberType),
       args: {
         limit: { type: GraphQLInt },
@@ -1149,10 +1111,7 @@ const CollectiveFields = () => {
     role: {
       type: GraphQLString,
       resolve(collective, args, req) {
-        return (
-          collective.role ||
-          collective.getRoleForMemberCollective(req.remoteUser.CollectiveId)
-        );
+        return collective.role || collective.getRoleForMemberCollective(req.remoteUser.CollectiveId);
       },
     },
     twitterHandle: {
@@ -1214,32 +1173,21 @@ const CollectiveFields = () => {
         },
       },
       async resolve(collective, args, req) {
-        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id))
-          return [];
-        let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(
-          collective.id,
-        );
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
+        let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
         if (args.service) {
-          paymentMethods = paymentMethods.filter(
-            pm => pm.service === args.service,
-          );
+          paymentMethods = paymentMethods.filter(pm => pm.service === args.service);
         }
         if (args.types) {
-          paymentMethods = paymentMethods.filter(pm =>
-            args.types.includes(pm.type),
-          );
+          paymentMethods = paymentMethods.filter(pm => args.types.includes(pm.type));
         }
         if (args.isConfirmed !== undefined) {
-          paymentMethods = paymentMethods.filter(
-            pm => pm.isConfirmed() === args.isConfirmed,
-          );
+          paymentMethods = paymentMethods.filter(pm => pm.isConfirmed() === args.isConfirmed);
         }
         if (args.hasBalanceAboveZero) {
           const filteredArray = [];
           for (const paymentMethod of paymentMethods) {
-            const balance = await paymentMethod.getBalanceForUser(
-              req.remoteUser,
-            );
+            const balance = await paymentMethod.getBalanceForUser(req.remoteUser);
             if (balance.amount > 0) {
               filteredArray.push(paymentMethod);
             }
@@ -1289,10 +1237,7 @@ export const UserCollectiveType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(userCollective, args, req) {
           return (
-            userCollective &&
-            req.loaders.getUserDetailsByCollectiveId
-              .load(userCollective.id)
-              .then(u => u.firstName)
+            userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(u => u.firstName)
           );
         },
       },
@@ -1300,10 +1245,7 @@ export const UserCollectiveType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(userCollective, args, req) {
           return (
-            userCollective &&
-            req.loaders.getUserDetailsByCollectiveId
-              .load(userCollective.id)
-              .then(u => u.lastName)
+            userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(u => u.lastName)
           );
         },
       },
@@ -1312,10 +1254,7 @@ export const UserCollectiveType = new GraphQLObjectType({
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
           return (
-            userCollective &&
-            req.loaders.getUserDetailsByCollectiveId
-              .load(userCollective.id)
-              .then(user => user.email)
+            userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email)
           );
         },
       },
@@ -1343,10 +1282,7 @@ export const OrganizationCollectiveType = new GraphQLObjectType({
         async resolve(orgCollective, args, req) {
           if (!req.remoteUser) return null;
           return (
-            orgCollective &&
-            req.loaders.getOrgDetailsByCollectiveId
-              .load(orgCollective.id)
-              .then(user => user.email)
+            orgCollective && req.loaders.getOrgDetailsByCollectiveId.load(orgCollective.id).then(user => user.email)
           );
         },
       },
@@ -1363,8 +1299,7 @@ export const EventCollectiveType = new GraphQLObjectType({
 
 export const CollectiveSearchResultsType = new GraphQLObjectType({
   name: 'CollectiveSearchResults',
-  description:
-    'The results from searching for collectives with pagination info',
+  description: 'The results from searching for collectives with pagination info',
   fields: () => ({
     collectives: {
       type: new GraphQLList(CollectiveType),

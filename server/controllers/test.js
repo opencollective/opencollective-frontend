@@ -27,11 +27,7 @@ export const resetTestDatabase = function(req, res, next) {
       databaseName = envsAndDatabases.development;
       break;
     default:
-      return next(
-        new errors.BadRequest(
-          `Unsupported NODE_ENV ${process.env.NODE_ENV} for reset API`,
-        ),
-      );
+      return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for reset API`));
   }
 
   const sequelize = new Sequelize(
@@ -52,8 +48,7 @@ export const resetTestDatabase = function(req, res, next) {
     email: 'member@opencollective.com',
     firstName: 'Xavier',
     lastName: 'Damman',
-    image:
-      'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
+    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
   };
 
   const backerData = {
@@ -138,10 +133,8 @@ export const resetTestDatabase = function(req, res, next) {
         models.ConnectedAccount.create({
           service: 'paypal',
           // Sandbox api keys
-          clientId:
-            'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
-          token:
-            'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8',
+          clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+          token: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8',
           CollectiveId: testHost.CollectivedId,
         }),
       )
@@ -244,21 +237,13 @@ export const getTestUserLoginUrl = function(req, res, next) {
       .catch(next);
   }
   return next(
-    new errors.BadRequest(
-      `Unsupported NODE_ENV ${
-        process.env.NODE_ENV
-      } for retreiving test API login token`,
-    ),
+    new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for retreiving test API login token`),
   );
 };
 
 export const exportPDF = function(req, res, next) {
   if (!envsAndDatabases[process.env.NODE_ENV]) {
-    return next(
-      new errors.BadRequest(
-        `Unsupported NODE_ENV ${process.env.NODE_ENV} for testing export PDF`,
-      ),
-    );
+    return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for testing export PDF`));
   }
 
   const d = new Date();
@@ -360,8 +345,7 @@ export const exportPDF = function(req, res, next) {
     let page = 1;
     let currentPage = 0;
     const transactionsPerTOCPage = 30; // number of transaction per page of the Table Of Content (for PDF export)
-    const note =
-      'using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.';
+    const note = 'using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.';
     data.expensesPerPage = [[]];
     data.totalPaidExpenses = transactions.length;
     data.transactions = transactions.map(t => {
@@ -370,9 +354,7 @@ export const exportPDF = function(req, res, next) {
       t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
       t.privateMessage = t.Expense && t.Expense.privateMessage;
       if (t.data && t.data.fxrateSource) {
-        t.privateMessage = t.privateMessage
-          ? `${t.privateMessage} (${note})`
-          : note;
+        t.privateMessage = t.privateMessage ? `${t.privateMessage} (${note})` : note;
         data.privateMessage = note;
       }
       if (page - (1 % transactionsPerTOCPage) === 0) {

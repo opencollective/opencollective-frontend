@@ -15,37 +15,21 @@ describe('transactions.routes.test.js', () => {
   before(() => utils.resetTestDB());
 
   // Create users
-  before('create user', () =>
-    models.User.createUserWithCollective(utils.data('user1')).tap(
-      u => (user = u),
-    ),
-  );
-  before('create host', () =>
-    models.User.createUserWithCollective(utils.data('host1')).tap(
-      u => (host = u),
-    ),
-  );
+  before('create user', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
+  before('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => (host = u)));
 
   // Create collectives
   before('create publicCollective', () =>
-    models.Collective.create(publicCollectiveData).tap(
-      g => (publicCollective = g),
-    ),
+    models.Collective.create(publicCollectiveData).tap(g => (publicCollective = g)),
   );
   before('create collective2', () =>
-    models.Collective.create(_.omit(utils.data('collective2'), ['slug'])).tap(
-      g => (collective2 = g),
-    ),
+    models.Collective.create(_.omit(utils.data('collective2'), ['slug'])).tap(g => (collective2 = g)),
   );
 
   // Add users to collectives
   before('add host to collective2', () => collective2.addHost(host.collective));
-  before('add host to publicCollective', () =>
-    publicCollective.addHost(host.collective),
-  );
-  before('add user to publicCollective as a member', () =>
-    publicCollective.addUserWithRole(user, roles.ADMIN),
-  );
+  before('add host to publicCollective', () => publicCollective.addHost(host.collective));
+  before('add user to publicCollective as a member', () => publicCollective.addUserWithRole(user, roles.ADMIN));
 
   let transaction, defaultAttributes;
 
@@ -82,9 +66,7 @@ describe('transactions.routes.test.js', () => {
         .get(`/transactions/${transaction.id}?api_key=${application.api_key}`)
         .expect(400)
         .end((e, res) => {
-          expect(res.body.error.message).to.equal(
-            'Must provide transaction uuid',
-          );
+          expect(res.body.error.message).to.equal('Must provide transaction uuid');
           done();
         });
     });
@@ -97,22 +79,12 @@ describe('transactions.routes.test.js', () => {
           expect(e).to.not.exist;
           const transactionDetails = res.body;
           expect(transactionDetails).to.have.property('host');
-          expect(transactionDetails.description).to.equal(
-            transaction.description,
-          );
+          expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
-          expect(transactionDetails.host.address).to.equal(
-            host.collective.address,
-          );
-          expect(transactionDetails.collective.slug).to.equal(
-            publicCollective.slug,
-          );
-          expect(transactionDetails.createdByUser).to.not.have.property(
-            'email',
-          );
-          expect(transactionDetails.createdByUser).to.not.have.property(
-            'paypalEmail',
-          );
+          expect(transactionDetails.host.address).to.equal(host.collective.address);
+          expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
+          expect(transactionDetails.createdByUser).to.not.have.property('email');
+          expect(transactionDetails.createdByUser).to.not.have.property('paypalEmail');
           expect(transactionDetails.host).to.not.have.property('email');
           done();
         });
@@ -126,23 +98,13 @@ describe('transactions.routes.test.js', () => {
           expect(e).to.not.exist;
           const transactionDetails = res.body;
           expect(transactionDetails).to.have.property('host');
-          expect(transactionDetails.createdByUser).to.not.have.property(
-            'email',
-          );
-          expect(transactionDetails.createdByUser).to.not.have.property(
-            'paypalEmail',
-          );
+          expect(transactionDetails.createdByUser).to.not.have.property('email');
+          expect(transactionDetails.createdByUser).to.not.have.property('paypalEmail');
           expect(transactionDetails.type).to.equal(transaction.type);
-          expect(transactionDetails.description).to.equal(
-            transaction.description,
-          );
+          expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
-          expect(transactionDetails.host.address).to.equal(
-            host.collective.address,
-          );
-          expect(transactionDetails.collective.slug).to.equal(
-            publicCollective.slug,
-          );
+          expect(transactionDetails.host.address).to.equal(host.collective.address);
+          expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           done();
         });
     });
@@ -153,11 +115,7 @@ describe('transactions.routes.test.js', () => {
 
     it("successfully get a group's transactions with per_page", done => {
       request(app)
-        .get(
-          `/groups/${publicCollective.id}/transactions?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
         .send({
           per_page: perPage,
           sort: 'id',
@@ -178,9 +136,7 @@ describe('transactions.routes.test.js', () => {
           expect(headers.link).to.contain('current');
           expect(headers.link).to.contain('page=1');
           expect(headers.link).to.contain(`per_page=${perPage}`);
-          expect(headers.link).to.contain(
-            `/groups/${publicCollective.id}/transactions`,
-          );
+          expect(headers.link).to.contain(`/groups/${publicCollective.id}/transactions`);
           const tot = transactionsData.length;
           expect(headers.link).to.contain(
             `/groups/${publicCollective.id}/transactions?page=${Math.ceil(
@@ -195,11 +151,7 @@ describe('transactions.routes.test.js', () => {
     it("successfully get the second page of a group's transactions", done => {
       const page = 2;
       request(app)
-        .get(
-          `/groups/${publicCollective.id}/transactions?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
         .send({
           per_page: perPage,
           page,
@@ -225,11 +177,7 @@ describe('transactions.routes.test.js', () => {
       const sinceId = 5;
 
       request(app)
-        .get(
-          `/groups/${publicCollective.id}/transactions?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
         .send({
           since_id: sinceId,
           sort: 'id',
@@ -257,11 +205,7 @@ describe('transactions.routes.test.js', () => {
   describe('Sorting', () => {
     it("successfully get a group's transactions with sorting", done => {
       request(app)
-        .get(
-          `/groups/${publicCollective.id}/transactions?api_key=${
-            application.api_key
-          }`,
-        )
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
         .send({
           sort: 'createdAt',
           direction: 'asc',

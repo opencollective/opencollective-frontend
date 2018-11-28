@@ -42,23 +42,13 @@ const sameDatesLastMonth = [
 
 const createdLastWeek = getTimeFrame('createdAt', lastWeek);
 const updatedLastWeek = getTimeFrame('updatedAt', lastWeek);
-const createdSameWeekPreviousMonth = getTimeFrame(
-  'createdAt',
-  sameDatesLastMonth,
-);
-const updatedSameWeekPreviousMonth = getTimeFrame(
-  'updatedAt',
-  sameDatesLastMonth,
-);
+const createdSameWeekPreviousMonth = getTimeFrame('createdAt', sameDatesLastMonth);
+const updatedSameWeekPreviousMonth = getTimeFrame('updatedAt', sameDatesLastMonth);
 
 const title = 'Weekly Platform Report';
-const subtitle = `Week ${lastWeek[0].week()} from ${lastWeek[0].format(
+const subtitle = `Week ${lastWeek[0].week()} from ${lastWeek[0].format('YYYY-MM-DD')} till ${lastWeek[1].format(
   'YYYY-MM-DD',
-)} till ${lastWeek[1].format(
-  'YYYY-MM-DD',
-)} (compared to ${sameDatesLastMonth[0].format(
-  'YYYY-MM-DD',
-)} till ${sameDatesLastMonth[1].format('YYYY-MM-DD')})`;
+)} (compared to ${sameDatesLastMonth[0].format('YYYY-MM-DD')} till ${sameDatesLastMonth[1].format('YYYY-MM-DD')})`;
 
 const donation = {
   where: {
@@ -83,13 +73,7 @@ const excludeOcTeam = {
   },
 };
 
-const lastWeekDonations = merge(
-  {},
-  createdLastWeek,
-  donation,
-  excludeOcTeam,
-  credit,
-);
+const lastWeekDonations = merge({}, createdLastWeek, donation, excludeOcTeam, credit);
 const lastWeekExpenses = merge({}, updatedLastWeek, excludeOcTeam);
 
 const pendingLastWeekExpenses = merge({}, lastWeekExpenses, pendingExpense);
@@ -97,19 +81,8 @@ const approvedLastWeekExpenses = merge({}, lastWeekExpenses, approvedExpense);
 const rejectedLastWeekExpenses = merge({}, lastWeekExpenses, rejectedExpense);
 const paidLastWeekExpenses = merge({}, lastWeekExpenses, paidExpense);
 
-const weekBeforeDonations = merge(
-  {},
-  createdSameWeekPreviousMonth,
-  donation,
-  excludeOcTeam,
-  credit,
-);
-const paidWeekBeforeExpenses = merge(
-  {},
-  updatedSameWeekPreviousMonth,
-  excludeOcTeam,
-  paidExpense,
-);
+const weekBeforeDonations = merge({}, createdSameWeekPreviousMonth, donation, excludeOcTeam, credit);
+const paidWeekBeforeExpenses = merge({}, updatedSameWeekPreviousMonth, excludeOcTeam, paidExpense);
 
 const groupAndOrderBy = (table, attribute = 'currency') => {
   return {
@@ -158,107 +131,59 @@ export default function run() {
   return Promise.props({
     // Donation statistics
 
-    stripeDonationCount: Transaction.count(
-      merge({}, lastWeekDonations, service('stripe')),
-    ),
+    stripeDonationCount: Transaction.count(merge({}, lastWeekDonations, service('stripe'))),
 
-    priorStripeDonationCount: Transaction.count(
-      merge({}, weekBeforeDonations, service('stripe')),
-    ),
+    priorStripeDonationCount: Transaction.count(merge({}, weekBeforeDonations, service('stripe'))),
 
-    manualDonationCount: Transaction.count(
-      merge({}, lastWeekDonations, service('opencollective')),
-    ),
+    manualDonationCount: Transaction.count(merge({}, lastWeekDonations, service('opencollective'))),
 
-    priorManualDonationCount: Transaction.count(
-      merge({}, weekBeforeDonations, service('opencollective')),
-    ),
+    priorManualDonationCount: Transaction.count(merge({}, weekBeforeDonations, service('opencollective'))),
 
-    paypalDonationCount: Transaction.count(
-      merge({}, lastWeekDonations, service('paypal')),
-    ),
+    paypalDonationCount: Transaction.count(merge({}, lastWeekDonations, service('paypal'))),
 
-    priorPaypalDonationCount: Transaction.count(
-      merge({}, weekBeforeDonations, service('paypal')),
-    ),
+    priorPaypalDonationCount: Transaction.count(merge({}, weekBeforeDonations, service('paypal'))),
 
     revenue: Transaction.aggregate(
       'platformFeeInHostCurrency',
       'SUM',
-      merge(
-        {},
-        lastWeekDonations,
-        groupAndOrderBy('Transaction', 'hostCurrency'),
-      ),
+      merge({}, lastWeekDonations, groupAndOrderBy('Transaction', 'hostCurrency')),
     ),
 
     priorRevenue: Transaction.aggregate(
       'platformFeeInHostCurrency',
       'SUM',
-      merge(
-        {},
-        weekBeforeDonations,
-        groupAndOrderBy('Transaction', 'hostCurrency'),
-      ),
+      merge({}, weekBeforeDonations, groupAndOrderBy('Transaction', 'hostCurrency')),
     ),
 
     stripeDonationAmount: Transaction.aggregate(
       'amount',
       'SUM',
-      merge(
-        {},
-        lastWeekDonations,
-        groupAndOrderBy('Transaction'),
-        service('stripe'),
-      ),
+      merge({}, lastWeekDonations, groupAndOrderBy('Transaction'), service('stripe')),
     ),
 
     priorStripeDonationAmount: Transaction.aggregate(
       'amount',
       'SUM',
-      merge(
-        {},
-        weekBeforeDonations,
-        groupAndOrderBy('Transaction'),
-        service('stripe'),
-      ),
+      merge({}, weekBeforeDonations, groupAndOrderBy('Transaction'), service('stripe')),
     ),
 
     manualDonationAmount: Transaction.aggregate(
       'amount',
       'SUM',
-      merge(
-        {},
-        lastWeekDonations,
-        groupAndOrderBy('Transaction'),
-        service('opencollective'),
-      ),
+      merge({}, lastWeekDonations, groupAndOrderBy('Transaction'), service('opencollective')),
     ),
 
     priorManualDonationAmount: Transaction.aggregate(
       'amount',
       'SUM',
-      merge(
-        {},
-        weekBeforeDonations,
-        groupAndOrderBy('Transaction'),
-        service('opencollective'),
-      ),
+      merge({}, weekBeforeDonations, groupAndOrderBy('Transaction'), service('opencollective')),
     ),
 
-    paypalReceivedCount: Activity.count(
-      merge({}, createdLastWeek, paypalReceived),
-    ),
+    paypalReceivedCount: Activity.count(merge({}, createdLastWeek, paypalReceived)),
 
-    paypalDonationAmount: Transaction.sum(
-      'amount',
-      merge({}, lastWeekDonations, service('paypal')),
-    ),
+    paypalDonationAmount: Transaction.sum('amount', merge({}, lastWeekDonations, service('paypal'))),
 
-    priorPaypalDonationAmount: Transaction.sum(
-      'amount',
-      merge({}, weekBeforeDonations, service('paypal')),
-    ),
+    priorPaypalDonationAmount: Transaction.sum('amount', merge({}, weekBeforeDonations, service('paypal'))),
 
     // Expense statistics
 
@@ -290,11 +215,7 @@ export default function run() {
       merge({}, rejectedLastWeekExpenses, groupAndOrderBy('Expense')),
     ).map(row => `${row.currency} ${formatCurrency(row.SUM, row.currency)}`),
 
-    paidExpenseAmount: Expense.aggregate(
-      'amount',
-      'SUM',
-      merge({}, paidLastWeekExpenses, groupAndOrderBy('Expense')),
-    ),
+    paidExpenseAmount: Expense.aggregate('amount', 'SUM', merge({}, paidLastWeekExpenses, groupAndOrderBy('Expense'))),
 
     priorPaidExpenseAmount: Expense.aggregate(
       'amount',
@@ -305,13 +226,7 @@ export default function run() {
     // Collective statistics
 
     activeCollectivesWithTransactions: Transaction.findAll(
-      merge(
-        { attributes: ['CollectiveId'] },
-        createdLastWeek,
-        distinct,
-        excludeOcTeam,
-        onlyIncludeCollectiveType,
-      ),
+      merge({ attributes: ['CollectiveId'] }, createdLastWeek, distinct, excludeOcTeam, onlyIncludeCollectiveType),
     ).map(row => row.CollectiveId),
 
     priorActiveCollectivesWithTransactions: Transaction.findAll(
@@ -325,45 +240,24 @@ export default function run() {
     ).map(row => row.CollectiveId),
 
     activeCollectivesWithExpenses: Expense.findAll(
-      merge(
-        { attributes: ['CollectiveId'] },
-        updatedLastWeek,
-        distinct,
-        excludeOcTeam,
-      ),
+      merge({ attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam),
     ).map(row => row.CollectiveId),
 
     priorActiveCollectivesWithExpenses: Expense.findAll(
-      merge(
-        { attributes: ['CollectiveId'] },
-        updatedSameWeekPreviousMonth,
-        distinct,
-        excludeOcTeam,
-      ),
+      merge({ attributes: ['CollectiveId'] }, updatedSameWeekPreviousMonth, distinct, excludeOcTeam),
     ).map(row => row.CollectiveId),
 
     newCollectives: Collective.findAll(
-      merge(
-        {},
-        { attributes: ['slug', 'name', 'tags'], where: { type: 'COLLECTIVE' } },
-        createdLastWeek,
-      ),
+      merge({}, { attributes: ['slug', 'name', 'tags'], where: { type: 'COLLECTIVE' } }, createdLastWeek),
     ).map(collective => {
-      const openSource =
-        collective.dataValues.tags &&
-        collective.dataValues.tags.indexOf('open source') !== -1;
-      return `[${collective.dataValues.name ||
-        collective.dataValues.slug}](https://opencollective.com/${
+      const openSource = collective.dataValues.tags && collective.dataValues.tags.indexOf('open source') !== -1;
+      return `[${collective.dataValues.name || collective.dataValues.slug}](https://opencollective.com/${
         collective.dataValues.slug
       }) (${openSource ? 'open source' : collective.dataValues.tags})`;
     }),
 
     priorNewCollectivesCount: Collective.count(
-      merge(
-        {},
-        { where: { type: 'COLLECTIVE' } },
-        createdSameWeekPreviousMonth,
-      ),
+      merge({}, { where: { type: 'COLLECTIVE' } }, createdSameWeekPreviousMonth),
     ),
   })
     .then(async results => {
@@ -412,9 +306,7 @@ export default function run() {
 function onlyExecuteInProdOnMondays() {
   const today = new Date();
   if (process.env.NODE_ENV === 'production' && today.getDay() !== 1) {
-    console.log(
-      'NODE_ENV is production and day is not Monday, script aborted!',
-    );
+    console.log('NODE_ENV is production and day is not Monday, script aborted!');
     process.exit();
   }
 }
@@ -467,27 +359,20 @@ function reportString({
   return `# ${title}
 ${subtitle}
 
-## Revenue ${formatCurrency(revenueInUSD, 'USD')} (${compareNumbers(
-    revenueInUSD,
-    priorRevenueInUSD,
-    n => formatCurrency(n, 'USD'),
+## Revenue ${formatCurrency(revenueInUSD, 'USD')} (${compareNumbers(revenueInUSD, priorRevenueInUSD, n =>
+    formatCurrency(n, 'USD'),
   )}) (${growthPercent} growth)
   ${revenue
     .map(
       ({ SUM, currency }) =>
-        `* ${currency} ${formatCurrency(-SUM, currency)} (${compareNumbers(
-          -SUM,
-          -getSum(priorRevenue, currency),
-          n => formatCurrency(n, currency),
+        `* ${currency} ${formatCurrency(-SUM, currency)} (${compareNumbers(-SUM, -getSum(priorRevenue, currency), n =>
+          formatCurrency(n, currency),
         )})`,
     )
     .join('\n  ')}
 
 ## Donations
-  - STRIPE: ${stripeDonationCount} donations received (${compareNumbers(
-    stripeDonationCount,
-    priorStripeDonationCount,
-  )})
+  - STRIPE: ${stripeDonationCount} donations received (${compareNumbers(stripeDonationCount, priorStripeDonationCount)})
     ${stripeDonationAmount
       .map(
         ({ SUM, currency }) =>
@@ -507,10 +392,7 @@ ${subtitle}
     priorPaypalDonationAmount,
     n => formatCurrency(n, 'USD'),
   )})
-  - MANUAL: ${manualDonationCount} donations received (${compareNumbers(
-    manualDonationCount,
-    priorManualDonationCount,
-  )})
+  - MANUAL: ${manualDonationCount} donations received (${compareNumbers(manualDonationCount, priorManualDonationCount)})
     ${manualDonationAmount
       .map(
         ({ SUM, currency }) =>
@@ -523,10 +405,7 @@ ${subtitle}
       .join('\n    ')}
 
 ## Expenses
-  - ${paidExpenseCount} paid expenses (${compareNumbers(
-    paidExpenseCount,
-    priorPaidExpenseCount,
-  )})
+  - ${paidExpenseCount} paid expenses (${compareNumbers(paidExpenseCount, priorPaidExpenseCount)})
     ${paidExpenseAmount
       .map(
         ({ SUM, currency }) =>
@@ -537,21 +416,12 @@ ${subtitle}
           )})`,
       )
       .join('\n    ')}
-  - ${pendingExpenseCount} pending expenses${displayTotals(
-    pendingExpenseAmount,
-  )}
-  - ${approvedExpenseCount} approved expenses${displayTotals(
-    approvedExpenseAmount,
-  )}
-  - ${rejectedExpenseCount} rejected expenses${displayTotals(
-    rejectedExpenseAmount,
-  )}
+  - ${pendingExpenseCount} pending expenses${displayTotals(pendingExpenseAmount)}
+  - ${approvedExpenseCount} approved expenses${displayTotals(approvedExpenseAmount)}
+  - ${rejectedExpenseCount} rejected expenses${displayTotals(rejectedExpenseAmount)}
 
 ## Collectives
-  - ${activeCollectiveCount} active collectives (${compareNumbers(
-    activeCollectiveCount,
-    priorActiveCollectiveCount,
-  )})
+  - ${activeCollectiveCount} active collectives (${compareNumbers(activeCollectiveCount, priorActiveCollectiveCount)})
   - ${newCollectives.length} new collectives (${compareNumbers(
     newCollectives.length,
     priorNewCollectivesCount,
@@ -576,11 +446,7 @@ function displayCollectives(collectives) {
   return '';
 }
 
-function compareNumbers(
-  recentNumber,
-  priorNumber,
-  formatter = number => number,
-) {
+function compareNumbers(recentNumber, priorNumber, formatter = number => number) {
   const diff = Math.round(recentNumber - priorNumber);
   return `${diff >= 0 ? '+' : ''}${formatter(diff)}`;
 }
