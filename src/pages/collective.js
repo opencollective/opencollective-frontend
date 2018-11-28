@@ -55,9 +55,8 @@ class CollectivePage extends React.Component {
   render() {
     const { data, query, LoggedInUser } = this.props;
 
-    if (!data.Collective) {
+    if (!data.Collective && !data.loading) {
       ssrNotFoundError(data);
-      return <ErrorPage LoggedInUser={LoggedInUser} data={data} />;
     }
 
     const collective = data.Collective;
@@ -71,13 +70,15 @@ class CollectivePage extends React.Component {
       return <PledgedCollective {...props} />;
     }
 
-    if (collective.type === 'COLLECTIVE') {
+    if (collective && collective.type === 'COLLECTIVE') {
       return <Collective {...props} />;
     }
 
-    if (['USER', 'ORGANIZATION'].includes(collective.type)) {
+    if (collective && ['USER', 'ORGANIZATION'].includes(collective.type)) {
       return <UserCollective {...props} />;
     }
+
+    return <ErrorPage LoggedInUser={LoggedInUser} data={data} />;
   }
 }
 

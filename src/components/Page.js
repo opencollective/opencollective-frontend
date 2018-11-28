@@ -10,7 +10,7 @@ import Header from '../components/Header';
 
 class Page extends React.Component {
   render() {
-    const { children, data, loadingLoggedInUser, LoggedInUser, title, showSearch } = this.props;
+    const { children, data = {}, loadingLoggedInUser, LoggedInUser, title, showSearch } = this.props;
 
     if (data.error) {
       return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
