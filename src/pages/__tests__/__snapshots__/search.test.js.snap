@@ -959,6 +959,7 @@ exports[`Search Page renders "Make pledge" button with empty results 1`] = `
               <a
                 className="c47 "
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -2125,6 +2126,7 @@ exports[`Search Page renders empty results message 1`] = `
               <a
                 className="c46 "
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -3275,6 +3277,7 @@ exports[`Search Page renders error message 1`] = `
               <a
                 className="c48 "
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -4562,6 +4565,7 @@ exports[`Search Page renders loading grid SVG 1`] = `
               <a
                 className="c46 "
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
@@ -5871,6 +5875,7 @@ exports[`Search Page renders search results with pagination 1`] = `
               <a
                 className="c50 "
                 href="/discover"
+                onClick={[Function]}
               >
                 Discover
               </a>
