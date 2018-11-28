@@ -184,6 +184,7 @@ const getDataQuery = gql`
       slug
       name
       isHost
+      currency
       paymentMethods {
         id
         uuid

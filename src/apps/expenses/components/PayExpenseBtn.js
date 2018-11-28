@@ -14,7 +14,7 @@ class PayExpenseBtn extends React.Component {
   static propTypes = {
     expense: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
-    paymentMethods: PropTypes.arrayOf(PropTypes.object),
+    host: PropTypes.object,
     disabled: PropTypes.bool,
     lock: PropTypes.func,
     unlock: PropTypes.func,
@@ -55,7 +55,7 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { collective, expense, intl, paymentMethods } = this.props;
+    const { collective, expense, intl, host } = this.props;
     let disabled = this.state.loading,
       selectedPayoutMethod = expense.payoutMethod,
       title = '',
@@ -66,7 +66,7 @@ class PayExpenseBtn extends React.Component {
         disabled = true;
         title = intl.formatMessage(this.messages['paypal.missing']);
       } else {
-        const paypalPaymentMethod = paymentMethods && paymentMethods.find(pm => pm.service === 'paypal');
+        const paypalPaymentMethod = host.paymentMethods && host.paymentMethods.find(pm => pm.service === 'paypal');
         if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
           selectedPayoutMethod = 'other';
         }

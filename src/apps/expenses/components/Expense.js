@@ -16,6 +16,7 @@ import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
+import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import colors from '../../../constants/colors';
 
 class Expense extends React.Component {
@@ -87,8 +88,9 @@ class Expense extends React.Component {
     this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
   }
 
-  handleChange(expense) {
-    this.setState({ modified: true, expense });
+  handleChange(obj) {
+    const newState = { ...this.state, modified: true, ...obj };
+    this.setState(newState);
   }
 
   async save() {
@@ -226,7 +228,9 @@ class Expense extends React.Component {
               margin-right: 1rem;
               float: left;
             }
-
+            .expenseActions {
+              display: flex;
+            }
             .expenseActions :global(> div) {
               margin-right: 0.5rem;
             }
@@ -299,8 +303,8 @@ class Expense extends React.Component {
               {' | '}
               {includeHostedCollectives && (
                 <span className="collective">
-                  <Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link>
-                  (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
+                  <Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance:{' '}
+                  {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
                 </span>
               )}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
@@ -341,7 +345,7 @@ class Expense extends React.Component {
             LoggedInUser={LoggedInUser}
             expense={expense}
             collective={collective}
-            onChange={this.handleChange}
+            onChange={expense => this.handleChange({ expense })}
             mode={mode}
           />
 
@@ -357,20 +361,30 @@ class Expense extends React.Component {
                   </div>
                 </div>
               )}
-              {mode !== 'edit' && LoggedInUser && LoggedInUser.canApproveExpense(expense) && (
-                <div className="expenseActions">
-                  {expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense) && (
-                    <PayExpenseBtn
-                      expense={expense}
-                      collective={collective}
-                      paymentMethods={host.paymentMethods}
-                      disabled={!this.props.allowPayAction}
-                      lock={this.props.lockPayAction}
-                      unlock={this.props.unlockPayAction}
+              {mode !== 'edit' && (canPay || canApprove || canReject) && (
+                <div className="manageExpense">
+                  {canPay && expense.payoutMethod === 'other' && (
+                    <EditPayExpenseFeesForm
+                      canEditPlatformFee={LoggedInUser.isRoot()}
+                      currency={collective.currency}
+                      onChange={fees => this.handleChange({ fees })}
                     />
                   )}
-                  {canApprove && <ApproveExpenseBtn id={expense.id} />}
-                  {canReject && <RejectExpenseBtn id={expense.id} />}
+                  <div className="expenseActions">
+                    {canPay && (
+                      <PayExpenseBtn
+                        expense={expense}
+                        collective={collective}
+                        host={host}
+                        {...this.state.fees}
+                        disabled={!this.props.allowPayAction}
+                        lock={this.props.lockPayAction}
+                        unlock={this.props.unlockPayAction}
+                      />
+                    )}
+                    {canApprove && <ApproveExpenseBtn id={expense.id} />}
+                    {canReject && <RejectExpenseBtn id={expense.id} />}
+                  </div>
                 </div>
               )}
             </div>
