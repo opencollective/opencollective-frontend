@@ -74,7 +74,7 @@ const navigation = {
  * are still hosted on legacy website and cannot be linked with NextJS Link
  * component. See https://github.com/opencollective/opencollective/issues/1361
  */
-const routesWithoutRouter = ['/learn-more', '/discover'];
+const routesWithoutRouter = ['/learn-more'];
 
 class Footer extends React.Component {
   render() {
