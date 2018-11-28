@@ -237,6 +237,67 @@ const queries = {
     },
   },
 
+  /**
+   * Get an invoice for a single transaction.
+   */
+  TransactionInvoice: {
+    type: InvoiceType,
+    args: {
+      transactionUuid: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Slug of the transaction.',
+      },
+    },
+    async resolve(_, args, req) {
+      // Need to be authenticated
+      if (!req.remoteUser) {
+        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
+      }
+
+      // Fetch transaction
+      const transaction = await models.Transaction.findOne({
+        where: { uuid: args.transactionUuid },
+      });
+
+      if (!transaction) {
+        throw new errors.NotFound(`Transaction ${args.transactionUuid} doesn't exists`);
+      }
+
+      // Ensure user is admin of collective
+      if (!req.remoteUser.isAdmin(transaction.FromCollectiveId)) {
+        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
+      }
+
+      // Load transaction host
+      transaction.host = await transaction.getHostCollective();
+
+      // If using a virtualcard, then billed collective will be the emitter
+      const fromCollectiveId = transaction.UsingVirtualCardFromCollectiveId
+        ? transaction.UsingVirtualCardFromCollectiveId
+        : transaction.FromCollectiveId;
+
+      // Get total in host currency
+      const totalAmountInHostCurrency =
+        transaction.type === 'CREDIT' ? transaction.amount : transaction.netAmountInCollectiveCurrency * -1;
+
+      // Generate invoice
+      const invoice = {
+        title: get(transaction.host, 'settings.invoiceTitle') || 'Donation Receipt',
+        HostCollectiveId: get(transaction.host, 'id'),
+        slug: `transaction-${args.transactionUuid}`,
+        currency: transaction.hostCurrency,
+        FromCollectiveId: fromCollectiveId,
+        totalAmount: totalAmountInHostCurrency,
+        transactions: [transaction],
+        year: transaction.createdAt.getFullYear(),
+        month: transaction.createdAt.getMonth() + 1,
+        day: transaction.createdAt.getDate(),
+      };
+
+      return invoice;
+    },
+  },
+
   /*
    * Given a collective slug, returns all transactions
    */
