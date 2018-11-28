@@ -42,8 +42,7 @@ class RedeemSuccess extends React.Component {
             <Title>
               <FormattedMessage
                 id="redeem.card.success.title"
-                defaultMessage="You’re just one step away from
-    supporting open initiatives."
+                defaultMessage="You are one step away from supporting open collectives."
               />
             </Title>
           </Box>
