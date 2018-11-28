@@ -15,6 +15,7 @@ import * as store from './features/support/stores';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
 import * as libtransactions from '../server/lib/transactions';
+import { getFxRate } from '../server/lib/currency';
 
 /* Queries used throughout these tests */
 const allExpensesQuery = `
@@ -57,8 +58,8 @@ const deleteExpenseQuery = `
   mutation deleteExpense($id: Int!) { deleteExpense(id: $id) { id } }`;
 
 const payExpenseQuery = `
-  mutation payExpense($id: Int!, $fee: Int!) {
-    payExpense(id: $id, fee: $fee) { id status } }`;
+  mutation payExpense($id: Int!, $paymentProcessorFeeInCollectiveCurrency: Int, $hostFeeInCollectiveCurrency: Int, $platformFeeInCollectiveCurrency: Int) {
+    payExpense(id: $id, paymentProcessorFeeInCollectiveCurrency: $paymentProcessorFeeInCollectiveCurrency, hostFeeInCollectiveCurrency: $hostFeeInCollectiveCurrency, platformFeeInCollectiveCurrency: $platformFeeInCollectiveCurrency) { id status } }`;
 
 describe('GraphQL Expenses API', () => {
   beforeEach(utils.resetTestDB);
@@ -581,7 +582,10 @@ describe('GraphQL Expenses API', () => {
         collective: { id: collective.id },
       });
       // When the expense attempted to be paid
-      const parameters = { id: expense.id, fee: 0 };
+      const parameters = {
+        id: expense.id,
+        paymentProcessorFeeInCollectiveCurrency: 0,
+      };
       const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
@@ -608,7 +612,10 @@ describe('GraphQL Expenses API', () => {
       // And the expense is rejected
       await models.Expense.update({ status: 'REJECTED' }, { where: { id: expense.id } });
       // When the expense attempted to be paid
-      const parameters = { id: expense.id, fee: 0 };
+      const parameters = {
+        id: expense.id,
+        paymentProcessorFeeInCollectiveCurrency: 0,
+      };
       const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
@@ -619,12 +626,19 @@ describe('GraphQL Expenses API', () => {
     }); /* End of "fails if expense is not approved (REJECTED)" */
 
     const addFunds = async (user, hostCollective, collective, amount) => {
+      const currency = collective.currency || 'USD';
+      const hostCurrencyFxRate = await getFxRate(currency, hostCollective.currency);
+      const amountInHostCurrency = hostCurrencyFxRate * amount;
       await models.Transaction.create({
         CreatedByUserId: user.id,
         HostCollectiveId: hostCollective.id,
         type: 'CREDIT',
+        amount,
+        amountInHostCurrency,
+        hostCurrencyFxRate,
         netAmountInCollectiveCurrency: amount,
-        currency: 'USD',
+        hostCurrency: hostCollective.currency,
+        currency,
         CollectiveId: collective.id,
       });
     };
@@ -655,7 +669,11 @@ describe('GraphQL Expenses API', () => {
       // And then add funds to the collective
       await addFunds(user, hostCollective, collective, 500);
       // When the expense is paid by the host admin
-      const result = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
+      const result = await utils.graphqlQuery(
+        payExpenseQuery,
+        { id: expense.id, paymentProcessorFeeInCollectiveCurrency: 0 },
+        hostAdmin,
+      );
       // Then there should be errors
       expect(result.errors).to.exist;
       // And then the error message should be set appropriately
@@ -690,7 +708,10 @@ describe('GraphQL Expenses API', () => {
       // And then add funds to the collective
       await addFunds(user, hostCollective, collective, 1000);
       // When the expense is paid by the host admin
-      const parameters = { id: expense.id, fee: 0 };
+      const parameters = {
+        id: expense.id,
+        paymentProcessorFeeInCollectiveCurrency: 0,
+      };
       const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
       // Then there should be errors
       expect(result.errors).to.exist;
@@ -706,8 +727,8 @@ describe('GraphQL Expenses API', () => {
       beforeEach(async () => {
         // Given that we have a host and a collective
         ({ hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
-          'Test Collective',
-          'USD',
+          'WWCode Berlin',
+          'EUR',
           'USD',
           10,
         ));
@@ -722,7 +743,7 @@ describe('GraphQL Expenses API', () => {
         expense = await store.createExpense(user, {
           amount: 1000,
           description: 'Pizza',
-          currency: 'USD',
+          currency: 'EUR',
           payoutMethod: 'manual',
           collective: { id: collective.id },
         });
@@ -737,20 +758,46 @@ describe('GraphQL Expenses API', () => {
         await expense.save();
         // And then add funds to the collective
         const initialBalance = 1500;
-        const fee = 100;
+        const paymentProcessorFeeInCollectiveCurrency = 100;
         await addFunds(user, hostCollective, collective, initialBalance);
         // When the expense is paid by the host admin
         let balance = await collective.getBalance();
         expect(balance).to.equal(1500);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee }, hostAdmin);
+        const res = await utils.graphqlQuery(
+          payExpenseQuery,
+          { id: expense.id, paymentProcessorFeeInCollectiveCurrency },
+          hostAdmin,
+        );
         res.errors && console.log(res.errors);
         expect(res.errors).to.not.exist;
         expect(res.data.payExpense.status).to.equal('PAID');
         balance = await collective.getBalance();
-        expect(balance).to.equal(initialBalance - expense.amount - fee);
+        expect(balance).to.equal(initialBalance - expense.amount - paymentProcessorFeeInCollectiveCurrency);
         await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, {
           delay: 500,
         });
+        const debitTransaction = await models.Transaction.findOne({
+          where: {
+            type: 'DEBIT',
+            ExpenseId: expense.id,
+          },
+        });
+        expect(debitTransaction.currency).to.equal('EUR'); // expense.currency
+        expect(debitTransaction.hostCurrency).to.equal('USD');
+        expect(debitTransaction.netAmountInCollectiveCurrency).to.equal(
+          -expense.amount - paymentProcessorFeeInCollectiveCurrency,
+        );
+        expect(debitTransaction.paymentProcessorFeeInHostCurrency).to.equal(
+          Math.round(-paymentProcessorFeeInCollectiveCurrency * debitTransaction.hostCurrencyFxRate),
+        );
+        const creditTransaction = await models.Transaction.findOne({
+          where: {
+            type: 'CREDIT',
+            ExpenseId: expense.id,
+          },
+        });
+        expect(creditTransaction.netAmountInCollectiveCurrency).to.equal(expense.amount);
+        expect(creditTransaction.amount).to.equal(expense.amount + paymentProcessorFeeInCollectiveCurrency);
         expect(emailSendMessageSpy.callCount).to.equal(4);
       }); /* End of "pays the expense manually and reduces the balance of the collective" */
 
@@ -759,7 +806,10 @@ describe('GraphQL Expenses API', () => {
         expense.payoutMethod = 'donation';
         await expense.save();
         // When the expense is paid by the host admin
-        const parameters = { id: expense.id, fee: 0 };
+        const parameters = {
+          id: expense.id,
+          paymentProcessorFeeInCollectiveCurrency: 0,
+        };
         const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
         result.errors && console.log(result.errors);
         // Then the collective's balance should stay 0
@@ -769,7 +819,7 @@ describe('GraphQL Expenses API', () => {
           await libtransactions.sum({
             FromCollectiveId: userCollective.id,
             CollectiveId: collective.id,
-            currency: 'USD',
+            currency: 'EUR',
             type: 'CREDIT',
           }),
         ).to.equal(expense.amount);
@@ -804,7 +854,11 @@ describe('GraphQL Expenses API', () => {
         // When the expense is paid by the host admin
         let balance = await collective.getBalance();
         expect(balance).to.equal(1500);
-        const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id, fee: 0 }, hostAdmin);
+        const res = await utils.graphqlQuery(
+          payExpenseQuery,
+          { id: expense.id, paymentProcessorFeeInCollectiveCurrency: 0 },
+          hostAdmin,
+        );
         res.errors && console.log(res.errors);
         expect(res.errors).to.not.exist;
         expect(res.data.payExpense.status).to.equal('PAID');
