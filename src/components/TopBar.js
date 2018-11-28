@@ -13,6 +13,7 @@ import { Box, Flex } from 'grid-styled';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../constants/animations';
+import { withUser } from './UserProvider';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
@@ -40,6 +41,7 @@ const NavLink = styled.a`
 class TopBar extends React.Component {
   static propTypes = {
     className: PropTypes.string,
+    loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
   };
 
@@ -59,8 +61,8 @@ class TopBar extends React.Component {
   }
 
   render() {
-    const { className, showSearch } = this.props;
-    const shouldAnimate = Array.isArray(className) && className.includes('loading');
+    const { className, loadingLoggedInUser, showSearch } = this.props;
+    const shouldAnimate = (Array.isArray(className) && className.includes('loading')) || loadingLoggedInUser;
 
     return (
       <Flex px={3} py={showSearch ? 2 : 3} alignItems="center" flexDirection="row" justifyContent="space-around">
@@ -135,4 +137,4 @@ class TopBar extends React.Component {
   }
 }
 
-export default withIntl(TopBar);
+export default withIntl(withUser(TopBar));

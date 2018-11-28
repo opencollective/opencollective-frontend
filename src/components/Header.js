@@ -57,7 +57,7 @@ class Header extends React.Component {
           ))}
         </Head>
         <div id="top" />
-        <TopBar className={className} LoggedInUser={this.props.LoggedInUser} showSearch={this.props.showSearch} />
+        <TopBar className={className} showSearch={this.props.showSearch} />
       </header>
     );
   }
