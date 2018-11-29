@@ -21,6 +21,8 @@ import { addSearchQueryData } from '../graphql/queries';
 
 import withIntl from '../lib/withIntl';
 
+import { Search } from 'styled-icons/octicons/Search.cjs';
+
 const { USE_PLEDGES } = process.env;
 
 const SearchInput = styled(FormControl)`
@@ -105,7 +107,7 @@ class SearchPage extends React.Component {
                 <Flex alignItems="flex-end" my={3}>
                   <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
                   <SearchButton type="submit">
-                    <span className="fa fa-search" />
+                    <Search size="1em" />
                   </SearchButton>
                 </Flex>
               </FormGroup>

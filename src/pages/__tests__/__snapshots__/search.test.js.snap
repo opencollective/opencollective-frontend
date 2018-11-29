@@ -334,7 +334,7 @@ Array [
   align-items: flex-end;
 }
 
-.c5 {
+.c6 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -349,7 +349,7 @@ Array [
   justify-content: center;
 }
 
-.c6 {
+.c7 {
   box-sizing: border-box;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -380,7 +380,7 @@ Array [
   width: 100%;
 }
 
-.c7 {
+.c8 {
   display: block;
   font-size: Paragraph;
   font-weight: bold;
@@ -390,6 +390,12 @@ Array [
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
+}
+
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 .c3.c3.c3 {
@@ -407,7 +413,7 @@ Array [
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -416,7 +422,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -469,19 +475,31 @@ Array [
                 onClick={[Function]}
                 type="submit"
               >
-                <span
-                  className="fa fa-search"
-                />
+                <svg
+                  aria-hidden="true"
+                  className="c5"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  size="1em"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                >
+                  <path
+                    d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"
+                    fillRule="evenodd"
+                  />
+                </svg>
               </button>
             </div>
           </div>
         </form>
       </div>
       <div
-        className="c5"
+        className="c6"
       >
         <div
-          className="c6"
+          className="c7"
           width={1}
         >
           <p>
@@ -492,7 +510,7 @@ Array [
             </em>
           </p>
           <a
-            className="c7"
+            className="c8"
             href="createPledge"
             onClick={[Function]}
           >
@@ -1547,7 +1565,7 @@ Array [
   align-items: flex-end;
 }
 
-.c5 {
+.c6 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1562,7 +1580,7 @@ Array [
   justify-content: center;
 }
 
-.c6 {
+.c7 {
   box-sizing: border-box;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -1593,6 +1611,12 @@ Array [
   width: 100%;
 }
 
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c3.c3.c3 {
   border: none;
   border-bottom: 2px solid #3385FF;
@@ -1608,7 +1632,7 @@ Array [
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -1617,7 +1641,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -1670,19 +1694,31 @@ Array [
                 onClick={[Function]}
                 type="submit"
               >
-                <span
-                  className="fa fa-search"
-                />
+                <svg
+                  aria-hidden="true"
+                  className="c5"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  size="1em"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                >
+                  <path
+                    d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"
+                    fillRule="evenodd"
+                  />
+                </svg>
               </button>
             </div>
           </div>
         </form>
       </div>
       <div
-        className="c5"
+        className="c6"
       >
         <div
-          className="c6"
+          className="c7"
           width={1}
         >
           <p>
@@ -3928,7 +3964,7 @@ Array [
   align-items: flex-end;
 }
 
-.c5 {
+.c6 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -3943,7 +3979,7 @@ Array [
   justify-content: center;
 }
 
-.c6 {
+.c7 {
   box-sizing: border-box;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -3967,6 +4003,12 @@ Array [
   width: 100%;
 }
 
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c3.c3.c3 {
   border: none;
   border-bottom: 2px solid #3385FF;
@@ -3982,7 +4024,7 @@ Array [
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -3991,7 +4033,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -4044,19 +4086,31 @@ Array [
                 onClick={[Function]}
                 type="submit"
               >
-                <span
-                  className="fa fa-search"
-                />
+                <svg
+                  aria-hidden="true"
+                  className="c5"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  size="1em"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                >
+                  <path
+                    d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"
+                    fillRule="evenodd"
+                  />
+                </svg>
               </button>
             </div>
           </div>
         </form>
       </div>
       <div
-        className="c5"
+        className="c6"
       >
         <div
-          className="c6"
+          className="c7"
           width={1}
         >
           <svg
@@ -5229,7 +5283,7 @@ Array [
   width: 100%;
 }
 
-.c8 {
+.c9 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5255,7 +5309,7 @@ Array [
   align-items: flex-end;
 }
 
-.c5 {
+.c6 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5270,7 +5324,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c13 {
   box-sizing: border-box;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -5292,7 +5346,7 @@ Array [
   justify-content: center;
 }
 
-.c6 {
+.c7 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
@@ -5304,7 +5358,7 @@ Array [
   display: flex;
 }
 
-.c9 {
+.c10 {
   box-sizing: border-box;
   margin-left: 8px;
   margin-right: 8px;
@@ -5327,7 +5381,7 @@ Array [
   width: 100%;
 }
 
-.c7 {
+.c8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5341,7 +5395,7 @@ Array [
   margin-bottom: 16px;
 }
 
-.c10 {
+.c11 {
   font-size: inherit;
   line-height: inherit;
   -webkit-letter-spacing: -0.2px;
@@ -5351,7 +5405,7 @@ Array [
   margin: 0px;
 }
 
-.c11 {
+.c12 {
   border: 1px solid #cccccc;
   border-radius: 4px;
   font-size: 14px;
@@ -5363,6 +5417,12 @@ Array [
   padding-bottom: 4px;
   text-align: center;
   width: 30px;
+}
+
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 .c3.c3.c3 {
@@ -5380,7 +5440,7 @@ Array [
 }
 
 @media screen and (min-width:40em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
@@ -5389,7 +5449,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c5 {
+  .c6 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -5442,19 +5502,31 @@ Array [
                 onClick={[Function]}
                 type="submit"
               >
-                <span
-                  className="fa fa-search"
-                />
+                <svg
+                  aria-hidden="true"
+                  className="c5"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  size="1em"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                >
+                  <path
+                    d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"
+                    fillRule="evenodd"
+                  />
+                </svg>
               </button>
             </div>
           </div>
         </form>
       </div>
       <div
-        className="c5"
+        className="c6"
       >
         <div
-          className="c6"
+          className="c7"
         >
           <a
             href="/test-collective"
@@ -5517,28 +5589,28 @@ Array [
         </div>
       </div>
       <div
-        className="c7"
+        className="c8"
       >
         <div
-          className="c8"
+          className="c9"
         >
           <div
-            className="c9"
+            className="c10"
           >
             <span
-              className="-Clean-span c10"
+              className="-Clean-span c11"
             >
               Page 
             </span>
             <input
-              className="c11"
+              className="c12"
               defaultValue={1}
               onBlur={[Function]}
               onKeyPress={[Function]}
               type="text"
             />
             <span
-              className="-Clean-span c10"
+              className="-Clean-span c11"
             >
               of 
               5
@@ -5554,7 +5626,7 @@ Array [
         </div>
       </div>
       <div
-        className="c12"
+        className="c13"
         width={1}
       >
         <p>
