@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "2.0.265",
+  "version": "2.0.266",
   "description": "Open Collective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
@@ -212,7 +212,10 @@
     "maildev": "maildev"
   },
   "nyc": {
-    "reporter": ["lcov", "text"],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
     "cache": true
   },
   "husky": {
@@ -221,7 +224,10 @@
     }
   },
   "lint-staged": {
-    "*.js": ["prettier --write", "git add"]
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "license": "MIT",
   "repository": {
