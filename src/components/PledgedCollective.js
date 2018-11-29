@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt.cjs';
 
 import { Link } from '../server/pages';
 
@@ -61,7 +62,7 @@ class PledgedCollective extends React.Component {
 
               <Box mb={4} mt={3}>
                 <StyledLink href={collective.website} color="primary.500" fontSize="Caption">
-                  <img src="/static/icons/external-link.svg" alt="link icon" /> {collective.website}
+                  <ExternalLinkAlt size="1em" /> {collective.website}
                 </StyledLink>
               </Box>
             </Flex>
