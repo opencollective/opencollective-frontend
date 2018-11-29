@@ -124,7 +124,9 @@
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
-    "graphql:get-schema:dev": "npx graphql-cli get-schema -p opencollective -e dev"
+    "graphql:get-schema:dev": "npx graphql-cli get-schema -p opencollective -e dev",
+    "styleguide:dev": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0",
