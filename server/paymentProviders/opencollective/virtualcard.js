@@ -236,6 +236,7 @@ async function claim(args, remoteUser) {
     throw Error('Gift Card already redeemed');
   }
   // find or creating a user with its collective
+  // if user is created, this will NOT send a registration email
   const user = remoteUser || (await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user));
   if (!user) {
     throw Error('Please provide user details or make this request as a logged in user.');

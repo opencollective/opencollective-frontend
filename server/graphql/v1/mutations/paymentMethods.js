@@ -68,13 +68,20 @@ export async function claimPaymentMethod(args, remoteUser) {
   const qs = queryString.stringify({
     code: paymentMethod.uuid.substring(0, 8),
   });
-  emailLib.send('user.card.claimed', user.email, {
-    loginLink: user.generateLoginLink(`/redeemed?${qs}`),
-    initialBalance: amount,
-    name,
-    currency,
-    expiryDate,
-    emitter,
-  });
+
+  // If the User is already authenticated it doesn't need this email
+  // It will be redirected to the /redeemed page
+  // See: https://github.com/opencollective/opencollective-frontend/blob/08323de06714c20ce33e93bfebcbbeb0af587413/src/pages/redeem.js#L143
+  if (!remoteUser) {
+    emailLib.send('user.card.claimed', user.email, {
+      loginLink: user.generateLoginLink(`/redeemed?${qs}`),
+      initialBalance: amount,
+      name,
+      currency,
+      expiryDate,
+      emitter,
+    });
+  }
+
   return paymentMethod;
 }
