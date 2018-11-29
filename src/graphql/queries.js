@@ -23,6 +23,7 @@ export const transactionFields = `
   }
   collective {
     slug
+    type
     name
   }
   fromCollective {
