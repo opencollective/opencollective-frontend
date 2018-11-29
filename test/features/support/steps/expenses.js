@@ -37,7 +37,7 @@ When('expense for {string} is approved by {string}', async function(description,
 
 When('expense for {string} is paid by {string} with {string} fee', async function(description, collectiveName, fee) {
   const hostAdmin = this.getValue(`${collectiveName}-host-admin`);
-  const query = 'mutation payExpense($id: Int!, $fee: Int!) { payExpense(id: $id, fee: $fee) { id } }';
+  const query = 'mutation payExpense($id: Int!) { payExpense(id: $id) { id } }';
   const expense = this.getValue(`expense-${description}`);
   const parameters = {
     id: expense.id,

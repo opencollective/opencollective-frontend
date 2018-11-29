@@ -31,8 +31,8 @@ const approveExpenseQuery = `
     approveExpense(id: $id) { id status } }`;
 
 const payExpenseQuery = `
-mutation payExpense($id: Int!, $fee: Int!) {
-  payExpense(id: $id, fee: $fee) { id status } }`;
+mutation payExpense($id: Int!) {
+  payExpense(id: $id) { id status } }`;
 
 // W9 Bot Collective based on the migration file
 // 20180725202700-createW9BotCollective.js
@@ -551,7 +551,7 @@ describe('w9.bot.test.js', () => {
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
 
       // When the expense is paid
-      const parameters = { id: expense2.id, fee: 0 };
+      const parameters = { id: expense2.id };
       await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Pay expense triggers one email as well
@@ -635,7 +635,7 @@ describe('w9.bot.test.js', () => {
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
 
       // When the expense is paid
-      let parameters = { id: expense2.id, fee: 0 };
+      let parameters = { id: expense2.id };
       await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Pay expense triggers one email as well
@@ -666,7 +666,7 @@ describe('w9.bot.test.js', () => {
       expect(result2.data.approveExpense.status).to.be.equal('APPROVED');
 
       // Then the expense is paid
-      parameters = { id: expense3.id, fee: 0 };
+      parameters = { id: expense3.id };
       await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Refetching host data again after expense is approved

@@ -11,6 +11,7 @@ import {
   createFromPaidExpense as createTransactionFromPaidExpense,
   createTransactionFromInKindDonation,
 } from '../../../lib/transactions';
+import { getFxRate } from '../../../lib/currency';
 
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
@@ -207,7 +208,7 @@ async function payExpenseUpdate(expense) {
   return updatedExpense;
 }
 
-async function markAsPaid(host, expense, options = {}) {
+async function markAsPaid(host, expense, fees = {}) {
   return await createTransactionFromPaidExpense(
     host,
     null,
@@ -215,11 +216,13 @@ async function markAsPaid(host, expense, options = {}) {
     null,
     null,
     expense.UserId,
-    options.paymentProcessorFee,
+    fees.paymentProcessorFeeInHostCurrency,
+    fees.hostFeeInHostCurrency,
+    fees.platformFeeInHostCurrency,
   );
 }
 
-async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod) {
+async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fees = {}) {
   try {
     const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(
       expense.collective,
@@ -235,6 +238,9 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod) {
       paymentResponse,
       preapprovalDetailsResponse,
       expense.UserId,
+      fees.paymentProcessorFeeInHostCurrency,
+      fees.hostFeeInHostCurrency,
+      fees.platformFeeInHostCurrency,
     );
     expense.setPaid(remoteUser.id);
   } catch (err) {
@@ -250,7 +256,12 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod) {
   }
 }
 
-export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
+/**
+ * Pay an expense based on the payout method defined in the Expense object
+ * @PRE: fees { id, paymentProcessorFeeInCollectiveCurrency, hostFeeInCollectiveCurrency, platformFeeInCollectiveCurrency }
+ * Note: some payout methods like PayPal will automatically define `paymentProcessorFeeInCollectiveCurrency`
+ */
+export async function payExpense(remoteUser, expenseId, fees = {}) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to pay an expense');
   }
@@ -291,24 +302,30 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
     );
   }
 
-  // TODO: Need to make sure that paymentProcessorFee is in the currency of the host (need to create tests for it)
-  // also need to make that clear on the frontend
+  const fxrate = await getFxRate(expense.collective.currency, host.currency);
+  const feesInHostCurrency = {};
   if (paymentProviders[expense.payoutMethod]) {
-    paymentProcessorFee = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
+    fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
       host,
     });
   }
 
-  if (expense.amount + paymentProcessorFee > balance) {
+  feesInHostCurrency.paymentProcessorFeeInHostCurrency = Math.round(
+    fxrate * (fees.paymentProcessorFeeInCollectiveCurrency || 0),
+  );
+  feesInHostCurrency.hostFeeInHostCurrency = Math.round(fxrate * (fees.hostFeeInCollectiveCurrency || 0));
+  feesInHostCurrency.platformFeeInHostCurrency = Math.round(fxrate * (fees.platformFeeInCollectiveCurrency || 0));
+
+  if (expense.amount + fees.paymentProcessorFeeInCollectiveCurrency > balance) {
     throw new Error(
       `You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(
         balance,
         expense.collective.currency,
       )}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${
         expense.payoutMethod
-      } fees: ${formatCurrency(paymentProcessorFee, expense.collective.currency)}`,
+      } fees: ${formatCurrency(fees.paymentProcessorFeeInCollectiveCurrency, expense.collective.currency)}`,
     );
   }
   if (expense.payoutMethod === 'paypal') {
@@ -319,15 +336,16 @@ export async function payExpense(remoteUser, expenseId, paymentProcessorFee) {
     // If the expense has been filed with the same paypal email than the host paypal
     // then we simply mark the expense as paid
     if (expense.paypalEmail === paymentMethod.name) {
-      await markAsPaid(host, expense);
+      feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
+      await markAsPaid(host, expense, feesInHostCurrency);
     } else {
-      await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod);
+      await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);
     }
   }
 
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
-    await markAsPaid(host, expense, { paymentProcessorFee });
+    await markAsPaid(host, expense, feesInHostCurrency);
   }
 
   return payExpenseUpdate(expense);

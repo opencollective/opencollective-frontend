@@ -1,4 +1,3 @@
-import Promise from 'bluebird';
 import models, { Op, sequelize } from '../models';
 import errors from '../lib/errors';
 import { TransactionTypes } from '../constants/transactions';
@@ -51,7 +50,7 @@ export function getTransactions(collectiveids, startDate = new Date('2015-01-01'
   return models.Transaction.findAll(query);
 }
 
-export function createFromPaidExpense(
+export async function createFromPaidExpense(
   host,
   paymentMethod,
   expense,
@@ -59,12 +58,13 @@ export function createFromPaidExpense(
   preapprovalDetails,
   UserId,
   paymentProcessorFeeInHostCurrency = 0,
+  hostFeeInHostCurrency = 0,
+  platformFeeInHostCurrency = 0,
 ) {
   const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
-  let fxrate;
-  let paymentProcessorFeeInCollectiveCurrency = paymentProcessorFeeInHostCurrency;
-  let getFxRatePromise;
+  let paymentProcessorFeeInCollectiveCurrency = 0;
+  let hostCurrencyFxRate = 1;
 
   // If PayPal
   if (paymentResponses) {
@@ -97,13 +97,12 @@ export function createFromPaidExpense(
     paymentProcessorFeeInCollectiveCurrency = senderFees.amount * 100; // paypal sends this in float
 
     const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
-    fxrate = 1 / parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
-    paymentProcessorFeeInHostCurrency = fxrate * paymentProcessorFeeInCollectiveCurrency;
-
-    getFxRatePromise = Promise.resolve(fxrate);
+    hostCurrencyFxRate = 1 / parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
+    paymentProcessorFeeInHostCurrency = Math.round(hostCurrencyFxRate * paymentProcessorFeeInCollectiveCurrency);
   } else {
     // If manual (add funds or manual reimbursement of an expense)
-    getFxRatePromise = getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
+    hostCurrencyFxRate = await getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
+    paymentProcessorFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * paymentProcessorFeeInHostCurrency);
   }
 
   // We assume that all expenses are in Collective currency
@@ -112,6 +111,8 @@ export function createFromPaidExpense(
     netAmountInCollectiveCurrency: -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
     hostCurrency,
     paymentProcessorFeeInHostCurrency: toNegative(paymentProcessorFeeInHostCurrency),
+    hostFeeInHostCurrency,
+    platformFeeInHostCurrency,
     ExpenseId: expense.id,
     type: TransactionTypes.DEBIT,
     amount: -expense.amount,
@@ -123,20 +124,11 @@ export function createFromPaidExpense(
     PaymentMethodId: paymentMethod ? paymentMethod.id : null,
   };
 
-  return getFxRatePromise
-    .then(hostCurrencyFxRate => {
-      if (!isNaN(hostCurrencyFxRate)) {
-        transaction.hostCurrencyFxRate = hostCurrencyFxRate;
-        transaction.amountInHostCurrency = -Math.round(hostCurrencyFxRate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
-      }
-      return transaction;
-    })
-    .then(() => models.User.findById(UserId))
-    .then(user => {
-      transaction.FromCollectiveId = user.CollectiveId;
-      return transaction;
-    })
-    .then(transaction => models.Transaction.createDoubleEntry(transaction));
+  transaction.hostCurrencyFxRate = hostCurrencyFxRate;
+  transaction.amountInHostCurrency = -Math.round(hostCurrencyFxRate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
+  const user = await models.User.findById(UserId);
+  transaction.FromCollectiveId = user.CollectiveId;
+  return models.Transaction.createDoubleEntry(transaction);
 }
 
 /** Create transaction for donation in kind
