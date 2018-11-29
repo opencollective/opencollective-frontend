@@ -1648,6 +1648,73 @@ export default function(Sequelize, DataTypes) {
       });
   };
 
+  /**
+   * A sequelize OR condition that will select all collective transactions:
+   * - Debit transactions made by collective without using a virtual card
+   * - Debit transactions made using a virtual card from collective
+   * - Credit transactions made to collective
+   */
+  Collective.prototype.transactionsWhereQuery = function() {
+    return {
+      [Op.or]: [
+        // Debit transactions
+        {
+          type: 'DEBIT',
+          [Op.or]: [
+            // Either Collective made the transaction without virtual card
+            {
+              CollectiveId: this.id,
+              UsingVirtualCardFromCollectiveId: null,
+            },
+            // Or a transaction was made using one of its virtual card
+            { UsingVirtualCardFromCollectiveId: this.id },
+          ],
+        },
+        // Credit transactions
+        {
+          type: 'CREDIT',
+          CollectiveId: this.id,
+        },
+      ],
+    };
+  };
+
+  /**
+   * Get all transactions for this collective.
+   */
+  Collective.prototype.getTransactions = function({
+    startDate,
+    endDate,
+    type,
+    offset,
+    limit,
+    order = [['createdAt', 'DESC']],
+  }) {
+    // Base query
+    const query = { where: this.transactionsWhereQuery() };
+
+    // Filter on date
+    if (startDate && endDate) {
+      query.where.createdAt = { [Op.gte]: startDate, [Op.lt]: endDate };
+    } else if (startDate) {
+      query.where.createdAt = { [Op.gte]: startDate };
+    } else if (endDate) {
+      query.where.createdAt = { [Op.lt]: endDate };
+    }
+
+    // Filter on type
+    if (type) query.where.type = type;
+
+    // Pagination
+    if (limit) query.limit = limit;
+    if (offset) queries.offset = offset;
+
+    // OrderBy
+    if (order) query.order = order;
+
+    return models.Transaction.findAll(query);
+  };
+
   Collective.prototype.getTotalTransactions = function(
     startDate,
     endDate,
@@ -1656,8 +1723,8 @@ export default function(Sequelize, DataTypes) {
   ) {
     endDate = endDate || new Date();
     const where = {
+      ...this.transactionsWhereQuery(),
       createdAt: { [Op.lt]: endDate },
-      CollectiveId: this.id,
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
     if (type === 'donation') where.amount = { [Op.gt]: 0 };
@@ -1985,10 +2052,6 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Member);
     Collective.hasMany(m.Activity);
     Collective.hasMany(m.Notification);
-    Collective.hasMany(m.Transaction, {
-      foreignKey: 'CollectiveId',
-      as: 'transactions',
-    }); // collective.getTransactions()
     Collective.hasMany(m.Tier, { as: 'tiers' });
   };
 

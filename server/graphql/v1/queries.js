@@ -232,10 +232,16 @@ const queries = {
   },
 
   /*
-   * Given a collective slug, returns all transactions
+   * Given a collective slug or id, returns all its transactions
    */
   allTransactions: {
     type: new GraphQLList(TransactionInterfaceType),
+    description: `
+    Given a collective, returns all its transactions:
+    - Debit transactions made by collective without using a virtual card
+    - Debit transactions made using a virtual card from collective
+    - Credit transactions made to collective
+    `,
     args: {
       CollectiveId: { type: GraphQLInt },
       collectiveSlug: { type: GraphQLString },
@@ -244,48 +250,26 @@ const queries = {
       offset: { type: GraphQLInt },
       dateFrom: { type: GraphQLString },
       dateTo: { type: GraphQLString },
+      /** @deprecated since 2018-11-29: Virtual cards now included by default when necessary */
       includeVirtualCards: { type: GraphQLBoolean },
     },
     async resolve(_, args) {
-      const query = {
-        where: {},
-        order: [['createdAt', 'DESC']],
-      };
-      const CollectiveId = args.CollectiveId || (await fetchCollectiveId(args.collectiveSlug));
-      if (args.includeVirtualCards) {
-        // find all Payment methods of CollectiveId
-        const collectivePaymentMethodsIds = await models.PaymentMethod.findAll({
-          where: { CollectiveId: CollectiveId },
-        }).map(pm => pm.id);
-        // find all Virtual Cards with SourcePaymentMethodId included in Collective Payment methods
-        const virtualCardsMadeByCollectivePaymentMethodsPair = await models.PaymentMethod.findAll({
-          where: { SourcePaymentMethodId: collectivePaymentMethodsIds },
-        }).map(virtualCard => {
-          return {
-            PaymentMethodId: virtualCard.id,
-            CollectiveId: virtualCard.CollectiveId,
-          };
-        });
-        // either find through collective id or through query: OR:[CollectiveId, virtualcards]
-        query.where.CollectiveId = CollectiveId;
-        if (virtualCardsMadeByCollectivePaymentMethodsPair.length > 0) {
-          query.where = {
-            [Op.or]: [{ CollectiveId: CollectiveId }, ...virtualCardsMadeByCollectivePaymentMethodsPair],
-          };
-        }
-      }
-      if (CollectiveId && !args.includeVirtualCards) query.where.CollectiveId = CollectiveId;
-      if (args.type) query.where.type = args.type;
-      if (args.limit) query.limit = args.limit;
-      if (args.offset) query.offset = args.offset;
+      // Load collective
+      const { CollectiveId, collectiveSlug } = args;
+      if (!CollectiveId && !collectiveSlug) throw new Error('You must specify a collective ID or a Slug');
+      const where = CollectiveId ? { id: CollectiveId } : { slug: collectiveSlug };
+      const collective = await models.Collective.findOne({ where });
+      if (!collective) throw new Error('This collective does not exist');
 
-      // Add date ranges to the query
-      if (args.dateFrom || args.dateTo) {
-        query.where.createdAt = {};
-        if (args.dateFrom) query.where.createdAt[Op.gte] = args.dateFrom;
-        if (args.dateTo) query.where.createdAt[Op.lte] = args.dateTo;
-      }
-      return models.Transaction.findAll(query);
+      // Load transactions
+      return collective.getTransactions({
+        order: [['createdAt', 'DESC']],
+        type: args.type,
+        limit: args.limit,
+        offset: args.offset,
+        startDate: args.dateFrom,
+        endDate: args.dateTo,
+      });
     },
   },
 
