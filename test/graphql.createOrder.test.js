@@ -35,6 +35,7 @@ const createOrderQuery = `
     createOrder(order: $order) {
       id
       status
+      description
       createdByUser {
         id
       }
@@ -345,6 +346,10 @@ describe('createOrder', () => {
     delete newOrder.paymentMethod;
 
     res = await utils.graphqlQuery(createOrderQuery, { order: newOrder }, user);
+
+    // Make sure the order's status is PAID
+    expect(res.data.createOrder.status).to.equal('PAID');
+    expect(res.data.createOrder.description).to.equal('Registration to Sustain OSS London 2019');
 
     // Then there should be no errors
     res.errors && console.error(res.errors);
