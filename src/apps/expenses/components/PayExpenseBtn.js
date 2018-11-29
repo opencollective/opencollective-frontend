@@ -6,17 +6,19 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
-import { getCurrencySymbol, isValidEmail } from '../../../lib/utils';
+import { isValidEmail } from '../../../lib/utils';
 
-import InputField from '../../../components/InputField';
 import SmallButton from '../../../components/SmallButton';
 
 class PayExpenseBtn extends React.Component {
   static propTypes = {
     expense: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
-    paymentMethods: PropTypes.arrayOf(PropTypes.object),
+    host: PropTypes.object,
     disabled: PropTypes.bool,
+    paymentProcessorFeeInCollectiveCurrency: PropTypes.number,
+    hostFeeInCollectiveCurrency: PropTypes.number,
+    platformFeeInCollectiveCurrency: PropTypes.number,
     lock: PropTypes.func,
     unlock: PropTypes.func,
   };
@@ -25,7 +27,7 @@ class PayExpenseBtn extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      paymentProcessorFeeInHostCurrency: 0,
+      paymentProcessorFeeInCollectiveCurrency: 0,
     };
     this.onClick = this.onClick.bind(this);
     this.messages = defineMessages({
@@ -44,7 +46,12 @@ class PayExpenseBtn extends React.Component {
     lock();
     this.setState({ loading: true });
     try {
-      await this.props.payExpense(expense.id, this.state.paymentProcessorFeeInHostCurrency);
+      await this.props.payExpense(
+        expense.id,
+        this.props.paymentProcessorFeeInCollectiveCurrency,
+        this.props.hostFeeInCollectiveCurrency,
+        this.props.platformFeeInCollectiveCurrency,
+      );
       this.setState({ loading: false });
       unlock();
     } catch (e) {
@@ -56,7 +63,7 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { collective, expense, intl, paymentMethods } = this.props;
+    const { collective, expense, intl, host } = this.props;
     let disabled = this.state.loading,
       selectedPayoutMethod = expense.payoutMethod,
       title = '',
@@ -67,7 +74,7 @@ class PayExpenseBtn extends React.Component {
         disabled = true;
         title = intl.formatMessage(this.messages['paypal.missing']);
       } else {
-        const paypalPaymentMethod = paymentMethods && paymentMethods.find(pm => pm.service === 'paypal');
+        const paypalPaymentMethod = host.paymentMethods && host.paymentMethods.find(pm => pm.service === 'paypal');
         if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
           selectedPayoutMethod = 'other';
         }
@@ -116,21 +123,6 @@ class PayExpenseBtn extends React.Component {
             }
           `}
         </style>
-        {expense.payoutMethod === 'other' && (
-          <div className="processorFee">
-            <label htmlFor="processorFee">
-              <FormattedMessage id="expense.paymentProcessorFeeInHostCurrency" defaultMessage="payment processor fee" />
-            </label>
-            <InputField
-              defaultValue={0}
-              id="paymentProcessorFeeInHostCurrency"
-              name="paymentProcessorFeeInHostCurrency"
-              onChange={fee => this.setState({ paymentProcessorFeeInHostCurrency: fee })}
-              pre={getCurrencySymbol(expense.currency)}
-              type="currency"
-            />
-          </div>
-        )}
         <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
           {selectedPayoutMethod === 'other' && (
             <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />
@@ -150,8 +142,18 @@ class PayExpenseBtn extends React.Component {
 }
 
 const payExpenseQuery = gql`
-  mutation payExpense($id: Int!, $fee: Int!) {
-    payExpense(id: $id, fee: $fee) {
+  mutation payExpense(
+    $id: Int!
+    $paymentProcessorFeeInCollectiveCurrency: Int
+    $hostFeeInCollectiveCurrency: Int
+    $platformFeeInCollectiveCurrency: Int
+  ) {
+    payExpense(
+      id: $id
+      paymentProcessorFeeInCollectiveCurrency: $paymentProcessorFeeInCollectiveCurrency
+      hostFeeInCollectiveCurrency: $hostFeeInCollectiveCurrency
+      platformFeeInCollectiveCurrency: $platformFeeInCollectiveCurrency
+    ) {
       id
       status
       collective {
@@ -167,8 +169,20 @@ const payExpenseQuery = gql`
 
 const addMutation = graphql(payExpenseQuery, {
   props: ({ mutate }) => ({
-    payExpense: async (id, fee) => {
-      return await mutate({ variables: { id, fee } });
+    payExpense: async (
+      id,
+      paymentProcessorFeeInCollectiveCurrency,
+      hostFeeInCollectiveCurrency,
+      platformFeeInCollectiveCurrency,
+    ) => {
+      return await mutate({
+        variables: {
+          id,
+          paymentProcessorFeeInCollectiveCurrency,
+          hostFeeInCollectiveCurrency,
+          platformFeeInCollectiveCurrency,
+        },
+      });
     },
   }),
 });
