@@ -20,7 +20,6 @@ const nextConfig = {
         API_URL: 'https://api.opencollective.com',
         INVOICES_URL: 'https://invoices.opencollective.com',
         DYNAMIC_IMPORT: true,
-        USE_PLEDGES: null, // should be unset by default
         WEBSITE_URL: 'https://opencollective.com',
       }),
     );

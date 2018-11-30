@@ -511,7 +511,7 @@ Array [
           </p>
           <a
             className="c8"
-            href="createPledge"
+            href="/pledges/new?name=test"
             onClick={[Function]}
           >
             Make a pledge
@@ -1611,6 +1611,18 @@ Array [
   width: 100%;
 }
 
+.c8 {
+  display: block;
+  font-size: Paragraph;
+  font-weight: bold;
+  max-width: 220px;
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
 .c5 {
   display: inline-block;
   vertical-align: middle;
@@ -1728,6 +1740,13 @@ Array [
               "
             </em>
           </p>
+          <a
+            className="c8"
+            href="/pledges/new?name=test"
+            onClick={[Function]}
+          >
+            Make a pledge
+          </a>
         </div>
       </div>
     </div>
@@ -5405,6 +5424,18 @@ Array [
   margin: 0px;
 }
 
+.c14 {
+  display: block;
+  font-size: Paragraph;
+  font-weight: bold;
+  max-width: 220px;
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
 .c12 {
   border: 1px solid #cccccc;
   border-radius: 4px;
@@ -5634,6 +5665,13 @@ Array [
             If you don't see the collective you're searching for:
           </em>
         </p>
+        <a
+          className="c14"
+          href="/pledges/new?name=Test"
+          onClick={[Function]}
+        >
+          Make a pledge
+        </a>
       </div>
     </div>
   </main>,
