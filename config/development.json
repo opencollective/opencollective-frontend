@@ -10,6 +10,15 @@
       "benchmark": true
     }
   },
+  "limits": {
+    "ordersPerHour": {
+      "perAccount": 100,
+      "perAccountForCollective": 20,
+      "perEmail": 100,
+      "perEmailForCollective": 20,
+      "perIp": 50
+    }
+  },
   "maintenancedb": {
     "database": "postgres",
     "username": "postgres",

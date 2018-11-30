@@ -4,6 +4,7 @@ import debug from 'debug';
 import md5 from 'md5';
 import Promise from 'bluebird';
 import { pick, omit, get } from 'lodash';
+import config from 'config';
 
 import models from '../../../models';
 import * as errors from '../../errors';
@@ -24,10 +25,11 @@ const oneHourInSeconds = 60 * 60;
 const debugOrder = debug('order');
 
 function checkOrdersLimit(order, remoteUser, reqIp) {
-  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'circleci') {
+  if (['circleci', 'test'].includes(process.env.NODE_ENV)) {
     return;
   }
 
+  const ordersLimits = config.limits.ordersPerHour;
   const collectiveId = get(order, 'collective.id');
   const fromCollectiveId = get(order, 'fromCollective.id');
   const userEmail = get(order, 'user.email');
@@ -38,11 +40,11 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
     // Limit on authenticated users
     limits.push({
       key: `order_limit_on_account_${fromCollectiveId}`,
-      value: 10,
+      value: ordersLimits.perAccount,
     });
     limits.push({
       key: `order_limit_on_account_${fromCollectiveId}_and_collective_${collectiveId}`,
-      value: 2,
+      value: ordersLimits.perAccountForCollective,
     });
   } else {
     // Limit on first time users
@@ -50,18 +52,18 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
       const emailHash = md5(userEmail);
       limits.push({
         key: `order_limit_on_email_${emailHash}`,
-        value: 10,
+        value: ordersLimits.perEmail,
       });
       limits.push({
         key: `order_limit_on_email_${emailHash}_and_collective_${collectiveId}`,
-        value: 2,
+        value: ordersLimits.perEmailForCollective,
       });
     }
     // Limit on IPs
     if (reqIp) {
       limits.push({
         key: `order_limit_on_ip_${md5(reqIp)}`,
-        value: 2,
+        value: ordersLimits.perIp,
       });
     }
   }
@@ -73,7 +75,14 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
     cache.set(limit.key, count + 1, oneHourInSeconds);
     if (limitReached) {
       debugOrder(`Order limit reached for limit '${limit.key}'`);
-      throw new Error('Error while processing your request, please try again or contact support@opencollective.com');
+      const errorMessage =
+        'Error while processing your request, please try again or contact support@opencollective.com';
+      // Show a developer-friendly message in DEV
+      if (process.env.NODE_ENV === 'development') {
+        throw new Error(`${errorMessage} - Orders limit reached`);
+      } else {
+        throw new Error(errorMessage);
+      }
     }
   }
 }
