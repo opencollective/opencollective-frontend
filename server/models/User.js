@@ -5,18 +5,18 @@ import bcrypt from 'bcrypt';
 import config from 'config';
 import Promise from 'bluebird';
 import slugify from 'limax';
+import debugLib from 'debug';
+import { extend, defaults, intersection } from 'lodash';
 
+import logger from '../logger';
 import * as auth from '../lib/auth';
 import errors from '../lib/errors';
 import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
 import imageUrlLib from '../lib/imageUrlToAmazonUrl';
-
 import roles from '../constants/roles';
-import { extend, defaults, intersection } from 'lodash';
-
-import debugLib from 'debug';
 import { isValidEmail } from '../lib/utils';
+
 const debug = debugLib('user');
 
 /**
@@ -138,7 +138,7 @@ export default (Sequelize, DataTypes) => {
         userCollective() {
           return models.Collective.findById(this.CollectiveId).then(userCollective => {
             if (!userCollective) {
-              console.error(
+              logger.info(
                 `No Collective attached to this user id ${this.id} (User.CollectiveId: ${this.CollectiveId})`,
               );
               return {};
@@ -397,8 +397,11 @@ export default (Sequelize, DataTypes) => {
     if (!CollectiveId) return false;
     if (this.CollectiveId === Number(CollectiveId)) return true;
     if (!this.rolesByCollectiveId) {
-      console.error(">>> User model error: User.rolesByCollectiveId hasn't been populated.", new Error().stack);
-      return false;
+      logger.info("User.rolesByCollectiveId hasn't been populated.");
+      if (config.env === 'development') {
+        logger.info(new Error().stack);
+      }
+      this.populateRoles();
     }
     if (typeof roles === 'string') {
       roles = [roles];

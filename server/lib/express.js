@@ -50,7 +50,7 @@ export default function(app) {
   }
 
   // Log requests if enabled (default false)
-  if (get(config, 'logs.accessLogs')) {
+  if (get(config, 'log.accessLogs')) {
     app.use(morgan('combined'));
   }
 

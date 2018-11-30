@@ -55,6 +55,7 @@
     }
   },
   "logs": {
+    "level": "info",
     "accessLogs": false
   },
   "aws": {

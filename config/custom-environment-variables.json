@@ -31,7 +31,8 @@
       "refreshInterval": "CACHE_HOMEPAGE_REFRESH_INTERVAL"
     }
   },
-  "logs": {
+  "log": {
+    "level": "LOG_LEVEL",
     "accessLogs": "ACCESS_LOGS"
   },
   "stripe": {
