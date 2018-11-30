@@ -38,7 +38,7 @@
     "graphql": "14.0.2",
     "graphql-request": "1.8.2",
     "graphql-tag": "2.10.0",
-    "@rebass/grid": "6.0.0-4",
+    "@rebass/grid": "6.0.0-5",
     "html-pdf": "2.2.0",
     "intl": "1.2.5",
     "jsonwebtoken": "8.4.0",
