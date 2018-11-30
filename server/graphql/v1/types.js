@@ -517,10 +517,12 @@ export const ExpenseType = new GraphQLObjectType({
         },
       },
       transaction: {
-        type: CollectiveInterfaceType,
+        type: TransactionInterfaceType,
+        description: 'Returns the DEBIT transaction to pay out this expense',
         resolve(expense) {
           return models.Transaction.findOne({
             where: {
+              type: 'DEBIT',
               CollectiveId: expense.CollectiveId,
               ExpenseId: expense.id,
             },
