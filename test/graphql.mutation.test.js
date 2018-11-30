@@ -702,7 +702,7 @@ describe('Mutation Tests', () => {
             },
           });
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
-          utils.inspectSpy(emailSendMessageSpy, 2);
+          // utils.inspectSpy(emailSendMessageSpy, 2);
           expect(members).to.have.length(1);
 
           // Make sure we send the collective.member.created email notification to core contributor of collective1
