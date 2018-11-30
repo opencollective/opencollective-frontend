@@ -24,7 +24,7 @@ class Expense extends React.Component {
     collective: PropTypes.object,
     host: PropTypes.object,
     expense: PropTypes.object,
-    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
@@ -113,7 +113,7 @@ class Expense extends React.Component {
     const title = expense.description;
     const status = expense.status.toLowerCase();
 
-    let view = this.props.view || 'list';
+    const view = this.props.view || 'summary';
     let { mode } = this.state;
     if (editable && LoggedInUser && !mode) {
       switch (expense.status) {
@@ -123,13 +123,9 @@ class Expense extends React.Component {
         case 'APPROVED':
           mode = LoggedInUser.canPayExpense(expense) && 'details';
           break;
-        case 'PAID':
-          mode = 'summary';
-          view = 'list';
-          break;
       }
     }
-    mode = mode || 'summary';
+    mode = mode || view;
 
     const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
 
@@ -330,7 +326,7 @@ class Expense extends React.Component {
                   </a>
                 </span>
               )}
-              {mode !== 'edit' && view === 'list' && (
+              {mode !== 'edit' && view === 'summary' && (
                 <span>
                   {' | '}
                   <a className="toggleDetails" onClick={this.toggleDetails}>

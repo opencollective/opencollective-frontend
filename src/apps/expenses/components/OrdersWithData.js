@@ -11,7 +11,7 @@ class OrdersWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
-    view: PropTypes.string, // "compact" for homepage (can't edit Order, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit Order, don't show header), "summary" for list view, "details" for details view
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool,
     LoggedInUser: PropTypes.object,
