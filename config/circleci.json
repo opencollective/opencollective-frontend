@@ -20,5 +20,8 @@
     "opencollective": {
       "apiKey": "circleci-1510egmf4a23d80342403fb599qd"
     }
+  },
+  "log": {
+    "level": "warn"
   }
 }
