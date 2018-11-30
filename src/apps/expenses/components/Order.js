@@ -17,13 +17,10 @@ class Order extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     order: PropTypes.object,
-    view: PropTypes.string, // "compact" for homepage (can't edit order, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit order, don't show header), "summary" for list view, "details" for details view
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
-    allowPayAction: PropTypes.bool,
-    lockPayAction: PropTypes.func,
-    unlockPayAction: PropTypes.func,
   };
 
   constructor(props) {
@@ -50,11 +47,25 @@ class Order extends React.Component {
   }
 
   render() {
-    const { intl, collective, order, includeHostedCollectives, LoggedInUser, view } = this.props;
+    const { intl, collective, order, includeHostedCollectives, LoggedInUser, view, editable } = this.props;
 
     const title = order.description;
     const status = order.status.toLowerCase();
     const canMarkOrderAsPaid = LoggedInUser && collective.host && LoggedInUser.canEditCollective(collective.host);
+
+    let { mode } = this.state;
+    if (editable && LoggedInUser && !mode) {
+      switch (order.status) {
+        case 'PENDING':
+          mode = canMarkOrderAsPaid && 'details';
+          break;
+        case 'ERROR':
+          mode = 'details';
+          break;
+      }
+    }
+    mode = mode || 'summary';
+
     return (
       <div className={`order ${status} ${this.state.mode}View`}>
         <style jsx>
@@ -210,13 +221,13 @@ class Order extends React.Component {
               {includeHostedCollectives && (
                 <span className="collective">
                   <Link route={`/${order.collective.slug}`}>{order.collective.slug}</Link>
+                  {' | '}
                 </span>
               )}
-              {' | '}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
             </div>
           </div>
-          <OrderDetails order={order} />
+          <OrderDetails order={order} mode={mode} />
           {order.status === 'PENDING' && canMarkOrderAsPaid && (
             <MarkOrderAsPaidBtn order={order} collective={order.collective} />
           )}

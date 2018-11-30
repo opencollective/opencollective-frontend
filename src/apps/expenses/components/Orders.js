@@ -13,7 +13,7 @@ class Orders extends React.Component {
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
-    view: PropTypes.string, // "compact" for homepage (can't edit order, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit order, don't show header), "summary" for list view, "details" for details view
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid/error/active)
     LoggedInUser: PropTypes.object,

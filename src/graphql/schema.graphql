@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Nov 28 2018 17:50:23 GMT+0800 (Central Indonesia Time)
+# timestamp: Fri Nov 30 2018 10:46:32 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -645,7 +645,9 @@ type ExpenseType {
   fromCollective: CollectiveInterface
   comments(limit: Int, offset: Int): CommentListType
   collective: CollectiveInterface
-  transaction: CollectiveInterface
+
+  """Returns the DEBIT transaction to pay out this expense"""
+  transaction: Transaction
 }
 
 """Properties by which hosts can be ordered."""
@@ -1178,7 +1180,7 @@ type Query {
   ): PaginatedTransactions
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
   Application(id: Int): Application
-  allComments(ExpenseId: Int, UpdateId: Int, limit: Int, offset: Int): [UpdateType]
+  allComments(ExpenseId: Int, OrderId: Int, UpdateId: Int, limit: Int, offset: Int): [CommentType]
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allOrders(
     CollectiveId: Int

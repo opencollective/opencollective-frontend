@@ -74,7 +74,8 @@ class PayExpenseBtn extends React.Component {
         disabled = true;
         title = intl.formatMessage(this.messages['paypal.missing']);
       } else {
-        const paypalPaymentMethod = host.paymentMethods && host.paymentMethods.find(pm => pm.service === 'paypal');
+        const paypalPaymentMethod =
+          get(host, 'paymentMethods') && host.paymentMethods.find(pm => pm.service === 'paypal');
         if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
           selectedPayoutMethod = 'other';
         }

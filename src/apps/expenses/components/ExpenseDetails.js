@@ -9,6 +9,7 @@ import withIntl from '../../../lib/withIntl';
 import { capitalize, getCurrencySymbol, imagePreview } from '../../../lib/utils';
 import InputField from '../../../components/InputField';
 import categories from '../../../constants/categories';
+import TransactionDetails from './TransactionDetails';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -29,7 +30,6 @@ class ExpenseDetails extends React.Component {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
-
     this.messages = defineMessages({
       paypal: {
         id: 'expense.payoutMethod.paypal',
@@ -169,7 +169,7 @@ class ExpenseDetails extends React.Component {
               margin: 0;
             }
 
-            .col.privateMessage {
+            .col.large {
               width: 100%;
             }
           `}
@@ -288,7 +288,7 @@ class ExpenseDetails extends React.Component {
           </div>
 
           {(expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) && (
-            <div className="col privateMessage">
+            <div className="col large privateMessage">
               <label>
                 <FormattedMessage id="expense.privateMessage" defaultMessage="private note" />
               </label>
@@ -302,6 +302,15 @@ class ExpenseDetails extends React.Component {
                 />
               )}
             </div>
+          )}
+
+          {expense.transaction && (
+            <TransactionDetails
+              className="col large"
+              {...expense.transaction}
+              collective={expense.collective}
+              host={expense.collective.host}
+            />
           )}
         </div>
       </div>
@@ -325,6 +334,8 @@ const getExpenseQuery = gql`
       collective {
         id
         slug
+        name
+        type
         host {
           id
           slug
@@ -332,6 +343,18 @@ const getExpenseQuery = gql`
       }
       fromCollective {
         id
+      }
+      transaction {
+        id
+        type
+        amount
+        currency
+        hostCurrency
+        hostCurrencyFxRate
+        netAmountInCollectiveCurrency
+        platformFeeInHostCurrency
+        paymentProcessorFeeInHostCurrency
+        hostFeeInHostCurrency
       }
       user {
         id

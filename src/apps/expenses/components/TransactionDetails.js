@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../../../lib/utils';
+import { capitalize } from '../../../lib/utils';
 import withIntl from '../../../lib/withIntl';
 import { get } from 'lodash';
 
@@ -16,13 +16,14 @@ class TransactionDetails extends React.Component {
       id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      hostFeePercent: PropTypes.number,
     }),
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
     canDownloadInvoice: PropTypes.bool,
     canRefund: PropTypes.bool,
+    className: PropTypes.string,
     currency: PropTypes.string.isRequired,
-    attachment: PropTypes.string,
     uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
@@ -33,7 +34,6 @@ class TransactionDetails extends React.Component {
       service: PropTypes.string.isRequired,
     }),
     host: PropTypes.shape({
-      hostFeePercent: PropTypes.number,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
     }),
@@ -48,11 +48,11 @@ class TransactionDetails extends React.Component {
     this.messages = defineMessages({
       hostFeeInHostCurrency: {
         id: 'transaction.hostFeeInHostCurrency',
-        defaultMessage: '{hostFeePercent} host fee',
+        defaultMessage: '{percentage} host fee',
       },
       platformFeeInHostCurrency: {
         id: 'transaction.platformFeeInHostCurrency',
-        defaultMessage: '5% Open Collective fee',
+        defaultMessage: '{percentage} Open Collective fee',
       },
       paymentProcessorFeeInHostCurrency: {
         id: 'transaction.paymentProcessorFeeInHostCurrency',
@@ -94,12 +94,9 @@ class TransactionDetails extends React.Component {
       amount,
       collective,
       currency,
-      host,
       hostCurrency,
       hostCurrencyFxRate,
     } = this.props;
-
-    const hostFeePercent = host && `${host.hostFeePercent}%`;
 
     const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type) ? -netAmountInCollectiveCurrency : amount;
 
@@ -126,7 +123,7 @@ class TransactionDetails extends React.Component {
               currency: hostCurrency,
               ...this.currencyStyle,
             })} (${intl.formatMessage(this.messages[feeName], {
-              hostFeePercent,
+              percentage: `${((this.props[feeName] / amount) * 100).toFixed(2)}%`,
             })})`,
           );
         }
@@ -150,7 +147,6 @@ class TransactionDetails extends React.Component {
       canRefund,
       collective,
       fromCollective,
-      attachment,
       id,
       type,
       host,
@@ -173,7 +169,7 @@ class TransactionDetails extends React.Component {
     }
 
     return (
-      <div className={`TransactionDetails ${this.props.mode}`}>
+      <div className={`TransactionDetails ${this.props.mode} ${this.props.className}`}>
         <style jsx>
           {`
             .TransactionDetails {
@@ -223,16 +219,6 @@ class TransactionDetails extends React.Component {
           `}
         </style>
 
-        {type === 'DEBIT' && (
-          <div className="frame">
-            {attachment && (
-              <a href={attachment} target="_blank" rel="noopener noreferrer" title="Open receipt in a new window">
-                <img src={imagePreview(attachment)} />
-              </a>
-            )}
-            {!attachment && <img src={'/static/images/receipt.svg'} />}
-          </div>
-        )}
         {get(host, 'name') && (
           <div className="col">
             <label>
@@ -241,12 +227,14 @@ class TransactionDetails extends React.Component {
             <Link route={`/${host.slug}`}>{host.name}</Link> ({hostCurrency})
           </div>
         )}
-        <div className="col">
-          <label>
-            <FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" />
-          </label>
-          {paymentMethod && this.paymentMethodName(paymentMethod)}
-        </div>
+        {paymentMethod && (
+          <div className="col">
+            <label>
+              <FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" />
+            </label>
+            {paymentMethod && this.paymentMethodName(paymentMethod)}
+          </div>
+        )}
         {hostCurrencyFxRate && hostCurrencyFxRate !== 1 && (
           <div className="col">
             <label>
@@ -271,7 +259,7 @@ class TransactionDetails extends React.Component {
 
         <div className="col">
           <label>
-            <FormattedMessage id="transaction.amountDetails" defaultMessage="amount details" />
+            <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
           </label>
           <div className="amountDetails">
             {amountDetailsStr && (
