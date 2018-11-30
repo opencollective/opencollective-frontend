@@ -26,6 +26,9 @@ ENV API_URL $API_URL
 ARG INTERNAL_API_URL=https://api-staging-direct.opencollective.com
 ENV INTERNAL_API_URL $INTERNAL_API_URL
 
+ARG IMAGES_URL=https://images-staging.opencollective.com
+ENV IMAGES_URL $IMAGES_URL
+
 ARG INVOICES_URL=https://invoices-staging.opencollective.com
 ENV INVOICES_URL $INVOICES_URL
 
