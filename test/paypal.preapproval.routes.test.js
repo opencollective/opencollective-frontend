@@ -1,10 +1,11 @@
 import Promise from 'bluebird';
-import app from '../server/index';
 import async from 'async';
-import { expect } from 'chai';
 import request from 'supertest';
-import * as utils from '../test/utils';
 import sinon from 'sinon';
+import { expect } from 'chai';
+
+import * as utils from '../test/utils';
+import app from '../server/index';
 import models from '../server/models';
 import paypalMock from './mocks/paypal';
 import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';

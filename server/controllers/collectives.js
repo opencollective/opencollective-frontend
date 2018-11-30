@@ -1,19 +1,20 @@
 /**
  * Dependencies.
  */
-import { pick, omit } from 'lodash';
-import async from 'async';
-import { defaultHostCollective, getLinkHeader, getRequestedUrl, resizeImage } from '../lib/utils';
 import Promise from 'bluebird';
-import roles from '../constants/roles';
-import activities from '../constants/activities';
-import emailLib from '../lib/email';
-import queries from '../lib/queries';
-import models, { Op } from '../models';
-import errors from '../lib/errors';
+import async from 'async';
 import debugLib from 'debug';
 import config from 'config';
 import prependHttp from 'prepend-http';
+import { pick, omit } from 'lodash';
+
+import activities from '../constants/activities';
+import roles from '../constants/roles';
+import emailLib from '../lib/email';
+import queries from '../lib/queries';
+import errors from '../lib/errors';
+import models, { Op } from '../models';
+import { defaultHostCollective, getLinkHeader, getRequestedUrl, resizeImage } from '../lib/utils';
 
 const { Activity, Notification, Collective, ConnectedAccount, User } = models;
 
