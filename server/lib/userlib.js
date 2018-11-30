@@ -1,7 +1,9 @@
 import debug from 'debug';
 import config from 'config';
-import url from 'url';
+
 import Promise from 'bluebird';
+import { URL } from 'url';
+
 import clearbit from '../gateways/clearbit';
 
 const debugClearbit = debug('clearbit');
@@ -47,7 +49,7 @@ export default {
     }
 
     if (website) {
-      const parsedWebsiteUrl = url.parse(website);
+      const parsedWebsiteUrl = new URL(website);
       const { hostname } = parsedWebsiteUrl;
       if (/facebook.com$/.test(hostname)) {
         facebookUrl = website;
