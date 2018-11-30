@@ -145,8 +145,7 @@
     "react-dom": "16.6.3",
     "sinon": "5.1.0",
     "supertest": "3.0.0",
-    "supertest-as-promised": "4.0.2",
-    "webpack": "2.2.0"
+    "supertest-as-promised": "4.0.2"
   },
   "scripts": {
     "start": "node ./dist/index.js",
