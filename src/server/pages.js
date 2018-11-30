@@ -1,7 +1,5 @@
 import nextRoutes from 'next-routes';
 
-const { USE_PLEDGES } = process.env;
-
 const pages = nextRoutes();
 
 pages
@@ -58,13 +56,12 @@ pages
   )
   .add('discover', '/discover');
 
-if (USE_PLEDGES) {
-  pages
-    .add('createPledge', '/pledges/new')
-    .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
-    .add('completePledge', '/pledges/:id')
-    .add('claimCollective', '/:collectiveSlug/claim');
-}
+// Pledges
+pages
+  .add('createPledge', '/pledges/new')
+  .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
+  .add('completePledge', '/pledges/:id')
+  .add('claimCollective', '/:collectiveSlug/claim');
 
 // Application management
 pages
