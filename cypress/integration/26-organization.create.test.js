@@ -1,16 +1,12 @@
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 describe('create an organization', () => {
   before(() => {
     cy.login({ redirect: '/organizations/new' });
   });
 
   it('edit info', () => {
-    fill('name', 'New org');
-    fill('description', 'short description for new org');
-    fill('website', 'https://newco.com');
+    cy.fillInputField('name', 'New org');
+    cy.fillInputField('description', 'short description for new org');
+    cy.fillInputField('website', 'https://newco.com');
     cy.get('.tos input[name="tos"]').click({ force: true });
     cy.wait(500);
     cy.get('.actions button').click();

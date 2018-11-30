@@ -1,7 +1,3 @@
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 const init = (skip_signin = false) => {
   if (skip_signin) {
     cy.visit(
@@ -14,7 +10,7 @@ const init = (skip_signin = false) => {
       .contains('Apply to create a collective')
       .click({ force: true });
     cy.wait(500);
-    fill('email', 'testuser@opencollective.com');
+    cy.fillInputField('email', 'testuser@opencollective.com');
     cy.get('.LoginForm button').click();
   }
 };
@@ -22,9 +18,9 @@ const init = (skip_signin = false) => {
 describe('apply to host', () => {
   it('as a new collective', () => {
     init(false);
-    fill('name', 'New collective');
-    fill('description', 'short description for new collective');
-    fill('website', 'https://xdamman.com');
+    cy.fillInputField('name', 'New collective');
+    cy.fillInputField('description', 'short description for new collective');
+    cy.fillInputField('website', 'https://xdamman.com');
     cy.get('.tos input[type="checkbox"]').click({ force: true });
     cy.wait(300);
     cy.get('.actions button').click();

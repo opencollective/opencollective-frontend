@@ -21,3 +21,7 @@ Cypress.Commands.add('login', (params = {}) => {
       cy.visit(redirect);
     });
 });
+
+Cypress.Commands.add('fillInputField', (fieldname, value) => {
+  return cy.get(`.inputField.${fieldname} input`).type(value);
+});

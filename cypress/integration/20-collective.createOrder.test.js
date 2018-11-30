@@ -1,7 +1,3 @@
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 describe('collective.createOrder page', () => {
   it('loads custom donate page', () => {
     cy.visit('/apex/donate/50/month/custom%20description');
@@ -14,12 +10,12 @@ describe('collective.createOrder page', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
     cy.visit('/apex/donate?test=e2e');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
-    fill('email', email);
-    fill('firstName', 'Xavier');
-    fill('lastName', 'Damman');
-    fill('website', 'http://xdamman.com');
-    fill('twitterHandle', 'xdamman');
-    fill('description', 'short description');
+    cy.fillInputField('email', email);
+    cy.fillInputField('firstName', 'Xavier');
+    cy.fillInputField('lastName', 'Damman');
+    cy.fillInputField('website', 'http://xdamman.com');
+    cy.fillInputField('twitterHandle', 'xdamman');
+    cy.fillInputField('description', 'short description');
     cy.get('.submit button').click();
     cy.wait(6500);
     cy.location().should(location => {
@@ -35,12 +31,12 @@ describe('collective.createOrder page', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
     cy.visit('/veganizerbxl/donate/100');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
-    fill('email', email);
-    fill('firstName', 'Xavier');
-    fill('lastName', 'Damman');
-    fill('website', 'http://xdamman.com');
-    fill('twitterHandle', 'xdamman');
-    fill('description', 'short description');
+    cy.fillInputField('email', email);
+    cy.fillInputField('firstName', 'Xavier');
+    cy.fillInputField('lastName', 'Damman');
+    cy.fillInputField('website', 'http://xdamman.com');
+    cy.fillInputField('twitterHandle', 'xdamman');
+    cy.fillInputField('description', 'short description');
     cy.get('select[name="paymentMethodTypeSelector"]').select('manual');
     cy.get('.manualPaymentMethod .instructions').contains(
       'Instructions to make the payment of €100.00 will be sent to your email address',
@@ -65,12 +61,12 @@ describe('collective.createOrder page', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
     cy.visit('/apex/donate?test=e2e&redirect=http://localhost:3000/callback');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
-    fill('email', email);
-    fill('firstName', 'Xavier');
-    fill('lastName', 'Damman');
-    fill('website', 'http://xdamman.com');
-    fill('twitterHandle', 'xdamman');
-    fill('description', 'short description');
+    cy.fillInputField('email', email);
+    cy.fillInputField('firstName', 'Xavier');
+    cy.fillInputField('lastName', 'Damman');
+    cy.fillInputField('website', 'http://xdamman.com');
+    cy.fillInputField('twitterHandle', 'xdamman');
+    cy.fillInputField('description', 'short description');
     cy.get('.submit button').click();
     cy.wait(2500);
     cy.get('.result .success').contains('Order processed successfully. Redirecting you to localhost...');

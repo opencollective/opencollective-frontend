@@ -1,9 +1,5 @@
 const collectiveName = 'New collective';
 
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 const init = (skip_signin = false) => {
   if (skip_signin) {
     cy.visit(
@@ -11,7 +7,7 @@ const init = (skip_signin = false) => {
     );
   } else {
     cy.visit('/create');
-    fill('email', 'testuser@opencollective.com');
+    cy.fillInputField('email', 'testuser@opencollective.com');
     cy.get('.LoginForm button').click();
   }
 };
@@ -22,9 +18,9 @@ describe('create a collective', () => {
     cy.get('.CollectiveCategoryPicker .category')
       .first()
       .click();
-    fill('name', collectiveName);
-    fill('description', 'short description for new collective');
-    fill('website', 'https://newcollective.org');
+    cy.fillInputField('name', collectiveName);
+    cy.fillInputField('description', 'short description for new collective');
+    cy.fillInputField('website', 'https://newcollective.org');
     cy.wait(100);
     cy.get('.actions button').click();
     cy.get('.error').contains('Please accept the terms of service');
@@ -35,8 +31,8 @@ describe('create a collective', () => {
     cy.get('#createHost input[type="radio"]').click();
     cy.get('#createHost .CreateHostForm');
     cy.get('select[name="hostType"]').select('organization');
-    fill('organization_name', 'new org');
-    fill('organization_website', 'newco.com');
+    cy.fillInputField('organization_name', 'new org');
+    cy.fillInputField('organization_website', 'newco.com');
     cy.wait(300);
     cy.get('#createHost .createOrganizationBtn').click();
     cy.wait(300);

@@ -1,7 +1,3 @@
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 describe('create an update', () => {
   before(() => {
     cy.login({ redirect: '/testcollective/updates/new' });
@@ -9,7 +5,7 @@ describe('create an update', () => {
 
   it('edit info', () => {
     cy.wait(1000);
-    fill('title', 'New update');
+    cy.fillInputField('title', 'New update');
     cy.get('.ql-editor').type('This is some bold HTML{selectall}');
     cy.get('.ql-bold').click();
     cy.wait(300);
