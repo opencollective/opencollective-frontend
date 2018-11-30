@@ -263,18 +263,18 @@ const queries = {
         throw new errors.NotFound(`Transaction ${args.transactionUuid} doesn't exists`);
       }
 
+      // If using a virtualcard, then billed collective will be the emitter
+      const fromCollectiveId = transaction.UsingVirtualCardFromCollectiveId
+        ? transaction.UsingVirtualCardFromCollectiveId
+        : transaction.FromCollectiveId;
+
       // Ensure user is admin of collective
-      if (!req.remoteUser.isAdmin(transaction.FromCollectiveId)) {
+      if (!req.remoteUser.isAdmin(fromCollectiveId)) {
         throw new errors.Unauthorized("You don't have permission to access invoices for this user");
       }
 
       // Load transaction host
       transaction.host = await transaction.getHostCollective();
-
-      // If using a virtualcard, then billed collective will be the emitter
-      const fromCollectiveId = transaction.UsingVirtualCardFromCollectiveId
-        ? transaction.UsingVirtualCardFromCollectiveId
-        : transaction.FromCollectiveId;
 
       // Get total in host currency
       const totalAmountInHostCurrency =
