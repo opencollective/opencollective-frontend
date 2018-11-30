@@ -170,9 +170,7 @@ const processCollective = collective => {
     collective.getCancelledOrders(startDate, endDate),
     collective.getUpdates('published', startDate, endDate),
     collective.getNextGoal(endDate),
-    collective.getTransactions({
-      where: { createdAt: { [Op.gte]: startDate, [Op.lt]: endDate } },
-    }),
+    collective.getTransactions({ startDate, endDate }),
   ];
 
   let emailData = {};

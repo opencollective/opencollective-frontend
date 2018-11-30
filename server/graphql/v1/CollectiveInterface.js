@@ -1066,12 +1066,7 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt },
       },
       resolve(collective, args) {
-        const query = {};
-        if (args.type) query.where = { type: args.type };
-        if (args.limit) query.limit = args.limit;
-        if (args.offset) query.offset = args.offset;
-        query.order = [['id', 'DESC']];
-        return collective.getTransactions(query);
+        return collective.getTransactions({ ...args, order: [['id', 'DESC']] });
       },
     },
     expenses: {
