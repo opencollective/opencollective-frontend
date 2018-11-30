@@ -47,6 +47,11 @@ class ExpenseWithData extends React.Component {
 
     return (
       <div className="ExpenseWithData">
+        <style jsx>{`
+          .comments {
+            margin-top: 3rem;
+          }
+        `}</style>
         <Expense
           key={expense.id}
           collective={collective}
@@ -60,7 +65,9 @@ class ExpenseWithData extends React.Component {
         />
 
         {view === 'details' && (
-          <CommentsWithData expense={expense} collective={collective} LoggedInUser={LoggedInUser} />
+          <div className="comments">
+            <CommentsWithData expense={expense} collective={collective} LoggedInUser={LoggedInUser} />
+          </div>
         )}
       </div>
     );
