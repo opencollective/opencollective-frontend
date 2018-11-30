@@ -1,8 +1,6 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 describe('collective.transactions.exportCsv', () => {
   it("shows the 'Download CSV' button", () => {
-    cy.visit(`${WEBSITE_URL}/apex/transactions`);
+    cy.visit('/apex/transactions');
     cy.get('.download-csv').contains('Download CSV');
   });
 
@@ -14,7 +12,7 @@ describe('collective.transactions.exportCsv', () => {
       .format('MM/DD/YYYY');
 
     // Go to the URL & click on the download button
-    cy.visit(`${WEBSITE_URL}/apex/transactions`);
+    cy.visit('/apex/transactions');
     cy.get('.download-csv').click();
 
     // Validate default dates
@@ -25,7 +23,7 @@ describe('collective.transactions.exportCsv', () => {
   });
 
   it('shows a message when the result is empty for the given date range', () => {
-    cy.visit(`${WEBSITE_URL}/apex/transactions`);
+    cy.visit('/apex/transactions');
     cy.get('.download-csv').click();
 
     // Date range that won't ever contain any results

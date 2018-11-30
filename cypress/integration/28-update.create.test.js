@@ -1,5 +1,3 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 const fill = (fieldname, value) => {
   cy.get(`.inputField.${fieldname} input`).type(value);
 };
@@ -7,10 +5,10 @@ const fill = (fieldname, value) => {
 const init = (skip_signin = false) => {
   if (skip_signin) {
     cy.visit(
-      'http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE3OTI1MTU3LCJleHAiOjE1MTgwMTE1NTcsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.conr19Fing0R_4HF5msk8xYedW06beY4YpDlPIy0AMY?next=/testcollective/updates/new',
+      '/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE3OTI1MTU3LCJleHAiOjE1MTgwMTE1NTcsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.conr19Fing0R_4HF5msk8xYedW06beY4YpDlPIy0AMY?next=/testcollective/updates/new',
     );
   } else {
-    cy.visit(`${WEBSITE_URL}/signin?next=/testcollective/updates/new`);
+    cy.visit('/signin?next=/testcollective/updates/new');
     fill('email', 'testuser+admin@opencollective.com');
     cy.get('.LoginForm button').click();
   }

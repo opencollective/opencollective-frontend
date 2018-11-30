@@ -1,7 +1,5 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 const signin = redirect => {
-  cy.visit(`${WEBSITE_URL}/signin?next=${redirect}`);
+  cy.visit(`/signin?next=${redirect}`);
   cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
   cy.wait(400);
   cy.get('.email.inputField input').type('{enter}');
@@ -111,7 +109,7 @@ describe('edit collective', () => {
     cy.get('.OrderForm', { timeout: 20000 });
     cy.get('.tier .selectPreset label').contains('Select monthly amount');
     cy.get('.tier .presetBtn', { timeout: 5000 }).should('have.length', 3);
-    cy.visit(`${WEBSITE_URL}/testcollective/edit#tiers`);
+    cy.visit('/testcollective/edit#tiers');
     cy.get('.EditTiers .tier')
       .first()
       .find('._amountType select')

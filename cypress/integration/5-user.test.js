@@ -1,8 +1,6 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 describe('user profile page', () => {
   it('shows the collectives backed by the user', () => {
-    cy.visit(`${WEBSITE_URL}/xdamman`);
+    cy.visit('/xdamman');
     cy.get('#backer');
     cy.get('#admin.organization .subtitle').contains("I'm an administrator of these 2 organizations");
     cy.get('#admin.organization .CollectiveCard').should('have.length', 2);

@@ -1,14 +1,13 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
 const init = (skip_signin = false, next = '/testcollective/expenses/new') => {
   if (skip_signin) {
     cy.visit(
-      'http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE3OTM2Njg5LCJleHAiOjE1MTgwMjMwODksImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.uw7RGXELcv7pmr80VCApQbyra03SPvm49lHyq4kZA28?next=/testcollective/expenses/new',
+      '/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE3OTM2Njg5LCJleHAiOjE1MTgwMjMwODksImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.uw7RGXELcv7pmr80VCApQbyra03SPvm49lHyq4kZA28?next=/testcollective/expenses/new',
     );
   } else {
-    cy.visit(`${WEBSITE_URL}/signin?next=${next}`);
+    cy.visit(`/signin?next=${next}`);
     cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
     cy.wait(500);
     cy.get('.LoginForm button').click();
@@ -37,7 +36,7 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
 
 describe('new expense', () => {
   it('requires to login to submit an expense', () => {
-    cy.visit(`${WEBSITE_URL}/testcollective/expenses/new`);
+    cy.visit('/testcollective/expenses/new');
     cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
     cy.get('.inputField.email input').type('testuser+admin@opencollective.com');
     cy.get('.login').click();

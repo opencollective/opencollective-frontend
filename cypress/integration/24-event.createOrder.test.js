@@ -1,12 +1,10 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 const fill = (fieldname, value) => {
   cy.get(`.inputField.${fieldname} input`).type(value);
 };
 
 describe('event.createOrder page', () => {
   it('makes an order as new user', () => {
-    cy.visit(`${WEBSITE_URL}/opensource/events/webpack-webinar`);
+    cy.visit('/opensource/events/webpack-webinar');
     cy.get('#free.tier .btn.increase').click();
     cy.get('#free.tier .ctabtn').click();
     cy.location().should(location => {

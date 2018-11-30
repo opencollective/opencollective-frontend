@@ -13,6 +13,6 @@
 
 // eslint-disable-next-line
 module.exports = (on, config) => {
-  // `on` is used to hook into various events Cypress emits
-  // `config` is the resolved Cypress config
+  config.baseUrl = process.env.WEBSITE_URL || 'http://localhost:3000';
+  return config;
 };

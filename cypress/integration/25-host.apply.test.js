@@ -1,5 +1,3 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 const fill = (fieldname, value) => {
   cy.get(`.inputField.${fieldname} input`).type(value);
 };
@@ -7,10 +5,10 @@ const fill = (fieldname, value) => {
 const init = (skip_signin = false) => {
   if (skip_signin) {
     cy.visit(
-      'http://localhost:3000/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE1NDA5ODkxLCJleHAiOjE1MTgwMDE4OTEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.FdisGSpfUyCgVJaWnnV5hp_IhRfO4_27kDc6DcCwqcI?next=/brusselstogetherasbl/apply',
+      '/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE1NDA5ODkxLCJleHAiOjE1MTgwMDE4OTEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.FdisGSpfUyCgVJaWnnV5hp_IhRfO4_27kDc6DcCwqcI?next=/brusselstogetherasbl/apply',
     );
   } else {
-    cy.visit(`${WEBSITE_URL}/brusselstogetherasbl`);
+    cy.visit('/brusselstogetherasbl');
     cy.get('#hosting h1').contains('We are hosting 2 collectives');
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
@@ -37,7 +35,7 @@ describe('apply to host', () => {
     cy.get('.NotificationBar p').contains('BrusselsTogether ASBL');
     cy.url().then(currentUrl => {
       const CollectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
-      return cy.visit(`${WEBSITE_URL}/brusselstogetherasbl/collectives/${CollectiveId}/approve`);
+      return cy.visit(`/brusselstogetherasbl/collectives/${CollectiveId}/approve`);
     });
     cy.get('.error .message').contains(
       'You need to be logged in as an admin of the host of this collective to approve it',
