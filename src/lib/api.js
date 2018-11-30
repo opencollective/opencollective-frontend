@@ -129,15 +129,29 @@ export async function refreshToken(currentToken) {
   }
 }
 
+/**
+ * Fetch the given file from `path`. Must be a local path, otherwise
+ * `options.allowExternal` must be explicitely set. You should be **extremely**
+ * careful when using this as an attacker abusing from this option could
+ * be able to fetch arbitrary files to our servers.
+ *
+ * @param options {Object}
+ *  - format {string} Format of the file to get (currently supports csv and blob)
+ *  - allowExtenal {string} An external URL from which get is allowed to fetch
+ */
 export function get(path, options = {}) {
-  if (path.substr(0, 1) !== '/') throw new Error('Can only get resources with a relative path');
+  const { allowExternal, format } = options;
+  const isAbsolute = path.substr(0, 1) === '/';
+  if (!isAbsolute && (!allowExternal || !path.startsWith(allowExternal))) {
+    throw new Error('Can only get resources with a relative path');
+  }
 
   return fetch(path, {
     method: 'get',
     headers: addAuthTokenToHeader(),
   }).then(response => {
-    if (options.format === 'csv') return response.text();
-    if (options.format === 'blob') return response.blob();
+    if (format === 'csv') return response.text();
+    if (format === 'blob') return response.blob();
     return checkResponseStatus(response);
   });
 }
