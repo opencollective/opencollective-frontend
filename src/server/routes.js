@@ -80,14 +80,6 @@ export default (server, app) => {
     '/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?',
     controllers.collectives.website,
   );
-  server.get(
-    '/:collectiveSlug/invoices/:invoiceSlug.:format(html|pdf|json)',
-    (req, res, next) => {
-      req.app = app;
-      next();
-    },
-    controllers.transactions.invoice,
-  );
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';

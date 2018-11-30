@@ -52,7 +52,6 @@ describe('Search Page', () => {
         },
       },
       term: 'test',
-      usePledges: true,
     };
 
     const tree = renderer.create(<MockSearchPage {...emptyResultsProps} />).toJSON();

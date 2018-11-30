@@ -23,8 +23,6 @@ import withIntl from '../lib/withIntl';
 
 import { Search } from 'styled-icons/octicons/Search.cjs';
 
-const { USE_PLEDGES } = process.env;
-
 const SearchInput = styled(FormControl)`
   &&& {
     border: none;
@@ -51,7 +49,6 @@ class SearchPage extends React.Component {
       term: query.q || '',
       limit: query.limit || 20,
       offset: query.offset || 0,
-      usePledges: USE_PLEDGES || false,
     };
   }
 
@@ -61,11 +58,6 @@ class SearchPage extends React.Component {
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
-    usePledges: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    usePledges: false,
   };
 
   refetch = event => {
@@ -87,7 +79,6 @@ class SearchPage extends React.Component {
     const {
       data: { error, loading, search },
       term = '',
-      usePledges,
     } = this.props;
 
     if (error) {
@@ -136,7 +127,7 @@ class SearchPage extends React.Component {
                     &quot;
                   </em>
                 </p>
-                {usePledges && (
+                {
                   <Link route="createPledge" params={{ name: term }} passHref>
                     <StyledLink
                       display="block"
@@ -151,7 +142,7 @@ class SearchPage extends React.Component {
                       Make a pledge
                     </StyledLink>
                   </Link>
-                )}
+                }
               </Flex>
             )}
           </Flex>
@@ -166,7 +157,7 @@ class SearchPage extends React.Component {
               <p>
                 <em>If you don&apos;t see the collective you&apos;re searching for:</em>
               </p>
-              {usePledges && (
+              {
                 <Link route="createPledge" params={{ name: term }} passHref>
                   <StyledLink
                     display="block"
@@ -181,7 +172,7 @@ class SearchPage extends React.Component {
                     Make a pledge
                   </StyledLink>
                 </Link>
-              )}
+              }
             </Flex>
           )}
         </Container>

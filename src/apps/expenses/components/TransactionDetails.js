@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import RefundTransactionBtn from './RefundTransactionBtn';
 
 import Link from '../../../components/Link';
+import InvoiceDownloadLink from './InvoiceDownloadLink';
 
 class TransactionDetails extends React.Component {
   static propTypes = {
@@ -23,7 +24,7 @@ class TransactionDetails extends React.Component {
     canRefund: PropTypes.bool,
     className: PropTypes.string,
     currency: PropTypes.string.isRequired,
-    uuid: PropTypes.number,
+    uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
@@ -243,15 +244,15 @@ class TransactionDetails extends React.Component {
           </div>
         )}
 
-        {type === 'DEBIT' && canDownloadInvoice && !isRefund && (
+        {type === 'DEBIT' && canDownloadInvoice && !isRefund && uuid && (
           <div className="col invoice">
             <label>
               <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
             </label>
             <div>
-              <a href={`/${collective.slug}/transactions/${uuid}/invoice.pdf`}>
+              <InvoiceDownloadLink type="transaction" transactionUuid={uuid} viewLoading={() => 'Loading...'}>
                 <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
-              </a>
+              </InvoiceDownloadLink>
             </div>
           </div>
         )}
