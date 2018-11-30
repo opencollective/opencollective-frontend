@@ -119,6 +119,7 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
+    "cypress:open": "TZ=UTC cypress open",
     "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
     "prettier:write": "npm run prettier -- --write",
