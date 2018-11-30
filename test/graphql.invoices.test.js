@@ -136,7 +136,7 @@ describe('graphql.invoices.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { invoiceSlug: '201710-brusselstogether-host-xdamman' }, xdamman);
+      const result = await utils.graphqlQuery(query, { invoiceSlug: '201710.brusselstogether-host.xdamman' }, xdamman);
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const invoice = result.data.Invoice;

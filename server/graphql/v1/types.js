@@ -329,6 +329,12 @@ export const InvoiceType = new GraphQLObjectType({
           return invoice.month;
         },
       },
+      day: {
+        type: GraphQLInt,
+        resolve(invoice) {
+          return invoice.day;
+        },
+      },
       totalAmount: {
         type: GraphQLInt,
         resolve(invoice) {
@@ -356,11 +362,19 @@ export const InvoiceType = new GraphQLObjectType({
       transactions: {
         type: new GraphQLList(TransactionInterfaceType),
         async resolve(invoice) {
+          // Directly return transactions if already loaded
+          if (invoice.transactions) {
+            return invoice.transactions;
+          }
+
           const startsAt = new Date(`${invoice.year}-${invoice.month}-01`);
           const endsAt = new Date(startsAt);
           endsAt.setMonth(startsAt.getMonth() + 1);
           const where = {
-            FromCollectiveId: invoice.FromCollectiveId,
+            [Op.or]: {
+              FromCollectiveId: invoice.FromCollectiveId,
+              UsingVirtualCardFromCollectiveId: invoice.FromCollectiveId,
+            },
             type: 'CREDIT',
             createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
           };
