@@ -2,17 +2,19 @@
  * Dependencies.
  */
 import config from 'config';
-import _, { pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
-import slugify from 'slug';
-import activities from '../constants/activities';
-import { mustHaveRole } from '../lib/auth';
+import slugify from 'limax';
 import Promise from 'bluebird';
 import showdown from 'showdown';
-const markdownConverter = new showdown.Converter();
-import { sanitizeObject } from '../lib/utils';
+import { defaults, pick } from 'lodash';
 
 import * as errors from '../graphql/errors';
+import activities from '../constants/activities';
+import { sanitizeObject } from '../lib/utils';
+import { mustHaveRole } from '../lib/auth';
+
+const markdownConverter = new showdown.Converter();
+
 /**
  * Update Model.
  */
@@ -300,7 +302,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Update.createMany = (updates, defaultValues) => {
-    return Promise.map(updates, u => Update.create(_.defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
+    return Promise.map(updates, u => Update.create(defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
       console.error,
     );
   };
