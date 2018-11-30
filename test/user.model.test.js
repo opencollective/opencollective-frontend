@@ -1,10 +1,10 @@
 import sinon from 'sinon';
 import config from 'config';
-import url from 'url';
 import { expect } from 'chai';
+import { URL } from 'url';
+
 import * as utils from '../test/utils';
 import { randEmail } from './features/support/stores';
-
 import models from '../server/models';
 import * as auth from '../server/lib/auth';
 
@@ -171,10 +171,10 @@ describe('user.models.test.js', () => {
       const link = user.generateLoginLink('/path/to/redirect');
 
       // Then the link should contain the right url
-      const parsed = url.parse(link);
-      expect(`${parsed.protocol}//${parsed.host}`).to.equal(config.host.website);
-      expect(parsed.query).to.equal('next=/path/to/redirect');
-      expect(parsed.pathname).to.equal('/signin/foo');
+      const parsedUrl = new URL(link);
+      expect(`${parsedUrl.protocol}//${parsedUrl.host}`).to.equal(config.host.website);
+      expect(parsedUrl.search).to.equal('?next=/path/to/redirect');
+      expect(parsedUrl.pathname).to.equal('/signin/foo');
 
       // And Then restore the mock
       mockUser.restore();

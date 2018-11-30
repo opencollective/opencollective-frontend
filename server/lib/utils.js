@@ -1,13 +1,14 @@
-import Url from 'url';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import pdf from 'html-pdf';
 import fs from 'fs';
 import path from 'path';
-import handlebars from './handlebars';
-import { get, cloneDeep } from 'lodash';
 import sanitizeHtml from 'sanitize-html';
+import { get, cloneDeep } from 'lodash';
+import { URL } from 'url';
+
+import handlebars from './handlebars';
 
 const debug = debugLib('utils');
 
@@ -115,7 +116,7 @@ export const getRequestedUrl = req => {
  * Add parameters to an url.
  */
 export const addParameterUrl = (url, parameters) => {
-  const parsedUrl = Url.parse(url, true);
+  const parsedUrl = new URL(url);
 
   function removeTrailingChar(str, char) {
     if (str.substr(-1) === char) {
@@ -127,15 +128,14 @@ export const addParameterUrl = (url, parameters) => {
 
   parsedUrl.pathname = removeTrailingChar(parsedUrl.pathname, '/');
 
-  delete parsedUrl.search; // Otherwise .search is used in place of .query
-  delete parsedUrl.query.api_key; // make sure we don't surface the api_key publicly
+  parsedUrl.searchParams.delete('search'); // Otherwise .search is used in place of .query
+  parsedUrl.searchParams.delete('api_key'); // make sure we don't surface the api_key publicly
 
   for (const p in parameters) {
-    const param = parameters[p];
-    parsedUrl.query[p] = param;
+    parsedUrl.searchParams.set(p, parameters[p]);
   }
 
-  return Url.format(parsedUrl);
+  return parsedUrl.toString();
 };
 
 /**
