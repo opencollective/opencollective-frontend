@@ -33,5 +33,5 @@ function getIndex() {
 }
 
 export default {
-  getIndex: getIndex(),
+  getIndex,
 };
