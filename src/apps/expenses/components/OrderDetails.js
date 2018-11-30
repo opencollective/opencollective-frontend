@@ -76,12 +76,6 @@ class OrderDetails extends React.Component {
             </div>
             <div className="col">
               <label>
-                <FormattedMessage id="order.quantity" defaultMessage="quantity" />
-              </label>
-              {order.quantity}
-            </div>
-            <div className="col">
-              <label>
                 <FormattedMessage id="tier.amount" defaultMessage="amount" />
               </label>
               <div className="amountDetails">
@@ -89,6 +83,12 @@ class OrderDetails extends React.Component {
                   <FormattedNumber value={order.tier.amount / 100} currency={order.currency} {...this.currencyStyle} />
                 </span>
               </div>
+            </div>
+            <div className="col">
+              <label>
+                <FormattedMessage id="order.quantity" defaultMessage="quantity" />
+              </label>
+              {order.quantity}
             </div>
           </div>
         )}
