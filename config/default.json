@@ -82,14 +82,6 @@
     "clientID": "UNDEFINED_GITHUB_CLIENT_ID",
     "clientSecret": "UNDEFINED_GITHUB_CLIENT_SECRET"
   },
-  "meetup": {
-    "clientID": "UNDEFINED_MEETUP_CLIENT_ID",
-    "clientSecret": "UNDEFINED_MEETUP_CLIENT_SECRET"
-  },
-  "twitter": {
-    "consumerKey": "UNDEFINED_TWITTER_CONSUMER_KEY",
-    "consumerSecret": "UNDEFINED_TWITTER_CONSUMER_SECRET"
-  },
   "algolia": {
     "index": "dvl_collectives"
   },

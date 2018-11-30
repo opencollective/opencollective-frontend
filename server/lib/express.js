@@ -14,7 +14,7 @@ import cloudflareIps from 'cloudflare-ip/ips.json';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
-import { get } from 'lodash';
+import { has, get } from 'lodash';
 
 import forest from './forest';
 import cacheMiddleware from '../middleware/cache';
@@ -107,9 +107,22 @@ export default function(app) {
   passport.deserializeUser((obj, cb) => cb(null, obj));
 
   const verify = (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile });
-  passport.use(new GitHubStrategy(config.github, verify));
-  passport.use(new MeetupStrategy(config.meetup, verify));
-  passport.use(new TwitterStrategy(config.twitter, verify));
+
+  if (has(config, 'github.clientID') && has(config, 'github.clientSecret')) {
+    passport.use(new GitHubStrategy(get(config, 'github'), verify));
+  } else {
+    console.warn('Configuration missing for passport GitHubStrategy, skipping.');
+  }
+  if (has(config, 'meetup.clientID') && has(config, 'meetup.clientSecret')) {
+    passport.use(new MeetupStrategy(get(config, 'meetup'), verify));
+  } else {
+    console.warn('Configuration missing for passport MeetupStrategy, skipping.');
+  }
+  if (has(config, 'twitter.consumerKey') && has(config, 'twitter.consumerSecret')) {
+    passport.use(new TwitterStrategy(get(config, 'twitter'), verify));
+  } else {
+    console.warn('Configuration missing for passport TwitterStrategy, skipping.');
+  }
 
   app.use(cookieParser());
   app.use(
