@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../../../lib/utils';
+import { capitalize } from '../../../lib/utils';
 import withIntl from '../../../lib/withIntl';
 import { get } from 'lodash';
 
