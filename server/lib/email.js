@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import he from 'he';
-import { isArray, pick, has, get, merge, includes } from 'lodash';
+import { isArray, pick, get, merge, includes } from 'lodash';
 
 import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
