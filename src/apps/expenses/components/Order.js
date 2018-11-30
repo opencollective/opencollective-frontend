@@ -21,9 +21,6 @@ class Order extends React.Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
-    allowPayAction: PropTypes.bool,
-    lockPayAction: PropTypes.func,
-    unlockPayAction: PropTypes.func,
   };
 
   constructor(props) {
