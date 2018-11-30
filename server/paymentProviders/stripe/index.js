@@ -79,10 +79,7 @@ export default {
       let state, collective;
       debug('req.query', JSON.stringify(req.query, null, '  '));
       try {
-        state = jwt.verify(
-          req.query.state,
-          config.keys.opencollective.jwtSecret,
-        );
+        state = jwt.verify(req.query.state, config.keys.opencollective.jwtSecret);
       } catch (e) {
         return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
       }
