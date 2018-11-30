@@ -520,7 +520,6 @@ describe('createOrder', () => {
     // Then the created transaction should match the requested data
     const orderCreated = res.data.createOrder;
     const { collective, subscription } = orderCreated;
-    console.log('>>> orderCreated', orderCreated);
 
     expect(subscription.interval).to.equal('month');
     expect(subscription.isActive).to.be.true;
