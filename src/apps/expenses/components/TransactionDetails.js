@@ -23,7 +23,7 @@ class TransactionDetails extends React.Component {
     canRefund: PropTypes.bool,
     currency: PropTypes.string.isRequired,
     attachment: PropTypes.string,
-    uuid: PropTypes.number,
+    uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
@@ -256,7 +256,7 @@ class TransactionDetails extends React.Component {
           </div>
         )}
 
-        {type === 'DEBIT' && canDownloadInvoice && !isRefund && (
+        {type === 'DEBIT' && canDownloadInvoice && !isRefund && uuid && (
           <div className="col invoice">
             <label>
               <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
