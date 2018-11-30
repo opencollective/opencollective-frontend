@@ -37,9 +37,7 @@ describe('the NotFound page when logged out', () => {
 
 describe('the NotFound page when logged in', () => {
   before(() => {
-    cy.visit(`/signin?next=/${notFoundSlug}`);
-    cy.get('.inputField.email input').type('testuser+admin@opencollective.com');
-    cy.get('.LoginForm button').click();
+    cy.login({ redirect: notFoundURL });
   });
 
   it('has the user properly logged in', () => {

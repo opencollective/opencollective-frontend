@@ -1,11 +1,3 @@
-const signin = redirect => {
-  cy.visit(`/signin?next=${redirect}`);
-  cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
-  cy.wait(400);
-  cy.get('.email.inputField input').type('{enter}');
-  cy.wait(700);
-};
-
 const addTier = tier => {
   cy.get('.addTier').click();
 
@@ -25,8 +17,11 @@ const addTier = tier => {
 };
 
 describe('edit collective', () => {
+  beforeEach(() => {
+    cy.login({ redirect: '/testcollective/edit' });
+  });
+
   it('edit info', () => {
-    signin('/testcollective/edit');
     cy.get('.name.inputField input').type(' edited');
     cy.get('.description.inputField input').type(' edited');
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
@@ -48,7 +43,6 @@ describe('edit collective', () => {
   });
 
   it('edit tiers', () => {
-    signin('/testcollective/edit');
     cy.get('.MenuItem.tiers').click();
     cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
     cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
