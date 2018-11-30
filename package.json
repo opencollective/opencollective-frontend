@@ -97,7 +97,7 @@
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.2",
     "sanitize-html": "1.19.1",
-    "sequelize": "4.37.5",
+    "sequelize": "4.41.2",
     "sequelize-cli": "4.0.0",
     "sequelize-temporal": "1.0.6",
     "showdown": "1.9.0",
@@ -212,7 +212,10 @@
     "maildev": "maildev"
   },
   "nyc": {
-    "reporter": ["lcov", "text"],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
     "cache": true
   },
   "husky": {
@@ -221,7 +224,10 @@
     }
   },
   "lint-staged": {
-    "*.js": ["prettier --write", "git add"]
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "license": "MIT",
   "repository": {
