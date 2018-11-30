@@ -73,20 +73,6 @@ const verboseData = (values, mapFunction) => {
   }
 };
 
-// Used to fetch external data that only comes in batches
-// Like stripe subscription list, only 100 at a time
-const fetchAll = (func, options) => {
-  return func(options).then(results => {
-    // if fetched less than the limit, stop fetching
-    if (results.data.length < options.limit) {
-      return results.data;
-    }
-    // otherwise, keep fetching from the end of last set of results
-    options.startingAfter = results.data.slice(-1)[0].id;
-    return fetchAll(func, options).then(result2 => results.data.concat(result2));
-  });
-};
-
 /* **** functions that check for various things **** */
 
 const checkHostsUserOrOrg = () => {
