@@ -54,6 +54,43 @@ Code style? Commit convention? Please check our [Contributing guidelines](CONTRI
 
 TL;DR: we use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/), we do like great commit messages and clean Git history.
 
+## Styleguide
+
+We use [React-Styleguidist](https://react-styleguidist.js.org/) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://jxnblk.com/styled-system/).
+
+### Start
+
+```
+npm run styleguide:dev
+```
+
+### Create a new component:
+
+Only components with a matching example markdown file in the `styleguide/examples/` directory will appear in the styleguide. After creating a new component in the `src/components/` directory (i.e. `src/components/NewComponent.js`), make an example markdown file to go with it (i.e. `styleguide/examples/NewComponent.md`). 
+
+If you are creating a styled-component, you will need to annotate the export statement for React-Styleguidist to recognize it:
+
+```es6
+/** @component */
+export default NewComponent;
+```
+
+Check out the [React-Styleguidist docs](https://react-styleguidist.js.org/docs/documenting.html) for more details about documenting components with [JSDoc](http://usejsdoc.org/) annotations and writing interactive code examples.
+
+### Build for deployment
+
+```
+npm run styleguide:build
+```
+
+### Deploy
+
+If you have access the Open Collective `now` team account:
+
+```
+now styleguide && now alias -A styleguide/now.json
+```
+
 ## Tests
 
 You can run the tests using `npm test` or more specifically:
