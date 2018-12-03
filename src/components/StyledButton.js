@@ -68,6 +68,11 @@ StyledButton.propTypes = {
    */
   maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /**
+   * styled-system prop: adds margin & padding props
+   * see: https://github.com/jxnblk/styled-system/blob/master/docs/api.md#space
+   */
+  space: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  /**
    * From styled-system: accepts any css 'text-align' value
    */
   textAlign: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
