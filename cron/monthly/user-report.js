@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
 
 process.env.PORT = 3066;
 
-import { get, pick, uniq } from 'lodash';
+import { get, pick, uniq, groupBy } from 'lodash';
 import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
@@ -125,7 +125,6 @@ const processBacker = async FromCollectiveId => {
     ],
   };
   const transactions = await models.Transaction.findAll(query);
-
   console.log('>>> transactions found', transactions.length);
   const distinctTransactions = [],
     collectiveIds = {};
@@ -189,7 +188,6 @@ const processBacker = async FromCollectiveId => {
       { concurrency: 4 },
     );
   }
-
   const orders = await models.Order.findAll({
     attributes: ['id', 'CollectiveId', 'totalAmount', 'currency'],
     where: {
@@ -198,25 +196,32 @@ const processBacker = async FromCollectiveId => {
         createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
         SubscriptionId: { [Op.ne]: null },
       },
+      deletedAt: null,
     },
-    include: [{ model: models.Subscription }],
+    include: [
+      {
+        model: models.Subscription,
+        where: {
+          isActive: true,
+        },
+      },
+    ],
   });
-  const ordersByCollectiveId = {};
-  orders.map(o => {
-    ordersByCollectiveId[o.CollectiveId] = o;
-  });
+
+  const ordersByCollectiveId = groupBy(orders, 'CollectiveId');
   const collectivesWithOrders = [];
   collectives.map(collective => {
+    // It's only possible to have one order with subscription active Per Collective
+    const collectiveOrder = ordersByCollectiveId[collective.id] && ordersByCollectiveId[collective.id][0];
     collectivesWithOrders.push({
       ...collective,
-      order: ordersByCollectiveId[collective.id],
+      order: collectiveOrder,
     });
   });
   collectivesWithOrders.sort((a, b) => {
     if (get(a, 'order.totalAmount') > get(b, 'order.totalAmount')) return -1;
     else return 1;
   });
-
   const stats = await computeStats(collectivesWithOrders, backerCollective.currency);
   const relatedCollectives = await models.Collective.getCollectivesSummaryByTag(
     stats.topTags,
@@ -451,6 +456,7 @@ const computeStats = async (collectives, currency = 'USD') => {
   stats.expensesBreakdownString = `${Object.keys(categories).length > 3 ? ', mostly in' : ' in'} ${formatArrayToString(
     ar,
   )}`;
+  console.log(`>>> Stats: ${JSON.stringify(stats, null, 2)}`);
   return stats;
 };
 
