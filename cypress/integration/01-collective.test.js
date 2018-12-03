@@ -1,8 +1,6 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 describe('collective page', () => {
   before(() => {
-    cy.visit(`${WEBSITE_URL}/apex`);
+    cy.visit('/apex');
   });
 
   it('loads the collective page', () => {

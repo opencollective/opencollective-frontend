@@ -1,12 +1,6 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 describe('event.createOrder page', () => {
   it('makes an order as new user', () => {
-    cy.visit(`${WEBSITE_URL}/opensource/events/webpack-webinar`);
+    cy.visit('/opensource/events/webpack-webinar');
     cy.get('#free.tier .btn.increase').click();
     cy.get('#free.tier .ctabtn').click();
     cy.location().should(location => {
@@ -15,11 +9,11 @@ describe('event.createOrder page', () => {
     });
     cy.wait(500);
     cy.get('.order');
-    fill('email', 'newuser@opencollective.com');
-    fill('firstName', 'New');
-    fill('lastName', 'User');
-    fill('website', 'http://mywebsite.com');
-    fill('twitterHandle', 'twhandle');
+    cy.fillInputField('email', 'newuser@opencollective.com');
+    cy.fillInputField('firstName', 'New');
+    cy.fillInputField('lastName', 'User');
+    cy.fillInputField('website', 'http://mywebsite.com');
+    cy.fillInputField('twitterHandle', 'twhandle');
     cy.get('.inputField.publicMessage textarea').type('excited to meet the community!');
     cy.wait(400);
     cy.get('.actions .submit button').click();

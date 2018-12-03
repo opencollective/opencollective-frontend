@@ -1,7 +1,5 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
 const notFoundSlug = 'a-collective-that-does-not-exist';
-const notFoundURL = `${WEBSITE_URL}/${notFoundSlug}`;
+const notFoundURL = `/${notFoundSlug}`;
 
 it("fetching a collective page that doesn't exist returns a 404", () => {
   cy.request({ url: notFoundURL, failOnStatusCode: false }).then(resp => {
@@ -39,9 +37,7 @@ describe('the NotFound page when logged out', () => {
 
 describe('the NotFound page when logged in', () => {
   before(() => {
-    cy.visit(`${WEBSITE_URL}/signin?next=/${notFoundSlug}`);
-    cy.get('.inputField.email input').type('testuser+admin@opencollective.com');
-    cy.get('.LoginForm button').click();
+    cy.login({ redirect: notFoundURL });
   });
 
   it('has the user properly logged in', () => {

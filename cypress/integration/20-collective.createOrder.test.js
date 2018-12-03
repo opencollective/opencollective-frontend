@@ -1,12 +1,6 @@
-const WEBSITE_URL = process.env.WEBSITE_URL || 'http://localhost:3000' || 'https://staging.opencollective.com';
-
-const fill = (fieldname, value) => {
-  cy.get(`.inputField.${fieldname} input`).type(value);
-};
-
 describe('collective.createOrder page', () => {
   it('loads custom donate page', () => {
-    cy.visit(`${WEBSITE_URL}/apex/donate/50/month/custom%20description`);
+    cy.visit('/apex/donate/50/month/custom%20description');
     cy.get('.tier .description').contains('custom description');
     cy.get('.tier .amount').contains('$50');
     cy.get('.tier .amount').contains('per month');
@@ -14,14 +8,14 @@ describe('collective.createOrder page', () => {
 
   it('makes an order logged out as a new user', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
-    cy.visit(`${WEBSITE_URL}/apex/donate?test=e2e`);
+    cy.visit('/apex/donate?test=e2e');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
-    fill('email', email);
-    fill('firstName', 'Xavier');
-    fill('lastName', 'Damman');
-    fill('website', 'http://xdamman.com');
-    fill('twitterHandle', 'xdamman');
-    fill('description', 'short description');
+    cy.fillInputField('email', email);
+    cy.fillInputField('firstName', 'Xavier');
+    cy.fillInputField('lastName', 'Damman');
+    cy.fillInputField('website', 'http://xdamman.com');
+    cy.fillInputField('twitterHandle', 'xdamman');
+    cy.fillInputField('description', 'short description');
     cy.get('.submit button').click();
     cy.wait(6500);
     cy.location().should(location => {
@@ -35,14 +29,14 @@ describe('collective.createOrder page', () => {
 
   it('makes an order logged out as a new user with a manual payment method', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
-    cy.visit(`${WEBSITE_URL}/veganizerbxl/donate/100`);
+    cy.visit('/veganizerbxl/donate/100');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
-    fill('email', email);
-    fill('firstName', 'Xavier');
-    fill('lastName', 'Damman');
-    fill('website', 'http://xdamman.com');
-    fill('twitterHandle', 'xdamman');
-    fill('description', 'short description');
+    cy.fillInputField('email', email);
+    cy.fillInputField('firstName', 'Xavier');
+    cy.fillInputField('lastName', 'Damman');
+    cy.fillInputField('website', 'http://xdamman.com');
+    cy.fillInputField('twitterHandle', 'xdamman');
+    cy.fillInputField('description', 'short description');
     cy.get('select[name="paymentMethodTypeSelector"]').select('manual');
     cy.get('.manualPaymentMethod .instructions').contains(
       'Instructions to make the payment of €100.00 will be sent to your email address',
@@ -65,14 +59,14 @@ describe('collective.createOrder page', () => {
 
   it('makes an order logged out as a new user with a redirect url', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
-    cy.visit(`${WEBSITE_URL}/apex/donate?test=e2e&redirect=http://localhost:3000/callback`);
+    cy.visit('/apex/donate?test=e2e&redirect=http://localhost:3000/callback');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
-    fill('email', email);
-    fill('firstName', 'Xavier');
-    fill('lastName', 'Damman');
-    fill('website', 'http://xdamman.com');
-    fill('twitterHandle', 'xdamman');
-    fill('description', 'short description');
+    cy.fillInputField('email', email);
+    cy.fillInputField('firstName', 'Xavier');
+    cy.fillInputField('lastName', 'Damman');
+    cy.fillInputField('website', 'http://xdamman.com');
+    cy.fillInputField('twitterHandle', 'xdamman');
+    cy.fillInputField('description', 'short description');
     cy.get('.submit button').click();
     cy.wait(2500);
     cy.get('.result .success').contains('Order processed successfully. Redirecting you to localhost...');
@@ -83,7 +77,7 @@ describe('collective.createOrder page', () => {
 
   it('makes an order as a new organization', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
-    cy.visit(`${WEBSITE_URL}/apex/donate`);
+    cy.visit('/apex/donate');
     cy.get('.inputField.email input').type(email);
     cy.wait(400);
     cy.get('.actions .submit button').click();
