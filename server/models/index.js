@@ -135,6 +135,10 @@ export function setupModels(client) {
     foreignKey: 'FromCollectiveId',
     as: 'fromCollective',
   });
+  m.Transaction.belongsTo(m.Collective, {
+    foreignKey: 'UsingVirtualCardFromCollectiveId',
+    as: 'usingVirtualCardFromCollective',
+  });
 
   m.Transaction.belongsTo(m.User, {
     foreignKey: 'CreatedByUserId',
