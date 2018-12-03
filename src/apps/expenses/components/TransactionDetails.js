@@ -71,7 +71,7 @@ class TransactionDetails extends React.Component {
     if (pm.type === 'virtualcard') {
       return pm.name.replace('card from', 'Gift Card from');
     } else if (pm.type === 'creditcard') {
-      return `${get(pm, 'data.brand', get(pm, 'type'))} ${pm.name}`;
+      return <FormattedMessage id="creditcard.label" defaultMessage="Credit Card" />;
     } else {
       return capitalize(pm.service);
     }
