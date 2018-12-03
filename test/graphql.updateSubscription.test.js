@@ -5,10 +5,10 @@ import config from 'config';
 
 import * as utils from '../test/utils';
 import models from '../server/models';
+import ORDER_STATUS from '../server/constants/order_status';
 import initNock from './graphql.updateSubscription.nock';
 
 const ordersData = utils.data('orders');
-
 const updateSubscriptionQuery = `
 mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $amount: Int) {
   updateSubscription(id: $id, paymentMethod: $paymentMethod, amount: $amount) {
@@ -398,17 +398,27 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
         expect(res.errors).to.not.exist;
 
-        const matchingOrders = await models.Order.findAll({
+        const activeOrders = await models.Order.findAll({
           where: {
             CreatedByUserId: order.CreatedByUserId,
             CollectiveId: order.CollectiveId,
           },
-          include: [{ model: models.Subscription }],
+          include: [
+            {
+              model: models.Subscription,
+              where: {
+                isActive: true,
+              },
+            },
+          ],
         });
+        const updatedOrder = await models.Order.findById(order.id);
+        const activeOrder = activeOrders && activeOrders[0];
 
-        const activeOrder = matchingOrders.find(order => order.Subscription.isActive);
-
+        expect(updatedOrder.totalAmount).to.equal(order.totalAmount);
+        expect(updatedOrder.status).to.equal(ORDER_STATUS.CANCELLED);
         expect(activeOrder.totalAmount).to.equal(4000);
+        expect(activeOrder.status).to.equal(order.status);
         expect(activeOrder.Subscription.amount).to.equal(4000);
       });
     });
