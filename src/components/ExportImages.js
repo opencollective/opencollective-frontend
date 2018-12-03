@@ -76,7 +76,7 @@ class ExportImages extends React.Component {
                 description: 'max height of each avatar / logo',
               },
               {
-                name: 'showBtn',
+                name: 'button',
                 description: 'show "become a backer/sponsor" button',
                 defaultValue: 'true',
               },
