@@ -112,7 +112,10 @@ const processBacker = async FromCollectiveId => {
   const query = {
     attributes: ['CollectiveId', 'HostCollectiveId'],
     where: {
-      FromCollectiveId,
+      [Op.or]: {
+        FromCollectiveId,
+        UsingVirtualCardFromCollectiveId: FromCollectiveId,
+      },
       type: 'CREDIT',
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
@@ -198,17 +201,10 @@ const processBacker = async FromCollectiveId => {
       },
       deletedAt: null,
     },
-    include: [
-      {
-        model: models.Subscription,
-        where: {
-          isActive: true,
-        },
-      },
-    ],
+    include: [{ model: models.Subscription }],
   });
-
-  const ordersByCollectiveId = groupBy(orders, 'CollectiveId');
+  // group orders(by collective) that either don't have subscription or have active subscription
+  const ordersByCollectiveId = groupBy(orders.filter(o => !o.Subscription || o.Subscription.isActive), 'CollectiveId');
   const collectivesWithOrders = [];
   collectives.map(collective => {
     // It's only possible to have one order with subscription active Per Collective
