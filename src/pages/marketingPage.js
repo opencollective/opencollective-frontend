@@ -12,9 +12,12 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 import { loadScriptAsync } from '../lib/utils';
 
 import sponsorPageHtml from '../static/sponsor-page/index.html';
+import howItWorksPageHtml from '../static/how-it-works-page/index.html';
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
+import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
+import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
 
 class MarketingPage extends React.Component {
   static getInitialProps({ query: { pageSlug } }) {
@@ -38,6 +41,8 @@ class MarketingPage extends React.Component {
 
     if (this.props.pageSlug === 'become-a-sponsor') {
       loadScriptAsync(sponsorPageScript);
+    } else if (this.props.pageSlug === 'how-it-works') {
+      loadScriptAsync(howItWorksPageScript);
     }
   }
 
@@ -51,6 +56,10 @@ class MarketingPage extends React.Component {
       html = sponsorPageHtml;
       style = sponsorPageStyle;
       className = 'sponsorPage';
+    } else if (pageSlug === 'how-it-works') {
+      html = howItWorksPageHtml;
+      style = howItWorksPageStyle;
+      className = 'mkt-page-how-it-works';
     }
 
     return (
