@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable */
+
 var internals = {};
 
 internals.w = window.innerWidth;
