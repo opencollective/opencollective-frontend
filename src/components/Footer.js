@@ -44,7 +44,7 @@ const FlexList = styled.ul([], ...Box.componentStyle.rules, ...Flex.componentSty
 const navigation = {
   PLATFORM: {
     Discover: '/discover',
-    'How it Works': '/learn-more',
+    'How it Works': '/how-it-works',
     'Sign Up': '/signin',
     Login: '/signin',
   },
@@ -68,13 +68,6 @@ const navigation = {
     'Privacy Policy': '/privacypolicy',
   },
 };
-
-/**
- * Patch for "How it works" and "Discover" menu links that
- * are still hosted on legacy website and cannot be linked with NextJS Link
- * component. See https://github.com/opencollective/opencollective/issues/1361
- */
-const routesWithoutRouter = ['/learn-more'];
 
 class Footer extends React.Component {
   render() {
@@ -130,13 +123,11 @@ class Footer extends React.Component {
                 <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
                   {Object.keys(navigation[key]).map(item => (
                     <ListItem key={item} textAlign={['center', null, 'left']} mb={2}>
-                      {routesWithoutRouter.includes(navigation[key][item]) ? (
-                        <MenuLink href={navigation[key][item]}>{item}</MenuLink>
-                      ) : (
+                      {
                         <Link route={navigation[key][item]} passHref>
                           <MenuLink>{item}</MenuLink>
                         </Link>
-                      )}
+                      }
                     </ListItem>
                   ))}
                 </FlexList>

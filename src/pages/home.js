@@ -236,9 +236,11 @@ class HomePage extends React.Component {
                     Join the movement
                   </StyledLink>
 
-                  <StyledLink href="/learn-more" mt={[3, null, 0]} ml={[0, null, 3]}>
-                    How it works &gt;
-                  </StyledLink>
+                  <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                    <StyledLink href="/how-it-works" mt={[3, null, 0]} ml={[0, null, 3]}>
+                      How it works &gt;
+                    </StyledLink>
+                  </Link>
                 </Flex>
               </Container>
 

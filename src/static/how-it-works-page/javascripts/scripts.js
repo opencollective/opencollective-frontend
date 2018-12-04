@@ -1,8 +1,6 @@
 'use strict';
 
-var log = console.log;
-
-log('📜 how it works');
+/* eslint-disable */
 
 var internals = {};
 
