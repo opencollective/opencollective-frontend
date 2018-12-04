@@ -1727,7 +1727,7 @@ export default function(Sequelize, DataTypes) {
 
     // Pagination
     if (limit) query.limit = limit;
-    if (offset) queries.offset = offset;
+    if (offset) query.offset = offset;
 
     // OrderBy
     if (order) query.order = order;
