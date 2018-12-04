@@ -278,7 +278,8 @@ Array [
             >
               <a
                 className="c12"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 <span>
                   How it Works
@@ -993,7 +994,8 @@ Array [
             >
               <a
                 className="c17"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -1509,7 +1511,8 @@ Array [
             >
               <a
                 className="c12"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 <span>
                   How it Works
@@ -2224,7 +2227,8 @@ Array [
             >
               <a
                 className="c17"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -3180,7 +3184,8 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c18"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 <span>
                   How it Works
@@ -3411,7 +3416,8 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c37"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -3927,7 +3933,8 @@ Array [
             >
               <a
                 className="c12"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 <span>
                   How it Works
@@ -4744,7 +4751,8 @@ Array [
             >
               <a
                 className="c17"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 How it Works
               </a>
@@ -5260,7 +5268,8 @@ Array [
             >
               <a
                 className="c12"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 <span>
                   How it Works
@@ -6148,7 +6157,8 @@ Array [
             >
               <a
                 className="c17"
-                href="/learn-more"
+                href="/how-it-works"
+                onClick={[Function]}
               >
                 How it Works
               </a>
