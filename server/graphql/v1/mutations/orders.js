@@ -574,6 +574,7 @@ export async function updateSubscription(remoteUser, args) {
       totalAmount: amount,
       SubscriptionId: newSubscription.id,
       updatedAt: new Date(),
+      status: status.PENDING,
     });
 
     order = await models.Order.create(newOrderDataValues);
