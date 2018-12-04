@@ -118,9 +118,11 @@ class TopBar extends React.Component {
                 </Link>
               </Box>
               <Box as="li" px={3}>
-                <NavLink href="/learn-more">
-                  <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-                </NavLink>
+                <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                  <NavLink>
+                    <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                  </NavLink>
+                </Link>
               </Box>
               <Box as="li" px={3}>
                 <NavLink href="https://medium.com/open-collective">

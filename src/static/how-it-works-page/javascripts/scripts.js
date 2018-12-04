@@ -1,9 +1,5 @@
 'use strict';
 
-var log = console.log;
-
-log('📜 how it works');
-
 var internals = {};
 
 internals.w = window.innerWidth;

@@ -39,6 +39,16 @@ class MarketingPage extends React.Component {
       this.setState({ LoggedInUser });
     });
 
+    this.loadScripts();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.pageSlug !== prevProps.pageSlug) {
+      this.loadScripts();
+    }
+  }
+
+  loadScripts() {
     if (this.props.pageSlug === 'become-a-sponsor') {
       loadScriptAsync(sponsorPageScript);
     } else if (this.props.pageSlug === 'how-it-works') {
