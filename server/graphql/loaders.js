@@ -88,33 +88,60 @@ export const loaders = req => {
           const query = {
             attributes: [
               'CollectiveId',
+              'UsingVirtualCardFromCollectiveId',
               [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))), 'count'],
             ],
             where: {
               CollectiveId: { [Op.in]: ids },
               type: 'CREDIT',
             },
+            include: [
+              {
+                model: models.Collective,
+                as: 'fromCollective',
+                attributes: ['id', 'type'],
+                required: true,
+              },
+              {
+                model: models.Collective,
+                as: 'usingVirtualCardFromCollective',
+                attributes: ['type'],
+                required: false,
+              },
+            ],
+            group: [
+              'CollectiveId',
+              'UsingVirtualCardFromCollectiveId',
+              'usingVirtualCardFromCollective.type',
+              'fromCollective.id',
+              'fromCollective.type',
+            ],
+            raw: true, // need this otherwise it automatically also fetches Transaction.id which messes up everything
           };
-          query.attributes.push('fromCollective.type');
-          query.include = [
-            {
-              model: models.Collective,
-              as: 'fromCollective',
-              attributes: [],
-              required: true,
-            },
-          ];
-          query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
-          query.group = ['fromCollective.type', 'CollectiveId'];
 
+          const fromCollectiveIdKey = 'fromCollective.id';
+          const fromCollectiveTypeKey = 'fromCollective.type';
+          const vcEmitterCollectiveTypeKey = 'usingVirtualCardFromCollective.type';
           return models.Transaction.findAll(query)
             .then(results => sortResults(ids, results, 'CollectiveId', []))
             .map(result => {
               const stats = { all: 0 };
+              const countedCollectiveIds = [];
+              const addToStats = (type, collectiveId, count) => {
+                // Ensure we only count a collective one time
+                if (!countedCollectiveIds.includes(collectiveId)) {
+                  stats[type] = (stats[type] || 0) + count;
+                  stats.all += count;
+                  countedCollectiveIds.push(collectiveId);
+                }
+              };
+
               result.forEach(r => {
                 stats.id = r.CollectiveId;
-                stats[r.type] = r.count;
-                stats.all += r.count;
+                if (r.UsingVirtualCardFromCollectiveId) {
+                  addToStats(r[vcEmitterCollectiveTypeKey], r.UsingVirtualCardFromCollectiveId, r.count);
+                }
+                addToStats(r[fromCollectiveTypeKey], r[fromCollectiveIdKey], r.count);
               });
               return stats;
             });
