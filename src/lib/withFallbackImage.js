@@ -1,9 +1,6 @@
 import { withState } from 'recompose';
-import fetch from 'cross-fetch';
 import { defaultImage } from '../constants/collectives';
 import { getDomain, imagePreview } from './utils';
-
-const fallbackFetchEnabled = false;
 
 export default ChildComponent =>
   withState('src', 'setSrc', ({ src }) => src)(
@@ -18,27 +15,6 @@ export default ChildComponent =>
         src = `https://logo.clearbit.com/${getDomain(website)}`;
       }
 
-      if (fallbackFetchEnabled && src && src !== fallback) {
-        // due to CORS issues, we should use the Image error event in the browser
-        if (process.browser) {
-          const img = new Image();
-          img.src = src;
-          img.addEventListener('error', () => {
-            setSrc(fallback);
-          });
-        } else {
-          fetch(src)
-            .then(({ status }) => {
-              if (status >= 400) {
-                setSrc(fallback);
-              }
-            })
-            .catch(() => {
-              setSrc(fallback);
-            });
-        }
-      }
-
       let image;
       if (!src) {
         image = fallback;
@@ -47,6 +23,16 @@ export default ChildComponent =>
           width: radius,
           height,
         });
+      }
+
+      if (image && image !== fallback) {
+        if (process.browser) {
+          const img = new Image();
+          img.src = image;
+          img.addEventListener('error', () => {
+            setSrc(fallback);
+          });
+        }
       }
 
       const childProps = {
