@@ -264,6 +264,7 @@
   "editCollective.menu.tiers": "Tiers",
   "editCollective.menu.expenses": "Dépenses",
   "editCollective.menu.paymentMethods": "Méthodes de paiement",
+  "editCollective.menu.virtualCards": "Chèques Cadeaux",
   "editCollective.menu.connectedAccounts": "Comptes connectés",
   "editCollective.menu.export": "Exporter",
   "editCollective.menu.advanced": "Avancé",
