@@ -18,6 +18,7 @@ import debugLib from 'debug';
 import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
+import ORDER_STATUS from '../../server/constants/order_status';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
 import { convertToCurrency } from '../../server/lib/currency';
 import path from 'path';
@@ -98,7 +99,6 @@ const init = async () => {
   }
 
   console.log(`Preparing the ${month} report for ${FromCollectiveIds.length} backers`);
-
   await Promise.each(FromCollectiveIds, processBacker);
 
   const timeLapsed = Math.round((new Date() - startTime) / 1000);
@@ -196,6 +196,12 @@ const processBacker = async FromCollectiveId => {
         createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
         SubscriptionId: { [Op.ne]: null },
       },
+      status: {
+        [Op.and]: {
+          [Op.ne]: ORDER_STATUS.ERROR,
+          [Op.ne]: ORDER_STATUS.CANCELLED,
+        },
+      },
       deletedAt: null,
     },
     include: [{ model: models.Subscription }],
@@ -204,16 +210,12 @@ const processBacker = async FromCollectiveId => {
   const ordersByCollectiveId = groupBy(orders.filter(o => !o.Subscription || o.Subscription.isActive), 'CollectiveId');
   const collectivesWithOrders = [];
   collectives.map(collective => {
-    // It's only possible to have one order with subscription active Per Collective
-    const collectiveOrder = ordersByCollectiveId[collective.id] && ordersByCollectiveId[collective.id][0];
-    collectivesWithOrders.push({
-      ...collective,
-      order: collectiveOrder,
-    });
-  });
-  collectivesWithOrders.sort((a, b) => {
-    if (get(a, 'order.totalAmount') > get(b, 'order.totalAmount')) return -1;
-    else return 1;
+    if (ordersByCollectiveId[collective.id]) {
+      collectivesWithOrders.push({
+        ...collective,
+        orders: ordersByCollectiveId[collective.id],
+      });
+    }
   });
   const stats = await computeStats(collectivesWithOrders, backerCollective.currency);
   const relatedCollectives = await models.Collective.getCollectivesSummaryByTag(
@@ -412,10 +414,11 @@ const computeStats = async (collectives, currency = 'USD') => {
         tagsIndex[t]++;
       });
     }
-    if (collective.order) {
-      stats.totalDonatedPerCurrency[collective.order.currency] =
-        stats.totalDonatedPerCurrency[collective.order.currency] || 0;
-      stats.totalDonatedPerCurrency[collective.order.currency] += collective.order.totalAmount;
+    if (collective.orders && collective.orders.length > 0) {
+      for (const order of collective.orders) {
+        stats.totalDonatedPerCurrency[order.currency] = stats.totalDonatedPerCurrency[order.currency] || 0;
+        stats.totalDonatedPerCurrency[order.currency] += order.totalAmount;
+      }
     }
     if (expenses && expenses.length > 0) {
       stats.expenses += expenses.length;
