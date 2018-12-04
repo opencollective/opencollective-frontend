@@ -5457,6 +5457,52 @@ Array [
   padding-bottom: 4px;
   text-align: center;
   width: 30px;
+  border-style: solid;
+}
+
+.c12 {
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-left: 4px;
+  margin-right: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  text-align: center;
+  width: 30px;
+  border-style: solid;
+}
+
+.c12 {
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-left: 4px;
+  margin-right: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  text-align: center;
+  width: 30px;
+  border-style: solid;
+}
+
+.c12 {
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-left: 4px;
+  margin-right: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  text-align: center;
+  width: 30px;
+  border-style: solid;
 }
 
 .c5 {
