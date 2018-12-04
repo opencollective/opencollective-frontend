@@ -16,6 +16,7 @@ import { Link } from '../server/pages';
 import { get } from 'lodash';
 import styled, { css } from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
+import EditVirtualCards from './EditVirtualCards';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -68,6 +69,7 @@ class EditCollectiveForm extends React.Component {
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
+    this.showVirtualCards = collective.canCreateVirtualCards;
     this.members = collective.members && collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
@@ -512,6 +514,15 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
               </MenuItem>
             )}
+            {this.showVirtualCards && (
+              <MenuItem
+                selected={this.state.section === 'virtualCards'}
+                onClick={() => this.showSection('virtualCards')}
+                className="MenuItem virtualCards"
+              >
+                <FormattedMessage id="editCollective.menu.virtualCards" defaultMessage="Gift Cards" />
+              </MenuItem>
+            )}
             <MenuItem
               selected={this.state.section === 'connectedAccounts'}
               onClick={() => this.showSection('connectedAccounts')}
@@ -609,6 +620,7 @@ class EditCollectiveForm extends React.Component {
                   onChange={this.handleObjectChange}
                 />
               )}
+              {this.state.section === 'virtualCards' && <EditVirtualCards collective={collective} />}
               {this.state.section === 'connectedAccounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
