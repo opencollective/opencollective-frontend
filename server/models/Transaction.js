@@ -249,9 +249,22 @@ export default (Sequelize, DataTypes) => {
     if (this.ExpenseId) return this.getExpense({ paranoid: false });
   };
 
+  /**
+   * Returns the transaction payment method provider collective ID, which is
+   * either the virtual card provider if using a virtual card or
+   * `CollectiveId` otherwise.
+   */
+  Transaction.prototype.paymentMethodProviderCollectiveId = function() {
+    if (this.UsingVirtualCardFromCollectiveId) {
+      return this.UsingVirtualCardFromCollectiveId;
+    }
+    return this.type === 'DEBIT' ? this.CollectiveId : this.FromCollectiveId;
+  };
+
   Transaction.prototype.getDetailsForUser = function(user) {
+    const sourceCollective = this.paymentMethodProviderCollectiveId();
     return user.populateRoles().then(() => {
-      if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(this.CollectiveId) || user.isRoot()) {
+      if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(sourceCollective) || user.isRoot()) {
         return this.uuid;
       } else {
         return null;

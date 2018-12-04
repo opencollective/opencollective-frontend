@@ -1650,25 +1650,32 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * A sequelize OR condition that will select all collective transactions:
-   * - Debit transactions made by collective without using a virtual card
+   * - Debit transactions made by collective
    * - Debit transactions made using a virtual card from collective
    * - Credit transactions made to collective
+   *
+   * @param {bool} includeUsedVirtualCardsEmittedByOthers will remove transactions using virtual
+   *  cards from other collectives when set to false.
    */
-  Collective.prototype.transactionsWhereQuery = function() {
+  Collective.prototype.transactionsWhereQuery = function(includeUsedVirtualCardsEmittedByOthers = true) {
+    const debitTransactionOrQuery = includeUsedVirtualCardsEmittedByOthers
+      ? // Include all transactions made by this collective or using one of its
+        // virtual cards
+        { CollectiveId: this.id, UsingVirtualCardFromCollectiveId: this.id }
+      : // Either Collective made the transaction without using a virtual card,
+        // or a transaction was made using one of its virtual cards - but don't
+        // include virtual cards used emitted by other collectives
+        [
+          { CollectiveId: this.id, UsingVirtualCardFromCollectiveId: null },
+          { UsingVirtualCardFromCollectiveId: this.id },
+        ];
+
     return {
       [Op.or]: [
         // Debit transactions
         {
           type: 'DEBIT',
-          [Op.or]: [
-            // Either Collective made the transaction without virtual card
-            {
-              CollectiveId: this.id,
-              UsingVirtualCardFromCollectiveId: null,
-            },
-            // Or a transaction was made using one of its virtual card
-            { UsingVirtualCardFromCollectiveId: this.id },
-          ],
+          [Op.or]: debitTransactionOrQuery,
         },
         // Credit transactions
         {
@@ -1683,15 +1690,28 @@ export default function(Sequelize, DataTypes) {
    * Get all transactions for this collective.
    */
   Collective.prototype.getTransactions = function({
+    HostCollectiveId,
     startDate,
     endDate,
     type,
     offset,
     limit,
+    attributes,
     order = [['createdAt', 'DESC']],
+    includeUsedVirtualCardsEmittedByOthers = true,
   }) {
     // Base query
-    const query = { where: this.transactionsWhereQuery() };
+    const query = { where: this.transactionsWhereQuery(includeUsedVirtualCardsEmittedByOthers) };
+
+    // Select attributes
+    if (attributes) {
+      query.attributes = attributes;
+    }
+
+    // Filter on host
+    if (HostCollectiveId) {
+      query.where.HostCollectiveId = HostCollectiveId;
+    }
 
     // Filter on date
     if (startDate && endDate) {

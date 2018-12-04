@@ -126,12 +126,13 @@ const queries = {
         attributes: ['createdAt', 'HostCollectiveId', 'amountInHostCurrency', 'hostCurrency'],
         where: {
           type: 'CREDIT',
-          [Op.or]: {
-            FromCollectiveId: fromCollective.id,
-            UsingVirtualCardFromCollectiveId: fromCollective.id,
-          },
+          [Op.or]: [
+            { FromCollectiveId: fromCollective.id, UsingVirtualCardFromCollectiveId: null },
+            { UsingVirtualCardFromCollectiveId: fromCollective.id },
+          ],
         },
       });
+
       const hostsById = {};
       const invoicesByKey = {};
       await Promise.map(transactions, async transaction => {
@@ -205,10 +206,10 @@ const queries = {
       endsAt.setMonth(startsAt.getMonth() + 1);
 
       const where = {
-        [Op.or]: {
-          FromCollectiveId: fromCollective.id,
-          UsingVirtualCardFromCollectiveId: fromCollective.id,
-        },
+        [Op.or]: [
+          { FromCollectiveId: fromCollective.id, UsingVirtualCardFromCollectiveId: null },
+          { UsingVirtualCardFromCollectiveId: fromCollective.id },
+        ],
         HostCollectiveId: host.id,
         createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
         type: 'CREDIT',
@@ -218,6 +219,7 @@ const queries = {
       if (transactions.length === 0) {
         throw new errors.NotFound('No transactions found');
       }
+
       const invoice = {
         title: get(host, 'settings.invoiceTitle') || 'Donation Receipt',
         HostCollectiveId: host.id,
@@ -232,6 +234,7 @@ const queries = {
       });
       invoice.FromCollectiveId = fromCollective.id;
       invoice.totalAmount = totalAmount;
+      invoice.currency = invoice.currency || host.currency;
       invoice.transactions = transactions;
       return invoice;
     },
@@ -264,9 +267,7 @@ const queries = {
       }
 
       // If using a virtualcard, then billed collective will be the emitter
-      const fromCollectiveId = transaction.UsingVirtualCardFromCollectiveId
-        ? transaction.UsingVirtualCardFromCollectiveId
-        : transaction.FromCollectiveId;
+      const fromCollectiveId = transaction.paymentMethodProviderCollectiveId();
 
       // Ensure user is admin of collective
       if (!req.remoteUser.isAdmin(fromCollectiveId)) {
