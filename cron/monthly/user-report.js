@@ -112,10 +112,7 @@ const processBacker = async FromCollectiveId => {
   const query = {
     attributes: ['CollectiveId', 'HostCollectiveId'],
     where: {
-      [Op.or]: {
-        FromCollectiveId,
-        UsingVirtualCardFromCollectiveId: FromCollectiveId,
-      },
+      FromCollectiveId,
       type: 'CREDIT',
       createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
     },
