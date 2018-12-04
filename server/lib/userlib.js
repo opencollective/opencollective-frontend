@@ -18,7 +18,9 @@ export default {
   },
 
   getUserData(email) {
-    if (!config.clearbit || config.clearbit.match(/x+/)) return Promise.resolve();
+    if (!config.clearbit || !config.clearbit.key) {
+      return Promise.resolve();
+    }
 
     if (!email || !email.match(/.+@.+\..+/)) {
       return Promise.resolve();

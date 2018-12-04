@@ -1,13 +1,15 @@
 import config from 'config';
 import Promise from 'bluebird';
 import Twitter from 'twitter';
-import activityType from '../constants/activities';
-import models from '../models';
-import { get } from 'lodash';
-import debugLib from 'debug';
-const debug = debugLib('twitter');
-import { formatCurrency } from '../lib/utils';
 import IntlMessageFormat from 'intl-messageformat';
+import debugLib from 'debug';
+import { has, get } from 'lodash';
+
+import models from '../models';
+import { formatCurrency } from '../lib/utils';
+import activityType from '../constants/activities';
+
+const debug = debugLib('twitter');
 
 const tweetUpdate = async activity => {
   const tweet = twitterLib.compileTweet('updatePublished', {
@@ -90,19 +92,19 @@ const tweetStatus = (twitterAccount, status, url, options = {}) => {
     return;
   }
 
-  const client = new Twitter({
-    consumer_key: config.twitter.consumerKey,
-    consumer_secret: config.twitter.consumerSecret,
-    access_token_key: twitterAccount.clientId,
-    access_token_secret: twitterAccount.token,
-  });
-
   if (url) {
     status += `\n${url}`;
   }
 
   debug('tweeting status: ', status, 'with options:', options);
-  if (config.twitter.consumerSecret) {
+  if (has(config, 'twitter.consumerKey') && has(config, 'twitter.consumerSecret')) {
+    const client = new Twitter({
+      consumer_key: get(config, 'twitter.consumerKey'),
+      consumer_secret: get(config, 'twitter.consumerSecret'),
+      access_token_key: twitterAccount.clientId,
+      access_token_secret: twitterAccount.token,
+    });
+
     const tweet = Promise.promisify(client.post, { context: client });
     return tweet('statuses/update', { status, ...options });
   } else {
@@ -121,9 +123,9 @@ Support them too!`,
       oneThousandBackers: `🎉 {collective} just reached 1,0000 backers!!! 🙌
 Support them too!`,
       updatePublished: 'Latest update from the collective: {title}',
-      monthlyStats: `In {month}, {totalNewBackers, select, 
-  0 {no new backer joined. 😑} 
-  1 {one new backer joined.} 
+      monthlyStats: `In {month}, {totalNewBackers, select,
+  0 {no new backer joined. 😑}
+  1 {one new backer joined.}
   other {{totalNewBackers} {totalNewBackers, plural, one {backer} other {backers}} joined ({newBackersTwitterHandles}) - you are the best! 🙌 }
 }
 
@@ -134,7 +136,7 @@ We received {totalAmountReceived} from {totalActiveBackers} {totalActiveBackers,
 
 Top backers: {topBackersTwitterHandles}`,
       monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation. 😑
-    
+
 Our current balance is {balance}.
 
 Become a backer! 😃`,

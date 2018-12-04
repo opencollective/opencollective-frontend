@@ -5,10 +5,7 @@ if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'development';
 }
 
-if (['production', 'circleci'].indexOf(process.env.NODE_ENV) === -1) {
-  dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-}
-
+dotenv.config();
 debug.enable(process.env.DEBUG);
 
 // Normalize Memcachier environment variables (production / heroku)

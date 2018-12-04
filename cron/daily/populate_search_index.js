@@ -1,17 +1,15 @@
-import config from 'config';
-import algoliasearch from 'algoliasearch';
 import Promise from 'bluebird';
+import debugLib from 'debug';
 import { Op } from 'sequelize';
 
-import models from '../../server/models';
-import { types as collectiveTypes } from '../../server/constants/collectives';
-import { chunkArray } from '../../server/lib/utils';
+import algolia from '../../server/lib/algolia';
 import emailLib from '../../server/lib/email';
-import debugLib from 'debug';
+import models from '../../server/models';
+import { chunkArray } from '../../server/lib/utils';
+import { types as collectiveTypes } from '../../server/constants/collectives';
 
 const debug = debugLib('populate_search_index');
 
-const { appId: ALGOLIA_APP_ID, appKey: ALGOLIA_KEY, index: ALGOLIA_INDEX } = config.algolia;
 const chunkSize = 10; // number of collectives to send at once
 
 const done = error => {
@@ -71,8 +69,7 @@ const populateIndex = async () => {
     };
   });
 
-  debug('initializing search index');
-  const index = initializeClientandIndex(ALGOLIA_INDEX);
+  const index = algolia.getIndex();
 
   // we need to send these in batches, there is a limit of 18kb per request
   const chunkedData = chunkArray(searchData, chunkSize);
@@ -86,14 +83,6 @@ const populateIndex = async () => {
     0,
   );
   debug(`Total collectives indexed: ${indexedCount}`);
-};
-
-const initializeClientandIndex = indexName => {
-  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY, {
-    protocol: 'https:',
-  });
-  const index = client.initIndex(indexName);
-  return index;
 };
 
 const run = () => {

@@ -1,15 +1,17 @@
 import config from 'config';
-import { isArray, pick, get, merge, includes } from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
 import debugLib from 'debug';
-import templates from './emailTemplates';
-import { isEmailInternal } from './utils';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import he from 'he';
+import { isArray, pick, get, merge, includes } from 'lodash';
+
+import templates from './emailTemplates';
+import { isEmailInternal } from './utils';
+
 const debug = debugLib('email');
 
 const render = (template, data) => {
@@ -37,7 +39,7 @@ const render = (template, data) => {
 };
 
 const generateUnsubscribeToken = (email, collectiveSlug, type) => {
-  const uid = `${email}.${collectiveSlug || 'any'}.${type}.${config.keys.opencollective.secret}`;
+  const uid = `${email}.${collectiveSlug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
   const token = crypto
     .createHash('md5')
     .update(uid)
@@ -81,7 +83,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       return false;
     }
     // if not in production, only send out emails to bcc'd opencollective address
-    if (process.env.NODE_ENV !== 'production' && !isEmailInternal(recipient)) {
+    if (config.env !== 'production' && !isEmailInternal(recipient)) {
       debug(`${recipient} is an external email address, skipping in development environment`);
       return false;
     } else {
@@ -89,9 +91,9 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     }
   });
 
-  if (process.env.NODE_ENV === 'staging') {
+  if (config.env === 'staging') {
     subject = `[STAGING] ${subject}`;
-  } else if (process.env.NODE_ENV !== 'production' && process.env.WEBSITE_URL !== 'https://opencollective.com') {
+  } else if (config.env !== 'production' && config.host.website !== 'https://opencollective.com') {
     subject = `[TESTING] ${subject}`;
   }
 
@@ -125,7 +127,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
   if (process.env.ONLY) {
     debug('Only sending email to ', process.env.ONLY);
     to = process.env.ONLY;
-  } else if (process.env.NODE_ENV !== 'production') {
+  } else if (config.env !== 'production') {
     if (!to) {
       return Promise.reject(new Error('emailLib.sendMessage error: No recipient defined'));
     }
@@ -137,7 +139,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     debug('emailLib.sendMessage error: No recipient to send to, only sending to bcc', options.bcc);
   }
 
-  if (config.mailgun.user || process.env.MAILDEV) {
+  if ((get(config, 'mailgun.user') && get(config, 'mailgun.password')) || process.env.MAILDEV) {
     const transport = process.env.MAILDEV
       ? {
           ignoreTLS: true,
@@ -146,8 +148,8 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       : {
           service: 'Mailgun',
           auth: {
-            user: config.mailgun.user,
-            pass: config.mailgun.password,
+            user: get(config, 'mailgun.user'),
+            pass: get(config, 'mailgun.password'),
           },
         };
     const mailgun = nodemailer.createTransport(transport);
@@ -160,7 +162,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       const attachments = options.attachments;
 
       // only attach tag in production to keep data clean
-      const tag = process.env.NODE_ENV === 'production' ? options.tag : 'internal';
+      const tag = config.env === 'production' ? options.tag : 'internal';
       const headers = { 'X-Mailgun-Tag': tag, 'X-Mailgun-Dkim': 'yes' };
       debug('mailgun> sending email to ', to, 'bcc', bcc);
 

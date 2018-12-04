@@ -29,7 +29,7 @@ if (process.env.RECORD) {
 
 jsonData.application = {
   name: 'client',
-  api_key: config.keys.opencollective.api_key,
+  api_key: config.keys.opencollective.apiKey,
 };
 
 export const data = path => {

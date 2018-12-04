@@ -85,6 +85,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
 
     // create a fake nodemailer transport
     beforeEach(() => {
+      config.mailgun = config.mailgun || {};
       config.mailgun.user = 'xxxxx';
       config.mailgun.password = 'password';
 

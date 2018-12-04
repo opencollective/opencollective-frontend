@@ -1,16 +1,13 @@
-import config from 'config';
-import algoliasearch from 'algoliasearch';
 import { Op } from 'sequelize';
 import moment from 'moment-timezone';
-
-import models from '../../server/models';
-import { types as collectiveTypes } from '../../server/constants/collectives';
-import emailLib from '../../server/lib/email';
 import debugLib from 'debug';
 
-const debug = debugLib('clean_search_index');
+import algolia from '../../server/lib/algolia';
+import emailLib from '../../server/lib/email';
+import models from '../../server/models';
+import { types as collectiveTypes } from '../../server/constants/collectives';
 
-const { appId: ALGOLIA_APP_ID, appKey: ALGOLIA_KEY, index: ALGOLIA_INDEX } = config.algolia;
+const debug = debugLib('clean_search_index');
 
 const yesterday = moment()
   .tz('America/New_York')
@@ -35,14 +32,6 @@ const done = error => {
   process.exit();
 };
 
-const initializeClientandIndex = indexName => {
-  const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_KEY, {
-    protocol: 'https:',
-  });
-  const index = client.initIndex(indexName);
-  return index;
-};
-
 const cleanIndex = async () => {
   const collectives = await models.Collective.findAll({
     where: {
@@ -61,7 +50,7 @@ const cleanIndex = async () => {
   debug(`Collectives found: ${collectives.length}`, ids);
 
   if (collectives.length > 0) {
-    const index = initializeClientandIndex(ALGOLIA_INDEX);
+    const index = algolia.getIndex();
     return index.deleteObjects(ids);
   }
   return;

@@ -1,7 +1,8 @@
 // testing libraries
+import config from 'config';
+import sinon from 'sinon';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import sinon from 'sinon';
 
 // class containing 'search' method to stub
 import Index from 'algoliasearch/src/Index';
@@ -44,11 +45,23 @@ describe('graphql.search.test.js', () => {
   });
 
   beforeEach(() => {
+    // Make sure the library is constructed
+    config.algolia = config.algolia || {};
+    config.algolia.appId = config.algolia.appId || 'x';
+    config.algolia.appKey = config.algolia.appKey || 'y';
+    config.algolia.index = config.algolia.index || 'z';
+
     sandbox.stub(Index.prototype, 'search');
     Index.prototype.search.returns(Promise.resolve({ hits, nbHits }));
   });
 
-  afterEach(() => sandbox.restore());
+  afterEach(() => {
+    if (config.algolia.appId === 'x') delete config.algolia.appId;
+    if (config.algolia.appKey === 'y') delete config.algolia.appKey;
+    if (config.algolia.index === 'z') delete config.algolia.index;
+
+    sandbox.restore();
+  });
 
   it('returns list of CollectiveSearch types', async () => {
     const query = `

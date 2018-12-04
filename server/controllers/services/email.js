@@ -1,12 +1,13 @@
-import emailLib from '../../lib/email';
 import Promise from 'bluebird';
 import config from 'config';
 import request from 'request-promise';
-import { pick } from 'lodash';
 import crypto from 'crypto';
 import debug from 'debug';
+import { pick, get } from 'lodash';
+
 import models, { sequelize, Op } from '../../models';
 import errors from '../../lib/errors';
+import emailLib from '../../lib/email';
 
 const debugEmail = debug('email');
 const debugWebhook = debug('webhook');
@@ -14,7 +15,7 @@ const debugWebhook = debug('webhook');
 export const unsubscribe = (req, res, next) => {
   const { type, email, slug, token } = req.params;
 
-  const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.secret}`;
+  const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
   const computedToken = crypto
     .createHash('md5')
     .update(identifier)
@@ -110,7 +111,7 @@ export const approve = (req, res, next) => {
     json: true,
     auth: {
       user: 'api',
-      pass: config.mailgun.api_key,
+      pass: get(config, 'mailgun.apiKey'),
     },
   };
 

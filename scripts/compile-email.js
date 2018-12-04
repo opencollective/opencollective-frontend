@@ -1,8 +1,12 @@
 /**
  * Use ./scripts/watch_email_template.sh [template] to compile an email template
  */
+import config from 'config';
 import nodemailer from 'nodemailer';
 import config from 'config';
+import juice from 'juice';
+
+import libEmailTemplates from '../server/lib/emailTemplates';
 
 const templateName = process.argv[2];
 const data = {};
@@ -15,16 +19,14 @@ data['onboarding.day21.noTwitter'] = {
     slug: 'yeoman',
   },
 };
-data['onboarding.day28'] = data['onboarding.day35.inactive'] =
-  data['onboarding.day21.noTwitter'];
+data['onboarding.day28'] = data['onboarding.day35.inactive'] = data['onboarding.day21.noTwitter'];
 data['collective.expense.approved'] = {
   host: { id: 1, name: 'WWCode', slug: 'wwcode' },
   expense: {
     amount: 1250,
     currency: 'USD',
     privateMessage: 'Private instructions',
-    attachment:
-      'https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG',
+    attachment: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG',
   },
   collective: { slug: 'wwcodeaustin', name: 'Women Who Code Austin' },
   fromCollective: { slug: 'xdamman', name: 'Xavier Damman' },
@@ -41,8 +43,7 @@ data['collective.expense.paid'] = {
     currency: 'USD',
     privateMessage: 'Private instructions',
     payoutMethod: 'PayPal (paypal@domain.tld)',
-    attachment:
-      'https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG',
+    attachment: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG',
   },
   collective: {
     slug: 'wwcodeaustin',
@@ -57,50 +58,52 @@ data['collective.expense.paid'] = {
     viewLatestExpenses: 'https://opencollective.com/wwcodeaustin/expenses',
   },
 };
-data['user.card.claimed'] = {
+(data['user.card.claimed'] = {
   currency: 'USD',
   initialBalance: 10000,
-  expiryDate: (new Date).setMonth((new Date).getMonth() + 3),
+  expiryDate: new Date().setMonth(new Date().getMonth() + 3),
   emitter: {
     slug: 'triplebyte',
     name: 'Triplebyte',
-    description: 'Triplebyte lets talented software engineers skip resumes  recruiters and go straight to final interviews at multiple top tech companies at once.',
+    description:
+      'Triplebyte lets talented software engineers skip resumes  recruiters and go straight to final interviews at multiple top tech companies at once.',
     image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
     backgroundImage: 'https://d.pr/free/i/GEbbjb+',
-    previewImage: 'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png'
+    previewImage:
+      'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
   },
   loginLink: 'https://opencollective.com/signin?next=',
-},
-data['ticket.confirmed'] = {
-  recipient: {
-    name: 'Xavier Damman',
-  },
-  event: {
-    name: 'Sustain 2019 San Francisco',
-    slug: 'sutain-2019-sf',
-    startsAt: '2019-06-19 17:15:00+00',
-    endsAt: '2019-06-19 21:15:00+00',
-    timezone: 'America/Los_Angeles',
-    locationName: 'Github HQ',
-    address: '88 Colin P Kelly Jr Street, San Francisco, CA',
-  },
-  collective: {
-    slug: 'sustainoss',
-  },
-  tier: {
-    id: 1,
-    name: 'Regular Ticket',
-    description: 'This gives you access to all the workshops',
-    amount: 1000,
-    currency: 'USD',
-  },
-  order: {
-    id: 2312321,
-    quantity: 2,
-    totalAmount: 5000,
-    currency: 'USD',
-  },
-};
+}),
+  (data['ticket.confirmed'] = {
+    recipient: {
+      name: 'Xavier Damman',
+    },
+    event: {
+      name: 'Sustain 2019 San Francisco',
+      slug: 'sutain-2019-sf',
+      startsAt: '2019-06-19 17:15:00+00',
+      endsAt: '2019-06-19 21:15:00+00',
+      timezone: 'America/Los_Angeles',
+      locationName: 'Github HQ',
+      address: '88 Colin P Kelly Jr Street, San Francisco, CA',
+    },
+    collective: {
+      slug: 'sustainoss',
+    },
+    tier: {
+      id: 1,
+      name: 'Regular Ticket',
+      description: 'This gives you access to all the workshops',
+      amount: 1000,
+      currency: 'USD',
+    },
+    order: {
+      id: 2312321,
+      quantity: 2,
+      totalAmount: 5000,
+      currency: 'USD',
+    },
+  });
 data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
 data['ticket.confirmed.fearlesscitiesbrussels'] = data['ticket.confirmed'];
 data['github.signup'] = {
@@ -163,10 +166,8 @@ data['user.monthlyreport'] = {
         publicUrl: 'cycle.js.org',
         name: 'Between the Wires',
         slug: 'cyclejs',
-        image:
-          'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
-        backgroundImage:
-          'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
+        image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+        backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
         mission:
           'We are on a mission to explore and develop new technologies for psychological, emotional and spiritual flourishing.',
         stats: {
@@ -190,10 +191,8 @@ data['user.monthlyreport'] = {
         publicUrl: 'cycle.js.org',
         name: 'Between the Wires',
         slug: 'cyclejs',
-        image:
-          'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
-        backgroundImage:
-          'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
+        image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+        backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
         mission:
           'We are on a mission to explore and develop new technologies for psychological, emotional and spiritual flourishing.',
         stats: {
@@ -212,14 +211,11 @@ data['user.monthlyreport'] = {
   relatedCollectives: [
     {
       currency: 'USD',
-      image:
-        'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
-      backgroundImage:
-        'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
+      image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+      backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
       slug: 'cyclejs',
       name: 'Cycle.js',
-      mission:
-        'We are on a mission to provide a framework for clean code, easy debugging experience, and fun.',
+      mission: 'We are on a mission to provide a framework for clean code, easy debugging experience, and fun.',
       // totalDonations: 41,
       tier: 'backer',
       yearlyIncome: 6271 * 100,
@@ -227,14 +223,11 @@ data['user.monthlyreport'] = {
     },
     {
       currency: 'USD',
-      image:
-        'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
-      backgroundImage:
-        'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
+      image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+      backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
       slug: 'cyclejs',
       name: 'Cycle.js',
-      mission:
-        'We are on a mission to provide a framework for clean code, easy debugging experience, and fun.',
+      mission: 'We are on a mission to provide a framework for clean code, easy debugging experience, and fun.',
       // totalDonations: 41,
       tier: 'backer',
       yearlyIncome: 6271 * 100,
@@ -242,14 +235,11 @@ data['user.monthlyreport'] = {
     },
     {
       currency: 'USD',
-      image:
-        'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
-      backgroundImage:
-        'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
+      image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+      backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
       slug: 'cyclejs',
       name: 'Cycle.js',
-      mission:
-        'We are on a mission to provide a framework for clean code, easy debugging experience, and fun.',
+      mission: 'We are on a mission to provide a framework for clean code, easy debugging experience, and fun.',
       // totalDonations: 41,
       tier: 'backer',
       yearlyIncome: 6271 * 100,
@@ -294,9 +284,7 @@ const getTemplateAttributes = str => {
   do {
     tokens = lines[index++].match(/^([a-z]+):(.+)/i);
     if (tokens) {
-      attributes[tokens[1].toLowerCase()] = tokens[2]
-        .replace(/<br( \/)?>/g, '\n')
-        .trim();
+      attributes[tokens[1].toLowerCase()] = tokens[2].replace(/<br( \/)?>/g, '\n').trim();
     }
   } while (tokens);
 
@@ -313,19 +301,13 @@ if (!templateName) {
   console.log('Where <name> is the name of a template found in:');
   console.log('./server/lib/emailTemplates\n');
   console.log('  Example 1: npm run -s compile:email user.monthlyreport\n');
-  console.log(
-    '  Example 2: npm run -s compile:email email.approve > email-approve.html\n',
-  );
+  console.log('  Example 2: npm run -s compile:email email.approve > email-approve.html\n');
   console.log('Note: `-s` switch is requried to suppress warnings from npm.');
-  console.log(
-    'Note: Edit the script to specify the data that is passed to the template.',
-  );
+  console.log('Note: Edit the script to specify the data that is passed to the template.');
 } else if (!data[templateName]) {
   console.log('There is no mocked data defined for this template.');
   console.log('Please add mocked data by editing `scripts/compile-email.js`.');
 } else {
-  const juice = require('juice');
-  const libEmailTemplates = require('../server/lib/emailTemplates');
   const template = libEmailTemplates[templateName];
   if (template) {
     const emailData = { ...data[templateName], ...defaultData };
@@ -335,13 +317,13 @@ if (!templateName) {
       text = libEmailTemplates[`${templateName}.text`](emailData);
     }
 
-    if (process.env.MAILGUN_PASSWORD) {
+    if (has(config, 'mailgun.user') && has(config, 'mailgun.password')) {
       const attributes = getTemplateAttributes(html);
       const mailgun = nodemailer.createTransport({
         service: 'Mailgun',
         auth: {
-          user: config.mailgun.user,
-          pass: config.mailgun.password,
+          user: get(config, 'mailgun.user'),
+          pass: get(config, 'mailgun.password'),
         },
       });
       console.log('>>> Sending by email to ', process.env.ONLY);

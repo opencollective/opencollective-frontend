@@ -16,10 +16,12 @@
     }
   },
   "host": {
-    "api": "https://opencollective-staging-api.herokuapp.com"
+    "api": "https://api-staging.opencollective.com",
+    "website": "https://staging.opencollective.com"
   },
   "stripe": {
-    "redirectUri": "https://opencollective-staging-api.herokuapp.com/connected-accounts/stripe/callback",
-    "platformPublishableKey": "pk_test_VgSB4VSg2wb5LdAkz7p38Gw8"
+    "redirectUri": "https://api-staging.opencollective.com/connected-accounts/stripe/callback"
   }
 }
+
+

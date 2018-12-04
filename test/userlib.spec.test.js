@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as utils from '../test/utils';
 
 import config from 'config';
-config.clearbit = '***';
+config.clearbit = { key: '***' };
 
 import userlib from '../server/lib/userlib';
 import sinon from 'sinon';

@@ -157,7 +157,7 @@ describe('stripe.routes.test.js', () => {
           CollectiveId: collective.id,
           CreatedByUserId: collective.CreatedByUserId,
         },
-        config.keys.opencollective.secret,
+        config.keys.opencollective.jwtSecret,
         { expiresIn: '1h' },
       );
       async.auto(

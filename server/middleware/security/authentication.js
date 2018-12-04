@@ -14,7 +14,7 @@ const { User } = models;
 
 const { BadRequest, CustomError, Unauthorized } = errors;
 
-const { secret } = config.keys.opencollective;
+const { jwtSecret } = config.keys.opencollective;
 
 /**
  * Middleware related to authentication.
@@ -49,11 +49,11 @@ export const parseJwtNoExpiryCheck = (req, res, next) => {
     }
   }
 
-  jwt.verify(token, secret, (err, decoded) => {
+  jwt.verify(token, jwtSecret, (err, decoded) => {
     // JWT library either returns an error or the decoded version
     if (err && err.name === 'TokenExpiredError') {
       req.jwtExpired = true;
-      req.jwtPayload = jwt.decode(token, secret); // we need to decode again
+      req.jwtPayload = jwt.decode(token, jwtSecret); // we need to decode again
     } else if (err) {
       return next(new BadRequest(err.message));
     } else {

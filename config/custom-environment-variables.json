@@ -18,9 +18,10 @@
   },
   "keys": {
     "opencollective": {
-      "api_key": "API_KEY",
-      "session_secret": "SESSION_SECRET",
-      "secret": "JWT_SECRET"
+      "apiKey": "API_KEY",
+      "sessionSecret": "SESSION_SECRET",
+      "jwtSecret": "JWT_SECRET",
+      "hashidSalt": "HASHID_SALT"
     }
   },
   "cache": {
@@ -62,7 +63,7 @@
   "mailgun": {
     "user": "MAILGUN_USER",
     "password": "MAILGUN_PASSWORD",
-    "api_key": "MAILGUN_API_KEY"
+    "apiKey": "MAILGUN_API_KEY"
   },
   "host": {
     "api": "API_URL",
@@ -73,7 +74,9 @@
   "slack": {
     "webhookUrl": "SLACK_HOOK_URL"
   },
-  "clearbit": "CLEARBIT_KEY",
+  "clearbit": {
+    "key": "CLEARBIT_KEY"
+  },
   "github": {
     "clientID": "GITHUB_CLIENT_ID",
     "clientSecret": "GITHUB_CLIENT_SECRET"
@@ -85,12 +88,6 @@
   "twitter": {
     "consumerKey": "TWITTER_CONSUMER_KEY",
     "consumerSecret": "TWITTER_CONSUMER_SECRET"
-  },
-  "session": {
-    "secret": "EXPRESS_SESSION_SECRET"
-  },
-  "expressperf": {
-    "api_key": "EXPRESS_PERF_API_KEY"
   },
   "algolia": {
     "appId": "ALGOLIA_APP_ID",

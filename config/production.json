@@ -19,11 +19,10 @@
   "host": {
     "api": "https://api.opencollective.com",
     "webapp": "https://app.opencollective.com",
-    "website": "https://www.opencollective.com"
+    "website": "https://opencollective.com"
   },
   "stripe": {
-    "redirectUri": "https://opencollective-prod-api.herokuapp.com/connected-accounts/stripe/callback",
-    "platformPublishableKey": "pk_live_qZ0OnX69UlIL6pRODicRzsZy"
+    "redirectUri": "https://api.opencollective.com/connected-accounts/stripe/callback"
   },
   "slack": {
     "privateActivityChannel": "#activity-private",
