@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import _, { get, difference, uniq, pick, omit } from 'lodash';
+import _, { get, difference, uniqBy, pick, omit } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -713,7 +713,7 @@ export default function(Sequelize, DataTypes) {
       })
       .then(users => {
         const usersFlattened = flattenArray(users);
-        return uniq(usersFlattened, user => user.id);
+        return uniqBy(usersFlattened, 'id');
       });
   };
 
