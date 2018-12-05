@@ -651,6 +651,17 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           },
         },
       },
+      createdVirtualCards: {
+        type: new GraphQLList(PaymentMethodType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          isConfirmed: {
+            type: GraphQLBoolean,
+            description: 'Wether the virtual card has been claimed or not',
+          },
+        },
+      },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) },
     };
   },
@@ -1205,6 +1216,37 @@ const CollectiveFields = () => {
         }
 
         return paymentMethods;
+      },
+    },
+    createdVirtualCards: {
+      type: new GraphQLList(PaymentMethodType),
+      description: 'Get the virtual cards created by this collective. RemoteUser must be a collective admin.',
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt },
+        isConfirmed: {
+          type: GraphQLBoolean,
+          description: 'Wether the virtual card has been claimed or not',
+        },
+      },
+      resolve: async (collective, args, req) => {
+        // Must be admin of the collective
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+          return [];
+        }
+
+        // Load all collective payment methods
+        // TODO Load this in a single query
+        const paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
+        const creditCardIds = paymentMethods.filter(p => p.type === 'creditcard').map(p => p.id);
+
+        // Get virtualcards associated with payment methods
+        const where = { SourcePaymentMethodId: { [Op.in]: creditCardIds } };
+        if (args.isConfirmed !== undefined) {
+          where.confirmedAt = { [args.isConfirmed ? Op.ne : Op.eq]: null };
+        }
+        const virtualCards = await models.PaymentMethod.findAll({ where });
+        return virtualCards;
       },
     },
     connectedAccounts: {
