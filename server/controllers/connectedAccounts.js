@@ -1,10 +1,12 @@
 import config from 'config';
-import request from 'request-promise';
 import Promise from 'bluebird';
+
+import { get } from 'lodash';
+
 import models, { Op } from '../models';
 import errors from '../lib/errors';
 import paymentProviders from '../paymentProviders';
-import { get } from 'lodash';
+import * as github from '../lib/github';
 
 const { ConnectedAccount, User } = models;
 
@@ -163,32 +165,46 @@ export const verify = (req, res, next) => {
   }
 };
 
-export const fetchAllRepositories = (req, res, next) => {
+const getGithubAccount = async req => {
   const payload = req.jwtPayload;
-  ConnectedAccount.findOne({ where: { id: payload.connectedAccountId } })
-    .then(ca => {
-      return Promise.map([1, 2, 3, 4, 5, 6, 7, 8, 9], page =>
-        request({
-          uri: 'https://api.github.com/user/repos',
-          qs: {
-            per_page: 100,
-            sort: 'pushed',
-            access_token: ca.token,
-            type: 'all',
-            page,
-          },
-          headers: {
-            'User-Agent': 'Open Collective',
-            Accept: 'application/vnd.github.mercy-preview+json', // needed to fetch 'topics', which we can use as tags
-          },
-          json: true,
-        }),
-      )
-        .then(data => [].concat(...data))
-        .filter(repo => repo.permissions && repo.permissions.push && !repo.private);
-    })
-    .then(body => res.json(body))
-    .catch(next);
+  const githubAccount = await models.ConnectedAccount.findOne({
+    where: { id: payload.connectedAccountId },
+  });
+  if (!githubAccount) {
+    throw new errors.BadRequest('No connected GitHub Account');
+  }
+  return githubAccount;
+};
+
+export const fetchAllRepositories = async (req, res, next) => {
+  const githubAccount = await getGithubAccount(req);
+  try {
+    const repos = await github.getAllUserPublicRepos(githubAccount.token);
+    res.send(repos);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getRepo = async (req, res, next) => {
+  const githubAccount = await getGithubAccount(req);
+  try {
+    const repo = await github.getRepo(req.query.name, githubAccount.token).then(res => res.data);
+    res.send(repo);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getOrgMemberships = async (req, res, next) => {
+  const githubAccount = await getGithubAccount(req);
+  try {
+    const memberships = await github.getOrgMemberships(githubAccount.token);
+    res.send(memberships);
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
 };
 
 function createConnectedAccountForCollective(CollectiveId, service) {

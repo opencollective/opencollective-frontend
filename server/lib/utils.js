@@ -421,6 +421,13 @@ export const defaultHostCollective = tag => {
       return {}; // Don't automatically assign a host anymore
     }
   }
+  if (process.env.NODE_ENV === 'development') {
+    if (tag === 'opensource') {
+      return { CollectiveId: 9805, ParentCollectiveId: 83 }; // Open Source Host Collective
+    } else {
+      return {}; // Don't automatically assign a host anymore
+    }
+  }
   return { id: 1, CollectiveId: 1 };
 };
 

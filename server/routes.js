@@ -296,6 +296,8 @@ export default app => {
    * Github API - fetch all repositories using the user's access_token
    */
   app.get('/github-repositories', connectedAccounts.fetchAllRepositories);
+  app.get('/github/repo', connectedAccounts.getRepo);
+  app.get('/github/orgMemberships', connectedAccounts.getOrgMemberships);
 
   /**
    * Application Management
