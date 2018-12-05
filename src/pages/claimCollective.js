@@ -1,13 +1,17 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
+import { get } from 'lodash';
+import { Flex } from '@rebass/grid';
 import { Github } from 'styled-icons/fa-brands/Github.cjs';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 import { getBaseApiUrl } from '../lib/utils';
+
 import { Router, Link } from '../server/pages';
 import { colors } from '../constants/theme';
 
@@ -15,7 +19,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import { H2, H5, P } from '../components/Text';
-import { Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
@@ -33,17 +36,25 @@ class ClaimCollectivePage extends React.Component {
     };
   }
 
+  static propTypes = {
+    data: PropTypes.object.isRequired, // from withData
+    claimCollective: PropTypes.func.isRequired, // from addGraphQL/addClaimCollectiveMutation
+    slug: PropTypes.string,
+    token: PropTypes.string,
+  };
+
   state = {
     error: null,
     loadingUserLogin: true,
-    loadingRepos: false,
+    loadingGithub: false,
     LoggedInUser: undefined,
-    repos: [],
+    repo: null,
+    memberships: [],
   };
 
   async componentDidMount() {
     const { getLoggedInUser, token } = this.props;
-    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
+    const LoggedInUser = await getLoggedInUser();
     this.setState({
       LoggedInUser,
       loadingUserLogin: false,
@@ -54,15 +65,29 @@ class ClaimCollectivePage extends React.Component {
       LoggedInUser &&
       LoggedInUser.collective &&
       LoggedInUser.collective.connectedAccounts.some(({ service }) => service === 'github');
+
     if (isConnected) {
-      this.setState({ loadingRepos: true });
-      const repos = await fetch(`${getBaseApiUrl()}/github-repositories?access_token=${token}`).then(response =>
-        response.json(),
-      );
-      this.setState({
-        loadingRepos: false,
-        repos,
-      });
+      const githubHandle = this.githubHandle();
+      this.setState({ loadingGithub: true });
+      if (githubHandle.includes('/')) {
+        fetch(`${getBaseApiUrl()}/github/repo?name=${githubHandle}&access_token=${token}`)
+          .then(response => response.json())
+          .then(repo => {
+            this.setState({ loadingGithub: false, repo });
+          })
+          .catch(() => {
+            this.setState({ loadingGithub: false });
+          });
+      } else {
+        fetch(`${getBaseApiUrl()}/github/orgMemberships?access_token=${token}`)
+          .then(response => response.json())
+          .then(memberships => {
+            this.setState({ loadingGithub: false, memberships });
+          })
+          .catch(() => {
+            this.setState({ loadingGithub: false });
+          });
+      }
     }
   }
 
@@ -79,11 +104,36 @@ class ClaimCollectivePage extends React.Component {
     }
   }
 
+  githubHandle() {
+    let githubHandle = get(this.props.data, 'Collective.githubHandle');
+
+    // Transition from website to githubHandle
+    const website = get(this.props.data, 'Collective.website');
+    if (!githubHandle && website && website.includes('://github.com/')) {
+      githubHandle = website.split('://github.com/')[1];
+    }
+
+    return githubHandle;
+  }
+
+  isAdmin() {
+    const githubHandle = this.githubHandle();
+
+    if (githubHandle.includes('/')) {
+      // A repository GitHub Handle (most common)
+      return get(this.state.repo, 'permissions.admin');
+    } else {
+      // An organization GitHub Handle
+      const membership = this.state.memberships.find(membership => membership.organization.login === githubHandle);
+      return get(membership, 'state') === 'active' && get(membership, 'role') === 'admin';
+    }
+  }
+
   render() {
     const { data, slug, token } = this.props;
-    const { error, LoggedInUser, loadingUserLogin, loadingRepos, repos } = this.state;
+    const { error, LoggedInUser, loadingUserLogin, loadingGithub } = this.state;
 
-    const { Collective: { id, name, website } = {}, loading } = data;
+    const { Collective, loading } = data;
 
     if (error) {
       data.error = data.error || error;
@@ -95,12 +145,19 @@ class ClaimCollectivePage extends React.Component {
 
     const connectUrl = `/api/connected-accounts/github?redirect=${WEBSITE_URL}/${slug}/claim`;
 
-    const websitePath = website && new RegExp(website.split('://')[1], 'i');
-    const [repo] = repos.filter(({ html_url }) => html_url.match(websitePath));
-
-    const isAdmin = repo && repo.permissions.admin;
-
-    const invalid = repos.length > 0 && !isAdmin;
+    let step, invalid;
+    if (loadingUserLogin) {
+      step = 'loading';
+    } else if (loadingGithub) {
+      step = 'analyzing';
+    } else if (this.isAdmin()) {
+      step = 'valid';
+    } else if (token || this.state.repo || this.state.org) {
+      step = 'invalid';
+      invalid = true;
+    } else {
+      step = 'initial';
+    }
 
     return (
       <Fragment>
@@ -109,7 +166,7 @@ class ClaimCollectivePage extends React.Component {
           <Container background="linear-gradient(180deg, #DBECFF, #FFFFFF)" py={4}>
             <Container display="flex" flexDirection="column" alignItems="center" mx="auto" maxWidth={1200} py={4}>
               <img src={defaultPledgedLogo} alt="Pledged Collective" />
-              <H2 as="h1">{name}</H2>
+              <H2 as="h1">{Collective.name}</H2>
 
               <Container
                 bg="white.full"
@@ -124,8 +181,11 @@ class ClaimCollectivePage extends React.Component {
                 py={4}
                 width={0.8}
               >
-                {(loadingRepos || loadingUserLogin) && <P textAlign="center">Analyzing your GitHub repos...</P>}
-                {!token && repos.length === 0 && (
+                {step === 'loading' && <P textAlign="center">Loading...</P>}
+
+                {step === 'analyzing' && <P textAlign="center">Analyzing your GitHub permissions...</P>}
+
+                {step === 'initial' && (
                   <Fragment>
                     <H5 textAlign="left" fontWeight="medium" mb={4}>
                       To claim this collective you first need to authenticate with your GitHub account.
@@ -163,7 +223,7 @@ class ClaimCollectivePage extends React.Component {
                     </StyledLink>
                   </Fragment>
                 )}
-                {invalid && (
+                {step === 'invalid' && (
                   <Fragment>
                     <Flex justifyContent="center" mb={4}>
                       <svg
@@ -208,7 +268,7 @@ class ClaimCollectivePage extends React.Component {
                     </StyledLink>
                   </Fragment>
                 )}
-                {token && isAdmin && (
+                {step === 'valid' && (
                   <Fragment>
                     <Flex justifyContent="center" mb={4}>
                       <svg
@@ -238,7 +298,7 @@ class ClaimCollectivePage extends React.Component {
                       buttonSize="medium"
                       maxWidth={300}
                       mx="auto"
-                      onClick={() => this.claim(id)}
+                      onClick={() => this.claim(data.Collective.id)}
                     >
                       Activate open collective
                     </StyledButton>
@@ -266,6 +326,7 @@ const addPledgesData = graphql(gql`
       id
       name
       website
+      githubHandle
     }
   }
 `);

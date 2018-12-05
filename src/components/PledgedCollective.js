@@ -45,6 +45,11 @@ class PledgedCollective extends React.Component {
 
     const pledges = collective.pledges.slice(0).reverse();
 
+    let website = collective.website;
+    if (!website && collective.githubHandle) {
+      website = `https://github.com/${collective.githubHandle}`;
+    }
+
     return (
       <Fragment>
         <Header title={collective.name} LoggedInUser={LoggedInUser} />
@@ -61,8 +66,8 @@ class PledgedCollective extends React.Component {
               <H2 as="h1">{collective.name}</H2>
 
               <Box mb={4} mt={3}>
-                <StyledLink href={collective.website} color="primary.500" fontSize="Caption">
-                  <ExternalLinkAlt size="1em" /> {collective.website}
+                <StyledLink href={website} color="primary.500" fontSize="Caption">
+                  <ExternalLinkAlt size="1em" /> {website}
                 </StyledLink>
               </Box>
             </Flex>

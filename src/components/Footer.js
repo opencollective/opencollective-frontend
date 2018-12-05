@@ -45,6 +45,7 @@ const navigation = {
   PLATFORM: {
     Discover: '/discover',
     'How it Works': '/how-it-works',
+    'Make a Pledge': '/pledges/new',
     'Sign Up': '/signin',
     Login: '/signin',
   },
