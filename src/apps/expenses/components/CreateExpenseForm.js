@@ -309,7 +309,7 @@ class CreateExpenseForm extends React.Component {
                   defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense."
                 />
               </p>
-              <Button className="blue" href={`/${collective.slug}/edit#expenses`}>
+              <Button className="blue" href={`/${collective.slug}/edit/expenses`}>
                 <FormattedMessage id="expense.expensePolicy.add" defaultMessage="add an expense policy" />
               </Button>
             </div>

@@ -21,7 +21,7 @@ class TeamSection extends React.Component {
     let action;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
-        href: `/${collective.slug}/edit#members`,
+        href: `/${collective.slug}/edit/members`,
         label: <FormattedMessage id="sections.team.edit" defaultMessage="Edit team members" />,
       };
     }
