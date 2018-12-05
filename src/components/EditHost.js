@@ -71,7 +71,7 @@ class EditHost extends React.Component {
     if (!newHost.id) {
       this.setState({ selectedOption: 'noHost' });
       if (window.location.search.length > 0) {
-        window.location.replace(`/${collective.slug}/edit#host`); // make sure we clean the query params if any
+        window.location.replace(`/${collective.slug}/edit/host`); // make sure we clean the query params if any
       }
     }
   }
