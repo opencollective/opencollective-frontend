@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
 
 process.env.PORT = 3066;
 
-import { get, pick, uniq } from 'lodash';
+import { get, pick, uniq, groupBy } from 'lodash';
 import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
@@ -18,6 +18,7 @@ import debugLib from 'debug';
 import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import roles from '../../server/constants/roles';
+import ORDER_STATUS from '../../server/constants/order_status';
 import { formatCurrencyObject, formatArrayToString } from '../../server/lib/utils';
 import { convertToCurrency } from '../../server/lib/currency';
 import path from 'path';
@@ -98,7 +99,6 @@ const init = async () => {
   }
 
   console.log(`Preparing the ${month} report for ${FromCollectiveIds.length} backers`);
-
   await Promise.each(FromCollectiveIds, processBacker);
 
   const timeLapsed = Math.round((new Date() - startTime) / 1000);
@@ -125,7 +125,6 @@ const processBacker = async FromCollectiveId => {
     ],
   };
   const transactions = await models.Transaction.findAll(query);
-
   console.log('>>> transactions found', transactions.length);
   const distinctTransactions = [],
     collectiveIds = {};
@@ -189,7 +188,6 @@ const processBacker = async FromCollectiveId => {
       { concurrency: 4 },
     );
   }
-
   const orders = await models.Order.findAll({
     attributes: ['id', 'CollectiveId', 'totalAmount', 'currency'],
     where: {
@@ -198,25 +196,27 @@ const processBacker = async FromCollectiveId => {
         createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
         SubscriptionId: { [Op.ne]: null },
       },
+      status: {
+        [Op.and]: {
+          [Op.ne]: ORDER_STATUS.ERROR,
+          [Op.ne]: ORDER_STATUS.CANCELLED,
+        },
+      },
+      deletedAt: null,
     },
     include: [{ model: models.Subscription }],
   });
-  const ordersByCollectiveId = {};
-  orders.map(o => {
-    ordersByCollectiveId[o.CollectiveId] = o;
-  });
+  // group orders(by collective) that either don't have subscription or have active subscription
+  const ordersByCollectiveId = groupBy(orders.filter(o => !o.Subscription || o.Subscription.isActive), 'CollectiveId');
   const collectivesWithOrders = [];
   collectives.map(collective => {
-    collectivesWithOrders.push({
-      ...collective,
-      order: ordersByCollectiveId[collective.id],
-    });
+    if (ordersByCollectiveId[collective.id]) {
+      collectivesWithOrders.push({
+        ...collective,
+        orders: ordersByCollectiveId[collective.id],
+      });
+    }
   });
-  collectivesWithOrders.sort((a, b) => {
-    if (get(a, 'order.totalAmount') > get(b, 'order.totalAmount')) return -1;
-    else return 1;
-  });
-
   const stats = await computeStats(collectivesWithOrders, backerCollective.currency);
   const relatedCollectives = await models.Collective.getCollectivesSummaryByTag(
     stats.topTags,
@@ -414,10 +414,11 @@ const computeStats = async (collectives, currency = 'USD') => {
         tagsIndex[t]++;
       });
     }
-    if (collective.order) {
-      stats.totalDonatedPerCurrency[collective.order.currency] =
-        stats.totalDonatedPerCurrency[collective.order.currency] || 0;
-      stats.totalDonatedPerCurrency[collective.order.currency] += collective.order.totalAmount;
+    if (collective.orders && collective.orders.length > 0) {
+      for (const order of collective.orders) {
+        stats.totalDonatedPerCurrency[order.currency] = stats.totalDonatedPerCurrency[order.currency] || 0;
+        stats.totalDonatedPerCurrency[order.currency] += order.totalAmount;
+      }
     }
     if (expenses && expenses.length > 0) {
       stats.expenses += expenses.length;
@@ -451,6 +452,7 @@ const computeStats = async (collectives, currency = 'USD') => {
   stats.expensesBreakdownString = `${Object.keys(categories).length > 3 ? ', mostly in' : ' in'} ${formatArrayToString(
     ar,
   )}`;
+  console.log(`>>> Stats: ${JSON.stringify(stats, null, 2)}`);
   return stats;
 };
 
