@@ -69,28 +69,34 @@ export async function processOrderWithSubscription(options, order) {
     nextPeriodStartAfter: null,
   };
 
-  let status = 'unattempted',
+  let orderProcessedStatus = 'unattempted',
     transaction;
   if (!options.dryRun) {
     if (hasReachedQuantity(order)) {
-      status = 'failure';
+      orderProcessedStatus = 'failure';
       csvEntry.error = 'Your subscription is over';
       cancelSubscription(order);
     } else {
       try {
         transaction = await paymentsLib.processOrder(order);
-        status = 'success';
+        orderProcessedStatus = 'success';
       } catch (error) {
-        status = 'failure';
+        orderProcessedStatus = 'failure';
         csvEntry.error = error.message;
       }
-      order.Subscription = Object.assign(order.Subscription, getNextChargeAndPeriodStartDates(status, order));
-      order.Subscription.chargeRetryCount = getChargeRetryCount(status, order);
-      if (status === 'success' && order.Subscription.chargeNumber !== null) order.Subscription.chargeNumber += 1;
+      order.Subscription = Object.assign(
+        order.Subscription,
+        getNextChargeAndPeriodStartDates(orderProcessedStatus, order),
+      );
+      order.Subscription.chargeRetryCount = getChargeRetryCount(orderProcessedStatus, order);
+      if (orderProcessedStatus === 'success' && order.Subscription.chargeNumber !== null) {
+        order.Subscription.chargeNumber += 1;
+        order.status = status.ACTIVE;
+      }
     }
   }
 
-  csvEntry.status = status;
+  csvEntry.status = orderProcessedStatus;
   csvEntry.retriesAfter = order.Subscription.chargeRetryCount;
   csvEntry.chargeDateAfter = dateFormat(order.Subscription.nextChargeDate);
   csvEntry.nextPeriodStartAfter = dateFormat(order.Subscription.nextPeriodStart);

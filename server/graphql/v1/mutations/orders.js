@@ -558,8 +558,9 @@ export async function updateSubscription(remoteUser, args) {
     if (amount < 100 || amount % 100 !== 0) {
       throw new Error('Invalid amount');
     }
-
-    order.Subscription.deactivate();
+    await order.Subscription.deactivate();
+    order.status = status.CANCELLED;
+    await order.save();
 
     const newSubscriptionDataValues = Object.assign(omit(order.Subscription.dataValues, ['id', 'deactivatedAt']), {
       amount: amount,
@@ -569,11 +570,11 @@ export async function updateSubscription(remoteUser, args) {
     });
 
     const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
-
-    const newOrderDataValues = Object.assign(omit(order.dataValues, ['id']), {
+    const newOrderDataValues = Object.assign(omit(order.dataValues, ['id', 'status']), {
       totalAmount: amount,
       SubscriptionId: newSubscription.id,
       updatedAt: new Date(),
+      status: status.PENDING,
     });
 
     order = await models.Order.create(newOrderDataValues);
