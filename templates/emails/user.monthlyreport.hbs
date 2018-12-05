@@ -225,7 +225,7 @@ Subject: {{{capitalize month}}} Report
           {{#if stats.expenses}}<br />They've spent a total of {{stats.totalSpentString}}{{stats.expensesBreakdownString}}.{{/if}}</li>
           {{#each collectives}}
             {{#if nextGoal}}
-              <li><a href="{{config.host.website}}/{{slug}}">{{name}}</a> needs {{{currency nextGoal.missing.amount currency=currency}}} more {{#if nextGoal.missing.interval}}per {{nextGoal.missing.interval}}{{/if}} to reach their next goal of {{nextGoal.title}} ({{nextGoal.percentage}} there). 
+              <li><a href="{{../config.host.website}}/{{slug}}">{{name}}</a> needs {{{currency nextGoal.missing.amount currency=currency}}} more {{#if nextGoal.missing.interval}}per {{nextGoal.missing.interval}}{{/if}} to reach their next goal of {{nextGoal.title}} ({{nextGoal.percentage}} there). 
               {{#if order.Subscription}}
               You are currently contributing {{{currency order.Subscription.amount currency=order.Subscription.currency}}} per {{order.Subscription.interval}}.
               (<a href="{{../config.host.website}}/{{../fromCollective.slug}}/subscriptions">increase your contribution</a>)
