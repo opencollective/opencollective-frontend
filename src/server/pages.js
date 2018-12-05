@@ -77,7 +77,10 @@ pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works)', 'marketingPa
 
 // Collective
 
-pages.add('collective', '/:slug').add('editCollective', '/:slug/edit');
+pages
+  .add('collective', '/:slug')
+  .add('editCollective', '/:slug/edit')
+  .add('editCollectiveSection', '/:slug/edit/:section', 'editCollective');
 
 export default pages;
 

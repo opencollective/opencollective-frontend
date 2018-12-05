@@ -741,6 +741,43 @@ export const getSubscriptionsQuery = gql`
   }
 `;
 
+/** A query to get the virtual cards created by a collective. Must be authenticated. */
+export const getCollectiveVirtualCards = gql`
+  query CollectiveVirtualCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int) {
+    Collective(id: $CollectiveId) {
+      createdVirtualCards(isConfirmed: $isConfirmed, limit: $limit, offset: $offset) {
+        offset
+        limit
+        total
+        paymentMethods {
+          id
+          uuid
+          currency
+          name
+          service
+          type
+          data
+          initialBalance
+          balance
+          expiryDate
+          isConfirmed
+          data
+          createdAt
+          expiryDate
+          description
+          collective {
+            id
+            slug
+            image
+            type
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const searchCollectivesQuery = gql`
   query search($term: String!, $limit: Int, $offset: Int) {
     search(term: $term, limit: $limit, offset: $offset) {

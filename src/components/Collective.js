@@ -311,7 +311,7 @@ class Collective extends React.Component {
                       )}
                       action={{
                         label: intl.formatMessage(this.messages['collective.addHostBtn']),
-                        href: `/${collective.slug}/edit#host`,
+                        href: `/${collective.slug}/edit/host`,
                       }}
                     />
                   )}

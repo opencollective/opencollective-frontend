@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Nov 30 2018 10:46:32 GMT+0100 (Central European Standard Time)
+# timestamp: Mon Dec 10 2018 09:46:19 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -72,6 +72,9 @@ type Collective implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
+
+  """Specify if collective is allowed to create new VirtualCards"""
+  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -125,6 +128,17 @@ type Collective implements CollectiveInterface {
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
   paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+
+  """
+  Get the virtual cards created by this collective. RemoteUser must be a collective admin.
+  """
+  createdVirtualCards(
+    limit: Int
+    offset: Int
+
+    """Wether the virtual card has been claimed or not"""
+    isConfirmed: Boolean
+  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -217,6 +231,9 @@ interface CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
+
+  """Specify if collective is allowed to create new VirtualCards"""
+  canCreateVirtualCards: Boolean
   slug: String
   path: String
   isHost: Boolean
@@ -287,6 +304,13 @@ interface CollectiveInterface {
     """Order entries based on given column. Set to null for no ordering."""
     orderBy: PaymenMethodOrderField
   ): [PaymentMethodType]
+  createdVirtualCards(
+    limit: Int
+    offset: Int
+
+    """Wether the virtual card has been claimed or not"""
+    isConfirmed: Boolean
+  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
 }
 
@@ -475,6 +499,9 @@ type Event implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
+
+  """Specify if collective is allowed to create new VirtualCards"""
+  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -528,6 +555,17 @@ type Event implements CollectiveInterface {
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
   paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+
+  """
+  Get the virtual cards created by this collective. RemoteUser must be a collective admin.
+  """
+  createdVirtualCards(
+    limit: Int
+    offset: Int
+
+    """Wether the virtual card has been claimed or not"""
+    isConfirmed: Boolean
+  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
@@ -675,6 +713,7 @@ type InvoiceType {
   title: String
   year: Int
   month: Int
+  day: Int
   totalAmount: Int
   currency: String
   host: CollectiveInterface
@@ -785,6 +824,9 @@ type Mutation {
     PaymentMethodId: Int
     description: String
     expiryDate: String
+
+    """The data attached to this PaymentMethod"""
+    data: PaymentMethodDataVirtualCardInputType
   ): PaymentMethodType
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
 }
@@ -1007,6 +1049,9 @@ type Organization implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
+
+  """Specify if collective is allowed to create new VirtualCards"""
+  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -1060,6 +1105,17 @@ type Organization implements CollectiveInterface {
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
   paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+
+  """
+  Get the virtual cards created by this collective. RemoteUser must be a collective admin.
+  """
+  createdVirtualCards(
+    limit: Int
+    offset: Int
+
+    """Wether the virtual card has been claimed or not"""
+    isConfirmed: Boolean
+  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   email: String
@@ -1071,6 +1127,14 @@ type PaginatedExpenses {
   limit: Int
   offset: Int
   total: Int
+}
+
+"""A list of PaymentMethod with pagination info"""
+type PaginatedPaymentMethod {
+  paymentMethods: [PaymentMethodType]
+  total: Int
+  limit: Int
+  offset: Int
 }
 
 """List of transactions with pagination data"""
@@ -1085,6 +1149,12 @@ type PaginatedTransactions {
 enum PaymenMethodOrderField {
   """Order payment methods by type (creditcard, virtualcard...)"""
   type
+}
+
+"""Input for virtual card (meta)data"""
+input PaymentMethodDataVirtualCardInputType {
+  """The email virtual card is generated for"""
+  email: String
 }
 
 """Input type for PaymentMethod (paypal/stripe)"""
@@ -1164,10 +1234,23 @@ type Query {
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
   Invoice(
     """
-    Slug of the invoice. Format: :year:2digitMonth-:hostSlug-:fromCollectiveSlug
+    Slug of the invoice. Format: :year:2digitMonth.:hostSlug.:fromCollectiveSlug
     """
     invoiceSlug: String!
   ): InvoiceType
+  TransactionInvoice(
+    """Slug of the transaction."""
+    transactionUuid: String!
+  ): InvoiceType
+
+  """
+  
+      Given a collective, returns all its transactions:
+      - Debit transactions made by collective without using a virtual card
+      - Debit transactions made using a virtual card from collective
+      - Credit transactions made to collective
+      
+  """
   allTransactions(CollectiveId: Int, collectiveSlug: String, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String, includeVirtualCards: Boolean): [Transaction]
   transactions(
     """Defaults to 100"""
@@ -1180,7 +1263,7 @@ type Query {
   ): PaginatedTransactions
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
   Application(id: Int): Application
-  allComments(ExpenseId: Int, OrderId: Int, UpdateId: Int, limit: Int, offset: Int): [CommentType]
+  allComments(ExpenseId: Int, UpdateId: Int, limit: Int, offset: Int): [UpdateType]
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
   allOrders(
     CollectiveId: Int
@@ -1547,6 +1630,9 @@ type User implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
+
+  """Specify if collective is allowed to create new VirtualCards"""
+  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -1600,6 +1686,17 @@ type User implements CollectiveInterface {
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
   paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+
+  """
+  Get the virtual cards created by this collective. RemoteUser must be a collective admin.
+  """
+  createdVirtualCards(
+    limit: Int
+    offset: Int
+
+    """Wether the virtual card has been claimed or not"""
+    isConfirmed: Boolean
+  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   firstName: String

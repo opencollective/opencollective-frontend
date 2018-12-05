@@ -69,7 +69,9 @@ class EditConnectedAccount extends React.Component {
     const { collective, options } = this.props;
 
     if (service === 'github' || service === 'twitter') {
-      const redirect = `${window.location.protocol}//${window.location.host}/${collective.slug}/edit#connectedAccounts`;
+      const redirect = `${window.location.protocol}//${window.location.host}/${
+        collective.slug
+      }/edit/connected-accounts`;
       return window.location.replace(
         `/api/connected-accounts/${service}/oauthUrl?CollectiveId=${collective.id}&redirect=${encodeURIComponent(
           redirect,

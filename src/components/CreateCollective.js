@@ -104,22 +104,24 @@ class CreateCollective extends React.Component {
       const successParams = {
         slug: collective.slug,
       };
-      let route = 'collective';
-
-      if (CollectiveInputType.HostCollectiveId) {
-        successParams.status = 'collectiveCreated';
-        successParams.CollectiveId = collective.id;
-        successParams.collectiveSlug = collective.slug;
-      } else {
-        route = `/${collective.slug}/edit#host`;
-      }
-
       this.setState({
         status: 'idle',
         result: { success: 'Collective created successfully' },
       });
 
-      Router.pushRoute(route, successParams);
+      if (CollectiveInputType.HostCollectiveId) {
+        successParams.status = 'collectiveCreated';
+        successParams.CollectiveId = collective.id;
+        successParams.collectiveSlug = collective.slug;
+        Router.pushRoute('collective', {
+          slug: collective.slug,
+          status: 'collectiveCreated',
+          CollectiveId: collective.id,
+          CollectiveSlug: collective.slug,
+        });
+      } else {
+        Router.pushRoute('editCollectiveSection', { slug: collective.slug, section: 'host' });
+      }
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
