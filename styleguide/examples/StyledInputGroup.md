@@ -1,7 +1,13 @@
-Default state:
+Prepend:
 
 ```js
-<StyledInputGroup prepend="http://" type="url" placeholder="Default" />
+<StyledInputGroup prepend="http://" type="url" placeholder="Prepend" />
+```
+
+Append:
+
+```js
+<StyledInputGroup append=".com" type="url" placeholder="Append" />
 ```
 
 Disabled state:
