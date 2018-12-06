@@ -2,6 +2,7 @@ import { TransactionTypes } from '../constants/transactions';
 import Promise from 'bluebird';
 import CustomDataTypes from './DataTypes';
 import Temporal from 'sequelize-temporal';
+import { get } from 'lodash';
 
 import debugLib from 'debug';
 const debug = debugLib('order');
@@ -161,8 +162,8 @@ export default function(Sequelize, DataTypes) {
 
         info() {
           return {
-            type: TransactionTypes.CREDIT,
             id: this.id,
+            type: get(this, 'collective.type') === 'EVENT' ? 'registration' : 'donation',
             CreatedByUserId: this.CreatedByUserId,
             TierId: this.TierId,
             FromCollectiveId: this.FromCollectiveId,

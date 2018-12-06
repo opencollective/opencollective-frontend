@@ -283,7 +283,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.interval) {
       defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
     } else {
-      defaultDescription = `${totalAmount > 0 ? 'Donation' : 'Registration'} to ${collective.name}${tierNameInfo}`;
+      defaultDescription = `${totalAmount === 0 || collective.type === types.EVENT ? 'Registration' : 'Donation'} to ${
+        collective.name
+      }${tierNameInfo}`;
     }
     debug('defaultDescription', defaultDescription, 'collective.type', collective.type);
 
