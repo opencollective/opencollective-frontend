@@ -1,6 +1,6 @@
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
-import debug from 'debug';
+import debugLib from 'debug';
 import md5 from 'md5';
 import Promise from 'bluebird';
 import { pick, omit, get } from 'lodash';
@@ -22,7 +22,7 @@ import { executeOrder } from '../../../lib/payments';
 
 const oneHourInSeconds = 60 * 60;
 
-const debugOrder = debug('order');
+const debug = debugLib('orders');
 
 function checkOrdersLimit(order, remoteUser, reqIp) {
   if (['circleci', 'test'].includes(process.env.NODE_ENV)) {
@@ -70,11 +70,11 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
 
   for (const limit of limits) {
     const count = cache.get(limit.key) || 0;
-    debugOrder(`${count} orders for limit '${limit.key}'`);
+    debug(`${count} orders for limit '${limit.key}'`);
     const limitReached = count >= limit.value;
     cache.set(limit.key, count + 1, oneHourInSeconds);
     if (limitReached) {
-      debugOrder(`Order limit reached for limit '${limit.key}'`);
+      debug(`Order limit reached for limit '${limit.key}'`);
       const errorMessage =
         'Error while processing your request, please try again or contact support@opencollective.com';
       // Show a developer-friendly message in DEV
@@ -111,7 +111,7 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
 }
 
 export async function createOrder(order, loaders, remoteUser, reqIp) {
-  debugOrder('Beginning creation of order', order);
+  debug('Beginning creation of order', order);
   checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
   try {
@@ -165,6 +165,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     const paymentRequired = (order.totalAmount > 0 || (tier && tier.amount > 0)) && collective.isActive;
+    debug('paymentRequired', paymentRequired, 'total amount:', order.totalAmount, 'isActive', collective.isActive);
     if (
       paymentRequired &&
       (!order.paymentMethod ||
@@ -282,8 +283,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.interval) {
       defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
     } else {
-      defaultDescription = `${totalAmount > 0 ? 'Donation' : 'Registration'} to ${collective.name}${tierNameInfo}`;
+      defaultDescription = `${totalAmount === 0 || collective.type === types.EVENT ? 'Registration' : 'Donation'} to ${
+        collective.name
+      }${tierNameInfo}`;
     }
+    debug('defaultDescription', defaultDescription, 'collective.type', collective.type);
 
     const orderData = {
       CreatedByUserId: remoteUser ? remoteUser.id : user.id,
@@ -366,7 +370,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     return order;
   } catch (error) {
-    debugOrder('createOrder mutation error: ', error);
+    debug('createOrder mutation error: ', error);
     if (orderCreated && !orderCreated.processedAt) {
       // TODO: Order should be updated with data JSON field to store the error to review later
       orderCreated.update({ status: status.ERROR });
