@@ -15,6 +15,8 @@ import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
 import { getRecommendedCollectives } from './data';
 import { formatCurrency } from '../lib/utils';
+import debugLib from 'debug';
+const debug = debugLib('payments');
 
 /** Check if paymentMethod has a given fully qualified name
  *
@@ -225,6 +227,7 @@ export async function associateTransactionRefundId(transaction, refund, data) {
 }
 
 export const sendEmailNotifications = (order, transaction) => {
+  debug('sendEmailNotifications');
   // for gift cards and manual payment methods
   if (!transaction) {
     sendOrderProcessingEmail(order);
@@ -316,6 +319,7 @@ export const executeOrder = async (user, order, options) => {
   if (order.processedAt) {
     return Promise.reject(new Error(`This order (#${order.id}) has already been processed at ${order.processedAt}`));
   }
+  debug('executeOrder', user.email, order.description, order.totalAmount, options);
 
   const payment = {
     amount: order.totalAmount,
