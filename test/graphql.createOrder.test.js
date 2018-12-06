@@ -185,6 +185,7 @@ describe('createOrder', () => {
     const host = await models.Collective.create({
       slug: 'host',
       name: 'Open Collective 501c3',
+      currency: 'USD',
       settings: {
         paymentMethods: {
           manual: {
@@ -197,19 +198,29 @@ describe('createOrder', () => {
     const collective = await models.Collective.create({
       slug: 'webpack',
       name: 'test',
+      currency: 'USD',
+      isActive: true,
+    });
+    const event = await models.Collective.create({
+      slug: 'meetup-ev1',
+      name: 'meetup',
+      type: 'EVENT',
+      ParentCollectiveId: collective.id,
       isActive: true,
     });
     const tier = await models.Tier.create({
       slug: 'backer',
       name: 'best backer',
-      CollectiveId: collective.id,
+      amount: 1000,
+      currency: collective.currency,
+      CollectiveId: event.id,
     });
     await collective.addHost(host);
     await collective.update({ isActive: true });
     const thisOrder = cloneDeep(baseOrder);
     delete thisOrder.paymentMethod;
     thisOrder.paymentMethod = { type: 'manual' };
-    thisOrder.collective.id = collective.id;
+    thisOrder.collective.id = event.id;
     thisOrder.user = {
       firstName: 'John',
       lastName: 'Smith',
@@ -217,6 +228,8 @@ describe('createOrder', () => {
       twitterHandle: 'johnsmith',
     };
     thisOrder.tier = { id: tier.id };
+    thisOrder.quantity = 2;
+    thisOrder.totalAmount = 2000;
     const res = await utils.graphqlQuery(createOrderQuery, {
       order: thisOrder,
     });
@@ -231,9 +244,11 @@ describe('createOrder', () => {
     expect(emailSendMessageSpy.callCount).to.equal(2);
     expect(emailSendMessageSpy.secondCall.args[0]).to.equal(thisOrder.user.email);
     expect(emailSendMessageSpy.secondCall.args[2]).to.match(
-      /Please send a wire to XXXX for the amount of \$1,543 with the mention: webpack backer order: [0-9]+/,
+      /Please send a wire to XXXX for the amount of \$20 with the mention: webpack event backer order: [0-9]+/,
     );
-    expect(emailSendMessageSpy.secondCall.args[1]).to.equal('ACTION REQUIRED: your $1,543 donation to test is pending');
+    expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
+      'ACTION REQUIRED: your $20 registration to meetup is pending',
+    );
   });
 
   it('creates an order as new user and sends a tweet', async () => {
