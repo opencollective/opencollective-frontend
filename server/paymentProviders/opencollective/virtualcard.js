@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, isValidEmail } from '../../lib/utils';
 
 /**
  * Virtual Card Payment method - This payment Method works basically as an alias
@@ -158,7 +158,7 @@ async function create(args, remoteUser) {
     SourcePaymentMethodId = sourcePaymentMethod.id;
   } else {
     sourcePaymentMethod = await models.PaymentMethod.findById(args.PaymentMethodId);
-    if (sourcePaymentMethod.CollectiveId !== collective.id) {
+    if (!sourcePaymentMethod || sourcePaymentMethod.CollectiveId !== collective.id) {
       throw Error('Invalid PaymentMethodId');
     }
   }
@@ -180,6 +180,15 @@ async function create(args, remoteUser) {
     }`;
   }
 
+  // Whitelist fields for `data`
+  let data = null;
+  if (args.data && args.data.email) {
+    if (!isValidEmail(args.data.email)) {
+      throw new Error(`Invalid email address: ${args.data.email}`);
+    }
+    data = { email: args.data.email };
+  }
+
   // creates a new Virtual card Payment method
   const paymentMethod = await models.PaymentMethod.create({
     CreatedByUserId: remoteUser && remoteUser.id,
@@ -199,6 +208,7 @@ async function create(args, remoteUser) {
     SourcePaymentMethodId: SourcePaymentMethodId,
     createdAt: new Date(),
     updatedAt: new Date(),
+    data,
   });
   return paymentMethod;
 }

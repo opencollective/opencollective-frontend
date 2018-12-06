@@ -11,6 +11,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
+import { pick } from 'lodash';
 
 import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
 
@@ -1308,10 +1309,19 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       data: {
         type: GraphQLJSON,
-        resolve(paymentMethod) {
+        resolve(paymentMethod, _, req) {
           if (!paymentMethod.data) {
             return null;
           }
+
+          // Protect and whitelist fields for virtualcard
+          if (paymentMethod.type === 'virtualcard') {
+            if (!req.remoteUser || !req.remoteUser.isAdmin(paymentMethod.CollectiveId)) {
+              return null;
+            }
+            return pick(paymentMethod.data, ['email']);
+          }
+
           const data = paymentMethod.data;
           // white list fields to send back; removes fields like CustomerIdForHost
           const dataSubset = {

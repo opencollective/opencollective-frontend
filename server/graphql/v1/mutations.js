@@ -57,6 +57,7 @@ import {
   CommentAttributesInputType,
   ConnectedAccountInputType,
   PaymentMethodInputType,
+  PaymentMethodDataVirtualCardInputType,
   UserInputType,
 } from './inputTypes';
 
@@ -424,6 +425,7 @@ const mutations = {
       PaymentMethodId: { type: GraphQLInt },
       description: { type: GraphQLString },
       expiryDate: { type: GraphQLString },
+      data: { type: PaymentMethodDataVirtualCardInputType, description: 'The data attached to this PaymentMethod' },
     },
     resolve: async (_, args, req) => {
       // either amount or monthlyLimitPerMember needs to be present
