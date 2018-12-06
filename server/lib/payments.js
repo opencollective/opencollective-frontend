@@ -448,6 +448,7 @@ const sendOrderProcessingEmail = async order => {
   const { collective, fromCollective } = order;
   const user = order.createdByUser;
   const host = await collective.getHostCollective();
+  const parentCollective = await collective.getParentCollective();
   const data = {
     order: order.info,
     user: user.info,
@@ -461,7 +462,7 @@ const sendOrderProcessingEmail = async order => {
     const formatValues = {
       orderid: order.id,
       amount: formatCurrency(order.totalAmount, order.currency),
-      collective: order.collective.slug,
+      collective: parentCollective ? `${parentCollective.slug} event` : order.collective.slug,
       tier: get(order, 'tier.slug') || get(order, 'tier.name'),
     };
     data.instructions = instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
