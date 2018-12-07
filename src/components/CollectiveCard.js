@@ -237,7 +237,7 @@ class CollectiveCard extends React.Component {
             </div>
           </div>
           <div className="footer">
-            {collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') && (
+            {collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') > 0 && (
               <div className="stats">
                 <div className="backers">
                   <div className="value">{collective.stats.backers.all}</div>
