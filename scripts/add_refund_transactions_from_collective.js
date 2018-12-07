@@ -65,6 +65,8 @@ async function refundTransaction(transaction) {
 }
 
 async function run() {
+  debugRefund(`Running refund scripts to get Transactions with the following FromCollectiveId:
+    ${JSON.stringify(fromCollectiveIds, null, 2)}`);
   const transactions = await models.Transaction.findAll({
     where: {
       FromCollectiveId: fromCollectiveIds,
@@ -74,6 +76,7 @@ async function run() {
     include: [models.Order, models.PaymentMethod],
   });
   try {
+    debugRefund(`Trying to refund ${(transactions && transactions.length) || 0} transactions...`);
     const mapResult = await Promise.map(transactions, refundTransaction);
     debugRefund(`Script finished successfully,
       mapResult(tip: result transactions need to have RefundTransactionId set):
