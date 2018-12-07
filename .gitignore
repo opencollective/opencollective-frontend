@@ -12,3 +12,4 @@ cypress/videos
 *.swp
 styleguide/index.html
 styleguide/build/
+.vimrc

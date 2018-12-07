@@ -11,9 +11,17 @@ const InputContainer = styled(Container)`
   &:hover {
     border-color: ${themeGet('colors.primary.300')};
   }
+
+  input:focus ~ div svg {
+    color: ${themeGet('colors.primary.300')};
+  }
 `;
 
 const getColor = ({ error, focused, success }) => {
+  if (focused) {
+    return 'primary.300';
+  }
+
   if (error) {
     return 'red.300';
   }
@@ -22,14 +30,14 @@ const getColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  if (focused) {
-    return 'primary.300';
-  }
-
   return 'black.400';
 };
 
 const getBgColor = ({ error, focused, success }) => {
+  if (focused) {
+    return 'primary.100';
+  }
+
   if (error) {
     return 'red.100';
   }
@@ -38,14 +46,14 @@ const getBgColor = ({ error, focused, success }) => {
     return 'green.100';
   }
 
-  if (focused) {
-    return 'primary.100';
-  }
-
   return 'black.50';
 };
 
 const getBorderColor = ({ error, focused, success }) => {
+  if (focused) {
+    return 'primary.300';
+  }
+
   if (error) {
     return 'red.500';
   }
@@ -54,19 +62,15 @@ const getBorderColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  if (focused) {
-    return 'primary.300';
-  }
-
   return 'black.300';
 };
 
 /**
- * A styled input with a prepended field element.
+ * A styled input with a prepended or appended field element.
  * @see See [StyledInput](/#!/StyledInput) for details about props passed to it
  */
 const StyledInputGroup = withState('focused', 'setFocus', false)(
-  ({ prepend, focused, setFocus, disabled, success, error, ...inputProps }) => (
+  ({ append, prepend, focused, setFocus, disabled, success, error, ...inputProps }) => (
     <InputContainer
       bg={disabled ? 'black.50' : 'white.full'}
       border="1px solid"
@@ -75,11 +79,13 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
       display="flex"
       alignItems="center"
     >
-      <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" py={2} px={3}>
-        <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
-          {prepend}
-        </Span>
-      </Container>
+      {prepend && (
+        <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" py={2} px={3}>
+          <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+            {prepend}
+          </Span>
+        </Container>
+      )}
       <StyledInput
         bare
         color="black.800"
@@ -92,13 +98,22 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
       />
+      {append && (
+        <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
+          <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+            {append}
+          </Span>
+        </Container>
+      )}
     </InputContainer>
   ),
 );
 
 StyledInputGroup.propTypes = {
+  /** Text shown after input */
+  append: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element]),
   /** Text shown before input */
-  prepend: PropTypes.string.isRequired,
+  prepend: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element]),
   /** Show disabled state for field */
   disabled: PropTypes.bool,
   /** Show error state for field */
