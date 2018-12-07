@@ -12,7 +12,7 @@ import debug from 'debug';
 import models from '../server/models';
 import * as libPayments from '../server/lib/payments';
 
-const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS || [23461];
+const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS ? process.env.FROM_COLLECTIVE_IDS.split(',').map(Number) : [];
 const debugRefund = debug('refundTransactions');
 
 async function refundTransaction(transaction) {
