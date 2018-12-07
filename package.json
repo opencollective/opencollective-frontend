@@ -207,7 +207,8 @@
     "cron:yearly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh yearly",
     "compile:email": "babel-node scripts/compile-email.js",
     "compile:email:watch": "./scripts/watch_email_template.sh",
-    "maildev": "maildev"
+    "maildev": "maildev",
+    "refund-transactions": "babel-node ./scripts/add_refund_transactions_from_collective.js"
   },
   "nyc": {
     "reporter": [
