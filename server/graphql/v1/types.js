@@ -31,6 +31,27 @@ dataloaderSequelize(models.Expense);
 // This breaks the tests for some reason (mocha test/Member.routes.test.js -g "successfully add a user to a collective with a role")
 // dataloaderSequelize(models.User);
 
+/**
+ * Take a graphql type and return a wrapper type that adds pagination. The pagination
+ * object has limit, offset and total keys to manage pages and stores the result
+ * of the query under the `values` key.
+ *
+ * @param {object} GraphQL type to paginate
+ * @param {string} The name of the type, used to generate name and description.
+ */
+export const paginatedList = (type, typeName, valuesKey) => {
+  return new GraphQLObjectType({
+    name: `Paginated${typeName}`,
+    description: `A list of ${typeName} with pagination info`,
+    fields: {
+      [valuesKey]: { type: new GraphQLList(type) },
+      total: { type: GraphQLInt },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt },
+    },
+  });
+};
+
 export const UserType = new GraphQLObjectType({
   name: 'UserDetails',
   description: 'This represents the details of a User',
@@ -1575,3 +1596,5 @@ export const PaginatedExpensesType = new GraphQLObjectType({
     total: { type: GraphQLInt },
   },
 });
+
+export const PaginatedPaymentMethodsType = paginatedList(PaymentMethodType, 'PaymentMethod', 'paymentMethods');
