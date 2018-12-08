@@ -23,7 +23,6 @@ import {
   ConnectedAccountType,
   ExpenseType,
   OrderStatusType,
-  paginatedList,
   PaginatedPaymentMethodsType,
 } from './types';
 
