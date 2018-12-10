@@ -45,7 +45,6 @@ const navigation = {
   PLATFORM: {
     Discover: '/discover',
     'How it Works': '/how-it-works',
-    'Make a Pledge': '/pledges/new',
     'Sign Up': '/signin',
     Login: '/signin',
   },
@@ -53,6 +52,7 @@ const navigation = {
     'Create a Collective': '/create',
     'Become a Sponsor': '/become-a-sponsor',
     'Create a chapter': '/chapters',
+    'Make a Pledge': '/pledges/new',
   },
   COMMUNITY: {
     'Open Source': '/opensource',
