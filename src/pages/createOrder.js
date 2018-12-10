@@ -1,25 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
 
 import { Router } from '../server/pages';
 
 import ErrorPage from '../components/ErrorPage';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
+import Page from '../components/Page';
 import OrderForm from '../components/OrderForm';
 import CollectiveCover from '../components/CollectiveCover';
 
 import { addCreateOrderMutation } from '../graphql/mutations';
 
 import storage from '../lib/storage';
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 import { isValidUrl, getDomain } from '../lib/utils';
 
 class CreateOrderPage extends React.Component {
@@ -64,7 +61,6 @@ class CreateOrderPage extends React.Component {
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from withIntl
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
   constructor(props) {
@@ -141,9 +137,8 @@ class CreateOrderPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser, data } = this.props;
+    const { data } = this.props;
     const newState = {};
-    newState.LoggedInUser = await getLoggedInUser();
     if (!data.Tier && data.fetchData) {
       data.fetchData();
     }
@@ -180,7 +175,7 @@ class CreateOrderPage extends React.Component {
       'currency',
       'save',
     ]);
-    if (this.state.LoggedInUser) {
+    if (this.props.LoggedInUser) {
       delete order.user;
     }
     try {
@@ -236,8 +231,7 @@ class CreateOrderPage extends React.Component {
   };
 
   render() {
-    const { intl, data } = this.props;
-    const { loading, LoggedInUser } = this.state;
+    const { intl, data, LoggedInUser } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -266,7 +260,12 @@ class CreateOrderPage extends React.Component {
     const coverClassName = collective.type === 'EVENT' ? 'small' : '';
 
     return (
-      <div>
+      <Page
+        title={`Contribute - ${collective.name}`}
+        description={collective.description}
+        twitterHandle={collective.twitterHandle}
+        image={collective.image || collective.backgroundImage}
+      >
         <style jsx>
           {`
             .result {
@@ -280,44 +279,32 @@ class CreateOrderPage extends React.Component {
             }
           `}
         </style>
-        <Header
-          title={collective.name}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          className={loading && 'loading'}
-          LoggedInUser={LoggedInUser}
+
+        <CollectiveCover
+          key={collective.slug}
+          collective={collective}
+          href={collective.path}
+          className={coverClassName}
         />
 
-        <Body>
-          <CollectiveCover
-            key={collective.slug}
+        <div className="content" id="content">
+          <OrderForm
             collective={collective}
-            href={collective.path}
+            order={this.order}
             LoggedInUser={LoggedInUser}
-            className={coverClassName}
+            onSubmit={this.createOrder}
+            redeemFlow={this.props.redeem}
+            matchingFund={this.state.matchingFund}
           />
-
-          <div className="content" id="content">
-            <OrderForm
-              collective={collective}
-              order={this.order}
-              LoggedInUser={this.state.LoggedInUser}
-              onSubmit={this.createOrder}
-              redeemFlow={this.props.redeem}
-              matchingFund={this.state.matchingFund}
-            />
-            <div className="row result">
-              <div className="col-sm-2" />
-              <div className="col-sm-10">
-                <div className="success">{this.state.result.success}</div>
-                {this.state.result.error && <div className="error">{this.state.result.error}</div>}
-              </div>
+          <div className="row result">
+            <div className="col-sm-2" />
+            <div className="col-sm-10">
+              <div className="success">{this.state.result.success}</div>
+              {this.state.result.error && <div className="error">{this.state.result.error}</div>}
             </div>
           </div>
-        </Body>
-        <Footer />
-      </div>
+        </div>
+      </Page>
     );
   }
 }
@@ -400,4 +387,9 @@ const addData = graphql(gql`
   }
 `);
 
-export default withData(withIntl(withLoggedInUser(addData(addCreateOrderMutation(CreateOrderPage)))));
+const addGraphQL = compose(
+  addData,
+  addCreateOrderMutation,
+);
+
+export default withIntl(addGraphQL(withUser(CreateOrderPage)));
