@@ -31,11 +31,10 @@ export default {
     }
   },
 
-  pay: (collective, expense, email, preapprovalKey) => {
-    const uri = `/collectives/${collective.id}/expenses/${expense.id}/paykey/`;
-    const baseUrl = config.host.webapp + uri;
+  pay: async (collective, expense, email, preapprovalKey) => {
+    const uri = `/${collective.slug}/expenses/${expense.id}`;
+    const expenseUrl = config.host.website + uri;
     const amount = expense.amount / 100;
-    let createPaymentResponse;
     const payload = {
       // Note: if we change this to 'PAY', payment will complete in one step
       // but we won't get any info on fees or conversion rates.
@@ -47,8 +46,8 @@ export default {
       memo: `Reimbursement from ${collective.name}: ${expense.description}`,
       trackingId: [uuidv1().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
-      returnUrl: `${baseUrl}/success`,
-      cancelUrl: `${baseUrl}/cancel`,
+      returnUrl: `${expenseUrl}?result=success&service=paypal`,
+      cancelUrl: `${expenseUrl}?result=cancel&service=paypal`,
       receiverList: {
         receiver: [
           {
@@ -59,14 +58,9 @@ export default {
         ],
       },
     };
-
-    return paypalAdaptive
-      .pay(payload)
-      .tap(payResponse => (createPaymentResponse = payResponse))
-      .then(payResponse => paypalAdaptive.executePayment(payResponse.payKey))
-      .then(executePaymentResponse => {
-        return { createPaymentResponse, executePaymentResponse };
-      });
+    const createPaymentResponse = await paypalAdaptive.pay(payload);
+    const executePaymentResponse = await paypalAdaptive.executePayment(createPaymentResponse.payKey);
+    return { createPaymentResponse, executePaymentResponse };
   },
 
   // Returns the balance in the currency of the paymentMethod
