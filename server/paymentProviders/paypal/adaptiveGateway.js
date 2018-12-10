@@ -24,6 +24,9 @@ const callPaypal = (endpointName, payload) => {
   return new Promise((resolve, reject) => {
     paypalAdaptiveClient[endpointName](Object.assign({}, payload, { requestEnvelope }), (err, res) => {
       console.log(`Paypal ${endpointName} response: ${JSON.stringify(res)}`); // leave this in permanently
+      if (get(res, 'responseEnvelope.ack') === 'Failure') {
+        return reject(new Error(`PayPal error: ${res.error[0].message} (error id: ${res.error[0].errorId})`));
+      }
       if (err) {
         console.log(`Paypal ${endpointName} error: ${JSON.stringify(err)}`); // leave this in permanently
         if (err.code === 'ENOTFOUND' && err.syscall === 'getaddrinfo') {
