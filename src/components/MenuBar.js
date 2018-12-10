@@ -494,6 +494,9 @@ class MenuBar extends React.Component {
               overflow: hidden;
               background-color: #17181a;
             }
+            #nprogress .bar {
+              z-index: 2001;
+            }
             .active .sticky-inner-wrapper {
               z-index: 2000;
               overflow: hidden;
