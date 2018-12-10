@@ -12,6 +12,9 @@ import {
   createTransactionFromInKindDonation,
 } from '../../../lib/transactions';
 import { getFxRate } from '../../../lib/currency';
+import debugLib from 'debug';
+
+const debug = debugLib('expenses');
 
 /**
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
@@ -202,13 +205,15 @@ export async function deleteExpense(remoteUser, expenseId) {
 }
 
 /** Helper that finishes the process of paying an expense */
-async function payExpenseUpdate(expense) {
+async function markExpenseAsPaid(expense) {
+  debug('update expense status to PAID', expense.id);
   const updatedExpense = await expense.update({ status: statuses.PAID });
   await expense.createActivity(activities.COLLECTIVE_EXPENSE_PAID);
   return updatedExpense;
 }
 
-async function markAsPaid(host, expense, fees = {}) {
+async function createTransactions(host, expense, fees = {}) {
+  debug('marking expense as paid and creating transactions in the ledger', expense.id);
   return await createTransactionFromPaidExpense(
     host,
     null,
@@ -223,6 +228,7 @@ async function markAsPaid(host, expense, fees = {}) {
 }
 
 async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fees = {}) {
+  debug('payExpenseWithPayPal', expense.id);
   try {
     const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(
       expense.collective,
@@ -231,6 +237,7 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
       paymentMethod.token,
     );
     const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
+    debug('paypal> preapprovalDetailsResponse', JSON.stringify(preapprovalDetailsResponse, null, '  '));
     await createTransactionFromPaidExpense(
       host,
       paymentMethod,
@@ -244,6 +251,7 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
     );
     expense.setPaid(remoteUser.id);
   } catch (err) {
+    debug('paypal> error', JSON.stringify(err, null, '  '));
     if (
       err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !== -1
     ) {
@@ -289,7 +297,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
     await createTransactionFromInKindDonation(transaction);
     const user = await models.User.findById(expense.UserId);
     await expense.collective.addUserWithRole(user, 'BACKER');
-    return payExpenseUpdate(expense);
+    return markExpenseAsPaid(expense);
   }
   const balance = await expense.collective.getBalance();
 
@@ -337,7 +345,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
     // then we simply mark the expense as paid
     if (expense.paypalEmail === paymentMethod.name) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
-      await markAsPaid(host, expense, feesInHostCurrency);
+      await createTransactions(host, expense, feesInHostCurrency);
     } else {
       await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);
     }
@@ -345,8 +353,8 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
 
   // note: we need to check for manual and other for legacy reasons
   if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
-    await markAsPaid(host, expense, feesInHostCurrency);
+    await createTransactions(host, expense, feesInHostCurrency);
   }
 
-  return payExpenseUpdate(expense);
+  return markExpenseAsPaid(expense);
 }
