@@ -4,11 +4,11 @@ import { graphql } from 'react-apollo';
 
 import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
-import { getOldTransactionsQuery } from '../../../graphql/queries';
+import { getTransactionsFromLedgerQuery } from '../../../graphql/queries';
 
 import Transactions from './Transactions';
 
-class TransactionsWithDataOld extends React.Component {
+class TransactionsWithDataFromLedger extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
@@ -27,24 +27,15 @@ class TransactionsWithDataOld extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      fetchMore,
-      showCSVlink,
-      filters,
-    } = this.props;
+    const { data, LoggedInUser, collective, fetchMore, showCSVlink, filters } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
       return <Error message="GraphQL error" />;
     }
 
-    const transactions = data.allTransactionsOld;
-    
-    console.log('OLD TRANSACTIONS');
-    console.log(transactions);
+    const transactions = data.allTransactionsFromLedger;
+
     return (
       <div className="TransactionsContainer">
         <Transactions
@@ -62,7 +53,7 @@ class TransactionsWithDataOld extends React.Component {
 }
 
 const TRANSACTIONS_PER_PAGE = 10;
-export const addTransactionsData = graphql(getOldTransactionsQuery, {
+export const addTransactionsData = graphql(getTransactionsFromLedgerQuery, {
   options(props) {
     return {
       variables: {
@@ -77,7 +68,7 @@ export const addTransactionsData = graphql(getOldTransactionsQuery, {
     fetchMore: () => {
       return data.fetchMore({
         variables: {
-          offset: data.allTransactionsOld.length,
+          offset: data.allTransactionsFromLedger.length,
           limit: TRANSACTIONS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
@@ -86,9 +77,9 @@ export const addTransactionsData = graphql(getOldTransactionsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allTransactionsOld: [
-              ...previousResult.allTransactionsOld,
-              ...fetchMoreResult.allTransactionsOld,
+            allTransactionsFromLedger: [
+              ...previousResult.allTransactionsFromLedger,
+              ...fetchMoreResult.allTransactionsFromLedger,
             ],
           });
         },
@@ -97,4 +88,4 @@ export const addTransactionsData = graphql(getOldTransactionsQuery, {
   }),
 });
 
-export default addTransactionsData(withIntl(TransactionsWithDataOld));
+export default addTransactionsData(withIntl(TransactionsWithDataFromLedger));

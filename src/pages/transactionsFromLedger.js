@@ -7,7 +7,7 @@ import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import ErrorPage from '../components/ErrorPage';
 
-import TransactionsWithDataOld from '../apps/expenses/components/TransactionsWithDataOld';
+import TransactionsWithDataFromLedger from '../apps/expenses/components/TransactionsWithDataFromLedger';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
@@ -61,15 +61,10 @@ class TransactionsOldPage extends React.Component {
         />
 
         <Body>
-          <CollectiveCover
-            collective={collective}
-            href={`/${collective.slug}`}
-            cta={cta}
-            LoggedInUser={LoggedInUser}
-          />
+          <CollectiveCover collective={collective} href={`/${collective.slug}`} cta={cta} LoggedInUser={LoggedInUser} />
 
           <div className="content">
-            <TransactionsWithDataOld
+            <TransactionsWithDataFromLedger
               collective={collective}
               LoggedInUser={this.state.LoggedInUser}
               showOldTransactions={true}
@@ -85,6 +80,4 @@ class TransactionsOldPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsOldPage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsOldPage))));
