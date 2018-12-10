@@ -118,6 +118,7 @@ const theme = {
         backgroundColor: colors.black[50],
         borderColor: colors.black[200],
         color: colors.black[300],
+        cursor: 'not-allowed',
       },
     },
 
@@ -138,6 +139,7 @@ const theme = {
 
       '&:disabled': {
         backgroundColor: colors.primary[200],
+        cursor: 'not-allowed',
       },
     },
   },

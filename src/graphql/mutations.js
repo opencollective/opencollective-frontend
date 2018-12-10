@@ -197,6 +197,48 @@ export const deleteApplicationMutation = gql`
   }
 `;
 
+export const createVirtualCardsMutationQuery = gql`
+  mutation createPaymentMethod(
+    $CollectiveId: Int!
+    $numberOfVirtualCards: Int
+    $emails: [String]
+    $PaymentMethodId: Int
+    $amount: Int
+    $monthlyLimitPerMember: Int
+    $description: String
+    $expiryDate: String
+    $currency: String
+    $limitedToTags: [String]
+    $limitedToCollectiveIds: [Int]
+    $limitedToHostCollectiveIds: [Int]
+  ) {
+    createVirtualCards(
+      amount: $amount
+      monthlyLimitPerMember: $monthlyLimitPerMember
+      CollectiveId: $CollectiveId
+      PaymentMethodId: $PaymentMethodId
+      description: $description
+      expiryDate: $expiryDate
+      currency: $currency
+      limitedToTags: $limitedToTags
+      limitedToCollectiveIds: $limitedToCollectiveIds
+      limitedToHostCollectiveIds: $limitedToHostCollectiveIds
+      numberOfVirtualCards: $numberOfVirtualCards
+      emails: $emails
+    ) {
+      id
+      name
+      uuid
+      description
+      initialBalance
+      monthlyLimitPerMember
+      expiryDate
+      currency
+      data
+    }
+  }
+`;
+
 export const addCreateOrderMutation = graphql(createOrderQuery, {
   props: ({ mutate }) => ({
     createOrder: order => mutate({ variables: { order } }),

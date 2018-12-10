@@ -5614,6 +5614,10 @@ Array [
   box-sizing: border-box;
 }
 
+.c12:disabled {
+  cursor: not-allowed;
+}
+
 .c5 {
   display: inline-block;
   vertical-align: middle;

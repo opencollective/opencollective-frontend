@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Mon Dec 10 2018 09:46:19 GMT+0100 (Central European Standard Time)
+# timestamp: Fri Dec 14 2018 10:12:19 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -827,7 +827,47 @@ type Mutation {
 
     """The data attached to this PaymentMethod"""
     data: PaymentMethodDataVirtualCardInputType
-  ): PaymentMethodType
+  ): PaymentMethodType @deprecated(reason: "Please use createVirtualCards")
+  createVirtualCards(
+    CollectiveId: Int!
+    PaymentMethodId: Int
+
+    """
+    A list of emails to generate virtual cards for (only if numberOfVirtualCards is not provided)
+    """
+    emails: [String]
+
+    """Number of virtual cards to generate (only if emails is not provided)"""
+    numberOfVirtualCards: Int
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: String
+
+    """The amount as an Integer without cents."""
+    amount: Int
+    monthlyLimitPerMember: Int
+
+    """
+    Limit this payment method to make donations to collectives having those tags
+    """
+    limitedToTags: [String]
+
+    """Limit this payment method to make donations to those collectives"""
+    limitedToCollectiveIds: [Int]
+
+    """
+    Limit this payment method to make donations to the collectives hosted by those hosts
+    """
+    limitedToHostCollectiveIds: [Int]
+
+    """
+    A custom message attached to the email that will be sent for this virtual card
+    """
+    description: String
+    expiryDate: String
+  ): [PaymentMethodType]
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
 }
 

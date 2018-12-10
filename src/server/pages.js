@@ -77,10 +77,7 @@ pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|
 
 // Collective
 
-pages
-  .add('collective', '/:slug')
-  .add('editCollective', '/:slug/edit')
-  .add('editCollectiveSection', '/:slug/edit/:section', 'editCollective');
+pages.add('collective', '/:slug').add('editCollective', '/:slug/edit/:section?');
 
 export default pages;
 

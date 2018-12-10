@@ -120,7 +120,7 @@ class CreateCollective extends React.Component {
           CollectiveSlug: collective.slug,
         });
       } else {
-        Router.pushRoute('editCollectiveSection', { slug: collective.slug, section: 'host' });
+        Router.pushRoute('editCollective', { slug: collective.slug, section: 'host' });
       }
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err));
