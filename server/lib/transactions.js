@@ -1,9 +1,18 @@
+import { get } from 'lodash';
 import models, { Op, sequelize } from '../models';
 import errors from '../lib/errors';
 import { TransactionTypes } from '../constants/transactions';
 import { getFxRate } from '../lib/currency';
 import { exportToCSV } from '../lib/utils';
 import { toNegative } from '../lib/math';
+
+const ledgerTransactionCategories = Object.freeze({
+  PLATFORM: 'Platform Fee',
+  PAYMENT_PROVIDER: 'Payment Provider Fee',
+  WALLET_PROVIDER: 'Wallet Provider Fee',
+  ACCOUNT: 'Account to Account',
+  CURRENCY_CONVERSION: 'Currency Conversion',
+});
 
 /**
  * Export transactions as CSV
@@ -159,6 +168,113 @@ export async function createTransactionFromInKindDonation(expenseTransaction) {
     paymentProcessorFeeInHostCurrency: expenseTransaction.paymentProcessorFeeInHostCurrency,
     ExpenseId: expenseTransaction.ExpenseId,
   });
+}
+
+/**
+ * Gets "ledger"(from the ledger service) transactions and format them
+ * to the api transactions
+ * @param {Number} legacyId - corresponding id from the opencollective-api Transactions table
+ * @param {Array} transactions - array of transactions representing one "legacy" transaction
+ * @param {Object} legacyInformation - extra information from corresponding legacy transaction
+ * @return {Object} returns a transaction with a similar format of the model Transaction
+ */
+export function parseLedgerTransactionToApiFormat(legacyId, transactions, legacyInformation) {
+  const { AccountId, legacyUuid, VirtualCardCollectiveId, HostCollectiveId, RefundTransactionId } = legacyInformation;
+  const creditTransaction = transactions.filter(t => {
+    return (
+      (t.category === ledgerTransactionCategories.ACCOUNT ||
+        t.category === `REFUND: ${ledgerTransactionCategories.ACCOUNT}`) &&
+      t.type === 'CREDIT'
+    );
+  });
+  // setting up type, From and to accounts
+  const FromAccountId = parseInt(creditTransaction[0].FromAccountId);
+  const ToAccountId = parseInt(creditTransaction[0].ToAccountId);
+  const type = AccountId === FromAccountId ? 'DEBIT' : 'CREDIT';
+  // finding fees, accounts and currency conversion transactions
+  // separately
+  const platformFeeTransaction = transactions.filter(t => {
+    return (
+      (t.category === ledgerTransactionCategories.PLATFORM ||
+        t.category === `REFUND: ${ledgerTransactionCategories.PLATFORM}`) &&
+      t.type === 'DEBIT'
+    );
+  });
+  const paymentFeeTransaction = transactions.filter(t => {
+    return (
+      (t.category === ledgerTransactionCategories.PAYMENT_PROVIDER ||
+        t.category === `REFUND: ${ledgerTransactionCategories.PAYMENT_PROVIDER}`) &&
+      t.type === 'DEBIT'
+    );
+  });
+  const hostFeeTransaction = transactions.filter(t => {
+    return (
+      (t.category === ledgerTransactionCategories.WALLET_PROVIDER ||
+        t.category === `REFUND: ${ledgerTransactionCategories.WALLET_PROVIDER}`) &&
+      t.type === 'DEBIT'
+    );
+  });
+  const accountTransaction =
+    type === 'CREDIT'
+      ? creditTransaction
+      : transactions.filter(t => {
+          return (
+            (t.category === ledgerTransactionCategories.ACCOUNT ||
+              t.category === `REFUND: ${ledgerTransactionCategories.ACCOUNT}`) &&
+            t.type === type
+          );
+        });
+  // setting up currency and amount information
+  const hostFeeInHostCurrency = hostFeeTransaction.length > 0 ? hostFeeTransaction[0].amount : 0;
+  const platformFeeInHostCurrency = platformFeeTransaction.length > 0 ? platformFeeTransaction[0].amount : 0;
+  const paymentProcessorFeeInHostCurrency = paymentFeeTransaction.length > 0 ? paymentFeeTransaction[0].amount : 0;
+  let amount = accountTransaction[0].amount;
+  let netAmountInCollectiveCurrency =
+    amount + hostFeeInHostCurrency + platformFeeInHostCurrency + paymentProcessorFeeInHostCurrency;
+  // if type is DEBIT, amount and netAmount are calculated differently
+  if (type === 'DEBIT') {
+    amount = amount - hostFeeInHostCurrency - platformFeeInHostCurrency - paymentProcessorFeeInHostCurrency;
+    netAmountInCollectiveCurrency = accountTransaction[0].amount;
+  }
+  const currency = accountTransaction[0].forexRateSourceCoin;
+  const hostCurrency = accountTransaction[0].forexRateDestinationCoin;
+  const forexRate = accountTransaction[0].forexRate;
+
+  const parsedTransaction = {
+    id: legacyId,
+    type,
+    amount,
+    currency,
+    HostCollectiveId,
+    hostCurrency,
+    hostFeeInHostCurrency,
+    platformFeeInHostCurrency,
+    paymentProcessorFeeInHostCurrency,
+    hostCurrencyFxRate: forexRate,
+    netAmountInCollectiveCurrency: parseInt(netAmountInCollectiveCurrency),
+    fromCollective: { id: type === 'DEBIT' ? ToAccountId : FromAccountId },
+    collective: { id: type === 'DEBIT' ? FromAccountId : ToAccountId },
+    description: accountTransaction[0].description,
+    createdAt: accountTransaction[0].createdAt,
+    updatedAt: accountTransaction[0].updatedAt,
+    uuid: legacyUuid,
+    UsingVirtualCardFromCollectiveId: VirtualCardCollectiveId,
+    // createdByUser: { type: UserType },
+    // privateMessage: { type: GraphQLString },
+  };
+  // setting refund transaction
+  if (RefundTransactionId) {
+    parsedTransaction.refundTransaction = {
+      id: RefundTransactionId,
+    };
+  }
+  // setting paymentMethod
+  if (get(creditTransaction[0], 'fromWallet.PaymentMethodId')) {
+    parsedTransaction.paymentMethod = {
+      id: parseInt(get(creditTransaction[0], 'fromWallet.PaymentMethodId')),
+    };
+  }
+  return parsedTransaction;
 }
 
 /**
