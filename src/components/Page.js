@@ -8,7 +8,17 @@ import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 
-const Page = ({ children, data = {}, loadingLoggedInUser, LoggedInUser, title, showSearch }) => {
+const Page = ({
+  children,
+  data = {},
+  description,
+  image,
+  loadingLoggedInUser,
+  LoggedInUser,
+  title,
+  twitterHandle,
+  showSearch,
+}) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
   }
@@ -17,7 +27,13 @@ const Page = ({ children, data = {}, loadingLoggedInUser, LoggedInUser, title, s
 
   return (
     <Fragment>
-      <Header showSearch={showSearch} title={title} />
+      <Header
+        showSearch={showSearch}
+        title={title}
+        twitterHandle={twitterHandle}
+        description={description}
+        image={image}
+      />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       <Footer />
     </Fragment>
@@ -30,10 +46,13 @@ Page.propTypes = {
   data: PropTypes.shape({
     error: PropTypes.shape({}),
   }),
+  description: PropTypes.string,
+  image: PropTypes.string,
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
   title: PropTypes.string,
+  twitterHandle: PropTypes.string,
 };
 
 Page.defaultProps = {
