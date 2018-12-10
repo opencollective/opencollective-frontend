@@ -70,42 +70,51 @@ const getBorderColor = ({ error, focused, success }) => {
  * @see See [StyledInput](/#!/StyledInput) for details about props passed to it
  */
 const StyledInputGroup = withState('focused', 'setFocus', false)(
-  ({ append, prepend, focused, setFocus, disabled, success, error, ...inputProps }) => (
-    <InputContainer
-      bg={disabled ? 'black.50' : 'white.full'}
-      border="1px solid"
-      borderColor={getBorderColor({ error, focused, success })}
-      borderRadius="4px"
-      display="flex"
-      alignItems="center"
-    >
-      {prepend && (
-        <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" py={2} px={3}>
-          <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
-            {prepend}
-          </Span>
-        </Container>
+  ({ append, prepend, focused, setFocus, disabled, success, error, maxWidth, ...inputProps }) => (
+    <div>
+      <InputContainer
+        bg={disabled ? 'black.50' : 'white.full'}
+        maxWidth={maxWidth}
+        border="1px solid"
+        borderColor={getBorderColor({ error, focused, success })}
+        borderRadius="4px"
+        display="flex"
+        alignItems="center"
+      >
+        {prepend && (
+          <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" py={2} px={3}>
+            <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+              {prepend}
+            </Span>
+          </Container>
+        )}
+        <StyledInput
+          bare
+          color="black.800"
+          type="text"
+          overflow="scroll"
+          fontSize="Paragraph"
+          flex="1 1 auto"
+          disabled={disabled}
+          py="0"
+          {...inputProps}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}
+        />
+        {append && (
+          <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
+            <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+              {append}
+            </Span>
+          </Container>
+        )}
+      </InputContainer>
+      {error && (
+        <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+          {error}
+        </Span>
       )}
-      <StyledInput
-        bare
-        color="black.800"
-        type="text"
-        overflow="scroll"
-        fontSize="Paragraph"
-        flex="1 1 auto"
-        disabled={disabled}
-        {...inputProps}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-      />
-      {append && (
-        <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
-          <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
-            {append}
-          </Span>
-        </Container>
-      )}
-    </InputContainer>
+    </div>
   ),
 );
 
@@ -116,8 +125,8 @@ StyledInputGroup.propTypes = {
   prepend: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element]),
   /** Show disabled state for field */
   disabled: PropTypes.bool,
-  /** Show error state for field */
-  error: PropTypes.bool,
+  /** Show error state for field, and a message error if given a string */
+  error: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   /** Show success state for field */
   success: PropTypes.bool,
   /** Passed to internal StyledInput */

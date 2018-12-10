@@ -78,25 +78,28 @@ class VirtualCardDetails extends React.Component {
 
   renderDetails() {
     const redeemCode = this.props.virtualCard.uuid.split('-')[0];
+    const email = get(this.props.virtualCard, 'data.email');
+    const linkParams = email ? { code: redeemCode, email } : { code: redeemCode };
+
     return (
       <Flex mt="0.75em" fontSize="0.8em">
         <Flex flexDirection="column" mr="1.5em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.redeemCode" defaultMessage="Redeem code" />
+            <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
           </DetailsColumnHeader>
-          <Link route="redeem" params={{ code: redeemCode }}>
+          <Link route="redeem" params={linkParams}>
             {redeemCode}
           </Link>
         </Flex>
         <Flex flexDirection="column" mr="1.5em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.expiryDate" defaultMessage="Expiry date" />
+            <FormattedMessage id="virtualCards.expiryDate" defaultMessage="EXPIRY DATE" />
           </DetailsColumnHeader>
           <span>{moment(this.props.virtualCard.expiryDate).format('MM/Y')}</span>
         </Flex>
         <Flex flexDirection="column" mr="1.5em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.customMessage" defaultMessage="Custom message" />
+            <FormattedMessage id="virtualCards.customMessage" defaultMessage="CUSTOM MESSAGE" />
           </DetailsColumnHeader>
           <span>{this.props.virtualCard.description}</span>
         </Flex>

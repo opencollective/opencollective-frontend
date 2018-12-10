@@ -61,6 +61,7 @@ const StyledInput = styled(tag.input)`
 
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
+    cursor: not-allowed;
   }
 
   &:focus, &:hover:not(:disabled) {

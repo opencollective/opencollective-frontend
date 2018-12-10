@@ -3,15 +3,20 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { ButtonGroup } from 'react-bootstrap';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
+
+import { Add } from 'styled-icons/material/Add.cjs';
+import { PaperPlane } from 'styled-icons/fa-solid/PaperPlane.cjs';
 
 import { getCollectiveVirtualCards } from '../graphql/queries';
 import VirtualCardDetails from './VirtualCardDetails';
 import Loading from './Loading';
 import Pagination from './Pagination';
 import Link from './Link';
+import { Link as LinkWrapper } from '../server/pages';
+import StyledLink from './StyledLink';
 
 /**
  * A filterable list of virtual cards meant to be displayed for organization
@@ -20,6 +25,7 @@ import Link from './Link';
 class EditVirtualCards extends React.Component {
   static propTypes = {
     collectiveId: PropTypes.number.isRequired,
+    collectiveSlug: PropTypes.string.isRequired,
     /** Max number of items to display */
     limit: PropTypes.number,
     /** Provided by graphql */
@@ -85,6 +91,20 @@ class EditVirtualCards extends React.Component {
     );
   }
 
+  renderNoVirtualCardMessage(onlyConfirmed) {
+    if (onlyConfirmed === undefined) {
+      return (
+        <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
+          <FormattedMessage id="virtualCards.createFirst" defaultMessage="Create your first gift card!" />
+        </Link>
+      );
+    } else if (onlyConfirmed) {
+      return <FormattedMessage id="virtualCards.emptyClaimed" defaultMessage="No gift card claimed yet" />;
+    } else {
+      return <FormattedMessage id="virtualCards.emptyUnclaimed" defaultMessage="No unclaimed gift card" />;
+    }
+  }
+
   render() {
     const { loading } = this.props.data;
     const queryResult = get(this.props, 'data.Collective.createdVirtualCards', {});
@@ -94,13 +114,43 @@ class EditVirtualCards extends React.Component {
 
     return (
       <div>
-        <Flex mb={4} justifyContent="center">
+        <Flex mb={4} justifyContent="space-between">
           {this.renderFilters(onlyConfirmed, paymentMethods)}
+          <Flex>
+            <LinkWrapper
+              route="editCollective"
+              params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}
+              passHref
+            >
+              <StyledLink buttonStyle="standard" buttonSize="medium">
+                <Add size="1em" />
+                {'  '}
+                <FormattedMessage id="virtualCards.createSingle" defaultMessage="Create gift cards" />
+              </StyledLink>
+            </LinkWrapper>
+            <Box mr="0.5em" />
+            <LinkWrapper
+              route="editCollective"
+              params={{ slug: this.props.collectiveSlug, section: 'gift-cards-send' }}
+              passHref
+            >
+              <StyledLink buttonStyle="primary" buttonSize="medium">
+                <PaperPlane size="1em" />
+                {'  '}
+                <FormattedMessage id="virtualCards.send" defaultMessage="Send gift cards" />
+              </StyledLink>
+            </LinkWrapper>
+          </Flex>
         </Flex>
         {loading ? (
           <Loading />
         ) : (
           <div>
+            {paymentMethods.length === 0 && (
+              <Flex justifyContent="center" mt="4em">
+                {this.renderNoVirtualCardMessage(onlyConfirmed)}
+              </Flex>
+            )}
             {paymentMethods.map(v => (
               <div key={v.id}>
                 <VirtualCardDetails virtualCard={v} />

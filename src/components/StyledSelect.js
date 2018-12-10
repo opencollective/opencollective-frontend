@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import Downshift from 'downshift';
 import styled from 'styled-components';
@@ -5,6 +6,7 @@ import { SelectArrows } from 'styled-icons/boxicons-regular/SelectArrows.cjs';
 import { themeGet } from 'styled-system';
 import { Box } from '@rebass/grid';
 
+import { getInputBorderColor } from '../lib/styled_components_utils';
 import Container from './Container';
 
 const matches = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -21,18 +23,6 @@ const getBgColor = ({ highlightedIndex, index, item, selectedItem }) => {
   return 'white.full';
 };
 
-const getBorderColor = ({ error, success }) => {
-  if (error) {
-    return 'red.500';
-  }
-
-  if (success) {
-    return 'green.300';
-  }
-
-  return 'black.300';
-};
-
 const getItems = options =>
   Object.keys(options).reduce(
     (items, key) =>
@@ -41,6 +31,8 @@ const getItems = options =>
   );
 
 const SelectContainer = styled(Container)`
+  cursor: pointer;
+  ${props => props.disabled && 'cursor: not-allowed;'};
   &:hover,
   &:focus {
     border-color: ${themeGet('colors.primary.300')};
@@ -51,8 +43,17 @@ const SelectContainer = styled(Container)`
   }
 `;
 
+const SelectPopupContainer = styled(Container)`
+  position: absolute;
+  z-index: 10;
+  background: white;
+`;
+
 const ListItem = styled(Container)`
   list-style: none;
+  cursor: pointer;
+  /* We need !important here cause "Body.js" CSS is overriding this :( */
+  margin: 0.2em !important;
 `;
 
 const Icon = styled(SelectArrows)`
@@ -81,10 +82,11 @@ const StyledSelect = ({ children, error, defaultValue, disabled, id, name, onCha
           alignItems="center"
           bg={disabled ? 'black.50' : 'white.full'}
           border="1px solid"
-          borderColor={getBorderColor({ error, success })}
+          borderColor={getInputBorderColor(error, success)}
           borderRadius="4px"
           fontSize="Paragraph"
-          p={2}
+          py={2}
+          px="1em"
           {...getInputProps({
             disabled,
             id,
@@ -93,20 +95,22 @@ const StyledSelect = ({ children, error, defaultValue, disabled, id, name, onCha
             onKeyDown: ({ key }) => key === 'Enter' && !disabled && toggleMenu(),
           })}
         >
-          <Box flex="1 1 auto">{selectedItem && children(selectedItem)}</Box>
-          <Icon size={14} disabled={disabled} error={error} success={success} />
+          <Box flex="1 1 auto" mr={1}>
+            {selectedItem && children(selectedItem)}
+          </Box>
+          <Icon size="1.2em" disabled={disabled} error={error} success={success} />
         </SelectContainer>
         {isOpen && (
-          <Container
+          <SelectPopupContainer
             as="ul"
-            px={1}
-            pt={1}
+            p={1}
             mt={2}
             border="1px solid"
             borderColor="black.300"
             borderRadius="4px"
             maxHeight={200}
-            overflow="scroll"
+            overflow="auto"
+            fontSize="Paragraph"
             {...getMenuProps()}
           >
             {getItems(options).map((item, index) => (
@@ -126,7 +130,7 @@ const StyledSelect = ({ children, error, defaultValue, disabled, id, name, onCha
                 {children(item)}
               </ListItem>
             ))}
-          </Container>
+          </SelectPopupContainer>
         )}
       </div>
     )}
@@ -138,7 +142,7 @@ StyledSelect.propTypes = {
   children: PropTypes.func,
   defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()]),
   /** disable selecion */
-  disabled: PropTypes.func,
+  disabled: PropTypes.bool,
   /** show error state */
   error: PropTypes.bool,
   /** element id for forms */

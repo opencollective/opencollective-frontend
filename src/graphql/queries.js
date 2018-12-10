@@ -835,6 +835,31 @@ export const getCollectiveApplicationsQuery = gql`
   }
 `;
 
+/**
+ * A query to get a collective source payment methods. This will not return
+ * virtual cards, as a virtual card cannot be used as a source payment method
+ * for another payment method.
+ */
+export const getCollectiveSourcePaymentMethodsQuery = gql`
+  query Collective($id: Int) {
+    Collective(id: $id) {
+      id
+      paymentMethods(types: ["creditcard"], hasBalanceAboveZero: true) {
+        id
+        uuid
+        name
+        data
+        monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
+      }
+    }
+  }
+`;
+
 export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = (component, options) => {
   return graphql(getCollectiveCoverQuery, options)(component);
