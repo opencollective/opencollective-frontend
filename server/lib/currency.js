@@ -48,7 +48,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
           return resolve(fxrate);
         } catch (e) {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;
-          console.error(msg, 'json:', json, 'error:', e);
+          debug(msg, 'json:', json, 'error:', e);
           throw new Error(msg);
         }
       })
