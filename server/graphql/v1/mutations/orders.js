@@ -142,12 +142,24 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
             message: 'We could not verify the GitHub repository',
           });
         }
+        if (repo.stargazers_count < 100) {
+          throw new errors.ValidationFailed({
+            message: 'The repository need at least 100 GitHub stars to be pledged.',
+          });
+        }
       } else {
         // An organization GitHub Handle
         const org = await github.getOrg(githubHandle).catch(() => null);
         if (!org) {
           throw new errors.ValidationFailed({
             message: 'We could not verify the GitHub organization',
+          });
+        }
+        const allRepos = await github.getAllOrganizationPublicRepos(githubHandle).catch(() => null);
+        const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= 100);
+        if (!repoWith100stars) {
+          throw new errors.ValidationFailed({
+            message: 'The organization need at least one repository with 100 GitHub stars to be pledged.',
           });
         }
       }

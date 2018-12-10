@@ -189,7 +189,7 @@ export const fetchAllRepositories = async (req, res, next) => {
 export const getRepo = async (req, res, next) => {
   const githubAccount = await getGithubAccount(req);
   try {
-    const repo = await github.getRepo(req.query.name, githubAccount.token).then(res => res.data);
+    const repo = await github.getRepo(req.query.name, githubAccount.token);
     res.send(repo);
   } catch (e) {
     next(e);

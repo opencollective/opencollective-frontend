@@ -55,6 +55,36 @@ export async function getAllUserPublicRepos(accessToken) {
   return repos;
 }
 
+export async function getAllOrganizationPublicRepos(org, accessToken) {
+  const cacheKey = `org_repos_all_${org}_${accessToken || ''}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const octokit = getOctokit(accessToken);
+
+  const parameters = { org, page: 1, per_page: 100 };
+
+  let repos = [];
+  let fetchRepos;
+  do {
+    // https://octokit.github.io/rest.js/#api-Repos-listForOrg
+    // https://developer.github.com/v3/repos/#list-organization-repositories
+    fetchRepos = await octokit.repos.listForOrg(parameters).then(res => res.data);
+    repos = [...repos, ...fetchRepos];
+    parameters.page++;
+  } while (fetchRepos.length === parameters.per_page);
+
+  repos = repos.map(repo =>
+    pick(repo, ['name', 'full_name', 'html_url', 'permissions', 'private', 'fork', 'stargazers_count']),
+  );
+
+  cache.set(cacheKey, repos, 5 * 60 /* 5 minutes */);
+
+  return repos;
+}
+
 export async function getRepo(name, accessToken) {
   const octokit = getOctokit(accessToken);
   // https://octokit.github.io/rest.js/#api-Repos-get
