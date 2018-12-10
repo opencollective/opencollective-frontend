@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+import models from '../../../server/models';
 import {
   GraphQLInt,
   GraphQLFloat,
@@ -65,7 +67,10 @@ const TransactionFields = () => {
     refundTransaction: {
       type: TransactionInterfaceType,
       resolve(transaction) {
-        return transaction.getRefundTransaction();
+        if (transaction && transaction.getRefundTransaction) {
+          return transaction.getRefundTransaction();
+        }
+        return null;
       },
     },
     uuid: {
@@ -74,7 +79,10 @@ const TransactionFields = () => {
         if (!req.remoteUser) {
           return null;
         }
-        return transaction.getDetailsForUser(req.remoteUser);
+        if (transaction && transaction.getDetailsForUser) {
+          return transaction.getDetailsForUser(req.remoteUser);
+        }
+        return null;
       },
     },
     type: {
@@ -140,32 +148,69 @@ const TransactionFields = () => {
     },
     host: {
       type: UserCollectiveType,
-      resolve(transaction) {
-        return transaction.getHostCollective();
+      async resolve(transaction) {
+        if (transaction && transaction.getHostCollective) {
+          return transaction.getHostCollective();
+        }
+        const FromCollectiveId = transaction.fromCollective.id;
+        const CollectiveId = transaction.collective.id;
+        let HostCollectiveId = transaction.HostCollectiveId;
+        // if the transaction is from the perspective of the fromCollective
+        if (!HostCollectiveId) {
+          const fromCollective = await models.Collective.findById(FromCollectiveId);
+          HostCollectiveId = await fromCollective.getHostCollectiveId();
+          // if fromCollective has no host, we try the collective
+          if (!HostCollectiveId) {
+            const collective = await models.Collective.findById(CollectiveId);
+            HostCollectiveId = await collective.getHostCollectiveId();
+          }
+        }
+        return models.Collective.findById(HostCollectiveId);
       },
     },
     createdByUser: {
       type: UserType,
       resolve(transaction) {
-        return transaction.getCreatedByUser();
+        if (transaction && transaction.getCreatedByUser) {
+          return transaction.getCreatedByUser();
+        }
+        return null;
       },
     },
     fromCollective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
-        return transaction.getFromCollective();
+        if (transaction && transaction.getFromCollective) {
+          return transaction.getFromCollective();
+        }
+        if (get(transaction, 'fromCollective.id')) {
+          return models.Collective.findById(get(transaction, 'fromCollective.id'));
+        }
+        return null;
       },
     },
     usingVirtualCardFromCollective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
-        return transaction.getVirtualCardEmitterCollective();
+        if (transaction && transaction.getVirtualCardEmitterCollective) {
+          return transaction.getVirtualCardEmitterCollective();
+        }
+        if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
+          return models.Collective.findById(transaction.UsingVirtualCardFromCollectiveId);
+        }
+        return null;
       },
     },
     collective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
-        return transaction.getCollective();
+        if (transaction && transaction.getCollective) {
+          return transaction.getCollective();
+        }
+        if (get(transaction, 'collective.id')) {
+          return models.Collective.findById(get(transaction, 'collective.id'));
+        }
+        return null;
       },
     },
     createdAt: {
@@ -183,9 +228,10 @@ const TransactionFields = () => {
     paymentMethod: {
       type: PaymentMethodType,
       resolve(transaction, args, req) {
-        if (!transaction.PaymentMethodId) return null;
+        const paymentMethodId = transaction.PaymentMethodId || get(transaction, 'paymentMethod.id');
+        if (!paymentMethodId) return null;
         // TODO: put behind a login check
-        return req.loaders.paymentMethods.findById.load(transaction.PaymentMethodId);
+        return req.loaders.paymentMethods.findById.load(paymentMethodId);
       },
     },
   };
@@ -200,25 +246,34 @@ export const TransactionExpenseType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction.description || transaction.getExpense().then(expense => expense && expense.description);
+          const expense = transaction.getExpense
+            ? transaction.getExpense().then(expense => expense && expense.description)
+            : null;
+          return transaction.description || expense;
         },
       },
       privateMessage: {
         type: GraphQLString,
         resolve(transaction, args, req) {
-          return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage);
+          return transaction.getExpenseForViewer
+            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage)
+            : null;
         },
       },
       category: {
         type: GraphQLString,
         resolve(transaction, args, req) {
-          return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category);
+          return transaction.getExpenseForViewer
+            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category)
+            : null;
         },
       },
       attachment: {
         type: GraphQLString,
         resolve(transaction, args, req) {
-          return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment);
+          return transaction.getExpenseForViewer
+            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment)
+            : null;
         },
       },
     };
@@ -235,32 +290,34 @@ export const TransactionOrderType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction.description || transaction.getOrder().then(order => order && order.description);
+          const getOrder = transaction.getOrder
+            ? transaction.getOrder().then(order => order && order.description)
+            : null;
+          return transaction.description || getOrder;
         },
       },
       privateMessage: {
         type: GraphQLString,
         resolve(transaction) {
-          // TODO: Put behind a login check
-          return transaction.getOrder().then(order => order && order.privateMessage);
+          return transaction.getOrder ? transaction.getOrder().then(order => order && order.privateMessage) : null;
         },
       },
       publicMessage: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction.getOrder().then(order => order && order.publicMessage);
+          return transaction.getOrder ? transaction.getOrder().then(order => order && order.publicMessage) : null;
         },
       },
       order: {
         type: OrderType,
         resolve(transaction) {
-          return transaction.getOrder();
+          return transaction.getOrder ? transaction.getOrder() : null;
         },
       },
       subscription: {
         type: SubscriptionType,
         resolve(transaction) {
-          return transaction.getOrder().then(order => order && order.getSubscription());
+          return transaction.getOrder ? transaction.getOrder().then(order => order && order.getSubscription()) : null;
         },
       },
     };
