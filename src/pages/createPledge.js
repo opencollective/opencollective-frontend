@@ -115,6 +115,7 @@ class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
     return {
       name: query.name || '',
+      githubHandle: query.githubHandle || '',
       slug: query.slug,
     };
   }
@@ -186,7 +187,7 @@ class CreatePledgePage extends React.Component {
 
   render() {
     const { errorMessage, submitting } = this.state;
-    const { data = {}, name, slug, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data = {}, name, slug, githubHandle, LoggedInUser, loadingLoggedInUser } = this.props;
 
     let website;
     if (data.Collective) {
@@ -318,7 +319,7 @@ class CreatePledgePage extends React.Component {
                             prepend="https://opencollective.com/"
                             id="slug"
                             name="slug"
-                            defaultValue={slugify(name || '')}
+                            defaultValue={slugify(name || '').toLowerCase()}
                           />
                         </Flex>
                       </Flex>
@@ -332,6 +333,7 @@ class CreatePledgePage extends React.Component {
                           id="githubHandle"
                           name="githubHandle"
                           placeholder="i.e. babel/babel"
+                          defaultValue={githubHandle || ''}
                         />
                       </Flex>
                     </Box>
