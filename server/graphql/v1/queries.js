@@ -317,7 +317,11 @@ const queries = {
       dateTo: { type: GraphQLString },
       /** @deprecated since 2018-11-29: Virtual cards now included by default when necessary */
       includeVirtualCards: { type: GraphQLBoolean },
-      fetchDataFromLedger: { type: GraphQLBoolean },
+      fetchDataFromLedger: { type: GraphQLBoolean }, // flag to go with either api or ledger transactions
+      includeHostedCollectivesTransactions: {
+        type: GraphQLBoolean,
+      } /** flag to determine
+        whether we should include the transactions of the collectives of that host(if it's a host collective) */,
     },
     async resolve(_, args) {
       let fetchDataFromLedger = process.env.GET_TRANSACTIONS_FROM_LEDGER || false;

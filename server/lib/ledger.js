@@ -24,6 +24,7 @@ export async function fetchLedgerTransactions(args) {
     },
     limit: args.limit,
     offset: args.offset,
+    includeHostedCollectivesTransactions: args.includeHostedCollectivesTransactions,
   };
   ledgerQuery.where = JSON.stringify(ledgerQuery.where);
   return axios.get(`${config.ledger.transactionUrl}?${queryString.stringify(ledgerQuery)}`);
