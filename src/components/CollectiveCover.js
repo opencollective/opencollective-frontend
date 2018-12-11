@@ -6,6 +6,7 @@ import { Github } from 'styled-icons/fa-brands/Github.cjs';
 import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt.cjs';
 import { get, pick } from 'lodash';
+import { withUser } from './UserProvider';
 import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
@@ -457,4 +458,4 @@ ${description}`;
   }
 }
 
-export default withIntl(CollectiveCover);
+export default withIntl(withUser(CollectiveCover));
