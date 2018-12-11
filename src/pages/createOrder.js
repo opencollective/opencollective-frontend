@@ -1,16 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
 
 import { Router } from '../server/pages';
 
+import { Flex } from '@rebass/grid';
+import { H2, P } from '../components/Text';
+import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import OrderForm from '../components/OrderForm';
-import CollectiveCover from '../components/CollectiveCover';
+import Link from '../components/Link';
 
 import { addCreateOrderMutation } from '../graphql/mutations';
 
@@ -257,7 +260,8 @@ class CreateOrderPage extends React.Component {
     this.order.tier = tier;
     this.order.description = description;
 
-    const coverClassName = collective.type === 'EVENT' ? 'small' : '';
+    const logo = collective.image || get(collective.parentCollective, 'image');
+    const tierName = (tier.name && tier.name.replace(/s$/, '')) || 'backer';
 
     return (
       <Page
@@ -280,12 +284,34 @@ class CreateOrderPage extends React.Component {
           `}
         </style>
 
-        <CollectiveCover
-          key={collective.slug}
-          collective={collective}
-          href={collective.path}
-          className={coverClassName}
-        />
+        <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4}>
+          <Link route="collective" params={{ slug: collective.slug }} className="goBack">
+            <Logo
+              src={logo}
+              className="logo"
+              type={collective.type}
+              website={collective.website}
+              height="10rem"
+              key={logo}
+            />
+          </Link>
+
+          <Link route="collective" params={{ slug: collective.slug }} className="goBack">
+            <H2 as="h1" color="black.900">
+              {collective.name}
+            </H2>
+          </Link>
+
+          <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3}>
+            <FormattedMessage
+              id="tier.defaultDescription"
+              defaultMessage="Become a {name}"
+              values={{
+                name: tierName,
+              }}
+            />
+          </P>
+        </Flex>
 
         <div className="content" id="content">
           <OrderForm
