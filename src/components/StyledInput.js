@@ -70,10 +70,6 @@ const StyledInput = styled(tag.input)`
   &::placeholder {
     color: ${themeGet('colors.black.400')};
   }
-
-  &:valid {
-    border-color: ${themeGet('colors.green.300')}
-  }
 `;
 
 StyledInput.propTypes = {
