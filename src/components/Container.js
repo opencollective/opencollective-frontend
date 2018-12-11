@@ -37,6 +37,7 @@ import {
   width,
   zIndex,
 } from 'styled-system';
+import { cursor } from './Text';
 
 export const overflow = style({ prop: 'overflow' });
 
@@ -61,6 +62,7 @@ const Container = styled(tag)(
   boxShadow,
   clear,
   color,
+  cursor,
   display,
   flex,
   flexDirection,
