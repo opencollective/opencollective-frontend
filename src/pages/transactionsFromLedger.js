@@ -15,7 +15,7 @@ import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 
-class TransactionsOldPage extends React.Component {
+class TransactionsFromLedgerPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
     return { slug: collectiveSlug };
   }
@@ -80,4 +80,4 @@ class TransactionsOldPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsOldPage))));
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsFromLedgerPage))));

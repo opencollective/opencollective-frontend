@@ -1,55 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 
 import withIntl from '../../../lib/withIntl';
-import Error from '../../../components/Error';
 import { getTransactionsQuery } from '../../../graphql/queries';
-
-import Transactions from './Transactions';
-
-class TransactionsWithDataFromLedger extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    limit: PropTypes.number,
-    filters: PropTypes.bool,
-    LoggedInUser: PropTypes.object,
-  };
-
-  constructor(props) {
-    super(props);
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (!this.props.LoggedInUser && nextProps.LoggedInUser) {
-      return this.props.data.refetch();
-    }
-  }
-
-  render() {
-    const { data, LoggedInUser, collective, fetchMore, showCSVlink, filters } = this.props;
-
-    if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
-    }
-    const transactions = data.allTransactions;
-
-    return (
-      <div className="TransactionsContainer">
-        <Transactions
-          collective={collective}
-          transactions={transactions}
-          refetch={data.refetch}
-          fetchMore={fetchMore}
-          filters={filters}
-          LoggedInUser={LoggedInUser}
-          showCSVlink={showCSVlink}
-        />
-      </div>
-    );
-  }
-}
+import TransactionsWithDataBase from './TransactionsWithDataBase';
 
 const TRANSACTIONS_PER_PAGE = 10;
 export const addTransactionsData = graphql(getTransactionsQuery, {
@@ -87,4 +40,5 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
   }),
 });
 
-export default addTransactionsData(withIntl(TransactionsWithDataFromLedger));
+export default addTransactionsData(withIntl(TransactionsWithDataBase));
+// export default addTransactionsData(withIntl(TransactionsWithDataFromLedger));
