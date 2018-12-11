@@ -1,12 +1,8 @@
 import Promise from 'bluebird';
-import { find, get, uniq, groupBy } from 'lodash';
-import axios from 'axios';
-import config from 'config';
-import queryString from 'query-string';
-
+import { find, get, uniq } from 'lodash';
 import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
-import { parseLedgerTransactionToApiFormat } from '../../lib/transactions';
+import { fetchLedgerTransactionsGroupedByLegacyIds, parseLedgerTransactions } from '../../lib/ledger';
 
 import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
 
@@ -324,16 +320,9 @@ const queries = {
       fetchDataFromLedger: { type: GraphQLBoolean },
     },
     async resolve(_, args) {
-      const fetchDataFromLedger = args.fetchDataFromLedger || process.env.GET_TRANSACTIONS_FROM_LEDGER || false;
-      let attributes;
-      if (fetchDataFromLedger) {
-        attributes = [
-          'id',
-          'uuid', // because the stored invoice pdf in aws uses the uuid as reference
-          'UsingVirtualCardFromCollectiveId', // because virtual cards will only work for wallets and we're skipping wallets in the transactions details for now
-          'HostCollectiveId', // because we're skipping wallets and using host on transactions details for now
-          'RefundTransactionId', // because the ledger refundTransactionId refers to the ledger id and not the legacy one
-        ];
+      let fetchDataFromLedger = process.env.GET_TRANSACTIONS_FROM_LEDGER || false;
+      if (args.fetchDataFromLedger) {
+        fetchDataFromLedger = args.fetchDataFromLedger;
       }
       // Load collective
       const { CollectiveId, collectiveSlug } = args;
@@ -342,58 +331,32 @@ const queries = {
       const collective = await models.Collective.findOne({ where });
       if (!collective) throw new Error('This collective does not exist');
 
-      // Load transactions
-      const allTransactions = await collective.getTransactions({
-        attributes: attributes,
-        order: [['createdAt', 'DESC']],
-        type: args.type,
-        limit: args.limit,
-        offset: args.offset,
-        startDate: args.dateFrom,
-        endDate: args.dateTo,
-      });
-      if (!fetchDataFromLedger) return allTransactions;
-
-      const ledgerQuery = {
-        where: {
-          ToAccountId: args.CollectiveId,
-        },
-        limit: args.limit,
-        offset: args.offset,
-      };
-      ledgerQuery.where = JSON.stringify(ledgerQuery.where);
-      const transactionsEndpointResult = await axios.get(
-        `${config.ledger.transactionUrl}?${queryString.stringify(ledgerQuery)}`,
-      );
-      const ledgerTransactions = groupBy(transactionsEndpointResult.data || [], 'LegacyCreditTransactionId');
-      // sort keys of result by legacy id DESC as lodash groupBy changes the order
-      const ledgerFormattedTransactions = [];
-      for (const key of Object.keys(ledgerTransactions).sort((a, b) => b - a)) {
-        // mapping legacy info to parse inside ledger mapping
-        const legacyMatchingTransaction = allTransactions.filter(t => {
-          return (
-            t.id === ledgerTransactions[key][0].LegacyDebitTransactionId ||
-            t.id === ledgerTransactions[key][0].LegacyCreditTransactionId
-          );
-        })[0];
-        let uuid, VirtualCardCollectiveId, HostCollectiveId, RefundTransactionId;
-        if (legacyMatchingTransaction) {
-          uuid = legacyMatchingTransaction.uuid;
-          VirtualCardCollectiveId = legacyMatchingTransaction.UsingVirtualCardFromCollectiveId;
-          HostCollectiveId = legacyMatchingTransaction.HostCollectiveId;
-          RefundTransactionId = legacyMatchingTransaction.RefundTransactionId;
-        }
-        ledgerFormattedTransactions.push(
-          parseLedgerTransactionToApiFormat(key, ledgerTransactions[key], {
-            AccountId: args.CollectiveId,
-            legacyUuid: uuid,
-            VirtualCardCollectiveId,
-            HostCollectiveId,
-            RefundTransactionId,
-          }),
-        );
+      // returns transactions straight from the api
+      if (!fetchDataFromLedger) {
+        return collective.getTransactions({
+          order: [['createdAt', 'DESC']],
+          type: args.type,
+          limit: args.limit,
+          offset: args.offset,
+          startDate: args.dateFrom,
+          endDate: args.dateTo,
+        });
       }
-      return ledgerFormattedTransactions;
+      // otherwise returns data from the ledger
+      const ledgerTransactions = await fetchLedgerTransactionsGroupedByLegacyIds(args);
+      const apiTransactions = await models.Transaction.findAll({
+        attributes: [
+          'id',
+          'uuid', // because the stored invoice pdf in aws uses the uuid as reference
+          'UsingVirtualCardFromCollectiveId', // because virtual cards will only work for wallets and we're skipping wallets in the transactions details for now
+          'HostCollectiveId', // because we're skipping wallets and using host on transactions details for now
+          'RefundTransactionId', // because the ledger refundTransactionId refers to the ledger id and not the legacy one
+        ],
+        where: {
+          id: Object.keys(ledgerTransactions),
+        },
+      });
+      return parseLedgerTransactions(args.CollectiveId, ledgerTransactions, apiTransactions);
     },
   },
 
