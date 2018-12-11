@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, uniqBy } from 'lodash';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { Link, Router } from '../server/pages';
+import { Link } from '../server/pages';
 import Currency from './Currency';
 import colors from '../constants/colors';
 import { formatCurrency } from '../lib/utils';
@@ -134,17 +134,6 @@ class TierCard extends React.Component {
     if (referral) {
       linkRoute.params.referral = referral;
     }
-
-    const onClick = e => {
-      e.preventDefault();
-      if (!disabled) {
-        // For better UX, we redirect to #content after the route is loaded
-        // without that, we would either scroll to the top or don't scroll at all
-        Router.pushRoute(linkRoute.name, linkRoute.params).then(() => {
-          window.location.hash = linkRoute.anchor;
-        });
-      }
-    };
 
     return (
       <div className={classNames('TierCard', this.props.className, this.anchor)}>
@@ -326,7 +315,7 @@ class TierCard extends React.Component {
           </div>
         )}
         <Link route={linkRoute.name} params={linkRoute.params}>
-          <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick}>
+          <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip}>
             {tier.button ? tier.button : <FormattedMessage id="tier.contribute" defaultMessage="contribute" />}
           </a>
         </Link>
