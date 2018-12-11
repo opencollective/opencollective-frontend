@@ -11,7 +11,9 @@ const paypalAdaptiveClient = new Paypal({
   sandbox: config.env !== 'production',
 });
 
-const callPaypal = (endpointName, payload) => {
+const paypalAdaptive = {};
+
+paypalAdaptive.callPaypal = (endpointName, payload) => {
   // Needs to be included in every call to PayPal
   const requestEnvelope = {
     errorLanguage: 'en_US',
@@ -24,6 +26,9 @@ const callPaypal = (endpointName, payload) => {
   return new Promise((resolve, reject) => {
     paypalAdaptiveClient[endpointName](Object.assign({}, payload, { requestEnvelope }), (err, res) => {
       console.log(`Paypal ${endpointName} response: ${JSON.stringify(res)}`); // leave this in permanently
+      if (get(res, 'responseEnvelope.ack') === 'Failure') {
+        return reject(new Error(`PayPal error: ${res.error[0].message} (error id: ${res.error[0].errorId})`));
+      }
       if (err) {
         console.log(`Paypal ${endpointName} error: ${JSON.stringify(err)}`); // leave this in permanently
         if (err.code === 'ENOTFOUND' && err.syscall === 'getaddrinfo') {
@@ -37,14 +42,10 @@ const callPaypal = (endpointName, payload) => {
   });
 };
 
-const pay = payload => callPaypal('pay', payload);
-const executePayment = payKey => callPaypal('executePayment', { payKey });
-const preapproval = payload => callPaypal('preapproval', payload);
-const preapprovalDetails = preapprovalKey => callPaypal('preapprovalDetails', { preapprovalKey });
+paypalAdaptive.pay = payload => paypalAdaptive.callPaypal('pay', payload);
+paypalAdaptive.executePayment = payKey => paypalAdaptive.callPaypal('executePayment', { payKey });
+paypalAdaptive.preapproval = payload => paypalAdaptive.callPaypal('preapproval', payload);
+paypalAdaptive.preapprovalDetails = preapprovalKey =>
+  paypalAdaptive.callPaypal('preapprovalDetails', { preapprovalKey });
 
-export default {
-  pay,
-  executePayment,
-  preapproval,
-  preapprovalDetails,
-};
+export default paypalAdaptive;

@@ -1,40 +1,61 @@
 export default {
   adaptive: {
     pay: {
-      responseEnvelope: {
-        timestamp: '2015-06-21T17:44:37.487-07:00',
-        ack: 'Success',
-        correlationId: 'c388ecaf49b1b',
-        build: '15743565',
+      success: {
+        responseEnvelope: {
+          timestamp: '2015-06-21T17:44:37.487-07:00',
+          ack: 'Success',
+          correlationId: 'c388ecaf49b1b',
+          build: '15743565',
+        },
+        payKey: 'AP-791807008W699005A',
+        paymentExecStatus: 'CREATED',
+        defaultFundingPlan: {
+          fundingPlanId: '0',
+          fundingAmount: {
+            code: 'EUR',
+            amount: '15.56',
+          },
+          backupFundingSource: {
+            lastFourOfAccountNumber: '0035',
+            type: 'CREDITCARD',
+          },
+          senderFees: {
+            code: 'USD',
+            amount: '3.78',
+          },
+          currencyConversion: {
+            exchangeRate: '0.9115770282588879',
+          },
+          charge: [
+            {
+              charge: { code: 'USD', amount: '120.00' },
+              fundingSource: { type: 'BALANCE' },
+            },
+          ],
+        },
+        httpStatusCode: 200,
+        paymentApprovalUrl: 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A',
       },
-      payKey: 'AP-791807008W699005A',
-      paymentExecStatus: 'CREATED',
-      defaultFundingPlan: {
-        fundingPlanId: '0',
-        fundingAmount: {
-          code: 'EUR',
-          amount: '15.56',
+      error: {
+        responseEnvelope: {
+          timestamp: '2018-12-07T06:58:13.981-08:00',
+          ack: 'Failure',
+          correlationId: '7c5fbca45d456',
+          build: '50282587',
         },
-        backupFundingSource: {
-          lastFourOfAccountNumber: '0035',
-          type: 'CREDITCARD',
-        },
-        senderFees: {
-          code: 'USD',
-          amount: '3.78',
-        },
-        currencyConversion: {
-          exchangeRate: '0.9115770282588879',
-        },
-        charge: [
+        error: [
           {
-            charge: { code: 'USD', amount: '120.00' },
-            fundingSource: { type: 'BALANCE' },
+            errorId: '579031',
+            domain: 'PLATFORM',
+            subdomain: 'Application',
+            severity: 'Error',
+            category: 'Application',
+            message: 'The total amount of all payments exceeds the maximum total amount for all payments',
           },
         ],
+        httpStatusCode: 200,
       },
-      httpStatusCode: 200,
-      paymentApprovalUrl: 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A',
     },
 
     executePayment: {

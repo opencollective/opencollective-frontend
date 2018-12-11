@@ -17,6 +17,8 @@ import emailLib from '../server/lib/email';
 import * as libtransactions from '../server/lib/transactions';
 import { getFxRate } from '../server/lib/currency';
 
+import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
+
 /* Queries used throughout these tests */
 const allExpensesQuery = `
   query allExpenses($CollectiveId: Int!, $category: String, $fromCollectiveSlug: String, $limit: Int, $includeHostedCollectives: Boolean) {
@@ -720,6 +722,78 @@ describe('GraphQL Expenses API', () => {
         "You don't have enough funds to cover for the fees of this payment method. Current balance: $10, Expense amount: $10, Estimated paypal fees: $1",
       );
     }); /* End of "fails if not enough funds to cover the fees" */
+
+    describe('pay with paypal', () => {
+      let hostAdmin, hostCollective, collective, expense, user, callPaypal;
+
+      beforeEach(() => {
+        callPaypal = sandbox.stub(paypalAdaptive, 'callPaypal').callsFake(() => {
+          return Promise.reject(
+            new Error(
+              'PayPal error: The total amount of all payments exceeds the maximum total amount for all payments (error id: 579031)',
+            ),
+          );
+        });
+      });
+
+      beforeEach(async () => {
+        // Given that we have a host and a collective
+        ({ hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
+          'WWCode Berlin',
+          'EUR',
+          'USD',
+          10,
+        ));
+
+        // And given a user to file expenses
+        ({ user } = await store.newUser('someone cool', {
+          paypalEmail: 'paypal@user.com',
+        }));
+        await models.PaymentMethod.create({
+          name: 'paypal@host.com',
+          service: 'paypal',
+          token: 'PA-1EF10938G1481222S',
+          CollectiveId: hostCollective.id,
+          confirmedAt: new Date(),
+        });
+        // And given the above collective has one expense (in PENDING
+        // state)
+        expense = await store.createExpense(user, {
+          amount: 1000,
+          description: 'Pizza',
+          currency: 'EUR',
+          payoutMethod: 'paypal',
+          collective: { id: collective.id },
+        });
+
+        // And given the expense is approved
+        expense.status = 'APPROVED';
+        expense.save();
+      });
+
+      it('fails if not enough funds on the paypal preapproved key', async () => {
+        // And then add funds to the collective
+        const initialBalance = 1500;
+        const paymentProcessorFeeInCollectiveCurrency = 100;
+        await addFunds(user, hostCollective, collective, initialBalance);
+        // When the expense is paid by the host admin
+        const res = await utils.graphqlQuery(
+          payExpenseQuery,
+          { id: expense.id, paymentProcessorFeeInCollectiveCurrency },
+          hostAdmin,
+        );
+        res.errors && console.log(res.errors);
+        expect(callPaypal.firstCall.args[0]).to.equal('pay');
+        expect(callPaypal.firstCall.args[1].currencyCode).to.equal('EUR');
+        expect(callPaypal.firstCall.args[1].memo).to.equal('Reimbursement from WWCode Berlin: Pizza');
+        expect(res.errors).to.exist;
+        expect(res.errors[0].message).to.contain('Not enough funds in your existing Paypal preapproval');
+        const updatedExpense = await models.Expense.findById(expense.id);
+        expect(updatedExpense.status).to.equal('APPROVED');
+        const transactions = await models.Transaction.findAll({ where: { ExpenseId: expense.id } });
+        expect(transactions.length).to.equal(0);
+      }); /* End of "pays the expense manually and reduces the balance of the collective" */
+    });
 
     describe('success', () => {
       let hostAdmin, hostCollective, collective, expense, user, userCollective;
