@@ -81,7 +81,7 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
     >
       {prepend && (
         <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" py={2} px={3}>
-          <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+          <Span color={getColor({ error, focused, success })} fontSize="Paragraph" lineHeight="Paragraph">
             {prepend}
           </Span>
         </Container>
@@ -100,7 +100,7 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
       />
       {append && (
         <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
-          <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+          <Span color={getColor({ error, focused, success })} fontSize="Paragraph" lineHeight="Paragraph">
             {append}
           </Span>
         </Container>
