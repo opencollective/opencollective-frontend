@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 
 import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
-import { getTransactionsFromLedgerQuery } from '../../../graphql/queries';
+import { getTransactionsQuery } from '../../../graphql/queries';
 
 import Transactions from './Transactions';
 
@@ -33,8 +33,7 @@ class TransactionsWithDataFromLedger extends React.Component {
       console.error('graphql error>>>', data.error.message);
       return <Error message="GraphQL error" />;
     }
-
-    const transactions = data.allTransactionsFromLedger;
+    const transactions = data.allTransactions;
 
     return (
       <div className="TransactionsContainer">
@@ -53,13 +52,16 @@ class TransactionsWithDataFromLedger extends React.Component {
 }
 
 const TRANSACTIONS_PER_PAGE = 10;
-export const addTransactionsData = graphql(getTransactionsFromLedgerQuery, {
+export const addTransactionsData = graphql(getTransactionsQuery, {
   options(props) {
     return {
       variables: {
         CollectiveId: props.collective.id,
         offset: 0,
         limit: props.limit || TRANSACTIONS_PER_PAGE * 2,
+        fetchDataFromLedger: true,
+        includeHostedCollectivesTransactions: false /** if the collective is a host we can show
+          all transactions(from the host itself and also its collective) through this flag */,
       },
     };
   },
@@ -68,7 +70,7 @@ export const addTransactionsData = graphql(getTransactionsFromLedgerQuery, {
     fetchMore: () => {
       return data.fetchMore({
         variables: {
-          offset: data.allTransactionsFromLedger.length,
+          offset: data.allTransactions.length,
           limit: TRANSACTIONS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
@@ -77,10 +79,7 @@ export const addTransactionsData = graphql(getTransactionsFromLedgerQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allTransactionsFromLedger: [
-              ...previousResult.allTransactionsFromLedger,
-              ...fetchMoreResult.allTransactionsFromLedger,
-            ],
+            allTransactions: [...previousResult.allTransactions, ...fetchMoreResult.allTransactions],
           });
         },
       });
