@@ -6,6 +6,7 @@ import { Box, Flex } from '@rebass/grid';
 import Container from './Container';
 import { P } from './Text';
 import StyledButton from './StyledButton';
+import StyledCard from './StyledCard';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
@@ -65,7 +66,7 @@ const enhance = compose(
  */
 const CreateProfile = enhance(
   ({ getFieldError, getFieldProps, onPersonalSubmit, onOrgSubmit, onSecondaryAction, state, setState }) => (
-    <Container borderRadius="8px" border="1px solid" borderColor="black.300" overflow="hidden" maxWidth={480}>
+    <StyledCard maxWidth={480}>
       <Flex>
         <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
           Create Personal Profile
@@ -212,7 +213,7 @@ const CreateProfile = enhance(
           Sign In
         </StyledButton>
       </Container>
-    </Container>
+    </StyledCard>
   ),
 );
 
