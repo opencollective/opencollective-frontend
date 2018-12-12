@@ -5,6 +5,24 @@ import { pick } from 'lodash';
 
 import cache from './cache';
 
+const compactRepo = repo => {
+  repo = pick(repo, [
+    'name', // (1)
+    'full_name', // (1)
+    'description', // (1)
+    'owner', // (1)
+    'stargazers_count', // (1) (2)
+    'topics', // (1)
+  ]);
+  repo.owner = pick(repo.owner, [
+    'login', // (1)
+  ]);
+  // 1) Required for the old website, according to:
+  // https://github.com/opencollective/opencollective-website/blob/master/frontend/src/reducers/github.js
+  // 2) Required for the pledge feature in /graphql/v1/orders.js
+  return repo;
+};
+
 export default function fetchUser(username) {
   return request({
     uri: `https://api.github.com/users/${username}`,
@@ -18,7 +36,11 @@ export default function fetchUser(username) {
 }
 
 export function getOctokit(accessToken) {
-  const octokit = octokitRest();
+  const octokit = octokitRest({
+    headers: {
+      accept: 'application/vnd.github.mercy-preview+json',
+    },
+  });
   if (accessToken) {
     octokit.authenticate({ type: 'oauth', token: accessToken });
   }
@@ -46,9 +68,7 @@ export async function getAllUserPublicRepos(accessToken) {
     parameters.page++;
   } while (fetchRepos.length === parameters.per_page);
 
-  repos = repos.map(repo =>
-    pick(repo, ['name', 'full_name', 'html_url', 'permissions', 'private', 'fork', 'stargazers_count']),
-  );
+  repos = repos.map(compactRepo);
 
   cache.set(cacheKey, repos, 5 * 60 /* 5 minutes */);
 
@@ -64,7 +84,7 @@ export async function getAllOrganizationPublicRepos(org, accessToken) {
 
   const octokit = getOctokit(accessToken);
 
-  const parameters = { org, page: 1, per_page: 100 };
+  const parameters = { org, page: 1, per_page: 100, type: 'public' };
 
   let repos = [];
   let fetchRepos;
@@ -76,9 +96,7 @@ export async function getAllOrganizationPublicRepos(org, accessToken) {
     parameters.page++;
   } while (fetchRepos.length === parameters.per_page);
 
-  repos = repos.map(repo =>
-    pick(repo, ['name', 'full_name', 'html_url', 'permissions', 'private', 'fork', 'stargazers_count']),
-  );
+  repos = repos.map(compactRepo);
 
   cache.set(cacheKey, repos, 5 * 60 /* 5 minutes */);
 
