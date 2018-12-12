@@ -1,7 +1,12 @@
 import { get, groupBy } from 'lodash';
+import amqp from 'amqplib';
+import debugLib from 'debug';
 import axios from 'axios';
-import config from 'config';
 import queryString from 'query-string';
+import { ledger, ledgerQueue } from 'config';
+import models from '../models';
+
+const debug = debugLib('ledgerLib');
 
 const ledgerTransactionCategories = Object.freeze({
   PLATFORM: 'Platform Fee',
@@ -27,7 +32,7 @@ export async function fetchLedgerTransactions(args) {
     includeHostedCollectivesTransactions: args.includeHostedCollectivesTransactions,
   };
   ledgerQuery.where = JSON.stringify(ledgerQuery.where);
-  return axios.get(`${config.ledger.transactionUrl}?${queryString.stringify(ledgerQuery)}`);
+  return axios.get(`${ledger.transactionUrl}?${queryString.stringify(ledgerQuery)}`);
 }
 /**
  * Fetches transactions from the ledger service and return them
@@ -186,4 +191,104 @@ export function parseLedgerTransactionToApiFormat(legacyId, transactions, legacy
     };
   }
   return parsedTransaction;
+}
+
+/**
+ * Given an API transactions, returns the same with its nested properties objects
+ * to the api transactions
+ * @param {Object} transactions - the transaction to return information from
+ * @return {Object} returns an api transaction with nested models
+ */
+export async function getTransactionWithNestedProperties(transaction) {
+  const fromCollective = await models.Collective.findById(transaction.FromCollectiveId);
+  const fromCollectiveHost = await fromCollective.getHostCollective();
+  const collective = await models.Collective.findById(transaction.CollectiveId);
+  const collectiveHost = await collective.getHostCollective();
+  transaction.fromCollectiveSlug = fromCollective.slug;
+  transaction.FromCollectiveHostId = fromCollectiveHost && fromCollectiveHost.id;
+  transaction.fromCollectiveHostSlug = fromCollectiveHost && fromCollectiveHost.slug;
+  transaction.CollectiveHostId = collectiveHost && collectiveHost.id;
+  transaction.collectiveHostSlug = collectiveHost && collectiveHost.slug;
+  transaction.collectiveSlug = collective.slug;
+  // get transaction DEBIT equivalent
+  const debitTransaction = models.Transaction.findOne({
+    attributes: ['id'],
+    where: {
+      TransactionGroup: transaction.TransactionGroup,
+      type: 'DEBIT',
+    },
+  });
+  transaction.debitId = debitTransaction.id;
+  if (transaction.HostCollectiveId) {
+    const hostCollective = await models.Collective.findById(transaction.HostCollectiveId);
+    transaction.hostCollectiveSlug = hostCollective.slug;
+    const paymentMethod = await models.PaymentMethod.findById(transaction.PaymentMethodId);
+    transaction.paymentMethodService = paymentMethod.service;
+    transaction.paymentMethodType = paymentMethod.type;
+    if (paymentMethod.CollectiveId) {
+      transaction.paymentMethodCollectiveId = paymentMethod.CollectiveId;
+      const pmCollective = await models.Collective.findById(paymentMethod.CollectiveId);
+      transaction.paymentMethodCollectiveSlug = pmCollective.slug;
+    }
+  }
+  if (transaction.OrderId) {
+    const order = await models.Order.findById(transaction.OrderId);
+    if (order.FromCollectiveId) {
+      transaction.orderFromCollectiveId = order.FromCollectiveId;
+      const orderFromCollective = await models.Collective.findById(order.FromCollectiveId);
+      transaction.orderFromCollectiveSlug = orderFromCollective.slug;
+    }
+    if (order.PaymentMethodId) {
+      const orderPaymentMethod = await models.PaymentMethod.findById(order.PaymentMethodId);
+      transaction.orderPaymentMethodService = orderPaymentMethod.service;
+      transaction.orderPaymentMethodType = orderPaymentMethod.type;
+      if (orderPaymentMethod.CollectiveId) {
+        transaction.orderPaymentMethodCollectiveId = orderPaymentMethod.CollectiveId;
+        const orderPaymentMethodCollective = await models.Collective.findById(orderPaymentMethod.CollectiveId);
+        transaction.orderPaymentMethodCollectiveSlug = orderPaymentMethodCollective.slug;
+      }
+    }
+  }
+  if (transaction.ExpenseId) {
+    const expense = await models.Expense.findById(transaction.ExpenseId);
+    transaction.expensePayoutMethod = expense.payoutMethod;
+    if (expense.UserId) {
+      transaction.expenseUserId = expense.UserId;
+      const expenseUser = await models.User.findById(expense.UserId);
+      transaction.expenseUserPaypalEmail = expenseUser.paypalEmail;
+      if (expenseUser.CollectiveId) {
+        const expenseUserCollective = await models.Collective.findById(expenseUser.CollectiveId);
+        transaction.expenseUserCollectiveSlug = expenseUserCollective.slug;
+      }
+    }
+    if (expense.CollectiveId) {
+      const expenseCollective = await models.Collective.findById(expense.CollectiveId);
+      transaction.expenseCollectiveId = expense.CollectiveId;
+      transaction.expenseCollectiveSlug = expenseCollective.slug;
+    }
+  }
+  return transaction;
+}
+
+/**
+ * Given an API transactions, send it to the ledger service/queue in the ledger format
+ * @param {Object} transactions - the transaction to return information from
+ * @return {Object} returns an api transaction with nested models
+ */
+export async function postTransactionToLedger(transaction) {
+  if (transaction.deletedAt || transaction.type !== 'CREDIT') {
+    return Promise.resolve();
+  }
+  try {
+    const ledgerTransaction = await getTransactionWithNestedProperties(transaction);
+    if (!process.env.QUEUE_ENABLED) {
+      return axios.post(ledger.transactionUrl, ledgerTransaction);
+    }
+    const conn = await amqp.connect(ledgerQueue.url);
+    const channel = await conn.createChannel();
+    await channel.assertQueue(ledgerQueue.transactionQueue, { exclusive: false });
+    channel.sendToQueue(ledgerQueue.transactionQueue, Buffer.from(JSON.stringify([ledgerTransaction]), 'utf8'));
+  } catch (error) {
+    debug('postTransactionToLedger error', error);
+  }
 }

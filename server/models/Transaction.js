@@ -1,18 +1,16 @@
 /** @module models/Transaction */
 
 import Promise from 'bluebird';
-import amqp from 'amqplib';
-import axios from 'axios';
 import activities from '../constants/activities';
 import { TransactionTypes } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
 import uuidv4 from 'uuid/v4';
-import { ledger, ledgerQueue } from 'config';
 import debugLib from 'debug';
 import { toNegative } from '../lib/math';
 import { exportToCSV } from '../lib/utils';
 import { get } from 'lodash';
 import moment from 'moment';
+import { postTransactionToLedger } from '../lib/ledger';
 
 const debug = debugLib('transaction');
 
@@ -208,7 +206,7 @@ export default (Sequelize, DataTypes) => {
       hooks: {
         afterCreate: transaction => {
           Transaction.createActivity(transaction);
-          Transaction.postTransactionToLedger(transaction);
+          postTransactionToLedger(transaction);
           // intentionally returns null, needs to be async (https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-created-in-a-handler-but-was-not-returned-from-it)
           return null;
         },
@@ -509,95 +507,5 @@ export default (Sequelize, DataTypes) => {
         )
     );
   };
-
-  const getTransactionWithNestedProperties = async transaction => {
-    const fromCollective = await models.Collective.findById(transaction.FromCollectiveId);
-    const fromCollectiveHost = await fromCollective.getHostCollective();
-    const collective = await models.Collective.findById(transaction.CollectiveId);
-    const collectiveHost = await collective.getHostCollective();
-    transaction.fromCollectiveSlug = fromCollective.slug;
-    transaction.FromCollectiveHostId = fromCollectiveHost && fromCollectiveHost.id;
-    transaction.fromCollectiveHostSlug = fromCollectiveHost && fromCollectiveHost.slug;
-    transaction.CollectiveHostId = collectiveHost && collectiveHost.id;
-    transaction.collectiveHostSlug = collectiveHost && collectiveHost.slug;
-    transaction.collectiveSlug = collective.slug;
-    // get transaction DEBIT equivalent
-    const debitTransaction = models.Transaction.findOne({
-      attributes: ['id'],
-      where: {
-        TransactionGroup: transaction.TransactionGroup,
-        type: 'DEBIT',
-      },
-    });
-    transaction.debitId = debitTransaction.id;
-    if (transaction.HostCollectiveId) {
-      const hostCollective = await models.Collective.findById(transaction.HostCollectiveId);
-      transaction.hostCollectiveSlug = hostCollective.slug;
-      const paymentMethod = await models.PaymentMethod.findById(transaction.PaymentMethodId);
-      transaction.paymentMethodService = paymentMethod.service;
-      transaction.paymentMethodType = paymentMethod.type;
-      if (paymentMethod.CollectiveId) {
-        transaction.paymentMethodCollectiveId = paymentMethod.CollectiveId;
-        const pmCollective = await models.Collective.findById(paymentMethod.CollectiveId);
-        transaction.paymentMethodCollectiveSlug = pmCollective.slug;
-      }
-    }
-    if (transaction.OrderId) {
-      const order = await models.Order.findById(transaction.OrderId);
-      if (order.FromCollectiveId) {
-        transaction.orderFromCollectiveId = order.FromCollectiveId;
-        const orderFromCollective = await models.Collective.findById(order.FromCollectiveId);
-        transaction.orderFromCollectiveSlug = orderFromCollective.slug;
-      }
-      if (order.PaymentMethodId) {
-        const orderPaymentMethod = await models.PaymentMethod.findById(order.PaymentMethodId);
-        transaction.orderPaymentMethodService = orderPaymentMethod.service;
-        transaction.orderPaymentMethodType = orderPaymentMethod.type;
-        if (orderPaymentMethod.CollectiveId) {
-          transaction.orderPaymentMethodCollectiveId = orderPaymentMethod.CollectiveId;
-          const orderPaymentMethodCollective = await models.Collective.findById(orderPaymentMethod.CollectiveId);
-          transaction.orderPaymentMethodCollectiveSlug = orderPaymentMethodCollective.slug;
-        }
-      }
-    }
-    if (transaction.ExpenseId) {
-      const expense = await models.Expense.findById(transaction.ExpenseId);
-      transaction.expensePayoutMethod = expense.payoutMethod;
-      if (expense.UserId) {
-        transaction.expenseUserId = expense.UserId;
-        const expenseUser = await models.User.findById(expense.UserId);
-        transaction.expenseUserPaypalEmail = expenseUser.paypalEmail;
-        if (expenseUser.CollectiveId) {
-          const expenseUserCollective = await models.Collective.findById(expenseUser.CollectiveId);
-          transaction.expenseUserCollectiveSlug = expenseUserCollective.slug;
-        }
-      }
-      if (expense.CollectiveId) {
-        const expenseCollective = await models.Collective.findById(expense.CollectiveId);
-        transaction.expenseCollectiveId = expense.CollectiveId;
-        transaction.expenseCollectiveSlug = expenseCollective.slug;
-      }
-    }
-    return transaction;
-  };
-
-  Transaction.postTransactionToLedger = async transaction => {
-    if (transaction.deletedAt || transaction.type !== 'CREDIT') {
-      return Promise.resolve();
-    }
-    try {
-      const ledgerTransaction = await getTransactionWithNestedProperties(transaction);
-      if (!process.env.QUEUE_ENABLED) {
-        return axios.post(ledger.transactionUrl, ledgerTransaction);
-      }
-      const conn = await amqp.connect(ledgerQueue.url);
-      const channel = await conn.createChannel();
-      await channel.assertQueue(ledgerQueue.transactionQueue, { exclusive: false });
-      channel.sendToQueue(ledgerQueue.transactionQueue, Buffer.from(JSON.stringify([ledgerTransaction]), 'utf8'));
-    } catch (error) {
-      debug('postTransactionToLedger error', error);
-    }
-  };
-
   return Transaction;
 };
