@@ -595,7 +595,7 @@ export default (Sequelize, DataTypes) => {
       await channel.assertQueue(ledgerQueue.transactionQueue, { exclusive: false });
       channel.sendToQueue(ledgerQueue.transactionQueue, Buffer.from(JSON.stringify([ledgerTransaction]), 'utf8'));
     } catch (error) {
-      throw error;
+      debug('postTransactionToLedger error', error);
     }
   };
 
