@@ -1,16 +1,18 @@
-import debugLib from 'debug';
+import debug from 'debug';
 import slugify from 'limax';
 import { get, omit } from 'lodash';
 
 import models from '../../../models';
 import * as errors from '../../errors';
-import { types } from '../../../constants/collectives';
+import emailLib from '../../../lib/email';
+import * as github from '../../../lib/github';
+import { defaultHostCollective } from '../../../lib/utils';
+
 import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
-import { defaultHostCollective } from '../../../lib/utils';
-import emailLib from '../../../lib/email';
+import { types } from '../../../constants/collectives';
 
-const debug = debugLib('claim');
+const debugClaim = debug('claim');
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -346,7 +348,6 @@ export async function claimCollective(_, args, req) {
   }
 
   let collective = await models.Collective.findById(args.id);
-
   if (!collective) {
     throw new errors.NotFound({
       message: `Collective with id ${args.id} not found`,
@@ -354,11 +355,51 @@ export async function claimCollective(_, args, req) {
   }
 
   const admins = await collective.getAdmins();
-
   if (admins.length > 0) {
     throw new errors.ValidationFailed({
       message: 'This collective has already been claimed',
     });
+  }
+
+  let githubHandle = collective.githubHandle;
+  if (!githubHandle && collective.website && collective.website.includes('://github.com/')) {
+    githubHandle = collective.website.split('://github.com/')[1];
+  }
+  if (!githubHandle) {
+    throw new errors.Unauthorized({
+      message: "We can't find the GitHub handle for the collective to be claimed",
+    });
+  }
+
+  const githubAccount = await models.ConnectedAccount.findOne({
+    where: { CollectiveId: req.remoteUser.CollectiveId, service: 'github' },
+  });
+  if (!githubAccount) {
+    throw new errors.Unauthorized({
+      message: 'You must have a connected GitHub Account to claim a collective',
+    });
+  }
+
+  if (githubHandle.includes('/')) {
+    // A repository GitHub Handle (most common)
+    const repo = await github.getRepo(githubAccount.token);
+    const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
+    if (!isGithubRepositoryAdmin) {
+      throw new errors.ValidationFailed({
+        message: "We could not verify that you're admin of the GitHub repository",
+      });
+    }
+  } else {
+    // An organization GitHub Handle
+    const memberships = await github.getOrgMemberships(githubAccount.token);
+    const organizationAdminMembership =
+      memberships &&
+      memberships.find(m => m.organization.login === githubHandle && m.state === 'active' && m.role === 'admin');
+    if (!organizationAdminMembership) {
+      throw new errors.ValidationFailed({
+        message: "We could not verify that you're admin of the GitHub organization",
+      });
+    }
   }
 
   // add remoteUser as admin of collective
@@ -372,6 +413,7 @@ export async function claimCollective(_, args, req) {
   // set collective as active
   // create default tiers
   const host = await models.Collective.findById(defaultHostCollective('opensource').CollectiveId);
+
   collective = await collective.addHost(host, {
     ...req.remoteUser.minimal,
     isAdmin: () => true,
@@ -385,7 +427,8 @@ export async function claimCollective(_, args, req) {
       status: 'PENDING',
     },
   });
-  debug(`${pledges.length} pledges found for collective ${collective.name}`);
+
+  debugClaim(`${pledges.length} pledges found for collective ${collective.name}`);
 
   // send complete-pledge emails to pledges
   const emails = pledges.map(pledge => {
@@ -401,5 +444,6 @@ export async function claimCollective(_, args, req) {
 
   // return successful status, frontend should redirect to claimed collective page
   await collective.save();
+
   return collective;
 }

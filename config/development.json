@@ -26,5 +26,9 @@
     "options": {
       "host": "127.0.0.1"
     }
+  },
+  "github": {
+    "clientID": "cdc163e5f5695e16787b",
+    "clientSecret": "1cc8e3a615af3a8ca47cd1f15adcfcdd1e880db4"
   }
 }

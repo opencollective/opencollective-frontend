@@ -9,6 +9,7 @@ import config from 'config';
 import models from '../../../models';
 import * as errors from '../../errors';
 import cache from '../../../lib/cache';
+import * as github from '../../../lib/github';
 import recaptcha from '../../../lib/recaptcha';
 import * as libPayments from '../../../lib/payments';
 import { capitalize, pluralize } from '../../../lib/utils';
@@ -119,8 +120,49 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       throw new Error('You need to be logged in to be able to use a payment method on file');
     }
 
-    if (!order.collective || (!order.collective.id && !order.collective.website)) {
-      throw new Error('No collective id or website provided');
+    if (!order.collective || (!order.collective.id && !order.collective.website && !order.collective.githubHandle)) {
+      throw new Error('No collective id/website/githubHandle provided');
+    }
+
+    const { id, githubHandle } = order.collective;
+
+    if (!id && !githubHandle) {
+      throw new errors.ValidationFailed({
+        message: 'An Open Collective id or a GitHub handle is mandatory.',
+      });
+    }
+
+    // Pledge to a GitHub organization or project
+    if (githubHandle) {
+      if (githubHandle.includes('/')) {
+        // A repository GitHub Handle (most common)
+        const repo = await github.getRepo(githubHandle).catch(() => null);
+        if (!repo) {
+          throw new errors.ValidationFailed({
+            message: 'We could not verify the GitHub repository',
+          });
+        }
+        if (repo.stargazers_count < 100) {
+          throw new errors.ValidationFailed({
+            message: 'The repository need at least 100 GitHub stars to be pledged.',
+          });
+        }
+      } else {
+        // An organization GitHub Handle
+        const org = await github.getOrg(githubHandle).catch(() => null);
+        if (!org) {
+          throw new errors.ValidationFailed({
+            message: 'We could not verify the GitHub organization',
+          });
+        }
+        const allRepos = await github.getAllOrganizationPublicRepos(githubHandle).catch(() => null);
+        const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= 100);
+        if (!repoWith100stars) {
+          throw new errors.ValidationFailed({
+            message: 'The organization need at least one repository with 100 GitHub stars to be pledged.',
+          });
+        }
+      }
     }
 
     if (order.platformFeePercent && !remoteUser.isRoot()) {
@@ -134,6 +176,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     } else if (order.collective.website) {
       collective = (await models.Collective.findOrCreate({
         where: { website: order.collective.website },
+        defaults: order.collective,
+      }))[0];
+    } else if (order.collective.githubHandle) {
+      collective = (await models.Collective.findOrCreate({
+        where: { githubHandle: order.collective.githubHandle },
         defaults: order.collective,
       }))[0];
     }
