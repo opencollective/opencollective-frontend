@@ -67,6 +67,8 @@ const TransactionFields = () => {
     refundTransaction: {
       type: TransactionInterfaceType,
       resolve(transaction) {
+        // If it's a sequelize model transaction, it means it has the method getRefundTransaction
+        // otherwise we just null
         if (transaction && transaction.getRefundTransaction) {
           return transaction.getRefundTransaction();
         }
@@ -79,10 +81,12 @@ const TransactionFields = () => {
         if (!req.remoteUser) {
           return null;
         }
+        // If it's a sequelize model transaction, it means it has the method getDetailsForUser
+        // otherwise we return transaction.uuid
         if (transaction && transaction.getDetailsForUser) {
           return transaction.getDetailsForUser(req.remoteUser);
         }
-        return null;
+        return transaction.uuid;
       },
     },
     type: {
@@ -171,6 +175,8 @@ const TransactionFields = () => {
     createdByUser: {
       type: UserType,
       resolve(transaction) {
+        // If it's a sequelize model transaction, it means it has the method getCreatedByUser
+        // otherwise we return null
         if (transaction && transaction.getCreatedByUser) {
           return transaction.getCreatedByUser();
         }
@@ -180,6 +186,8 @@ const TransactionFields = () => {
     fromCollective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
+        // If it's a sequelize model transaction, it means it has the method getFromCollective
+        // otherwise we check whether transaction has 'fromCollective.id', if not we return null
         if (transaction && transaction.getFromCollective) {
           return transaction.getFromCollective();
         }
@@ -192,6 +200,8 @@ const TransactionFields = () => {
     usingVirtualCardFromCollective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
+        // If it's a sequelize model transaction, it means it has the method getVirtualCardEmitterCollective
+        // otherwise we find the collective by id if transactions has UsingVirtualCardFromCollectiveId, if not we return null
         if (transaction && transaction.getVirtualCardEmitterCollective) {
           return transaction.getVirtualCardEmitterCollective();
         }
@@ -204,6 +214,8 @@ const TransactionFields = () => {
     collective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
+        // If it's a sequelize model transaction, it means it has the method getCollective
+        // otherwise we check whether transaction has 'collective.id', if not we return null
         if (transaction && transaction.getCollective) {
           return transaction.getCollective();
         }
@@ -246,6 +258,8 @@ export const TransactionExpenseType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
+          // If it's a sequelize model transaction, it means it has the method getExpense
+          // otherwise we return transaction.description , if not then return null
           const expense = transaction.getExpense
             ? transaction.getExpense().then(expense => expense && expense.description)
             : null;
@@ -255,6 +269,8 @@ export const TransactionExpenseType = new GraphQLObjectType({
       privateMessage: {
         type: GraphQLString,
         resolve(transaction, args, req) {
+          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // otherwise we return null
           return transaction.getExpenseForViewer
             ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage)
             : null;
@@ -263,6 +279,8 @@ export const TransactionExpenseType = new GraphQLObjectType({
       category: {
         type: GraphQLString,
         resolve(transaction, args, req) {
+          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // otherwise we return null
           return transaction.getExpenseForViewer
             ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category)
             : null;
@@ -271,6 +289,8 @@ export const TransactionExpenseType = new GraphQLObjectType({
       attachment: {
         type: GraphQLString,
         resolve(transaction, args, req) {
+          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // otherwise we return null
           return transaction.getExpenseForViewer
             ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment)
             : null;
@@ -290,6 +310,8 @@ export const TransactionOrderType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
+          // If it's a sequelize model transaction, it means it has the method getOrder
+          // otherwise we return either transaction.description or null
           const getOrder = transaction.getOrder
             ? transaction.getOrder().then(order => order && order.description)
             : null;
@@ -299,24 +321,32 @@ export const TransactionOrderType = new GraphQLObjectType({
       privateMessage: {
         type: GraphQLString,
         resolve(transaction) {
+          // If it's a sequelize model transaction, it means it has the method getOrder
+          // otherwise we return null
           return transaction.getOrder ? transaction.getOrder().then(order => order && order.privateMessage) : null;
         },
       },
       publicMessage: {
         type: GraphQLString,
         resolve(transaction) {
+          // If it's a sequelize model transaction, it means it has the method getOrder
+          // otherwise we return null
           return transaction.getOrder ? transaction.getOrder().then(order => order && order.publicMessage) : null;
         },
       },
       order: {
         type: OrderType,
         resolve(transaction) {
+          // If it's a sequelize model transaction, it means it has the method getOrder
+          // otherwise we return null
           return transaction.getOrder ? transaction.getOrder() : null;
         },
       },
       subscription: {
         type: SubscriptionType,
         resolve(transaction) {
+          // If it's a sequelize model transaction, it means it has the method getOrder
+          // otherwise we return null
           return transaction.getOrder ? transaction.getOrder().then(order => order && order.getSubscription()) : null;
         },
       },
