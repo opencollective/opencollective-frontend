@@ -331,7 +331,7 @@ class Collective extends React.Component {
                         LoggedInUser={LoggedInUser}
                         role="BACKER"
                         orderBy="totalDonations"
-                        limit={100}
+                        limit={20}
                       />
 
                       <MembersWithData
