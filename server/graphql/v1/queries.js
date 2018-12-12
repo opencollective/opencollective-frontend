@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import { find, get, uniq } from 'lodash';
 import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
+import { parseToBoolean } from '../../lib/utils';
 import { fetchLedgerTransactionsGroupedByLegacyIds, parseLedgerTransactions } from '../../lib/ledger';
 
 import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
@@ -324,8 +325,8 @@ const queries = {
         whether we should include the transactions of the collectives of that host(if it's a host collective) */,
     },
     async resolve(_, args) {
-      let fetchDataFromLedger = process.env.GET_TRANSACTIONS_FROM_LEDGER || false;
-      if (args.fetchDataFromLedger) {
+      let fetchDataFromLedger = parseToBoolean(process.env.GET_TRANSACTIONS_FROM_LEDGER);
+      if (args.hasOwnProperty('fetchDataFromLedger')) {
         fetchDataFromLedger = args.fetchDataFromLedger;
       }
       // Load collective
