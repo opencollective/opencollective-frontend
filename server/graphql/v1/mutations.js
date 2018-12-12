@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit, times } from 'lodash';
 import {
   claimCollective,
   createCollective,
@@ -60,6 +60,7 @@ import {
   PaymentMethodDataVirtualCardInputType,
   UserInputType,
 } from './inputTypes';
+import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
 
 const mutations = {
   createCollective: {
@@ -404,6 +405,7 @@ const mutations = {
   },
   createPaymentMethod: {
     type: PaymentMethodType,
+    deprecationReason: 'Please use createVirtualCards',
     args: {
       type: { type: new GraphQLNonNull(GraphQLString) },
       currency: { type: new GraphQLNonNull(GraphQLString) },
@@ -433,6 +435,58 @@ const mutations = {
         throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
       }
       return createPaymentMethod(args, req.remoteUser);
+    },
+  },
+  createVirtualCards: {
+    type: new GraphQLList(PaymentMethodType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      PaymentMethodId: { type: GraphQLInt },
+      emails: {
+        type: new GraphQLList(GraphQLString),
+        description: 'A list of emails to generate virtual cards for (only if numberOfVirtualCards is not provided)',
+      },
+      numberOfVirtualCards: {
+        type: GraphQLInt,
+        description: 'Number of virtual cards to generate (only if emails is not provided)',
+      },
+      currency: {
+        type: GraphQLString,
+        description: 'An optional currency. If not provided, will use the collective currency.',
+      },
+      amount: {
+        type: GraphQLInt,
+        description: 'The amount as an Integer with cents.',
+      },
+      monthlyLimitPerMember: { type: GraphQLInt },
+      limitedToTags: {
+        type: new GraphQLList(GraphQLString),
+        description: 'Limit this payment method to make donations to collectives having those tags',
+      },
+      limitedToCollectiveIds: {
+        type: new GraphQLList(GraphQLInt),
+        description: 'Limit this payment method to make donations to those collectives',
+      },
+      limitedToHostCollectiveIds: {
+        type: new GraphQLList(GraphQLInt),
+        description: 'Limit this payment method to make donations to the collectives hosted by those hosts',
+      },
+      description: {
+        type: GraphQLString,
+        description: 'A custom message attached to the email that will be sent for this virtual card',
+      },
+      expiryDate: { type: GraphQLString },
+    },
+    resolve: async (_, { emails, numberOfVirtualCards, ...args }, { remoteUser }) => {
+      if (numberOfVirtualCards && emails && numberOfVirtualCards !== emails.length) {
+        throw Error("numberOfVirtualCards and emails counts doesn't match");
+      } else if (numberOfVirtualCards) {
+        return await bulkCreateVirtualCards(args, remoteUser, numberOfVirtualCards);
+      } else if (emails) {
+        return await createVirtualCardsForEmails(args, remoteUser, emails);
+      }
+
+      throw new Error('You must either pass numberOfVirtualCards of an email list');
     },
   },
   claimPaymentMethod: {

@@ -1242,6 +1242,7 @@ const CollectiveFields = () => {
           where: { type: 'virtualcard' },
           limit: args.limit,
           offset: args.offset,
+          order: [['createdAt', 'DESC'], ['id', 'DESC']],
           include: [
             {
               model: models.PaymentMethod,
