@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import models from '../../../server/models';
+import models from '../../models';
 import {
   GraphQLInt,
   GraphQLFloat,
