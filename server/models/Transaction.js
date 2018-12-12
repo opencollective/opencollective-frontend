@@ -7,7 +7,7 @@ import CustomDataTypes from './DataTypes';
 import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import { toNegative } from '../lib/math';
-import { exportToCSV } from '../lib/utils';
+import { exportToCSV, parseToBoolean } from '../lib/utils';
 import { get } from 'lodash';
 import moment from 'moment';
 import { postTransactionToLedger } from '../lib/ledger';
@@ -206,7 +206,10 @@ export default (Sequelize, DataTypes) => {
       hooks: {
         afterCreate: transaction => {
           Transaction.createActivity(transaction);
-          postTransactionToLedger(transaction);
+          // we only send data to the ledger if env ENABLE_LEDGER_BACKGROUND is true
+          if (parseToBoolean(process.env.ENABLE_LEDGER_BACKGROUND)) {
+            postTransactionToLedger(transaction);
+          }
           // intentionally returns null, needs to be async (https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-created-in-a-handler-but-was-not-returned-from-it)
           return null;
         },
