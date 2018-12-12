@@ -115,6 +115,7 @@ class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
     return {
       name: query.name || '',
+      githubHandle: query.githubHandle || '',
       slug: query.slug,
     };
   }
@@ -130,7 +131,7 @@ class CreatePledgePage extends React.Component {
     event.preventDefault();
     const {
       target: {
-        elements: { name, slug, totalAmount, fromCollective, website, publicMessage, interval },
+        elements: { name, slug, totalAmount, fromCollective, githubHandle, publicMessage, interval },
       },
     } = event;
     const { data } = this.props;
@@ -157,7 +158,7 @@ class CreatePledgePage extends React.Component {
         name: name.value,
         slug: slug.value,
         tags: ['open source', 'pledged'],
-        website: website.value,
+        githubHandle: githubHandle.value,
       };
     }
 
@@ -174,7 +175,10 @@ class CreatePledgePage extends React.Component {
       }
     } catch (error) {
       this.setState({
-        errorMessage: error.toString(),
+        errorMessage: error
+          .toString()
+          .replace('GraphQL error:', '')
+          .trim(),
       });
     } finally {
       this.setState({ submitting: false });
@@ -183,7 +187,14 @@ class CreatePledgePage extends React.Component {
 
   render() {
     const { errorMessage, submitting } = this.state;
-    const { data = {}, name, slug, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data = {}, name, slug, githubHandle, LoggedInUser, loadingLoggedInUser } = this.props;
+
+    let website;
+    if (data.Collective) {
+      website = data.Collective.githubHandle
+        ? `https://github.com/${data.Collective.githubHandle}`
+        : data.Collective.website;
+    }
 
     const profiles =
       LoggedInUser &&
@@ -239,6 +250,11 @@ class CreatePledgePage extends React.Component {
               <P my={3} color="black.500">
                 Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an
                 email to ask you to fulfill your pledge.
+              </P>
+
+              <P my={3} color="black.500">
+                At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We
+                request the project to have a least 100 stars on GitHub!
               </P>
 
               {loadingLoggedInUser && (
@@ -303,20 +319,21 @@ class CreatePledgePage extends React.Component {
                             prepend="https://opencollective.com/"
                             id="slug"
                             name="slug"
-                            defaultValue={slugify(name || '')}
+                            defaultValue={slugify(name || '').toLowerCase()}
                           />
                         </Flex>
                       </Flex>
 
                       <Flex flexDirection="column" mb={3}>
-                        <P {...labelStyles} htmlFor="website">
-                          GitHub URL - More collective types soon!
+                        <P {...labelStyles} htmlFor="githubHandle">
+                          GitHub URL: repository or organization with at least 100 stars!
                         </P>
                         <StyledInputGroup
-                          prepend="https://"
-                          id="website"
-                          name="website"
-                          placeholder="i.e. github.com/babel/babel"
+                          prepend="https://github.com/"
+                          id="githubHandle"
+                          name="githubHandle"
+                          placeholder="i.e. babel/babel"
+                          defaultValue={githubHandle || ''}
                         />
                       </Flex>
                     </Box>
@@ -405,8 +422,8 @@ class CreatePledgePage extends React.Component {
                     {data.Collective.name}
                   </H3>
 
-                  <StyledLink fontSize="Paragraph" href={data.Collective.website}>
-                    {data.Collective.website}
+                  <StyledLink fontSize="Paragraph" href={website}>
+                    {website}
                   </StyledLink>
                 </Container>
 
@@ -550,6 +567,7 @@ const addCollectiveData = graphql(
         id
         name
         website
+        githubHandle
         pledges: orders(status: PENDING) {
           totalAmount
           fromCollective {

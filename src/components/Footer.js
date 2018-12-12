@@ -52,6 +52,7 @@ const navigation = {
     'Create a Collective': '/create',
     'Become a Sponsor': '/become-a-sponsor',
     'Create a chapter': '/chapters',
+    'Make a Pledge': '/pledges/new',
   },
   COMMUNITY: {
     'Open Source': '/opensource',

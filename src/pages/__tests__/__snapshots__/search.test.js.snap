@@ -1075,6 +1075,17 @@ Array [
                 Create a chapter
               </a>
             </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/pledges/new"
+                onClick={[Function]}
+              >
+                Make a Pledge
+              </a>
+            </li>
           </ul>
         </div>
         <div
@@ -2308,6 +2319,17 @@ Array [
                 Create a chapter
               </a>
             </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/pledges/new"
+                onClick={[Function]}
+              >
+                Make a Pledge
+              </a>
+            </li>
           </ul>
         </div>
         <div
@@ -3495,6 +3517,17 @@ exports[`Search Page renders error message 1`] = `
                 onClick={[Function]}
               >
                 Create a chapter
+              </a>
+            </li>
+            <li
+              className="c36"
+            >
+              <a
+                className="c37"
+                href="/pledges/new"
+                onClick={[Function]}
+              >
+                Make a Pledge
               </a>
             </li>
           </ul>
@@ -4830,6 +4863,17 @@ Array [
                 onClick={[Function]}
               >
                 Create a chapter
+              </a>
+            </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/pledges/new"
+                onClick={[Function]}
+              >
+                Make a Pledge
               </a>
             </li>
           </ul>
@@ -6286,6 +6330,17 @@ Array [
                 onClick={[Function]}
               >
                 Create a chapter
+              </a>
+            </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/pledges/new"
+                onClick={[Function]}
+              >
+                Make a Pledge
               </a>
             </li>
           </ul>
