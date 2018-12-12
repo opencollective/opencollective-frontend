@@ -46,56 +46,58 @@ export const pointerEvents = style({ prop: 'pointerEvents' });
 export const float = style({ prop: 'float' });
 export const clear = style({ prop: 'clear' });
 
-const Container = styled(tag)(
-  [],
-  alignItems,
-  alignSelf,
-  background,
-  backgroundImage,
-  backgroundPosition,
-  backgroundRepeat,
-  backgroundSize,
-  borders,
-  borderColor,
-  borderRadius,
-  bottom,
-  boxShadow,
-  clear,
-  color,
-  cursor,
-  display,
-  flex,
-  flexDirection,
-  flexWrap,
-  float,
-  fontSize,
-  height,
-  justifyContent,
-  left,
-  maxHeight,
-  maxWidth,
-  minHeight,
-  minWidth,
-  order,
-  overflow,
-  pointerEvents,
-  position,
-  right,
-  size,
-  space,
-  top,
-  textAlign,
-  width,
-  zIndex,
-  props =>
-    props.clearfix && {
-      '::after': {
-        content: '""',
-        display: 'table',
-        clear: 'both',
-      },
-    },
-);
+const Container = styled(tag)`
+  box-sizing: border-box;
+
+  ${alignItems}
+  ${alignSelf}
+  ${background}
+  ${backgroundImage}
+  ${backgroundPosition}
+  ${backgroundRepeat}
+  ${backgroundSize}
+  ${borders}
+  ${borderColor}
+  ${borderRadius}
+  ${bottom}
+  ${boxShadow}
+  ${clear}
+  ${color}
+  ${cursor}
+  ${display}
+  ${flex}
+  ${flexDirection}
+  ${flexWrap}
+  ${float}
+  ${fontSize}
+  ${height}
+  ${justifyContent}
+  ${left}
+  ${maxHeight}
+  ${maxWidth}
+  ${minHeight}
+  ${minWidth}
+  ${order}
+  ${overflow}
+  ${pointerEvents}
+  ${position}
+  ${right}
+  ${size}
+  ${space}
+  ${top}
+  ${textAlign}
+  ${width}
+  ${zIndex}
+  ${props =>
+    props.clearfix &&
+    `
+      ::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+    `}
+`;
 
 Container.defaultProps = {
   blacklist: tag.defaultProps.blacklist.concat('float', 'clear'),
