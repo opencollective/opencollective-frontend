@@ -373,6 +373,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -612,6 +613,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -621,6 +623,7 @@ Array [
 }
 
 .c2 {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -634,6 +637,7 @@ Array [
 }
 
 .c5 {
+  box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1617,6 +1621,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -1856,6 +1861,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -1865,6 +1871,7 @@ Array [
 }
 
 .c2 {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1878,6 +1885,7 @@ Array [
 }
 
 .c5 {
+  box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -2681,6 +2689,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 .c20 {
+  box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -2690,6 +2699,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 .c22 {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2703,6 +2713,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 .c25 {
+  box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -4054,6 +4065,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -4402,6 +4414,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -4411,6 +4424,7 @@ Array [
 }
 
 .c2 {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4424,6 +4438,7 @@ Array [
 }
 
 .c5 {
+  box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5455,6 +5470,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -5464,6 +5480,7 @@ Array [
 }
 
 .c8 {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5869,6 +5886,7 @@ Array [
 }
 
 .c0 {
+  box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
   bottom: 0px;
   background-color: white;
@@ -5878,6 +5896,7 @@ Array [
 }
 
 .c2 {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5891,6 +5910,7 @@ Array [
 }
 
 .c5 {
+  box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
