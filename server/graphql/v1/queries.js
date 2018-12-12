@@ -1,8 +1,9 @@
 import Promise from 'bluebird';
 import { find, get, uniq } from 'lodash';
-
 import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
+import { parseToBoolean } from '../../lib/utils';
+import { fetchLedgerTransactionsGroupedByLegacyIds, parseLedgerTransactions } from '../../lib/ledger';
 
 import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
 
@@ -317,8 +318,17 @@ const queries = {
       dateTo: { type: GraphQLString },
       /** @deprecated since 2018-11-29: Virtual cards now included by default when necessary */
       includeVirtualCards: { type: GraphQLBoolean },
+      fetchDataFromLedger: { type: GraphQLBoolean }, // flag to go with either api or ledger transactions
+      includeHostedCollectivesTransactions: {
+        type: GraphQLBoolean,
+      } /** flag to determine
+        whether we should include the transactions of the collectives of that host(if it's a host collective) */,
     },
     async resolve(_, args) {
+      let fetchDataFromLedger = parseToBoolean(process.env.GET_TRANSACTIONS_FROM_LEDGER);
+      if (args.hasOwnProperty('fetchDataFromLedger')) {
+        fetchDataFromLedger = args.fetchDataFromLedger;
+      }
       // Load collective
       const { CollectiveId, collectiveSlug } = args;
       if (!CollectiveId && !collectiveSlug) throw new Error('You must specify a collective ID or a Slug');
@@ -326,15 +336,32 @@ const queries = {
       const collective = await models.Collective.findOne({ where });
       if (!collective) throw new Error('This collective does not exist');
 
-      // Load transactions
-      return collective.getTransactions({
-        order: [['createdAt', 'DESC']],
-        type: args.type,
-        limit: args.limit,
-        offset: args.offset,
-        startDate: args.dateFrom,
-        endDate: args.dateTo,
+      // returns transactions straight from the api
+      if (!fetchDataFromLedger) {
+        return collective.getTransactions({
+          order: [['createdAt', 'DESC']],
+          type: args.type,
+          limit: args.limit,
+          offset: args.offset,
+          startDate: args.dateFrom,
+          endDate: args.dateTo,
+        });
+      }
+      // otherwise returns data from the ledger
+      const ledgerTransactions = await fetchLedgerTransactionsGroupedByLegacyIds(args);
+      const apiTransactions = await models.Transaction.findAll({
+        attributes: [
+          'id',
+          'uuid', // because the stored invoice pdf in aws uses the uuid as reference
+          'UsingVirtualCardFromCollectiveId', // because virtual cards will only work for wallets and we're skipping wallets in the transactions details for now
+          'HostCollectiveId', // because we're skipping wallets and using host on transactions details for now
+          'RefundTransactionId', // because the ledger refundTransactionId refers to the ledger id and not the legacy one
+        ],
+        where: {
+          id: Object.keys(ledgerTransactions),
+        },
       });
+      return parseLedgerTransactions(args.CollectiveId, ledgerTransactions, apiTransactions);
     },
   },
 

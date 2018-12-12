@@ -100,5 +100,13 @@
   "recaptcha": {
     "siteKey": "RECAPTCHA_SITE_KEY",
     "secretKey": "RECAPTCHA_SECRET_KEY"
+  },
+  "ledger": {
+    "url": "LEDGER_URL",
+    "transactionUrl": "LEDGER_TRANSACTION_URL"
+  },
+  "ledgerQueue": {
+    "url": "LEDGER_QUEUE_URL",
+    "transactionQueue": "TRANSACTION_QUEUE_NAME"
   }
 }
