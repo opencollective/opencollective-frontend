@@ -53,7 +53,7 @@ const navigation = {
     'Become a Sponsor': '/become-a-sponsor',
     'Create a Chapter': '/chapters',
     'Make a Pledge': '/pledges/new',
-    'Company Gift Cards': '/gift-cards',
+    'Gift Cards': '/gift-cards',
   },
   COMMUNITY: {
     'Open Source': '/opensource',
