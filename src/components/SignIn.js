@@ -4,6 +4,7 @@ import { withState } from 'recompose';
 import { Box, Flex } from '@rebass/grid';
 import Container from './Container';
 import StyledButton from './StyledButton';
+import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
 import { H5, P, Span } from './Text';
 
@@ -12,14 +13,7 @@ import { H5, P, Span } from './Text';
  */
 const SignIn = withState('state', 'setState', { email: '', error: null })(
   ({ state, setState, onSubmit, onSecondaryAction }) => (
-    <Container
-      borderRadius="8px"
-      border="1px solid"
-      borderColor="black.300"
-      bg="white.full"
-      overflow="hidden"
-      maxWidth={450}
-    >
+    <StyledCard maxWidth={450}>
       <Box p={4}>
         <H5 as="label" fontWeight="bold" htmlFor="email" mb={3} textAlign="left" display="block">
           Sign in using your email address:
@@ -72,7 +66,7 @@ const SignIn = withState('state', 'setState', { email: '', error: null })(
           Join Free
         </StyledButton>
       </Container>
-    </Container>
+    </StyledCard>
   ),
 );
 

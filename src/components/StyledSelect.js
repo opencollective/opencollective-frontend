@@ -33,10 +33,17 @@ const getBorderColor = ({ error, success }) => {
   return 'black.300';
 };
 
-const getItems = options =>
+export const getItems = options =>
   Object.keys(options).reduce(
     (items, key) =>
-      items.concat({ key: Array.isArray(options) ? JSON.stringify(options[key]) : key, value: options[key] }),
+      items.concat({
+        key: Array.isArray(options)
+          ? typeof options[key] === 'object'
+            ? JSON.stringify(options[key])
+            : options[key]
+          : key,
+        value: options[key],
+      }),
     [],
   );
 
