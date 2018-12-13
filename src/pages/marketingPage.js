@@ -13,20 +13,26 @@ import { loadScriptAsync } from '../lib/utils';
 
 import sponsorPageHtml from '../static/sponsor-page/index.html';
 import howItWorksPageHtml from '../static/how-it-works-page/index.html';
+import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
+import holidayGiftCardConfirmationHtml from '../static/holiday-gift-card/confirmation.html';
+
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
 import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
 import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
+import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
 
 class MarketingPage extends React.Component {
-  static getInitialProps({ query: { pageSlug } }) {
-    return { pageSlug };
+  static async getInitialProps({ req, query: { pageSlug } }) {
+    const confirmationPage = req && req.method === 'POST' && pageSlug === 'gift-of-giving';
+    return { pageSlug, confirmationPage };
   }
 
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     pageSlug: PropTypes.string.isRequired,
+    confirmationPage: PropTypes.bool,
   };
 
   constructor(props) {
@@ -57,7 +63,7 @@ class MarketingPage extends React.Component {
   }
 
   render() {
-    const { pageSlug } = this.props;
+    const { pageSlug, confirmationPage } = this.props;
     const { LoggedInUser } = this.state;
 
     let html, style, className;
@@ -70,8 +76,11 @@ class MarketingPage extends React.Component {
       html = howItWorksPageHtml;
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
+    } else if (pageSlug === 'gift-of-giving') {
+      html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
+      style = holidayGiftCardPageStyle;
+      className = null;
     }
-
     return (
       <Fragment>
         <div>

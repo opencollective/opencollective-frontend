@@ -73,7 +73,7 @@ pages
 
 // Marketing Pages
 
-pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works)', 'marketingPage');
+pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving)', 'marketingPage');
 
 // Collective
 

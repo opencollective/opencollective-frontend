@@ -53,6 +53,7 @@
     "next": "7.0.2",
     "next-routes": "1.4.2",
     "node-fetch": "2.3.0",
+    "nodemailer": "^4.7.0",
     "nprogress": "0.2.0",
     "nuka-carousel": "4.4.4",
     "payment": "2.3.0",

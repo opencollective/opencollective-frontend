@@ -76,6 +76,7 @@
       </div>
       <div class='md-col-6 form-col'>
         <div class='form-wrapper'>
+        <form method="POST" action="">
           <div class='gift-card-wrapper'>
             <div class='gift-card'>
               <div class='gift-card-text'>
@@ -95,22 +96,22 @@
               <label class='paragraph neutralsolid600'>Gift card amount</label>
               <div class='text-input'>
                 <div class='field-element'>$</div>
-                <input value='50'>
+                <input name="giftCardAmount" value='50' type="number" step="1" min="5" max="10000">
               </div>
             </div>
             <div class='sm-col-6 sm-pl1 pb2'>
               <label class='paragraph neutralsolid600'>Number of cards</label>
               <div class='text-input'>
-                <input placeholder='i.e. 100'>
+                <input name="giftCardNumber" value="100" type="number" step="1" min="1" max="10000">
               </div>
             </div>
           </div>
           <div class='pb2'>
             <label class='paragraph neutralsolid600'>Company name</label>
             <div class='text-input'>
-              <div class='field-element'>http://</div>
-              <input placeholder='i.e. Airbnb, Trivago, etc...'>
+              <input name="companyName" placeholder='i.e. Airbnb, Trivago, etc...'>
             </div>
+            <!--
             <div class='text-input -success'>
               <div class='field-element'>http://</div>
               <input placeholder='i.e. Airbnb, Trivago, etc...'>
@@ -129,19 +130,21 @@
                 </svg>
               </div>
             </div>
-            <div class='tiny red500'>Error message goes here and it can be this long or perhaps even longer.</div>
+            <div class='tiny red500'>Error message goes here and it can be this long or perhaps even longer.</div> -->
           </div>
           <div class='pb2'>
             <label class='paragraph neutralsolid600'>Company website</label>
             <div class='text-input'>
-              <input placeholder='yourwebsite.com'>
+              <div class='field-element'>https://</div>
+              <input name="companyWebsite" placeholder='yourwebsite.com'>
             </div>
           </div>
           <div class='pb2'>
             <label class='paragraph neutralsolid600'>Your name</label>
             <div class='text-input'>
-              <input>
+              <input name="contactName">
             </div>
+            <!--
             <div class='text-input -success'>
               <input>
               <div class='field-icon'>
@@ -158,16 +161,19 @@
                 </svg>
               </div>
             </div>
-            <div class='tiny red500'>Error message goes here and it can be this long or perhaps even longer.</div>
+            <div class='tiny red500'>Error message goes here and it can be this long or perhaps even longer.</div> -->
           </div>
           <div class='pb4'>
             <label class='paragraph neutralsolid600'>Your email</label>
             <div class='text-input'>
-              <input placeholder='i.e. you@youremail.com'>
+              <input name="contactEmail" type="email" placeholder='i.e. you@youremail.com'>
             </div>
           </div>
           <button class='btn -large -primary w100'>Submit</button>
+          <!--
           <button class='btn -large -primary w100' disabled>Submit</button>
+          -->
+        </form>
         </div>
       </div>
     </div>
