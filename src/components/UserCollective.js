@@ -211,7 +211,7 @@ class UserCollective extends React.Component {
     const type = collective.type.toLowerCase();
     let cta;
     if (collective.canApply) {
-      cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} />;
+      cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} sticky={false} />;
     }
 
     const notification = {};

@@ -250,6 +250,7 @@ class MenuBar extends React.Component {
     const offset = -this.height;
 
     let cta = this.props.cta;
+    const stickyCTA = get(this.props, 'cta.props.sticky', true);
     if (get(cta, 'label')) {
       cta = (
         <Link route={cta.href} animate={{ offset }}>
@@ -323,7 +324,7 @@ class MenuBar extends React.Component {
             }
           `}
         </style>
-        {this.state.sticky && cta && cta}
+        {this.state.sticky && stickyCTA && cta}
         {['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 && (
           <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
