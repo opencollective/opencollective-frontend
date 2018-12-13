@@ -162,7 +162,7 @@
     "mkdirp": "^0.5.1",
     "prettier": "1.15.3",
     "raf": "^3.4.1",
-    "raw-loader": "^0.5.1",
+    "raw-loader": "^1.0.0",
     "react-styleguidist": "^8.0.6",
     "react-test-renderer": "^16.6.3",
     "regenerator-runtime": "^0.13.1",
