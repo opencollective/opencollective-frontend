@@ -127,6 +127,11 @@ ${description}`;
       }
     }
 
+    const showGoalsCover =
+      get(collective, 'stats.balance') > 0 ||
+      get(collective, 'stats.yearlyBudget') > 0 ||
+      get(collective, 'settings.goals[0].title');
+
     const classNames = ['CollectiveCover', className, type];
 
     if (!collective.backgroundImage) {
@@ -262,6 +267,8 @@ ${description}`;
               flex-direction: column;
               justify-content: center;
               color: white;
+            }
+            .statsContainer.goals {
               background-color: #252729;
             }
             .topContributors {
@@ -436,14 +443,14 @@ ${description}`;
             )}
 
           {collective.type === 'COLLECTIVE' && collective.isActive && collective.host && (
-            <div className="statsContainer">
+            <div className={`statsContainer ${showGoalsCover ? 'goals' : ''}`}>
               {className !== 'small' && collective.type === 'COLLECTIVE' && (
                 <div className="topContributors">
                   <TopBackersCoverWithData collective={this.props.collective} LoggedInUser={LoggedInUser} limit={10} />
                 </div>
               )}
 
-              {className !== 'small' && collective.type === 'COLLECTIVE' && (
+              {className !== 'small' && collective.type === 'COLLECTIVE' && showGoalsCover && (
                 <GoalsCover collective={collective} LoggedInUser={LoggedInUser} />
               )}
 
