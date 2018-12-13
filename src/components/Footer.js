@@ -51,8 +51,9 @@ const navigation = {
   'JOIN THE MOVEMENT': {
     'Create a Collective': '/create',
     'Become a Sponsor': '/become-a-sponsor',
-    'Create a chapter': '/chapters',
+    'Create a Chapter': '/chapters',
     'Make a Pledge': '/pledges/new',
+    'Company Gift Cards': '/gift-cards',
   },
   COMMUNITY: {
     'Open Source': '/opensource',
