@@ -608,7 +608,7 @@ export default function(Sequelize, DataTypes) {
         }
         ics.createEvent(event, (err, res) => {
           if (err) {
-            console.error(`Error while generating the ics file for event id ${this.id} (${url})`, err);
+            logger.error(`Error while generating the ics file for event id ${this.id} (${url})`, err);
           }
           return resolve(res);
         });
@@ -628,7 +628,7 @@ export default function(Sequelize, DataTypes) {
           }
         })
         .catch(e => {
-          console.error(`models/Collective: checkAndUpdateImage> Unable to fetch the image ${image}`, e);
+          logger.error(`models/Collective: checkAndUpdateImage> Unable to fetch the image ${image}`, e);
         });
     };
 
@@ -1024,7 +1024,7 @@ export default function(Sequelize, DataTypes) {
             const TierId = order.TierId;
             tiersById[TierId] = tiersById[TierId] || order.Tier;
             if (!tiersById[TierId]) {
-              console.error(">>> Couldn't find a tier with id", order.TierId, 'collective: ', this.slug);
+              logger.error(">>> Couldn't find a tier with id", order.TierId, 'collective: ', this.slug);
               tiersById[TierId] = { dataValues: { users: [] } };
             }
             tiersById[TierId].dataValues.users = tiersById[TierId].dataValues.users || [];
@@ -1065,7 +1065,7 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes = {}) {
     if (role === roles.HOST) {
-      return console.error('Please use Collective.addHost(hostCollective, remoteUser);');
+      return logger.info('Please use Collective.addHost(hostCollective, remoteUser);');
     }
 
     const member = {
@@ -1927,7 +1927,7 @@ export default function(Sequelize, DataTypes) {
 
   Collective.createMany = (collectives, defaultValues) => {
     return Promise.map(collectives, u => Collective.create(defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
-      console.error,
+      logger.error,
     );
   };
 
