@@ -89,7 +89,7 @@
     "styled-icons": "5.5.0",
     "styled-jsx": "3.1.0",
     "styled-system": "3.1.11",
-    "unified": "7.0.2",
+    "unified": "7.1.0",
     "uuid": "3.3.2",
     "webpack": "4.20.2",
     "winston": "3.1.0"
