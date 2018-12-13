@@ -1,29 +1,33 @@
 /**
  * Dependencies.
  */
-import _, { get, difference, uniqBy, pick, omit } from 'lodash';
+const ics = require('ics'); // eslint-disable-line import/no-commonjs
+
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import prependHttp from 'prepend-http';
-import queries from '../lib/queries';
-import { types } from '../constants/collectives';
-import roles from '../constants/roles';
-import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { capitalize, flattenArray, getDomain, formatCurrency } from '../lib/utils';
 import slugify from 'limax';
-import activities from '../constants/activities';
 import Promise from 'bluebird';
-import userlib from '../lib/userlib';
-import CustomDataTypes from './DataTypes';
-import { convertToCurrency } from '../lib/currency';
-import emailLib from '../lib/email';
 import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
+import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
+
+import CustomDataTypes from './DataTypes';
+import logger from '../logger';
+import userlib from '../lib/userlib';
+import emailLib from '../lib/email';
+import queries from '../lib/queries';
+import { convertToCurrency } from '../lib/currency';
 import { isBlacklistedCollectiveSlug } from '../lib/collectivelib';
-const ics = require('ics'); // eslint-disable-line import/no-commonjs
+import { capitalize, flattenArray, getDomain, formatCurrency } from '../lib/utils';
+
+import roles from '../constants/roles';
+import activities from '../constants/activities';
+import { HOST_FEE_PERCENT } from '../constants/transactions';
+import { types } from '../constants/collectives';
 
 const debug = debugLib('collective');
 
@@ -1853,7 +1857,7 @@ export default function(Sequelize, DataTypes) {
               } collective has no Stripe account set up (HostCollectiveId: ${HostCollectiveId})`,
             ),
           );
-        } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.token, 'live')) {
+        } else if (process.env.NODE_ENV !== 'production' && includes(stripeAccount.token, 'live')) {
           return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
         } else {
           return stripeAccount;
@@ -1922,7 +1926,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.createMany = (collectives, defaultValues) => {
-    return Promise.map(collectives, u => Collective.create(_.defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
+    return Promise.map(collectives, u => Collective.create(defaults({}, u, defaultValues)), { concurrency: 1 }).catch(
       console.error,
     );
   };
