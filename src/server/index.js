@@ -13,6 +13,8 @@ import { getLocaleDataScript, getMessages, languages } from './intl';
 
 const server = express();
 
+server.use(express.urlencoded({ extended: false }));
+
 server.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
 const env = process.env.NODE_ENV || 'development';

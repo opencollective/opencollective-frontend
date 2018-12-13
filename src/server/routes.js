@@ -10,6 +10,7 @@ import controllers from './controllers';
 import { maxAge } from './middlewares';
 import { logger } from './logger';
 import { translateApiUrl } from '../lib/utils';
+import email from './lib/email';
 
 export default (server, app) => {
   // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
@@ -147,6 +148,18 @@ export default (server, app) => {
         host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
       }),
     );
+  });
+
+  // Form submission in Marketing pages
+
+  server.post('/:pageSlug(gift-of-giving)', (req, res, next) => {
+    email.sendMessage({
+      to: 'Open Collective <info@opencollective.com>',
+      from: 'Open Collective <info@opencollective.com>',
+      subject: 'Gift of Giving',
+      text: JSON.stringify(req.body, null, 2),
+    });
+    next();
   });
 
   return pages.getRequestHandler(server.next);
