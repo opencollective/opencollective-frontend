@@ -6,6 +6,7 @@ import {
   borders,
   borderRadius,
   boxShadow,
+  color,
   display,
   height,
   maxHeight,
@@ -27,6 +28,7 @@ const StyledCard = styled(Box)`
   ${borderColor}
   ${borderRadius}
   ${boxShadow}
+  ${color}
   ${display}
   ${height}
   ${maxHeight}
@@ -47,6 +49,8 @@ StyledCard.propTypes = {
   borderRadius: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'box-shadow' value */
   boxShadow: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  /** styled-system prop: accepts any css 'color' value */
+  color: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'display' value */
   display: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'height' value */
