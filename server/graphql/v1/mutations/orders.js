@@ -19,13 +19,12 @@ import roles from '../../../constants/roles';
 import status from '../../../constants/order_status';
 import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
-import { executeOrder } from '../../../lib/payments';
 
 const oneHourInSeconds = 60 * 60;
 
 const debug = debugLib('orders');
 
-function checkOrdersLimit(order, remoteUser, reqIp) {
+async function checkOrdersLimit(order, remoteUser, reqIp) {
   if (['circleci', 'test'].includes(process.env.NODE_ENV)) {
     return;
   }
@@ -70,7 +69,7 @@ function checkOrdersLimit(order, remoteUser, reqIp) {
   }
 
   for (const limit of limits) {
-    const count = cache.get(limit.key) || 0;
+    const count = (await cache.get(limit.key)) || 0;
     debug(`${count} orders for limit '${limit.key}'`);
     const limitReached = count >= limit.value;
     cache.set(limit.key, count + 1, oneHourInSeconds);
@@ -96,6 +95,7 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
   if (!order.recaptchaToken) {
     // Fail if Recaptcha is required
     if (!remoteUser) {
+      debug('Recaptcha token missing');
       throw new Error(
         'Error while processing your request (Recaptcha token missing), please try again or contact support@opencollective.com',
       );
@@ -113,7 +113,7 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
 
 export async function createOrder(order, loaders, remoteUser, reqIp) {
   debug('Beginning creation of order', order);
-  checkOrdersLimit(order, remoteUser, reqIp);
+  await checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
   try {
     if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
@@ -736,6 +736,6 @@ export async function markOrderAsPaid(remoteUser, id) {
    * - send confirmation email
    * - update order.status and order.processedAt
    */
-  await executeOrder(remoteUser, order);
+  await libPayments.executeOrder(remoteUser, order);
   return order;
 }
