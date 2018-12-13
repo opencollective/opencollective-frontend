@@ -398,10 +398,8 @@ export default (Sequelize, DataTypes) => {
     if (this.CollectiveId === Number(CollectiveId)) return true;
     if (!this.rolesByCollectiveId) {
       logger.info("User.rolesByCollectiveId hasn't been populated.");
-      if (config.env === 'development') {
-        logger.info(new Error().stack);
-      }
-      this.populateRoles();
+      logger.debug(new Error().stack);
+      return false;
     }
     if (typeof roles === 'string') {
       roles = [roles];
