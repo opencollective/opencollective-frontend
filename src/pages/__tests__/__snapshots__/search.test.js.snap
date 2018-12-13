@@ -1076,7 +1076,7 @@ Array [
                 href="/chapters"
                 onClick={[Function]}
               >
-                Create a chapter
+                Create a Chapter
               </a>
             </li>
             <li
@@ -1088,6 +1088,17 @@ Array [
                 onClick={[Function]}
               >
                 Make a Pledge
+              </a>
+            </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/gift-cards"
+                onClick={[Function]}
+              >
+                Gift Cards
               </a>
             </li>
           </ul>
@@ -2324,7 +2335,7 @@ Array [
                 href="/chapters"
                 onClick={[Function]}
               >
-                Create a chapter
+                Create a Chapter
               </a>
             </li>
             <li
@@ -2336,6 +2347,17 @@ Array [
                 onClick={[Function]}
               >
                 Make a Pledge
+              </a>
+            </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/gift-cards"
+                onClick={[Function]}
+              >
+                Gift Cards
               </a>
             </li>
           </ul>
@@ -3527,7 +3549,7 @@ exports[`Search Page renders error message 1`] = `
                 href="/chapters"
                 onClick={[Function]}
               >
-                Create a chapter
+                Create a Chapter
               </a>
             </li>
             <li
@@ -3539,6 +3561,17 @@ exports[`Search Page renders error message 1`] = `
                 onClick={[Function]}
               >
                 Make a Pledge
+              </a>
+            </li>
+            <li
+              className="c36"
+            >
+              <a
+                className="c37"
+                href="/gift-cards"
+                onClick={[Function]}
+              >
+                Gift Cards
               </a>
             </li>
           </ul>
@@ -4877,7 +4910,7 @@ Array [
                 href="/chapters"
                 onClick={[Function]}
               >
-                Create a chapter
+                Create a Chapter
               </a>
             </li>
             <li
@@ -4889,6 +4922,17 @@ Array [
                 onClick={[Function]}
               >
                 Make a Pledge
+              </a>
+            </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/gift-cards"
+                onClick={[Function]}
+              >
+                Gift Cards
               </a>
             </li>
           </ul>
@@ -6349,7 +6393,7 @@ Array [
                 href="/chapters"
                 onClick={[Function]}
               >
-                Create a chapter
+                Create a Chapter
               </a>
             </li>
             <li
@@ -6361,6 +6405,17 @@ Array [
                 onClick={[Function]}
               >
                 Make a Pledge
+              </a>
+            </li>
+            <li
+              className="c16"
+            >
+              <a
+                className="c17"
+                href="/gift-cards"
+                onClick={[Function]}
+              >
+                Gift Cards
               </a>
             </li>
           </ul>
