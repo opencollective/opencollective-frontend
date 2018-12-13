@@ -54,7 +54,7 @@
       "refreshInterval": 3600
     }
   },
-  "logs": {
+  "log": {
     "level": "info",
     "accessLogs": false
   },
