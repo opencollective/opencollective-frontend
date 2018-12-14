@@ -514,10 +514,6 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
       data: { type: GraphQLJSON },
-      canCreateVirtualCards: {
-        description: 'Specify if collective is allowed to create new VirtualCards',
-        type: GraphQLBoolean,
-      },
       slug: { type: GraphQLString },
       path: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
@@ -814,10 +810,6 @@ const CollectiveFields = () => {
       resolve(collective) {
         return collective.data || {};
       },
-    },
-    canCreateVirtualCards: {
-      description: 'Specify if collective is allowed to create new VirtualCards',
-      type: GraphQLBoolean,
     },
     slug: {
       type: GraphQLString,

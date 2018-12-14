@@ -232,12 +232,6 @@ export default function(Sequelize, DataTypes) {
         allowNull: true,
       },
 
-      canCreateVirtualCards: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-
       startsAt: {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,
