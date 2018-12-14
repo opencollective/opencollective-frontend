@@ -8,7 +8,7 @@ import slugify from 'limax';
 import debugLib from 'debug';
 import { extend, defaults, intersection } from 'lodash';
 
-import logger from '../logger';
+import logger from '../lib/logger';
 import * as auth from '../lib/auth';
 import errors from '../lib/errors';
 import userLib from '../lib/userlib';

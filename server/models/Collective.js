@@ -16,7 +16,8 @@ import moment from 'moment';
 import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
 
 import CustomDataTypes from './DataTypes';
-import logger from '../logger';
+
+import logger from '../lib/logger';
 import userlib from '../lib/userlib';
 import emailLib from '../lib/email';
 import queries from '../lib/queries';

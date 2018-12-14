@@ -1,4 +1,4 @@
-import logger from '../server/logger';
+import logger from '../server/lib/logger';
 import { expect, assert } from 'chai';
 import { exportToPDF, sanitizeForLogs } from '../server/lib/utils';
 

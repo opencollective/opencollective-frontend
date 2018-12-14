@@ -9,7 +9,7 @@ import path from 'path';
 import he from 'he';
 import { isArray, pick, get, merge, includes } from 'lodash';
 
-import logger from '../logger';
+import logger from './logger';
 import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
 
