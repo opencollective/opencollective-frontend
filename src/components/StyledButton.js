@@ -32,6 +32,9 @@ const StyledButtonContent = styled(tag.button)`
   cursor: pointer;
   outline: 0;
 
+  ${buttonStyle}
+  ${buttonSize}
+
   ${bgColor}
   ${border}
   ${borderRadius}
@@ -46,9 +49,6 @@ const StyledButtonContent = styled(tag.button)`
   ${space}
   ${textAlign}
   ${width}
-
-  ${buttonStyle}
-  ${buttonSize}
 `;
 
 const StyledButton = ({ loading, ...props }) =>

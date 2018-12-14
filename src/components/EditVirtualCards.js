@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import { ButtonGroup } from 'react-bootstrap';
 import { Flex, Box } from '@rebass/grid';
 import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
@@ -17,6 +16,8 @@ import Pagination from './Pagination';
 import Link from './Link';
 import { Link as LinkWrapper } from '../server/pages';
 import StyledLink from './StyledLink';
+import StyledButtonSet from './StyledButtonSet';
+import { P } from './Text';
 
 /**
  * A filterable list of virtual cards meant to be displayed for organization
@@ -41,53 +42,23 @@ class EditVirtualCards extends React.Component {
     this.state = { claimedFilter: 'all' };
   }
 
-  renderFilterLink(onlyConfirmed, paymentMethods, filterName, label) {
-    let btnClassName = 'btn-default';
-    if (
-      (filterName === 'all' && (onlyConfirmed === undefined || onlyConfirmed === 'all')) ||
-      (filterName === 'claimed' && onlyConfirmed) ||
-      (filterName === 'unclaimed' && onlyConfirmed === false)
-    ) {
-      btnClassName = 'btn-primary';
-    } else if (onlyConfirmed === undefined && (!paymentMethods || paymentMethods.length === 0)) {
-      btnClassName += ' disabled';
-    }
+  renderFilters(onlyConfirmed) {
+    let selected = 'all';
+    if (onlyConfirmed) selected = 'redeemed';
+    if (onlyConfirmed === false) selected = 'pending';
 
     return (
-      <Link
-        route="editCollective"
-        className={`filterBtn btn ${btnClassName}`}
-        params={{ ...this.props.router.query, filter: filterName, offset: 0 }}
-      >
-        {label}
-      </Link>
-    );
-  }
-
-  renderFilters(onlyConfirmed, paymentMethods) {
-    return (
-      <div className="filter">
-        <ButtonGroup>
-          {this.renderFilterLink(
-            onlyConfirmed,
-            paymentMethods,
-            'all',
-            <FormattedMessage id="virtualCards.filterAll" defaultMessage="All" />,
-          )}
-          {this.renderFilterLink(
-            onlyConfirmed,
-            paymentMethods,
-            'claimed',
-            <FormattedMessage id="virtualCards.filterClaimed" defaultMessage="Claimed" />,
-          )}
-          {this.renderFilterLink(
-            onlyConfirmed,
-            paymentMethods,
-            'unclaimed',
-            <FormattedMessage id="virtualCards.filterUnclaimed" defaultMessage="Unclaimed" />,
-          )}
-        </ButtonGroup>
-      </div>
+      <StyledButtonSet items={['all', 'redeemed', 'pending']} selected={selected} buttonProps={{ p: 0 }}>
+        {({ item, isSelected }) => (
+          <Link route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
+            <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
+              {item === 'all' && <FormattedMessage id="virtualCards.filterAll" defaultMessage="All" />}
+              {item === 'redeemed' && <FormattedMessage id="virtualCards.filterRedeemed" defaultMessage="Redeemed" />}
+              {item === 'pending' && <FormattedMessage id="virtualCards.filterPending" defaultMessage="Pending" />}
+            </P>
+          </Link>
+        )}
+      </StyledButtonSet>
     );
   }
 
@@ -114,8 +85,8 @@ class EditVirtualCards extends React.Component {
 
     return (
       <div>
-        <Flex mb={4} justifyContent="space-between">
-          {this.renderFilters(onlyConfirmed, paymentMethods)}
+        <Flex mb={4} justifyContent="space-between" flexWrap="wrap">
+          {this.renderFilters(onlyConfirmed)}
           <Flex>
             <LinkWrapper
               route="editCollective"
@@ -125,7 +96,7 @@ class EditVirtualCards extends React.Component {
               <StyledLink buttonStyle="standard" buttonSize="medium">
                 <Add size="1em" />
                 {'  '}
-                <FormattedMessage id="virtualCards.createSingle" defaultMessage="Create gift cards" />
+                <FormattedMessage id="virtualCards.createCodes" defaultMessage="Create gift card codes" />
               </StyledLink>
             </LinkWrapper>
             <Box mr="0.5em" />
@@ -137,7 +108,7 @@ class EditVirtualCards extends React.Component {
               <StyledLink buttonStyle="primary" buttonSize="medium">
                 <PaperPlane size="1em" />
                 {'  '}
-                <FormattedMessage id="virtualCards.send" defaultMessage="Send gift cards" />
+                <FormattedMessage id="virtualCards.send" defaultMessage="Send gift cards by email" />
               </StyledLink>
             </LinkWrapper>
           </Flex>
@@ -175,7 +146,7 @@ const getIsConfirmedFromFilter = filter => {
   if (filter === undefined || filter === 'all') {
     return undefined;
   }
-  return filter === 'claimed';
+  return filter === 'redeemed';
 };
 
 const getGraphQLVariablesFromProps = props => ({
