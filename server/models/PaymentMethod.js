@@ -348,6 +348,15 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
+   * Updates the paymentMethod.data with the balance on the preapproved paypal card
+   */
+  PaymentMethod.prototype.updateBalance = async function() {
+    if (!this.service !== 'paypal') throw new Error('Can only update balance for paypal preapproved cards');
+    const paymentProvider = libpayments.findPaymentMethodProvider(this);
+    return await paymentProvider.updateBalance(this);
+  };
+
+  /**
    * getBalanceForUser
    * Returns the available balance of the current payment method based on:
    * - the balance of CollectiveId if service is opencollective
@@ -362,6 +371,11 @@ export default function(Sequelize, DataTypes) {
     const paymentProvider = libpayments.findPaymentMethodProvider(this);
     const getBalance =
       paymentProvider && paymentProvider.getBalance ? paymentProvider.getBalance : () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
+
+    // Paypal Preapproved Key
+    if (this.service === 'paypal' && !this.type) {
+      return getBalance(this);
+    }
 
     // needed because giftcard payment method can be accessed without logged in
     if (libpayments.isProvider('opencollective.giftcard', this)) {

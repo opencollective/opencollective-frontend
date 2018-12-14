@@ -9,7 +9,7 @@ import { convertToCurrency } from '../../lib/currency';
 import { formatCurrency } from '../../lib/utils';
 import adaptive from './adaptive';
 import payment from './payment';
-
+import { get } from 'lodash';
 const debugPaypal = debug('paypal');
 
 /**
@@ -31,6 +31,19 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = async function(paymentMethod
     throw new errors.BadRequest('This preapprovalkey is not approved yet.');
   }
 
+  const data = {
+    redirect: paymentMethod.data.redirect,
+    details: response,
+    balance: (parseFloat(response.maxTotalAmountOfAllPayments) - parseFloat(response.curPaymentsAmount)) * 100,
+    currency: response.currencyCode,
+    transactionsCount: response.curPayments,
+  };
+
+  return paymentMethod.update({
+    confirmedAt: new Date(),
+    name: response.senderEmail,
+    data,
+  });
 };
 
 export default {
@@ -192,6 +205,17 @@ export default {
       }
       const updatedPaymentMethod = await getPreapprovalDetailsAndUpdatePaymentMethod(pm);
       return res.json(updatedPaymentMethod.info);
+    },
+
+    updateBalance: async paymentMethod => {
+      return await getPreapprovalDetailsAndUpdatePaymentMethod(paymentMethod);
+    },
+
+    getBalance: async paymentMethod => {
+      return {
+        amount: get(paymentMethod, 'data.balance'),
+        currency: get(paymentMethod, 'data.currency'),
+      };
     },
   },
 };

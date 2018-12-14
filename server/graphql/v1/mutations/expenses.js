@@ -235,8 +235,7 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
       expense.paypalEmail,
       paymentMethod.token,
     );
-    const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
-    debug('paypal> preapprovalDetailsResponse', JSON.stringify(preapprovalDetailsResponse, null, '  '));
+    paymentMethod.updateBalance();
     await createTransactionFromPaidExpense(
       host,
       paymentMethod,
