@@ -1,5 +1,6 @@
 import config from 'config';
 
+import logger from './lib/logger';
 import queries from './lib/queries';
 
 // warming up the cache with the homepage queries
@@ -59,9 +60,9 @@ const cacheHomepageRefresh = async () => {
 };
 
 export default () => {
-  console.log('Starting Background Jobs.');
+  logger.info('Starting Background Jobs.');
   if (!config.cache.homepage.disabled) {
-    console.log('- starting cacheHomepageRefresh');
+    logger.verbose('- starting cacheHomepageRefresh');
     setInterval(cacheHomepageRefresh, config.cache.homepage.refreshInterval * 1000);
     cacheHomepageRefresh();
   }

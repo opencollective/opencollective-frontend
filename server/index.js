@@ -1,10 +1,12 @@
 import './env'; // important to load first for environment config
 
-import express from 'express';
-import routes from './routes';
 import os from 'os';
-import expressLib from './lib/express';
+import express from 'express';
+
+import routes from './routes';
 import backgroundJobs from './background-jobs';
+import expressLib from './lib/express';
+import logger from './lib/logger';
 
 const app = express();
 
@@ -22,7 +24,7 @@ routes(app);
 const port = process.env.PORT || 3060;
 const server = app.listen(port, () => {
   const host = os.hostname();
-  console.log(
+  logger.info(
     'Open Collective API listening at http://%s:%s in %s environment.\n',
     host,
     server.address().port,
