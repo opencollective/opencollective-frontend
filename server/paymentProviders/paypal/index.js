@@ -21,35 +21,16 @@ const debugPaypal = debug('paypal');
  * Confirms that the preapprovalKey has been approved by PayPal
  * and updates the paymentMethod
  */
-const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
+const getPreapprovalDetailsAndUpdatePaymentMethod = async function(paymentMethod) {
   if (!paymentMethod) {
     return Promise.reject(new Error('No payment method provided to getPreapprovalDetailsAndUpdatePaymentMethod'));
   }
 
-  let preapprovalDetailsResponse;
+  const response = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
+  if (response.approved === 'false') {
+    throw new errors.BadRequest('This preapprovalkey is not approved yet.');
+  }
 
-  return paypalAdaptive
-    .preapprovalDetails(paymentMethod.token)
-    .tap(response => (preapprovalDetailsResponse = response))
-    .then(response => {
-      if (response.approved === 'false') {
-        throw new errors.BadRequest('This preapprovalkey is not approved yet.');
-      }
-    })
-    .then(() =>
-      paymentMethod.update({
-        confirmedAt: new Date(),
-        name: preapprovalDetailsResponse.senderEmail,
-        data: {
-          ...paymentMethod.data,
-          response: preapprovalDetailsResponse,
-        },
-      }),
-    )
-    .catch(e => {
-      debugPaypal('>>> getPreapprovalDetailsAndUpdatePaymentMethod error ', e);
-      throw e;
-    });
 };
 
 export default {
@@ -189,30 +170,28 @@ export default {
     /**
      * Get preapproval key details
      */
-    verify: (req, res, next) => {
-      return models.PaymentMethod.findOne({
+    verify: async (req, res, next) => {
+      const pm = await models.PaymentMethod.findOne({
         where: {
           service: 'paypal',
           token: req.query.preapprovalKey,
         },
         order: [['createdAt', 'DESC']],
-      })
-        .then(pm => {
-          if (!pm) {
-            return next(
-              new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`),
-            );
-          }
-          if (!req.remoteUser.isAdmin(pm.CollectiveId)) {
-            return next(
-              new errors.Unauthorized(
-                'You are not authorized to verify a payment method of a collective that you are not an admin of',
-              ),
-            );
-          }
-          return getPreapprovalDetailsAndUpdatePaymentMethod(pm).then(pm => res.json(pm.info));
-        })
-        .catch(next);
+      });
+      if (!pm) {
+        return next(
+          new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`),
+        );
+      }
+      if (!req.remoteUser.isAdmin(pm.CollectiveId)) {
+        return next(
+          new errors.Unauthorized(
+            'You are not authorized to verify a payment method of a collective that you are not an admin of',
+          ),
+        );
+      }
+      const updatedPaymentMethod = await getPreapprovalDetailsAndUpdatePaymentMethod(pm);
+      return res.json(updatedPaymentMethod.info);
     },
   },
 };
