@@ -87,7 +87,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
     limitedToCollectiveIds: paymentMethod.limitedToCollectiveIds,
     limitedToHostCollectiveIds: paymentMethod.limitedToHostCollectiveIds,
     code: paymentMethod.uuid.substring(0, 8),
-    expiryDate: moment(paymentMethod.expiryDate).format(),
+    expiryDate: moment(new Date(paymentMethod.expiryDate)).format(),
     redeemUrl: `${config.host.website}/redeem?code=${paymentMethod.uuid.substring(0, 8)}`,
   };
 }
