@@ -5,6 +5,7 @@ import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import moment from 'moment';
 import styled, { withTheme } from 'styled-components';
+import { themeGet } from 'styled-system';
 
 import { CardGiftcard as GiftCardIcon } from 'styled-icons/material/CardGiftcard.cjs';
 
@@ -15,7 +16,7 @@ import Moment from './Moment';
 
 const DetailsColumnHeader = styled.span`
   text-transform: uppercase;
-  color: ${props => props.theme.colors.black[500]};
+  color: ${themeGet('colors.black.500')};
   font-weight: 300;
   white-space: nowrap;
 `;
@@ -73,35 +74,42 @@ class VirtualCardDetails extends React.Component {
 
   getStatusColor(isConfirmed, balance) {
     const { colors } = this.props.theme;
-    return balance === 0 ? colors.yellow[500] : isConfirmed ? colors.green[500] : colors.black[200];
+    if (balance === 0) {
+      return colors.black[200];
+    }
+
+    return isConfirmed ? colors.green[500] : colors.yellow[500];
   }
 
   renderDetails() {
-    const redeemCode = this.props.virtualCard.uuid.split('-')[0];
-    const email = get(this.props.virtualCard, 'data.email');
+    const { virtualCard } = this.props;
+    const redeemCode = virtualCard.uuid.split('-')[0];
+    const email = get(virtualCard, 'data.email');
     const linkParams = email ? { code: redeemCode, email } : { code: redeemCode };
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
-        <Flex flexDirection="column" mr="1.5em">
-          <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
-          </DetailsColumnHeader>
-          <Link route="redeem" params={linkParams}>
-            {redeemCode}
-          </Link>
-        </Flex>
+        {!virtualCard.isConfirmed && (
+          <Flex flexDirection="column" mr="1.5em">
+            <DetailsColumnHeader>
+              <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
+            </DetailsColumnHeader>
+            <Link route="redeem" params={linkParams}>
+              {redeemCode}
+            </Link>
+          </Flex>
+        )}
         <Flex flexDirection="column" mr="1.5em">
           <DetailsColumnHeader>
             <FormattedMessage id="virtualCards.expiryDate" defaultMessage="EXPIRY DATE" />
           </DetailsColumnHeader>
-          <span>{moment(this.props.virtualCard.expiryDate).format('MM/Y')}</span>
+          <span>{moment(virtualCard.expiryDate).format('MM/Y')}</span>
         </Flex>
         <Flex flexDirection="column" mr="1.5em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.customMessage" defaultMessage="CUSTOM MESSAGE" />
+            <FormattedMessage id="virtualCards.description" defaultMessage="DESCRIPTION" />
           </DetailsColumnHeader>
-          <span>{this.props.virtualCard.description}</span>
+          <span>{virtualCard.description}</span>
         </Flex>
       </Flex>
     );

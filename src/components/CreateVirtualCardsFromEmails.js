@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { themeGet } from 'styled-system';
 import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
@@ -12,7 +13,6 @@ import { getCollectiveSourcePaymentMethodsQuery } from '../graphql/queries';
 import { createVirtualCardsMutationQuery } from '../graphql/mutations';
 import StyledInputAmount from './StyledInputAmount';
 import StyledButton from './StyledButton';
-import StyledInput from './StyledInput';
 import StyledPaymentMethodChooser from './StyledPaymentMethodChooser';
 import Loading from './Loading';
 import Link from './Link';
@@ -31,7 +31,7 @@ const InlineField = ({ name, children, label }) => (
 );
 
 const FieldLabelDetails = styled.span`
-  color: ${props => props.theme.colors.black[400]};
+  color: ${themeGet('colors.black.400')};
   font-weight: 400;
 `;
 
@@ -200,28 +200,6 @@ class CreateVirtualCardsFromEmails extends Component {
               paymentMethods={paymentMethods}
               defaultPaymentMethod={this.getDefaultPaymentMethod()}
               onChange={option => this.onChange('paymentMethod', option)}
-            />
-          </InlineField>
-
-          <InlineField
-            name="customMessage"
-            label={
-              <Flex flexDirection="column">
-                <FormattedMessage id="virtualCards.create.customMessage" defaultMessage="Custom message" />
-                <FieldLabelDetails>
-                  <FormattedMessage id="forms.optional" defaultMessage="Optional" />
-                </FieldLabelDetails>
-              </Flex>
-            }
-          >
-            <StyledInput
-              id="virtualcard-customMessage"
-              type="text"
-              maxLength="255"
-              placeholder="Will be sent in the invitation email"
-              onChange={value => this.onChange('customMessage', value)}
-              style={{ flexGrow: 1 }}
-              disabled={submitting}
             />
           </InlineField>
 
