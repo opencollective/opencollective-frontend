@@ -60,9 +60,9 @@ const cacheHomepageRefresh = async () => {
 };
 
 export default () => {
-  logger.info('Starting Background Jobs.');
+  logger.info('Starting background jobs');
   if (!config.cache.homepage.disabled) {
-    logger.verbose('- starting cacheHomepageRefresh');
+    logger.info("Starting 'cacheHomepageRefresh' job");
     setInterval(cacheHomepageRefresh, config.cache.homepage.refreshInterval * 1000);
     cacheHomepageRefresh();
   }

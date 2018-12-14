@@ -1,13 +1,11 @@
 import config from 'config';
-import winston from 'winston';
+import winston, { format } from 'winston';
 
 const logger = winston.createLogger();
 
 const winstonLevel = config.log.level;
 
-const winstonBaseFormat = winston.format.combine(winston.format.simple(), winston.format.splat());
-
-const winstonFormat = winston.format.combine(winston.format.colorize(), winstonBaseFormat);
+const winstonFormat = format.combine(format.colorize(), format.splat(), format.simple());
 
 const winstonConsole = new winston.transports.Console({
   level: winstonLevel,

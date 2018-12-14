@@ -1,6 +1,7 @@
 import './env'; // important to load first for environment config
 
 import os from 'os';
+import config from 'config';
 import express from 'express';
 
 import routes from './routes';
@@ -28,7 +29,7 @@ const server = app.listen(port, () => {
     'Open Collective API listening at http://%s:%s in %s environment.\n',
     host,
     server.address().port,
-    app.set('env'),
+    config.env,
   );
 });
 
