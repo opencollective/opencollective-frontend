@@ -121,7 +121,7 @@ describe('graphql.comments.test', () => {
       const createdComment = result.data.createComment;
       expect(createdComment.html).to.equal('<p>This is the <strong>comment</strong></p>');
       await utils.waitForCondition(() => sendEmailSpy.callCount === 3);
-      utils.inspectSpy(sendEmailSpy, 2);
+      // utils.inspectSpy(sendEmailSpy, 2);
       expect(sendEmailSpy.callCount).to.equal(3);
       expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
       expect(sendEmailSpy.firstCall.args[1]).to.contain(

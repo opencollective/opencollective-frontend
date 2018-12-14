@@ -87,7 +87,7 @@ async function createVirtualCardThroughGraphQL(args, user) {
     limitedToCollectiveIds: paymentMethod.limitedToCollectiveIds,
     limitedToHostCollectiveIds: paymentMethod.limitedToHostCollectiveIds,
     code: paymentMethod.uuid.substring(0, 8),
-    expiryDate: moment(paymentMethod.expiryDate).format(),
+    expiryDate: moment(new Date(paymentMethod.expiryDate)).format(),
     redeemUrl: `${config.host.website}/redeem?code=${paymentMethod.uuid.substring(0, 8)}`,
   };
 }
@@ -116,7 +116,6 @@ export function createVirtualCard(req, res) {
       res.send(response);
     })
     .catch(error => {
-      console.error(error);
       res.status(400).send({ error: error.toString() });
     });
 }

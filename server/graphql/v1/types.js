@@ -1441,7 +1441,6 @@ export const PaymentMethodType = new GraphQLObjectType({
           const res = await models.Transaction.findAll({
             attributes: [[sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId']],
             where: { PaymentMethodId: paymentMethod.id, type: 'CREDIT' },
-            logging: console.log,
           });
           const FromCollectiveIds = res.map(r => r.dataValues.FromCollectiveId);
           const result = await models.Collective.findAndCountAll({

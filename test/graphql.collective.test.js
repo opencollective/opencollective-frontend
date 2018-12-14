@@ -950,7 +950,7 @@ describe('graphql.collective.test.js', () => {
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
       const updatedCollective = res.data.editCollective;
-      console.log('>>> updatedCollective', updatedCollective);
+      // console.log('>>> updatedCollective', updatedCollective);
       expect(updatedCollective.host.id).to.equal(hostCollective.id);
       expect(updatedCollective.currency).to.equal('EUR');
     });

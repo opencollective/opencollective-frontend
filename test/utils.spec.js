@@ -1,3 +1,4 @@
+import logger from '../server/lib/logger';
 import { expect, assert } from 'chai';
 import { exportToPDF, sanitizeForLogs } from '../server/lib/utils';
 
@@ -50,7 +51,7 @@ describe('utils', () => {
     exportToPDF('expenses', data).then(buffer => {
       const expectedSize = process.env.NODE_ENV === 'circleci' ? 27750 : 26123;
       // Size varies for some reason...
-      console.log('PDF length is', buffer.length, 'expected length', expectedSize);
+      logger.info('PDF length is', buffer.length, 'expected length', expectedSize);
       try {
         assert.isAtLeast(buffer.length, 18000, 'PDF length should be at least 20000 bytes');
         done();

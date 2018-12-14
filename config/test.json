@@ -1,5 +1,8 @@
 {
   "database": {
     "database": "opencollective_test"
+  },
+  "log": {
+    "level": "warn"
   }
 }

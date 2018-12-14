@@ -6,7 +6,9 @@ import debugLib from 'debug';
 import { has, get } from 'lodash';
 
 import models from '../models';
-import { formatCurrency } from '../lib/utils';
+import logger from './logger';
+import { formatCurrency } from './utils';
+
 import activityType from '../constants/activities';
 
 const debug = debugLib('twitter');
@@ -105,10 +107,12 @@ const tweetStatus = (twitterAccount, status, url, options = {}) => {
       access_token_secret: twitterAccount.token,
     });
 
-    const tweet = Promise.promisify(client.post, { context: client });
-    return tweet('statuses/update', { status, ...options });
+    return client.post('statuses/update', { status, ...options }).catch(err => {
+      err = Array.isArray(err) ? err.shift() : err;
+      logger.info(`Tweet not sent: ${err.message}`);
+    });
   } else {
-    console.log('Tweet not sent: no twitter key/secret provided in env');
+    logger.warn('Tweet not sent: missing twitter consumerKey or consumerSecret configuration');
     return Promise.resolve();
   }
 };

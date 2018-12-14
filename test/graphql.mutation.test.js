@@ -702,7 +702,7 @@ describe('Mutation Tests', () => {
             },
           });
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
-          utils.inspectSpy(emailSendMessageSpy, 2);
+          // utils.inspectSpy(emailSendMessageSpy, 2);
           expect(members).to.have.length(1);
 
           // Make sure we send the collective.member.created email notification to core contributor of collective1
@@ -1068,7 +1068,7 @@ describe('Mutation Tests', () => {
 
           const loggedInUser = null;
           const result = await utils.graphqlQuery(query, { order }, loggedInUser);
-          result.errors && console.error(result.errors[0]);
+          // result.errors && console.error(result.errors[0]);
           expect(result.errors).to.exist;
           expect(result.errors[0].message).to.equal('An account already exists for this email address. Please login.');
         });
