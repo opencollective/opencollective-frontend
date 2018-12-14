@@ -203,7 +203,6 @@ const getCollectiveToEditQuery = gql`
       isActive
       isHost
       expensePolicy
-      canCreateVirtualCards
       stats {
         id
         yearlyBudget

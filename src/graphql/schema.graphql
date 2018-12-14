@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Dec 14 2018 10:12:19 GMT+0100 (Central European Standard Time)
+# timestamp: Fri Dec 14 2018 15:05:37 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -72,9 +72,6 @@ type Collective implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
-
-  """Specify if collective is allowed to create new VirtualCards"""
-  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -231,9 +228,6 @@ interface CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
-
-  """Specify if collective is allowed to create new VirtualCards"""
-  canCreateVirtualCards: Boolean
   slug: String
   path: String
   isHost: Boolean
@@ -499,9 +493,6 @@ type Event implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
-
-  """Specify if collective is allowed to create new VirtualCards"""
-  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -845,7 +836,7 @@ type Mutation {
     """
     currency: String
 
-    """The amount as an Integer without cents."""
+    """The amount as an Integer with cents."""
     amount: Int
     monthlyLimitPerMember: Int
 
@@ -1089,9 +1080,6 @@ type Organization implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
-
-  """Specify if collective is allowed to create new VirtualCards"""
-  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
@@ -1670,9 +1658,6 @@ type User implements CollectiveInterface {
   backgroundImage: String
   settings: JSON
   data: JSON
-
-  """Specify if collective is allowed to create new VirtualCards"""
-  canCreateVirtualCards: Boolean
   slug: String
   path: String
 
