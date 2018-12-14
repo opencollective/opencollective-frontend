@@ -317,6 +317,7 @@ async function sendVirtualCardCreatedEmail(virtualCard, emitterCollective) {
   }
 
   return emailLib.send('user.card.invited', email, {
+    email,
     redeemCode: code,
     initialBalance: virtualCard.initialBalance,
     expiryDate: virtualCard.expiryDate,

@@ -89,6 +89,7 @@ data['user.card.invited'] = {
       'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
   },
   redeemCode: '00000000',
+  email: 'info@opencolletive.com',
 };
 data['ticket.confirmed'] = {
   recipient: {
