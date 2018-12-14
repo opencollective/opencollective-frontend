@@ -116,7 +116,6 @@ export function createVirtualCard(req, res) {
       res.send(response);
     })
     .catch(error => {
-      console.error(error);
       res.status(400).send({ error: error.toString() });
     });
 }
