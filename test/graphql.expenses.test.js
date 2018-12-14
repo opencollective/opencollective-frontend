@@ -782,7 +782,7 @@ describe('GraphQL Expenses API', () => {
           { id: expense.id, paymentProcessorFeeInCollectiveCurrency },
           hostAdmin,
         );
-        res.errors && console.log(res.errors);
+        // res.errors && console.log(res.errors);
         expect(callPaypal.firstCall.args[0]).to.equal('pay');
         expect(callPaypal.firstCall.args[1].currencyCode).to.equal('EUR');
         expect(callPaypal.firstCall.args[1].memo).to.equal('Reimbursement from WWCode Berlin: Pizza');
