@@ -6,7 +6,6 @@ import activities from '../../../constants/activities';
 import models from '../../../models';
 import paymentProviders from '../../../paymentProviders';
 import { formatCurrency } from '../../../lib/utils';
-import paypalAdaptive from '../../../paymentProviders/paypal/adaptiveGateway';
 import {
   createFromPaidExpense as createTransactionFromPaidExpense,
   createTransactionFromInKindDonation,
