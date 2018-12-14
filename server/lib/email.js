@@ -9,6 +9,7 @@ import path from 'path';
 import he from 'he';
 import { isArray, pick, get, merge, includes } from 'lodash';
 
+import logger from '../logger';
 import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
 
@@ -301,7 +302,8 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
  */
 const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
   if (!recipient) {
-    return Promise.reject('No recipient');
+    logger.info(`Email with template '${template}' not sent. No recipient.`);
+    return;
   }
   return generateEmailFromTemplate(template, recipient, data, options).then(renderedTemplate => {
     const attributes = getTemplateAttributes(renderedTemplate.html);
