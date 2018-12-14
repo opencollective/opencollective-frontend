@@ -219,7 +219,6 @@ async function createTransactions(host, expense, fees = {}) {
     null,
     expense,
     null,
-    null,
     expense.UserId,
     fees.paymentProcessorFeeInHostCurrency,
     fees.hostFeeInHostCurrency,
@@ -243,7 +242,6 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
       paymentMethod,
       expense,
       paymentResponse,
-      preapprovalDetailsResponse,
       expense.UserId,
       fees.paymentProcessorFeeInHostCurrency,
       fees.hostFeeInHostCurrency,
@@ -293,7 +291,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   // Expenses in kind can be made for collectives without any
   // funds. That's why we skip earlier here.
   if (expense.payoutMethod === 'donation') {
-    const transaction = await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId);
+    const transaction = await createTransactionFromPaidExpense(host, null, expense, null, expense.UserId);
     await createTransactionFromInKindDonation(transaction);
     const user = await models.User.findById(expense.UserId);
     await expense.collective.addUserWithRole(user, 'BACKER');

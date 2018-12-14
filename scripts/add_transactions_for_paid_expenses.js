@@ -55,16 +55,7 @@ function run() {
           expense = e;
           return e.collective.getHostCollective();
         })
-        .then(host =>
-          createTransactionFromPaidExpense(
-            host,
-            null,
-            expense,
-            null,
-            null,
-            expense.UserId,
-          ),
-        )
+        .then(host => createTransactionFromPaidExpense(host, null, expense, null, expense.UserId))
         .then(() => expensesFixed.push(expenseId));
     })
     .then(() => console.log('Expenses fixed: ', expensesFixed.length))
