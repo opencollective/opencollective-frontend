@@ -1079,8 +1079,7 @@ const queries = {
               offset: args.offset || 0,
             }),
           )
-          .catch(e => {
-            console.error(e.message);
+          .catch(() => {
             return [];
           });
       } else {
