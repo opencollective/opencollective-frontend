@@ -1,6 +1,7 @@
 # FAQ for collectives
 
 ### What is an Open Collective?
+
 An Open Collective is a group of people with a shared mission that operates in full transparency. Everyone can see how they receive or spend money.
 
 ### What can I do with Open Collective?
@@ -55,4 +56,5 @@ If your collective is small, and depending on the regulations in your country, h
 But if you need to start providing donation receipts or invoices to your backers, you will have to create a legal entity. Because it's such a burden and a distraction from your day to day activities, Open Collective makes it easy to share a host. That way, the burden of accounting and compliance can be mutualized across a lot of collectives that operate in the same space (either by type of activity, like open source projects, or by geography, like all citizen initiatives in Brussels).
 
 Read more about hosts:
+
 - [FAQ for hosts](https://opencollective.com/faq/hosts)
