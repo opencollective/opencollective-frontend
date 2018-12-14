@@ -5,6 +5,7 @@ import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
 import { formatCurrency, isValidEmail } from '../../lib/utils';
+import emailLib from '../../lib/email';
 
 /**
  * Virtual Card Payment method - This payment Method works basically as an alias
@@ -147,7 +148,7 @@ async function create(args, remoteUser) {
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
   const createParams = getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
   const virtualCard = await models.PaymentMethod.create(createParams);
-  // TODO send email
+  sendVirtualCardCreatedEmail(virtualCard, collective);
   return virtualCard;
 }
 
@@ -192,7 +193,7 @@ export async function createVirtualCardsForEmails(args, remoteUser, emails) {
     getCreateParams({ ...args, data: { email } }, collective, sourcePaymentMethod, remoteUser),
   );
   const virtualCards = models.PaymentMethod.bulkCreate(virtualCardsParams);
-  // TODO send emails
+  virtualCards.map(vc => sendVirtualCardCreatedEmail(vc, collective));
   return virtualCards;
 }
 
@@ -300,6 +301,29 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
     updatedAt: new Date(),
     data,
   };
+}
+
+/**
+ * Send an email with the virtual card redeem URL to the user.
+ *
+ * @param {object} virtualCard
+ */
+async function sendVirtualCardCreatedEmail(virtualCard, emitterCollective) {
+  const code = virtualCard.uuid.split('-')[0];
+  const email = get(virtualCard, 'data.email');
+
+  if (!email) {
+    return false;
+  }
+
+  return emailLib.send('user.card.invited', email, {
+    redeemCode: code,
+    initialBalance: virtualCard.initialBalance,
+    expiryDate: virtualCard.expiryDate,
+    name: virtualCard.name,
+    currency: virtualCard.currency,
+    emitter: emitterCollective,
+  });
 }
 
 /** Claim the Virtual Card Payment Method By an (existing or not) user

@@ -1,0 +1,27 @@
+Subject: 🎁 {{emitter.name}} has granted you a {{{currency initialBalance currency=currency}}} gift card to donate on Open Collective!
+
+{{> header}}
+
+<table>
+  <tr>
+    <td>
+      <center>
+        <h1>{{#ifCond currency '===' 'USD'}}💵{{/ifCond}}{{#ifCond currency '===' 'EUR'}}💶{{/ifCond}}{{#ifCond currency '===' 'GBP'}}💷{{/ifCond}}</h1>
+        <p>
+          You're one step away to redeem the {{{currency initialBalance currency=currency}}} gift card
+          offered to you by <a href="{{config.host.website}}/{{emitter.slug}}">{{emitter.name}}</a>. Just
+          click on the button bellow and fill your info to redeem your gift card 🎁
+        </p>
+        <center>
+          <a href="{{config.host.website}}/redeem/{{redeemCode}}" class="btn blue"><div>Redeem</div></a>
+        </center>
+      </center>
+    </td>
+    <td></td>
+    <td valign="top">
+      {{> collectivecard emitter}}
+    </td>
+  </tr>
+</table>
+
+{{> footer}}

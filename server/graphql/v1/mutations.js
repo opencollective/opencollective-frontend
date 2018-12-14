@@ -1,4 +1,4 @@
-import { omit, times } from 'lodash';
+import { omit } from 'lodash';
 import {
   claimCollective,
   createCollective,

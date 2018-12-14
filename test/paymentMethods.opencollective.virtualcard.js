@@ -100,14 +100,16 @@ describe('opencollective.virtualcard', () => {
         }).then(c => (collective1 = c)),
       );
       before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
-      before('user1 to become Admin of collective1', () =>
-        models.Member.create({
+      before('user1 to become Admin of collective1', () => {
+        return models.Member.create({
           CreatedByUserId: user1.id,
           MemberCollectiveId: user1.CollectiveId,
           CollectiveId: collective1.id,
           role: 'ADMIN',
-        }),
-      );
+        }).then(() => {
+          user1.populateRoles();
+        });
+      });
       before('create a payment method', () =>
         models.PaymentMethod.create({
           name: '4242',
@@ -126,7 +128,7 @@ describe('opencollective.virtualcard', () => {
           amount: 10000,
           currency: 'USD',
         };
-        const paymentMethod = await virtualcard.create(args);
+        const paymentMethod = await virtualcard.create(args, user1);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
         expect(paymentMethod.initialBalance).to.be.equal(args.amount);
@@ -150,7 +152,7 @@ describe('opencollective.virtualcard', () => {
           currency: 'USD',
           expiryDate: expiryDate,
         };
-        const paymentMethod = await virtualcard.create(args);
+        const paymentMethod = await virtualcard.create(args, user1);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
         expect(paymentMethod.initialBalance).to.be.equal(args.amount);
@@ -167,7 +169,7 @@ describe('opencollective.virtualcard', () => {
           monthlyLimitPerMember: 10000,
           currency: 'USD',
         };
-        const paymentMethod = await virtualcard.create(args);
+        const paymentMethod = await virtualcard.create(args, user1);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
         expect(paymentMethod.service).to.be.equal('opencollective');
@@ -194,7 +196,7 @@ describe('opencollective.virtualcard', () => {
           currency: 'USD',
           expiryDate: expiryDate,
         };
-        const paymentMethod = await virtualcard.create(args);
+        const paymentMethod = await virtualcard.create(args, user1);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.CollectiveId).to.be.equal(collective1.id);
         expect(paymentMethod.service).to.be.equal('opencollective');
@@ -207,7 +209,7 @@ describe('opencollective.virtualcard', () => {
     }); /** End Of "#create" */
 
     describe('#claim', async () => {
-      let collective1, paymentMethod1, virtualCardPaymentMethod;
+      let collective1, paymentMethod1, user1, virtualCardPaymentMethod;
 
       before(() => utils.resetTestDB());
       before('create collective1(currency USD, No Host)', () =>
@@ -228,16 +230,27 @@ describe('opencollective.virtualcard', () => {
         }).then(pm => (paymentMethod1 = pm)),
       );
 
-      before('create a virtual card payment method', () =>
-        virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-          })
-          .then(pm => (virtualCardPaymentMethod = pm)),
-      );
+      before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
+      before('user1 to become Admin of collective1', () => {
+        return models.Member.create({
+          CreatedByUserId: user1.id,
+          MemberCollectiveId: user1.CollectiveId,
+          CollectiveId: collective1.id,
+          role: 'ADMIN',
+        }).then(() => {
+          user1.populateRoles();
+        });
+      });
+
+      before('create a virtual card payment method', () => {
+        const createParams = {
+          description: 'virtual card test',
+          CollectiveId: collective1.id,
+          amount: 10000,
+          currency: 'USD',
+        };
+        return virtualcard.create(createParams, user1).then(pm => (virtualCardPaymentMethod = pm));
+      });
 
       it('new User should claim a virtual card', async () => {
         // setting correct code to claim virtual card by new User
@@ -274,7 +287,7 @@ describe('opencollective.virtualcard', () => {
     }); /** End Of "#claim" */
 
     describe('#processOrder', async () => {
-      let host1, collective1, collective2, paymentMethod1, virtualCardPaymentMethod, user, userCollective;
+      let host1, collective1, collective2, paymentMethod1, virtualCardPaymentMethod, user, user1, userCollective;
 
       before(() => utils.resetTestDB());
 
@@ -306,6 +319,19 @@ describe('opencollective.virtualcard', () => {
           isActive: true,
         }).then(c => (collective2 = c)),
       );
+
+      before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
+      before('user1 to become Admin of collective1', () => {
+        return models.Member.create({
+          CreatedByUserId: user1.id,
+          MemberCollectiveId: user1.CollectiveId,
+          CollectiveId: collective1.id,
+          role: 'ADMIN',
+        }).then(() => {
+          user1.populateRoles();
+        });
+      });
+
       before('create a credit card payment method', () =>
         models.PaymentMethod.create({
           name: '4242',
@@ -319,12 +345,15 @@ describe('opencollective.virtualcard', () => {
 
       beforeEach('create a virtual card payment method', () =>
         virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-          })
+          .create(
+            {
+              description: 'virtual card test',
+              CollectiveId: collective1.id,
+              amount: 10000,
+              currency: 'USD',
+            },
+            user1,
+          )
           .then(pm => (virtualCardPaymentMethod = pm)),
       );
 
@@ -588,7 +617,7 @@ describe('opencollective.virtualcard', () => {
     }); /** End Of "#create" */
 
     describe('#claim', async () => {
-      let collective1, paymentMethod1, virtualCardPaymentMethod;
+      let collective1, paymentMethod1, virtualCardPaymentMethod, user1;
 
       before(() => utils.resetTestDB());
 
@@ -612,14 +641,29 @@ describe('opencollective.virtualcard', () => {
         }).then(pm => (paymentMethod1 = pm)),
       );
 
+      before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
+      before('user1 to become Admin of collective1', () => {
+        return models.Member.create({
+          CreatedByUserId: user1.id,
+          MemberCollectiveId: user1.CollectiveId,
+          CollectiveId: collective1.id,
+          role: 'ADMIN',
+        }).then(() => {
+          user1.populateRoles();
+        });
+      });
+
       beforeEach('create a virtual card payment method', () =>
         virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-          })
+          .create(
+            {
+              description: 'virtual card test',
+              CollectiveId: collective1.id,
+              amount: 10000,
+              currency: 'USD',
+            },
+            user1,
+          )
           .then(pm => (virtualCardPaymentMethod = pm)),
       );
 
@@ -722,7 +766,7 @@ describe('opencollective.virtualcard', () => {
       }); /** End Of "Existing User should claim a virtual card" */
     }); /** End Of "#claim" */
 
-    describe('#processOrder', async () => {
+    describe('#processOrder2', async () => {
       let host1,
         host2,
         collective1,
@@ -779,14 +823,16 @@ describe('opencollective.virtualcard', () => {
         await collective2.update({ isActive: true });
       });
       before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
-      before('user1 to become Admin of collective1', () =>
-        models.Member.create({
+      before('user1 to become Admin of collective1', () => {
+        return models.Member.create({
           CreatedByUserId: user1.id,
           MemberCollectiveId: user1.CollectiveId,
           CollectiveId: collective1.id,
           role: 'ADMIN',
-        }),
-      );
+        }).then(() => {
+          user1.populateRoles();
+        });
+      });
       before('create a credit card payment method', () =>
         models.PaymentMethod.create({
           name: '4242',
@@ -800,14 +846,17 @@ describe('opencollective.virtualcard', () => {
 
       before('create a virtual card payment method', () =>
         virtualcard
-          .create({
-            description: 'virtual card test',
-            CollectiveId: collective1.id,
-            amount: 10000,
-            currency: 'USD',
-            limitedToHostCollectiveIds: [host1.id],
-            limitedToTags: ['open source'],
-          })
+          .create(
+            {
+              description: 'virtual card test',
+              CollectiveId: collective1.id,
+              amount: 10000,
+              currency: 'USD',
+              limitedToHostCollectiveIds: [host1.id],
+              limitedToTags: ['open source'],
+            },
+            user1,
+          )
           .then(pm => (virtualCardPaymentMethod = pm)),
       );
 
