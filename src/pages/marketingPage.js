@@ -25,7 +25,8 @@ import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/st
 
 class MarketingPage extends React.Component {
   static async getInitialProps({ req, query: { pageSlug } }) {
-    const confirmationPage = req && req.method === 'POST' && pageSlug === 'gift-of-giving';
+    const confirmationPage =
+      req && req.method === 'POST' && (pageSlug === 'gift-of-giving' || pageSlug === 'gift-cards');
     return { pageSlug, confirmationPage };
   }
 
@@ -76,7 +77,7 @@ class MarketingPage extends React.Component {
       html = howItWorksPageHtml;
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
-    } else if (pageSlug === 'gift-of-giving') {
+    } else if (pageSlug === 'gift-of-giving' || pageSlug === 'gift-cards') {
       html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
       className = null;

@@ -152,7 +152,7 @@ export default (server, app) => {
 
   // Form submission in Marketing pages
 
-  server.post('/:pageSlug(gift-of-giving)', (req, res, next) => {
+  server.post('/:pageSlug(gift-of-giving|gift-cards)', (req, res, next) => {
     email.sendMessage({
       to: 'Open Collective <info@opencollective.com>',
       from: 'Open Collective <info@opencollective.com>',
