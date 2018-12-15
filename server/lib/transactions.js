@@ -63,7 +63,9 @@ export async function createFromPaidExpense(
 ) {
   const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
-  let paymentProcessorFeeInCollectiveCurrency = 0;
+  let paymentProcessorFeeInCollectiveCurrency = 0,
+    hostFeeInCollectiveCurrency = 0,
+    platformFeeInCollectiveCurrency = 0;
   let hostCurrencyFxRate = 1;
 
   // If PayPal
@@ -103,12 +105,19 @@ export async function createFromPaidExpense(
     // If manual (add funds or manual reimbursement of an expense)
     hostCurrencyFxRate = await getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
     paymentProcessorFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * paymentProcessorFeeInHostCurrency);
+    hostFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * hostFeeInHostCurrency);
+    platformFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * platformFeeInHostCurrency);
   }
 
   // We assume that all expenses are in Collective currency
   // (otherwise, ledger breaks with a triple currency conversion)
   const transaction = {
-    netAmountInCollectiveCurrency: -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
+    netAmountInCollectiveCurrency:
+      -1 *
+      (expense.amount +
+        paymentProcessorFeeInCollectiveCurrency +
+        hostFeeInCollectiveCurrency +
+        platformFeeInCollectiveCurrency),
     hostCurrency,
     paymentProcessorFeeInHostCurrency: toNegative(paymentProcessorFeeInHostCurrency),
     hostFeeInHostCurrency: toNegative(hostFeeInHostCurrency),
