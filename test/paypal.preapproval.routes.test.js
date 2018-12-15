@@ -251,7 +251,7 @@ describe('paypal.preapproval.routes.test.js', () => {
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
-            expect(res.body.data.response.approved).to.equal('true');
+            expect(res.body.data.details.approved).to.equal('true');
             done();
           });
       });
