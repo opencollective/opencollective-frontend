@@ -45,6 +45,7 @@ class CreateVirtualCardsBulk extends Component {
       errors: { emails: [] },
       submitting: false,
       createdVirtualCards: null,
+      serverError: null,
     };
   }
 
@@ -84,6 +85,9 @@ class CreateVirtualCardsBulk extends Component {
         })
         .then(({ data }) => {
           this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
+        })
+        .catch(e => {
+          this.setState({ serverError: e.message, submitting: false });
         });
     }
   }
@@ -160,7 +164,7 @@ class CreateVirtualCardsBulk extends Component {
     if (loading) return <Loading />;
     if (paymentMethods.length === 0) return this.renderNoPaymentMethodMessage();
 
-    const { submitting, values, createdVirtualCards } = this.state;
+    const { submitting, values, createdVirtualCards, serverError } = this.state;
 
     return createdVirtualCards ? (
       this.renderSuccess(createdVirtualCards)
@@ -211,6 +215,8 @@ class CreateVirtualCardsBulk extends Component {
               onChange={option => this.onChange('paymentMethod', option)}
             />
           </InlineField>
+
+          {serverError && <P color="red.700">{serverError}</P>}
 
           <Box mb="1em" css={{ alignSelf: 'center' }}>
             {this.renderSubmit()}

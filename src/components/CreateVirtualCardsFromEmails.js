@@ -52,6 +52,7 @@ class CreateVirtualCardsFromEmails extends Component {
       errors: { emails: [] },
       submitting: false,
       createdVirtualCards: null,
+      serverError: null,
     };
   }
 
@@ -94,6 +95,9 @@ class CreateVirtualCardsFromEmails extends Component {
         })
         .then(({ data }) => {
           this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
+        })
+        .catch(e => {
+          this.setState({ serverError: e.message, submitting: false });
         });
     }
   }
@@ -168,7 +172,7 @@ class CreateVirtualCardsFromEmails extends Component {
     if (loading) return <Loading />;
     if (paymentMethods.length === 0) return this.renderNoPaymentMethodMessage();
 
-    const { submitting, values, errors, createdVirtualCards } = this.state;
+    const { submitting, values, errors, createdVirtualCards, serverError } = this.state;
 
     return createdVirtualCards ? (
       this.renderSuccess(createdVirtualCards)
@@ -222,6 +226,8 @@ class CreateVirtualCardsFromEmails extends Component {
               disabled={submitting}
             />
           </Flex>
+
+          {serverError && <P color="red.700">{serverError}</P>}
 
           <Box mb="1em" css={{ alignSelf: 'center' }}>
             {this.renderSubmit()}
