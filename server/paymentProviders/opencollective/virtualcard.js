@@ -1,11 +1,14 @@
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import { get, times } from 'lodash';
+import config from 'config';
+
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
 import { formatCurrency, isValidEmail } from '../../lib/utils';
 import emailLib from '../../lib/email';
+import cache from '../../lib/cache';
 
 /**
  * Virtual Card Payment method - This payment Method works basically as an alias
@@ -13,6 +16,9 @@ import emailLib from '../../lib/email';
  * and then the payment methods of those transactions will be replaced by
  * the virtual card payment method that first processed the order.
  */
+
+const LIMIT_REACHED_ERROR =
+  'Gift card create failed because you reached limit. Please try again later or contact support@opencollective.com';
 
 /** Get the balance of a virtual card card
  * @param {models.PaymentMethod} paymentMethod is the instance of the
@@ -144,11 +150,16 @@ async function processOrder(order) {
             an extra property "code" that is basically the last 8 digits of the UUID
  */
 async function create(args, remoteUser) {
+  if (!(await checkCreateLimit(args.CollectiveId, 1))) {
+    throw new Error(LIMIT_REACHED_ERROR);
+  }
+
   const collective = await models.Collective.findById(args.CollectiveId);
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
   const createParams = getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
   const virtualCard = await models.PaymentMethod.create(createParams);
   sendVirtualCardCreatedEmail(virtualCard, collective);
+  registerCreateInCache(args.CollectiveId, 1);
   return virtualCard;
 }
 
@@ -161,16 +172,18 @@ async function create(args, remoteUser) {
  * @param {integer} count
  */
 export async function bulkCreateVirtualCards(args, remoteUser, count) {
-  if (count > 100) {
-    throw new Error('Cannot create more than 100 virtual cards in one pass.');
-  } else if (!count) {
+  if (!count) {
     return [];
+  } else if (!(await checkCreateLimit(args.CollectiveId, count))) {
+    throw new Error(LIMIT_REACHED_ERROR);
   }
 
   const collective = await models.Collective.findById(args.CollectiveId);
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
   const virtualCardsParams = times(count, () => getCreateParams(args, collective, sourcePaymentMethod, remoteUser));
-  return await models.PaymentMethod.bulkCreate(virtualCardsParams);
+  const virtualCards = await models.PaymentMethod.bulkCreate(virtualCardsParams);
+  registerCreateInCache(args.CollectiveId, virtualCards.length);
+  return virtualCards;
 }
 
 /**
@@ -181,10 +194,10 @@ export async function bulkCreateVirtualCards(args, remoteUser, count) {
  * @param {integer} count
  */
 export async function createVirtualCardsForEmails(args, remoteUser, emails) {
-  if (emails.length > 100) {
-    throw new Error('Cannot create more than 100 virtual cards in one pass.');
-  } else if (emails.length === 0) {
+  if (emails.length === 0) {
     return [];
+  } else if (!(await checkCreateLimit(args.CollectiveId, emails.length))) {
+    throw new Error(LIMIT_REACHED_ERROR);
   }
 
   const collective = await models.Collective.findById(args.CollectiveId);
@@ -194,6 +207,7 @@ export async function createVirtualCardsForEmails(args, remoteUser, emails) {
   );
   const virtualCards = models.PaymentMethod.bulkCreate(virtualCardsParams);
   virtualCards.map(vc => sendVirtualCardCreatedEmail(vc, collective));
+  registerCreateInCache(args.CollectiveId, virtualCards.length);
   return virtualCards;
 }
 
@@ -372,6 +386,25 @@ async function claim(args, remoteUser) {
   });
   virtualCardPaymentMethod.sourcePaymentMethod = sourcePaymentMethod;
   return virtualCardPaymentMethod;
+}
+
+function createCacheKey(collectiveId) {
+  return `virtualcard_create_limit_on_collective_${collectiveId}`;
+}
+
+/** Return false if create limit has been reached */
+async function checkCreateLimit(collectiveId, count) {
+  const cacheKey = createCacheKey(collectiveId);
+  const existingCount = (await cache.get(cacheKey)) || 0;
+  return existingCount + count <= config.limits.virtualCardsPerHour;
+}
+
+/** `checkCreateLimit`'s best friend - register `count` create actions in cache */
+async function registerCreateInCache(collectiveId, count) {
+  const oneHourInSeconds = 60 * 60;
+  const cacheKey = createCacheKey(collectiveId);
+  const existingCount = (await cache.get(cacheKey)) || 0;
+  cache.set(cacheKey, existingCount + count, oneHourInSeconds);
 }
 
 /* Expected API of a Payment Method Type */

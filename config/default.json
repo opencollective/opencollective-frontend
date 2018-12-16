@@ -42,7 +42,8 @@
       "perEmail": 10,
       "perEmailForCollective": 2,
       "perIp": 5
-    }
+    },
+    "virtualCardsPerHour": 100
   },
   "email": {
     "from": "Open Collective <info@opencollective.com>"

@@ -17,7 +17,8 @@
       "perEmail": 100,
       "perEmailForCollective": 20,
       "perIp": 50
-    }
+    },
+    "virtualCardsPerHour": 1000
   },
   "maintenancedb": {
     "database": "postgres",
