@@ -220,6 +220,7 @@ class CreateVirtualCardsFromEmails extends Component {
               </Flex>
             </label>
             <StyledMultiEmailInput
+              className="virtualcards-recipients"
               mt="0.25em"
               invalids={errors.emails}
               onChange={value => this.onChange('emails', value)}

@@ -116,7 +116,7 @@ class EditVirtualCards extends React.Component {
         {loading ? (
           <Loading />
         ) : (
-          <div>
+          <div className="virtualcards-list">
             {paymentMethods.length === 0 && (
               <Flex justifyContent="center" mt="4em">
                 {this.renderNoVirtualCardMessage(onlyConfirmed)}
