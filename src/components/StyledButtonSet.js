@@ -16,6 +16,10 @@ const StyledButtonItem = styled(StyledButton)`
     /* Use a higher z-index on hover to get all the borders colored */
     z-index: 9;
   }
+  /* Remove the dotted outline on Firefox */
+  &::-moz-focus-inner {
+    border: 0;
+  }
   &:first-child {
     border-radius: ${borderRadius} 0 0 ${borderRadius};
   }

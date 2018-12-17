@@ -23,9 +23,15 @@ const CheckboxContainer = styled.div`
   input {
     position: absolute;
     opacity: 0;
-    cursor: pointer;
     height: 0;
     width: 0;
+  }
+
+  label {
+    cursor: pointer;
+    margin-left: 1.5em;
+    color: black;
+    z-index: 9;
   }
 
   /* Show our custom checkbox */
@@ -34,12 +40,12 @@ const CheckboxContainer = styled.div`
     justify-content: center;
     align-items: center;
     position: absolute;
+    cursor: pointer;
     height: ${props => props.size};
     width: ${props => props.size};
     border: 1px solid #dcdee0;
     border-radius: 4px;
     background-color: white;
-    cursor: pointer;
     transition: background-color 0.2s;
     svg {
       opacity: 0;
@@ -49,12 +55,14 @@ const CheckboxContainer = styled.div`
     }
   }
 
-  /* Hover label / checkbox */
-  &:hover .custom-checkbox {
-    background: ${themeGet('colors.primary.400')};
-    border-color: ${themeGet('colors.primary.400')};
-    svg {
-      opacity: 1;
+  /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
+  @media (hover:hover) {
+    &:hover input:not(:disabled) ~ .custom-checkbox {
+      background: ${themeGet('colors.primary.400')};
+      border-color: ${themeGet('colors.primary.400')};
+      svg {
+        opacity: 1;
+      }
     }
   }
 
@@ -68,30 +76,29 @@ const CheckboxContainer = styled.div`
   }
 
   /* Disabled */
-  input:disabled ~ .custom-checkbox {
-    background: #f7f8fa;
-    border: 1px solid #e8e9eb;
-    cursor: not-allowed;
-    svg {
-      fill: ${themeGet('colors.primary.200')};
+  input:disabled {
+    & ~ .custom-checkbox {
+      background: #f7f8fa;
+      border: 1px solid #e8e9eb;
+      cursor: not-allowed;
+      svg {
+        fill: ${themeGet('colors.primary.200')};
+      }
+    }
+    & ~ label {
+      cursor: not-allowed;
     }
   }
 `;
 
-const Label = styled.label`
-  margin-left: 1.5em;
-  color: black;
-  z-index: 9;
-`;
-
 const StyledCheckbox = ({ checked, onChange, label, disabled, size }) => {
   return (
-    <CheckboxContainer fontSize={size} size={size} onClick={() => onChange(!checked)}>
+    <CheckboxContainer fontSize={size} size={size} onClick={() => !disabled && onChange(!checked)}>
       <input type="checkbox" checked={checked} disabled={disabled} />
       <span className="custom-checkbox">
         <IconCheckmark />
       </span>
-      {label && <Label>{label}</Label>}
+      {label && <label>{label}</label>}
     </CheckboxContainer>
   );
 };

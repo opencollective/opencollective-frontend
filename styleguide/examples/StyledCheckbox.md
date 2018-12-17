@@ -1,4 +1,4 @@
-### Interactive
+### Normal
 
 ```js
 initialState = { checked: false };
@@ -9,28 +9,38 @@ initialState = { checked: false };
 />;
 ```
 
-### Normal
-
-```js
-<StyledCheckbox label="Unchecked" />
-<br/>
-<StyledCheckbox label="Checked" checked />
-```
-
 ### Disabled
 
 ```js
-<StyledCheckbox disabled label="Uncheckd" />
-<br/>
-<StyledCheckbox disabled checked label="Checked" />
+initialState = { checked: false };
+
+<div>
+  <StyledCheckbox disabled label="Unchecked" checked={state.checked} onChange={checked => setState({ checked })} />
+  <br />
+  <StyledCheckbox disabled checked label="Checked" />
+</div>;
 ```
 
 ### With custom sizes
 
 ```js
-<StyledCheckbox label="A little bit bigger" size="20px" />
-<br/>
-<StyledCheckbox label="Wow" size="30px"/>
-<br/>
-<StyledCheckbox label="This is huge" size="50px" />
+initialState = { checked: false };
+
+<div>
+  <StyledCheckbox
+    label="A little bit bigger"
+    size="20px"
+    checked={state.checked}
+    onChange={checked => setState({ checked })}
+  />
+  <br />
+  <StyledCheckbox label="Wow" size="30px" checked={state.checked} onChange={checked => setState({ checked })} />
+  <br />
+  <StyledCheckbox
+    label="This is huge"
+    size="50px"
+    checked={state.checked}
+    onChange={checked => setState({ checked })}
+  />
+</div>;
 ```
