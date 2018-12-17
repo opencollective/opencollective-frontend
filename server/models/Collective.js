@@ -1,8 +1,6 @@
 /**
  * Dependencies.
  */
-const ics = require('ics'); // eslint-disable-line import/no-commonjs
-
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -13,6 +11,7 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
+import * as ics from 'ics';
 import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
 
 import CustomDataTypes from './DataTypes';
