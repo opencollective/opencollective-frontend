@@ -27,3 +27,9 @@ Error state:
 ```js
 <StyledInputGroup prepend="https://" type="url" placeholder="Error!" error />
 ```
+
+Error message:
+
+```js
+<StyledInputGroup prepend="https://" type="url" placeholder="Error!" error="This is not a valid URL" />
+```

@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { themeGet } from 'styled-system';
@@ -71,7 +72,7 @@ const getBorderColor = ({ error, focused, success }) => {
  */
 const StyledInputGroup = withState('focused', 'setFocus', false)(
   ({ append, prepend, focused, setFocus, disabled, success, error, maxWidth, ...inputProps }) => (
-    <div>
+    <React.Fragment>
       <InputContainer
         bg={disabled ? 'black.50' : 'white.full'}
         maxWidth={maxWidth}
@@ -97,6 +98,7 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
           flex="1 1 auto"
           disabled={disabled}
           py="0"
+          error={error}
           {...inputProps}
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
@@ -114,7 +116,7 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
           {error}
         </Span>
       )}
-    </div>
+    </React.Fragment>
   ),
 );
 

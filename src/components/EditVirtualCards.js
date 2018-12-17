@@ -80,7 +80,7 @@ class EditVirtualCards extends React.Component {
     const { loading } = this.props.data;
     const queryResult = get(this.props, 'data.Collective.createdVirtualCards', {});
     const onlyConfirmed = get(this.props, 'data.variables.isConfirmed');
-    const { offset, limit, total, paymentMethods } = queryResult;
+    const { offset, limit, total, paymentMethods = [] } = queryResult;
     const lastVirtualCard = last(paymentMethods);
 
     return (
@@ -117,12 +117,11 @@ class EditVirtualCards extends React.Component {
           <Loading />
         ) : (
           <div className="virtualcards-list">
-            {!paymentMethods ||
-              (paymentMethods.length === 0 && (
-                <Flex justifyContent="center" mt="4em">
-                  {this.renderNoVirtualCardMessage(onlyConfirmed)}
-                </Flex>
-              ))}
+            {paymentMethods.length === 0 && (
+              <Flex justifyContent="center" mt="4em">
+                {this.renderNoVirtualCardMessage(onlyConfirmed)}
+              </Flex>
+            )}
             {paymentMethods.map(v => (
               <div key={v.id}>
                 <VirtualCardDetails virtualCard={v} />

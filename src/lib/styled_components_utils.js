@@ -3,7 +3,7 @@
  *
  * ## Examples
  *
- *    > getInputBorderColor({error: true})
+ *    > getInputBorderColor(true)
  *    'red.500'
  */
 export const getInputBorderColor = (error, success) => {

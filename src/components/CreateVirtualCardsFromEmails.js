@@ -21,11 +21,14 @@ import StyledMultiEmailInput from './StyledMultiEmailInput';
 import { P } from './Text';
 
 const MIN_AMOUNT = 5;
+const MAX_AMOUNT = 10000;
 
-const InlineField = ({ name, children, label }) => (
+const InlineField = ({ name, children, label, isLabelClickable }) => (
   <Flex alignItems="center" mb="2.5em" className={`field-${name}`}>
     <Box css={{ flexBasis: '12em' }}>
-      <label htmlFor={`virtualcard-${name}`}>{label}</label>
+      <label htmlFor={`virtualcard-${name}`} style={isLabelClickable && { cursor: 'pointer' }}>
+        {label}
+      </label>
     </Box>
     {children}
   </Flex>
@@ -194,6 +197,7 @@ class CreateVirtualCardsFromEmails extends Component {
               error={this.getError('amount')}
               value={values.amount}
               min={MIN_AMOUNT}
+              max={MAX_AMOUNT}
               disabled={submitting}
               required
             />
@@ -212,7 +216,8 @@ class CreateVirtualCardsFromEmails extends Component {
           </InlineField>
 
           <InlineField
-            name="limitToOpenSourceCollectives"
+            name="onlyOpensource"
+            isLabelClickable
             label={
               <FormattedMessage
                 id="virtualCards.create.onlyOpenSource"
@@ -221,8 +226,10 @@ class CreateVirtualCardsFromEmails extends Component {
             }
           >
             <StyledCheckbox
+              inputId="virtualcard-onlyOpensource"
+              name="onlyOpensource"
               checked={values.onlyOpensource}
-              onChange={checked => this.onChange('onlyOpensource', checked)}
+              onChange={({ checked }) => this.onChange('onlyOpensource', checked)}
               size="25px"
             />
           </InlineField>
@@ -250,7 +257,7 @@ class CreateVirtualCardsFromEmails extends Component {
 
           {serverError && <P color="red.700">{serverError}</P>}
 
-          <Box mb="1em" css={{ alignSelf: 'center' }}>
+          <Box mb="1em" alignSelf="center">
             {this.renderSubmit()}
           </Box>
         </Flex>

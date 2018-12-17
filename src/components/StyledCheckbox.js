@@ -57,7 +57,7 @@ const CheckboxContainer = styled.div`
 
   /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
   @media (hover:hover) {
-    &:hover input:not(:disabled) ~ .custom-checkbox {
+    &:hover input:not(:disabled):not(:checked) ~ .custom-checkbox {
       background: ${themeGet('colors.primary.400')};
       border-color: ${themeGet('colors.primary.400')};
       svg {
@@ -73,6 +73,12 @@ const CheckboxContainer = styled.div`
     svg {
       opacity: 1;
     }
+  }
+
+  /* Focused */
+  input:focus ~ .custom-checkbox {
+    background: ${themeGet('colors.primary.400')};
+    border-color: ${themeGet('colors.primary.400')};
   }
 
   /* Disabled */
@@ -91,10 +97,14 @@ const CheckboxContainer = styled.div`
   }
 `;
 
-const StyledCheckbox = ({ checked, onChange, label, disabled, size }) => {
+const StyledCheckbox = ({ name, checked, onChange, label, disabled, size, inputId }) => {
   return (
-    <CheckboxContainer fontSize={size} size={size} onClick={() => !disabled && onChange(!checked)}>
-      <input type="checkbox" checked={checked} disabled={disabled} />
+    <CheckboxContainer
+      onClick={() => !disabled && onChange({ name, checked: !checked, type: 'checkbox' })}
+      fontSize={size}
+      size={size}
+    >
+      <input id={inputId} name={name} type="checkbox" checked={checked} disabled={disabled} readOnly />
       <span className="custom-checkbox">
         <IconCheckmark />
       </span>
@@ -108,10 +118,14 @@ StyledCheckbox.defaultProps = {
 };
 
 StyledCheckbox.propTypes = {
+  /** The name of the input */
+  name: PropTypes.string.isRequired,
   /** Wether the checkbox is checked */
   checked: PropTypes.bool.isRequired,
   /** Called when state change with a bool representing new state */
   onChange: PropTypes.func.isRequired,
+  /* And optional ID for the `<input/>` */
+  inputId: PropTypes.string,
   /** Wether checkbox should be disabled */
   disabled: PropTypes.bool,
   /** An optional label to display next to checkbox */
