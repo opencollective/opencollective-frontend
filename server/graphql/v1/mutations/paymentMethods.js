@@ -5,10 +5,8 @@ import queryString from 'query-string';
 
 /** Create a Payment Method through a collective(organization or user)
  *
- * @param {Object} args contains the parameters to create the new
- *  payment method.
- * @param {Object} args contains the parameters to create the new
- *  payment method.
+ * @param {Object} args contains the parameters to create the new payment method
+ * @param {Object} remoteUser logged in user
  */
 export async function createPaymentMethod(args, remoteUser) {
   // We only support the creation of virtual cards payment methods at the moment
@@ -32,6 +30,7 @@ export async function createPaymentMethod(args, remoteUser) {
  * @param {String} args.currency The currency of the virtual card
  * @param {[limitedToTags]} [args.limitedToTags] Limit this payment method to donate to collectives having those tags
  * @param {Date} [args.expiryDate] The expiry date of the payment method
+ * @param {Object} remoteUser logged in user
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 async function createVirtualPaymentMethod(args, remoteUser) {

@@ -58,6 +58,14 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
   }),
 });
 
+export const PaymentMethodDataVirtualCardInputType = new GraphQLInputObjectType({
+  name: 'PaymentMethodDataVirtualCardInputType',
+  description: 'Input for virtual card (meta)data',
+  fields: () => ({
+    email: { type: GraphQLString, description: 'The email virtual card is generated for' },
+  }),
+});
+
 export const UserInputType = new GraphQLInputObjectType({
   name: 'UserInputType',
   description: 'Input type for UserType',

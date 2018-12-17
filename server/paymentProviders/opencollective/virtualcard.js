@@ -1,10 +1,14 @@
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
-import { get } from 'lodash';
+import { get, times } from 'lodash';
+import config from 'config';
+
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, isValidEmail } from '../../lib/utils';
+import emailLib from '../../lib/email';
+import cache from '../../lib/cache';
 
 /**
  * Virtual Card Payment method - This payment Method works basically as an alias
@@ -12,6 +16,9 @@ import { formatCurrency } from '../../lib/utils';
  * and then the payment methods of those transactions will be replaced by
  * the virtual card payment method that first processed the order.
  */
+
+const LIMIT_REACHED_ERROR =
+  'Gift card create failed because you reached limit. Please try again later or contact support@opencollective.com';
 
 /** Get the balance of a virtual card card
  * @param {models.PaymentMethod} paymentMethod is the instance of the
@@ -137,36 +144,148 @@ async function processOrder(order) {
  * @param {[limitedToTags]} [args.limitedToTags] Limit this payment method to donate to collectives having those tags
  * @param {[limitedToCollectiveIds]} [args.limitedToCollectiveIds] Limit this payment method to those collective ids
  * @param {[limitedToHostCollectiveIds]} [args.limitedToHostCollectiveIds] Limit this payment method to collectives hosted by those collective ids
+ * @param {boolean} sendEmailAsync if true, emails will be sent in background
+ *  and we won't check if it has properly been sent to confirm
  * @returns {models.PaymentMethod + code} return the virtual card payment method with
             an extra property "code" that is basically the last 8 digits of the UUID
  */
 async function create(args, remoteUser) {
+  const totalAmount = args.amount || args.monthlyLimitPerMember;
   const collective = await models.Collective.findById(args.CollectiveId);
-  let SourcePaymentMethodId = args.PaymentMethodId;
-  let sourcePaymentMethod;
+  if (!collective) {
+    throw new Error('Collective does not exist');
+  } else if (!(await checkCreateLimit(collective, 1, totalAmount))) {
+    throw new Error(LIMIT_REACHED_ERROR);
+  }
+
+  const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
+  const createParams = getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
+  const virtualCard = await models.PaymentMethod.create(createParams);
+  sendVirtualCardCreatedEmail(virtualCard, collective);
+  registerCreateInCache(args.CollectiveId, 1, totalAmount);
+  return virtualCard;
+}
+
+/**
+ * Bulk create virtual cards from a `count`. Doesn't send emails, please use
+ * `createForEmails` if you need to.
+ *
+ * @param {object} args
+ * @param {object} remoteUser
+ * @param {integer} count
+ */
+export async function bulkCreateVirtualCards(args, remoteUser, count) {
+  if (!count) return [];
+
+  // Check rate limit
+  const totalAmount = (args.amount || args.monthlyLimitPerMember) * count;
+  const collective = await models.Collective.findById(args.CollectiveId);
+  if (!collective) {
+    throw new Error('Collective does not exist');
+  } else if (!(await checkCreateLimit(collective, count, totalAmount))) {
+    throw new Error(LIMIT_REACHED_ERROR);
+  }
+
+  const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
+  const virtualCardsParams = times(count, () => {
+    return getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
+  });
+  const virtualCards = await models.PaymentMethod.bulkCreate(virtualCardsParams);
+  registerCreateInCache(args.CollectiveId, virtualCards.length, totalAmount);
+  return virtualCards;
+}
+
+/**
+ * Bulk create virtual cards from a list of emails.
+ *
+ * @param {object} args
+ * @param {object} remoteUser
+ * @param {integer} count
+ */
+export async function createVirtualCardsForEmails(args, remoteUser, emails) {
+  if (emails.length === 0) {
+    return [];
+  }
+  // Check rate limit
+  const totalAmount = (args.amount || args.monthlyLimitPerMember) * emails.length;
+  const collective = await models.Collective.findById(args.CollectiveId);
+  if (!collective) {
+    throw new Error('Collective does not exist');
+  } else if (!(await checkCreateLimit(collective, emails.length, totalAmount))) {
+    throw new Error(LIMIT_REACHED_ERROR);
+  }
+
+  const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
+  const virtualCardsParams = emails.map(email =>
+    getCreateParams({ ...args, data: { email } }, collective, sourcePaymentMethod, remoteUser),
+  );
+  const virtualCards = models.PaymentMethod.bulkCreate(virtualCardsParams);
+  virtualCards.map(vc => sendVirtualCardCreatedEmail(vc, collective));
+  registerCreateInCache(args.CollectiveId, virtualCards.length, totalAmount);
+  return virtualCards;
+}
+
+/**
+ * Get a payment method from args or returns collective default payment method
+ * if none has been provided. Will throw if collective doesn't have any payment
+ * method attached.
+ *
+ * @param {object} args
+ * @param {object} remoteUser
+ */
+async function getSourcePaymentMethodFromCreateArgs(args, collective) {
+  let paymentMethod = null;
   if (!args.PaymentMethodId) {
-    sourcePaymentMethod = await collective.getPaymentMethod(
-      {
-        service: 'stripe',
-        type: 'creditcard',
-      },
-      false,
-    );
-    if (!sourcePaymentMethod) {
+    paymentMethod = await collective.getPaymentMethod({ service: 'stripe', type: 'creditcard' }, false);
+    if (!paymentMethod) {
       throw Error(`Collective id ${collective.id} needs to have a Credit Card attached to create Gift Cards.`);
     }
-    SourcePaymentMethodId = sourcePaymentMethod.id;
   } else {
-    sourcePaymentMethod = await models.PaymentMethod.findById(args.PaymentMethodId);
-    if (sourcePaymentMethod.CollectiveId !== collective.id) {
+    paymentMethod = await models.PaymentMethod.findById(args.PaymentMethodId);
+    if (!paymentMethod || paymentMethod.CollectiveId !== collective.id) {
       throw Error('Invalid PaymentMethodId');
     }
   }
+  return paymentMethod;
+}
+
+/**
+ * Get a PaymentMethod object representing the VirtualCard to be created. Will
+ * throw if given invalid args.
+ *
+ * @param {object} args
+ * @param {object} remoteUser
+ * @param {object} collective
+ * @param {object} sourcePaymentMethod
+ */
+function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
+  // Make sure user is admin of collective
+  if (!remoteUser.isAdmin(collective.id)) {
+    throw new Error('User must be admin of collective');
+  }
+
+  // Make sure currency is a string, trim and uppercase it.
+  args.currency = args.currency ? args.currency.toString().toUpperCase() : collective.currency;
+  if (!['USD', 'EUR'].includes(args.currency)) {
+    throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
+  }
+
+  // Ensure amount or monthlyLimitPerMember are valid
+  if (!args.amount && !args.monthlyLimitPerMember) {
+    throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
+  } else if (args.amount && args.amount < 5) {
+    throw Error('Min amount for gift card is $5');
+  } else if (args.monthlyLimitPerMember && args.monthlyLimitPerMember < 5) {
+    throw Error('Min monthly limit per member for gift card is $5');
+  }
+
+  // Set a default expirity date to 3 months by default
   const expiryDate = args.expiryDate
     ? moment(args.expiryDate).format()
     : moment()
         .add(3, 'months')
         .format();
+
   // If monthlyLimitPerMember is defined, we ignore the amount field and
   // consider monthlyLimitPerMember times the months from now until the expiry date
   let monthlyLimitPerMember;
@@ -180,9 +299,19 @@ async function create(args, remoteUser) {
     }`;
   }
 
-  // creates a new Virtual card Payment method
-  const paymentMethod = await models.PaymentMethod.create({
-    CreatedByUserId: remoteUser && remoteUser.id,
+  // Whitelist fields for `data`
+  let data = null;
+  if (args.data && args.data.email) {
+    if (!isValidEmail(args.data.email)) {
+      throw new Error(`Invalid email address: ${args.data.email}`);
+    }
+    data = { email: args.data.email };
+  }
+
+  // Build the virtualcard object
+  return {
+    CreatedByUserId: remoteUser.id,
+    SourcePaymentMethodId: sourcePaymentMethod.id,
     name: description,
     description: args.description || description,
     initialBalance: amount,
@@ -196,11 +325,34 @@ async function create(args, remoteUser) {
     uuid: uuidv4(),
     service: 'opencollective',
     type: 'virtualcard',
-    SourcePaymentMethodId: SourcePaymentMethodId,
     createdAt: new Date(),
     updatedAt: new Date(),
+    data,
+  };
+}
+
+/**
+ * Send an email with the virtual card redeem URL to the user.
+ *
+ * @param {object} virtualCard
+ */
+async function sendVirtualCardCreatedEmail(virtualCard, emitterCollective) {
+  const code = virtualCard.uuid.split('-')[0];
+  const email = get(virtualCard, 'data.email');
+
+  if (!email) {
+    return false;
+  }
+
+  return emailLib.send('user.card.invited', email, {
+    email,
+    redeemCode: code,
+    initialBalance: virtualCard.initialBalance,
+    expiryDate: virtualCard.expiryDate,
+    name: virtualCard.name,
+    currency: virtualCard.currency,
+    emitter: emitterCollective,
   });
-  return paymentMethod;
 }
 
 /** Claim the Virtual Card Payment Method By an (existing or not) user
@@ -248,6 +400,52 @@ async function claim(args, remoteUser) {
   });
   virtualCardPaymentMethod.sourcePaymentMethod = sourcePaymentMethod;
   return virtualCardPaymentMethod;
+}
+
+function createCountCacheKey(collectiveId) {
+  return `virtualcards_count_limit_on_collective_${collectiveId}`;
+}
+
+function createAmountCacheKey(collectiveId) {
+  return `virtualcards_amount_limit_on_collective_${collectiveId}`;
+}
+
+/** Return false if create limits have been reached */
+async function checkCreateLimit(collective, count, amount) {
+  const limitFromSettings = type => get(collective, `settings.virtualCardsMaxDaily${type}`);
+  const limitPerDay = limitFromSettings('Count') || config.limits.virtualCards.maxPerDay;
+  const limitAmountPerDay = limitFromSettings('Amount') || config.limits.virtualCards.maxAmountPerDay;
+
+  // Check count
+  const countCacheKey = createCountCacheKey(collective.id);
+  const existingCount = (await cache.get(countCacheKey)) || 0;
+  if (existingCount + count > limitPerDay) {
+    return false;
+  }
+
+  // Check amount
+  const amountCacheKey = createAmountCacheKey(collective.id);
+  const existingAmount = (await cache.get(amountCacheKey)) || 0;
+  if (existingAmount + amount > limitAmountPerDay) {
+    return false;
+  }
+
+  return true;
+}
+
+/** `checkCreateLimit`'s best friend - register `count` create actions in cache */
+async function registerCreateInCache(collectiveId, count, amount) {
+  const oneDayInSeconds = 24 * 60 * 60;
+
+  // Set count cache
+  const countCacheKey = createCountCacheKey(collectiveId);
+  const existingCount = (await cache.get(countCacheKey)) || 0;
+  cache.set(countCacheKey, existingCount + count, oneDayInSeconds);
+
+  // Set amount cache
+  const amountCacheKey = createAmountCacheKey(collectiveId);
+  const existingAmount = (await cache.get(amountCacheKey)) || 0;
+  cache.set(amountCacheKey, existingAmount + amount, oneDayInSeconds);
 }
 
 /* Expected API of a Payment Method Type */

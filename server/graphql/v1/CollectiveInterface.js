@@ -23,6 +23,7 @@ import {
   ConnectedAccountType,
   ExpenseType,
   OrderStatusType,
+  PaginatedPaymentMethodsType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -647,6 +648,17 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           },
         },
       },
+      createdVirtualCards: {
+        type: PaginatedPaymentMethodsType,
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          isConfirmed: {
+            type: GraphQLBoolean,
+            description: 'Wether the virtual card has been claimed or not',
+          },
+        },
+      },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) },
     };
   },
@@ -1197,6 +1209,55 @@ const CollectiveFields = () => {
         }
 
         return paymentMethods;
+      },
+    },
+    createdVirtualCards: {
+      type: PaginatedPaymentMethodsType,
+      description: 'Get the virtual cards created by this collective. RemoteUser must be a collective admin.',
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt },
+        isConfirmed: {
+          type: GraphQLBoolean,
+          description: 'Wether the virtual card has been claimed or not',
+        },
+      },
+      resolve: async (collective, args, req) => {
+        // Must be admin of the collective
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+          return [];
+        }
+
+        const offset = args.offset || 0;
+        const limit = args.limit || 15;
+        const query = {
+          where: { type: 'virtualcard' },
+          limit: args.limit,
+          offset: args.offset,
+          order: [['createdAt', 'DESC'], ['id', 'DESC']],
+          include: [
+            {
+              model: models.PaymentMethod,
+              as: 'sourcePaymentMethod',
+              where: { CollectiveId: collective.id },
+              required: true,
+              attributes: [],
+            },
+          ],
+        };
+
+        if (args.isConfirmed !== undefined) {
+          query.where.confirmedAt = { [args.isConfirmed ? Op.ne : Op.eq]: null };
+        }
+
+        const result = await models.PaymentMethod.findAndCountAll(query);
+
+        return {
+          paymentMethods: result.rows,
+          total: result.count,
+          limit,
+          offset,
+        };
       },
     },
     connectedAccounts: {

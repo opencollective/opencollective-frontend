@@ -104,7 +104,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
             CreatedByUserId: req.remoteUser.id,
           }),
         )
-        .then(() => res.redirect(redirect || `${config.host.website}/${req.query.slug}/edit#connectedAccounts`))
+        .then(() => res.redirect(redirect || `${config.host.website}/${req.query.slug}/edit/connected-accounts`))
         .catch(next);
 
     case 'twitter': {
@@ -136,7 +136,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
             CreatedByUserId: req.remoteUser.id,
           }),
         )
-        .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}/edit#connectedAccounts`))
+        .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}/edit/connected-accounts`))
         .catch(next);
     }
 

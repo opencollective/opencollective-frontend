@@ -11,6 +11,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
+import { pick } from 'lodash';
 
 import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
 
@@ -29,6 +30,27 @@ dataloaderSequelize(models.Expense);
 
 // This breaks the tests for some reason (mocha test/Member.routes.test.js -g "successfully add a user to a collective with a role")
 // dataloaderSequelize(models.User);
+
+/**
+ * Take a graphql type and return a wrapper type that adds pagination. The pagination
+ * object has limit, offset and total keys to manage pages and stores the result
+ * of the query under the `values` key.
+ *
+ * @param {object} GraphQL type to paginate
+ * @param {string} The name of the type, used to generate name and description.
+ */
+export const paginatedList = (type, typeName, valuesKey) => {
+  return new GraphQLObjectType({
+    name: `Paginated${typeName}`,
+    description: `A list of ${typeName} with pagination info`,
+    fields: {
+      [valuesKey]: { type: new GraphQLList(type) },
+      total: { type: GraphQLInt },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt },
+    },
+  });
+};
 
 export const UserType = new GraphQLObjectType({
   name: 'UserDetails',
@@ -1308,10 +1330,19 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       data: {
         type: GraphQLJSON,
-        resolve(paymentMethod) {
+        resolve(paymentMethod, _, req) {
           if (!paymentMethod.data) {
             return null;
           }
+
+          // Protect and whitelist fields for virtualcard
+          if (paymentMethod.type === 'virtualcard') {
+            if (!req.remoteUser || !req.remoteUser.isAdmin(paymentMethod.CollectiveId)) {
+              return null;
+            }
+            return pick(paymentMethod.data, ['email']);
+          }
+
           const data = paymentMethod.data;
           // white list fields to send back; removes fields like CustomerIdForHost
           const dataSubset = {
@@ -1564,3 +1595,5 @@ export const PaginatedExpensesType = new GraphQLObjectType({
     total: { type: GraphQLInt },
   },
 });
+
+export const PaginatedPaymentMethodsType = paginatedList(PaymentMethodType, 'PaymentMethod', 'paymentMethods');

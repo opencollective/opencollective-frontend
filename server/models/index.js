@@ -82,6 +82,10 @@ export function setupModels(client) {
 
   // PaymentMethod.
   m.PaymentMethod.belongsTo(m.Collective);
+  m.PaymentMethod.belongsTo(m.PaymentMethod, {
+    as: 'sourcePaymentMethod',
+    foreignKey: 'SourcePaymentMethodId',
+  });
 
   // User
   m.User.hasMany(m.Activity);

@@ -58,7 +58,7 @@ data['collective.expense.paid'] = {
     viewLatestExpenses: 'https://opencollective.com/wwcodeaustin/expenses',
   },
 };
-(data['user.card.claimed'] = {
+data['user.card.claimed'] = {
   currency: 'USD',
   initialBalance: 10000,
   expiryDate: new Date().setMonth(new Date().getMonth() + 3),
@@ -73,37 +73,54 @@ data['collective.expense.paid'] = {
       'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
   },
   loginLink: 'https://opencollective.com/signin?next=',
-}),
-  (data['ticket.confirmed'] = {
-    recipient: {
-      name: 'Xavier Damman',
-    },
-    event: {
-      name: 'Sustain 2019 San Francisco',
-      slug: 'sutain-2019-sf',
-      startsAt: '2019-06-19 17:15:00+00',
-      endsAt: '2019-06-19 21:15:00+00',
-      timezone: 'America/Los_Angeles',
-      locationName: 'Github HQ',
-      address: '88 Colin P Kelly Jr Street, San Francisco, CA',
-    },
-    collective: {
-      slug: 'sustainoss',
-    },
-    tier: {
-      id: 1,
-      name: 'Regular Ticket',
-      description: 'This gives you access to all the workshops',
-      amount: 1000,
-      currency: 'USD',
-    },
-    order: {
-      id: 2312321,
-      quantity: 2,
-      totalAmount: 5000,
-      currency: 'USD',
-    },
-  });
+};
+data['user.card.invited'] = {
+  currency: 'USD',
+  initialBalance: 10000,
+  expiryDate: new Date().setMonth(new Date().getMonth() + 3),
+  emitter: {
+    slug: 'triplebyte',
+    name: 'Triplebyte',
+    description:
+      'Triplebyte lets talented software engineers skip resumes  recruiters and go straight to final interviews at multiple top tech companies at once.',
+    image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
+    backgroundImage: 'https://d.pr/free/i/GEbbjb+',
+    previewImage:
+      'https://opencollective-production.s3-us-west-1.amazonaws.com/02f87560-b2f1-11e8-85a0-75f200a0e2db.png',
+  },
+  redeemCode: '00000000',
+  email: 'info@opencolletive.com',
+};
+data['ticket.confirmed'] = {
+  recipient: {
+    name: 'Xavier Damman',
+  },
+  event: {
+    name: 'Sustain 2019 San Francisco',
+    slug: 'sutain-2019-sf',
+    startsAt: '2019-06-19 17:15:00+00',
+    endsAt: '2019-06-19 21:15:00+00',
+    timezone: 'America/Los_Angeles',
+    locationName: 'Github HQ',
+    address: '88 Colin P Kelly Jr Street, San Francisco, CA',
+  },
+  collective: {
+    slug: 'sustainoss',
+  },
+  tier: {
+    id: 1,
+    name: 'Regular Ticket',
+    description: 'This gives you access to all the workshops',
+    amount: 1000,
+    currency: 'USD',
+  },
+  order: {
+    id: 2312321,
+    quantity: 2,
+    totalAmount: 5000,
+    currency: 'USD',
+  },
+};
 data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
 data['ticket.confirmed.fearlesscitiesbrussels'] = data['ticket.confirmed'];
 data['github.signup'] = {

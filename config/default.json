@@ -42,6 +42,10 @@
       "perEmail": 10,
       "perEmailForCollective": 2,
       "perIp": 5
+    },
+    "virtualCards": {
+      "maxPerDay": 100,
+      "maxAmountPerDay": 500000
     }
   },
   "email": {
