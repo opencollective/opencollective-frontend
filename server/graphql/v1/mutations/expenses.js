@@ -6,7 +6,6 @@ import activities from '../../../constants/activities';
 import models from '../../../models';
 import paymentProviders from '../../../paymentProviders';
 import { formatCurrency } from '../../../lib/utils';
-import paypalAdaptive from '../../../paymentProviders/paypal/adaptiveGateway';
 import {
   createFromPaidExpense as createTransactionFromPaidExpense,
   createTransactionFromInKindDonation,
@@ -219,7 +218,6 @@ async function createTransactions(host, expense, fees = {}) {
     null,
     expense,
     null,
-    null,
     expense.UserId,
     fees.paymentProcessorFeeInHostCurrency,
     fees.hostFeeInHostCurrency,
@@ -236,14 +234,12 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
       expense.paypalEmail,
       paymentMethod.token,
     );
-    const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
-    debug('paypal> preapprovalDetailsResponse', JSON.stringify(preapprovalDetailsResponse, null, '  '));
+    paymentMethod.updateBalance();
     await createTransactionFromPaidExpense(
       host,
       paymentMethod,
       expense,
       paymentResponse,
-      preapprovalDetailsResponse,
       expense.UserId,
       fees.paymentProcessorFeeInHostCurrency,
       fees.hostFeeInHostCurrency,
@@ -293,7 +289,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   // Expenses in kind can be made for collectives without any
   // funds. That's why we skip earlier here.
   if (expense.payoutMethod === 'donation') {
-    const transaction = await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId);
+    const transaction = await createTransactionFromPaidExpense(host, null, expense, null, expense.UserId);
     await createTransactionFromInKindDonation(transaction);
     const user = await models.User.findById(expense.UserId);
     await expense.collective.addUserWithRole(user, 'BACKER');

@@ -55,7 +55,6 @@ export async function createFromPaidExpense(
   paymentMethod,
   expense,
   paymentResponses,
-  preapprovalDetails,
   UserId,
   paymentProcessorFeeInHostCurrency = 0,
   hostFeeInHostCurrency = 0,
