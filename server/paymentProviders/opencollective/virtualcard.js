@@ -150,16 +150,19 @@ async function processOrder(order) {
             an extra property "code" that is basically the last 8 digits of the UUID
  */
 async function create(args, remoteUser) {
-  if (!(await checkCreateLimit(args.CollectiveId, 1))) {
+  const totalAmount = args.amount || args.monthlyLimitPerMember;
+  const collective = await models.Collective.findById(args.CollectiveId);
+  if (!collective) {
+    throw new Error('Collective does not exist');
+  } else if (!(await checkCreateLimit(collective, 1, totalAmount))) {
     throw new Error(LIMIT_REACHED_ERROR);
   }
 
-  const collective = await models.Collective.findById(args.CollectiveId);
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
   const createParams = getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
   const virtualCard = await models.PaymentMethod.create(createParams);
   sendVirtualCardCreatedEmail(virtualCard, collective);
-  registerCreateInCache(args.CollectiveId, 1);
+  registerCreateInCache(args.CollectiveId, 1, totalAmount);
   return virtualCard;
 }
 
@@ -172,17 +175,23 @@ async function create(args, remoteUser) {
  * @param {integer} count
  */
 export async function bulkCreateVirtualCards(args, remoteUser, count) {
-  if (!count) {
-    return [];
-  } else if (!(await checkCreateLimit(args.CollectiveId, count))) {
+  if (!count) return [];
+
+  // Check rate limit
+  const totalAmount = (args.amount || args.monthlyLimitPerMember) * count;
+  const collective = await models.Collective.findById(args.CollectiveId);
+  if (!collective) {
+    throw new Error('Collective does not exist');
+  } else if (!(await checkCreateLimit(collective, count, totalAmount))) {
     throw new Error(LIMIT_REACHED_ERROR);
   }
 
-  const collective = await models.Collective.findById(args.CollectiveId);
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
-  const virtualCardsParams = times(count, () => getCreateParams(args, collective, sourcePaymentMethod, remoteUser));
+  const virtualCardsParams = times(count, () => {
+    return getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
+  });
   const virtualCards = await models.PaymentMethod.bulkCreate(virtualCardsParams);
-  registerCreateInCache(args.CollectiveId, virtualCards.length);
+  registerCreateInCache(args.CollectiveId, virtualCards.length, totalAmount);
   return virtualCards;
 }
 
@@ -196,18 +205,23 @@ export async function bulkCreateVirtualCards(args, remoteUser, count) {
 export async function createVirtualCardsForEmails(args, remoteUser, emails) {
   if (emails.length === 0) {
     return [];
-  } else if (!(await checkCreateLimit(args.CollectiveId, emails.length))) {
+  }
+  // Check rate limit
+  const totalAmount = (args.amount || args.monthlyLimitPerMember) * emails.length;
+  const collective = await models.Collective.findById(args.CollectiveId);
+  if (!collective) {
+    throw new Error('Collective does not exist');
+  } else if (!(await checkCreateLimit(collective, emails.length, totalAmount))) {
     throw new Error(LIMIT_REACHED_ERROR);
   }
 
-  const collective = await models.Collective.findById(args.CollectiveId);
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
   const virtualCardsParams = emails.map(email =>
     getCreateParams({ ...args, data: { email } }, collective, sourcePaymentMethod, remoteUser),
   );
   const virtualCards = models.PaymentMethod.bulkCreate(virtualCardsParams);
   virtualCards.map(vc => sendVirtualCardCreatedEmail(vc, collective));
-  registerCreateInCache(args.CollectiveId, virtualCards.length);
+  registerCreateInCache(args.CollectiveId, virtualCards.length, totalAmount);
   return virtualCards;
 }
 
@@ -388,23 +402,50 @@ async function claim(args, remoteUser) {
   return virtualCardPaymentMethod;
 }
 
-function createCacheKey(collectiveId) {
-  return `virtualcard_create_limit_on_collective_${collectiveId}`;
+function createCountCacheKey(collectiveId) {
+  return `virtualcards_count_limit_on_collective_${collectiveId}`;
 }
 
-/** Return false if create limit has been reached */
-async function checkCreateLimit(collectiveId, count) {
-  const cacheKey = createCacheKey(collectiveId);
-  const existingCount = (await cache.get(cacheKey)) || 0;
-  return existingCount + count <= config.limits.virtualCardsPerHour;
+function createAmountCacheKey(collectiveId) {
+  return `virtualcards_amount_limit_on_collective_${collectiveId}`;
+}
+
+/** Return false if create limits have been reached */
+async function checkCreateLimit(collective, count, amount) {
+  const limitFromSettings = type => get(collective, `settings.virtualCardsMaxDaily${type}`);
+  const limitPerDay = limitFromSettings('Count') || config.limits.virtualCards.maxPerDay;
+  const limitAmountPerDay = limitFromSettings('Amount') || config.limits.virtualCards.maxAmountPerDay;
+
+  // Check count
+  const countCacheKey = createCountCacheKey(collective.id);
+  const existingCount = (await cache.get(countCacheKey)) || 0;
+  if (existingCount + count > limitPerDay) {
+    return false;
+  }
+
+  // Check amount
+  const amountCacheKey = createAmountCacheKey(collective.id);
+  const existingAmount = (await cache.get(amountCacheKey)) || 0;
+  if (existingAmount + amount > limitAmountPerDay) {
+    return false;
+  }
+
+  return true;
 }
 
 /** `checkCreateLimit`'s best friend - register `count` create actions in cache */
-async function registerCreateInCache(collectiveId, count) {
-  const oneHourInSeconds = 60 * 60;
-  const cacheKey = createCacheKey(collectiveId);
-  const existingCount = (await cache.get(cacheKey)) || 0;
-  cache.set(cacheKey, existingCount + count, oneHourInSeconds);
+async function registerCreateInCache(collectiveId, count, amount) {
+  const oneDayInSeconds = 24 * 60 * 60;
+
+  // Set count cache
+  const countCacheKey = createCountCacheKey(collectiveId);
+  const existingCount = (await cache.get(countCacheKey)) || 0;
+  cache.set(countCacheKey, existingCount + count, oneDayInSeconds);
+
+  // Set amount cache
+  const amountCacheKey = createAmountCacheKey(collectiveId);
+  const existingAmount = (await cache.get(amountCacheKey)) || 0;
+  cache.set(amountCacheKey, existingAmount + amount, oneDayInSeconds);
 }
 
 /* Expected API of a Payment Method Type */

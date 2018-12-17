@@ -43,7 +43,10 @@
       "perEmailForCollective": 2,
       "perIp": 5
     },
-    "virtualCardsPerHour": 100
+    "virtualCards": {
+      "maxPerDay": 100,
+      "maxAmountPerDay": 500000
+    }
   },
   "email": {
     "from": "Open Collective <info@opencollective.com>"

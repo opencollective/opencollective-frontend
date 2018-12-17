@@ -18,7 +18,10 @@
       "perEmailForCollective": 20,
       "perIp": 50
     },
-    "virtualCardsPerHour": 1000
+    "virtualCards": {
+      "maxPerDay": 1000,
+      "maxAmountPerDay": 5000000
+    }
   },
   "maintenancedb": {
     "database": "postgres",
