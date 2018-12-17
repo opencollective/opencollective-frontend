@@ -13,7 +13,6 @@ import {
   fontWeight,
   minWidth,
   maxWidth,
-  minWidth,
   space,
   textAlign,
   width,
@@ -45,7 +44,6 @@ const StyledButtonContent = styled(tag.button)`
   ${fontWeight}
   ${minWidth}
   ${maxWidth}
-  ${minWidth}
   ${space}
   ${textAlign}
   ${width}
@@ -87,10 +85,6 @@ StyledButton.propTypes = {
    * From styled-system: accepts any css 'max-width' value
    */
   maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * From styled-system: accepts any css 'min-width' value
-   */
-  minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /**
    * styled-system prop: adds margin & padding props
    * see: https://github.com/jxnblk/styled-system/blob/master/docs/api.md#space

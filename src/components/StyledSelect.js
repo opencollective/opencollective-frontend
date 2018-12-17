@@ -23,7 +23,7 @@ const getBgColor = ({ highlightedIndex, index, item, selectedItem }) => {
   return 'white.full';
 };
 
-const getItems = options =>
+export const getItems = options =>
   Object.keys(options).reduce(
     (items, key) =>
       items.concat({
