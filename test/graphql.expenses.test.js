@@ -833,20 +833,32 @@ describe('GraphQL Expenses API', () => {
         // And then add funds to the collective
         const initialBalance = 1500;
         const paymentProcessorFeeInCollectiveCurrency = 100;
+        const hostFeeInCollectiveCurrency = 200;
+        const platformFeeInCollectiveCurrency = 150;
         await addFunds(user, hostCollective, collective, initialBalance);
         // When the expense is paid by the host admin
         let balance = await collective.getBalance();
         expect(balance).to.equal(1500);
         const res = await utils.graphqlQuery(
           payExpenseQuery,
-          { id: expense.id, paymentProcessorFeeInCollectiveCurrency },
+          {
+            id: expense.id,
+            paymentProcessorFeeInCollectiveCurrency,
+            hostFeeInCollectiveCurrency,
+            platformFeeInCollectiveCurrency,
+          },
           hostAdmin,
         );
         res.errors && console.log(res.errors);
         expect(res.errors).to.not.exist;
         expect(res.data.payExpense.status).to.equal('PAID');
         balance = await collective.getBalance();
-        expect(balance).to.equal(initialBalance - expense.amount - paymentProcessorFeeInCollectiveCurrency);
+        const expensePlusFees =
+          expense.amount +
+          paymentProcessorFeeInCollectiveCurrency +
+          hostFeeInCollectiveCurrency +
+          platformFeeInCollectiveCurrency;
+        expect(balance).to.equal(initialBalance - expensePlusFees);
         await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, {
           delay: 500,
         });
@@ -858,9 +870,7 @@ describe('GraphQL Expenses API', () => {
         });
         expect(debitTransaction.currency).to.equal('EUR'); // expense.currency
         expect(debitTransaction.hostCurrency).to.equal('USD');
-        expect(debitTransaction.netAmountInCollectiveCurrency).to.equal(
-          -expense.amount - paymentProcessorFeeInCollectiveCurrency,
-        );
+        expect(debitTransaction.netAmountInCollectiveCurrency).to.equal(-expensePlusFees);
         expect(debitTransaction.paymentProcessorFeeInHostCurrency).to.equal(
           Math.round(-paymentProcessorFeeInCollectiveCurrency * debitTransaction.hostCurrencyFxRate),
         );
@@ -871,7 +881,7 @@ describe('GraphQL Expenses API', () => {
           },
         });
         expect(creditTransaction.netAmountInCollectiveCurrency).to.equal(expense.amount);
-        expect(creditTransaction.amount).to.equal(expense.amount + paymentProcessorFeeInCollectiveCurrency);
+        expect(creditTransaction.amount).to.equal(expensePlusFees);
         expect(emailSendMessageSpy.callCount).to.equal(4);
       }); /* End of "pays the expense manually and reduces the balance of the collective" */
 
