@@ -1,5 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
+import { ArrowBack } from 'styled-icons/material/ArrowBack.cjs';
+
+import { Router } from '../server/pages';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
@@ -12,22 +16,28 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { Button } from 'react-bootstrap';
-import { Link } from '../server/pages';
+import Link from './Link';
 import { get } from 'lodash';
 import styled, { css } from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
+import StyledButton from './StyledButton';
+import EditVirtualCards from './EditVirtualCards';
+import CreateVirtualCardsFromEmails from './CreateVirtualCardsFromEmails';
+import CreateVirtualCardsBulk from './CreateVirtualCardsBulk';
 
 const selectedStyle = css`
   background-color: #eee;
   color: black;
 `;
 
-const MenuItem = styled.div`
+const MenuItem = styled(Link)`
+  display: block;
   border-radius: 5px;
   padding: 5px 10px;
   color: #888;
   cursor: pointer;
-  &:hover {
+  &:hover,
+  a:hover {
     color: black;
   }
   ${({ selected }) => selected && selectedStyle};
@@ -39,14 +49,16 @@ class EditCollectiveForm extends React.Component {
     status: PropTypes.string, // loading, saved
     onSubmit: PropTypes.func,
     LoggedInUser: PropTypes.object.isRequired,
+    /** Provided by withRouter */
+    router: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
+
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleObjectChange = this.handleObjectChange.bind(this);
-    this.showSection = this.showSection.bind(this);
 
     const collective = { ...(props.collective || {}) };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
@@ -69,6 +81,9 @@ class EditCollectiveForm extends React.Component {
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
     this.members = collective.members && collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
+    this.showVirtualCards =
+      collective.type === 'ORGANIZATION' &&
+      (get(collective, 'settings.canCreateVirtualCards') || props.router.query.showGiftCards);
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
@@ -181,25 +196,39 @@ class EditCollectiveForm extends React.Component {
 
   componentDidMount() {
     const hash = window.location.hash;
-    if (hash) {
-      this.setState({ section: hash.substr(1) });
+
+    if (this.props.router.query.section) {
+      this.setState({ section: this.props.router.query.section });
+    } else if (hash) {
+      // Legacy route converter - sections used to be assigned to URLs looking
+      // like `/collective/edit#paymentMethods. We have migrated them to proper
+      // routes (like `/collective/edit/payment-methods`) but we keep this
+      // legacy redirect for old emails sent with the old URL scheme
+      // Deprecated on 2018-12-08
+      const legacySections = ['info', 'images', 'members', 'payment-methods', 'connected-accounts', 'advanced'];
+      let section = hash.substr(1);
+      if (section === 'connectedAccounts') section = 'connected-accounts';
+      else if (section === 'paymentMethods') section = 'payment-methods';
+      if (legacySections.includes(section))
+        Router.pushRoute('editCollective', {
+          ...this.props.router.query,
+          slug: this.props.collective.slug,
+          section: section,
+        });
     }
   }
 
   componentDidUpdate(oldProps) {
-    const { collective } = this.props;
+    const { collective, router } = this.props;
     if (oldProps.collective !== collective) {
       this.setState({
         collective: collective,
         tiers: collective.tiers,
         paymentMethods: collective.paymentMethods,
       });
+    } else if (oldProps.router.query.section !== router.query.section) {
+      this.setState({ section: router.query.section });
     }
-  }
-
-  showSection(section) {
-    window.location.hash = `#${section}`;
-    this.setState({ section });
   }
 
   handleChange(fieldname, value) {
@@ -446,14 +475,16 @@ class EditCollectiveForm extends React.Component {
           <Box width={1 / 5} mr={4}>
             <MenuItem
               selected={this.state.section === 'info'}
-              onClick={() => this.showSection('info')}
+              route="editCollective"
+              params={{ slug: collective.slug, section: 'info' }}
               className="MenuItem info"
             >
               <FormattedMessage id="editCollective.menu.info" defaultMessage="Info" />
             </MenuItem>
             <MenuItem
               selected={this.state.section === 'images'}
-              onClick={() => this.showSection('images')}
+              route="editCollective"
+              params={{ slug: collective.slug, section: 'images' }}
               className="MenuItem images"
             >
               <FormattedMessage id="editCollective.menu." defaultMessage="Images" />
@@ -461,7 +492,8 @@ class EditCollectiveForm extends React.Component {
             {this.showEditMembers && (
               <MenuItem
                 selected={this.state.section === 'members'}
-                onClick={() => this.showSection('members')}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'members' }}
                 className="MenuItem members"
               >
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="Members" />
@@ -470,7 +502,8 @@ class EditCollectiveForm extends React.Component {
             {this.showEditGoals && (
               <MenuItem
                 selected={this.state.section === 'goals'}
-                onClick={() => this.showSection('goals')}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'goals' }}
                 className="MenuItem goals"
               >
                 <FormattedMessage id="editCollective.menu.goals" defaultMessage="Goals" />
@@ -479,7 +512,8 @@ class EditCollectiveForm extends React.Component {
             {this.showHost && (
               <MenuItem
                 selected={this.state.section === 'host'}
-                onClick={() => this.showSection('host')}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'host' }}
                 className="MenuItem host"
               >
                 <FormattedMessage id="editCollective.menu.host" defaultMessage="Fiscal Host" />
@@ -488,7 +522,8 @@ class EditCollectiveForm extends React.Component {
             {this.showEditTiers && (
               <MenuItem
                 selected={this.state.section === 'tiers'}
-                onClick={() => this.showSection('tiers')}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'tiers' }}
                 className="MenuItem tiers"
               >
                 <FormattedMessage id="editCollective.menu.tiers" defaultMessage="Tiers" />
@@ -497,7 +532,8 @@ class EditCollectiveForm extends React.Component {
             {this.showExpenses && (
               <MenuItem
                 selected={this.state.section === 'expenses'}
-                onClick={() => this.showSection('expenses')}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'expenses' }}
                 className="MenuItem expenses"
               >
                 <FormattedMessage id="editCollective.menu.expenses" defaultMessage="Expenses" />
@@ -505,16 +541,28 @@ class EditCollectiveForm extends React.Component {
             )}
             {this.showPaymentMethods && (
               <MenuItem
-                selected={this.state.section === 'paymentMethods'}
-                onClick={() => this.showSection('paymentMethods')}
+                selected={this.state.section === 'payment-methods'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'payment-methods' }}
                 className="MenuItem paymentMethods"
               >
                 <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
               </MenuItem>
             )}
+            {this.showVirtualCards && (
+              <MenuItem
+                selected={['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(this.state.section)}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'gift-cards' }}
+                className="MenuItem gift-cards"
+              >
+                <FormattedMessage id="editCollective.menu.virtualCards" defaultMessage="Gift Cards" />
+              </MenuItem>
+            )}
             <MenuItem
-              selected={this.state.section === 'connectedAccounts'}
-              onClick={() => this.showSection('connectedAccounts')}
+              selected={this.state.section === 'connected-accounts'}
+              route="editCollective"
+              params={{ slug: collective.slug, section: 'connected-accounts' }}
               className="MenuItem connectedAccounts"
             >
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
@@ -522,7 +570,8 @@ class EditCollectiveForm extends React.Component {
             {collective.type === 'COLLECTIVE' && (
               <MenuItem
                 selected={this.state.section === 'export'}
-                onClick={() => this.showSection('export')}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'export' }}
                 className="MenuItem export"
               >
                 <FormattedMessage id="editCollective.menu.export" defaultMessage="Export" />
@@ -530,7 +579,8 @@ class EditCollectiveForm extends React.Component {
             )}
             <MenuItem
               selected={this.state.section === 'advanced'}
-              onClick={() => this.showSection('advanced')}
+              route="editCollective"
+              params={{ slug: collective.slug, section: 'advanced' }}
               className="MenuItem advanced"
             >
               <FormattedMessage id="editCollective.menu.advanced" defaultMessage="Advanced" />
@@ -602,20 +652,51 @@ class EditCollectiveForm extends React.Component {
                   editCollectiveMutation={this.props.onSubmit}
                 />
               )}
-              {this.state.section === 'paymentMethods' && (
+              {this.state.section === 'payment-methods' && (
                 <EditPaymentMethods
                   paymentMethods={this.state.paymentMethods}
                   collective={collective}
                   onChange={this.handleObjectChange}
                 />
               )}
-              {this.state.section === 'connectedAccounts' && (
+              {this.state.section === 'gift-cards' && (
+                <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />
+              )}
+              {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
+                <Flex flexDirection="column">
+                  <Box mb="3em">
+                    <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
+                      <StyledButton>
+                        <ArrowBack size="1em" />{' '}
+                        <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
+                      </StyledButton>
+                    </Link>
+                  </Box>
+                  {this.state.section === 'gift-cards-send' && (
+                    <CreateVirtualCardsFromEmails
+                      collectiveId={collective.id}
+                      collectiveSlug={collective.slug}
+                      currency={collective.currency}
+                    />
+                  )}
+                  {this.state.section === 'gift-cards-create' && (
+                    <CreateVirtualCardsBulk
+                      collectiveId={collective.id}
+                      collectiveSlug={collective.slug}
+                      currency={collective.currency}
+                    />
+                  )}
+                </Flex>
+              )}
+              {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
-            {['export', 'connectedAccounts', 'host'].indexOf(this.state.section) === -1 && (
+            {['export', 'connected-accounts', 'host', 'gift-cards', 'gift-cards-create', 'gift-cards-send'].indexOf(
+              this.state.section,
+            ) === -1 && (
               <div className="actions">
                 <Button
                   bsStyle="primary"
@@ -626,14 +707,12 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </Button>
                 <div className="backToProfile">
-                  <Link route={`/${collective.slug}`}>
-                    <a>
-                      <FormattedMessage
-                        id="collective.edit.backToProfile"
-                        defaultMessage="view the {type} page"
-                        values={{ type }}
-                      />
-                    </a>
+                  <Link route="collective" params={{ slug: collective.slug }}>
+                    <FormattedMessage
+                      id="collective.edit.backToProfile"
+                      defaultMessage="view the {type} page"
+                      values={{ type }}
+                    />
                   </Link>
                 </div>
               </div>
@@ -645,4 +724,4 @@ class EditCollectiveForm extends React.Component {
   }
 }
 
-export default withIntl(EditCollectiveForm);
+export default withRouter(withIntl(EditCollectiveForm));

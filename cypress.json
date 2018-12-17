@@ -3,5 +3,6 @@
   "viewportHeight": 1660,
   "projectId": "yt5kwm",
   "defaultCommandTimeout": 8000,
-  "video": false
+  "video": false,
+  "chromeWebSecurity": false
 }

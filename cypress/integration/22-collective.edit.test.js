@@ -103,7 +103,7 @@ describe('edit collective', () => {
     cy.get('.OrderForm', { timeout: 20000 });
     cy.get('.tier .selectPreset label').contains('Select monthly amount');
     cy.get('.tier .presetBtn', { timeout: 5000 }).should('have.length', 3);
-    cy.visit('/testcollective/edit#tiers');
+    cy.visit('/testcollective/edit/tiers');
     cy.get('.EditTiers .tier')
       .first()
       .find('._amountType select')

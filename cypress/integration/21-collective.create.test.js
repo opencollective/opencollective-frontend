@@ -1,20 +1,8 @@
 const collectiveName = 'New collective';
 
-const init = (skip_signin = false) => {
-  if (skip_signin) {
-    cy.visit(
-      '/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE3NzgzMTkwLCJleHAiOjE1MTc4Njk1OTAsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.RZojXMJVzznInDr5LyVhzsO5Dcq3qzRsKooPoeJQAEQ?next=/opencollective-host/apply',
-    );
-  } else {
-    cy.visit('/create');
-    cy.fillInputField('email', 'testuser@opencollective.com');
-    cy.get('.LoginForm button').click();
-  }
-};
-
 describe('create a collective', () => {
   it('edit info', () => {
-    init();
+    cy.login({ email: 'testuser@opencollective.com', redirect: '/create' });
     cy.get('.CollectiveCategoryPicker .category')
       .first()
       .click();

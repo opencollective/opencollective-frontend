@@ -740,6 +740,43 @@ export const getSubscriptionsQuery = gql`
   }
 `;
 
+/** A query to get the virtual cards created by a collective. Must be authenticated. */
+export const getCollectiveVirtualCards = gql`
+  query CollectiveVirtualCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int) {
+    Collective(id: $CollectiveId) {
+      createdVirtualCards(isConfirmed: $isConfirmed, limit: $limit, offset: $offset) {
+        offset
+        limit
+        total
+        paymentMethods {
+          id
+          uuid
+          currency
+          name
+          service
+          type
+          data
+          initialBalance
+          balance
+          expiryDate
+          isConfirmed
+          data
+          createdAt
+          expiryDate
+          description
+          collective {
+            id
+            slug
+            image
+            type
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const searchCollectivesQuery = gql`
   query search($term: String!, $limit: Int, $offset: Int) {
     search(term: $term, limit: $limit, offset: $offset) {
@@ -792,6 +829,31 @@ export const getCollectiveApplicationsQuery = gql`
           clientId
           clientSecret
         }
+      }
+    }
+  }
+`;
+
+/**
+ * A query to get a collective source payment methods. This will not return
+ * virtual cards, as a virtual card cannot be used as a source payment method
+ * for another payment method.
+ */
+export const getCollectiveSourcePaymentMethodsQuery = gql`
+  query Collective($id: Int) {
+    Collective(id: $id) {
+      id
+      paymentMethods(types: ["creditcard"], hasBalanceAboveZero: true) {
+        id
+        uuid
+        name
+        data
+        monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
       }
     }
   }
