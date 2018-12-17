@@ -211,6 +211,7 @@ export const createVirtualCardsMutationQuery = gql`
     $limitedToTags: [String]
     $limitedToCollectiveIds: [Int]
     $limitedToHostCollectiveIds: [Int]
+    $limitedToOpenSourceCollectives: Boolean
   ) {
     createVirtualCards(
       amount: $amount
@@ -225,6 +226,7 @@ export const createVirtualCardsMutationQuery = gql`
       limitedToHostCollectiveIds: $limitedToHostCollectiveIds
       numberOfVirtualCards: $numberOfVirtualCards
       emails: $emails
+      limitedToOpenSourceCollectives: $limitedToOpenSourceCollectives
     ) {
       id
       name

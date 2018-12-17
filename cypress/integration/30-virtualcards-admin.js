@@ -17,6 +17,7 @@ describe('Virtual cards admin', () => {
     cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-create` });
     cy.get('#virtualcard-amount').type('42');
     cy.get('#virtualcard-numberOfVirtualCards').type('{selectall}5');
+    cy.get('.field-limitToOpenSourceCollectives .custom-checkbox').click();
     cy.get('.FormInputs button[type="submit"]').click();
     cy.contains('Your 5 gift cards are ready!');
   });
@@ -46,6 +47,7 @@ describe('Virtual cards admin', () => {
     );
     cy.get('#virtualcard-amount').type('12');
     checkSubmit(true, 'Create 3 gift cards');
+    cy.get('.field-limitToOpenSourceCollectives .custom-checkbox').click();
     cy.get('.FormInputs button[type="submit"]').click();
     cy.contains('Your 3 gift cards have been sent!');
   });

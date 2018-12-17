@@ -11,6 +11,7 @@ import { getCollectiveSourcePaymentMethodsQuery } from '../graphql/queries';
 import { createVirtualCardsMutationQuery } from '../graphql/mutations';
 import StyledInputAmount from './StyledInputAmount';
 import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
 import StyledPaymentMethodChooser from './StyledPaymentMethodChooser';
 import Loading from './Loading';
@@ -20,11 +21,11 @@ import { P } from './Text';
 const MIN_AMOUNT = 5;
 
 const InlineField = ({ name, children, label }) => (
-  <Flex alignItems="center" mb="2.5em">
+  <Flex alignItems="center" mb="2.5em" className={`field-${name}`}>
     <Box css={{ flexBasis: '12em' }}>
       <label htmlFor={`virtualcard-${name}`}>{label}</label>
     </Box>
-    {children}
+    <Box>{children}</Box>
   </Flex>
 );
 
@@ -41,7 +42,7 @@ class CreateVirtualCardsBulk extends Component {
     this.form = React.createRef();
     this.onSubmit = this.onSubmit.bind(this);
     this.state = {
-      values: { amount: '', numberOfVirtualCards: 1 },
+      values: { amount: '', numberOfVirtualCards: 1, onlyOpensource: true },
       errors: { emails: [] },
       submitting: false,
       createdVirtualCards: null,
@@ -69,6 +70,8 @@ class CreateVirtualCardsBulk extends Component {
       }
     } else if (fieldName === 'paymentMethod') {
       this.setState(state => ({ ...state, values: { ...state.values, PaymentMethodId: value.value.id } }));
+    } else if (fieldName === 'onlyOpensource') {
+      this.setState(state => ({ ...state, values: { ...state.values, onlyOpensource: value } }));
     }
   }
 
@@ -82,6 +85,7 @@ class CreateVirtualCardsBulk extends Component {
           amount: values.amount * 100,
           numberOfVirtualCards: values.numberOfVirtualCards,
           PaymentMethodId: values.PaymentMethodId || this.getDefaultPaymentMethod().id,
+          limitedToOpenSourceCollectives: values.onlyOpensource,
         })
         .then(({ data }) => {
           this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
@@ -213,6 +217,22 @@ class CreateVirtualCardsBulk extends Component {
               paymentMethods={paymentMethods}
               defaultPaymentMethod={this.getDefaultPaymentMethod()}
               onChange={option => this.onChange('paymentMethod', option)}
+            />
+          </InlineField>
+
+          <InlineField
+            name="limitToOpenSourceCollectives"
+            label={
+              <FormattedMessage
+                id="virtualCards.create.onlyOpenSource"
+                defaultMessage="Limit to opensource collectives"
+              />
+            }
+          >
+            <StyledCheckbox
+              checked={values.onlyOpensource}
+              onChange={checked => this.onChange('onlyOpensource', checked)}
+              size="25px"
             />
           </InlineField>
 
