@@ -117,11 +117,12 @@ class EditVirtualCards extends React.Component {
           <Loading />
         ) : (
           <div className="virtualcards-list">
-            {paymentMethods.length === 0 && (
-              <Flex justifyContent="center" mt="4em">
-                {this.renderNoVirtualCardMessage(onlyConfirmed)}
-              </Flex>
-            )}
+            {!paymentMethods ||
+              (paymentMethods.length === 0 && (
+                <Flex justifyContent="center" mt="4em">
+                  {this.renderNoVirtualCardMessage(onlyConfirmed)}
+                </Flex>
+              ))}
             {paymentMethods.map(v => (
               <div key={v.id}>
                 <VirtualCardDetails virtualCard={v} />

@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Dec 14 2018 15:05:37 GMT+0100 (Central European Standard Time)
+# timestamp: Mon Dec 17 2018 15:22:26 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -852,6 +852,9 @@ type Mutation {
     Limit this payment method to make donations to the collectives hosted by those hosts
     """
     limitedToHostCollectiveIds: [Int]
+
+    """Set `limitedToHostCollectiveIds` to open-source collectives only"""
+    limitedToOpenSourceCollectives: Boolean
 
     """
     A custom message attached to the email that will be sent for this virtual card
