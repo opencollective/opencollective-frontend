@@ -942,6 +942,7 @@ export default function(Sequelize, DataTypes) {
         where: { CollectiveId: this.id },
       },
       options,
+      { clone: false },
     );
     return models.Order.findAll(query);
   };
@@ -952,6 +953,7 @@ export default function(Sequelize, DataTypes) {
         where: { FromCollectiveId: this.id },
       },
       options,
+      { clone: false },
     );
     return models.Order.findAll(query);
   };
