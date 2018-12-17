@@ -26,7 +26,7 @@ import * as applicationMutations from './mutations/applications';
 
 import statuses from '../../constants/expense_status';
 
-import { GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt } from 'graphql';
+import { GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
 
 import {
   OrderType,
@@ -61,6 +61,7 @@ import {
   UserInputType,
 } from './inputTypes';
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
+import models from '../../models';
 
 const mutations = {
   createCollective: {
@@ -471,6 +472,10 @@ const mutations = {
         type: new GraphQLList(GraphQLInt),
         description: 'Limit this payment method to make donations to the collectives hosted by those hosts',
       },
+      limitedToOpenSourceCollectives: {
+        type: GraphQLBoolean,
+        description: 'Set `limitedToHostCollectiveIds` to open-source collectives only',
+      },
       description: {
         type: GraphQLString,
         description: 'A custom message attached to the email that will be sent for this virtual card',
@@ -480,7 +485,24 @@ const mutations = {
     resolve: async (_, { emails, numberOfVirtualCards, ...args }, { remoteUser }) => {
       if (numberOfVirtualCards && emails && numberOfVirtualCards !== emails.length) {
         throw Error("numberOfVirtualCards and emails counts doesn't match");
-      } else if (numberOfVirtualCards) {
+      } else if (args.limitedToOpenSourceCollectives && args.limitedToHostCollectiveIds) {
+        throw Error('limitedToOpenSourceCollectives and limitedToHostCollectiveIds cannot be used at the same time');
+      }
+
+      if (args.limitedToOpenSourceCollectives) {
+        const openSourceHost = await models.Collective.findOne({
+          attributes: ['id'],
+          where: { slug: 'opensourcecollective' },
+        });
+        if (!openSourceHost) {
+          throw new Error(
+            'Cannot find OpenSource collective host. You can disable the opensource-only limitation, or contact us on info@opencollective.com if this keeps hapening',
+          );
+        }
+        args.limitedToHostCollectiveIds = [openSourceHost.id];
+      }
+
+      if (numberOfVirtualCards) {
         return await bulkCreateVirtualCards(args, remoteUser, numberOfVirtualCards);
       } else if (emails) {
         return await createVirtualCardsForEmails(args, remoteUser, emails);
