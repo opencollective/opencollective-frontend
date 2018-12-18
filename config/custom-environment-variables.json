@@ -72,6 +72,19 @@
     "webapp": "WEBAPP_URL",
     "website": "WEBSITE_URL"
   },
+  "limits": {
+    "ordersPerHour": {
+      "perAccount": "ORDER_PERHOUR_LIMIT_ACCOUNT",
+      "perAccountForCollective": "ORDER_PERHOUR_LIMIT_ACCOUNT_COLLECTIVE",
+      "perEmail": "ORDER_PERHOUR_LIMIT_EMAIL",
+      "perEmailForCollective": "ORDER_PERHOUR_LIMIT_EMAIL_COLLECTIVE",
+      "perIp": "ORDER_PERHOUR_LIMIT_IP"
+    },
+    "virtualCards": {
+      "maxPerDay": "VIRTUAL_CARD_PER_DAY",
+      "maxAmountPerDay": "VIRTUAL_CARD_AMOUNT_PER_DAY"
+    }
+  },
   "slack": {
     "webhookUrl": "SLACK_HOOK_URL"
   },
