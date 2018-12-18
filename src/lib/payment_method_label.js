@@ -30,7 +30,7 @@ const messages = defineMessages({
   },
   prepaid: {
     id: 'paymentMethods.labelPrepaid',
-    defaultMessage: '{name} ({balance} left)',
+    defaultMessage: 'Prepaid: {name} ({balance} left)',
   },
   collective: {
     id: 'paymentMethods.labelCollective',
@@ -92,7 +92,7 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
     });
   } else if (type === 'prepaid') {
     label = intl.formatMessage(messages.prepaid, {
-      name: `${brand || type} ${name}`,
+      name,
       balance: formatCurrency(balance, currency),
     });
   } else if (type === 'creditcard') {
