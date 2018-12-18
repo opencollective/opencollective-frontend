@@ -120,7 +120,7 @@
     "chai-as-promised": "7.1.1",
     "chai-jest-snapshot": "2.0.0",
     "chance": "1.0.17",
-    "cheerio": "0.22.0",
+    "cheerio": "^1.0.0-rc.2",
     "coveralls": "3.0.2",
     "eslint": "^5.9.0",
     "eslint-config-opencollective": "^1.5.0",
