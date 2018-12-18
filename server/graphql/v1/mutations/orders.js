@@ -42,10 +42,12 @@ async function checkOrdersLimit(order, remoteUser, reqIp) {
       key: `order_limit_on_account_${fromCollectiveId}`,
       value: ordersLimits.perAccount,
     });
-    limits.push({
-      key: `order_limit_on_account_${fromCollectiveId}_and_collective_${collectiveId}`,
-      value: ordersLimits.perAccountForCollective,
-    });
+    if (collectiveId) {
+      limits.push({
+        key: `order_limit_on_account_${fromCollectiveId}_and_collective_${collectiveId}`,
+        value: ordersLimits.perAccountForCollective,
+      });
+    }
   } else {
     // Limit on first time users
     if (userEmail) {
@@ -54,10 +56,12 @@ async function checkOrdersLimit(order, remoteUser, reqIp) {
         key: `order_limit_on_email_${emailHash}`,
         value: ordersLimits.perEmail,
       });
-      limits.push({
-        key: `order_limit_on_email_${emailHash}_and_collective_${collectiveId}`,
-        value: ordersLimits.perEmailForCollective,
-      });
+      if (collectiveId) {
+        limits.push({
+          key: `order_limit_on_email_${emailHash}_and_collective_${collectiveId}`,
+          value: ordersLimits.perEmailForCollective,
+        });
+      }
     }
     // Limit on IPs
     if (reqIp) {
