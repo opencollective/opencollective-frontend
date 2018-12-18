@@ -56,7 +56,7 @@ class TransactionDetails extends React.Component {
       },
       paymentProcessorFeeInHostCurrency: {
         id: 'transaction.paymentProcessorFeeInHostCurrency',
-        defaultMessage: 'payment processor fee',
+        defaultMessage: '{percentage} payment processor fee',
       },
     });
     this.currencyStyle = {
@@ -99,7 +99,7 @@ class TransactionDetails extends React.Component {
     } = this.props;
 
     const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type) ? -netAmountInCollectiveCurrency : amount;
-
+    let totalAmount = initialAmount;
     const amountDetails = [
       intl.formatNumber(initialAmount / 100, {
         currency: currency,
@@ -108,6 +108,7 @@ class TransactionDetails extends React.Component {
     ];
     if (hostCurrencyFxRate && hostCurrencyFxRate !== 1) {
       const amountInHostCurrency = amount * hostCurrencyFxRate;
+      totalAmount = amount;
       amountDetails.push(
         ` (${intl.formatNumber(amountInHostCurrency / 100, {
           currency: hostCurrency,
@@ -118,12 +119,14 @@ class TransactionDetails extends React.Component {
     const addFees = feesArray => {
       feesArray.forEach(feeName => {
         if (this.props[feeName]) {
+          const percentage =
+            this.props[feeName] > 0 ? this.props[feeName] / totalAmount : -(this.props[feeName] / totalAmount);
           amountDetails.push(
             `${intl.formatNumber(this.props[feeName] / 100, {
               currency: hostCurrency,
               ...this.currencyStyle,
             })} (${intl.formatMessage(this.messages[feeName], {
-              percentage: `${((this.props[feeName] / amount) * 100).toFixed(2)}%`,
+              percentage: `${(percentage * 100).toFixed(2)}%`,
             })})`,
           );
         }
