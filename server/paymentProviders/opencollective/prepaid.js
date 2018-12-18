@@ -1,4 +1,4 @@
-import models from '../../models';
+import models, { Op } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
@@ -22,10 +22,20 @@ async function getBalance(paymentMethod) {
   /* Result will be negative (We're looking for DEBIT transactions) */
   const allTransactions = await models.Transaction.findAll({
     attributes: ['netAmountInCollectiveCurrency', 'currency'],
-    where: {
-      PaymentMethodId: paymentMethod.id,
-      type: 'DEBIT',
-    },
+    where: { type: 'DEBIT' },
+    include: [
+      {
+        model: models.PaymentMethod,
+        require: true,
+        attributes: [],
+        where: {
+          [Op.or]: {
+            id: paymentMethod.id,
+            SourcePaymentMethodId: paymentMethod.id,
+          },
+        },
+      },
+    ],
   });
   let spent = 0;
   for (const transaction of allTransactions) {

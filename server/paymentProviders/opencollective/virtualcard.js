@@ -270,6 +270,11 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
     throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
   }
 
+  // Ensure sourcePaymentMethod type is supported
+  if (!['creditcard', 'prepaid'].includes(sourcePaymentMethod.type)) {
+    throw new Error('Only prepaid and creditcard can be used as gift cards source payment methods');
+  }
+
   // Ensure amount or monthlyLimitPerMember are valid
   if (!args.amount && !args.monthlyLimitPerMember) {
     throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');

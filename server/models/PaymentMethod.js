@@ -406,24 +406,31 @@ export default function(Sequelize, DataTypes) {
     }
 
     let limit = Infinity; // no no, no no no no, no no no no limit!
-    const where = {
-      PaymentMethodId: this.id,
-      type: TransactionTypes.DEBIT,
+    const query = {
+      where: { type: TransactionTypes.DEBIT },
+      include: [
+        {
+          model: models.PaymentMethod,
+          require: true,
+          attributes: [],
+          where: { [Op.or]: { id: this.id, SourcePaymentMethodId: this.id } },
+        },
+      ],
     };
 
     if (this.monthlyLimitPerMember) {
       limit = this.monthlyLimitPerMember;
       const d = new Date();
       const firstOfTheMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-      where.createdAt = { [Op.gte]: firstOfTheMonth };
-      where.CreatedByUserId = user.id;
+      query.where.createdAt = { [Op.gte]: firstOfTheMonth };
+      query.where.CreatedByUserId = user.id;
     }
 
     if (this.initialBalance) {
       limit = this.initialBalance > limit ? limit : this.initialBalance;
     }
 
-    const result = await sumTransactions('netAmountInCollectiveCurrency', { where }, this.currency);
+    const result = await sumTransactions('netAmountInCollectiveCurrency', query, this.currency);
     const availableBalance = limit + result.totalInHostCurrency; // result.totalInHostCurrency is negative
     return { amount: availableBalance, currency: this.currency };
   };
