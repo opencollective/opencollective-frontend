@@ -16,7 +16,7 @@ import { formatCurrency, formatArrayToString, formatCurrencyObject } from '../..
 import emailLib from '../../server/lib/email';
 import queries from '../../server/lib/queries';
 
-const d = new Date();
+const d = process.env.START_DATE ? new Date(process.env.START_DATE) : new Date();
 const startDate = new Date(`${d.getFullYear() - 1}`);
 const endDate = new Date(`${d.getFullYear()}`);
 const year = startDate.getFullYear();
