@@ -28,7 +28,7 @@
     "bcrypt": "3.0.2",
     "bluebird": "3.4.0",
     "body-parser": "1.18.3",
-    "child-process-promise": "1.1.0",
+    "child-process-promise": "2.2.1",
     "clearbit": "1.3.4",
     "cloudflare-ip": "0.0.7",
     "config": "3.0.1",
