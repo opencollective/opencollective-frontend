@@ -190,7 +190,7 @@ describe('createOrder', () => {
         paymentMethods: {
           manual: {
             instructions:
-              'Please send a wire to XXXX for the amount of {amount} with the mention: {collective} {tier} order: {OrderId} {unknownVariable}',
+              'Your order is pending. Please send a wire to <code>IBAN 1234567890987654321</code> for the amount of {amount} with the mention: {collective} {tier} order: {OrderId} {unknownVariable}',
           },
         },
       },
@@ -243,8 +243,9 @@ describe('createOrder', () => {
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
     expect(emailSendMessageSpy.callCount).to.equal(2);
     expect(emailSendMessageSpy.secondCall.args[0]).to.equal(thisOrder.user.email);
+    expect(emailSendMessageSpy.secondCall.args[2]).to.match(/IBAN 1234567890987654321/);
     expect(emailSendMessageSpy.secondCall.args[2]).to.match(
-      /Please send a wire to XXXX for the amount of \$20 with the mention: webpack event backer order: [0-9]+/,
+      /for the amount of \$20 with the mention: webpack event backer order: [0-9]+/,
     );
     expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
       'ACTION REQUIRED: your $20 registration to meetup is pending',
