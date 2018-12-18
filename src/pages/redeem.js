@@ -11,6 +11,7 @@ import { get } from 'lodash';
 
 import { Router } from '../server/pages';
 
+import { withUser } from '../components/UserProvider';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -19,11 +20,11 @@ import RedeemForm from '../components/RedeemForm';
 import RedeemSuccess from '../components/RedeemSuccess';
 import { P, H1, H5 } from '../components/Text';
 
+import { getLoggedInUserQuery } from '../graphql/queries';
 import { isValidEmail } from '../lib/utils';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 const Error = styled(P)`
   color: red;
@@ -96,9 +97,10 @@ class RedeemPage extends React.Component {
   }
 
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     intl: PropTypes.object.isRequired, // from withIntl
     claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
+    LoggedInUser: PropTypes.object, // from withUser
     code: PropTypes.string,
     name: PropTypes.string,
     email: PropTypes.string,
@@ -127,19 +129,16 @@ class RedeemPage extends React.Component {
     });
   }
 
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   async claimPaymentMethod() {
     this.setState({ loading: true });
     const { code, email, name } = this.state.form;
     try {
       let res;
-      if (this.state.LoggedInUser) {
+      if (this.props.LoggedInUser) {
         res = await this.props.claimPaymentMethod(code);
+
+        // Refresh LoggedInUser
+        this.props.refetchLoggedInUser();
         Router.pushRoute('redeemed', { code });
         return;
       } else {
@@ -163,7 +162,7 @@ class RedeemPage extends React.Component {
 
   handleSubmit() {
     const { intl } = this.props;
-    if (!this.state.LoggedInUser && !isValidEmail(this.state.form.email)) {
+    if (!this.props.LoggedInUser && !isValidEmail(this.state.form.email)) {
       return this.setState({
         error: intl.formatMessage(this.messages['error.email.invalid']),
       });
@@ -177,8 +176,7 @@ class RedeemPage extends React.Component {
   }
 
   render() {
-    const { code, email, name } = this.props;
-    const { LoggedInUser } = this.state;
+    const { code, email, name, LoggedInUser } = this.props;
 
     return (
       <div className="RedeemedPage">
@@ -258,9 +256,15 @@ const redeemMutation = gql`
 const addMutation = graphql(redeemMutation, {
   props: ({ mutate }) => ({
     claimPaymentMethod: async (code, user) => {
-      return await mutate({ variables: { code, user } });
+      // Claim payment method and refresh LoggedInUser Apollo cache so
+      // `client.query` will deliver new data for next call
+      return await mutate({
+        variables: { code, user },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
+      });
     },
   }),
 });
 
-export default withData(withIntl(withLoggedInUser(addMutation(RedeemPage))));
+export default withData(withIntl(withUser(addMutation(RedeemPage))));

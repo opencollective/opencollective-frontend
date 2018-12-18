@@ -10,6 +10,7 @@ export const UserContext = React.createContext({
   LoggedInUser: null,
   logout() {},
   login() {},
+  refetchLoggedInUser() {},
 });
 
 class UserProvider extends React.Component {
@@ -67,9 +68,31 @@ class UserProvider extends React.Component {
     return true;
   };
 
+  /**
+   * Same as `login` but skip loading the user from localStorage cache. Note
+   * that Apollo keeps a local cache too, so you should first use
+   * [refetchQueries](https://www.apollographql.com/docs/react/api/react-apollo.html#graphql-mutation-options-refetchQueries)
+   * if you really need to be up-to-date with server.
+   */
+  refetchLoggedInUser = async () => {
+    const { getLoggedInUser } = this.props;
+    try {
+      const LoggedInUser = await getLoggedInUser({ ignoreLocalStorage: true });
+      this.setState({
+        loadingLoggedInUser: false,
+        LoggedInUser,
+      });
+    } catch (error) {
+      this.setState({ loadingLoggedInUser: false });
+    }
+    return true;
+  };
+
   render() {
     return (
-      <UserContext.Provider value={{ ...this.state, logout: this.logout, login: this.login }}>
+      <UserContext.Provider
+        value={{ ...this.state, logout: this.logout, login: this.login, refetchLoggedInUser: this.refetchLoggedInUser }}
+      >
         {this.props.children}
       </UserContext.Provider>
     );

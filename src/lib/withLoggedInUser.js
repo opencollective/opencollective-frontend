@@ -44,7 +44,9 @@ export default WrappedComponent => {
         }
       });
 
-    getLoggedInUser = async () => {
+    getLoggedInUser = async (options = {}) => {
+      const { ignoreLocalStorage = false } = options;
+
       // only Client Side for now
       if (!process.browser || !window) {
         return null;
@@ -62,7 +64,7 @@ export default WrappedComponent => {
 
       // From cache
       const cache = storage.get('LoggedInUser');
-      if (cache) {
+      if (!ignoreLocalStorage && cache) {
         // This is asynchronous and will take care of updating the cache
         this.getLoggedInUserFromServer();
         // Return from cache immediately
