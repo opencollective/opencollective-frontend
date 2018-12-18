@@ -72,6 +72,15 @@
     "webapp": "WEBAPP_URL",
     "website": "WEBSITE_URL"
   },
+  "limits": {
+    "ordersPerHour": {
+      "perAccount": "ORDERS_LIMIT_ACCOUNT",
+      "perAccountForCollective": "ORDERS_LIMIT_ACCOUNT_COLLECTIVE",
+      "perEmail": "ORDERS_LIMIT_EMAIL",
+      "perEmailForCollective": "ORDERS_LIMIT_EMAIL_COLLECTIVE",
+      "perIp": "ORDERS_LIMIT_IP"
+    }
+  },
   "slack": {
     "webhookUrl": "SLACK_HOOK_URL"
   },
