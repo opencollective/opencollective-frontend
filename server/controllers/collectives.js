@@ -283,23 +283,6 @@ export const createFromGithub = (req, res, next) => {
   const githubUser = payload.user;
   let createdCollective;
 
-  collectiveData.tiers = [
-    {
-      type: 'TIER',
-      name: 'backer',
-      slug: 'backers',
-      amount: 500,
-      interval: 'month',
-    },
-    {
-      type: 'TIER',
-      name: 'sponsor',
-      slug: 'sponsors',
-      amount: 10000,
-      interval: 'month',
-    },
-  ];
-
   // Find the creator's Connected Account
   ConnectedAccount.findOne({
     where: { id: connectedAccountId },
@@ -365,15 +348,6 @@ export const createFromGithub = (req, res, next) => {
         },
       }),
     )
-    .then(() => {
-      if (collectiveData.tiers) {
-        return models.Tier.createMany(collectiveData.tiers, {
-          CollectiveId: createdCollective.id,
-          currency: collectiveData.currency,
-        });
-      }
-      return null;
-    })
     .then(() => createdCollective.update({ isActive: true }))
     .then(() => {
       const data = {
