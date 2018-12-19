@@ -757,6 +757,7 @@ export const getCollectiveVirtualCards = gql`
           type
           data
           initialBalance
+          monthlyLimitPerMember
           balance
           expiryDate
           isConfirmed
