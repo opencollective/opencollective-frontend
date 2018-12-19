@@ -158,7 +158,11 @@ async function create(args, remoteUser) {
     throw new Error(LIMIT_REACHED_ERROR);
   }
 
+  // Load source payment method, ensure there is enough funds on it
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
+  const virtualCardCurrency = getCurrencyFromCreateArgs(args, collective);
+  await checkSourcePaymentMethodBalance(sourcePaymentMethod, totalAmount, virtualCardCurrency);
+
   const createParams = getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
   const virtualCard = await models.PaymentMethod.create(createParams);
   sendVirtualCardCreatedEmail(virtualCard, collective);
@@ -186,7 +190,11 @@ export async function bulkCreateVirtualCards(args, remoteUser, count) {
     throw new Error(LIMIT_REACHED_ERROR);
   }
 
+  // Load source payment method, ensure there is enough funds on it
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
+  const virtualCardCurrency = getCurrencyFromCreateArgs(args, collective);
+  await checkSourcePaymentMethodBalance(sourcePaymentMethod, totalAmount, virtualCardCurrency);
+
   const virtualCardsParams = times(count, () => {
     return getCreateParams(args, collective, sourcePaymentMethod, remoteUser);
   });
@@ -215,7 +223,11 @@ export async function createVirtualCardsForEmails(args, remoteUser, emails) {
     throw new Error(LIMIT_REACHED_ERROR);
   }
 
+  // Load source payment method, ensure there is enough funds on it
   const sourcePaymentMethod = await getSourcePaymentMethodFromCreateArgs(args, collective);
+  const virtualCardCurrency = getCurrencyFromCreateArgs(args, collective);
+  await checkSourcePaymentMethodBalance(sourcePaymentMethod, totalAmount, virtualCardCurrency);
+
   const virtualCardsParams = emails.map(email =>
     getCreateParams({ ...args, data: { email } }, collective, sourcePaymentMethod, remoteUser),
   );
@@ -250,6 +262,44 @@ async function getSourcePaymentMethodFromCreateArgs(args, collective) {
 }
 
 /**
+ * Ensure `paymentMethod` has at least `amount` as balance, throw if it hasn't.
+ *
+ * @param {PaymentMethod} paymentMethod
+ * @param {Integer} amount
+ */
+async function checkSourcePaymentMethodBalance(paymentMethod, amount, virtualCardCurrency) {
+  // Load balance
+  const paymentProvider = libpayments.findPaymentMethodProvider(paymentMethod);
+  let balance = 0;
+  if (paymentProvider && paymentProvider.getBalance) {
+    balance = await paymentProvider.getBalance(paymentMethod);
+  } else {
+    // PM doesn't have any limit, we can continue safely
+    return;
+  }
+
+  // Convert amounts if not the same currency
+  const fxrate = await currency.getFxRate(virtualCardCurrency, balance.currency);
+  const totalAmountInPaymentMethodCurrency = amount * fxrate;
+
+  // Check balance
+  if (totalAmountInPaymentMethodCurrency > balance.amount) {
+    const currentBalanceDetails = `Current balance is ${formatCurrency(balance.amount, balance.currency)}`;
+    throw new Error(`There is not enough funds on this PaymentMethod. ${currentBalanceDetails}`);
+  }
+}
+
+/** Get currency from args, or returns default currency. Throws if currency is invalid */
+function getCurrencyFromCreateArgs(args, collective) {
+  // Make sure currency is a string, trim and uppercase it.
+  const currency = args.currency ? args.currency.toString().toUpperCase() : collective.currency;
+  if (!['USD', 'EUR'].includes(currency)) {
+    throw new Error(`Currency ${currency} not supported. We only support USD and EUR at the moment.`);
+  }
+  return currency;
+}
+
+/**
  * Get a PaymentMethod object representing the VirtualCard to be created. Will
  * throw if given invalid args.
  *
@@ -265,10 +315,7 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
   }
 
   // Make sure currency is a string, trim and uppercase it.
-  args.currency = args.currency ? args.currency.toString().toUpperCase() : collective.currency;
-  if (!['USD', 'EUR'].includes(args.currency)) {
-    throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
-  }
+  args.currency = getCurrencyFromCreateArgs(args, collective);
 
   // Ensure sourcePaymentMethod type is supported
   if (!['creditcard', 'prepaid'].includes(sourcePaymentMethod.type)) {
