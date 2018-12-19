@@ -47,7 +47,7 @@ SELECT
   host.slug as "hostSlug",
   host.name as "hostName",
   host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
-  g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
+  g.slug, g.name, g.mission, g.description, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
 FROM "CollectiveTransactions" ut
 LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
 LEFT JOIN "Collectives" host ON ut."HostCollectiveId" = host.id`;
@@ -129,7 +129,7 @@ const processCollective = collective => {
         collectivesBySlug[row.slug] = {
           slug: row.slug,
           name: row.name || row.slug,
-          mission: row.mission,
+          description: row.mission || row.description,
           image: row.image,
           backgroundImage:
             row.backgroundImage || 'https://opencollective.com/public/images/collectives/default-header-bg.jpg',
@@ -137,6 +137,7 @@ const processCollective = collective => {
           settings: row.settings,
           data: row.data,
           totalDonations: Number(row.amountInHostCurrency),
+          tier: 'total contributed',
           currency: row.hostCurrency,
         };
 

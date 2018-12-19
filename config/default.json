@@ -33,7 +33,8 @@
   "host": {
     "api": "http://localhost:3060",
     "webapp": "http://localhost:3000/app",
-    "website": "http://localhost:3000"
+    "website": "http://localhost:3000",
+    "images": "https://images.opencollective.com"
   },
   "limits": {
     "ordersPerHour": {
