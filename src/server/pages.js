@@ -12,6 +12,7 @@ pages
   )
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
+  .add('signinLinkSent', '/signin/sent')
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
