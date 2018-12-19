@@ -287,6 +287,18 @@ async function checkSourcePaymentMethodBalance(paymentMethod, amount, virtualCar
     const currentBalanceDetails = `Current balance is ${formatCurrency(balance.amount, balance.currency)}`;
     throw new Error(`There is not enough funds on this PaymentMethod. ${currentBalanceDetails}`);
   }
+
+  // Total virtual cards sum cannot be more than the initial balance
+  const existingTotal = await paymentMethod.getChildrenPMTotalSum();
+  if (existingTotal + totalAmountInPaymentMethodCurrency > paymentMethod.initialBalance) {
+    const initialBalanceStr = formatCurrency(paymentMethod.initialBalance, paymentMethod.currency);
+    const alreadyCreatedAmountStr = formatCurrency(existingTotal, balance.currency);
+    const currentBalanceDetails = `Initial balance is ${initialBalanceStr}`;
+    const alreadyCreatedDetails = `you have already created ${alreadyCreatedAmountStr} worth of gift cards`;
+    throw new Error(
+      `There is not enough funds on this PaymentMethod for new gift cards. ${currentBalanceDetails} and ${alreadyCreatedDetails}.`,
+    );
+  }
 }
 
 /** Get currency from args, or returns default currency. Throws if currency is invalid */
