@@ -22,8 +22,7 @@ import styled, { css } from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
-import CreateVirtualCardsFromEmails from './CreateVirtualCardsFromEmails';
-import CreateVirtualCardsBulk from './CreateVirtualCardsBulk';
+import CreateVirtualCardsForm from './CreateVirtualCardsForm';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -672,20 +671,11 @@ class EditCollectiveForm extends React.Component {
                       </StyledButton>
                     </Link>
                   </Box>
-                  {this.state.section === 'gift-cards-send' && (
-                    <CreateVirtualCardsFromEmails
-                      collectiveId={collective.id}
-                      collectiveSlug={collective.slug}
-                      currency={collective.currency}
-                    />
-                  )}
-                  {this.state.section === 'gift-cards-create' && (
-                    <CreateVirtualCardsBulk
-                      collectiveId={collective.id}
-                      collectiveSlug={collective.slug}
-                      currency={collective.currency}
-                    />
-                  )}
+                  <CreateVirtualCardsForm
+                    collectiveId={collective.id}
+                    collectiveSlug={collective.slug}
+                    currency={collective.currency}
+                  />
                 </Flex>
               )}
               {this.state.section === 'connected-accounts' && (
