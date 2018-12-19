@@ -72,13 +72,14 @@ class EditPaymentMethods extends React.Component {
   renderPaymentMethod(paymentMethod) {
     const { collective } = this.props;
     const keyId = paymentMethod.id || 'new';
+    const hasMonthlyLimitPerMember = collective.type === 'ORGANIZATION' && paymentMethod.type !== 'prepaid';
     return (
       <div className="paymentMethod" key={`paymentMethod-${keyId}`}>
         <EditPaymentMethod
           paymentMethod={paymentMethod}
           onChange={pm => this.editPaymentMethod(paymentMethod.id, pm)}
           editMode={paymentMethod.id ? false : true}
-          monthlyLimitPerMember={collective.type === 'ORGANIZATION'}
+          monthlyLimitPerMember={hasMonthlyLimitPerMember}
           currency={collective.currency}
           slug={collective.slug}
         />
