@@ -66,7 +66,7 @@ const enhance = compose(
  */
 const CreateProfile = enhance(
   ({ getFieldError, getFieldProps, onPersonalSubmit, onOrgSubmit, onSecondaryAction, state, setState }) => (
-    <StyledCard maxWidth={480}>
+    <StyledCard maxWidth={480} width={1}>
       <Flex>
         <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
           Create Personal Profile
