@@ -2,5 +2,5 @@
   "name": "opencollective-styleguide",
   "alias": "opencollective-styleguide",
   "version": 1,
-  "files": ["index.html", "build"]
+  "files": ["index.html", "build", "static"]
 }
