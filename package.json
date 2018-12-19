@@ -87,7 +87,7 @@
     "passport-meetup-oauth2": "0.0.2",
     "passport-twitter": "1.0.4",
     "paypal-adaptive": "0.4.2",
-    "paypal-rest-sdk": "1.6.8",
+    "paypal-rest-sdk": "1.8.1",
     "pg": "7.7.1",
     "pg-format": "1.0.4",
     "pg-hstore": "2.3.2",
