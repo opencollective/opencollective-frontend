@@ -7,20 +7,39 @@ import { get, pick } from 'lodash';
 
 import { Router } from '../server/pages';
 
-import { Flex } from '@rebass/grid';
+import { Box, Flex } from '@rebass/grid';
 import { H2, P } from '../components/Text';
 import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-import OrderForm from '../components/OrderForm';
+// import OrderForm from '../components/OrderForm';
 import Link from '../components/Link';
+import SignIn from '../components/SignIn';
+import CreateProfile from '../components/CreateProfile';
+import StyledRadioList from '../components/StyledRadioList';
+import StyledInputField from '../components/StyledInputField';
+import StyledCard from '../components/StyledCard';
+import Container from '../components/Container';
+import StyledButton from '../components/StyledButton';
 
 import { addCreateOrderMutation } from '../graphql/mutations';
 
+import * as api from '../lib/api';
 import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import { isValidUrl, getDomain } from '../lib/utils';
+
+/*
+            <OrderForm
+              collective={collective}
+              order={this.order}
+              LoggedInUser={LoggedInUser}
+              onSubmit={this.createOrder}
+              redeemFlow={this.props.redeem}
+              matchingFund={this.state.matchingFund}
+            />
+*/
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -68,12 +87,16 @@ class CreateOrderPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { result: {}, loading: false };
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
     this.order = {
       quantity: parseInt(props.quantity, 10) || 1,
       interval: ['month', 'year'].indexOf(interval) !== -1 ? interval : null,
       totalAmount: parseInt(props.totalAmount, 10) || null,
+    };
+    this.state = {
+      loading: false,
+      result: {},
+      step: props.LoggedInUser ? 'showOrder' : 'signin',
     };
 
     switch (props.verb) {
@@ -97,7 +120,7 @@ class CreateOrderPage extends React.Component {
       },
       'donation.title': {
         id: 'tier.order.donation.title',
-        defaultMessage: 'Contribute',
+        defaultMessage: 'Contributer',
       },
       'membership.title': {
         id: 'tier.order.membership.title',
@@ -151,6 +174,16 @@ class CreateOrderPage extends React.Component {
       newState.matchingFund = matchingFund;
     }
     this.setState(newState);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
+      this.setState({ step: 'showOrder' });
+    }
+
+    if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
+      this.setState({ step: 'signin' });
+    }
   }
 
   UNSAFE_componentWillReceiveProps(newProps) {
@@ -234,7 +267,8 @@ class CreateOrderPage extends React.Component {
   };
 
   render() {
-    const { intl, data, LoggedInUser } = this.props;
+    const { intl, data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { step } = this.state;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -262,6 +296,23 @@ class CreateOrderPage extends React.Component {
 
     const logo = collective.image || get(collective.parentCollective, 'image');
     const tierName = (tier.name && tier.name.replace(/s$/, '')) || 'backer';
+
+    let options = LoggedInUser
+      ? LoggedInUser.memberOf
+          .filter(({ role }) => role === 'ADMIN')
+          .reduce((data, { collective }) => {
+            return { ...data, [collective.id]: collective };
+          }, {})
+      : {};
+
+    if (LoggedInUser) {
+      options = {
+        me: { ...LoggedInUser.collective, image: LoggedInUser.image },
+        ...options,
+        'new-org': { name: 'A new organization', image: null, type: 'ORGANIZATION' },
+        anonymous: { name: 'anonymous', image: null, type: 'USER' },
+      };
+    }
 
     return (
       <Page
@@ -314,14 +365,74 @@ class CreateOrderPage extends React.Component {
         </Flex>
 
         <div className="content" id="content">
-          <OrderForm
-            collective={collective}
-            order={this.order}
-            LoggedInUser={LoggedInUser}
-            onSubmit={this.createOrder}
-            redeemFlow={this.props.redeem}
-            matchingFund={this.state.matchingFund}
-          />
+          {step === 'showOrder' && (
+            <Flex justifyContent="center" mt={4} flexDirection="column" alignItems="center">
+              <StyledInputField htmlFor="contributeAs" label="Contribute as:">
+                {fieldProps => (
+                  <StyledCard maxWidth={500}>
+                    <StyledRadioList {...fieldProps} options={options} onChange={console.log} defaultValue="me">
+                      {({ key, value, radio, checked }) => (
+                        <Container
+                          display="flex"
+                          alignItems="center"
+                          px={4}
+                          py={3}
+                          borderBottom="1px solid"
+                          borderColor="black.200"
+                          flexWrap="wrap"
+                        >
+                          <Box as="span" mr={3}>
+                            {radio}
+                          </Box>
+                          <Logo src={value.image} type={value.type} height="3rem" name={value.name} />
+                          <Box as="span" ml={2}>
+                            {value.name}
+                          </Box>
+                          {key === 'new-org' && checked && (
+                            <Box width={1}>
+                              <P
+                                fontSize="LeadParagraph"
+                                fontWeight="LeadParagraph"
+                                color="black.600"
+                                mt={3}
+                                textAlign="center"
+                              >
+                                Show new org form
+                              </P>
+                            </Box>
+                          )}
+                        </Container>
+                      )}
+                    </StyledRadioList>
+                  </StyledCard>
+                )}
+              </StyledInputField>
+              <Box mt={5}>
+                <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold">
+                  Next step &rarr;
+                </StyledButton>
+              </Box>
+            </Flex>
+          )}
+          {step === 'signin' && !loadingLoggedInUser && (
+            <Flex justifyContent="center" mt={4}>
+              <SignIn
+                onSubmit={email =>
+                  api.signin({ email }, Router.asPath).then(() => Router.pushRoute('signinLinkSent', { email }))
+                }
+                onSecondaryAction={() => this.setState({ step: 'signup' })}
+              />
+            </Flex>
+          )}
+          {step === 'signup' && (
+            <Flex justifyContent="center" mt={4}>
+              <CreateProfile
+                onPersonalSubmit={console.log}
+                onOrgSubmit={console.log}
+                onSecondaryAction={() => this.setState({ step: 'signin' })}
+              />
+            </Flex>
+          )}
           <div className="row result">
             <div className="col-sm-2" />
             <div className="col-sm-10">
