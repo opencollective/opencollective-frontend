@@ -125,7 +125,7 @@ export function paymentMethodUnicodeIcon(paymentMethod) {
     case 'virtualcard':
       return '🎁';
     case 'prepaid':
-      return '🎟️';
+      return paymentMethod.currency === 'EUR' ? '💶' : '💵';
     case 'collective':
       return '💸';
     default:
