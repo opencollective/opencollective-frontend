@@ -47,10 +47,12 @@ SELECT
   host.slug as "hostSlug",
   host.name as "hostName",
   host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
-  g.slug, g.name, g.mission, g.description, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
+  c.slug, c.name, c.mission, c.description, c.image, c."backgroundImage", c."twitterHandle", c.settings, c.data
 FROM "CollectiveTransactions" ut
-LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
-LEFT JOIN "Collectives" host ON ut."HostCollectiveId" = host.id`;
+LEFT JOIN "Collectives" c ON ut."CollectiveId" = c.id
+LEFT JOIN "Collectives" host ON ut."HostCollectiveId" = host.id
+WHERE c.type = 'COLLECTIVE'
+`;
 
 const buildTweet = (fromCollective, collectives, totalDonations) => {
   let tweet;
