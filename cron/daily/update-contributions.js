@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import '../../server/env';
 
-import { assign, get, isArray, orderBy, pick } from 'lodash';
+import { assign, get, isArray, pick } from 'lodash';
 
 import models from '../../server/models';
 import logger from '../../server/lib/logger';
@@ -16,14 +16,14 @@ const { Collective } = models;
 
 const noContentToArray = value => (isArray(value) ? value : []);
 
-const sortObjectByValue = obj => {
+const sortObjectByValue = (obj, path) => {
   const sortable = [];
   for (const key in obj) {
-    sortable.push([key, obj[key]]);
+    sortable.push([key, obj[key], path ? get(obj[key], path) : obj[key]]);
   }
 
   sortable.sort((a, b) => {
-    return a[1] > b[1] ? -1 : a[1] < b[1] ? 1 : 0;
+    return a[2] > b[2] ? -1 : a[2] < b[2] ? 1 : 0;
   });
 
   const orderedList = {};
@@ -140,7 +140,7 @@ const run = async () => {
       });
 
       if (githubData.repoData) {
-        data.repos = orderBy(githubData.repoData, ['stars', 'desc']);
+        data.repos = sortObjectByValue(githubData.repoData, 'stars');
       }
 
       await collective.update({ data });
