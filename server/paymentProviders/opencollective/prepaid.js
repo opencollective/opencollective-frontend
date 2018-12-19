@@ -74,6 +74,12 @@ async function processOrder(order) {
   if (hostCollective.id !== data.HostCollectiveId)
     throw new Error('Prepaid method can only be used in collectives from the same host');
 
+  // Checking if balance is ok or will still be after completing the order
+  const balance = await getBalance(order.paymentMethod);
+  if (balance.amount - order.totalAmount < 0) {
+    throw new Error("This payment method doesn't have enough funds to complete this order");
+  }
+
   // Use the above payment method to donate to Collective
   const hostFeeInHostCurrency = libpayments.calcFee(order.totalAmount, order.collective.hostFeePercent);
   const platformFeeInHostCurrency = libpayments.calcFee(order.totalAmount, OC_FEE_PERCENT);
