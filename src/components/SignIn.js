@@ -13,7 +13,7 @@ import { H5, P, Span } from './Text';
  */
 const SignIn = withState('state', 'setState', { email: '', error: null })(
   ({ state, setState, onSubmit, onSecondaryAction }) => (
-    <StyledCard maxWidth={450}>
+    <StyledCard maxWidth={450} width={1}>
       <Box p={4}>
         <H5 as="label" fontWeight="bold" htmlFor="email" mb={3} textAlign="left" display="block">
           Sign in using your email address:
@@ -21,7 +21,7 @@ const SignIn = withState('state', 'setState', { email: '', error: null })(
         <Flex
           as="form"
           method="POST"
-          novalidate
+          noValidate
           onSubmit={event => {
             event.preventDefault();
             onSubmit(state.email);
