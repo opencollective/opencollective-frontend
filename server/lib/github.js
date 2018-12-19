@@ -1,7 +1,7 @@
 import config from 'config';
 import octokitRest from '@octokit/rest';
 import request from 'request-promise';
-import { pick } from 'lodash';
+import { get, has, pick } from 'lodash';
 
 import cache from './cache';
 
@@ -43,6 +43,12 @@ export function getOctokit(accessToken) {
   });
   if (accessToken) {
     octokit.authenticate({ type: 'oauth', token: accessToken });
+  } else if (has(config, 'github.clientID') && has(config, 'github.clientSecret')) {
+    octokit.authenticate({
+      type: 'oauth',
+      key: get(config, 'github.clientID'),
+      secret: get(config, 'github.clientSecret'),
+    });
   }
   return octokit;
 }
@@ -76,7 +82,7 @@ export async function getAllUserPublicRepos(accessToken) {
 }
 
 export async function getAllOrganizationPublicRepos(org, accessToken) {
-  const cacheKey = `org_repos_all_${org}_${accessToken || ''}`;
+  const cacheKey = `org_repos_all_${org}`;
   const fromCache = await cache.get(cacheKey);
   if (fromCache) {
     return fromCache;
