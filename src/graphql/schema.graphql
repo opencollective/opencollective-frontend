@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Mon Dec 17 2018 15:22:26 GMT+0100 (Central European Standard Time)
+# timestamp: Thu Dec 20 2018 14:43:37 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -860,6 +860,9 @@ type Mutation {
     A custom message attached to the email that will be sent for this virtual card
     """
     description: String
+
+    """A custom message that will be sent in the invitation link"""
+    customMessage: String
     expiryDate: String
   ): [PaymentMethodType]
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
@@ -1282,7 +1285,7 @@ type Query {
       - Credit transactions made to collective
       
   """
-  allTransactions(CollectiveId: Int, collectiveSlug: String, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String, includeVirtualCards: Boolean): [Transaction]
+  allTransactions(CollectiveId: Int, collectiveSlug: String, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String, includeVirtualCards: Boolean, fetchDataFromLedger: Boolean, includeHostedCollectivesTransactions: Boolean): [Transaction]
   transactions(
     """Defaults to 100"""
     limit: Int = 100

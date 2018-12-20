@@ -26,7 +26,7 @@ const InputContainer = styled(Container)`
   }
 
   .public-DraftEditor-content {
-    min-height: 6em;
+    min-height: 3em;
     max-height: 18em;
     overflow-y: auto;
   }
