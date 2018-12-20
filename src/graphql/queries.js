@@ -277,7 +277,7 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      paymentMethods(types: ["creditcard", "virtualcard"], hasBalanceAboveZero: true) {
+      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"], hasBalanceAboveZero: true) {
         id
         uuid
         name
@@ -844,7 +844,7 @@ export const getCollectiveSourcePaymentMethodsQuery = gql`
   query Collective($id: Int) {
     Collective(id: $id) {
       id
-      paymentMethods(types: ["creditcard"], hasBalanceAboveZero: true) {
+      paymentMethods(types: ["creditcard", "prepaid"], hasBalanceAboveZero: true) {
         id
         uuid
         name
