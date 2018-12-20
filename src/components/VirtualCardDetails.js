@@ -115,8 +115,22 @@ class VirtualCardDetails extends React.Component {
     );
   }
 
+  renderValue() {
+    const { initialBalance, currency, monthlyLimitPerMember } = this.props.virtualCard;
+
+    return monthlyLimitPerMember ? (
+      <FormattedMessage
+        id="virtualCards.monthlyValue"
+        defaultMessage="{value} monthly"
+        values={{ value: formatCurrency(monthlyLimitPerMember, currency) }}
+      />
+    ) : (
+      formatCurrency(initialBalance, currency)
+    );
+  }
+
   render() {
-    const { isConfirmed, collective, initialBalance, balance, currency, createdAt, data } = this.props.virtualCard;
+    const { isConfirmed, collective, balance, currency, createdAt, data } = this.props.virtualCard;
 
     return (
       <Flex className="vc-details">
@@ -142,7 +156,7 @@ class VirtualCardDetails extends React.Component {
         {/* Infos + details column */}
         <Flex flexDirection="column" p="0.1em">
           <Box>
-            <strong>{formatCurrency(initialBalance, currency)}</strong>{' '}
+            <strong>{this.renderValue()}</strong>{' '}
             <VirtualCardStatus isConfirmed={isConfirmed} collective={collective} data={data} />
           </Box>
           <Box color={this.props.theme.colors.black[500]} fontSize="0.9em">
