@@ -1,4 +1,4 @@
-import models from '../../models';
+import models, { Op } from '../../models';
 import * as libpayments from '../../lib/payments';
 import * as currency from '../../lib/currency';
 import { TransactionTypes, OC_FEE_PERCENT } from '../../constants/transactions';
@@ -22,10 +22,20 @@ async function getBalance(paymentMethod) {
   /* Result will be negative (We're looking for DEBIT transactions) */
   const allTransactions = await models.Transaction.findAll({
     attributes: ['netAmountInCollectiveCurrency', 'currency'],
-    where: {
-      PaymentMethodId: paymentMethod.id,
-      type: 'DEBIT',
-    },
+    where: { type: 'DEBIT' },
+    include: [
+      {
+        model: models.PaymentMethod,
+        require: true,
+        attributes: [],
+        where: {
+          [Op.or]: {
+            id: paymentMethod.id,
+            SourcePaymentMethodId: paymentMethod.id,
+          },
+        },
+      },
+    ],
   });
   let spent = 0;
   for (const transaction of allTransactions) {
@@ -63,6 +73,12 @@ async function processOrder(order) {
   const hostCollective = await order.collective.getHostCollective();
   if (hostCollective.id !== data.HostCollectiveId)
     throw new Error('Prepaid method can only be used in collectives from the same host');
+
+  // Checking if balance is ok or will still be after completing the order
+  const balance = await getBalance(order.paymentMethod);
+  if (balance.amount - order.totalAmount < 0) {
+    throw new Error("This payment method doesn't have enough funds to complete this order");
+  }
 
   // Use the above payment method to donate to Collective
   const hostFeeInHostCurrency = libpayments.calcFee(order.totalAmount, order.collective.hostFeePercent);
