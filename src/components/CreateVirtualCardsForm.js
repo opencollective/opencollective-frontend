@@ -62,11 +62,13 @@ const RadioButtonContainer = styled(Flex)`
   }
 `;
 
-const RadioButtonWithLabel = ({ checked, onClick, children }) => {
+const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   const icon = checked ? <RadioButtonChecked /> : <RadioButtonUnchecked />;
   return (
-    <RadioButtonContainer>
-      <Box onClick={onClick}>{icon}</Box>
+    <RadioButtonContainer data-name={name}>
+      <Box className="radio-btn" onClick={onClick}>
+        {icon}
+      </Box>
       <H3>{children}</H3>
     </RadioButtonContainer>
   );
@@ -260,6 +262,7 @@ class CreateVirtualCardsForm extends Component {
               />
             </Box>
             <RedeemLinksTextarea
+              className="result-redeem-links"
               readOnly
               value={createdVirtualCards
                 .map(vc => {
@@ -385,11 +388,19 @@ class CreateVirtualCardsForm extends Component {
             />
           </InlineField>
 
-          <DeliverTypeRadioSelector>
-            <RadioButtonWithLabel checked={deliverType === 'email'} onClick={() => this.changeDeliverType('email')}>
+          <DeliverTypeRadioSelector className="deliver-type-selector">
+            <RadioButtonWithLabel
+              name="email"
+              checked={deliverType === 'email'}
+              onClick={() => this.changeDeliverType('email')}
+            >
               <FormattedMessage id="virtualCards.create.sendEmails" defaultMessage="Send them the cards by email" />
             </RadioButtonWithLabel>
-            <RadioButtonWithLabel checked={deliverType === 'manual'} onClick={() => this.changeDeliverType('manual')}>
+            <RadioButtonWithLabel
+              name="manual"
+              checked={deliverType === 'manual'}
+              onClick={() => this.changeDeliverType('manual')}
+            >
               <FormattedMessage id="virtualCards.create.generateCodes" defaultMessage="I'll send the codes myself" />
             </RadioButtonWithLabel>
           </DeliverTypeRadioSelector>

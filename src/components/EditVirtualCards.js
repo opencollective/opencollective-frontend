@@ -117,7 +117,7 @@ class EditVirtualCards extends React.Component {
               </div>
             ))}
             {total > limit && (
-              <Flex justifyContent="center" mt={4}>
+              <Flex className="vc-pagination" justifyContent="center" mt={4}>
                 <Pagination offset={offset} total={total} limit={limit} />
               </Flex>
             )}

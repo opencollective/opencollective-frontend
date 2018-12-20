@@ -119,7 +119,7 @@ class VirtualCardDetails extends React.Component {
     const { isConfirmed, collective, initialBalance, balance, currency, createdAt, data } = this.props.virtualCard;
 
     return (
-      <Flex>
+      <Flex className="vc-details">
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
