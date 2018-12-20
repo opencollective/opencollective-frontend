@@ -4,6 +4,7 @@ import request from 'request-promise';
 import { get, has, pick } from 'lodash';
 
 import cache from './cache';
+import logger from './logger';
 
 const compactRepo = repo => {
   repo = pick(repo, [
@@ -13,6 +14,7 @@ const compactRepo = repo => {
     'owner', // (1)
     'stargazers_count', // (1) (2)
     'topics', // (1)
+    'fork', // (3)
   ]);
   repo.owner = pick(repo.owner, [
     'login', // (1)
@@ -20,6 +22,7 @@ const compactRepo = repo => {
   // 1) Required for the old website, according to:
   // https://github.com/opencollective/opencollective-website/blob/master/frontend/src/reducers/github.js
   // 2) Required for the pledge feature in /graphql/v1/orders.js
+  // 3) Required for update-contributions
   return repo;
 };
 
@@ -53,6 +56,13 @@ export function getOctokit(accessToken) {
   return octokit;
 }
 
+export function getData(res) {
+  if (has(res, ['headers', 'x-ratelimit-remaining'])) {
+    logger.debug(`RateLimit Remaining: ${get(res, ['headers', 'x-ratelimit-remaining'])}`);
+  }
+  return res.data;
+}
+
 export async function getAllUserPublicRepos(accessToken) {
   const cacheKey = `user_repos_all_${accessToken}`;
   const fromCache = await cache.get(cacheKey);
@@ -69,7 +79,7 @@ export async function getAllUserPublicRepos(accessToken) {
   do {
     // https://octokit.github.io/rest.js/#api-Repos-list
     // https://developer.github.com/v3/repos/#list-your-repositories
-    fetchRepos = await octokit.repos.list(parameters).then(res => res.data);
+    fetchRepos = await octokit.repos.list(parameters).then(getData);
     repos = [...repos, ...fetchRepos];
     parameters.page++;
   } while (fetchRepos.length === parameters.per_page);
@@ -97,7 +107,7 @@ export async function getAllOrganizationPublicRepos(org, accessToken) {
   do {
     // https://octokit.github.io/rest.js/#api-Repos-listForOrg
     // https://developer.github.com/v3/repos/#list-organization-repositories
-    fetchRepos = await octokit.repos.listForOrg(parameters).then(res => res.data);
+    fetchRepos = await octokit.repos.listForOrg(parameters).then(getData);
     repos = [...repos, ...fetchRepos];
     parameters.page++;
   } while (fetchRepos.length === parameters.per_page);
@@ -114,19 +124,19 @@ export async function getRepo(name, accessToken) {
   // https://octokit.github.io/rest.js/#api-Repos-get
   // https://developer.github.com/v3/repos/#get
   const [owner, repo] = name.split('/');
-  return octokit.repos.get({ owner, repo }).then(res => res.data);
+  return octokit.repos.get({ owner, repo }).then(getData);
 }
 
 export async function getOrg(name, accessToken) {
   const octokit = getOctokit(accessToken);
   // https://octokit.github.io/rest.js/#api-Orgs-get
   // https://developer.github.com/v3/orgs/#get-an-organization
-  return octokit.orgs.get({ org: name }).then(res => res.data);
+  return octokit.orgs.get({ org: name }).then(getData);
 }
 
 export async function getOrgMemberships(accessToken) {
   const octokit = getOctokit(accessToken);
   // https://octokit.github.io/rest.js/#api-Orgs-listMemberships
   // https://developer.github.com/v3/orgs/members/#list-your-organization-memberships
-  return octokit.orgs.listMemberships({ page: 1, per_page: 100 }).then(res => res.data);
+  return octokit.orgs.listMemberships({ page: 1, per_page: 100 }).then(getData);
 }

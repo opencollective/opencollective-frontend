@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 import '../../server/env';
 
+import PQueue from 'p-queue';
 import { assign, get, isArray, pick } from 'lodash';
 
 import models from '../../server/models';
+import cache from '../../server/lib/cache';
 import logger from '../../server/lib/logger';
 import * as github from '../../server/lib/github';
 
 const { Collective } = models;
+
+const CONCURRENCY = 5;
 
 // TODO: As number of collectives grow, we need to consider fetching 100 at a time,
 // otherwise, we end up fetching a lot of data.
@@ -35,28 +39,38 @@ const sortObjectByValue = (obj, path) => {
 };
 
 const getAllContributors = async repo => {
+  const cacheKey = `repos_contributors_${repo.owner}_${repo.repo}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
   const octokit = github.getOctokit();
 
   const fetchParameters = { page: 1, per_page: 100 };
 
-  let repos = [];
+  let contributors = [];
   let fetchContributors;
   do {
     // https://octokit.github.io/rest.js/#api-Repos-listContributors
     // https://developer.github.com/v3/repos/#list-contributors
+    logger.verbose(`Fetching contributors for ${repo.owner}/${repo.repo}, page ${fetchParameters.page}`);
     fetchContributors = await octokit.repos
       .listContributors(repo, fetchParameters)
-      .then(res => res.data)
+      .then(github.getData)
       .then(noContentToArray)
-      .then(repos => repos.map(repo => pick(repo, ['login', 'contributions'])));
-    repos = [...repos, ...fetchContributors];
+      .then(c => c.map(repo => pick(repo, ['login', 'contributions'])));
+    contributors = [...contributors, ...fetchContributors];
     fetchParameters.page++;
   } while (fetchContributors.length === fetchParameters.per_page);
 
-  return repos;
+  cache.set(cacheKey, contributors, 60 * 60 /* 60 minutes */);
+
+  return contributors;
 };
 
 const getRepoData = repo => {
+  logger.verbose(`Fetching repo data for ${repo.owner}/${repo.repo}`);
   return getAllContributors(repo).then(contributors => {
     const contributorData = {};
     for (const contributor of contributors) {
@@ -67,8 +81,9 @@ const getRepoData = repo => {
 };
 
 const getOrgData = org => {
+  logger.verbose(`Fetching org data for ${org}`);
   return github.getAllOrganizationPublicRepos(org).then(async repos => {
-    const contributorData = [];
+    const contributorData = {};
     const repoData = {};
     for (const repo of repos) {
       if (repo.fork) {
@@ -88,7 +103,23 @@ const getOrgData = org => {
   });
 };
 
+const updateCollectiveGithubData = async (collective, githubData) => {
+  const data = assign(collective.data || {}, {
+    githubContributors: sortObjectByValue(githubData.contributorData),
+  });
+
+  if (githubData.repoData) {
+    data.repos = sortObjectByValue(githubData.repoData, 'stars');
+  }
+
+  await collective.update({ data });
+
+  logger.info(`Successfully updated contribution data for '${collective.name}'`);
+};
+
 const run = async () => {
+  const queue = new PQueue({ concurrency: CONCURRENCY });
+
   let collectives = await Collective.findAll({
     where: {
       type: 'COLLECTIVE',
@@ -107,15 +138,12 @@ const run = async () => {
     const org = get(collective, 'settings.githubOrg');
     const repo = get(collective, 'settings.githubRepo');
 
-    let githubData;
-
     if (org) {
-      try {
-        githubData = await getOrgData(org);
-      } catch (e) {
-        logger.error(`Error while fetching org data for collective '${collective.slug}'`);
-        continue;
-      }
+      queue
+        .add(() => getOrgData(org).then(data => updateCollectiveGithubData(collective, data)))
+        .catch(() => {
+          logger.error(`Error while fetching org data for collective '${collective.slug}'`);
+        });
     } else {
       const split = repo.split('/');
       if (split.length !== 2) {
@@ -126,28 +154,18 @@ const run = async () => {
         owner: split[0],
         repo: split[1],
       };
-      try {
-        githubData = await getRepoData(options);
-      } catch (e) {
-        logger.error(`Error while fetching ${options.owner}/${options.repo} for collective '${collective.slug}'`);
-        continue;
-      }
-    }
-
-    if (githubData) {
-      const data = assign(collective.data || {}, {
-        githubContributors: sortObjectByValue(githubData.contributorData),
-      });
-
-      if (githubData.repoData) {
-        data.repos = sortObjectByValue(githubData.repoData, 'stars');
-      }
-
-      await collective.update({ data });
-
-      logger.info(`Successfully updated contribution data for '${collective.name}'`);
+      queue
+        .add(() => getRepoData(options).then(data => updateCollectiveGithubData(collective, data)))
+        .catch(() => {
+          logger.error(`Error while fetching ${options.owner}/${options.repo} for collective '${collective.slug}'`);
+        });
     }
   }
+
+  queue.onIdle().then(() => {
+    logger.info('Done.');
+    process.exit();
+  });
 };
 
 run();
