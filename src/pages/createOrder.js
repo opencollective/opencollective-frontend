@@ -12,14 +12,11 @@ import { H2, P } from '../components/Text';
 import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-// import OrderForm from '../components/OrderForm';
 import Link from '../components/Link';
 import SignIn from '../components/SignIn';
 import CreateProfile from '../components/CreateProfile';
-import StyledRadioList from '../components/StyledRadioList';
+import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
-import StyledCard from '../components/StyledCard';
-import Container from '../components/Container';
 import StyledButton from '../components/StyledButton';
 
 import { addCreateOrderMutation } from '../graphql/mutations';
@@ -29,17 +26,6 @@ import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import { isValidUrl, getDomain } from '../lib/utils';
-
-/*
-            <OrderForm
-              collective={collective}
-              order={this.order}
-              LoggedInUser={LoggedInUser}
-              onSubmit={this.createOrder}
-              redeemFlow={this.props.redeem}
-              matchingFund={this.state.matchingFund}
-            />
-*/
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -297,7 +283,7 @@ class CreateOrderPage extends React.Component {
     const logo = collective.image || get(collective.parentCollective, 'image');
     const tierName = (tier.name && tier.name.replace(/s$/, '')) || 'backer';
 
-    let options = LoggedInUser
+    const profiles = LoggedInUser
       ? LoggedInUser.memberOf
           .filter(({ role }) => role === 'ADMIN')
           .reduce((data, { collective }) => {
@@ -305,14 +291,9 @@ class CreateOrderPage extends React.Component {
           }, {})
       : {};
 
-    if (LoggedInUser) {
-      options = {
-        me: { ...LoggedInUser.collective, image: LoggedInUser.image },
-        ...options,
-        'new-org': { name: 'A new organization', image: null, type: 'ORGANIZATION' },
-        anonymous: { name: 'anonymous', image: null, type: 'USER' },
-      };
-    }
+    const personal = LoggedInUser
+      ? { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective }
+      : {};
 
     return (
       <Page
@@ -364,49 +345,16 @@ class CreateOrderPage extends React.Component {
           </P>
         </Flex>
 
-        <div className="content" id="content">
+        <div id="content">
           {step === 'showOrder' && (
-            <Flex justifyContent="center" mt={4} flexDirection="column" alignItems="center">
-              <StyledInputField htmlFor="contributeAs" label="Contribute as:">
-                {fieldProps => (
-                  <StyledCard maxWidth={500}>
-                    <StyledRadioList {...fieldProps} options={options} onChange={console.log} defaultValue="me">
-                      {({ key, value, radio, checked }) => (
-                        <Container
-                          display="flex"
-                          alignItems="center"
-                          px={4}
-                          py={3}
-                          borderBottom="1px solid"
-                          borderColor="black.200"
-                          flexWrap="wrap"
-                        >
-                          <Box as="span" mr={3}>
-                            {radio}
-                          </Box>
-                          <Logo src={value.image} type={value.type} height="3rem" name={value.name} />
-                          <Box as="span" ml={2}>
-                            {value.name}
-                          </Box>
-                          {key === 'new-org' && checked && (
-                            <Box width={1}>
-                              <P
-                                fontSize="LeadParagraph"
-                                fontWeight="LeadParagraph"
-                                color="black.600"
-                                mt={3}
-                                textAlign="center"
-                              >
-                                Show new org form
-                              </P>
-                            </Box>
-                          )}
-                        </Container>
-                      )}
-                    </StyledRadioList>
-                  </StyledCard>
-                )}
-              </StyledInputField>
+            <Flex mt={4} alignItems="center" flexDirection="column">
+              <Box>
+                <StyledInputField htmlFor="contributeAs" label="Contribute as:">
+                  {fieldProps => (
+                    <ContributeAs {...fieldProps} onChange={console.log} profiles={profiles} personal={personal} />
+                  )}
+                </StyledInputField>
+              </Box>
               <Box mt={5}>
                 <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold">
                   Next step &rarr;
