@@ -14,16 +14,41 @@ describe('Virtual cards admin', () => {
   });
 
   it('create gift card codes', () => {
+    const numberOfVirtualCards = 20;
+    const paginationSize = 15;
+    const numberOfPages = Math.trunc(numberOfVirtualCards / paginationSize + 1);
+
     cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-create` });
+
+    // Fill form
     cy.get('#virtualcard-amount').type('42');
-    cy.get('#virtualcard-numberOfVirtualCards').type('{selectall}5');
+    cy.get('.deliver-type-selector div[data-name="manual"] .radio-btn').click();
+    cy.get('#virtualcard-numberOfVirtualCards').type(`{selectall}${numberOfVirtualCards}`);
     cy.get('.field-onlyOpensource .custom-checkbox').click();
     cy.get('.FormInputs button[type="submit"]').click();
-    cy.contains('Your 5 gift cards are ready!');
+
+    // Success page
+    cy.contains(`Your ${numberOfVirtualCards} gift cards have been created! Here are your redeem links:`);
+    cy.get('textarea.result-redeem-links').should($textareas => {
+      // Ensure we have all the generated links
+      expect($textareas).to.have.length(1);
+      const $textarea = $textareas.first();
+      const links = $textarea.val().split('\n');
+      expect(links).to.have.lengthOf(numberOfVirtualCards);
+    });
+
+    // Links should also be added to gift cards list
+    cy.get('a[href$="/edit/gift-cards"]').click();
+    cy.get('.vc-details').should($virtualCards => {
+      expect($virtualCards).to.have.length(paginationSize);
+    });
+
+    // Should have pagination
+    cy.get('.vc-pagination').contains(`of ${numberOfPages}`);
   });
 
   it('send gift cards by emails', () => {
-    cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-send` });
+    cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-create` });
 
     // Button should be disabled untill we add emails
     checkSubmit(false, 'Create 0 gift cards');

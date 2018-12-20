@@ -7,7 +7,6 @@ import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
 
 import { Add } from 'styled-icons/material/Add.cjs';
-import { PaperPlane } from 'styled-icons/fa-solid/PaperPlane.cjs';
 
 import { getCollectiveVirtualCards } from '../graphql/queries';
 import VirtualCardDetails from './VirtualCardDetails';
@@ -88,27 +87,16 @@ class EditVirtualCards extends React.Component {
         <Flex mb={4} justifyContent="space-between" flexWrap="wrap">
           {this.renderFilters(onlyConfirmed)}
           <Flex>
+            <Box mr="0.5em" />
             <LinkWrapper
               route="editCollective"
               params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}
               passHref
             >
-              <StyledLink buttonStyle="standard" buttonSize="medium">
+              <StyledLink buttonStyle="primary" buttonSize="medium">
                 <Add size="1em" />
                 {'  '}
-                <FormattedMessage id="virtualCards.createCodes" defaultMessage="Create gift card codes" />
-              </StyledLink>
-            </LinkWrapper>
-            <Box mr="0.5em" />
-            <LinkWrapper
-              route="editCollective"
-              params={{ slug: this.props.collectiveSlug, section: 'gift-cards-send' }}
-              passHref
-            >
-              <StyledLink buttonStyle="primary" buttonSize="medium">
-                <PaperPlane size="1em" />
-                {'  '}
-                <FormattedMessage id="virtualCards.send" defaultMessage="Send gift cards by email" />
+                <FormattedMessage id="virtualCards.create" defaultMessage="Create gift cards" />
               </StyledLink>
             </LinkWrapper>
           </Flex>
@@ -129,7 +117,7 @@ class EditVirtualCards extends React.Component {
               </div>
             ))}
             {total > limit && (
-              <Flex justifyContent="center" mt={4}>
+              <Flex className="vc-pagination" justifyContent="center" mt={4}>
                 <Pagination offset={offset} total={total} limit={limit} />
               </Flex>
             )}

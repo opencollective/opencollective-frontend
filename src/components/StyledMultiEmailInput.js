@@ -38,8 +38,12 @@ const InputContainer = styled(Container)`
 
 export default class StyledMultiEmailInput extends Component {
   static propTypes = {
+    /** Editor initial state */
+    initialState: PropTypes.instanceOf(EditorState),
     /** Callback for state update like `({emails, invalids}) => void` */
     onChange: PropTypes.func,
+    /** Callback for when component is unmount. Usefull to save editor state. */
+    onClose: PropTypes.func,
     /** On array of invalid emails */
     invalids: PropTypes.arrayOf(PropTypes.string),
   };
@@ -50,7 +54,16 @@ export default class StyledMultiEmailInput extends Component {
     this.onChangeParent = debounce(this.onChangeParent.bind(this), 100, { trailing: true });
     this.onBlur = this.onBlur.bind(this);
     this.onFocus = this.onFocus.bind(this);
-    this.state = { editorState: EditorState.createEmpty(), showErrors: false };
+    this.state = {
+      editorState: props.initialState || EditorState.createEmpty(),
+      showErrors: false,
+    };
+  }
+
+  componentWillUnmount() {
+    if (this.props.onClose) {
+      this.props.onClose(this.state.editorState);
+    }
   }
 
   extractEmails(str) {
@@ -101,7 +114,7 @@ export default class StyledMultiEmailInput extends Component {
         bg={disabled ? 'black.50' : 'white.full'}
         fontSize="Paragraph"
         borderColor={getInputBorderColor(invalids && invalids.length > 0)}
-        {...omit(this.props, ['invalids', 'onChange'])}
+        {...omit(this.props, ['invalids', 'onChange', 'initialState', 'onClose'])}
       >
         <Editor
           editorState={this.state.editorState}
