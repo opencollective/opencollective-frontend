@@ -126,8 +126,9 @@ describe('groups.routes.test.js', () => {
       beforeEach(() => sinon.spy(emailLib, 'send'));
       afterEach(() => emailLib.send.restore());
 
-      it('assigns contributors as users with connectedAccounts', () =>
-        request(app)
+      it('assigns contributors as users with connectedAccounts', () => {
+        let CollectiveId;
+        return request(app)
           .post('/groups?flow=github')
           .set(
             'Authorization',
@@ -153,6 +154,7 @@ describe('groups.routes.test.js', () => {
           .toPromise()
           .then(res => {
             expect(res.body).to.have.property('id');
+            CollectiveId = res.body.id;
             expect(res.body).to.have.property('name', 'Loot');
             expect(res.body).to.have.property('slug', 'loot');
             expect(res.body).to.have.property('mission', 'mission statement');
@@ -161,13 +163,25 @@ describe('groups.routes.test.js', () => {
             expect(res.body).to.have.property('isActive', true);
             expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
             return models.Member.findAll({
-              where: { CollectiveId: res.body.id },
+              where: { CollectiveId: CollectiveId },
             });
           })
           .then(members => {
             expect(members).to.have.length(2);
             expect(members[0]).to.have.property('role', roles.ADMIN);
             expect(members[1]).to.have.property('role', roles.HOST);
+            return models.Tier.findAll({
+              where: { CollectiveId: CollectiveId },
+            });
+          })
+          .then(tiers => {
+            // when we add host to collective(method Collective.prototype.addHost),
+            // we already add the default tiers
+            expect(tiers).to.have.length(2);
+            expect(tiers[0]).to.have.property('type', 'TIER');
+            expect(tiers[0]).to.have.property('name', 'backer');
+            expect(tiers[1]).to.have.property('type', 'TIER');
+            expect(tiers[1]).to.have.property('name', 'sponsor');
             return null;
           })
           .then(() => ConnectedAccount.findOne({ where: { username: 'asood123' } }))
@@ -177,7 +191,8 @@ describe('groups.routes.test.js', () => {
           })
           .then(userCollective => {
             expect(userCollective).to.exist;
-          }));
+          });
+      });
     });
   });
 
