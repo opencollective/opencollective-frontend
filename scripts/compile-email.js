@@ -90,6 +90,7 @@ data['user.card.invited'] = {
   },
   redeemCode: '00000000',
   email: 'info@opencolletive.com',
+  customMessage: '',
 };
 data['ticket.confirmed'] = {
   recipient: {

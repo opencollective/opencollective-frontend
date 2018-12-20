@@ -2,26 +2,71 @@ Subject: 🎁 {{emitter.name}} has granted you a {{{currency initialBalance curr
 
 {{> header}}
 
-<table>
-  <tr>
-    <td>
-      <center>
-        <h1>{{#ifCond currency '===' 'USD'}}💵{{/ifCond}}{{#ifCond currency '===' 'EUR'}}💶{{/ifCond}}{{#ifCond currency '===' 'GBP'}}💷{{/ifCond}}</h1>
-        <p>
-          You're one step away to redeem the {{{currency initialBalance currency=currency}}} gift card
-          offered to you by <a href="{{config.host.website}}/{{emitter.slug}}">{{emitter.name}}</a>. Just
-          click on the button bellow and fill your info to redeem your gift card 🎁
-        </p>
-        <center>
-          <a href="{{config.host.website}}/redeem/{{redeemCode}}?email={{email}}" class="btn blue"><div>Redeem</div></a>
-        </center>
-      </center>
-    </td>
-    <td></td>
-    <td valign="top">
-      {{> collectivecard emitter}}
-    </td>
-  </tr>
-</table>
+<h1>
+  🎁 {{emitter.name}} has granted you a {{{currency initialBalance currency=currency}}} gift card to donate on Open Collective!
+</h1>
+
+{{#if customMessage}}
+  <table style="width: 100%; border: 1px solid #e8edee; border-radius: 6px; padding: 1em;">
+    <tbody>
+      <tr>
+        <td>
+          <center>
+            {{> collectivecard emitter}}
+          </center>
+        </td>
+        <td>
+          <center>
+            <blockquote style="font-style: italic; color: grey; font-size: 16px;">
+              “ {{customMessage}} ”
+            </blockquote>
+          </center>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <center>
+            <p style="font-size: 17px; padding: 1em;">
+              You're one step away to redeem the {{{currency initialBalance currency=currency}}} gift card
+              offered to you by <a href="{{config.host.website}}/{{emitter.slug}}">{{emitter.name}}</a>. Just
+              click on the button bellow and fill your info to redeem your gift card.
+            </p>
+            <a href="{{config.host.website}}/redeem/{{redeemCode}}?email={{email}}" class="btn blue" style="padding: 1em 2em;">
+              <div style="font-size: 17px;">Redeem</div>
+            </a>
+          </center>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+{{else}}
+  <table style="width: 100%;">
+    <tbody>
+      <tr>
+        <td>
+          <center>
+            <p style="font-size: 17px; padding: 0 1em;">
+              You're one step away to redeem the {{{currency initialBalance currency=currency}}} gift card
+              offered to you by <a href="{{config.host.website}}/{{emitter.slug}}">{{emitter.name}}</a>. Just
+              click on the button bellow and fill your info to redeem your gift card.
+            </p>
+            <a href="{{config.host.website}}/redeem/{{redeemCode}}?email={{email}}" class="btn blue" style="padding: 1em 2em;">
+              <div style="font-size: 17px;">Redeem</div>
+            </a>
+          </center>
+        </td>
+        <td>
+          <center>
+            {{> collectivecard emitter}}
+          </center>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+{{/if}}
 
 {{> footer}}
