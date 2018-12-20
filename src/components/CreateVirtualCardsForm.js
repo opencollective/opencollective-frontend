@@ -99,7 +99,7 @@ class CreateVirtualCardsForm extends Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.state = {
       deliverType: 'email', // email or manual
-      values: { emails: [], amount: '', numberOfVirtualCards: 1, onlyOpensource: true },
+      values: { amount: '', onlyOpensource: true, emails: [], customMessage: '', numberOfVirtualCards: 1 },
       errors: { emails: [] },
       multiEmailsInitialState: null,
       submitting: false,
@@ -137,6 +137,8 @@ class CreateVirtualCardsForm extends Component {
       this.setState(state => ({ ...state, values: { ...state.values, PaymentMethodId: value.value.id } }));
     } else if (fieldName === 'onlyOpensource') {
       this.setState(state => ({ ...state, values: { ...state.values, onlyOpensource: value } }));
+    } else if (fieldName === 'customMessage') {
+      this.setState(state => ({ ...state, values: { ...state.values, customMessage: value } }));
     }
   }
 
@@ -164,6 +166,7 @@ class CreateVirtualCardsForm extends Component {
 
       if (deliverType === 'email') {
         params.emails = values.emails;
+        params.customMessage = values.customMessage;
       } else if (deliverType === 'manual') {
         params.numberOfVirtualCards = values.numberOfVirtualCards;
       }
@@ -280,28 +283,51 @@ class CreateVirtualCardsForm extends Component {
   renderEmailFields() {
     const { submitting, errors, multiEmailsInitialState } = this.state;
     return (
-      <Flex flexDirection="column" mb="2em">
-        <label style={{ width: '100%' }}>
-          <Flex flexDirection="column">
-            <FormattedMessage id="virtualCards.create.recipients" defaultMessage="Recipients" />
-            <FieldLabelDetails>
-              <FormattedMessage
-                id="virtualCards.create.recipientsDetails"
-                defaultMessage="A list of emails that will receive a gift card"
-              />
-            </FieldLabelDetails>
-          </Flex>
-        </label>
-        <StyledMultiEmailInput
-          className="virtualcards-recipients"
-          mt="0.25em"
-          invalids={errors.emails}
-          initialState={multiEmailsInitialState}
-          onClose={s => this.setState({ multiEmailsInitialState: s })}
-          onChange={value => this.onChange('emails', value)}
-          disabled={submitting}
-        />
-      </Flex>
+      <Box>
+        <Flex flexDirection="column" mb="2em">
+          <label style={{ width: '100%' }}>
+            <Flex flexDirection="column">
+              <FormattedMessage id="virtualCards.create.recipients" defaultMessage="Recipients" />
+              <FieldLabelDetails>
+                <FormattedMessage
+                  id="virtualCards.create.recipientsDetails"
+                  defaultMessage="A list of emails that will receive a gift card"
+                />
+              </FieldLabelDetails>
+            </Flex>
+          </label>
+          <StyledMultiEmailInput
+            className="virtualcards-recipients"
+            mt="0.25em"
+            invalids={errors.emails}
+            initialState={multiEmailsInitialState}
+            onClose={s => this.setState({ multiEmailsInitialState: s })}
+            onChange={value => this.onChange('emails', value)}
+            disabled={submitting}
+          />
+        </Flex>
+        <InlineField
+          name="customMessage"
+          label={
+            <Flex flexDirection="column">
+              <FormattedMessage id="virtualCards.create.customMessage" defaultMessage="Custom message" />
+              <FieldLabelDetails>
+                <FormattedMessage id="forms.optional" defaultMessage="Optional" />
+              </FieldLabelDetails>
+            </Flex>
+          }
+        >
+          <StyledInput
+            id="virtualcard-customMessage"
+            type="text"
+            maxLength="255"
+            placeholder="Will be sent in the invitation email"
+            onChange={e => this.onChange('customMessage', e.target.value)}
+            style={{ flexGrow: 1 }}
+            disabled={submitting}
+          />
+        </InlineField>
+      </Box>
     );
   }
 
