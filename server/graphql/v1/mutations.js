@@ -480,6 +480,10 @@ const mutations = {
         type: GraphQLString,
         description: 'A custom message attached to the email that will be sent for this virtual card',
       },
+      customMessage: {
+        type: GraphQLString,
+        description: 'A custom message that will be sent in the invitation email',
+      },
       expiryDate: { type: GraphQLString },
     },
     resolve: async (_, { emails, numberOfVirtualCards, ...args }, { remoteUser }) => {
@@ -505,7 +509,7 @@ const mutations = {
       if (numberOfVirtualCards) {
         return await bulkCreateVirtualCards(args, remoteUser, numberOfVirtualCards);
       } else if (emails) {
-        return await createVirtualCardsForEmails(args, remoteUser, emails);
+        return await createVirtualCardsForEmails(args, remoteUser, emails, args.customMessage);
       }
 
       throw new Error('You must either pass numberOfVirtualCards of an email list');

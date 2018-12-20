@@ -2,6 +2,7 @@ import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import { get, times } from 'lodash';
 import config from 'config';
+import sanitize from 'sanitize-html';
 
 import models, { Op, sequelize } from '../../models';
 import * as libpayments from '../../lib/payments';
@@ -209,8 +210,9 @@ export async function bulkCreateVirtualCards(args, remoteUser, count) {
  * @param {object} args
  * @param {object} remoteUser
  * @param {integer} count
+ * @param {string} customMessage A message that will be sent in the invitation email
  */
-export async function createVirtualCardsForEmails(args, remoteUser, emails) {
+export async function createVirtualCardsForEmails(args, remoteUser, emails, customMessage) {
   if (emails.length === 0) {
     return [];
   }
@@ -228,9 +230,10 @@ export async function createVirtualCardsForEmails(args, remoteUser, emails) {
   const virtualCardCurrency = getCurrencyFromCreateArgs(args, collective);
   await checkSourcePaymentMethodBalance(sourcePaymentMethod, totalAmount, virtualCardCurrency);
 
-  const virtualCardsParams = emails.map(email =>
-    getCreateParams({ ...args, data: { email } }, collective, sourcePaymentMethod, remoteUser),
-  );
+  const virtualCardsParams = emails.map(email => {
+    const createArgs = { ...args, data: { email, customMessage } };
+    return getCreateParams(createArgs, collective, sourcePaymentMethod, remoteUser);
+  });
   const virtualCards = models.PaymentMethod.bulkCreate(virtualCardsParams);
   virtualCards.map(vc => sendVirtualCardCreatedEmail(vc, collective));
   registerCreateInCache(args.CollectiveId, virtualCards.length, totalAmount);
@@ -364,12 +367,32 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
   }
 
   // Whitelist fields for `data`
-  let data = null;
-  if (args.data && args.data.email) {
-    if (!isValidEmail(args.data.email)) {
-      throw new Error(`Invalid email address: ${args.data.email}`);
+  let data = {};
+  if (args.data) {
+    // Email
+    if (args.data.email) {
+      if (!isValidEmail(args.data.email)) {
+        throw new Error(`Invalid email address: ${args.data.email}`);
+      }
+      data.email = args.data.email;
     }
-    data = { email: args.data.email };
+    // Custom message
+    if (args.data.customMessage) {
+      const customMessage = sanitize(args.data.customMessage.trim(), {
+        allowedTags: [],
+        allowedAttributes: {},
+      });
+
+      if (customMessage.length > 255) {
+        throw new Error('Custom message must be 255 characters max');
+      } else if (customMessage.length > 0) {
+        data.customMessage = customMessage;
+      }
+    }
+  }
+
+  if (Object.keys(data).length === 0) {
+    data = null;
   }
 
   // Build the virtualcard object
@@ -416,6 +439,7 @@ async function sendVirtualCardCreatedEmail(virtualCard, emitterCollective) {
     name: virtualCard.name,
     currency: virtualCard.currency,
     emitter: emitterCollective,
+    customMessage: get(virtualCard, 'data.customMessage', ''),
   });
 }
 
