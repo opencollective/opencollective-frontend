@@ -1,18 +1,22 @@
 /**
  * Note: to update the snapshots run:
- * TZ=UTC CHAI_JEST_SNAPSHOT_UPDATE_ALL=true mocha test/api.v1.test.js
+ * TZ=UTC CHAI_JEST_SNAPSHOT_UPDATE_ALL=true npx mocha test/api.v1.test.js
  */
 
-import app from '../server/index';
-import { expect } from 'chai';
-import { omit } from 'lodash';
 import request from 'supertest';
-import * as utils from '../test/utils';
+import { expect } from 'chai';
+import { omit, orderBy } from 'lodash';
+
+import app from '../server/index';
 import models from '../server/models';
 import roles from '../server/constants/roles';
+import * as utils from '../test/utils';
+
 const application = utils.data('application');
 const publicCollectiveData = utils.data('collective1');
 const transactionsData = utils.data('transactions1.transactions');
+
+const orderTransactions = transactions => orderBy(transactions, ['createdAt', 'id'], ['desc', 'desc']);
 
 describe('api.v1.test.js', () => {
   let collective, user, host;
@@ -44,9 +48,11 @@ describe('api.v1.test.js', () => {
     return models.Transaction.createMany(transactionsData, {
       CollectiveId: collective.id,
       ...defaultAttributes,
-    }).then(transactions => {
-      transaction = transactions[0];
-    });
+    })
+      .then(orderTransactions)
+      .then(transactions => {
+        transaction = transactions[0];
+      });
   });
 
   /**
@@ -59,7 +65,7 @@ describe('api.v1.test.js', () => {
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          const transactions = res.body.result;
+          const transactions = orderTransactions(res.body.result);
           expect(transactions.length).to.equal(9);
           expect(omit(transactions[0], ['id', 'createdAt'])).to.matchSnapshot();
           done();

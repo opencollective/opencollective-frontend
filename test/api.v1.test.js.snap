@@ -108,7 +108,7 @@ Object {
 
 exports[`api.v1.test.js #get get the latest transactions 1`] = `
 Object {
-  "amount": 5000,
+  "amount": -1199,
   "collective": Object {
     "id": 3,
     "image": null,
@@ -133,11 +133,11 @@ Object {
   "hostCurrency": null,
   "hostCurrencyFxRate": null,
   "hostFeeInHostCurrency": null,
-  "netAmountInCollectiveCurrency": 4500,
+  "netAmountInCollectiveCurrency": null,
   "paymentMethod": null,
   "paymentProcessorFeeInHostCurrency": null,
   "platformFeeInHostCurrency": null,
-  "type": "CREDIT",
+  "type": "DEBIT",
   "uuid": null,
 }
 `;
