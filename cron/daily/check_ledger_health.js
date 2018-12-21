@@ -3,12 +3,12 @@
  */
 
 import Promise from 'bluebird';
-import json2csv from 'json2csv';
+// import json2csv from 'json2csv';
 import models, { sequelize, Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
-import * as transactionsLib from '../../server/lib/transactions';
+// import * as transactionsLib from '../../server/lib/transactions';
 import { formatCurrency } from '../../server/lib/utils';
-import moment from 'moment';
+// import moment from 'moment';
 
 const VERBOSE = true;
 const attachments = [];
@@ -375,7 +375,8 @@ const checkTransactions = () => {
         // txnsWithoutOrderOrExpenses.map(t => Object.assign({id: t.id}));
       })
 
-      // Check that various fees and amounts add up
+    // Check that various fees and amounts add up
+    /*
       .then(async () => {
         const allTransactions = await models.Transaction.findAll({
           where: { deletedAt: null },
@@ -436,6 +437,7 @@ const checkTransactions = () => {
         }
         subHeader("Transactions that don't add up", funkyTransactions.length);
       })
+    */
   );
 };
 
