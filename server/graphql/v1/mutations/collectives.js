@@ -382,7 +382,7 @@ export async function claimCollective(_, args, req) {
 
   if (githubHandle.includes('/')) {
     // A repository GitHub Handle (most common)
-    const repo = await github.getRepo(githubAccount.token);
+    const repo = await github.getRepo(githubHandle, githubAccount.token);
     const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
     if (!isGithubRepositoryAdmin) {
       throw new errors.ValidationFailed({
