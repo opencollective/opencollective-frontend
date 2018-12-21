@@ -6,6 +6,7 @@ import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
 import withIntl from '../lib/withIntl';
 import { defineMessages } from 'react-intl';
+import { colors } from '../constants/theme';
 
 class InputTypeDropzone extends React.Component {
   static propTypes = {
@@ -176,14 +177,22 @@ class InputTypeDropzone extends React.Component {
             }
             .dropzone:hover,
             .dropzone.empty {
-              border: 2px dashed grey;
+              border-color: grey;
             }
             .dropzone:hover .placeholder,
             .dropzone.empty .placeholder {
               display: flex;
             }
+            .dropzone:focus {
+              border-color: ${colors.primary['300']};
+            }
             .removeImage {
+              color: ${colors.primary['400']};
+              cursor: pointer;
               font-size: 11px;
+            }
+            .removeImage:hover {
+              color: ${colors.primary['500']};
             }
           `}
         </style>
@@ -192,14 +201,26 @@ class InputTypeDropzone extends React.Component {
           onDrop={this.handleChange}
           className={`${this.props.name}-dropzone dropzone ${!this.state.value && 'empty'}`}
           style={{}}
+          inputProps={{ tabIndex: '-1' }}
+          tabIndex="0"
+          onKeyDown={({ key, target }) => {
+            if (key === 'Enter') {
+              target.querySelector('input[type="file"]').click();
+            }
+          }}
           {...options}
         >
           {this.renderContainer}
         </Dropzone>
         {this.state.value && (
-          <a className="removeImage" onClick={() => this.handleChange(null)}>
+          <span
+            className="removeImage"
+            tabIndex="0"
+            onClick={() => this.handleChange(null)}
+            onKeyDown={({ key }) => key === 'Enter' && this.handleChange(null)}
+          >
             ❌ remove image
-          </a>
+          </span>
         )}
       </div>
     );
