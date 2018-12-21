@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { P, Span } from './Text';
 
@@ -6,7 +6,7 @@ import { P, Span } from './Text';
  * Form field to display an input element with a label and errors. Uses [renderProps](https://reactjs.org/docs/render-props.html#using-props-other-than-render) to pass field props like 'name' and 'id' to child input.
  */
 const StyledInputField = ({ children, label, htmlFor, error, success, disabled }) => (
-  <Fragment>
+  <div>
     {label && (
       <P as="label" htmlFor={htmlFor} display="block" color="black.500" mb={1}>
         {label}
@@ -18,7 +18,7 @@ const StyledInputField = ({ children, label, htmlFor, error, success, disabled }
         {error}
       </Span>
     )}
-  </Fragment>
+  </div>
 );
 
 StyledInputField.propTypes = {
