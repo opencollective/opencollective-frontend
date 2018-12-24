@@ -204,7 +204,15 @@ class EditCollectiveForm extends React.Component {
       // routes (like `/collective/edit/payment-methods`) but we keep this
       // legacy redirect for old emails sent with the old URL scheme
       // Deprecated on 2018-12-08
-      const legacySections = ['info', 'images', 'members', 'payment-methods', 'connected-accounts', 'advanced'];
+      const legacySections = [
+        'info',
+        'images',
+        'members',
+        'payment-methods',
+        'connected-accounts',
+        'advanced',
+        'expenses',
+      ];
       let section = hash.substr(1);
       if (section === 'connectedAccounts') section = 'connected-accounts';
       else if (section === 'paymentMethods') section = 'payment-methods';
