@@ -16,7 +16,7 @@ class CommentForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    notice: PropTypes.oneOf(PropTypes.string, PropTypes.node),
+    notice: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     onChange: PropTypes.func,
     onSubmit: PropTypes.func,
   };
