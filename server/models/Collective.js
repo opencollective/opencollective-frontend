@@ -1642,6 +1642,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         ReferralCollectiveId: this.id,
+        status: 'PAID',
       },
       group: ['currency'],
     })
