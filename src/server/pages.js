@@ -26,6 +26,7 @@ pages
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('event', '/:parentCollectiveSlug/events/:eventSlug')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit')
+  .add('editCollective', '/:slug/edit/:section?')
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', 'createOrder')
@@ -77,7 +78,7 @@ pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|
 
 // Collective
 
-pages.add('collective', '/:slug').add('editCollective', '/:slug/edit/:section?');
+pages.add('collective', '/:slug');
 
 export default pages;
 
