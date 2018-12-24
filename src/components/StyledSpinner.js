@@ -1,19 +1,11 @@
 import PropTypes from 'prop-types';
 import { LoaderAlt } from 'styled-icons/boxicons-regular/LoaderAlt.cjs';
-import styled, { keyframes } from 'styled-components';
-
-const spin = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
+import styled from 'styled-components';
+import { rotating } from './StyledKeyframes';
 
 /** A loading spinner using SVG + css animation. */
 const StyledSpinner = styled(LoaderAlt)`
-  animation: ${spin} 1s linear infinite;
+  animation: ${rotating} 1s linear infinite;
 `;
 
 StyledSpinner.defaultProps = {
