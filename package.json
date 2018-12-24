@@ -25,7 +25,7 @@
     "babel-plugin-add-module-exports": "1.0.0",
     "babel-plugin-lodash": "3.3.4",
     "base64url": "3.0.1",
-    "bcrypt": "3.0.2",
+    "bcrypt": "3.0.3",
     "bluebird": "3.4.0",
     "body-parser": "1.18.3",
     "child-process-promise": "2.2.1",
