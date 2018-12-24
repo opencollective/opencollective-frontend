@@ -79,7 +79,7 @@
   "transaction.usingGiftCardFrom": "avec un chèque cadeau de {collectiveLink}",
   "transaction.closeDetails": "Fermer les détails",
   "transaction.viewDetails": "Voir les détails",
-  "transaction.hostFeeInHostCurrency": "{hostFeePercent} commission de l'hôte",
+  "transaction.hostFeeInHostCurrency": "{percentage} commission de l'hôte",
   "transaction.platformFeeInHostCurrency": "5% commission de Open Collective",
   "transaction.paymentProcessorFeeInHostCurrency": "commission du processeur de paiement",
   "transaction.host": "hôte",

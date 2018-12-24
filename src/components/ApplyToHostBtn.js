@@ -36,8 +36,8 @@ class ApplyToHostBtn extends React.Component {
         <div className="hostConditions">
           <FormattedMessage
             id="transaction.hostFeeInHostCurrency"
-            defaultMessage="{hostFeePercent} host fee"
-            values={{ hostFeePercent: `${host.hostFeePercent || 0}%` }}
+            defaultMessage="{percentage} host fee"
+            values={{ percentage: `${host.hostFeePercent || 0}%` }}
           />
           <HelpTooltip className="dark">
             <FormattedMessage
