@@ -134,7 +134,12 @@ class ExportImages extends React.Component {
         </h1>
         <p>You can export images of each tier with the logo/avatar of the contributors.</p>
         <div>
-          <InputField type="select" options={tierOptions} onChange={tierIndex => this.setState({ tierIndex })} />
+          <InputField
+            name="tiers"
+            type="select"
+            options={tierOptions}
+            onChange={tierIndex => this.setState({ tierIndex })}
+          />
         </div>
         {tier && (
           <div>

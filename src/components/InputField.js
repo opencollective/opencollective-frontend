@@ -203,7 +203,7 @@ class InputField extends React.Component {
             help={field.description}
             after={after}
             maxLength={field.maxLength}
-            value={this.state.value || this.props.defaultValue}
+            value={this.state.value || this.props.defaultValue || ''}
             onChange={event => this.handleChange(event.target.value)}
           />
         );
