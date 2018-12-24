@@ -157,6 +157,7 @@ class GoalsCover extends React.Component {
 
     const maxGoal = maxBy(get(props.collective, 'settings.goals', []), g => (g.title ? g.amount : 0));
     this.currentProgress = maxGoal ? this.getMaxCurrentAchievement() / maxGoal.amount : 1.0;
+    this.interpolation = props.interpolation || get(props.collective, 'settings.goalsInterpolation', 'auto');
     this.state = { ...this.populateGoals(true, true) };
   }
 
@@ -181,9 +182,7 @@ class GoalsCover extends React.Component {
 
   /** Returns a percentage (0.0-1.0) that reprensent X position */
   getTranslatedPercentage(x) {
-    const { interpolation } = this.props;
-
-    if (interpolation === 'logarithm' || (interpolation === 'auto' && this.currentProgress <= 0.3)) {
+    if (this.interpolation === 'logarithm' || (this.interpolation === 'auto' && this.currentProgress <= 0.3)) {
       // See https://www.desmos.com/calculator/30pua5xx7q
       return -1 * Math.pow(x - 1, 2) + 1;
     }
