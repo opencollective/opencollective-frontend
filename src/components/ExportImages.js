@@ -144,7 +144,7 @@ class ExportImages extends React.Component {
         {tier && (
           <div>
             {tier.images.map(image => (
-              <div>
+              <div key={image.name}>
                 <label>{image.name}</label>
                 <div
                   dangerouslySetInnerHTML={{
@@ -167,7 +167,7 @@ class ExportImages extends React.Component {
                         <th>default value</th>
                       </tr>
                       {image.options.map(option => (
-                        <tr>
+                        <tr key={option.name}>
                           <th valign="top">{option.name}</th>
                           <td valign="top">{option.description}</td>
                           <td valign="top">{option.defaultValue}</td>

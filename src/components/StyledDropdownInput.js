@@ -105,6 +105,7 @@ const StyledDropdownInput = ({
             {getItems(options)
               .filter(item => filter(inputValue, item))
               .map((item, index) => (
+                // eslint-disable-next-line react/jsx-key
                 <ListItem
                   {...getItemProps({
                     key: item.key,

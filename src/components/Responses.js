@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import Response from './Response';
 
 class Responses extends React.Component {
@@ -24,8 +25,8 @@ class Responses extends React.Component {
           `}
         </style>
         <div className="innerResponses">
-          {responses.map((response, index) => (
-            <Response key={`response${index}`} response={response} />
+          {responses.map(response => (
+            <Response key={`${get(response, 'user.id', 0)}-${response.createdAt}`} response={response} />
           ))}
         </div>
       </div>

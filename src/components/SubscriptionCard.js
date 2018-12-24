@@ -449,16 +449,16 @@ class SubscriptionCard extends React.Component {
                 </CustomToggle>
                 <Dropdown.Menu className="menu-item">
                   {subscription.status !== 'PENDING' && [
-                    <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editPaymentMethod}>
+                    <MenuItem key="pm" style={menuItemStyle} eventKey={this.stateConstants.editPaymentMethod}>
                       <FormattedMessage
                         id="subscription.menu.editPaymentMethod"
                         defaultMessage="Update payment method"
                       />
                     </MenuItem>,
-                    <MenuItem style={menuItemStyle} eventKey={this.stateConstants.editAmount}>
+                    <MenuItem key="amount" style={menuItemStyle} eventKey={this.stateConstants.editAmount}>
                       <FormattedMessage id="subscription.menu.editAmount" defaultMessage="Update amount" />
                     </MenuItem>,
-                    <MenuItem style={{ margin: '2px' }} divider />,
+                    <MenuItem key="divider" style={{ margin: '2px' }} divider />,
                   ]}
                   <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>
                     <FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel contribution" />

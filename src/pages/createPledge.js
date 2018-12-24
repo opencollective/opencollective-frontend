@@ -457,7 +457,7 @@ class CreatePledgePage extends React.Component {
                     {data.Collective.pledges
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
-                        <Box mr={2} mt={2}>
+                        <Box key={fromCollective.id} mr={2} mt={2}>
                           <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
                             <a>
                               <Container
@@ -488,7 +488,7 @@ class CreatePledgePage extends React.Component {
                           fromCollective.type === 'ORGANIZATION' || fromCollective.type === 'COLLECTIVE',
                       )
                       .map(({ fromCollective }) => (
-                        <Box mr={2} mt={2}>
+                        <Box key={fromCollective.id} mr={2} mt={2}>
                           <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
                             <a>
                               <Container
