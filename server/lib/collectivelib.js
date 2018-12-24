@@ -25,5 +25,8 @@ export function isBlacklistedCollectiveSlug(slug) {
     'subscriptions',
     'tos',
     'widgets',
+    'edit',
+    'expenses',
+    'orders',
   ].includes(slug);
 }
