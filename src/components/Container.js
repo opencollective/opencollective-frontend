@@ -100,7 +100,7 @@ const Container = styled(tag)`
 `;
 
 Container.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('float', 'clear'),
+  blacklist: tag.defaultProps.blacklist.concat('float', 'clear', 'clearfix'),
 };
 
 export default Container;

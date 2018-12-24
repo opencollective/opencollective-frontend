@@ -114,7 +114,7 @@ class NotificationBar extends React.Component {
             {actions && (
               <div className="actions">
                 {actions.map(action => (
-                  <div>{action}</div>
+                  <div key={action.key}>{action}</div>
                 ))}
               </div>
             )}

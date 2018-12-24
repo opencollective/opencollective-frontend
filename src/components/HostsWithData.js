@@ -15,7 +15,7 @@ class HostsWithData extends React.Component {
     tags: PropTypes.arrayOf(PropTypes.string), // only fetch collectives that have those tags
     onChange: PropTypes.func,
     limit: PropTypes.number,
-    empty: PropTypes.oneOf(PropTypes.node, PropTypes.stirng),
+    empty: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
   };
 
   constructor(props) {

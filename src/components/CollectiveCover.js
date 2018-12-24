@@ -346,7 +346,7 @@ ${description}`;
               )}
             </Link>
             <h1>{title}</h1>
-            {this.description && <p className="description">{this.description}</p>}
+            {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
               <div>
                 {company && company.substr(0, 1) === '@' && (

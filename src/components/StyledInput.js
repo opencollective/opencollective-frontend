@@ -110,7 +110,7 @@ StyledInput.propTypes = {
 };
 
 StyledInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
   border: '1px solid',
   borderColor: 'black.300',
   borderRadius: '4px',
@@ -121,6 +121,7 @@ StyledInput.defaultProps = {
 export const TextInput = styled(StyledInput)``;
 
 TextInput.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
   border: '1px solid #cccccc',
   borderRadius: '4px',
   fontSize: '14px',
@@ -135,6 +136,7 @@ export const SubmitInput = styled(StyledInput)`
 `;
 
 SubmitInput.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
   buttonStyle: 'primary',
   buttonSize: 'large',
   fontWeight: 'bold',

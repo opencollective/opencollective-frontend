@@ -37,9 +37,9 @@ class CreateOrderPage extends React.Component {
   }) {
     return {
       slug: eventSlug || collectiveSlug,
-      TierId,
-      quantity,
-      totalAmount: totalAmount || amount * 100,
+      TierId: TierId,
+      quantity: parseInt(quantity) || 1,
+      totalAmount: parseInt(totalAmount) || parseInt(amount) * 100 || 0,
       interval,
       description,
       verb,

@@ -19,7 +19,7 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
-    return { slug: collectiveSlug, ExpenseId };
+    return { slug: collectiveSlug, ExpenseId: parseInt(ExpenseId) };
   }
 
   static propTypes = {

@@ -26,8 +26,8 @@ class Sponsors extends React.Component {
             }
           `}
         </style>
-        {sponsors.map((sponsor, index) => (
-          <EventSponsorCard type="sponsor" key={`sponsor${index}`} sponsor={sponsor} />
+        {sponsors.map(sponsor => (
+          <EventSponsorCard type="sponsor" key={sponsor.id} sponsor={sponsor} />
         ))}
       </div>
     );

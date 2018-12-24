@@ -79,7 +79,7 @@
   "transaction.usingGiftCardFrom": "using a gift card from {collectiveLink}",
   "transaction.closeDetails": "Close Details",
   "transaction.viewDetails": "View Details",
-  "transaction.hostFeeInHostCurrency": "{hostFeePercent} host fee",
+  "transaction.hostFeeInHostCurrency": "{percentage} host fee",
   "transaction.platformFeeInHostCurrency": "5% Open Collective fee",
   "transaction.paymentProcessorFeeInHostCurrency": "payment processor fee",
   "transaction.host": "host",

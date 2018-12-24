@@ -22,6 +22,7 @@ export const transactionFields = `
     data
   }
   collective {
+    id
     slug
     type
     name

@@ -134,12 +134,17 @@ class ExportImages extends React.Component {
         </h1>
         <p>You can export images of each tier with the logo/avatar of the contributors.</p>
         <div>
-          <InputField type="select" options={tierOptions} onChange={tierIndex => this.setState({ tierIndex })} />
+          <InputField
+            name="tiers"
+            type="select"
+            options={tierOptions}
+            onChange={tierIndex => this.setState({ tierIndex })}
+          />
         </div>
         {tier && (
           <div>
             {tier.images.map(image => (
-              <div>
+              <div key={image.name}>
                 <label>{image.name}</label>
                 <div
                   dangerouslySetInnerHTML={{
@@ -162,7 +167,7 @@ class ExportImages extends React.Component {
                         <th>default value</th>
                       </tr>
                       {image.options.map(option => (
-                        <tr>
+                        <tr key={option.name}>
                           <th valign="top">{option.name}</th>
                           <td valign="top">{option.description}</td>
                           <td valign="top">{option.defaultValue}</td>

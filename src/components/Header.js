@@ -52,8 +52,8 @@ class Header extends React.Component {
           <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
           {css && <link rel="stylesheet" href={css} />}
           <title>{title}</title>
-          {this.meta.map(({ name, content }, index) => (
-            <meta property={name} content={content} key={`meta-${index}`} />
+          {this.meta.map(({ name, content }) => (
+            <meta property={name} content={content} key={`meta-${name}`} />
           ))}
         </Head>
         <div id="top" />

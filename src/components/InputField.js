@@ -80,7 +80,13 @@ class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.bool]),
+    defaultValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.object,
+      PropTypes.bool,
+      PropTypes.array,
+    ]),
     validate: PropTypes.func,
     options: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
     context: PropTypes.object,
@@ -197,7 +203,7 @@ class InputField extends React.Component {
             help={field.description}
             after={after}
             maxLength={field.maxLength}
-            value={this.state.value || this.props.defaultValue}
+            value={this.state.value || this.props.defaultValue || ''}
             onChange={event => this.handleChange(event.target.value)}
           />
         );
