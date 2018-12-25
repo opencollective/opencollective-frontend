@@ -2,6 +2,8 @@ import nextRoutes from 'next-routes';
 
 const pages = nextRoutes();
 
+const createOrderPage = process.env.USE_OLD_CREATE_ORDER === 'true' ? 'createOrder' : 'createOrderNewFlow';
+
 pages
   .add('home', '/')
   .add('about', '/:pageSlug(about|widgets|tos|privacypolicy)', 'staticPage')
@@ -29,12 +31,12 @@ pages
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit')
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
-  .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', 'createOrder')
-  .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder')
+  .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', createOrderPage)
+  .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrderLegacy') // New contribution flow not applied to events yet
   .add(
     'donate',
     '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?',
-    'createOrder',
+    createOrderPage,
   )
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
