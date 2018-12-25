@@ -23,19 +23,37 @@ const getBgColor = ({ highlightedIndex, index, item, selectedItem }) => {
   return 'white.full';
 };
 
-export const getItems = options =>
-  Object.keys(options).reduce(
+/**
+ * Convert a list of items to an object like {key, value} to be used in selects
+ * and other lists.
+ *
+ * @param {object[] | string[]} options a list of items to transform to be used in list
+ * @param {string | func} key a string to get the unique key from objects, or
+ *  a function that get passed the object and returns a key. If not passed, the
+ *  JSON representation of the item will be used. This can have very bad performances
+ *  impact, so we should avoid using it.
+ */
+export const getItems = (options, keyGetter) => {
+  let keyExtractor = null;
+  if (typeof keyGetter === 'string') {
+    keyExtractor = item => item[keyGetter];
+  } else if (typeof keyGetter === 'function') {
+    keyExtractor = keyGetter;
+  } else if (Array.isArray(options)) {
+    keyExtractor = item => (typeof item === 'object' ? JSON.stringify(item) : item);
+  } else {
+    keyExtractor = (_item, key) => key;
+  }
+
+  return Object.keys(options).reduce(
     (items, key) =>
       items.concat({
-        key: Array.isArray(options)
-          ? typeof options[key] === 'object'
-            ? JSON.stringify(options[key])
-            : options[key]
-          : key,
+        key: keyExtractor(options[key], key),
         value: options[key],
       }),
     [],
   );
+};
 
 const SelectContainer = styled(Container)`
   cursor: pointer;
