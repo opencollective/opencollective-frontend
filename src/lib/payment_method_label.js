@@ -72,6 +72,24 @@ function formatCreditCardBrand(brand) {
 }
 
 /**
+ * Format payment method name
+ */
+export const getPaymentMethodName = ({ name, data, type }) => {
+  if (type === 'virtualcard') {
+    return name.replace('card from', 'Gift Card from');
+  } else if (type === 'prepaid') {
+    return name;
+  } else if (type === 'creditcard') {
+    const brand = data && data.brand && formatCreditCardBrand(data.brand);
+    return `${brand || type} **** ${name}`;
+  } else if (type === 'collective') {
+    return `Collective ${name}`;
+  } else {
+    return name;
+  }
+};
+
+/**
  * Generate a pretty label for given payment method or return its name if type
  * is unknown.
  *
@@ -80,13 +98,13 @@ function formatCreditCardBrand(brand) {
  * @param {string} collectiveName an optional name to prefix the payment method
  */
 export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
-  const { type, balance, currency, name, data } = paymentMethod;
-  const brand = data && data.brand && formatCreditCardBrand(data.brand);
+  const { type, balance, currency } = paymentMethod;
+  const name = getPaymentMethodName(paymentMethod);
   let label = null;
 
   if (type === 'virtualcard') {
     label = intl.formatMessage(messages.virtualcard, {
-      name: name.replace('card from', 'Gift Card from'),
+      name,
       balance: formatCurrency(balance, currency),
       expiration: paymentMethodExpiration(paymentMethod),
     });
@@ -97,12 +115,12 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
     });
   } else if (type === 'creditcard') {
     label = intl.formatMessage(messages.creditcard, {
-      name: `${brand || type} **** ${name}`,
+      name,
       expiration: paymentMethodExpiration(paymentMethod),
     });
   } else if (type === 'collective') {
     label = intl.formatMessage(messages.collective, {
-      name: `Collective ${name}`,
+      name,
       balance: formatCurrency(balance, currency),
     });
   } else if (!name) {
