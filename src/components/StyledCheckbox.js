@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { themeGet, fontSize } from 'styled-system';
+import { Flex } from '@rebass/grid';
 
 const IconCheckmark = () => {
   return (
@@ -14,10 +15,10 @@ const IconCheckmark = () => {
   );
 };
 
-const CheckboxContainer = styled.div`
+const CheckboxContainer = styled(Flex)`
   ${fontSize}
-
   height: ${props => props.size};
+  align-items: center;
 
   /* Hide the default checkbox */
   input {
@@ -29,9 +30,11 @@ const CheckboxContainer = styled.div`
 
   label {
     cursor: pointer;
+    margin: 0;
     margin-left: 1.5em;
     color: black;
     z-index: 9;
+    font-weight: normal;
   }
 
   /* Show our custom checkbox */
@@ -97,34 +100,59 @@ const CheckboxContainer = styled.div`
   }
 `;
 
-const StyledCheckbox = ({ name, checked, onChange, label, disabled, size, inputId }) => {
-  return (
-    <CheckboxContainer
-      onClick={() => !disabled && onChange({ name, checked: !checked, type: 'checkbox' })}
-      fontSize={size}
-      size={size}
-    >
-      <input id={inputId} name={name} type="checkbox" checked={checked} disabled={disabled} readOnly />
-      <span className="custom-checkbox">
-        <IconCheckmark />
-      </span>
-      {label && <label>{label}</label>}
-    </CheckboxContainer>
-  );
-};
+class StyledCheckbox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { checked: props.defaultChecked };
+  }
+
+  onChange(newValue) {
+    const { name, checked, onChange, disabled } = this.props;
+
+    if (disabled) {
+      return false;
+    }
+
+    if (checked === undefined) {
+      this.setState({ checked: newValue });
+    }
+
+    if (onChange) {
+      onChange({ name, checked: newValue, type: 'checkbox' });
+    }
+  }
+
+  render() {
+    const { name, checked, label, disabled, size, inputId } = this.props;
+    const realChecked = checked === undefined ? this.state.checked : checked;
+
+    return (
+      <CheckboxContainer onClick={() => this.onChange(!realChecked)} fontSize={size} size={size}>
+        <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
+        <span className="custom-checkbox">
+          <IconCheckmark />
+        </span>
+        {label && <label>{label}</label>}
+      </CheckboxContainer>
+    );
+  }
+}
 
 StyledCheckbox.defaultProps = {
   size: '14px',
+  defaultChecked: false,
 };
 
 StyledCheckbox.propTypes = {
   /** The name of the input */
   name: PropTypes.string.isRequired,
-  /** Wether the checkbox is checked */
-  checked: PropTypes.bool.isRequired,
   /** Called when state change with a bool representing new state */
-  onChange: PropTypes.func.isRequired,
-  /* And optional ID for the `<input/>` */
+  onChange: PropTypes.func,
+  /** Wether the checkbox is checked. Use it to control the component. If not provided, component will maintain its own state. */
+  checked: PropTypes.bool,
+  /** Wether the checkbox should be checked by default. Ignored if `checked` is provided. */
+  defaultChecked: PropTypes.bool,
+  /** And optional ID for the `<input/>` */
   inputId: PropTypes.string,
   /** Wether checkbox should be disabled */
   disabled: PropTypes.bool,
