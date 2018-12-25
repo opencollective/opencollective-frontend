@@ -26,6 +26,7 @@ import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import { isValidUrl, getDomain } from '../lib/utils';
+import ContributePayment from '../components/ContributePayment';
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -166,7 +167,6 @@ class CreateOrderPage extends React.Component {
     if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
       this.setState({ step: 'showOrder' });
     }
-
     if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
       this.setState({ step: 'signin' });
     }
@@ -378,6 +378,44 @@ class CreateOrderPage extends React.Component {
                 onPersonalSubmit={console.log}
                 onOrgSubmit={console.log}
                 onSecondaryAction={() => this.setState({ step: 'signin' })}
+              />
+            </Flex>
+          )}
+          {step === 'choose-payment' && (
+            <Flex justifyContent="center" mt={4}>
+              <ContributePayment
+                onChange={console.log}
+                paymentMethods={[
+                  {
+                    id: 8771,
+                    uuid: 'ce4e0885-ebb4-4e1b-b644-4fa009370300',
+                    name: '4444',
+                    data: {
+                      expMonth: 2,
+                      expYear: 2022,
+                      brand: 'MasterCard',
+                      country: 'US',
+                    },
+                    monthlyLimitPerMember: null,
+                    service: 'stripe',
+                    type: 'creditcard',
+                    balance: 10000000,
+                    currency: 'USD',
+                    expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
+                  },
+                  {
+                    id: 8783,
+                    uuid: '493eb5de-905f-4f9a-a11e-668bd19d8750',
+                    name: '$100 Gift Card from New Collective',
+                    data: null,
+                    monthlyLimitPerMember: null,
+                    service: 'opencollective',
+                    type: 'virtualcard',
+                    balance: 2300,
+                    currency: 'USD',
+                    expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
+                  },
+                ]}
               />
             </Flex>
           )}

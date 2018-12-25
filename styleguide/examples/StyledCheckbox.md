@@ -4,7 +4,7 @@
 initialState = { checked: false };
 <StyledCheckbox
   checked={state.checked}
-  onChange={checked => setState({ checked })}
+  onChange={({ checked }) => setState({ checked })}
   label={state.checked ? 'Checked' : 'Unchecked'}
 />;
 ```
@@ -12,13 +12,17 @@ initialState = { checked: false };
 ### Disabled
 
 ```js
-initialState = { checked: false };
-
 <div>
-  <StyledCheckbox disabled label="Unchecked" checked={state.checked} onChange={checked => setState({ checked })} />
+  <StyledCheckbox disabled label="Unchecked" defaultChecked={false} />
   <br />
-  <StyledCheckbox disabled checked label="Checked" />
-</div>;
+  <StyledCheckbox disabled label="Checked" defaultChecked />
+</div>
+```
+
+### Without label
+
+```js
+<StyledCheckbox />
 ```
 
 ### With custom sizes
@@ -31,16 +35,16 @@ initialState = { checked: false };
     label="A little bit bigger"
     size="20px"
     checked={state.checked}
-    onChange={checked => setState({ checked })}
+    onChange={({ checked }) => setState({ checked })}
   />
   <br />
-  <StyledCheckbox label="Wow" size="30px" checked={state.checked} onChange={checked => setState({ checked })} />
+  <StyledCheckbox label="Wow" size="30px" checked={state.checked} onChange={({ checked }) => setState({ checked })} />
   <br />
   <StyledCheckbox
     label="This is huge"
     size="50px"
     checked={state.checked}
-    onChange={checked => setState({ checked })}
+    onChange={({ checked }) => setState({ checked })}
   />
 </div>;
 ```
