@@ -1,25 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
 
 import { Router } from '../server/pages';
 
+import { Box, Flex } from '@rebass/grid';
+import { H2, P } from '../components/Text';
+import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-import OrderForm from '../components/OrderForm';
-import CollectiveCover from '../components/CollectiveCover';
+import Link from '../components/Link';
+import SignIn from '../components/SignIn';
+import CreateProfile from '../components/CreateProfile';
+import ContributeAs from '../components/ContributeAs';
+import StyledInputField from '../components/StyledInputField';
+import StyledButton from '../components/StyledButton';
 
 import { addCreateOrderMutation } from '../graphql/mutations';
 
+import * as api from '../lib/api';
 import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import { isValidUrl, getDomain } from '../lib/utils';
 
-class CreateOrderLegacyPage extends React.Component {
+class CreateOrderPage extends React.Component {
   static getInitialProps({
     query: {
       collectiveSlug,
@@ -37,9 +45,9 @@ class CreateOrderLegacyPage extends React.Component {
   }) {
     return {
       slug: eventSlug || collectiveSlug,
-      TierId: TierId,
-      quantity: parseInt(quantity) || 1,
-      totalAmount: parseInt(totalAmount) || parseInt(amount) * 100 || 0,
+      TierId,
+      quantity,
+      totalAmount: totalAmount || amount * 100,
       interval,
       description,
       verb,
@@ -65,12 +73,16 @@ class CreateOrderLegacyPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { result: {}, loading: false };
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
     this.order = {
       quantity: parseInt(props.quantity, 10) || 1,
       interval: ['month', 'year'].indexOf(interval) !== -1 ? interval : null,
       totalAmount: parseInt(props.totalAmount, 10) || null,
+    };
+    this.state = {
+      loading: false,
+      result: {},
+      step: props.LoggedInUser ? 'showOrder' : 'signin',
     };
 
     switch (props.verb) {
@@ -94,7 +106,7 @@ class CreateOrderLegacyPage extends React.Component {
       },
       'donation.title': {
         id: 'tier.order.donation.title',
-        defaultMessage: 'Contribute',
+        defaultMessage: 'Contributer',
       },
       'membership.title': {
         id: 'tier.order.membership.title',
@@ -148,6 +160,16 @@ class CreateOrderLegacyPage extends React.Component {
       newState.matchingFund = matchingFund;
     }
     this.setState(newState);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
+      this.setState({ step: 'showOrder' });
+    }
+
+    if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
+      this.setState({ step: 'signin' });
+    }
   }
 
   UNSAFE_componentWillReceiveProps(newProps) {
@@ -231,7 +253,8 @@ class CreateOrderLegacyPage extends React.Component {
   };
 
   render() {
-    const { intl, data, LoggedInUser } = this.props;
+    const { intl, data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { step } = this.state;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -257,7 +280,20 @@ class CreateOrderLegacyPage extends React.Component {
     this.order.tier = tier;
     this.order.description = description;
 
-    const coverClassName = collective.type === 'EVENT' ? 'small' : '';
+    const logo = collective.image || get(collective.parentCollective, 'image');
+    const tierName = (tier.name && tier.name.replace(/s$/, '')) || 'backer';
+
+    const profiles = LoggedInUser
+      ? LoggedInUser.memberOf
+          .filter(({ role }) => role === 'ADMIN')
+          .reduce((data, { collective }) => {
+            return { ...data, [collective.id]: collective };
+          }, {})
+      : {};
+
+    const personal = LoggedInUser
+      ? { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective }
+      : {};
 
     return (
       <Page
@@ -280,22 +316,71 @@ class CreateOrderLegacyPage extends React.Component {
           `}
         </style>
 
-        <CollectiveCover
-          key={collective.slug}
-          collective={collective}
-          href={collective.path}
-          className={coverClassName}
-        />
+        <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4}>
+          <Link route="collective" params={{ slug: collective.slug }} className="goBack">
+            <Logo
+              src={logo}
+              className="logo"
+              type={collective.type}
+              website={collective.website}
+              height="10rem"
+              key={logo}
+            />
+          </Link>
 
-        <div className="content" id="content">
-          <OrderForm
-            collective={collective}
-            order={this.order}
-            LoggedInUser={LoggedInUser}
-            onSubmit={this.createOrder}
-            redeemFlow={this.props.redeem}
-            matchingFund={this.state.matchingFund}
-          />
+          <Link route="collective" params={{ slug: collective.slug }} className="goBack">
+            <H2 as="h1" color="black.900">
+              {collective.name}
+            </H2>
+          </Link>
+
+          <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3}>
+            <FormattedMessage
+              id="tier.defaultDescription"
+              defaultMessage="Become a {name}"
+              values={{
+                name: tierName,
+              }}
+            />
+          </P>
+        </Flex>
+
+        <div id="content">
+          {step === 'showOrder' && (
+            <Flex mt={4} alignItems="center" flexDirection="column">
+              <Box>
+                <StyledInputField htmlFor="contributeAs" label="Contribute as:">
+                  {fieldProps => (
+                    <ContributeAs {...fieldProps} onChange={console.log} profiles={profiles} personal={personal} />
+                  )}
+                </StyledInputField>
+              </Box>
+              <Box mt={5}>
+                <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold">
+                  Next step &rarr;
+                </StyledButton>
+              </Box>
+            </Flex>
+          )}
+          {step === 'signin' && !loadingLoggedInUser && (
+            <Flex justifyContent="center" mt={4}>
+              <SignIn
+                onSubmit={email =>
+                  api.signin({ email }, Router.asPath).then(() => Router.pushRoute('signinLinkSent', { email }))
+                }
+                onSecondaryAction={() => this.setState({ step: 'signup' })}
+              />
+            </Flex>
+          )}
+          {step === 'signup' && (
+            <Flex justifyContent="center" mt={4}>
+              <CreateProfile
+                onPersonalSubmit={console.log}
+                onOrgSubmit={console.log}
+                onSecondaryAction={() => this.setState({ step: 'signin' })}
+              />
+            </Flex>
+          )}
           <div className="row result">
             <div className="col-sm-2" />
             <div className="col-sm-10">
@@ -392,4 +477,4 @@ const addGraphQL = compose(
   addCreateOrderMutation,
 );
 
-export default withIntl(addGraphQL(withUser(CreateOrderLegacyPage)));
+export default withIntl(addGraphQL(withUser(CreateOrderPage)));
