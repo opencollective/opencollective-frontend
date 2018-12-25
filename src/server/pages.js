@@ -1,8 +1,9 @@
 import nextRoutes from 'next-routes';
+import { getEnvVar } from '../lib/utils';
 
 const pages = nextRoutes();
 
-const createOrderPage = process.env.USE_OLD_CREATE_ORDER === 'true' ? 'createOrder' : 'createOrderNewFlow';
+const createOrderPage = getEnvVar('USE_NEW_CREATE_ORDER') === 'true' ? 'createOrderNewFlow' : 'createOrder';
 
 pages
   .add('home', '/')
@@ -33,7 +34,7 @@ pages
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', createOrderPage)
-  .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrderLegacy') // New contribution flow not applied to events yet
+  .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder') // New contribution flow not applied to events yet
   .add(
     'donate',
     '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?',

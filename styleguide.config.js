@@ -1,4 +1,4 @@
-const { createConfig, babel, css } = require('webpack-blocks');
+const { createConfig, babel } = require('webpack-blocks');
 const path = require('path');
 const fileExistsCaseInsensitive = require('react-styleguidist/scripts/utils/findFileCaseInsensitive');
 
@@ -41,7 +41,7 @@ module.exports = {
   ],
   skipComponentsWithoutExample: true,
   styleguideComponents: {
-    Wrapper: path.join(__dirname, 'styleguide/ThemeWrapper'),
+    Wrapper: path.join(__dirname, 'styleguide/Wrapper'),
   },
   styles: {
     Blockquote: {
