@@ -4,9 +4,9 @@ import { getEnvVar, loadScriptAsync } from './utils';
 
 let stripe;
 
-const getStripe = async () => {
+const getStripe = async token => {
   if (!stripe) {
-    const stripeKey = getEnvVar('STRIPE_KEY');
+    const stripeKey = token || getEnvVar('STRIPE_KEY');
     if (stripeKey) {
       if (typeof window.Stripe === 'undefined') {
         await loadScriptAsync('https://js.stripe.com/v3/');
