@@ -332,42 +332,42 @@
             <label class='paragraph neutralsolid600'>Gift card amount</label>
             <div class='text-input'>
               <div class='field-element'>$</div>
-              <input pattern='[0-9]' required type='number' value='50'>
+              <input name="giftCardAmount" value='50' type="number" step="1" min="5" max="10000" pattern='[0-9]' required>
             </div>
           </div>
           <div class='sm-col-6 sm-pl1 pb2'>
             <label class='paragraph neutralsolid600'>Number of cards</label>
             <div class='text-input'>
-              <input pattern='[0-9]' placeholder='i.e. 100' required type='number' value='10'>
+              <input name="giftCardNumber" value="100" type="number" step="1" min="1" max="10000" pattern='[0-9]' required>
             </div>
           </div>
         </div>
         <div class='pb2'>
           <label class='paragraph neutralsolid600'>Company name</label>
           <div class='text-input'>
-            <input placeholder='i.e. Airbnb, Trivago, etc...' type='text'>
+            <input name="companyName" placeholder='i.e. Airbnb, Trivago, etc...' type='text'>
           </div>
         </div>
         <div class='pb2'>
           <label class='paragraph neutralsolid600'>Company website</label>
           <div class='text-input'>
             <div class='field-element'>http://</div>
-            <input placeholder='yourwebsite.com' type='text'>
+            <input name="companyWebsite" placeholder='yourwebsite.com' type='text'>
           </div>
         </div>
         <div class='pb2'>
           <label class='paragraph neutralsolid600'>Your name</label>
           <div class='text-input'>
-            <input type='text'>
+            <input name="contactName" type='text'>
           </div>
         </div>
         <div class='pb4'>
           <label class='paragraph neutralsolid600'>Your email</label>
           <div class='text-input'>
-            <input placeholder='i.e. you@youremail.com' required type='email'>
+            <input name="contactEmail" placeholder='i.e. you@youremail.com' required type='email'>
           </div>
         </div>
-        <button class='btn -large -primary w100' disabled>Request 10 gift cards</button>
+        <button class='btn -large -primary w100'>Submit</button>
       </div>
     </div>
   </section>
