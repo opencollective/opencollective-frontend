@@ -15,19 +15,19 @@ import { getCollectiveSourcePaymentMethodsQuery } from '../graphql/queries';
 import { createVirtualCardsMutationQuery } from '../graphql/mutations';
 import StyledInputAmount from './StyledInputAmount';
 import StyledButton from './StyledButton';
-import StyledCheckbox from './StyledCheckbox';
 import StyledPaymentMethodChooser from './StyledPaymentMethodChooser';
 import Loading from './Loading';
 import Link from './Link';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import { P, H3 } from './Text';
 import StyledInput from './StyledInput';
+import InputField from './InputField';
 
 const MIN_AMOUNT = 5;
 const MAX_AMOUNT = 10000;
 
 const InlineField = ({ name, children, label, isLabelClickable }) => (
-  <Flex alignItems="center" mb="2.5em" className={`field-${name}`}>
+  <Flex flexWrap="wrap" alignItems="center" mb="2.5em" className={`field-${name}`}>
     <Box css={{ flexBasis: '12em' }}>
       <label htmlFor={`virtualcard-${name}`} style={isLabelClickable && { cursor: 'pointer' }}>
         {label}
@@ -47,13 +47,15 @@ const DeliverTypeRadioSelector = styled(Flex)`
   border-bottom: 1px solid ${themeGet('colors.black.200')};
 `;
 
-const RadioButtonContainer = styled(Flex)`
+const RadioButtonContainer = styled.label`
+  display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
+  width: auto;
   svg {
     height: 30px;
     width: 30px;
-    cursor: pointer;
     color: ${themeGet('colors.primary.400')};
     transition: color 0.2s;
     &:hover {
@@ -65,11 +67,11 @@ const RadioButtonContainer = styled(Flex)`
 const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   const icon = checked ? <RadioButtonChecked /> : <RadioButtonUnchecked />;
   return (
-    <RadioButtonContainer data-name={name}>
-      <Box className="radio-btn" onClick={onClick}>
-        {icon}
-      </Box>
-      <H3>{children}</H3>
+    <RadioButtonContainer data-name={name} onClick={onClick}>
+      <Box className="radio-btn">{icon}</Box>
+      <H3 textAlign="center" px={2}>
+        {children}
+      </H3>
     </RadioButtonContainer>
   );
 };
@@ -80,9 +82,11 @@ const FieldLabelDetails = styled.span`
 `;
 
 const RedeemLinksTextarea = styled.textarea`
-  width: 450px;
+  max-width: 450px;
   height: 175px;
   resize: vertical;
+  width: 95%;
+  overflow-wrap: normal;
 `;
 
 class CreateVirtualCardsForm extends Component {
@@ -400,17 +404,17 @@ class CreateVirtualCardsForm extends Component {
             isLabelClickable
             label={
               <FormattedMessage
-                id="virtualCards.create.onlyOpenSource"
+                id="virtualCards.create.onlyOpensource"
                 defaultMessage="Limit to opensource collectives"
               />
             }
           >
-            <StyledCheckbox
-              inputId="virtualcard-onlyOpensource"
+            <InputField
+              id="virtualcard-onlyOpensource"
               name="onlyOpensource"
-              checked={values.onlyOpensource}
-              onChange={({ checked }) => this.onChange('onlyOpensource', checked)}
-              size="25px"
+              defaultValue={values.onlyOpensource}
+              onChange={value => this.onChange('onlyOpensource', value)}
+              type="switch"
             />
           </InlineField>
 
@@ -420,7 +424,7 @@ class CreateVirtualCardsForm extends Component {
               checked={deliverType === 'email'}
               onClick={() => this.changeDeliverType('email')}
             >
-              <FormattedMessage id="virtualCards.create.sendEmails" defaultMessage="Send them the cards by email" />
+              <FormattedMessage id="virtualCards.create.sendEmails" defaultMessage="Send the cards by&#160;email" />
             </RadioButtonWithLabel>
             <RadioButtonWithLabel
               name="manual"

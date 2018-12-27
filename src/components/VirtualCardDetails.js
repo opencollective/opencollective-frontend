@@ -7,12 +7,10 @@ import moment from 'moment';
 import styled, { withTheme } from 'styled-components';
 import { themeGet } from 'styled-system';
 
-import { CardGiftcard as GiftCardIcon } from 'styled-icons/material/CardGiftcard.cjs';
-
+import GiftCard from './icons/GiftCard';
 import Link from './Link';
 import Avatar from './Avatar';
 import { formatCurrency } from '../lib/utils';
-import Moment from './Moment';
 
 const DetailsColumnHeader = styled.span`
   text-transform: uppercase;
@@ -86,11 +84,18 @@ class VirtualCardDetails extends React.Component {
     const redeemCode = virtualCard.uuid.split('-')[0];
     const email = get(virtualCard, 'data.email');
     const linkParams = email ? { code: redeemCode, email } : { code: redeemCode };
+    const time = moment(virtualCard.createdAt);
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
+        <Flex flexDirection="column" mr="2em">
+          <DetailsColumnHeader>
+            <FormattedMessage id="virtualCards.emmited" defaultMessage="Emmited" />
+          </DetailsColumnHeader>
+          {time.format('LLLL')} ({time.fromNow()})
+        </Flex>
         {!virtualCard.isConfirmed && (
-          <Flex flexDirection="column" mr="1.5em">
+          <Flex flexDirection="column" mr="2em">
             <DetailsColumnHeader>
               <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
@@ -99,13 +104,13 @@ class VirtualCardDetails extends React.Component {
             </Link>
           </Flex>
         )}
-        <Flex flexDirection="column" mr="1.5em">
+        <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
             <FormattedMessage id="virtualCards.expiryDate" defaultMessage="EXPIRY DATE" />
           </DetailsColumnHeader>
           <span>{moment(virtualCard.expiryDate).format('MM/Y')}</span>
         </Flex>
-        <Flex flexDirection="column" mr="1.5em">
+        <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
             <FormattedMessage id="virtualCards.description" defaultMessage="DESCRIPTION" />
           </DetailsColumnHeader>
@@ -130,7 +135,7 @@ class VirtualCardDetails extends React.Component {
   }
 
   render() {
-    const { isConfirmed, collective, balance, currency, createdAt, data } = this.props.virtualCard;
+    const { isConfirmed, collective, balance, currency, data } = this.props.virtualCard;
 
     return (
       <Flex className="vc-details">
@@ -138,7 +143,7 @@ class VirtualCardDetails extends React.Component {
         <Box mr="20px">
           {isConfirmed ? (
             <Link route="collective" params={{ slug: collective.slug }} title={collective.name} passHref>
-              <GiftCardIcon alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
+              <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
               <Avatar
                 radius={24}
                 mt="-1em"
@@ -150,7 +155,7 @@ class VirtualCardDetails extends React.Component {
               />
             </Link>
           ) : (
-            <GiftCardIcon alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
+            <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
           )}
         </Box>
         {/* Infos + details column */}
@@ -165,12 +170,6 @@ class VirtualCardDetails extends React.Component {
                 id="virtualCards.balance"
                 defaultMessage="Balance: {balance}"
                 values={{ balance: formatCurrency(balance, currency) }}
-              />
-              <Box mx={1}>|</Box>
-              <FormattedMessage
-                id="virtualCards.emmitedSince"
-                defaultMessage="Emmited {since}"
-                values={{ since: <Moment relative value={createdAt} /> }}
               />
               <Box mx={1}>|</Box>
               <a onClick={() => this.toggleExpended()}>
