@@ -38,7 +38,7 @@
     "cucumber": "5.0.3",
     "dataloader": "1.4.0",
     "dataloader-sequelize": "1.7.6",
-    "debug": "4.1.0",
+    "debug": "4.1.1",
     "deepmerge": "3.0.0",
     "dotenv": "6.2.0",
     "errorhandler": "1.5.0",
