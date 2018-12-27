@@ -307,6 +307,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+
+      monthlySpending: {
+        type: new DataTypes.VIRTUAL(DataTypes.INTEGER),
+      },
     },
     {
       paranoid: true,
