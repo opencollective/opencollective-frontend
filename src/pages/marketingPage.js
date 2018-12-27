@@ -80,11 +80,11 @@ class MarketingPage extends React.Component {
       html = howItWorksPageHtml;
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
-    } else if (pageSlug === 'gift-of-giving') {
+    } else if (pageSlug === 'gift-of-giving' || pageSlug === 'gift-cards') {
       html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
       className = null;
-    } else if (pageSlug === 'gift-cards') {
+    } else if (pageSlug === 'gift-cards-next') {
       html = confirmationPage ? giftCardPageConfirmationHtml : giftCardPageHtml;
       style = giftCardPageStyle;
       className = null;
