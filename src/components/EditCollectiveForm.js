@@ -478,8 +478,8 @@ class EditCollectiveForm extends React.Component {
           `}
         </style>
 
-        <Flex>
-          <Box width={1 / 5} mr={4}>
+        <Flex flexWrap="wrap">
+          <Flex flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexBasis: '100px', flexGrow: 1 }}>
             <MenuItem
               selected={this.state.section === 'info'}
               route="editCollective"
@@ -592,9 +592,9 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.advanced" defaultMessage="Advanced" />
             </MenuItem>
-          </Box>
+          </Flex>
 
-          <Box width={4 / 5}>
+          <Box width={4 / 5} css={{ flexGrow: 1 }}>
             <div className="FormInputs">
               {Object.keys(this.fields).map(
                 section =>

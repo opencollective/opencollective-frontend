@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import { Flex, Box } from '@rebass/grid';
+import { Flex } from '@rebass/grid';
 import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
 
@@ -47,7 +47,13 @@ class EditVirtualCards extends React.Component {
     if (onlyConfirmed === false) selected = 'pending';
 
     return (
-      <StyledButtonSet items={['all', 'redeemed', 'pending']} selected={selected} buttonProps={{ p: 0 }}>
+      <StyledButtonSet
+        justifyContent="center"
+        mt={[4, 0]}
+        items={['all', 'redeemed', 'pending']}
+        selected={selected}
+        buttonProps={{ p: 0 }}
+      >
         {({ item, isSelected }) => (
           <Link route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
@@ -84,10 +90,9 @@ class EditVirtualCards extends React.Component {
 
     return (
       <div>
-        <Flex mb={4} justifyContent="space-between" flexWrap="wrap">
+        <Flex mb={4} flexDirection={['column-reverse', 'row']} justifyContent="space-between" flexWrap="wrap">
           {this.renderFilters(onlyConfirmed)}
-          <Flex>
-            <Box mr="0.5em" />
+          <Flex justifyContent="center">
             <LinkWrapper
               route="editCollective"
               params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}

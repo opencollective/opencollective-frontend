@@ -459,11 +459,14 @@ class InputField extends React.Component {
           <FormGroup controlId={field.name} help={field.description}>
             {horizontal && (
               <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
+                {field.label && (
+                  <Col componentClass={ControlLabel} sm={2}>
+                    {capitalize(field.label)}
+                  </Col>
+                )}
                 <Col sm={10}>
                   <Switch
+                    name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
                   />
@@ -473,9 +476,10 @@ class InputField extends React.Component {
             )}
             {!horizontal && (
               <div>
-                <ControlLabel>{capitalize(field.label)}</ControlLabel>
+                {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
                 <div className="switch">
                   <Switch
+                    name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
                   />
@@ -559,11 +563,13 @@ class InputField extends React.Component {
               display: flex;
               align-items: center;
             }
-            .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 {
+            .inputField span[class*='MuiSwitch-colorSecondary-'][class*='MuiSwitch-checked-'] {
               color: #3385ff;
             }
-            .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 + .MuiSwitch-bar-9 {
-              background-color: #3385ff;
+            .inputField
+              span[class*='MuiSwitch-colorSecondary-'][class*='MuiSwitch-checked-']
+              + span[class*='MuiSwitch-bar-'] {
+              background-color: #3385ff !important;
             }
           `}
         </style>
