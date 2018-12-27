@@ -7,7 +7,7 @@ pages
   .add('about', '/:pageSlug(about|widgets|tos|privacypolicy)', 'staticPage')
   .add(
     'faq',
-    '/:path(faq)/:pageSlug(collectives|backers|expenses|hosts|becoming-an-open-collective-host)?',
+    '/:path(faq)/:pageSlug(about|collectives|backers|expenses|hosts|becoming-an-open-collective-host)?',
     'staticPage',
   )
   .add('redeem', '/redeem/:code?')
