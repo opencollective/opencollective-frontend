@@ -880,12 +880,7 @@ const serializeCollectivesResult = JSON.stringify;
 
 const unserializeCollectivesResult = string => {
   const result = JSON.parse(string);
-  result.collectives = result.collectives.map(collective => {
-    return {
-      ...models.Collective.build({ ...collective }),
-      monthlySpending: collective.monthlySpending,
-    };
-  });
+  result.collectives = result.collectives.map(collective => models.Collective.build(collective));
   return result;
 };
 
