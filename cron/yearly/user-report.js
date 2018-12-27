@@ -16,7 +16,7 @@ import { formatCurrency, formatArrayToString, formatCurrencyObject } from '../..
 import emailLib from '../../server/lib/email';
 import queries from '../../server/lib/queries';
 
-const d = new Date();
+const d = process.env.START_DATE ? new Date(process.env.START_DATE) : new Date();
 const startDate = new Date(`${d.getFullYear() - 1}`);
 const endDate = new Date(`${d.getFullYear()}`);
 const year = startDate.getFullYear();
@@ -47,10 +47,12 @@ SELECT
   host.slug as "hostSlug",
   host.name as "hostName",
   host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
-  g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
+  c.slug, c.name, c.mission, c.description, c.image, c."backgroundImage", c."twitterHandle", c.settings, c.data
 FROM "CollectiveTransactions" ut
-LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
-LEFT JOIN "Collectives" host ON ut."HostCollectiveId" = host.id`;
+LEFT JOIN "Collectives" c ON ut."CollectiveId" = c.id
+LEFT JOIN "Collectives" host ON ut."HostCollectiveId" = host.id
+WHERE c.type = 'COLLECTIVE'
+`;
 
 const buildTweet = (fromCollective, collectives, totalDonations) => {
   let tweet;
@@ -129,7 +131,7 @@ const processCollective = collective => {
         collectivesBySlug[row.slug] = {
           slug: row.slug,
           name: row.name || row.slug,
-          mission: row.mission,
+          description: row.mission || row.description,
           image: row.image,
           backgroundImage:
             row.backgroundImage || 'https://opencollective.com/public/images/collectives/default-header-bg.jpg',
@@ -137,6 +139,7 @@ const processCollective = collective => {
           settings: row.settings,
           data: row.data,
           totalDonations: Number(row.amountInHostCurrency),
+          tier: 'total contributed',
           currency: row.hostCurrency,
         };
 

@@ -39,23 +39,18 @@ async function HostReport(year, month, hostId) {
   let previousStartDate, startDate, endDate;
 
   const d = new Date();
+  d.setFullYear(year);
 
-  if (process.env.START_DATE) {
-    startDate = new Date(process.env.START_DATE);
-    year = startDate.getFullYear();
-    previousStartDate = new Date(year - 1, startDate.getMonth(), startDate.getDate());
-    endDate = new Date(year + 1, startDate.getMonth(), startDate.getDate());
-  } else if (!month) {
+  if (!month) {
     // yearly report
-    d.setFullYear(year);
     previousStartDate = new Date(d.getFullYear() - 1, 0, 1);
     startDate = new Date(d.getFullYear(), 0, 1);
     endDate = new Date(d.getFullYear() + 1, 0, 1);
   } else {
-    d.setMonth(d.getMonth() - 2);
-    previousStartDate = new Date(d.getFullYear(), d.getMonth(), 1);
-    startDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
-    endDate = new Date(d.getFullYear(), d.getMonth() + 2, 1);
+    d.setMonth(month);
+    previousStartDate = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+    startDate = new Date(d.getFullYear(), d.getMonth(), 1);
+    endDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
   }
 
   const endDateIncluded = moment(endDate)
