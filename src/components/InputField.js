@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { get } from 'lodash';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
-import Switch from '@material-ui/core/Switch';
 
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
+import InputSwitch from './InputSwitch';
 
 import { capitalize } from '../lib/utils';
 
@@ -465,7 +465,7 @@ class InputField extends React.Component {
                   </Col>
                 )}
                 <Col sm={10}>
-                  <Switch
+                  <InputSwitch
                     name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
@@ -478,7 +478,7 @@ class InputField extends React.Component {
               <div>
                 {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
                 <div className="switch">
-                  <Switch
+                  <InputSwitch
                     name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
@@ -562,14 +562,6 @@ class InputField extends React.Component {
             .inputField .switch {
               display: flex;
               align-items: center;
-            }
-            .inputField span[class*='MuiSwitch-colorSecondary-'][class*='MuiSwitch-checked-'] {
-              color: #3385ff;
-            }
-            .inputField
-              span[class*='MuiSwitch-colorSecondary-'][class*='MuiSwitch-checked-']
-              + span[class*='MuiSwitch-bar-'] {
-              background-color: #3385ff !important;
             }
           `}
         </style>
