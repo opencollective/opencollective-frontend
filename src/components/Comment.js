@@ -134,12 +134,6 @@ class Comment extends React.Component {
             .commentActions :global(> div) {
               margin-right: 0.5rem;
             }
-
-            @media (max-width: 600px) {
-              .comment {
-                max-height: 23rem;
-              }
-            }
           `}
         </style>
         <style jsx global>

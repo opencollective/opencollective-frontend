@@ -133,14 +133,14 @@ class HTMLEditor extends React.Component {
         <style jsx>
           {`
             .HTMLEditor :global(.quill) {
-              height: 1rem;
-              min-height: 40rem;
+              height: auto;
             }
             .HTMLEditor :global(.ql-container) {
-              height: 35rem;
+              min-height: 20rem;
+              max-height: 35rem;
             }
             .HTMLEditor.small :global(.quill) {
-              height: 1rem;
+              height: auto;
               min-height: 20rem;
             }
             .HTMLEditor.small :global(.ql-container) {
