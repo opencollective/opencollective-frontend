@@ -495,7 +495,12 @@ class InputField extends React.Component {
         this.input = (
           <div>
             {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
-            <HTMLEditor defaultValue={field.defaultValue} onChange={this.handleChange} className={field.className} />
+            <HTMLEditor
+              value={this.props.value}
+              defaultValue={field.defaultValue}
+              onChange={this.handleChange}
+              className={field.className}
+            />
           </div>
         );
         break;

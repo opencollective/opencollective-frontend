@@ -58,17 +58,10 @@ class ExpensePage extends React.Component {
               display: flex;
             }
 
-            .col.side {
-              width: 100%;
-              min-width: 20rem;
-              max-width: 25%;
-              margin-left: 5rem;
-            }
-
             .col.large {
               width: 100%;
               min-width: 30rem;
-              max-width: 75%;
+              max-width: 800px;
             }
 
             @media (max-width: 600px) {
@@ -125,8 +118,6 @@ class ExpensePage extends React.Component {
                   unlockPayAction={() => this.setState({ isPayActionLocked: false })}
                 />
               </div>
-
-              <div className="col side" />
             </div>
           </div>
         </Body>

@@ -19,7 +19,7 @@ class HTMLEditor extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { editorHtml: '', theme: 'snow' };
+    this.state = { editorHtml: props.defaultValue, theme: 'snow' };
     this.handleChange = this.handleChange.bind(this);
     this.saveToServer = this.saveToServer.bind(this);
     this.insertToEditor = this.insertToEditor.bind(this);
@@ -71,6 +71,12 @@ class HTMLEditor extends React.Component {
       'image',
       'video',
     ];
+  }
+
+  componentDidUpdate(oldProps) {
+    if (this.props.value !== oldProps.value) {
+      this.setState({ editorHtml: this.props.value });
+    }
   }
 
   handleChange(html) {
@@ -133,14 +139,14 @@ class HTMLEditor extends React.Component {
         <style jsx>
           {`
             .HTMLEditor :global(.quill) {
-              height: 1rem;
-              min-height: 40rem;
+              height: auto;
             }
             .HTMLEditor :global(.ql-container) {
-              height: 35rem;
+              min-height: 20rem;
+              max-height: 35rem;
             }
             .HTMLEditor.small :global(.quill) {
-              height: 1rem;
+              height: auto;
               min-height: 20rem;
             }
             .HTMLEditor.small :global(.ql-container) {
@@ -152,8 +158,8 @@ class HTMLEditor extends React.Component {
           ref={el => (this.reactQuillRef = el)}
           theme="snow"
           onChange={this.handleChange}
-          // value={this.state.editorHtml}
-          defaultValue={this.props.defaultValue}
+          value={this.state.editorHtml || ''}
+          defaultValue={this.props.defaultValue || ''}
           modules={this.modules}
           formats={this.formats}
           bounds={'.app'}
