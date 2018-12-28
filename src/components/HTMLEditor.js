@@ -144,6 +144,7 @@ class HTMLEditor extends React.Component {
             .HTMLEditor :global(.ql-container) {
               min-height: 20rem;
               max-height: 35rem;
+              overflow-y: auto;
             }
             .HTMLEditor.small :global(.quill) {
               height: auto;
