@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get, pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
 import Link from './Link';
-import { pick } from 'lodash';
 
 /**
  * Component to render for for **new** comments. Comment Edit form is created
@@ -138,7 +138,7 @@ class CommentForm extends React.Component {
                 <InputField
                   name="comment-new"
                   type="html"
-                  defaultValue={this.state.comment.html}
+                  value={get(this.state, 'comment.html', '')}
                   onChange={value => this.handleChange('html', value)}
                   className="small"
                 />
