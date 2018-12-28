@@ -67,6 +67,8 @@ class CollectiveCard extends React.Component {
       (collective.longDescription && firstSentence(collective.longDescription, 80));
     const description = collective.description;
 
+    const route = collective.type === 'EVENT' ? collective.path : 'collective';
+
     const params = {
       slug: collective.slug,
     };
@@ -75,7 +77,7 @@ class CollectiveCard extends React.Component {
     }
 
     return (
-      <Link route="collective" target="_top" params={params}>
+      <Link route={route} target="_top" params={params}>
         <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>
             {`
