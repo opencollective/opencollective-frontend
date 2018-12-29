@@ -242,7 +242,6 @@ Array [
                 fill="currentColor"
                 focusable="false"
                 height={24}
-                size={24}
                 viewBox="0 0 448 512"
                 width={24}
               >
@@ -483,7 +482,6 @@ Array [
                   fill="currentColor"
                   focusable="false"
                   height="1em"
-                  size="1em"
                   viewBox="0 0 16 16"
                   width="1em"
                 >
@@ -860,7 +858,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -881,7 +878,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -902,7 +898,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 496 512"
             width={17}
           >
@@ -923,7 +918,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 448 512"
             width={17}
           >
@@ -944,7 +938,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={19}
-            size={19}
             viewBox="0 0 24 24"
             width={19}
           >
@@ -1501,7 +1494,6 @@ Array [
                 fill="currentColor"
                 focusable="false"
                 height={24}
-                size={24}
                 viewBox="0 0 448 512"
                 width={24}
               >
@@ -1742,7 +1734,6 @@ Array [
                   fill="currentColor"
                   focusable="false"
                   height="1em"
-                  size="1em"
                   viewBox="0 0 16 16"
                   width="1em"
                 >
@@ -2119,7 +2110,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -2140,7 +2130,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -2161,7 +2150,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 496 512"
             width={17}
           >
@@ -2182,7 +2170,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 448 512"
             width={17}
           >
@@ -2203,7 +2190,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={19}
-            size={19}
             viewBox="0 0 24 24"
             width={19}
           >
@@ -3203,7 +3189,6 @@ exports[`Search Page renders error message 1`] = `
                 fill="currentColor"
                 focusable="false"
                 height={24}
-                size={24}
                 viewBox="0 0 448 512"
                 width={24}
               >
@@ -3333,7 +3318,6 @@ exports[`Search Page renders error message 1`] = `
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -3354,7 +3338,6 @@ exports[`Search Page renders error message 1`] = `
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -3375,7 +3358,6 @@ exports[`Search Page renders error message 1`] = `
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 496 512"
             width={17}
           >
@@ -3396,7 +3378,6 @@ exports[`Search Page renders error message 1`] = `
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 448 512"
             width={17}
           >
@@ -3417,7 +3398,6 @@ exports[`Search Page renders error message 1`] = `
             fill="currentColor"
             focusable="false"
             height={19}
-            size={19}
             viewBox="0 0 24 24"
             width={19}
           >
@@ -3974,7 +3954,6 @@ Array [
                 fill="currentColor"
                 focusable="false"
                 height={24}
-                size={24}
                 viewBox="0 0 448 512"
                 width={24}
               >
@@ -4196,7 +4175,6 @@ Array [
                   fill="currentColor"
                   focusable="false"
                   height="1em"
-                  size="1em"
                   viewBox="0 0 16 16"
                   width="1em"
                 >
@@ -4694,7 +4672,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -4715,7 +4692,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -4736,7 +4712,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 496 512"
             width={17}
           >
@@ -4757,7 +4732,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 448 512"
             width={17}
           >
@@ -4778,7 +4752,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={19}
-            size={19}
             viewBox="0 0 24 24"
             width={19}
           >
@@ -5335,7 +5308,6 @@ Array [
                 fill="currentColor"
                 focusable="false"
                 height={24}
-                size={24}
                 viewBox="0 0 448 512"
                 width={24}
               >
@@ -5707,7 +5679,6 @@ Array [
                   fill="currentColor"
                   focusable="false"
                   height="1em"
-                  size="1em"
                   viewBox="0 0 16 16"
                   width="1em"
                 >
@@ -6181,7 +6152,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -6202,7 +6172,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 512 512"
             width={17}
           >
@@ -6223,7 +6192,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 496 512"
             width={17}
           >
@@ -6244,7 +6212,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={17}
-            size={17}
             viewBox="0 0 448 512"
             width={17}
           >
@@ -6265,7 +6232,6 @@ Array [
             fill="currentColor"
             focusable="false"
             height={19}
-            size={19}
             viewBox="0 0 24 24"
             width={19}
           >
