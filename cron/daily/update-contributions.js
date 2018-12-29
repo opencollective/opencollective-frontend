@@ -56,7 +56,7 @@ const getAllContributors = async repo => {
     // https://developer.github.com/v3/repos/#list-contributors
     logger.verbose(`Fetching contributors for ${repo.owner}/${repo.repo}, page ${fetchParameters.page}`);
     fetchContributors = await octokit.repos
-      .listContributors(repo, fetchParameters)
+      .listContributors({ ...repo, ...fetchParameters })
       .then(github.getData)
       .then(noContentToArray)
       .then(c => c.map(repo => pick(repo, ['login', 'contributions'])));
