@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import {
   claimCollective,
   createCollective,
@@ -26,7 +26,7 @@ import * as applicationMutations from './mutations/applications';
 
 import statuses from '../../constants/expense_status';
 
-import { GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
+import { GraphQLNonNull, GraphQLList, GraphQLString, GraphQLInt, GraphQLBoolean, GraphQLObjectType } from 'graphql';
 
 import {
   OrderType,
@@ -37,6 +37,7 @@ import {
   CommentType,
   ConnectedAccountType,
   PaymentMethodType,
+  UserType,
 } from './types';
 
 import { CollectiveInterfaceType } from './CollectiveInterface';
@@ -61,7 +62,9 @@ import {
   UserInputType,
 } from './inputTypes';
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
-import models from '../../models';
+import models, { sequelize } from '../../models';
+import emailLib from '../../lib/email';
+import roles from '../../constants/roles';
 
 const mutations = {
   createCollective: {
@@ -108,6 +111,58 @@ const mutations = {
     },
     resolve(_, args, req) {
       return approveCollective(req.remoteUser, args.id);
+    },
+  },
+  createUser: {
+    description: 'Create a user with an optional organization.',
+    type: new GraphQLObjectType({
+      name: 'CreateUserResult',
+      fields: {
+        user: { type: UserType },
+        organization: { type: CollectiveInterfaceType },
+      },
+    }),
+    args: {
+      user: {
+        type: new GraphQLNonNull(UserInputType),
+        description: 'The user info',
+      },
+      organization: {
+        type: CollectiveInputType,
+        description: 'An optional organization to create alongside the user',
+      },
+      redirect: {
+        type: GraphQLString,
+        description: 'The redirect URL for the login email sent to the user',
+        defaultValue: '/',
+      },
+    },
+    resolve(_, args) {
+      return sequelize.transaction(async transaction => {
+        // Create user
+        if (await models.User.findOne({ where: { email: args.user.email.toLowerCase() } }, { transaction })) {
+          throw new Error('User already exists for given email');
+        }
+
+        const user = await models.User.createUserWithCollective(args.user, transaction);
+        const loginLink = user.generateLoginLink(args.redirect);
+
+        if (!args.organization) {
+          emailLib.send('user.new.token', user.email, { loginLink }, { bcc: 'ops@opencollective.com' });
+          return { user, organization: null };
+        }
+
+        // Create organization
+        const organizationParams = {
+          type: 'ORGANIZATION',
+          ...pick(args.organization, ['name', 'website', 'twitterHandle', 'githubHandle']),
+        };
+        const organization = await models.Collective.create(organizationParams, { transaction });
+        await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, transaction);
+
+        emailLib.send('user.new.token', user.email, { loginLink }, { bcc: 'ops@opencollective.com' });
+        return { user, organization };
+      });
     },
   },
   editConnectedAccount: {

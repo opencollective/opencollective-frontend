@@ -522,12 +522,13 @@ export default (Sequelize, DataTypes) => {
     });
   };
 
-  User.createUserWithCollective = userData => {
+  User.createUserWithCollective = (userData, transaction) => {
     if (!userData) return Promise.reject(new Error('Cannot create a user: no user data provided'));
 
+    const sequelizeParams = transaction ? { transaction } : undefined;
     let user;
     debug('createUserWithCollective', userData);
-    return User.create(userData)
+    return User.create(userData, sequelizeParams)
       .then(u => {
         user = u;
         let name = userData.firstName;
@@ -559,12 +560,12 @@ export default (Sequelize, DataTypes) => {
           CreatedByUserId: userData.CreatedByUserId || user.id,
           data: { UserId: user.id },
         };
-        return models.Collective.create(userCollective);
+        return models.Collective.create(userCollective, sequelizeParams);
       })
       .tap(collective => {
         collective.findImage(user);
         user.CollectiveId = collective.id;
-        return user.save();
+        return user.save(sequelizeParams);
       })
       .then(collective => {
         user.collective = collective;
