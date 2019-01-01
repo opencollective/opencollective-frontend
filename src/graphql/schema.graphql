@@ -463,6 +463,11 @@ type ConnectedAccountType {
   updatedAt: String
 }
 
+type CreateUserResult {
+  user: UserDetails
+  organization: CollectiveInterface
+}
+
 scalar Email
 
 """This represents an Event Collective"""
@@ -765,6 +770,18 @@ type Mutation {
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
+
+  """Create a user with an optional organization."""
+  createUser(
+    """The user info"""
+    user: UserInputType!
+
+    """An optional organization to create alongside the user"""
+    organization: CollectiveInputType
+
+    """The redirect URL for the login email sent to the user"""
+    redirect: String = "/"
+  ): CreateUserResult
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
@@ -861,7 +878,7 @@ type Mutation {
     """
     description: String
 
-    """A custom message that will be sent in the invitation link"""
+    """A custom message that will be sent in the invitation email"""
     customMessage: String
     expiryDate: String
   ): [PaymentMethodType]
