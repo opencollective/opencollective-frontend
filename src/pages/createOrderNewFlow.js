@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 
 import { Router } from '../server/pages';
@@ -19,7 +19,7 @@ import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
 import StyledButton from '../components/StyledButton';
 
-import { addCreateOrderMutation } from '../graphql/mutations';
+import { addCreateOrderMutation, createUserQuery } from '../graphql/mutations';
 
 import * as api from '../lib/api';
 import withIntl from '../lib/withIntl';
@@ -73,6 +73,7 @@ class CreateOrderPage extends React.Component {
 
   constructor(props) {
     super(props);
+    this.createProfile = this.createProfile.bind(this);
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
     this.order = {
       quantity: parseInt(props.quantity, 10) || 1,
@@ -81,6 +82,7 @@ class CreateOrderPage extends React.Component {
     };
     this.state = {
       loading: false,
+      submitting: false,
       result: {},
       step: props.LoggedInUser ? 'showOrder' : 'signin',
     };
@@ -94,6 +96,27 @@ class CreateOrderPage extends React.Component {
       this.setState({ step: 'signin' });
     }
   }
+
+  createProfile = data => {
+    const redirect = window.location.pathname;
+    const user = pick(data, ['email', 'firstName', 'lastName']);
+    const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
+    const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
+    if (organization) {
+      organization.name = organization.orgName;
+      delete organization.orgName;
+    }
+
+    this.setState({ submitting: true });
+    this.props
+      .createUser({ user, organization, redirect })
+      .then(() => {
+        Router.pushRoute('signinLinkSent', { email: user.email });
+      })
+      .catch(error => {
+        this.setState({ result: { error: error.message }, submitting: false });
+      });
+  };
 
   /** Returns an array like [personnalProfile, otherProfiles] */
   getProfiles() {
@@ -194,9 +217,10 @@ class CreateOrderPage extends React.Component {
           {step === 'signup' && (
             <Flex justifyContent="center" mt={4}>
               <CreateProfile
-                onPersonalSubmit={console.log}
-                onOrgSubmit={console.log}
+                onPersonalSubmit={this.createProfile}
+                onOrgSubmit={this.createProfile}
                 onSecondaryAction={() => this.setState({ step: 'signin' })}
+                submitting={this.state.submitting}
               />
             </Flex>
           )}
@@ -329,9 +353,16 @@ const addData = graphql(gql`
   }
 `);
 
+const addCreateUserMutation = graphql(createUserQuery, {
+  props: ({ mutate }) => ({
+    createUser: variables => mutate({ variables }),
+  }),
+});
+
 const addGraphQL = compose(
   addData,
   addCreateOrderMutation,
+  addCreateUserMutation,
 );
 
 export default withIntl(addGraphQL(withUser(CreateOrderPage)));

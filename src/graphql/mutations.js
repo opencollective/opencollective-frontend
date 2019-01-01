@@ -26,6 +26,21 @@ const createOrderQuery = gql`
   }
 `;
 
+export const createUserQuery = gql`
+  mutation createUser($user: UserInputType!, $organization: CollectiveInputType, $redirect: String) {
+    createUser(user: $user, organization: $organization, redirect: $redirect) {
+      user {
+        id
+        email
+      }
+      organization {
+        id
+        slug
+      }
+    }
+  }
+`;
+
 const createMemberQuery = gql`
   mutation createMember(
     $member: CollectiveAttributesInputType!
