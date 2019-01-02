@@ -9,7 +9,7 @@ import knox from '../gateways/knox';
 const IMAGE_UPLOAD_TIMEOUT = 2 * 60 * 1000;
 
 export default function uploadImage(req, res, next) {
-  const { file } = req.files;
+  const file = req.file;
 
   if (!file) {
     return next(

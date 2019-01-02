@@ -3,7 +3,6 @@ import config from 'config';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
-import multer from 'multer';
 import errorHandler from 'errorhandler';
 import passport from 'passport';
 import connectSessionSequelize from 'connect-session-sequelize';
@@ -90,8 +89,6 @@ export default function(app) {
   if (get(config, 'cache.middleware')) {
     app.use(cacheMiddleware());
   }
-
-  app.use(multer());
 
   // Error handling.
   if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {

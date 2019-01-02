@@ -1,6 +1,10 @@
 import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql';
 import curlify from 'request-as-curl';
+import multer from 'multer';
+import debug from 'debug';
+import { ApolloServer } from 'apollo-server-express';
+import { formatError } from 'apollo-errors';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
@@ -27,17 +31,16 @@ import * as auth from './middleware/security/auth';
 import errorHandler from './middleware/error_handler';
 import * as params from './middleware/params';
 import errors from './lib/errors';
-import { formatError } from 'apollo-errors';
+
 import * as paypal from './paymentProviders/paypal/payment';
 
 import sanitizer from './middleware/sanitizer';
 import { sanitizeForLogs } from './lib/utils';
-import debug from 'debug';
-
-import { ApolloServer } from 'apollo-server-express';
 
 import graphqlSchemaV1 from './graphql/v1/schema';
 import graphqlSchemaV2 from './graphql/v2/schema';
+
+const upload = multer();
 
 const cacheControlMaxAge = maxAge => {
   maxAge = maxAge || 5;
@@ -265,7 +268,7 @@ export default app => {
    * Separate route for uploading images to S3
    * TODO: User should be logged in
    */
-  app.post('/images', uploadImage);
+  app.post('/images', upload.single('file'), uploadImage);
 
   /**
    * Generic OAuth (ConnectedAccounts)
