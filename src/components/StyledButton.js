@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import tag from 'clean-tag';
 import {
   bgColor,
@@ -16,6 +16,7 @@ import {
   space,
   textAlign,
   width,
+  themeGet,
 } from 'styled-system';
 import { buttonSize, buttonStyle } from '../constants/theme';
 import StyledSpinner from './StyledSpinner';
@@ -47,6 +48,21 @@ const StyledButtonContent = styled(tag.button)`
   ${space}
   ${textAlign}
   ${width}
+
+  ${props =>
+    props.asLink &&
+    css`
+      background: none !important;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: ${themeGet('colors.primary.500')};
+
+      &:active {
+        color: ${themeGet('colors.primary.400')};
+      }
+    `}
 `;
 
 const StyledButton = ({ loading, ...props }) =>
@@ -102,10 +118,12 @@ StyledButton.propTypes = {
    * Show a loading spinner on button
    */
   loading: PropTypes.bool,
+  /** If true, will display a link instead of a button */
+  asLink: PropTypes.bool,
 };
 
 StyledButton.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'asLink'),
   buttonSize: 'medium',
   buttonStyle: 'standard',
   loading: false,
