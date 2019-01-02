@@ -129,7 +129,9 @@ class CreateOrderPage extends React.Component {
       ? [{}, {}]
       : [
           { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective },
-          LoggedInUser.memberOf.reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
+          LoggedInUser.memberOf
+            .filter(m => m.role === 'ADMIN')
+            .reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
         ];
   }
 
