@@ -210,6 +210,7 @@ const CreateProfile = enhance(
             width={1}
             type="submit"
             fontWeight="600"
+            loading={submitting}
           >
             <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
           </StyledButton>
@@ -218,7 +219,7 @@ const CreateProfile = enhance(
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
         <P color="black.700">Already have an account?</P>
-        <StyledButton fontWeight="600" onClick={onSecondaryAction}>
+        <StyledButton fontWeight="600" onClick={onSecondaryAction} disabled={submitting}>
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
         </StyledButton>
       </Container>
@@ -235,10 +236,13 @@ CreateProfile.propTypes = {
   onOrgSubmit: PropTypes.func.isRequired,
   /** handles redirect from profile create, i.e. Sign In */
   onSecondaryAction: PropTypes.func.isRequired,
+  /** Disable submit and show a spinner on button when set to true */
+  submitting: PropTypes.bool,
 };
 
 CreateProfile.defaultProps = {
   errors: {},
+  submitting: false,
 };
 
 export default CreateProfile;
