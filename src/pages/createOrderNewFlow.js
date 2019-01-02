@@ -291,74 +291,16 @@ const addData = graphql(gql`
     Collective(slug: $slug) {
       id
       slug
-      path
       name
-      type
-      tags
       description
       twitterHandle
+      type
+      website
       image
-      isActive
-      host {
-        id
-        name
-        slug
-        image
-        settings
-      }
-      location {
-        name
-      }
-      startsAt
-      endsAt
-      timezone
-      parentCollective {
-        id
-        slug
-        name
-        image
-        backgroundImage
-      }
-      stats {
-        id
-        yearlyBudget
-        balance
-        backers {
-          all
-        }
-      }
-      members(role: "ADMIN") {
-        id
-        role
-        createdAt
-        description
-        member {
-          id
-          description
-          name
-          slug
-          type
-          image
-        }
-      }
       backgroundImage
-      settings
       currency
-      tiers {
-        id
-        type
-        name
-        slug
-        description
-        amount
-        currency
-        interval
-        presets
-        maxQuantity
-        stats {
-          id
-          availableQuantity
-        }
+      parentCollective {
+        image
       }
     }
   }
