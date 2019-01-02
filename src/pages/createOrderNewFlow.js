@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, pick } from 'lodash';
+import { get } from 'lodash';
+import { Box, Flex } from '@rebass/grid';
 
 import { Router } from '../server/pages';
 
-import { Box, Flex } from '@rebass/grid';
 import { H2, P } from '../components/Text';
 import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
@@ -22,11 +22,10 @@ import StyledButton from '../components/StyledButton';
 import { addCreateOrderMutation } from '../graphql/mutations';
 
 import * as api from '../lib/api';
-import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
-import { isValidUrl, getDomain } from '../lib/utils';
 import ContributePayment from '../components/ContributePayment';
+import Loading from '../components/Loading';
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -85,215 +84,51 @@ class CreateOrderPage extends React.Component {
       result: {},
       step: props.LoggedInUser ? 'showOrder' : 'signin',
     };
-
-    switch (props.verb) {
-      case 'pay':
-        this.defaultType = 'PAYMENT';
-        break;
-      case 'donate':
-        this.defaultType = 'DONATION';
-        break;
-      case 'contribute':
-      default:
-        this.defaultType = 'CONTRIBUTION';
-        break;
-    }
-
-    this.messages = defineMessages({
-      'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
-      'tier.title': {
-        id: 'tier.order.backer.title',
-        defaultMessage: 'Become a {name}',
-      },
-      'donation.title': {
-        id: 'tier.order.donation.title',
-        defaultMessage: 'Contributer',
-      },
-      'membership.title': {
-        id: 'tier.order.membership.title',
-        defaultMessage: 'Become a member',
-      },
-      'service.title': {
-        id: 'tier.order.service.title',
-        defaultMessage: 'Order',
-      },
-      'product.title': {
-        id: 'tier.order.product.title',
-        defaultMessage: 'Order',
-      },
-      'contribution.title': {
-        id: 'tier.name.contribution',
-        defaultMessage: 'contribution',
-      },
-      'payment.title': { id: 'tier.name.payment', defaultMessage: 'payment' },
-      'order.success': {
-        id: 'tier.order.success',
-        defaultMessage: 'Order processed successfully',
-      },
-      'order.successRedirect': {
-        id: 'tier.order.successRedirect',
-        defaultMessage: 'Order processed successfully. Redirecting you to {domain}...',
-      },
-      'order.error': {
-        id: 'tier.order.error',
-        defaultMessage: "An error occured 😳. The order didn't go through. Please try again in a few.",
-      },
-      'tier.donation.button': {
-        id: 'tier.donation.button',
-        defaultMessage: 'donate',
-      },
-      'tier.donation.description': {
-        id: 'tier.donation.description',
-        defaultMessage: 'Thank you for your kind donation 🙏',
-      },
-    });
-  }
-
-  async componentDidMount() {
-    const { data } = this.props;
-    const newState = {};
-    if (!data.Tier && data.fetchData) {
-      data.fetchData();
-    }
-    this.referral = storage.get('referral');
-    const matchingFund = storage.get('matchingFund');
-    if (matchingFund) {
-      newState.matchingFund = matchingFund;
-    }
-    this.setState(newState);
   }
 
   componentDidUpdate(prevProps) {
+    // Signin redirect
     if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
       this.setState({ step: 'showOrder' });
-    }
-    if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
+    } else if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
       this.setState({ step: 'signin' });
     }
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
-    if (this.state.matchingFund) return;
-    const matchingFund = get(newProps, 'data.Collective.settings.matchingFund');
-    if (matchingFund) {
-      this.setState({ matchingFund });
+  /** Returns an array like [personnalProfile, otherProfiles] */
+  getProfiles() {
+    const { LoggedInUser } = this.props;
+    return !LoggedInUser
+      ? [{}, {}]
+      : [
+          { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective },
+          LoggedInUser.memberOf.reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
+        ];
+  }
+
+  getContributorTypeName() {
+    switch (this.props.verb) {
+      case 'pay':
+        return <FormattedMessage id="member.title" defaultMessage="member" />;
+      default:
+        return <FormattedMessage id="backer.title" defaultMessage="backer" />;
     }
   }
 
-  createOrder = async order => {
-    const { intl, data, redirect } = this.props;
-
-    if (this.referral && this.referral > 0) {
-      order.referral = { id: this.referral };
-    }
-    order.paymentMethod = pick(order.paymentMethod, [
-      'uuid',
-      'service',
-      'type',
-      'token',
-      'customerId',
-      'data',
-      'name',
-      'currency',
-      'save',
-    ]);
-    if (this.props.LoggedInUser) {
-      delete order.user;
-    }
-    try {
-      this.setState({ loading: true });
-      const res = await this.props.createOrder(order);
-      const orderCreated = res.data.createOrder;
-      if (redirect && isValidUrl(redirect)) {
-        const domain = getDomain(redirect);
-        this.setState({
-          loading: false,
-          order,
-          result: {
-            success: intl.formatMessage(this.messages['order.successRedirect'], { domain }),
-          },
-        });
-        const redirectTo = `${redirect}?transactionid=${get(orderCreated, 'transactions[0].id')}&status=${
-          orderCreated.status
-        }`;
-        window.location.href = redirectTo;
-      } else {
-        await Router.pushRoute('collective', {
-          slug: orderCreated.fromCollective.slug,
-          status: orderCreated.status,
-          CollectiveId: order.collective.id,
-          collectiveType: data.Collective.type,
-          OrderId: orderCreated.id,
-          TierId: get(order, 'tier.id'),
-          totalAmount: order.totalAmount,
-          paymentMethodType: order.paymentMethod.type,
-        });
-        this.setState({
-          loading: false,
-          order,
-          result: {
-            success: intl.formatMessage(this.messages['order.success']),
-          },
-        });
-        window.scrollTo(0, 0);
-      }
-    } catch (e) {
-      console.error('>>> createOrder error: ', e);
-      const error = e
-        .toString()
-        .replace('GraphQL error: ', '')
-        .replace('Error:', '');
-      this.setState({
-        loading: false,
-        result: {
-          error: error || intl.formatMessage(this.messages['order.error']),
-        },
-      });
-    }
-  };
-
   render() {
-    const { intl, data, LoggedInUser, loadingLoggedInUser } = this.props;
-    const { step } = this.state;
+    const { data, loadingLoggedInUser } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
-
-    const description = decodeURIComponent(this.props.description || '');
-    const collective = data.Collective;
-
-    const TierId = parseInt(this.props.TierId);
-    let tier;
-    if (TierId) {
-      tier = collective.tiers.find(t => t.id === TierId);
+    if (!data.Collective) {
+      return <ErrorPage data={data} />;
+    } else if (loadingLoggedInUser) {
+      return <Loading />;
     }
 
-    tier = tier || {
-      name: intl.formatMessage(this.messages[`${this.defaultType.toLowerCase()}.title`]),
-      presets: !this.order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
-      type: this.defaultType,
-      currency: collective.currency,
-      interval: this.order.interval,
-      button: intl.formatMessage(this.messages['tier.donation.button']),
-      description: description || intl.formatMessage(this.messages['tier.donation.description']),
-    };
-
-    this.order.tier = tier;
-    this.order.description = description;
-
+    const { step } = this.state;
+    const collective = data.Collective;
     const logo = collective.image || get(collective.parentCollective, 'image');
-    const tierName = (tier.name && tier.name.replace(/s$/, '')) || 'backer';
-
-    const profiles = LoggedInUser
-      ? LoggedInUser.memberOf
-          .filter(({ role }) => role === 'ADMIN')
-          .reduce((data, { collective }) => {
-            return { ...data, [collective.id]: collective };
-          }, {})
-      : {};
-
-    const personal = LoggedInUser
-      ? { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective }
-      : {};
+    const tierName = this.getContributorTypeName();
+    const [personal, profiles] = this.getProfiles();
 
     return (
       <Page
@@ -302,20 +137,6 @@ class CreateOrderPage extends React.Component {
         twitterHandle={collective.twitterHandle}
         image={collective.image || collective.backgroundImage}
       >
-        <style jsx>
-          {`
-            .result {
-              margin-bottom: 5rem;
-            }
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-          `}
-        </style>
-
         <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4}>
           <Link route="collective" params={{ slug: collective.slug }} className="goBack">
             <Logo
@@ -336,16 +157,14 @@ class CreateOrderPage extends React.Component {
 
           <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3}>
             <FormattedMessage
-              id="tier.defaultDescription"
+              id="contribute.contributorType"
               defaultMessage="Become a {name}"
-              values={{
-                name: tierName,
-              }}
+              values={{ name: tierName }}
             />
           </P>
         </Flex>
 
-        <div id="content">
+        <Box id="content" mb={5}>
           {step === 'showOrder' && (
             <Flex mt={4} alignItems="center" flexDirection="column">
               <Box>
@@ -426,7 +245,7 @@ class CreateOrderPage extends React.Component {
               {this.state.result.error && <div className="error">{this.state.result.error}</div>}
             </div>
           </div>
-        </div>
+        </Box>
       </Page>
     );
   }
@@ -473,7 +292,7 @@ const addData = graphql(gql`
           all
         }
       }
-      members {
+      members(role: "ADMIN") {
         id
         role
         createdAt
