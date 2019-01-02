@@ -138,20 +138,107 @@ class CreateOrderPage extends React.Component {
     }
   }
 
+  renderContent() {
+    const { step } = this.state;
+    const [personal, profiles] = this.getProfiles();
+
+    return (
+      <Box id="content" mb={5}>
+        {step === 'showOrder' && (
+          <Flex alignItems="center" flexDirection="column">
+            <Box>
+              <StyledInputField htmlFor="contributeAs" label="Contribute as:">
+                {fieldProps => (
+                  <ContributeAs {...fieldProps} onChange={console.log} profiles={profiles} personal={personal} />
+                )}
+              </StyledInputField>
+            </Box>
+            <Box mt={5}>
+              <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold">
+                Next step &rarr;
+              </StyledButton>
+            </Box>
+          </Flex>
+        )}
+        {step === 'signin' && (
+          <Flex justifyContent="center">
+            <SignIn
+              onSubmit={email =>
+                api.signin({ email }, Router.asPath).then(() => Router.pushRoute('signinLinkSent', { email }))
+              }
+              onSecondaryAction={() => this.setState({ step: 'signup' })}
+            />
+          </Flex>
+        )}
+        {step === 'signup' && (
+          <Flex justifyContent="center">
+            <CreateProfile
+              onPersonalSubmit={this.createProfile}
+              onOrgSubmit={this.createProfile}
+              onSecondaryAction={() => this.setState({ step: 'signin' })}
+              submitting={this.state.submitting}
+            />
+          </Flex>
+        )}
+        {step === 'choose-payment' && (
+          <Flex justifyContent="center">
+            <ContributePayment
+              onChange={console.log}
+              paymentMethods={[
+                {
+                  id: 8771,
+                  uuid: 'ce4e0885-ebb4-4e1b-b644-4fa009370300',
+                  name: '4444',
+                  data: {
+                    expMonth: 2,
+                    expYear: 2022,
+                    brand: 'MasterCard',
+                    country: 'US',
+                  },
+                  monthlyLimitPerMember: null,
+                  service: 'stripe',
+                  type: 'creditcard',
+                  balance: 10000000,
+                  currency: 'USD',
+                  expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
+                },
+                {
+                  id: 8783,
+                  uuid: '493eb5de-905f-4f9a-a11e-668bd19d8750',
+                  name: '$100 Gift Card from New Collective',
+                  data: null,
+                  monthlyLimitPerMember: null,
+                  service: 'opencollective',
+                  type: 'virtualcard',
+                  balance: 2300,
+                  currency: 'USD',
+                  expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
+                },
+              ]}
+            />
+          </Flex>
+        )}
+        <div className="row result">
+          <div className="col-sm-2" />
+          <div className="col-sm-10">
+            <div className="success">{this.state.result.success}</div>
+            {this.state.result.error && <div className="error">{this.state.result.error}</div>}
+          </div>
+        </div>
+      </Box>
+    );
+  }
+
   render() {
     const { data, loadingLoggedInUser } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
-    } else if (loadingLoggedInUser) {
-      return <Loading />;
     }
 
-    const { step } = this.state;
     const collective = data.Collective;
     const logo = collective.image || get(collective.parentCollective, 'image');
     const tierName = this.getContributorTypeName();
-    const [personal, profiles] = this.getProfiles();
 
     return (
       <Page
@@ -160,7 +247,7 @@ class CreateOrderPage extends React.Component {
         twitterHandle={collective.twitterHandle}
         image={collective.image || collective.backgroundImage}
       >
-        <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4}>
+        <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4} mb={4}>
           <Link route="collective" params={{ slug: collective.slug }} className="goBack">
             <Logo
               src={logo}
@@ -187,89 +274,7 @@ class CreateOrderPage extends React.Component {
           </P>
         </Flex>
 
-        <Box id="content" mb={5}>
-          {step === 'showOrder' && (
-            <Flex mt={4} alignItems="center" flexDirection="column">
-              <Box>
-                <StyledInputField htmlFor="contributeAs" label="Contribute as:">
-                  {fieldProps => (
-                    <ContributeAs {...fieldProps} onChange={console.log} profiles={profiles} personal={personal} />
-                  )}
-                </StyledInputField>
-              </Box>
-              <Box mt={5}>
-                <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold">
-                  Next step &rarr;
-                </StyledButton>
-              </Box>
-            </Flex>
-          )}
-          {step === 'signin' && !loadingLoggedInUser && (
-            <Flex justifyContent="center" mt={4}>
-              <SignIn
-                onSubmit={email =>
-                  api.signin({ email }, Router.asPath).then(() => Router.pushRoute('signinLinkSent', { email }))
-                }
-                onSecondaryAction={() => this.setState({ step: 'signup' })}
-              />
-            </Flex>
-          )}
-          {step === 'signup' && (
-            <Flex justifyContent="center" mt={4}>
-              <CreateProfile
-                onPersonalSubmit={this.createProfile}
-                onOrgSubmit={this.createProfile}
-                onSecondaryAction={() => this.setState({ step: 'signin' })}
-                submitting={this.state.submitting}
-              />
-            </Flex>
-          )}
-          {step === 'choose-payment' && (
-            <Flex justifyContent="center" mt={4}>
-              <ContributePayment
-                onChange={console.log}
-                paymentMethods={[
-                  {
-                    id: 8771,
-                    uuid: 'ce4e0885-ebb4-4e1b-b644-4fa009370300',
-                    name: '4444',
-                    data: {
-                      expMonth: 2,
-                      expYear: 2022,
-                      brand: 'MasterCard',
-                      country: 'US',
-                    },
-                    monthlyLimitPerMember: null,
-                    service: 'stripe',
-                    type: 'creditcard',
-                    balance: 10000000,
-                    currency: 'USD',
-                    expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
-                  },
-                  {
-                    id: 8783,
-                    uuid: '493eb5de-905f-4f9a-a11e-668bd19d8750',
-                    name: '$100 Gift Card from New Collective',
-                    data: null,
-                    monthlyLimitPerMember: null,
-                    service: 'opencollective',
-                    type: 'virtualcard',
-                    balance: 2300,
-                    currency: 'USD',
-                    expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
-                  },
-                ]}
-              />
-            </Flex>
-          )}
-          <div className="row result">
-            <div className="col-sm-2" />
-            <div className="col-sm-10">
-              <div className="success">{this.state.result.success}</div>
-              {this.state.result.error && <div className="error">{this.state.result.error}</div>}
-            </div>
-          </div>
-        </Box>
+        {loadingLoggedInUser ? <Loading mb={4} /> : this.renderContent()}
       </Page>
     );
   }
