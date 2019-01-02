@@ -98,6 +98,10 @@ class CreateOrderPage extends React.Component {
   }
 
   createProfile = data => {
+    if (this.state.submitting) {
+      return false;
+    }
+
     const redirect = window.location.pathname;
     const user = pick(data, ['email', 'firstName', 'lastName']);
     const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
