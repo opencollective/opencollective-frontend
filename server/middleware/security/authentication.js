@@ -73,10 +73,6 @@ export const checkJwtExpiry = (req, res, next) => {
   return next();
 };
 
-export function authenticateUserByJwtNoExpiry() {
-  return [this.parseJwtNoExpiryCheck, this._authenticateUserByJwt];
-}
-
 /**
  * Authenticate the user using the JWT token and populates:
  *  - req.remoteUser

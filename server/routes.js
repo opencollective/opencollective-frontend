@@ -98,11 +98,6 @@ export default app => {
   app.post('/users/token', auth.mustBeLoggedIn, users.token);
   app.post('/users/update-token', auth.mustBeLoggedIn, users.updateToken);
 
-  // These two endpoints are used by opencollective-website and might
-  // be removed when the new frontend replaces it.
-  app.post('/users/new_login_token', required('email'), mw.getOrCreateUser, users.sendNewTokenByEmail);
-  app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
-
   /**
    * Moving forward, all requests will try to authenticate the user if there is a JWT token provided
    * (an error will be returned if the JWT token is invalid, if not present it will simply continue)

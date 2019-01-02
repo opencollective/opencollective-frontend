@@ -2,7 +2,6 @@ import { paginateOffset } from '../lib/utils';
 import json2csv from 'json2csv';
 import moment from 'moment';
 import _ from 'lodash';
-import * as users from '../controllers/users';
 import queries from '../lib/queries';
 import models, { Op } from '../models';
 import errors from '../lib/errors';
@@ -53,77 +52,6 @@ export const format = format => {
         return next();
     }
   };
-};
-
-/**
- * Get the user based on its email or paypalEmail. If not found, creates one.
- * Used for creating a transaction from a new/returning donor or an expense from a new/returning user.
- */
-export const getOrCreateUser = (req, res, next) => {
-  // If already logged in, proceed
-  if (req.remoteUser) {
-    if (req.body.expense) {
-      const { name, paypalEmail } = req.body.expense;
-      return req.remoteUser
-        .updateWhiteListedAttributes({ name, paypalEmail })
-        .then(user => (req.user = user))
-        .then(() => next());
-    } else {
-      req.user = req.remoteUser;
-      return next();
-    }
-  }
-
-  let name, email, paypalEmail;
-
-  if (req.body.expense) {
-    ({ email } = req.body.expense);
-    ({ paypalEmail } = req.body.expense);
-    ({ name } = req.body.expense);
-  } else if (req.body.user) {
-    ({ name } = req.body.user);
-    ({ email } = req.body.user);
-  } else if (req.body.payment) {
-    ({ email } = req.body.payment);
-  } else if (req.body.email) {
-    email = req.body.email; // used by /new_login_token
-  }
-
-  const password = req.body.password || req.query.password;
-
-  if (!email && !paypalEmail) {
-    return next(new errors.ValidationFailed('Email or paypalEmail required'));
-  }
-
-  if (password) {
-    return this.authenticate(req, res, next);
-  }
-
-  if (email) {
-    email = email.toLowerCase();
-  }
-  if (paypalEmail) {
-    paypalEmail = paypalEmail.toLowerCase();
-  }
-
-  const userData = {
-    name,
-    email: email || paypalEmail,
-    paypalEmail,
-  };
-
-  User.findOne({
-    where: {
-      [Op.or]: {
-        email: userData.email,
-        paypalEmail: userData.paypalEmail,
-      },
-    },
-  })
-    .then(user => user || users._create(userData))
-    .tap(user => (req.user = user))
-    .tap(() => next())
-    .catch(next);
 };
 
 /**

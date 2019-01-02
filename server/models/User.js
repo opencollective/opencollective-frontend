@@ -1,6 +1,3 @@
-/**
- * Dependencies.
- */
 import bcrypt from 'bcrypt';
 import config from 'config';
 import Promise from 'bluebird';
@@ -12,8 +9,6 @@ import logger from '../lib/logger';
 import * as auth from '../lib/auth';
 import errors from '../lib/errors';
 import userLib from '../lib/userlib';
-import knox from '../gateways/knox';
-import imageUrlLib from '../lib/imageUrlToAmazonUrl';
 import roles from '../constants/roles';
 import { isValidEmail } from '../lib/utils';
 
@@ -293,75 +288,6 @@ export default (Sequelize, DataTypes) => {
         return models.Notification.create(notification);
       }
     });
-  };
-
-  // should be deprecated
-  User.prototype.updateWhiteListedAttributes = function(attributes) {
-    const allowedFields = [
-      'slug',
-      'firstName',
-      'lastName',
-      'description',
-      'longDescription',
-      'twitterHandle',
-      'githubHandle',
-      'website',
-      'image',
-      'paypalEmail',
-    ];
-
-    if (attributes.name) {
-      const nameTokens = attributes.name.split(' ');
-      this.firstName = nameTokens.shift();
-      this.lastName = nameTokens.join(' ');
-    }
-    const updatedAttributes = { User: {}, Collective: {} };
-    const userAttributes = ['firstName', 'lastName', 'image', 'paypalEmail'];
-
-    return Promise.map(allowedFields, attr => {
-      if (attributes[attr]) {
-        const model = userAttributes.indexOf(attr) !== -1 ? 'User' : 'Collective';
-        updatedAttributes[model][attr] = attributes[attr];
-      }
-
-      if (attr === 'slug') {
-        return Sequelize.query(`SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[attr]}'`, {
-          type: Sequelize.QueryTypes.SELECT,
-        }).then(res => {
-          const count = res[0].count;
-          if (count > 0) throw new errors.BadRequest(`slug ${attributes[attr]} is already taken`);
-        });
-      }
-    })
-      .then(() => updatedAttributes.User.image || (this.firstName && userLib.fetchAvatar(this.email))) // don't try to fetch avatar if user hasn't provided a first name (i.e. if they wanted to remain anonymous)
-      .then(image => {
-        if (
-          process.env.NODE_ENV === 'development' ||
-          !image ||
-          image.indexOf('/public') === 0 ||
-          image.indexOf(config.aws.s3.bucket) !== -1
-        ) {
-          return;
-        }
-        debug('updateWhiteListedAttributes', 'uploading image', image);
-        return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, {
-          context: imageUrlLib,
-        })(knox, image).then((aws_src, error) => {
-          updatedAttributes.User.image = error ? updatedAttributes.User.image : aws_src;
-        });
-      })
-      .then(() => {
-        debug('updateWhiteListedAttributes', updatedAttributes);
-        if (Object.keys(updatedAttributes.Collective).length > 0) {
-          models.Collective.update(updatedAttributes.Collective, {
-            where: { id: this.CollectiveId },
-          });
-        }
-        if (Object.keys(updatedAttributes.User).length > 0) {
-          return this.update(updatedAttributes.User);
-        }
-        return this;
-      });
   };
 
   User.prototype.populateRoles = async function() {
