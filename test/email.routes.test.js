@@ -83,7 +83,7 @@ describe('email.routes.test', () => {
   before('create collective and members', done => {
     Collective.create(collectiveData)
       .tap(g => (collective = g))
-      .then(() => Promise.map(usersData, models.User.createUserWithCollective))
+      .then(() => Promise.map(usersData, u => models.User.createUserWithCollective(u)))
       .tap(users => {
         return Promise.map(users, (user, index) => {
           return collective.addUserWithRole(user, usersData[index].role);

@@ -1069,10 +1069,12 @@ export default function(Sequelize, DataTypes) {
    * @param {*} role
    * @param {*} defaultAttributes
    */
-  Collective.prototype.addUserWithRole = function(user, role, defaultAttributes = {}) {
+  Collective.prototype.addUserWithRole = function(user, role, defaultAttributes = {}, transaction) {
     if (role === roles.HOST) {
       return logger.info('Please use Collective.addHost(hostCollective, remoteUser);');
     }
+
+    const sequelizeParams = transaction ? { transaction } : undefined;
 
     const member = {
       role,
@@ -1084,13 +1086,21 @@ export default function(Sequelize, DataTypes) {
 
     debug('addUserWithRole', user.id, role, 'member', member);
     return Promise.all([
-      models.Member.create(member),
-      models.User.findById(member.CreatedByUserId, {
-        include: [{ model: models.Collective, as: 'collective' }],
-      }),
-      models.User.findById(user.id, {
-        include: [{ model: models.Collective, as: 'collective' }],
-      }),
+      models.Member.create(member, sequelizeParams),
+      models.User.findById(
+        member.CreatedByUserId,
+        {
+          include: [{ model: models.Collective, as: 'collective' }],
+        },
+        sequelizeParams,
+      ),
+      models.User.findById(
+        user.id,
+        {
+          include: [{ model: models.Collective, as: 'collective' }],
+        },
+        sequelizeParams,
+      ),
     ]).then(results => {
       const member = results[0];
       const remoteUser = results[1];
@@ -1101,19 +1111,22 @@ export default function(Sequelize, DataTypes) {
         case roles.ATTENDEE:
         case roles.FOLLOWER:
           return Promise.props({
-            memberCollective: models.Collective.findById(member.MemberCollectiveId),
-            order: models.Order.findOne({
-              where: {
-                CollectiveId: this.id,
-                FromCollectiveId: member.MemberCollectiveId,
+            memberCollective: models.Collective.findById(member.MemberCollectiveId, sequelizeParams),
+            order: models.Order.findOne(
+              {
+                where: {
+                  CollectiveId: this.id,
+                  FromCollectiveId: member.MemberCollectiveId,
+                },
+                include: [
+                  { model: models.Tier },
+                  { model: models.Subscription },
+                  { model: models.Collective, as: 'referral' },
+                ],
+                order: [['createdAt', 'ASC']],
               },
-              include: [
-                { model: models.Tier },
-                { model: models.Subscription },
-                { model: models.Collective, as: 'referral' },
-              ],
-              order: [['createdAt', 'ASC']],
-            }),
+              sequelizeParams,
+            ),
             urlPath: this.getUrlPath(),
           }).then(({ order, urlPath, memberCollective }) => {
             const data = {
@@ -1133,11 +1146,14 @@ export default function(Sequelize, DataTypes) {
             if (order && order.referral) {
               data.order.referral = order.referral.minimal;
             }
-            return models.Activity.create({
-              CollectiveId: this.id,
-              type: activities.COLLECTIVE_MEMBER_CREATED,
-              data,
-            });
+            return models.Activity.create(
+              {
+                CollectiveId: this.id,
+                type: activities.COLLECTIVE_MEMBER_CREATED,
+                data,
+              },
+              sequelizeParams,
+            );
           });
 
         case roles.MEMBER:

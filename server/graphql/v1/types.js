@@ -1549,6 +1549,25 @@ export const ExpenseStatusType = new GraphQLEnumType({
   values: Object.keys(status).reduce((values, key) => ({ ...values, [key]: {} }), {}),
 });
 
+export const UserInputType = new GraphQLInputObjectType({
+  name: 'UserInput',
+  description: 'Create and edit options for users',
+  fields: {
+    email: {
+      type: GraphQLString,
+      description: 'User email address',
+    },
+    firstName: {
+      type: GraphQLString,
+      description: 'User first name',
+    },
+    lastName: {
+      type: GraphQLString,
+      description: 'User last name',
+    },
+  },
+});
+
 export const OrderByType = new GraphQLInputObjectType({
   name: 'OrderByType',
   description: 'Ordering options',
