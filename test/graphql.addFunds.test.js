@@ -61,7 +61,7 @@ describe('graphql.addFunds', () => {
     // When the funds are added twice
     const gqlResult0 = await utils.graphqlQuery(addFundsToOrgQuery, args, user);
     gqlResult0.errors && console.error(gqlResult0.errors[0]);
-    expect(gqlResult0.errors).to.be.empty;
+    expect(gqlResult0.errors).to.be.undefined;
 
     // changing some properties on the second query parameters
     args.totalAmount = 3000;
@@ -70,7 +70,7 @@ describe('graphql.addFunds', () => {
     // executing second query
     const gqlResult1 = await utils.graphqlQuery(addFundsToOrgQuery, args, user);
     gqlResult1.errors && console.error(gqlResult1.errors[0]);
-    expect(gqlResult1.errors).to.be.empty;
+    expect(gqlResult1.errors).to.be.undefined;
 
     // changing some properties on the second query parameters
     args.totalAmount = 4000;
@@ -79,7 +79,7 @@ describe('graphql.addFunds', () => {
     // executing second query
     const gqlResult2 = await utils.graphqlQuery(addFundsToOrgQuery, args, user);
     gqlResult2.errors && console.error(gqlResult2.errors[0]);
-    expect(gqlResult2.errors).to.be.empty;
+    expect(gqlResult2.errors).to.be.undefined;
 
     // And then there should be 2 payment methods created in the
     // database

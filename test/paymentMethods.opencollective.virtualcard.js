@@ -584,7 +584,8 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user1);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
+
         const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.createPaymentMethod.id);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.limitedToTags).to.contain('open source');
@@ -683,7 +684,8 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(claimPaymentMethodQuery, args);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
+
         const paymentMethod = gqlResult.data.claimPaymentMethod;
         // payment method should exist
         expect(paymentMethod).to.exist;
@@ -736,7 +738,7 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(claimPaymentMethodQuery, args, existingUser);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
 
         const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.claimPaymentMethod.id);
 
@@ -939,7 +941,8 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
+
         const transactions = await models.Transaction.findAll({
           where: {
             OrderId: gqlResult.data.createOrder.id,
