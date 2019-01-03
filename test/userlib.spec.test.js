@@ -55,7 +55,6 @@ describe('userlib', () => {
       .then(() => userlib.fetchAvatar(userData1.email))
       .then(image => {
         expect(stub.callCount).to.equal(1);
-        expect(image).to.be.falsy;
         expect(image).to.equal(null);
       }));
 });
