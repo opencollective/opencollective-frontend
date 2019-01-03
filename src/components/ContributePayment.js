@@ -192,6 +192,7 @@ class ContributePayment extends React.Component {
     return (
       <StyledCard maxWidth={500}>
         <StyledRadioList
+          id="PaymentMethod"
           name="PaymentMethod"
           keyGetter="key"
           options={paymentMethodsOptions}
