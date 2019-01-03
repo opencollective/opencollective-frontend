@@ -35,9 +35,7 @@ class HostExpensesPage extends React.Component {
 
     return (
       <div className="HostExpensesPage">
-        {LoggedInUser && (
-          <HostDashboard hostCollectiveSlug={this.props.hostCollectiveSlug} LoggedInUser={LoggedInUser} />
-        )}
+        <HostDashboard hostCollectiveSlug={this.props.hostCollectiveSlug} LoggedInUser={LoggedInUser} />
       </div>
     );
   }
