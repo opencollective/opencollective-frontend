@@ -73,7 +73,6 @@ class CreateOrderPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.createProfile = this.createProfile.bind(this);
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
     this.order = {
       quantity: parseInt(props.quantity, 10) || 1,
@@ -84,19 +83,27 @@ class CreateOrderPage extends React.Component {
       loading: false,
       submitting: false,
       result: {},
-      step: props.LoggedInUser ? 'showOrder' : 'signin',
+      step: props.LoggedInUser ? 'contributeAs' : 'signin',
       unknownEmail: false,
+      selectedProfile: null,
     };
   }
 
   componentDidUpdate(prevProps) {
     // Signin redirect
     if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
-      this.setState({ step: 'showOrder' });
+      this.setState({ step: 'contributeAs' });
     } else if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
       this.setState({ step: 'signin' });
     }
   }
+
+  nextStep = () => {
+    this.setState(state => {
+      if (state.step === 'contributeAs') return { ...state, step: 'choose-payment' };
+      return state;
+    });
+  };
 
   signIn = email => {
     if (this.state.submitting) {
@@ -153,7 +160,7 @@ class CreateOrderPage extends React.Component {
       : [
           { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective },
           LoggedInUser.memberOf
-            .filter(m => m.role === 'ADMIN')
+            .filter(m => m.role === 'ADMIN' && m.collective.id !== this.props.data.Collective.id)
             .reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
         ];
   }
@@ -168,23 +175,35 @@ class CreateOrderPage extends React.Component {
   }
 
   renderContent() {
-    const { step, loading, submitting, unknownEmail } = this.state;
+    const { LoggedInUser } = this.props;
+    const { step, loading, submitting, unknownEmail, selectedProfile } = this.state;
     const [personal, profiles] = this.getProfiles();
 
     return (
       <Box id="content" mb={5}>
-        {step === 'showOrder' && (
+        {step === 'contributeAs' && (
           <Flex alignItems="center" flexDirection="column">
             <Box>
               <StyledInputField htmlFor="contributeAs" label="Contribute as:">
                 {fieldProps => (
-                  <ContributeAs {...fieldProps} onChange={console.log} profiles={profiles} personal={personal} />
+                  <ContributeAs
+                    {...fieldProps}
+                    onChange={profile => this.setState({ selectedProfile: profile })}
+                    profiles={profiles}
+                    personal={personal}
+                  />
                 )}
               </StyledInputField>
             </Box>
             <Box mt={5}>
-              <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold">
-                Next step &rarr;
+              <StyledButton
+                disabled={selectedProfile === null}
+                buttonStyle="primary"
+                buttonSize="large"
+                fontWeight="bold"
+                onClick={this.nextStep}
+              >
+                <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" /> &rarr;
               </StyledButton>
             </Box>
           </Flex>
@@ -213,37 +232,8 @@ class CreateOrderPage extends React.Component {
           <Flex justifyContent="center">
             <ContributePayment
               onChange={console.log}
-              paymentMethods={[
-                {
-                  id: 8771,
-                  uuid: 'ce4e0885-ebb4-4e1b-b644-4fa009370300',
-                  name: '4444',
-                  data: {
-                    expMonth: 2,
-                    expYear: 2022,
-                    brand: 'MasterCard',
-                    country: 'US',
-                  },
-                  monthlyLimitPerMember: null,
-                  service: 'stripe',
-                  type: 'creditcard',
-                  balance: 10000000,
-                  currency: 'USD',
-                  expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
-                },
-                {
-                  id: 8783,
-                  uuid: '493eb5de-905f-4f9a-a11e-668bd19d8750',
-                  name: '$100 Gift Card from New Collective',
-                  data: null,
-                  monthlyLimitPerMember: null,
-                  service: 'opencollective',
-                  type: 'virtualcard',
-                  balance: 2300,
-                  currency: 'USD',
-                  expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
-                },
-              ]}
+              paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
+              collective={this.state.selectedProfile}
             />
           </Flex>
         )}
