@@ -33,20 +33,16 @@ const enhance = compose(
   withState('state', 'setState', ({ errors = {} }) => ({ errors })),
   withHandlers({
     getFieldError: ({ state }) => name => state.errors[name],
-    onChange: ({ onChange, personal, profiles, state }) => value => {
-      if (value === 'new-org') {
+    onChange: ({ onChange, state }) => selected => {
+      if (selected.key === 'new-org') {
         return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
       }
 
-      if (value === 'anonymous') {
+      if (selected.key === 'anonymous') {
         return onChange({ name: 'anonymous' });
       }
 
-      if (value === '0') {
-        return onChange(personal);
-      }
-
-      return onChange(profiles[value]);
+      return onChange(selected.value);
     },
     onFieldChange: ({ onChange, setState }) => event => {
       event.stopPropagation();
