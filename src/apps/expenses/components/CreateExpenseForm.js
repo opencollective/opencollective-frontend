@@ -11,6 +11,8 @@ import InputField from '../../../components/InputField';
 import SignInForm from '../../../components/SignInForm';
 import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
+import { P } from '../../../components/Text';
+import Container from '../../../components/Container';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -179,7 +181,7 @@ class CreateExpenseForm extends React.Component {
             .CreateExpenseForm {
               font-size: 1.2rem;
               overflow: hidden;
-              margin: 0 1rem 5rem 1rem;
+              padding: 0 2rem 5rem;
             }
             .disclaimer,
             .expensePolicy {
@@ -297,7 +299,7 @@ class CreateExpenseForm extends React.Component {
           `}
         </style>
 
-        <form onSubmit={this.onSubmit}>
+        <Container as="form" onSubmit={this.onSubmit} maxWidth={[500, null, 800]} mx="auto">
           {!collective.expensePolicy && LoggedInUser && LoggedInUser.canEditCollective(collective) && (
             <div className="expensePolicy">
               <h2>
@@ -484,7 +486,7 @@ class CreateExpenseForm extends React.Component {
               {this.state.error && <div className="error">{this.state.error}</div>}
             </div>
           </div>
-        </form>
+        </Container>
       </div>
     );
   }
@@ -495,9 +497,9 @@ class CreateExpenseForm extends React.Component {
     if (!LoggedInUser) {
       return (
         <div className="CreateExpenseForm">
-          <p>
+          <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
             <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
-          </p>
+          </P>
           <SignInForm next={`/${collective.slug}/expenses/new`} />
         </div>
       );
