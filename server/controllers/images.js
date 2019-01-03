@@ -60,5 +60,5 @@ export default function uploadImage(req, res, next) {
     });
   });
 
-  put.end(file.buffer.toString());
+  put.end(file.buffer);
 }
