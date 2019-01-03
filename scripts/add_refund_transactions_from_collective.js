@@ -12,10 +12,12 @@ import debug from 'debug';
 import models from '../server/models';
 import * as libPayments from '../server/lib/payments';
 
-const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS ? process.env.FROM_COLLECTIVE_IDS.split(',').map(Number) : [];
-
 // the user id of the one who's running this script, will be set on the field `CreatedByUserId`.
-const UPDATER_USER_ID = process.env.UPDATER_USER_ID;
+const UPDATER_USER_ID = parseInt(process.env.UPDATER_USER_ID);
+if (!UPDATER_USER_ID) {
+  throw Error('You need to define a user id to run this script');
+}
+const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS ? process.env.FROM_COLLECTIVE_IDS.split(',').map(Number) : [];
 
 const debugRefund = debug('refundTransactions');
 
