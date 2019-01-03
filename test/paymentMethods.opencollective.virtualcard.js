@@ -889,7 +889,7 @@ describe('opencollective.virtualcard', () => {
         };
         // Executing queries
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain("You don't have enough funds available");
       }); /** End Of "Order should NOT be executed because its amount exceeds the balance of the virtual card" */
@@ -904,7 +904,7 @@ describe('opencollective.virtualcard', () => {
         };
         // Executing queries
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain(
           'This payment method can only be used for collectives in open source',
@@ -922,7 +922,7 @@ describe('opencollective.virtualcard', () => {
         };
         // Executing queries
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain(
           'This payment method can only be used for collectives hosted by Host 1',
@@ -981,7 +981,7 @@ describe('opencollective.virtualcard', () => {
         await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
 
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain("You don't have enough funds available");
       }); /** End Of "should fail when multiple orders exceed the balance of the virtual card" */
