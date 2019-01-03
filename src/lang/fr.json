@@ -670,7 +670,7 @@
   "organization.supercollective.title": "{tags} collectifs",
   "paymentMethods.labelVirtualCard": "{name} {expiration} ({balance} restants)",
   "paymentMethods.labelCreditCard": "{name} {expiration}",
-  "paymentMethods.labelPrepaid": "Prépayé: {name} ({balance} restants)",
+  "paymentMethods.labelPrepaid": "{name} ({balance} restants)",
   "paymentMethods.labelCollective": "{balance} available",
   "actions.approveCollective.processing": "Approbation du collectif en cours",
   "actions.approveExpense.processing": "Approbation de la dépense en cours",

@@ -670,7 +670,7 @@
   "organization.supercollective.title": "{tags} collectives",
   "paymentMethods.labelVirtualCard": "{name} {expiration} ({balance} left)",
   "paymentMethods.labelCreditCard": "{name} {expiration}",
-  "paymentMethods.labelPrepaid": "Prepaid: {name} ({balance} left)",
+  "paymentMethods.labelPrepaid": "{name} ({balance} left)",
   "paymentMethods.labelCollective": "{balance} available",
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Approving expense",
