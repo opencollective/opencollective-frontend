@@ -2,17 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
-import moment from 'moment';
 import { Box, Flex } from '@rebass/grid';
 import { Elements, CardElement, injectStripe } from 'react-stripe-elements';
 import { FormattedMessage } from 'react-intl';
+import { uniqBy, get } from 'lodash';
+
+import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck.cjs';
 
 import { withStripeLoader } from './StripeProvider';
 import Container from './Container';
 import { P, Span } from './Text';
 import StyledCard from './StyledCard';
 import StyledRadioList from './StyledRadioList';
-import { getPaymentMethodName } from '../lib/payment_method_label';
+import { getPaymentMethodName, paymentMethodExpiration } from '../lib/payment_method_label';
 import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
 
@@ -21,6 +23,7 @@ import GiftCard from './icons/GiftCard';
 import PayPal from './icons/PayPal';
 import CreditCardInactive from './icons/CreditCardInactive';
 import StyledCheckbox from './StyledCheckbox';
+import Avatar from './Avatar';
 
 const PaymentEntryContainer = styled(Container)`
   display: flex;
@@ -32,26 +35,36 @@ const PaymentEntryContainer = styled(Container)`
   }
 `;
 
-const getPaymentMethodIcon = pm => {
+const getPaymentMethodIcon = (pm, collective) => {
   if (pm.type === 'creditcard') {
     return <CreditCard />;
   } else if (pm.type === 'virtualcard') {
     return <GiftCard />;
   } else if (pm.type === 'paypal') {
     return <PayPal />;
+  } else if (pm.type === 'prepaid') {
+    return <MoneyCheck width="26px" height="18px" />;
+  } else if (pm.type === 'collective' && collective) {
+    const { image, type, name } = collective;
+    return <Avatar src={image} type={type} size="3.6rem" name={name} />;
   }
 };
 
 const getPaymentMethodMetadata = pm => {
+  const expiryDate = paymentMethodExpiration(pm);
   if (pm.type === 'creditcard') {
-    return `Expires on ${moment(pm.expiryDate).format('MM/Y')}`;
+    return `Expires on ${expiryDate}`;
   } else if (pm.type === 'virtualcard') {
     const balanceLeft = `${formatCurrency(pm.balance, pm.balance.curency)} left`;
-    if (pm.expiryDate) {
-      return `${balanceLeft}, expires on ${moment(pm.expiryDate).format('MM/Y')}`;
+    if (expiryDate) {
+      return `${balanceLeft}, expires on ${expiryDate}`;
     } else {
       return balanceLeft;
     }
+  } else if (pm.type === 'prepaid') {
+    return `${formatCurrency(pm.balance, pm.balance.curency)} left`;
+  } else if (pm.type === 'collective') {
+    return `${formatCurrency(pm.balance, pm.balance.curency)} available`;
   }
 };
 
@@ -159,12 +172,15 @@ class ContributePayment extends React.Component {
   }
 
   generatePaymentsOptions() {
+    const { paymentMethods, collective } = this.props;
+    const userPaymentMethods = uniqBy([...paymentMethods, ...get(collective, 'paymentMethods', [])], 'id');
+
     return [
-      ...this.props.paymentMethods.map(pm => ({
+      ...userPaymentMethods.map(pm => ({
         key: `pm-${pm.id}`,
         title: getPaymentMethodName(pm),
         subtitle: getPaymentMethodMetadata(pm),
-        icon: getPaymentMethodIcon(pm),
+        icon: getPaymentMethodIcon(pm, collective),
         paymentMethod: pm,
       })),
       ...this.staticPaymentMethodsOptions,
@@ -229,7 +245,12 @@ class ContributePayment extends React.Component {
 
 ContributePayment.propTypes = {
   /** The payment methods to display */
-  paymentMethods: PropTypes.arrayOf(PropTypes.object).isRequired,
+  paymentMethods: PropTypes.arrayOf(PropTypes.object),
+  /**
+   * An optional collective to get payment methods from. If used at the same time as
+   * `paymentMethods` it will merge both lists and filter uniques using their ids.
+   */
+  collective: PropTypes.object,
   /** Called when the payment method changes */
   onChange: PropTypes.func,
   /** Wether PayPal should be enabled */
@@ -238,6 +259,8 @@ ContributePayment.propTypes = {
 
 ContributePayment.defaultProps = {
   withPaypal: true,
+  paymentMethods: [],
+  collective: null,
 };
 
 export default withIntl(withStripeLoader(ContributePayment));

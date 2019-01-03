@@ -30,7 +30,7 @@ const messages = defineMessages({
   },
   prepaid: {
     id: 'paymentMethods.labelPrepaid',
-    defaultMessage: 'Prepaid: {name} ({balance} left)',
+    defaultMessage: '{name} ({balance} left)',
   },
   collective: {
     id: 'paymentMethods.labelCollective',
@@ -47,12 +47,12 @@ const messages = defineMessages({
  * string if payment method has no expiry date.
  * @param {PaymentMethod} pm
  */
-function paymentMethodExpiration(pm) {
+export function paymentMethodExpiration(pm) {
   /* The expiryDate field will show up for prepaid cards */
   return pm.expiryDate
-    ? `- exp ${moment(pm.expiryDate).format('MM/Y')}`
+    ? moment(pm.expiryDate).format('MM/Y')
     : get(pm, 'data.expMonth') || get(pm, 'data.expYear')
-    ? `- exp ${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(pm, 'data.expYear')}`
+    ? `${padStart(get(pm, 'data.expMonth'), 2, '0')}/${get(pm, 'data.expYear')}`
     : '';
 }
 
@@ -78,12 +78,10 @@ export const getPaymentMethodName = ({ name, data, type }) => {
   if (type === 'virtualcard') {
     return name.replace('card from', 'Gift Card from');
   } else if (type === 'prepaid') {
-    return name;
+    return `Prepaid: ${name}`;
   } else if (type === 'creditcard') {
     const brand = data && data.brand && formatCreditCardBrand(data.brand);
     return `${brand || type} **** ${name}`;
-  } else if (type === 'collective') {
-    return `Collective ${name}`;
   } else {
     return name;
   }
@@ -103,10 +101,11 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
   let label = null;
 
   if (type === 'virtualcard') {
+    const expiryDate = paymentMethodExpiration(paymentMethod);
     label = intl.formatMessage(messages.virtualcard, {
       name,
       balance: formatCurrency(balance, currency),
-      expiration: paymentMethodExpiration(paymentMethod),
+      expiration: `- exp ${expiryDate}`,
     });
   } else if (type === 'prepaid') {
     label = intl.formatMessage(messages.prepaid, {
@@ -114,9 +113,10 @@ export function paymentMethodLabel(intl, paymentMethod, collectiveName = null) {
       balance: formatCurrency(balance, currency),
     });
   } else if (type === 'creditcard') {
+    const expiryDate = paymentMethodExpiration(paymentMethod);
     label = intl.formatMessage(messages.creditcard, {
       name,
-      expiration: paymentMethodExpiration(paymentMethod),
+      expiration: `- exp ${expiryDate}`,
     });
   } else if (type === 'collective') {
     label = intl.formatMessage(messages.collective, {
