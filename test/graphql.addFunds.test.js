@@ -37,7 +37,7 @@ describe('graphql.addFunds', () => {
 
     // Then it should be a successful call
     gqlResult.errors && console.error(gqlResult.errors[0]);
-    expect(gqlResult.errors).to.be.empty;
+    expect(gqlResult.errors).to.be.undefined;
 
     // And then there should be a new payment method created in the
     // database
