@@ -35,7 +35,7 @@
     "connect-session-sequelize": "6.0.0",
     "cookie-parser": "1.4.3",
     "cors": "2.8.5",
-    "cucumber": "5.0.3",
+    "cucumber": "5.1.0",
     "dataloader": "1.4.0",
     "dataloader-sequelize": "1.7.6",
     "debug": "4.1.1",
