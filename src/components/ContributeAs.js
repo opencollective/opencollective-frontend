@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, withHandlers, withState } from 'recompose';
 import { capitalize, omit } from 'lodash';
@@ -18,6 +19,14 @@ import { Search } from 'styled-icons/octicons/Search.cjs';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
+`;
+
+const ContributeAsEntryContainer = styled(Container)`
+  cursor: pointer;
+  background: ${themeGet('colors.white.full')};
+  &:hover {
+    background: ${themeGet('colors.black.50')};
+  }
 `;
 
 const enhance = compose(
@@ -130,7 +139,7 @@ const ContributeAs = enhance(
         )}
         <StyledRadioList {...fieldProps} options={options} onChange={onChange} defaultValue={firstProfile}>
           {({ key, value, radio, checked, index }) => (
-            <Container
+            <ContributeAsEntryContainer
               display="flex"
               alignItems="center"
               px={4}
@@ -210,7 +219,7 @@ const ContributeAs = enhance(
                   <Logo name={key} height="3rem" />
                 </Container>
               )}
-            </Container>
+            </ContributeAsEntryContainer>
           )}
         </StyledRadioList>
       </StyledCard>
