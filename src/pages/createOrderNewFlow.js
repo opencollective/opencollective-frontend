@@ -85,6 +85,7 @@ class CreateOrderPage extends React.Component {
       submitting: false,
       result: {},
       step: props.LoggedInUser ? 'showOrder' : 'signin',
+      unknownEmail: false,
     };
   }
 
@@ -96,6 +97,28 @@ class CreateOrderPage extends React.Component {
       this.setState({ step: 'signin' });
     }
   }
+
+  signIn = email => {
+    if (this.state.submitting) {
+      return false;
+    }
+
+    this.setState({ submitting: true });
+    return api
+      .checkUserExistence(email)
+      .then(exists => {
+        if (exists) {
+          return api.signin({ email }, Router.asPath).then(() => {
+            Router.pushRoute('signinLinkSent', { email });
+          });
+        } else {
+          this.setState({ unknownEmail: true, submitting: false });
+        }
+      })
+      .catch(e => {
+        this.setState({ error: e.message, submitting: false });
+      });
+  };
 
   createProfile = data => {
     if (this.state.submitting) {
@@ -145,7 +168,7 @@ class CreateOrderPage extends React.Component {
   }
 
   renderContent() {
-    const { step } = this.state;
+    const { step, loading, submitting, unknownEmail } = this.state;
     const [personal, profiles] = this.getProfiles();
 
     return (
@@ -169,10 +192,10 @@ class CreateOrderPage extends React.Component {
         {step === 'signin' && (
           <Flex justifyContent="center">
             <SignIn
-              onSubmit={email =>
-                api.signin({ email }, Router.asPath).then(() => Router.pushRoute('signinLinkSent', { email }))
-              }
+              onSubmit={this.signIn}
               onSecondaryAction={() => this.setState({ step: 'signup' })}
+              loading={loading || submitting}
+              unknownEmail={unknownEmail}
             />
           </Flex>
         )}
@@ -182,7 +205,7 @@ class CreateOrderPage extends React.Component {
               onPersonalSubmit={this.createProfile}
               onOrgSubmit={this.createProfile}
               onSecondaryAction={() => this.setState({ step: 'signin' })}
-              submitting={this.state.submitting}
+              submitting={submitting}
             />
           </Flex>
         )}
