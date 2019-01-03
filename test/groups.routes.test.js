@@ -163,7 +163,10 @@ describe('groups.routes.test.js', () => {
             expect(res.body).to.have.property('isActive', true);
             // We're sending multiple emails at almost the same time
             // Order is not reliable, so we look in the last three emails
-            const lastEmailRecipients = [0, 1, 2].map(i => emailLib.send.getCall(i)).map(call => call.args[1]);
+            const lastEmailRecipients = [0, 1, 2]
+              .map(i => emailLib.send.getCall(i))
+              .filter(call => !!call)
+              .map(call => call.args[1]);
             expect(lastEmailRecipients).to.include('githubuser@gmail.com');
             return models.Member.findAll({
               where: { CollectiveId: CollectiveId },
