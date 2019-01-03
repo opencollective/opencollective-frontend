@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import nodemailer from 'nodemailer';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import config from 'config';
 import * as utils from '../test/utils';
 import models from '../server/models';
@@ -167,7 +167,8 @@ describe('graphql.cancelSubscriptions.test.js', () => {
         where: { type: 'subscription.canceled' },
       });
 
-      expect(activity).to.be.defined;
+      assert.isDefined(activity);
+
       expect(activity.CollectiveId).to.be.equal(collective.id);
       expect(activity.UserId).to.be.equal(user.id);
       expect(activity.data.subscription.id).to.be.equal(order.SubscriptionId);
