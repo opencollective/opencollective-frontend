@@ -35,11 +35,7 @@ pages
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', createOrderPage)
   .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder') // New contribution flow not applied to events yet
-  .add(
-    'donate',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?',
-    createOrderPage,
-  )
+  .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:step?', createOrderPage)
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
