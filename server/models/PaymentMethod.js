@@ -397,12 +397,15 @@ export default function(Sequelize, DataTypes) {
       return getBalance(this);
     }
 
+    // Most paymentMethods getBalance functions return a {amount, currency} object while
+    // collective payment method returns a raw number.
     const balance = await getBalance(this);
+    const balanceAmount = typeof balance === 'number' ? balance : balance.amount;
 
     // Independently of the balance of the external source, the owner of the payment method
     // may have set up a monthlyLimitPerMember or an initialBalance
     if (!this.initialBalance && (!this.monthlyLimitPerMember || (user && user.isAdmin(this.CollectiveId)))) {
-      return { amount: balance, currency: this.currency };
+      return { amount: balanceAmount, currency: this.currency };
     }
 
     let limit = Infinity; // no no, no no no no, no no no no limit!
@@ -432,7 +435,7 @@ export default function(Sequelize, DataTypes) {
 
     const result = await sumTransactions('netAmountInCollectiveCurrency', query, this.currency);
     const availableBalance = limit + result.totalInHostCurrency; // result.totalInHostCurrency is negative
-    return { amount: availableBalance, currency: this.currency };
+    return { amount: Math.min(balanceAmount, availableBalance), currency: this.currency };
   };
 
   /**
