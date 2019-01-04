@@ -5,10 +5,11 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
+import styled from 'styled-components';
 
 import { Router } from '../server/pages';
 
-import { H2, P } from '../components/Text';
+import { H2, P, Span } from '../components/Text';
 import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -26,8 +27,17 @@ import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
 import Loading from '../components/Loading';
 import StyledButton from '../components/StyledButton';
+import StepsProgress from '../components/StepsProgress';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
+
+const StepLabel = styled(Span)`
+  text-transform: uppercase;
+`;
+StepLabel.defaultProps = { color: 'black.400', fontSize: 'Tiny', mt: 1 };
+
+const PrevNextButton = styled(StyledButton)``;
+PrevNextButton.defaultProps = { buttonSize: 'large', fontWeight: 'bold', mx: 2 };
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -169,14 +179,10 @@ class CreateOrderPage extends React.Component {
       return null;
     }
 
-    const prevStep = STEPS[prevStepIdx] !== 'contributeAs' ? STEPS[prevStepIdx] : undefined;
-    const collectiveSlug = get(this.props, 'data.Collective.slug');
     return (
-      <Link route="donate" params={{ collectiveSlug, step: prevStep, verb: this.props.verb }} passHref>
-        <StyledButton buttonStyle="standard" buttonSize="large" fontWeight="bold" mr={3}>
-          &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
-        </StyledButton>
-      </Link>
+      <PrevNextButton onClick={() => this.changeStep(STEPS[prevStepIdx])} buttonStyle="standard">
+        &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
+      </PrevNextButton>
     );
   }
 
@@ -188,18 +194,15 @@ class CreateOrderPage extends React.Component {
 
     const isLast = stepIdx + 1 >= STEPS.length;
     const nextStep = isLast ? 'summary' : STEPS[stepIdx + 1];
-    const collectiveSlug = get(this.props, 'data.Collective.slug');
     return (
-      <Link route="donate" params={{ collectiveSlug, step: nextStep, verb: this.props.verb }} passHref>
-        <StyledButton buttonStyle="primary" buttonSize="large" fontWeight="bold" mr={3}>
-          {isLast ? (
-            <FormattedMessage id="contribute.summary" defaultMessage="Summary" />
-          ) : (
-            <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
-          )}{' '}
-          &rarr;
-        </StyledButton>
-      </Link>
+      <PrevNextButton onClick={() => this.changeStep(nextStep)} buttonStyle="primary">
+        {isLast ? (
+          <FormattedMessage id="contribute.summary" defaultMessage="Summary" />
+        ) : (
+          <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
+        )}{' '}
+        &rarr;
+      </PrevNextButton>
     );
   }
 
@@ -221,7 +224,11 @@ class CreateOrderPage extends React.Component {
         </StyledInputField>
       );
     } else if (step === 'details') {
-      return <div>&rarr; Insert Details component here &larr;</div>;
+      return (
+        <Flex alignItems="center" css={{ height: 300 }}>
+          &rarr; Insert Details component here &larr;
+        </Flex>
+      );
     } else if (step === 'payment') {
       return (
         <ContributePayment
@@ -233,6 +240,39 @@ class CreateOrderPage extends React.Component {
     }
 
     return null;
+  }
+
+  changeStep = step => {
+    const { verb, data } = this.props;
+    Router.pushRoute('donate', {
+      verb,
+      collectiveSlug: data.Collective.slug,
+      step: step === 'contributeAs' ? undefined : step,
+    });
+  };
+
+  renderStepsProgress(currentStep) {
+    return (
+      <StepsProgress
+        steps={STEPS}
+        focus={currentStep}
+        allCompleted={currentStep === 'summary'}
+        onStepSelect={this.changeStep}
+      >
+        {({ step }) => {
+          let label = null;
+          if (step === 'contributeAs') {
+            label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage="Contribute as" />;
+          } else if (step === 'details') {
+            label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
+          } else if (step === 'payment') {
+            label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
+          }
+
+          return <StepLabel>{label}</StepLabel>;
+        }}
+      </StepsProgress>
+    );
   }
 
   renderContent() {
@@ -264,8 +304,11 @@ class CreateOrderPage extends React.Component {
     const step = this.props.step || 'contributeAs';
     return (
       <Flex flexDirection="column" alignItems="center">
+        <Box mb={4} width={0.8} css={{ maxWidth: 365 }}>
+          {this.renderStepsProgress(step)}
+        </Box>
         <Box>{this.renderStep(step)}</Box>
-        <Flex mt={4}>
+        <Flex mt={5}>
           {this.renderPrevStepButton(step)}
           {this.renderNextStepButton(step)}
         </Flex>
@@ -318,7 +361,7 @@ class CreateOrderPage extends React.Component {
           </P>
         </Flex>
 
-        <Box id="content" mb={5}>
+        <Box id="content" mb={6}>
           {loadingLoggedInUser || data.loading ? <Loading /> : this.renderContent()}
         </Box>
 
