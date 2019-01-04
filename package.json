@@ -11,7 +11,7 @@
     "npm": "^6.4.1"
   },
   "dependencies": {
-    "@material-ui/core": "3.7.1",
+    "@material-ui/core": "3.8.1",
     "@rebass/grid": "6.0.0-7",
     "@zeit/next-css": "1.0.1",
     "accepts": "1.3.5",
