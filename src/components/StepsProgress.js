@@ -27,8 +27,13 @@ const Bubble = styled(Flex)`
     css`
       color: ${themeGet('colors.primary.500')};
       border: 2px solid ${themeGet('colors.primary.500')};
-      cursor: pointer;
+    `}
 
+  ${props =>
+    !props.disabled &&
+    props.onClick &&
+    css`
+      cursor: pointer;
       &:hover {
         background: ${themeGet('colors.black.100')};
       }
@@ -59,6 +64,7 @@ const SeparatorLine = styled(Box)`
   background: #e8e9eb;
   z-index: 1;
   flex-grow: 1;
+  flex-shrink: 1;
   transition: border-color 0.3s;
 
   ${props =>
@@ -88,23 +94,32 @@ const getBubbleContent = (idx, checked, loading) => {
   );
 };
 
-const StepsProgress = ({ steps, disabledSteps, children, focus, loadingStep, onStepSelect }) => {
+const StepsProgress = ({
+  steps,
+  disabledSteps,
+  children,
+  focus,
+  loadingStep,
+  onStepSelect,
+  allCompleted,
+  stepWidth,
+}) => {
   const focusIdx = focus ? steps.indexOf(focus) : -1;
   return (
     <Flex>
       {steps.map((step, idx) => {
-        const checked = idx < focusIdx;
+        const checked = idx < focusIdx || allCompleted;
         const focused = idx === focusIdx;
         const disabled = disabledSteps.includes(step);
         const loading = step === loadingStep;
 
         return (
-          <Flex key={step} flexDirection="column" alignItems="center" css={{ flexGrow: 1 }}>
-            <Flex alignItems="center" mb={3} css={{ width: '100%' }}>
+          <Flex key={step} flexDirection="column" alignItems="center" css={{ flexGrow: 1, flexBasis: stepWidth }}>
+            <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
               <SeparatorLine active={checked || focused} transparent={idx === 0} />
               <Bubble
                 disabled={disabled}
-                onClick={() => !disabled && onStepSelect(step)}
+                onClick={!disabled && onStepSelect && (() => onStepSelect(step))}
                 checked={checked}
                 focus={focused}
               >
@@ -112,7 +127,7 @@ const StepsProgress = ({ steps, disabledSteps, children, focus, loadingStep, onS
               </Bubble>
               <SeparatorLine active={checked} transparent={idx === steps.length - 1} />
             </Flex>
-            {children && <Box>{children({ step, checked, focused })}</Box>}
+            {children && children({ step, checked, focused })}
           </Flex>
         );
       })}
@@ -133,12 +148,17 @@ StepsProgress.propTypes = {
   loadingStep: PropTypes.string,
   /** Called when a step is clicked */
   onStepSelect: PropTypes.func,
+  /** If true, all steps will be marked as completed */
+  allCompleted: PropTypes.bool,
+  /** Base step width */
+  stepWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 StepsProgress.defaultProps = {
   focused: null,
   loadingStep: null,
   disabledSteps: [],
+  stepWidth: '100%',
 };
 
 export default StepsProgress;
