@@ -7,6 +7,8 @@ import StyledButton from './StyledButton';
 
 const borderRadius = '4px';
 
+const comboStyle = ({ combo }) => (combo ? '0' : `0 ${borderRadius} ${borderRadius} 0`);
+
 const StyledButtonItem = styled(StyledButton)`
   border-radius: 0;
   &:active p {
@@ -27,14 +29,15 @@ const StyledButtonItem = styled(StyledButton)`
     margin-left: -1px;
   }
   &:last-child {
-    border-radius: 0 ${borderRadius} ${borderRadius} 0;
+    border-radius: ${comboStyle};
   }
 `;
 
-const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, ...props }) => (
+const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, ...props }) => (
   <Flex {...props}>
     {items.map(item => (
       <StyledButtonItem
+        combo={combo}
         key={item}
         buttonSize={size}
         buttonStyle={item === selected ? 'primary' : 'standard'}
@@ -56,11 +59,14 @@ StyledButtonSet.propTypes = {
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   /** Currently selected item */
   selected: PropTypes.any,
-  /** An optionnal func called with the new item when option changes */
+  /** An optional func called with the new item when option changes */
   onChange: PropTypes.func,
+  /** Setting to style last item to look good in combination with a text input */
+  combo: PropTypes.bool,
 };
 
 StyledButtonSet.defaultProps = {
+  combo: false,
   size: 'medium',
 };
 
