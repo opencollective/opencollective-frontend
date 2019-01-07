@@ -110,7 +110,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.2.3",
-    "@babel/polyfill": "7.2.3",
+    "@babel/polyfill": "7.2.5",
     "@babel/register": "7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-istanbul": "^5.1.0",
