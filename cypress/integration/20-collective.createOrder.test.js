@@ -1,6 +1,6 @@
 describe('collective.createOrder page', () => {
   it('loads custom donate page', () => {
-    cy.visit('/apex/donate/50/month/custom%20description');
+    cy.visit('/apex/donate?amount=50&interval=month&description=custom%20description');
     cy.get('.tier .description').contains('custom description');
     cy.get('.tier .amount').contains('$50');
     cy.get('.tier .amount').contains('per month');
@@ -29,7 +29,7 @@ describe('collective.createOrder page', () => {
 
   it('makes an order logged out as a new user with a manual payment method', () => {
     const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
-    cy.visit('/veganizerbxl/donate/100');
+    cy.visit('/veganizerbxl/donate?amount=100');
     cy.get(".inputField textarea[name='publicMessage']").type('public message');
     cy.fillInputField('email', email);
     cy.fillInputField('firstName', 'Xavier');
