@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import sinon from 'sinon';
 import request from 'supertest';
 
@@ -86,7 +86,7 @@ describe('XSS.test', () => {
 
     it('should call next callback', () => {
       middleware()(req, {}, next);
-      expect(next).calledOnce;
+      assert(next.calledOnce);
     });
   });
 

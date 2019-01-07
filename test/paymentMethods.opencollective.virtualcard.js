@@ -584,7 +584,8 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user1);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
+
         const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.createPaymentMethod.id);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.limitedToTags).to.contain('open source');
@@ -683,7 +684,8 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(claimPaymentMethodQuery, args);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
+
         const paymentMethod = gqlResult.data.claimPaymentMethod;
         // payment method should exist
         expect(paymentMethod).to.exist;
@@ -736,7 +738,7 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(claimPaymentMethodQuery, args, existingUser);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
 
         const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.claimPaymentMethod.id);
 
@@ -887,7 +889,7 @@ describe('opencollective.virtualcard', () => {
         };
         // Executing queries
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain("You don't have enough funds available");
       }); /** End Of "Order should NOT be executed because its amount exceeds the balance of the virtual card" */
@@ -902,7 +904,7 @@ describe('opencollective.virtualcard', () => {
         };
         // Executing queries
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain(
           'This payment method can only be used for collectives in open source',
@@ -920,7 +922,7 @@ describe('opencollective.virtualcard', () => {
         };
         // Executing queries
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain(
           'This payment method can only be used for collectives hosted by Host 1',
@@ -939,7 +941,8 @@ describe('opencollective.virtualcard', () => {
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
 
         gqlResult.errors && console.error(gqlResult.errors[0]);
-        expect(gqlResult.errors).to.be.empty;
+        expect(gqlResult.errors).to.be.undefined;
+
         const transactions = await models.Transaction.findAll({
           where: {
             OrderId: gqlResult.data.createOrder.id,
@@ -978,7 +981,7 @@ describe('opencollective.virtualcard', () => {
         await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
         const gqlResult = await utils.graphqlQuery(createOrderQuery, { order }, userVirtualCard);
 
-        expect(gqlResult.errors).to.not.be.empty;
+        expect(gqlResult.errors).to.be.an('array');
         expect(gqlResult.errors[0]).to.exist;
         expect(gqlResult.errors[0].toString()).to.contain("You don't have enough funds available");
       }); /** End Of "should fail when multiple orders exceed the balance of the virtual card" */

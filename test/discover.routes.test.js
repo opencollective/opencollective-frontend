@@ -49,7 +49,7 @@ describe('discover', () => {
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('all');
           expect(body.sort).equal('most popular');
-          expect(body.collectives).to.be.Array;
+          expect(body.collectives).to.be.an('array');
           expect(body.collectives.length).equal(2);
           expect(body.total).equal(2);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
@@ -69,7 +69,7 @@ describe('discover', () => {
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('open source');
           expect(body.sort).equal('most popular');
-          expect(body.collectives).to.be.Array;
+          expect(body.collectives).to.be.an('array');
           expect(body.collectives.length).equal(1);
           expect(body.total).equal(1);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
@@ -88,7 +88,7 @@ describe('discover', () => {
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('meetup');
           expect(body.sort).equal('most popular');
-          expect(body.collectives).to.be.Array;
+          expect(body.collectives).to.be.an('array');
           expect(body.collectives.length).equal(1);
           expect(body.total).equal(1);
           expect(ids.indexOf(collective1.id)).equal(-1);
@@ -106,7 +106,7 @@ describe('discover', () => {
           const { body } = res;
           expect(body.show).equal('undefined');
           expect(body.sort).equal('most popular');
-          expect(body.collectives).to.be.Array;
+          expect(body.collectives).to.be.an('array');
           expect(body.collectives.length).equal(0);
           expect(body.total).equal(0);
           done();
@@ -122,7 +122,7 @@ describe('discover', () => {
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('all');
           expect(body.sort).equal('newest');
-          expect(body.collectives).to.be.Array;
+          expect(body.collectives).to.be.an('array');
           expect(body.collectives.length).equal(2);
           expect(body.total).equal(2);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
@@ -142,7 +142,7 @@ describe('discover', () => {
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('all');
           expect(body.sort).equal('most popular');
-          expect(body.collectives).to.be.Array;
+          expect(body.collectives).to.be.an('array');
           expect(body.collectives.length).equal(2);
           expect(body.total).equal(2);
           expect(ids.indexOf(collective1.id)).not.equal(-1);
