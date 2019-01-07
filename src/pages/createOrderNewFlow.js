@@ -280,11 +280,16 @@ class CreateOrderPage extends React.Component {
 
   changeStep = step => {
     const { verb, data } = this.props;
-    Router.pushRoute('donate', {
-      verb,
+    const params = {
       collectiveSlug: data.Collective.slug,
       step: step === 'contributeAs' ? undefined : step,
-    });
+    };
+
+    if (verb) {
+      Router.pushRoute('donate', { ...params, verb });
+    } else {
+      Router.pushRoute('orderCollectiveTier', { ...params, TierId: this.props.TierId });
+    }
   };
 
   renderStepsProgress(currentStep) {
