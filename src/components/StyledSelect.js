@@ -24,6 +24,25 @@ const getBgColor = ({ highlightedIndex, index, item, selectedItem }) => {
 };
 
 /**
+ * Returns a function that will return a unique key from iteratee. As we rely on
+ * <input/> only a string key is valid.
+ *
+ * @param {array|object} options an options iterable, the same one given to `StyledSelect`
+ * @param {string|function} keyGetter a key to get value from, or an extract func
+ */
+export const getKeyExtractor = (options, keyGetter) => {
+  if (typeof keyGetter === 'function') {
+    return item => keyGetter(item).toString();
+  } else if (typeof keyGetter === 'string') {
+    return item => item[keyGetter].toString();
+  } else if (Array.isArray(options)) {
+    return item => (typeof item === 'object' ? JSON.stringify(item) : item.toString());
+  } else {
+    return (_item, key) => key.toString();
+  }
+};
+
+/**
  * Convert a list of items to an object like {key, value} to be used in selects
  * and other lists.
  *
@@ -34,16 +53,7 @@ const getBgColor = ({ highlightedIndex, index, item, selectedItem }) => {
  *  impact, so we should avoid using it.
  */
 export const getItems = (options, keyGetter) => {
-  let keyExtractor = null;
-  if (typeof keyGetter === 'string') {
-    keyExtractor = item => item[keyGetter];
-  } else if (typeof keyGetter === 'function') {
-    keyExtractor = keyGetter;
-  } else if (Array.isArray(options)) {
-    keyExtractor = item => (typeof item === 'object' ? JSON.stringify(item) : item);
-  } else {
-    keyExtractor = (_item, key) => key;
-  }
+  const keyExtractor = getKeyExtractor(options, keyGetter);
 
   return Object.keys(options).reduce(
     (items, key) =>
