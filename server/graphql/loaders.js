@@ -286,6 +286,7 @@ export const loaders = req => {
             expiryDate: { [Op.or]: [null, { [Op.gte]: new Date() }] },
             archivedAt: null,
           },
+          order: [['id', 'ASC']],
         }).then(results => sortResults(CollectiveIds, results, 'CollectiveId', [])),
       ),
     },

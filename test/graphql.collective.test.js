@@ -850,7 +850,9 @@ describe('graphql.collective.test.js', () => {
       res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
+
       paymentMethods = res.data.editCollective.paymentMethods;
+
       expect(paymentMethods).to.have.length(2);
       expect(paymentMethods[1].uuid).to.have.length(36);
       expect(paymentMethods[1].name).to.equal('4242');
@@ -880,7 +882,9 @@ describe('graphql.collective.test.js', () => {
       res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
+
       paymentMethods = res.data.editCollective.paymentMethods;
+
       expect(paymentMethods).to.have.length(3);
       expect(paymentMethods[1].uuid).to.have.length(36);
       expect(paymentMethods[1].name).to.equal('4242');
@@ -899,6 +903,8 @@ describe('graphql.collective.test.js', () => {
 
       res = await utils.graphqlQuery(query, { slug: 'pubnub' }, pubnubAdmin);
       res.errors && console.error(res.errors[0]);
+      expect(res.errors).to.not.exist;
+
       paymentMethods = res.data.Collective.paymentMethods;
       expect(paymentMethods).to.have.length(3);
       expect(paymentMethods[1].uuid).to.have.length(36);
@@ -910,14 +916,17 @@ describe('graphql.collective.test.js', () => {
       res = await utils.graphqlQuery(query, { slug: 'pubnub' });
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
+
       paymentMethods = res.data.Collective.paymentMethods;
       expect(paymentMethods).to.have.length(0);
 
       // Shouldn't return the credit cards if not logged in as an admin of the collective
       const { member } = await store.newUser('member');
+
       res = await utils.graphqlQuery(query, { slug: 'pubnub' }, member);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
+
       paymentMethods = res.data.Collective.paymentMethods;
       expect(paymentMethods).to.have.length(0);
 
