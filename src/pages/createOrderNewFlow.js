@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, pick } from 'lodash';
+import { find, get, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 
 import { Router } from '../server/pages';
@@ -26,6 +26,7 @@ import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
 import Loading from '../components/Loading';
+import ContributeDetails from '../components/ContributeDetails';
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -100,7 +101,8 @@ class CreateOrderPage extends React.Component {
 
   nextStep = () => {
     this.setState(state => {
-      if (state.step === 'contributeAs') return { ...state, step: 'choose-payment' };
+      if (state.step === 'contributeAs') return { ...state, step: 'contribute-details' };
+      if (state.step === 'contribute-details') return { ...state, step: 'choose-payment' };
       return state;
     });
   };
@@ -158,10 +160,10 @@ class CreateOrderPage extends React.Component {
     return !LoggedInUser
       ? [{}, {}]
       : [
-          { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective },
+          { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective },
           LoggedInUser.memberOf
             .filter(m => m.role === 'ADMIN' && m.collective.id !== this.props.data.Collective.id)
-            .reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
+            .map(({ collective }) => collective),
         ];
   }
 
@@ -175,9 +177,10 @@ class CreateOrderPage extends React.Component {
   }
 
   renderContent() {
-    const { LoggedInUser } = this.props;
-    const { step, loading, submitting, unknownEmail, selectedProfile } = this.state;
+    const { data, LoggedInUser, TierId } = this.props;
+    const { step, loading, submitting, unknownEmail, selectedProfile, orderDetails } = this.state;
     const [personal, profiles] = this.getProfiles();
+    const tier = TierId ? data.Collective.tiers.find(t => t.id == TierId) : {};
 
     return (
       <Box id="content" mb={5}>
@@ -226,6 +229,27 @@ class CreateOrderPage extends React.Component {
               onSecondaryAction={() => this.setState({ step: 'signin' })}
               submitting={submitting}
             />
+          </Flex>
+        )}
+        {step === 'contribute-details' && (
+          <Flex flexDirection="column" alignItems="center">
+            <ContributeDetails
+              amountOptions={(tier && tier.presets) || [500, 1000, 2000, 5000]}
+              currency={(tier && tier.currency) || data.Collective.currency}
+              onChange={data => this.setState({ orderDetails: data })}
+              showFrequency={TierId}
+            />
+            <Box mt={5}>
+              <StyledButton
+                disabled={orderDetails === null}
+                buttonStyle="primary"
+                buttonSize="large"
+                fontWeight="bold"
+                onClick={this.nextStep}
+              >
+                <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" /> &rarr;
+              </StyledButton>
+            </Box>
           </Flex>
         )}
         {step === 'choose-payment' && (
@@ -314,6 +338,17 @@ const addData = graphql(gql`
       currency
       parentCollective {
         image
+      }
+      tiers {
+        id
+        type
+        name
+        slug
+        description
+        amount
+        currency
+        interval
+        presets
       }
     }
   }
