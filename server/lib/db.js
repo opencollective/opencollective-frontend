@@ -7,6 +7,7 @@
 import config from 'config';
 import path from 'path';
 import pg from 'pg';
+import pgConnectionString from 'pg-connection-string';
 import format from 'pg-format';
 import { promisify } from 'util';
 import { exec } from 'child_process';
@@ -23,13 +24,13 @@ import { has, get } from 'lodash';
  */
 export async function loadDB(name) {
   const fullPath = path.join(__dirname, '..', '..', 'test', 'dbdumps', `${name}.pgsql`);
-  const { database, username, password, host, port } = getDBConf('database');
+  const { database, user, password, host, port } = getDBConf('database');
   const cmd = format(
     '/usr/bin/pg_restore --no-acl --no-owner --clean --schema=public --if-exists --role=%I --host=%I --port=%s --username=%I -w --dbname=%I %s',
-    username,
+    user,
     host,
     port,
-    username,
+    user,
     database,
     fullPath,
   );
@@ -50,21 +51,28 @@ export function getDBConf(name) {
   if (!has(config, name)) {
     throw new Error(`Configuration missing key "${name}"`);
   }
-  const { database, username, password } = get(config, name);
-  const { host, port } = get(config, [name, 'options']);
-  return { database, username, password, host, port: port || 5432 };
+
+  let db;
+  if (name === 'database') {
+    db = { ...pgConnectionString.parse(config.database.url), ...config.database.override };
+  } else {
+    db = pgConnectionString.parse(get(config, [name, 'url']));
+  }
+
+  const { database, user, password, host, port } = db;
+  return { database, user, password, host, port: port || 5432 };
 }
 
 /** Assemble an URL from database connection options.
  *
  * @param {string} section of the configuration file that will be read
  *  to assemble the URL. The configuration section MUST have the
- *  following fields: `database`, `username`, `password`
+ *  following fields: `database`, `user`, `password`
  *  `options.host` and optionally `options.port`.
  */
 export function getDBUrl(section) {
-  const { database, username, password, host, port } = getDBConf(section);
-  return `postgresql://${username}:${password}@${host}:${port}/${database}`;
+  const { database, user, password, host, port } = getDBConf(section);
+  return `postgresql://${user}:${password}@${host}:${port}/${database}`;
 }
 
 /** Get an instance of a connected client.
@@ -137,12 +145,12 @@ export async function createExtensionsQuery(client) {
  */
 export async function recreateDatabase(destroy = true) {
   /* Parameters from the application database */
-  const { database, username } = getDBConf('database');
+  const { database, user } = getDBConf('database');
 
   /* Operations that require connecting to a maintenance database. */
   const client = await getConnectedClient(getDBUrl('maintenancedb'));
   if (destroy) await dropDatabaseQuery(client, database);
-  await createDatabaseQuery(client, database, username);
+  await createDatabaseQuery(client, database, user);
 
   /* Operations that require connecting to the application
    * database. */

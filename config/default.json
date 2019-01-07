@@ -12,12 +12,7 @@
     }
   },
   "maintenancedb": {
-    "database": "postgres",
-    "username": "postgres",
-    "password": "",
-    "options": {
-      "host": "127.0.0.1"
-    }
+    "url": "postgres://postgres@127.0.0.1:5432/postgres"
   },
   "keys": {
     "opencollective": {
