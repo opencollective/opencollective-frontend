@@ -1,8 +1,13 @@
-import app from '../server/index';
-import { expect } from 'chai';
+import fs from 'fs';
+import path from 'path';
+
 import request from 'supertest';
-import * as utils from '../test/utils';
+import fetch from 'node-fetch';
+import { expect } from 'chai';
+
+import app from '../server/index';
 import models from '../server/models';
+import * as utils from '../test/utils';
 
 const application = utils.data('application');
 const userData = utils.data('user1');
@@ -19,15 +24,23 @@ describe('images.routes.test.js', () => {
   beforeEach(() => models.User.create(userData).tap(u => (user = u)));
 
   it('should upload an image to S3', done => {
+    const originalImage = fs.readFileSync(path.join(__dirname, 'mocks/images/camera.png'), {
+      encoding: 'utf8',
+    });
     request(app)
       .post(`/images/?api_key=${application.api_key}`)
       .attach('file', 'test/mocks/images/camera.png')
       .set('Authorization', `Bearer ${user.jwt()}`)
       .expect(200)
-      .end((err, res) => {
+      .then(res => {
         expect(res.body.url).to.contain('.png');
+        return fetch(res.body.url).then(res => res.text());
+      })
+      .then(image => {
+        expect(image).to.equal(originalImage);
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('should throw an error if no file field is sent', done => {

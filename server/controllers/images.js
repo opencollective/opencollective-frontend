@@ -1,6 +1,6 @@
-import fs from 'fs';
 import path from 'path';
 import uuidv1 from 'uuid/v1';
+
 import errors from '../lib/errors';
 import knox from '../gateways/knox';
 
@@ -9,7 +9,7 @@ import knox from '../gateways/knox';
 const IMAGE_UPLOAD_TIMEOUT = 2 * 60 * 1000;
 
 export default function uploadImage(req, res, next) {
-  const { file } = req.files;
+  const file = req.file;
 
   if (!file) {
     return next(
@@ -53,12 +53,12 @@ export default function uploadImage(req, res, next) {
 
   req.setTimeout(IMAGE_UPLOAD_TIMEOUT);
 
-  fs.createReadStream(file.path).pipe(put);
-
   put.on('response', response => {
     res.send({
       status: response.statusCode,
       url: put.url,
     });
   });
+
+  put.end(file.buffer);
 }
