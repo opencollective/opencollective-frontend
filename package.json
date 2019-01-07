@@ -22,7 +22,7 @@
     "apollo-link-error": "1.1.5",
     "apollo-link-http": "1.5.9",
     "bluebird": "3.5.3",
-    "bootstrap": "3.3.7",
+    "bootstrap": "3.4.0",
     "classnames": "2.2.6",
     "clean-tag": "2.0.2",
     "cloudflare-ip": "0.0.7",
