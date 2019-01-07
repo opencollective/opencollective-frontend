@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { withUser } from '../components/UserProvider';
 import HostDashboard from '../components/HostDashboard';
+import Loading from '../components/Loading';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 class HostExpensesPage extends React.Component {
   static getInitialProps({ query: { hostCollectiveSlug } }) {
@@ -19,26 +20,19 @@ class HostExpensesPage extends React.Component {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
-  constructor(props) {
-    super(props);
-    this.state = { selectedCollective: null };
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser, loadingLoggedInUser } = this.props;
 
     return (
       <div className="HostExpensesPage">
-        <HostDashboard hostCollectiveSlug={this.props.hostCollectiveSlug} LoggedInUser={LoggedInUser} />
+        {loadingLoggedInUser ? (
+          <Loading />
+        ) : (
+          <HostDashboard hostCollectiveSlug={this.props.hostCollectiveSlug} LoggedInUser={LoggedInUser} />
+        )}
       </div>
     );
   }
 }
 
-export default withData(withIntl(withLoggedInUser(HostExpensesPage)));
+export default withData(withIntl(withUser(HostExpensesPage)));
