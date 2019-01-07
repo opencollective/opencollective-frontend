@@ -11,7 +11,7 @@ Subject: {{#ifCond expense.currency '===' 'USD'}}💵 {{/ifCond}}{{#ifCond expen
 
 <center>
   <h3>Hi there!</h3>
-  <p>Just a quick note to let you know that your expense <b>{{expense.description}}</b> that you filed on {{{moment expense.createdAt}}} to the <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}} collective</a> has just been paid.</p>
+  <p>Just a quick note to let you know that your expense <b><a href="{{config.host.website}}/expenses/{{expense.id}}">{{expense.description}}</a></b> that you filed on {{{moment expense.createdAt}}} to the <a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}} collective</a> has just been paid.</p>
   <h2>{{{currency expense.amount currency=expense.currency precision=2}}}</h2>
   <div>{{transaction.description}}</div>
   <table>

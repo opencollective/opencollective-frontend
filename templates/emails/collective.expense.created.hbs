@@ -4,7 +4,7 @@ Subject: New expense on {{collective.name}}: {{{currency expense.amount currency
 
 <center>
   <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
-  <div>{{expense.description}}</div>
+  <div><a href="{{config.host.website}}/expenses/{{expense.id}}">{{expense.description}}</a></div>
   <div>Submitted by: {{fromCollective.name}}</div>
   <div>Paypal Email: {{user.paypalEmail}}</div>
   <p><font color="#999">{{expense.notes}}</font></p>
