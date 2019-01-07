@@ -4,18 +4,8 @@ import { withState } from 'recompose';
 import { find } from 'lodash';
 
 import { Box } from '@rebass/grid';
-import { getItems } from './StyledSelect';
+import { getItems, getKeyExtractor } from './StyledSelect';
 import Container from './Container';
-
-const getKeyExtractor = keyGetter => {
-  if (typeof keyGetter === 'string') {
-    return item => item[keyGetter];
-  } else if (typeof keyGetter === 'function') {
-    return keyGetter;
-  }
-
-  return item => JSON.stringify(item);
-};
 
 const enhance = withState('selected', 'setSelected', ({ defaultValue }) => defaultValue);
 
@@ -24,8 +14,9 @@ const enhance = withState('selected', 'setSelected', ({ defaultValue }) => defau
  */
 const StyledRadioList = enhance(
   ({ children, defaultValue, id, name, onChange, options, selected, setSelected, keyGetter }) => {
-    const keyExtractor = getKeyExtractor(keyGetter);
-    const items = getItems(options, keyGetter);
+    const keyExtractor = getKeyExtractor(options, keyGetter);
+    const items = getItems(options, keyExtractor);
+    const defaultValueStr = defaultValue !== undefined && defaultValue.toString();
 
     return (
       <Container
@@ -40,19 +31,20 @@ const StyledRadioList = enhance(
         }}
         id={id}
       >
-        {items.map((item, index) => (
-          <Container as="label" display="block" htmlFor={id && item.key + id} key={item.key} width={1} m={0}>
+        {items.map(({ value, key }, index) => (
+          <Container as="label" display="block" htmlFor={id && key + id} key={key} width={1} m={0}>
             {children({
-              ...item,
-              checked: selected && keyExtractor(item) === selected,
+              checked: selected && key === selected,
               index,
+              key,
+              value,
               radio: (
                 <input
                   type="radio"
                   name={name}
-                  id={id && item.key + id}
-                  value={item.key}
-                  defaultChecked={defaultValue && keyExtractor(defaultValue) === selected}
+                  id={id && key + id}
+                  value={key}
+                  defaultChecked={defaultValue !== undefined && defaultValueStr === key}
                 />
               ),
             })}
