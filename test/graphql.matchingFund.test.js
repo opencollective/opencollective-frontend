@@ -157,6 +157,7 @@ describe('graphql.matchingFund.test.js', () => {
     const res = await utils.graphqlQuery(createOrderQuery, { order }, user2);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
+
     const orderCreated = res.data.createOrder;
 
     const fromCollective = res.data.createOrder.fromCollective;
@@ -195,6 +196,7 @@ describe('graphql.matchingFund.test.js', () => {
     const res = await utils.graphqlQuery(createOrderQuery, { order }, user2);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
+
     const orderCreated = res.data.createOrder;
 
     const fromCollective = res.data.createOrder.fromCollective;

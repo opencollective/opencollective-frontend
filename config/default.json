@@ -95,7 +95,8 @@
     "accessKey": "UNDEFINED_FIXER_ACCESS_KEY"
   },
   "stripe": {
-    "clientId": "pk_test_5aBB887rPuzvWzbdRiSzV3QB",
+    "clientId": "ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue",
+    "key": "pk_test_VgSB4VSg2wb5LdAkz7p38Gw8",
     "secret": "sk_test_o3A3GoHbeb113oq1aZbDJNJe",
     "redirectUri": "http://localhost:3060/connected-accounts/stripe/callback"
   },
