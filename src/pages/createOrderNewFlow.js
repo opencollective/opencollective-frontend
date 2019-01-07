@@ -99,9 +99,17 @@ class CreateOrderPage extends React.Component {
       submitting: false,
       result: {},
       unknownEmail: false,
-      selectedProfile: null,
       signIn: true,
+      stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
+      stepPayment: null,
+      stepDetails: null,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
+      this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
+    }
   }
 
   signIn = email => {
@@ -151,16 +159,30 @@ class CreateOrderPage extends React.Component {
       });
   };
 
+  getLoggedInUserDefaultContibuteProfile() {
+    if (get(this.state, 'stepProfile')) {
+      return this.state.stepProfile;
+    }
+
+    const { LoggedInUser } = this.props;
+    return !LoggedInUser ? null : { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+  }
+
+  getLoggedInUserDefaultPaymentMethodId() {
+    const pm = get(this.props.LoggedInUser, 'collective.paymentMethods', [])[0];
+    return pm && pm.id;
+  }
+
   /** Returns an array like [personnalProfile, otherProfiles] */
   getProfiles() {
     const { LoggedInUser } = this.props;
     return !LoggedInUser
       ? [{}, {}]
       : [
-          { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective },
+          { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective },
           LoggedInUser.memberOf
             .filter(m => m.role === 'ADMIN' && m.collective.id !== this.props.data.Collective.id)
-            .reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
+            .map(({ collective }) => collective),
         ];
   }
 
@@ -193,11 +215,11 @@ class CreateOrderPage extends React.Component {
     }
 
     const isLast = stepIdx + 1 >= STEPS.length;
-    const nextStep = isLast ? 'summary' : STEPS[stepIdx + 1];
+    const nextStep = isLast ? 'submit' : STEPS[stepIdx + 1];
     return (
       <PrevNextButton onClick={() => this.changeStep(nextStep)} buttonStyle="primary">
         {isLast ? (
-          <FormattedMessage id="contribute.summary" defaultMessage="Summary" />
+          <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
         ) : (
           <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
         )}{' '}
@@ -216,9 +238,10 @@ class CreateOrderPage extends React.Component {
           {fieldProps => (
             <ContributeAs
               {...fieldProps}
-              onChange={profile => this.setState({ selectedProfile: profile })}
+              onChange={profile => this.setState({ stepProfile: profile, stepPayment: null })}
               profiles={profiles}
               personal={personal}
+              defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
             />
           )}
         </StyledInputField>
@@ -232,10 +255,23 @@ class CreateOrderPage extends React.Component {
     } else if (step === 'payment') {
       return (
         <ContributePayment
-          onChange={console.log}
+          onChange={stepPayment => this.setState({ stepPayment })}
           paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
-          collective={this.state.selectedProfile}
+          collective={this.state.stepProfile}
         />
+      );
+    } else if (step === 'submit') {
+      return (
+        <Flex justifyContent="center" alignItems="center" flexDirection="column">
+          <Loading />
+          <P color="red.700">__DEBUG__</P>
+          <P color="red.700">Profile:</P>
+          <textarea>{JSON.stringify(this.state.stepProfile)}</textarea>
+          <P color="red.700">Details:</P>
+          <textarea>{JSON.stringify(this.state.stepDetails)}</textarea>
+          <P color="red.700">PaymentMethod:</P>
+          <textarea>{JSON.stringify(this.state.stepPayment)}</textarea>
+        </Flex>
       );
     }
 
@@ -256,20 +292,33 @@ class CreateOrderPage extends React.Component {
       <StepsProgress
         steps={STEPS}
         focus={currentStep}
-        allCompleted={currentStep === 'summary'}
+        allCompleted={currentStep === 'submit'}
         onStepSelect={this.changeStep}
       >
         {({ step }) => {
           let label = null;
+          let details = null;
           if (step === 'contributeAs') {
             label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage="Contribute as" />;
+            details = get(this.state, 'stepProfile.name', null);
           } else if (step === 'details') {
             label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
           } else if (step === 'payment') {
             label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
+            const stepPayment = this.state.stepPayment;
+            if (stepPayment) {
+              details = get(stepPayment, 'title');
+            }
           }
 
-          return <StepLabel>{label}</StepLabel>;
+          return (
+            <Flex flexDirection="column" alignItems="center">
+              <StepLabel>{label}</StepLabel>
+              <Span fontSize="Caption" textAlign="center">
+                {details}
+              </Span>
+            </Flex>
+          );
         }}
       </StepsProgress>
     );
@@ -304,7 +353,7 @@ class CreateOrderPage extends React.Component {
     const step = this.props.step || 'contributeAs';
     return (
       <Flex flexDirection="column" alignItems="center">
-        <Box mb={4} width={0.8} css={{ maxWidth: 365 }}>
+        <Box mb={3} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
           {this.renderStepsProgress(step)}
         </Box>
         <Box>{this.renderStep(step)}</Box>
