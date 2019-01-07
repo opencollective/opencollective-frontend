@@ -293,12 +293,14 @@ class CreateOrderPage extends React.Component {
   };
 
   renderStepsProgress(currentStep) {
+    const loading = this.props.loadingLoggedInUser || this.state.loading || this.state.submitting;
     return (
       <StepsProgress
         steps={STEPS}
         focus={currentStep}
         allCompleted={currentStep === 'submit'}
         onStepSelect={this.changeStep}
+        loadingStep={loading ? currentStep : undefined}
       >
         {({ step }) => {
           let label = null;
