@@ -358,9 +358,6 @@ class CreateOrderPage extends React.Component {
     const step = this.props.step || 'contributeAs';
     return (
       <Flex flexDirection="column" alignItems="center">
-        <Box mb={3} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
-          {this.renderStepsProgress(step)}
-        </Box>
         <Box>{this.renderStep(step)}</Box>
         <Flex mt={5}>
           {this.renderPrevStepButton(step)}
@@ -415,9 +412,12 @@ class CreateOrderPage extends React.Component {
           </P>
         </Flex>
 
-        <Box id="content" mb={6}>
+        <Flex id="content" flexDirection="column" alignItems="center" mb={6}>
+          <Box mb={3} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+            {this.renderStepsProgress(this.props.step || 'contributeAs')}
+          </Box>
           {loadingLoggedInUser || data.loading ? <Loading /> : this.renderContent()}
-        </Box>
+        </Flex>
 
         {/* TODO Errors below should be displayed somewhere else */}
         <div className="row result">
