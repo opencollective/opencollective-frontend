@@ -31,7 +31,7 @@ StyledInputField.propTypes = {
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** text to display above the input */
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   /** Show success state for field */
   success: PropTypes.bool,
 };
