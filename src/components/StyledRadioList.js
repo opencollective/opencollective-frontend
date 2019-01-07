@@ -34,7 +34,7 @@ const StyledRadioList = enhance(
         m={0}
         p={0}
         onChange={({ target }) => {
-          const selectedItem = find(items, item => item.key === target.value);
+          const selectedItem = find(items, item => keyExtractor(item.value) == target.value);
           onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
           setSelected(target.value);
         }}
@@ -44,7 +44,7 @@ const StyledRadioList = enhance(
           <Container as="label" display="block" htmlFor={id && item.key + id} key={item.key} width={1} m={0}>
             {children({
               ...item,
-              checked: selected && keyExtractor(item) === selected,
+              checked: selected && keyExtractor(item.value) === selected,
               index,
               radio: (
                 <input
