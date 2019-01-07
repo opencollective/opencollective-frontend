@@ -1,19 +1,12 @@
 {
   "database": {
-    "database": "opencollective_dvl",
-    "username": "ubuntu",
-    "password": "",
+    "url": "postgres://ubuntu@localhost:5432/opencollective_dvl",
     "options": {
-      "host": "localhost",
-      "dialect": "postgres",
       "logging": false,
       "benchmark": true
     }
   },
   "maintenancedb": {
-    "database": "postgres",
-    "username": "postgres",
-    "password": "",
     "options": { "host": "localhost" }
   },
   "keys": {

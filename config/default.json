@@ -1,17 +1,14 @@
 {
   "database": {
-    "database": "opencollective_dvl",
-    "username": "opencollective",
-    "password": "",
+    "url": "postgres://opencollective@127.0.0.1:5432/opencollective_dvl",
     "options": {
-      "host": "127.0.0.1",
-      "dialect": "postgres",
       "pool": {
         "min": 5,
         "max": 10,
         "acquire": 1200000
       },
-      "logging": false
+      "logging": false,
+      "operatorsAliases": false
     }
   },
   "maintenancedb": {

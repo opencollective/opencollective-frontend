@@ -313,7 +313,6 @@ export default app => {
   /**
    * test-api routes
    */
-  app.get('/database/reset', test.resetTestDatabase);
   app.get('/test/loginlink', test.getTestUserLoginUrl);
   app.get('/test/pdf', test.exportPDF);
 

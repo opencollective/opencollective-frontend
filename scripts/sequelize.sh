@@ -16,9 +16,7 @@ PATH=${PATH}:$NODEBIN
 SQLENV=${SEQUELIZE_ENV:=${NODE_ENV:=development}}
 
 # Parameters & Command
-SEQUELIZE_CONFIG="--models-path server/models/ --config config/sequelize_cli.json --env ${SQLENV}"
-LOCAL_DB_URL="--url postgres://${PG_USERNAME:=opencollective}@${PG_HOST:=localhost}:${PG_PORT:=5432}/${PG_DATABASE:=opencollective_dvl}"
-[ -n "$LOCAL" ] && SEQUELIZE_CONFIG="${SEQUELIZE_CONFIG} ${LOCAL_DB_URL}"
+SEQUELIZE_CONFIG="--models-path server/models/ --config config/sequelize_cli.js --env ${SQLENV}"
 COMMAND="babel-node $NODEBIN/sequelize ${SEQUELIZE_CONFIG} $@"
 
 # Variables exported for the exec

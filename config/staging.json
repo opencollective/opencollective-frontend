@@ -1,9 +1,6 @@
 {
   "database": {
     "options": {
-      "port": 5432,
-      "dialect": "postgres",
-      "protocol": "postgres",
       "logging": true,
       "pool": {
         "min": 4,
@@ -23,5 +20,3 @@
     "redirectUri": "https://api-staging.opencollective.com/connected-accounts/stripe/callback"
   }
 }
-
-

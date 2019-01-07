@@ -1,11 +1,15 @@
 {
   "env": "NODE_ENV",
   "database": {
-    "database": "PG_DATABASE",
-    "username": "PG_USERNAME",
-    "password": "PG_PASSWORD",
-    "options": {
+    "url": "PG_URL",
+    "override": {
+      "database": "PG_DATABASE",
+      "user": "PG_USERNAME",
+      "password": "PG_PASSWORD",
       "host": "PG_HOST",
+      "port": "PG_PORT"
+    },
+    "options": {
       "pool": {
         "max": "PG_MAX_CONNECTIONS"
       }

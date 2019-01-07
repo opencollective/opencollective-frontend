@@ -1,34 +1,34 @@
-/**
- * Dependencies.
- */
 import pg from 'pg';
+import pgConnectionString from 'pg-connection-string';
 import Sequelize from 'sequelize';
-import { database as config } from 'config';
+import config from 'config';
 import debug from 'debug';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
 // like in case of the key totalOrders and raw query (like User.getTopBackers())
 pg.defaults.parseInt8 = true;
 
+const db = { ...pgConnectionString.parse(config.database.url), ...config.database.override };
+
 /**
  * Database connection.
  */
-console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
+console.log(`Connecting to postgres://${db.host}/${db.database}`);
 
 // If we launch the process with DEBUG=psql, we log the postgres queries
 if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
-  config.options.logging = true;
+  config.database.options.logging = true;
 }
 
-if (config.options.logging) {
+if (config.database.options.logging) {
   if (process.env.NODE_ENV === 'production') {
-    config.options.logging = (query, executionTime) => {
+    config.database.options.logging = (query, executionTime) => {
       if (executionTime > 50) {
         debug('psql')(query.replace(/(\n|\t| +)/g, ' ').slice(0, 100), '|', executionTime, 'ms');
       }
     };
   } else {
-    config.options.logging = (query, executionTime) => {
+    config.database.options.logging = (query, executionTime) => {
       debug('psql')(
         '\n-------------------- <query> --------------------\n',
         query,
@@ -38,11 +38,15 @@ if (config.options.logging) {
   }
 }
 
-config.options.operatorsAliases = false;
-
-export const sequelize = new Sequelize(config.database, config.username, config.password, config.options);
+export const sequelize = new Sequelize(db.database, db.user, db.password, {
+  dialect: 'postgres',
+  host: db.host,
+  port: db.port,
+  ...config.database.options,
+});
 
 const models = setupModels(sequelize);
+
 export default models;
 
 /**

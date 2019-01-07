@@ -19,6 +19,10 @@ if (process.env.MEMCACHIER_PASSWORD) {
   process.env.MEMCACHE_PASSWORD = process.env.MEMCACHIER_PASSWORD;
 }
 
+if (process.env.PG_URL_ENVIRONMENT_VARIABLE) {
+  process.env.PG_URL = process.env[process.env.PG_URL_ENVIRONMENT_VARIABLE];
+}
+
 // Only load newrelic when we explicitly want it
 if (process.env.NEW_RELIC_LICENSE_KEY) {
   require('newrelic');

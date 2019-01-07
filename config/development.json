@@ -1,15 +1,4 @@
 {
-  "database": {
-    "database": "opencollective_dvl",
-    "username": "opencollective",
-    "password": "",
-    "options": {
-      "host": "127.0.0.1",
-      "dialect": "postgres",
-      "logging": false,
-      "benchmark": true
-    }
-  },
   "limits": {
     "ordersPerHour": {
       "perAccount": 100,
@@ -21,14 +10,6 @@
     "virtualCards": {
       "maxPerDay": 1000,
       "maxAmountPerDay": 5000000
-    }
-  },
-  "maintenancedb": {
-    "database": "postgres",
-    "username": "postgres",
-    "password": "",
-    "options": {
-      "host": "127.0.0.1"
     }
   },
   "github": {

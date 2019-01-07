@@ -1,9 +1,6 @@
 {
   "database": {
     "options": {
-      "port": 5432,
-      "dialect": "postgres",
-      "protocol": "postgres",
       "logging": true,
       "pool": {
         "min": 10,
