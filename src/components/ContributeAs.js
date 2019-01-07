@@ -23,10 +23,6 @@ const SearchIcon = styled(Search)`
 
 const ContributeAsEntryContainer = styled(Container)`
   cursor: pointer;
-  background: ${themeGet('colors.white.full')};
-  &:hover {
-    background: ${themeGet('colors.black.50')};
-  }
 `;
 
 const enhance = compose(
@@ -93,30 +89,28 @@ const enhance = compose(
  */
 const ContributeAs = enhance(
   ({ getFieldProps, getFieldError, onChange, onFieldChange, onSearch, personal, profiles, state, ...fieldProps }) => {
-    profiles = {
-      '0': personal, // personal should always be first
-      ...profiles,
-    };
+    profiles = [
+      personal, // personal should always be first
+    ].concat(profiles);
 
     if (state.search) {
       const test = new RegExp(state.search, 'i');
-      profiles = Object.keys(profiles)
-        .filter(key => profiles[key].name.match(test))
-        .reduce((result, key) => ({ ...result, [key]: profiles[key] }), {});
+      profiles = profiles.filter(profile => profile.name.match(test));
     }
 
-    const options = {
-      ...profiles,
-      'new-org': {
+    const options = profiles.concat([
+      {
+        id: 'new-org',
         name: 'A new organization',
       },
-      anonymous: {
+      {
+        id: 'anonymous',
         name: 'Anonymously',
       },
-    };
-    const firstProfile = Object.keys(options)[0];
-    const lastIndex = Object.keys(options).length - 1;
-    const showSearch = Object.keys(profiles).length >= 5 || state.search;
+    ]);
+    const firstProfile = options[0];
+    const lastIndex = options.length - 1;
+    const showSearch = profiles.length >= 5 || state.search;
 
     return (
       <StyledCard maxWidth={500}>
@@ -133,7 +127,13 @@ const ContributeAs = enhance(
             />
           </Container>
         )}
-        <StyledRadioList {...fieldProps} options={options} onChange={onChange} defaultValue={firstProfile}>
+        <StyledRadioList
+          {...fieldProps}
+          options={options}
+          onChange={onChange}
+          defaultValue={firstProfile}
+          keyGetter="id"
+        >
           {({ key, value, radio, checked, index }) => (
             <ContributeAsEntryContainer
               display="flex"
@@ -160,7 +160,7 @@ const ContributeAs = enhance(
                 </P>
                 {value.type && (
                   <P fontSize="Caption" lineHeight="Caption" color="black.500">
-                    {key === '0' ? `Personal account - ${value.email}` : capitalize(value.type)}
+                    {value.type === 'USER' ? `Personal account - ${value.email}` : capitalize(value.type)}
                   </P>
                 )}
               </Flex>
