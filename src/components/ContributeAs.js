@@ -92,12 +92,18 @@ const enhance = compose(
  * Search is displayed if 5 or more profiles are passed in.
  */
 const ContributeAs = enhance(
-  ({ getFieldProps, getFieldError, onChange, onFieldChange, onSearch, personal, profiles, state, ...fieldProps }) => {
-    profiles = {
-      '0': personal, // personal should always be first
-      ...profiles,
-    };
-
+  ({
+    getFieldProps,
+    getFieldError,
+    onChange,
+    onFieldChange,
+    onSearch,
+    personal,
+    profiles,
+    state,
+    defaultSelectedProfile,
+    ...fieldProps
+  }) => {
     if (state.search) {
       const test = new RegExp(state.search, 'i');
       profiles = Object.keys(profiles)
@@ -105,16 +111,12 @@ const ContributeAs = enhance(
         .reduce((result, key) => ({ ...result, [key]: profiles[key] }), {});
     }
 
-    const options = {
+    const options = [
+      personal,
       ...profiles,
-      'new-org': {
-        name: 'A new organization',
-      },
-      anonymous: {
-        name: 'Anonymously',
-      },
-    };
-    const firstProfile = Object.keys(options)[0];
+      { id: 'new-org', name: 'A new organization' },
+      { id: 'Anonymously', name: 'Anonymously' },
+    ];
     const lastIndex = Object.keys(options).length - 1;
     const showSearch = Object.keys(profiles).length >= 5 || state.search;
 
@@ -133,7 +135,13 @@ const ContributeAs = enhance(
             />
           </Container>
         )}
-        <StyledRadioList {...fieldProps} options={options} onChange={onChange} defaultValue={firstProfile}>
+        <StyledRadioList
+          {...fieldProps}
+          options={options}
+          keyGetter="id"
+          defaultValue={defaultSelectedProfile.id}
+          onChange={onChange}
+        >
           {({ key, value, radio, checked, index }) => (
             <ContributeAsEntryContainer
               display="flex"
@@ -231,14 +239,19 @@ ContributeAs.propTypes = {
    * else the data passed to `profiles` or `personal` is returned
    */
   onChange: PropTypes.func,
+  defaultSelectedProfile: PropTypes.shape({
+    id: PropTypes.number,
+  }),
   personal: PropTypes.shape({
+    id: PropTypes.number,
     email: PropTypes.string,
     image: PropTypes.string,
     name: PropTypes.string,
     type: PropTypes.string,
   }),
-  profiles: PropTypes.objectOf(
+  profiles: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.number,
       email: PropTypes.string,
       image: PropTypes.string,
       name: PropTypes.string,
