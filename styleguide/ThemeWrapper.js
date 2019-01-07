@@ -3,6 +3,7 @@ import { ThemeProvider } from 'styled-components';
 import theme from '../src/constants/theme';
 import AppGlobalStyles from '../src/pages/global-styles';
 import { createGlobalStyle } from 'styled-components';
+import { IntlProvider } from 'react-intl';
 
 const StyleguideGlobalStyles = createGlobalStyle`
   body {
@@ -16,7 +17,9 @@ export default class ThemeWrapper extends Component {
       <Fragment>
         <AppGlobalStyles />
         <StyleguideGlobalStyles />
-        <ThemeProvider theme={theme}>{this.props.children}</ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <IntlProvider locale="en">{this.props.children}</IntlProvider>
+        </ThemeProvider>
       </Fragment>
     );
   }

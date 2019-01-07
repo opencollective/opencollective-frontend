@@ -16,6 +16,7 @@ module.exports = {
   styleguideComponents: {
     Wrapper: path.join(__dirname, 'styleguide/ThemeWrapper'),
   },
+  title: 'Open Collective Frontend Style Guide',
   usageMode: 'expand',
   webpackConfig: createConfig([babel()]),
 };
