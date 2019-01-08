@@ -102,7 +102,8 @@
   },
   "slack": {
     "privateActivityChannel": "#activity-private-test",
-    "publicActivityChannel": "#activity-public-test"
+    "publicActivityChannel": "#activity-public-test",
+    "abuseChannel": "#abuse"
   },
   "recaptcha": {
     "siteKey": "6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK",

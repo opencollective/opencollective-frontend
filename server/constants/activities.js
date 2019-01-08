@@ -28,6 +28,7 @@ export default {
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
   COLLECTIVE_MONTHLY: 'collective.monthly',
+  ORDERS_SUSPICIOUS: 'orders.suspicious',
 
   // Not used anymore, leaving for historical reference
   COLLECTIVE_TRANSACTION_PAID: 'collective.transaction.paid', // replaced with COLLECTIVE_EXPENSE_PAID

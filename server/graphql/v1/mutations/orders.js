@@ -11,6 +11,7 @@ import * as errors from '../../errors';
 import cache from '../../../lib/cache';
 import * as github from '../../../lib/github';
 import recaptcha from '../../../lib/recaptcha';
+import slackLib from '../../../lib/slack';
 import * as libPayments from '../../../lib/payments';
 import { capitalize, pluralize } from '../../../lib/utils';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount } from '../../../lib/subscriptions';
@@ -356,7 +357,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       MatchingPaymentMethodId: order.MatchingPaymentMethodId,
       data: {
         reqIp,
-        recaptchaResponse: recaptchaResponse,
+        recaptchaResponse,
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };
@@ -417,6 +418,28 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     // If there was a referral for this order, we add it as a FUNDRAISER role
     if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
       collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
+    }
+
+    // Share suspicious transactions on Slack
+    if (recaptchaResponse && recaptchaResponse.score && recaptchaResponse.score <= 0.5) {
+      slackLib
+        .postActivityOnPublicChannel(
+          {
+            type: activities.ORDERS_SUSPICIOUS,
+            data: {
+              order,
+              user,
+              fromCollective,
+              collective,
+              recaptchaResponse,
+            },
+          },
+          config.slack.webhookUrl,
+          {
+            channel: config.slack.abuseChannel,
+          },
+        )
+        .catch(console.log);
     }
 
     return order;
