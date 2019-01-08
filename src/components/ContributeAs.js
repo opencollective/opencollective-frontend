@@ -4,9 +4,12 @@ import { compose, withHandlers, withState } from 'recompose';
 import { capitalize, omit } from 'lodash';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
+import { FormattedMessage } from 'react-intl';
+import { Box, Flex } from '@rebass/grid';
+
+import { Search } from 'styled-icons/octicons/Search.cjs';
 
 import Avatar from './Avatar';
-import { Box, Flex } from '@rebass/grid';
 import Container from './Container';
 import Logo from './Logo';
 import { P } from './Text';
@@ -15,7 +18,6 @@ import StyledRadioList from './StyledRadioList';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
-import { Search } from 'styled-icons/octicons/Search.cjs';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
@@ -23,10 +25,6 @@ const SearchIcon = styled(Search)`
 
 const ContributeAsEntryContainer = styled(Container)`
   cursor: pointer;
-  background: ${themeGet('colors.white.full')};
-  &:hover {
-    background: ${themeGet('colors.black.50')};
-  }
 `;
 
 const enhance = compose(
@@ -115,7 +113,7 @@ const ContributeAs = enhance(
       personal,
       ...profiles,
       { id: 'new-org', name: 'A new organization' },
-      { id: 'Anonymously', name: 'Anonymously' },
+      { id: 'anonymous', name: 'Anonymously' },
     ];
     const lastIndex = Object.keys(options).length - 1;
     const showSearch = Object.keys(profiles).length >= 5 || state.search;
@@ -168,7 +166,15 @@ const ContributeAs = enhance(
                 </P>
                 {value.type && (
                   <P fontSize="Caption" lineHeight="Caption" color="black.500">
-                    {key === '0' ? `Personal account - ${value.email}` : capitalize(value.type)}
+                    {value.type === 'USER' ? (
+                      <FormattedMessage
+                        id="contributeAs.personal"
+                        defaultMessage="Personal account - {email}"
+                        values={{ email: value.email }}
+                      />
+                    ) : (
+                      capitalize(value.type)
+                    )}
                   </P>
                 )}
               </Flex>
@@ -219,9 +225,9 @@ const ContributeAs = enhance(
                 </Container>
               )}
               {key === 'anonymous' && checked && (
-                <Container flex="1 1 auto" textAlign="right">
+                <Flex flex="1 1 auto" justifyContent="flex-end">
                   <Logo name={key} height="3rem" />
-                </Container>
+                </Flex>
               )}
             </ContributeAsEntryContainer>
           )}
