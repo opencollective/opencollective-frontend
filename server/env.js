@@ -22,7 +22,7 @@ if (process.env.MEMCACHIER_PASSWORD) {
 
 // Compute PG_URL based on PG_URL_ENVIRONMENT_VARIABLE, look in DATABASE_URL by default
 const pgUrlEnvironmentVariable = get(process.env, 'PG_URL_ENVIRONMENT_VARIABLE', 'DATABASE_URL');
-if (has(process.env, pgUrlEnvironmentVariable)) {
+if (has(process.env, pgUrlEnvironmentVariable) && !has(process.env, 'PG_URL')) {
   process.env.PG_URL = get(process.env, pgUrlEnvironmentVariable);
 }
 
