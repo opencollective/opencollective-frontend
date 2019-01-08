@@ -2,6 +2,8 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick, isArray } from 'lodash';
 
+import { getLoggedInUserQuery } from './queries';
+
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
@@ -79,7 +81,11 @@ const createCollectiveQuery = gql`
   mutation createCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
+      name
       slug
+      type
+      website
+      twitterHandle
     }
   }
 `;
@@ -311,7 +317,18 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
       );
       CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
-      return await mutate({ variables: { collective: CollectiveInputType } });
+      return await mutate({
+        variables: { collective: CollectiveInputType },
+        update: (store, { data: { createCollective } }) => {
+          const data = store.readQuery({ query: getLoggedInUserQuery });
+          data.LoggedInUser.memberOf.push({
+            __typename: 'Member',
+            collective: createCollective,
+            role: 'ADMIN',
+          });
+          store.writeQuery({ query: getLoggedInUserQuery, data });
+        },
+      });
     },
   }),
 });
