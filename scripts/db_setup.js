@@ -39,7 +39,8 @@ async function main() {
   const client = await libdb.getConnectedClient(libdb.getDBUrl('maintenancedb'));
   const { username, password } = libdb.getDBConf('database');
   await createUser(client, username, password);
-  const [clientMaint, clientApp] = await libdb.recreateDatabase(false);
+  const destroy = process.env.DB_DESTROY ? true : false;
+  const [clientMaint, clientApp] = await libdb.recreateDatabase(destroy);
   await Promise.all([client.end(), clientMaint.end(), clientApp.end()]);
 }
 

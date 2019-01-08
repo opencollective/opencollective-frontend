@@ -124,7 +124,7 @@ export async function dropDatabaseQuery(client, database) {
        WHERE datname = '${database}';`,
     );
     await client.query(format('DROP DATABASE %s;', database));
-    console.log(`database ${database} droped`);
+    console.log(`database ${database} dropped`);
   } else {
     console.log('database did not exist');
   }
