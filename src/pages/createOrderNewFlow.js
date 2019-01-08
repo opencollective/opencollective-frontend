@@ -188,12 +188,20 @@ class CreateOrderPage extends React.Component {
         ];
   }
 
+  /** Return the currently selected tier, or a falsy value if none selected */
+  getTier() {
+    const { data, TierId } = this.props;
+    return TierId && get(data, 'Collective.tiers', []).find(t => t.id == TierId);
+  }
+
   getContributorTypeName() {
-    switch (this.props.verb) {
-      case 'pay':
-        return <FormattedMessage id="member.title" defaultMessage="member" />;
-      default:
-        return <FormattedMessage id="backer.title" defaultMessage="backer" />;
+    const tier = this.getTier();
+    if (tier) {
+      return tier.name;
+    } else if (this.props.verb === 'pay') {
+      return <FormattedMessage id="member.title" defaultMessage="member" />;
+    } else {
+      return <FormattedMessage id="backer.title" defaultMessage="backer" />;
     }
   }
 
@@ -245,7 +253,7 @@ class CreateOrderPage extends React.Component {
   renderStep(step) {
     const { data, LoggedInUser, TierId } = this.props;
     const [personal, profiles] = this.getProfiles();
-    const tier = TierId ? data.Collective.tiers.find(t => t.id == TierId) : {};
+    const tier = this.getTier();
 
     if (step === 'contributeAs') {
       return (
