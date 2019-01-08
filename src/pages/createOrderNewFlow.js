@@ -25,9 +25,11 @@ import * as api from '../lib/api';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
+import ContributeDetails from '../components/ContributeDetails';
 import Loading from '../components/Loading';
 import StyledButton from '../components/StyledButton';
 import StepsProgress from '../components/StepsProgress';
+import { formatCurrency } from '../lib/utils';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
 
@@ -101,8 +103,8 @@ class CreateOrderPage extends React.Component {
       unknownEmail: false,
       signIn: true,
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
-      stepPayment: null,
       stepDetails: null,
+      stepPayment: null,
     };
   }
 
@@ -208,6 +210,14 @@ class CreateOrderPage extends React.Component {
     );
   }
 
+  /** Return the index of the last step user can switch to */
+  getMaxStepIdx() {
+    if (!this.state.stepProfile) return 0;
+    if (!this.state.stepDetails) return 1;
+    if (!this.state.stepPayment) return 2;
+    return STEPS.length;
+  }
+
   renderNextStepButton(step) {
     const stepIdx = STEPS.indexOf(step);
     if (stepIdx === -1) {
@@ -217,7 +227,11 @@ class CreateOrderPage extends React.Component {
     const isLast = stepIdx + 1 >= STEPS.length;
     const nextStep = isLast ? 'submit' : STEPS[stepIdx + 1];
     return (
-      <PrevNextButton onClick={() => this.changeStep(nextStep)} buttonStyle="primary">
+      <PrevNextButton
+        onClick={() => this.changeStep(nextStep)}
+        buttonStyle="primary"
+        disabled={stepIdx + 1 > this.getMaxStepIdx()}
+      >
         {isLast ? (
           <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
         ) : (
@@ -229,8 +243,9 @@ class CreateOrderPage extends React.Component {
   }
 
   renderStep(step) {
-    const { LoggedInUser } = this.props;
+    const { data, LoggedInUser, TierId } = this.props;
     const [personal, profiles] = this.getProfiles();
+    const tier = TierId ? data.Collective.tiers.find(t => t.id == TierId) : {};
 
     if (step === 'contributeAs') {
       return (
@@ -248,9 +263,12 @@ class CreateOrderPage extends React.Component {
       );
     } else if (step === 'details') {
       return (
-        <Flex alignItems="center" css={{ height: 300 }}>
-          &rarr; Insert Details component here &larr;
-        </Flex>
+        <ContributeDetails
+          amountOptions={(tier && tier.presets) || [500, 1000, 2000, 5000]}
+          currency={(tier && tier.currency) || data.Collective.currency}
+          onChange={data => this.setState({ stepDetails: data })}
+          showFrequency={TierId}
+        />
       );
     } else if (step === 'payment') {
       return (
@@ -293,6 +311,7 @@ class CreateOrderPage extends React.Component {
   };
 
   renderStepsProgress(currentStep) {
+    const { stepProfile, stepDetails, stepPayment } = this.state;
     const loading = this.props.loadingLoggedInUser || this.state.loading || this.state.submitting;
     return (
       <StepsProgress
@@ -301,21 +320,34 @@ class CreateOrderPage extends React.Component {
         allCompleted={currentStep === 'submit'}
         onStepSelect={this.changeStep}
         loadingStep={loading ? currentStep : undefined}
+        disabledSteps={STEPS.slice(this.getMaxStepIdx() + 1, STEPS.length)}
       >
         {({ step }) => {
           let label = null;
           let details = null;
           if (step === 'contributeAs') {
             label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage="Contribute as" />;
-            details = get(this.state, 'stepProfile.name', null);
+            details = get(stepProfile, 'name', null);
           } else if (step === 'details') {
             label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
+            if (stepDetails) {
+              const amount = formatCurrency(stepDetails.totalAmount, get(this.props, 'data.Collective.currency'));
+              details = !stepDetails.interval ? (
+                amount
+              ) : (
+                <Span>
+                  {amount}{' '}
+                  <FormattedMessage
+                    id="tier.interval"
+                    defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                    values={{ interval: stepDetails.interval }}
+                  />
+                </Span>
+              );
+            }
           } else if (step === 'payment') {
             label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
-            const stepPayment = this.state.stepPayment;
-            if (stepPayment) {
-              details = get(stepPayment, 'title');
-            }
+            details = get(stepPayment, 'title', null);
           }
 
           return (
@@ -449,6 +481,17 @@ const addData = graphql(gql`
       currency
       parentCollective {
         image
+      }
+      tiers {
+        id
+        type
+        name
+        slug
+        description
+        amount
+        currency
+        interval
+        presets
       }
     }
   }
