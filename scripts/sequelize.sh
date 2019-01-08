@@ -7,12 +7,8 @@ ROOT="$( dirname "$(readlink "$0/..")" )"
 NODEBIN=${ROOT}/node_modules/.bin
 PATH=${PATH}:$NODEBIN
 
-# Environment
-SQLENV=${SEQUELIZE_ENV:=${NODE_ENV:=development}}
-
 # Parameters & Command
-PG_URL=`babel-node config/pg-url.js`
-SEQUELIZE_CONFIG="--models-path server/models/ --url ${PG_URL} --env ${SQLENV}"
+SEQUELIZE_CONFIG="--models-path server/models/ --config config/sequelize-cli.js"
 COMMAND="babel-node $NODEBIN/sequelize ${SEQUELIZE_CONFIG} $@"
 
 # Variables exported for the exec
