@@ -33,7 +33,7 @@ pages
   .add('editCollective', '/:slug/edit/:section?')
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
-  .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', createOrderPage)
+  .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:step?', createOrderPage)
   .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder') // New contribution flow not applied to events yet
   .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:step?', createOrderPage)
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
