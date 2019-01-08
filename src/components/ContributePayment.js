@@ -135,6 +135,23 @@ class ContributePayment extends React.Component {
   componentDidMount() {
     // We load stripe script as soon as the component mount
     this.props.loadStripe();
+
+    // Generate an onChange event with default value on first mount
+    this.dispatchChangeEvent(this.state.selectedOption);
+  }
+
+  dispatchChangeEvent(selectedOption, newCreditCardInfo, saveCreditCard) {
+    if (this.props.onChange) {
+      const isNew = selectedOption.key === 'newCreditCard';
+      this.props.onChange({
+        paymentMethod: isNew ? newCreditCardInfo : selectedOption.paymentMethod,
+        title: selectedOption.title,
+        subtitle: selectedOption.subtitle,
+        isNew,
+        saveCreditCard,
+        key: selectedOption.key,
+      });
+    }
   }
 
   onChange(event) {
@@ -158,16 +175,11 @@ class ContributePayment extends React.Component {
         saveCreditCard = checked;
       }
 
-      const isNew = selectedOption.key === 'newCreditCard';
       if (this.props.onChange) {
-        this.props.onChange({
-          paymentMethod: isNew ? newCreditCardInfo : selectedOption.paymentMethod,
-          isNew,
-          saveCreditCard,
-        });
+        this.dispatchChangeEvent(selectedOption, newCreditCardInfo, saveCreditCard);
       }
 
-      this.setState({ ...state, selectedOption, saveCreditCard, errors });
+      return { ...state, selectedOption, saveCreditCard, errors };
     });
   }
 
@@ -197,7 +209,7 @@ class ContributePayment extends React.Component {
           keyGetter="key"
           options={paymentMethodsOptions}
           onChange={this.onChange}
-          defaultValue={paymentMethodsOptions[0]}
+          defaultValue={this.state.selectedOption.key}
         >
           {({ radio, checked, index, value: { key, title, subtitle, icon } }) => (
             <PaymentEntryContainer

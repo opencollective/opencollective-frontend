@@ -5,10 +5,11 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
+import styled from 'styled-components';
 
 import { Router } from '../server/pages';
 
-import { H2, P } from '../components/Text';
+import { H2, P, Span } from '../components/Text';
 import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -17,7 +18,6 @@ import SignIn from '../components/SignIn';
 import CreateProfile from '../components/CreateProfile';
 import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
-import StyledButton from '../components/StyledButton';
 
 import { addCreateOrderMutation, createUserQuery } from '../graphql/mutations';
 
@@ -26,6 +26,18 @@ import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
 import Loading from '../components/Loading';
+import StyledButton from '../components/StyledButton';
+import StepsProgress from '../components/StepsProgress';
+
+const STEPS = ['contributeAs', 'details', 'payment'];
+
+const StepLabel = styled(Span)`
+  text-transform: uppercase;
+`;
+StepLabel.defaultProps = { color: 'black.400', fontSize: 'Tiny', mt: 1 };
+
+const PrevNextButton = styled(StyledButton)``;
+PrevNextButton.defaultProps = { buttonSize: 'large', fontWeight: 'bold', mx: 2 };
 
 class CreateOrderPage extends React.Component {
   static getInitialProps({
@@ -39,6 +51,7 @@ class CreateOrderPage extends React.Component {
       interval,
       description,
       verb,
+      step,
       redeem,
       redirect,
     },
@@ -51,6 +64,7 @@ class CreateOrderPage extends React.Component {
       interval,
       description,
       verb,
+      step,
       redeem,
       redirect,
     };
@@ -64,6 +78,7 @@ class CreateOrderPage extends React.Component {
     interval: PropTypes.string,
     description: PropTypes.string,
     verb: PropTypes.string,
+    step: PropTypes.string,
     redirect: PropTypes.string,
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
@@ -83,27 +98,19 @@ class CreateOrderPage extends React.Component {
       loading: false,
       submitting: false,
       result: {},
-      step: props.LoggedInUser ? 'contributeAs' : 'signin',
       unknownEmail: false,
-      selectedProfile: null,
+      signIn: true,
+      stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
+      stepPayment: null,
+      stepDetails: null,
     };
   }
 
   componentDidUpdate(prevProps) {
-    // Signin redirect
-    if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
-      this.setState({ step: 'contributeAs' });
-    } else if (prevProps.LoggedInUser && !this.props.LoggedInUser) {
-      this.setState({ step: 'signin' });
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
+      this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
     }
   }
-
-  nextStep = () => {
-    this.setState(state => {
-      if (state.step === 'contributeAs') return { ...state, step: 'choose-payment' };
-      return state;
-    });
-  };
 
   signIn = email => {
     if (this.state.submitting) {
@@ -152,16 +159,30 @@ class CreateOrderPage extends React.Component {
       });
   };
 
+  getLoggedInUserDefaultContibuteProfile() {
+    if (get(this.state, 'stepProfile')) {
+      return this.state.stepProfile;
+    }
+
+    const { LoggedInUser } = this.props;
+    return !LoggedInUser ? null : { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+  }
+
+  getLoggedInUserDefaultPaymentMethodId() {
+    const pm = get(this.props.LoggedInUser, 'collective.paymentMethods', [])[0];
+    return pm && pm.id;
+  }
+
   /** Returns an array like [personnalProfile, otherProfiles] */
   getProfiles() {
     const { LoggedInUser } = this.props;
     return !LoggedInUser
       ? [{}, {}]
       : [
-          { email: LoggedInUser.email, image: LoggedInUser.iamge, ...LoggedInUser.collective },
+          { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective },
           LoggedInUser.memberOf
             .filter(m => m.role === 'ADMIN' && m.collective.id !== this.props.data.Collective.id)
-            .reduce((data, { collective }) => ({ ...data, [collective.id]: collective }), {}),
+            .map(({ collective }) => collective),
         ];
   }
 
@@ -174,77 +195,177 @@ class CreateOrderPage extends React.Component {
     }
   }
 
-  renderContent() {
-    const { LoggedInUser } = this.props;
-    const { step, loading, submitting, unknownEmail, selectedProfile } = this.state;
-    const [personal, profiles] = this.getProfiles();
+  renderPrevStepButton(step) {
+    const prevStepIdx = STEPS.indexOf(step) - 1;
+    if (prevStepIdx < 0) {
+      return null;
+    }
 
     return (
-      <Box id="content" mb={5}>
-        {step === 'contributeAs' && (
-          <Flex alignItems="center" flexDirection="column">
-            <Box>
-              <StyledInputField htmlFor="contributeAs" label="Contribute as:">
-                {fieldProps => (
-                  <ContributeAs
-                    {...fieldProps}
-                    onChange={profile => this.setState({ selectedProfile: profile })}
-                    profiles={profiles}
-                    personal={personal}
-                  />
-                )}
-              </StyledInputField>
-            </Box>
-            <Box mt={5}>
-              <StyledButton
-                disabled={selectedProfile === null}
-                buttonStyle="primary"
-                buttonSize="large"
-                fontWeight="bold"
-                onClick={this.nextStep}
-              >
-                <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" /> &rarr;
-              </StyledButton>
-            </Box>
-          </Flex>
-        )}
-        {step === 'signin' && (
-          <Flex justifyContent="center">
-            <SignIn
-              onSubmit={this.signIn}
-              onSecondaryAction={() => this.setState({ step: 'signup' })}
-              loading={loading || submitting}
-              unknownEmail={unknownEmail}
+      <PrevNextButton onClick={() => this.changeStep(STEPS[prevStepIdx])} buttonStyle="standard">
+        &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
+      </PrevNextButton>
+    );
+  }
+
+  renderNextStepButton(step) {
+    const stepIdx = STEPS.indexOf(step);
+    if (stepIdx === -1) {
+      return null;
+    }
+
+    const isLast = stepIdx + 1 >= STEPS.length;
+    const nextStep = isLast ? 'submit' : STEPS[stepIdx + 1];
+    return (
+      <PrevNextButton onClick={() => this.changeStep(nextStep)} buttonStyle="primary">
+        {isLast ? (
+          <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
+        ) : (
+          <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
+        )}{' '}
+        &rarr;
+      </PrevNextButton>
+    );
+  }
+
+  renderStep(step) {
+    const { LoggedInUser } = this.props;
+    const [personal, profiles] = this.getProfiles();
+
+    if (step === 'contributeAs') {
+      return (
+        <StyledInputField htmlFor="contributeAs" label="Contribute as:">
+          {fieldProps => (
+            <ContributeAs
+              {...fieldProps}
+              onChange={profile => this.setState({ stepProfile: profile, stepPayment: null })}
+              profiles={profiles}
+              personal={personal}
+              defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
             />
-          </Flex>
-        )}
-        {step === 'signup' && (
-          <Flex justifyContent="center">
-            <CreateProfile
-              onPersonalSubmit={this.createProfile}
-              onOrgSubmit={this.createProfile}
-              onSecondaryAction={() => this.setState({ step: 'signin' })}
-              submitting={submitting}
-            />
-          </Flex>
-        )}
-        {step === 'choose-payment' && (
-          <Flex justifyContent="center">
-            <ContributePayment
-              onChange={console.log}
-              paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
-              collective={this.state.selectedProfile}
-            />
-          </Flex>
-        )}
-        <div className="row result">
-          <div className="col-sm-2" />
-          <div className="col-sm-10">
-            <div className="success">{this.state.result.success}</div>
-            {this.state.result.error && <div className="error">{this.state.result.error}</div>}
-          </div>
-        </div>
-      </Box>
+          )}
+        </StyledInputField>
+      );
+    } else if (step === 'details') {
+      return (
+        <Flex alignItems="center" css={{ height: 300 }}>
+          &rarr; Insert Details component here &larr;
+        </Flex>
+      );
+    } else if (step === 'payment') {
+      return (
+        <ContributePayment
+          onChange={stepPayment => this.setState({ stepPayment })}
+          paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
+          collective={this.state.stepProfile}
+        />
+      );
+    } else if (step === 'submit') {
+      return (
+        <Flex justifyContent="center" alignItems="center" flexDirection="column">
+          <Loading />
+          <P color="red.700">__DEBUG__</P>
+          <P color="red.700">Profile:</P>
+          <textarea>{JSON.stringify(this.state.stepProfile)}</textarea>
+          <P color="red.700">Details:</P>
+          <textarea>{JSON.stringify(this.state.stepDetails)}</textarea>
+          <P color="red.700">PaymentMethod:</P>
+          <textarea>{JSON.stringify(this.state.stepPayment)}</textarea>
+        </Flex>
+      );
+    }
+
+    return null;
+  }
+
+  changeStep = step => {
+    const { verb, data } = this.props;
+    const params = {
+      collectiveSlug: data.Collective.slug,
+      step: step === 'contributeAs' ? undefined : step,
+    };
+
+    if (verb) {
+      Router.pushRoute('donate', { ...params, verb });
+    } else {
+      Router.pushRoute('orderCollectiveTier', { ...params, TierId: this.props.TierId });
+    }
+  };
+
+  renderStepsProgress(currentStep) {
+    const loading = this.props.loadingLoggedInUser || this.state.loading || this.state.submitting;
+    return (
+      <StepsProgress
+        steps={STEPS}
+        focus={currentStep}
+        allCompleted={currentStep === 'submit'}
+        onStepSelect={this.changeStep}
+        loadingStep={loading ? currentStep : undefined}
+      >
+        {({ step }) => {
+          let label = null;
+          let details = null;
+          if (step === 'contributeAs') {
+            label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage="Contribute as" />;
+            details = get(this.state, 'stepProfile.name', null);
+          } else if (step === 'details') {
+            label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
+          } else if (step === 'payment') {
+            label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
+            const stepPayment = this.state.stepPayment;
+            if (stepPayment) {
+              details = get(stepPayment, 'title');
+            }
+          }
+
+          return (
+            <Flex flexDirection="column" alignItems="center">
+              <StepLabel>{label}</StepLabel>
+              <Span fontSize="Caption" textAlign="center">
+                {details}
+              </Span>
+            </Flex>
+          );
+        }}
+      </StepsProgress>
+    );
+  }
+
+  renderContent() {
+    const { LoggedInUser } = this.props;
+    const { loading, submitting, unknownEmail } = this.state;
+
+    if (!LoggedInUser) {
+      return this.state.signIn ? (
+        <Flex justifyContent="center">
+          <SignIn
+            onSubmit={this.signIn}
+            onSecondaryAction={() => this.setState({ signIn: false })}
+            loading={loading || submitting}
+            unknownEmail={unknownEmail}
+          />
+        </Flex>
+      ) : (
+        <Flex justifyContent="center">
+          <CreateProfile
+            onPersonalSubmit={this.createProfile}
+            onOrgSubmit={this.createProfile}
+            onSecondaryAction={() => this.setState({ signIn: true })}
+            submitting={submitting}
+          />
+        </Flex>
+      );
+    }
+
+    const step = this.props.step || 'contributeAs';
+    return (
+      <Flex flexDirection="column" alignItems="center">
+        <Box>{this.renderStep(step)}</Box>
+        <Flex mt={5}>
+          {this.renderPrevStepButton(step)}
+          {this.renderNextStepButton(step)}
+        </Flex>
+      </Flex>
     );
   }
 
@@ -293,7 +414,21 @@ class CreateOrderPage extends React.Component {
           </P>
         </Flex>
 
-        {loadingLoggedInUser ? <Loading mb={4} /> : this.renderContent()}
+        <Flex id="content" flexDirection="column" alignItems="center" mb={6}>
+          <Box mb={3} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+            {this.renderStepsProgress(this.props.step || 'contributeAs')}
+          </Box>
+          {loadingLoggedInUser || data.loading ? <Loading /> : this.renderContent()}
+        </Flex>
+
+        {/* TODO Errors below should be displayed somewhere else */}
+        <div className="row result">
+          <div className="col-sm-2" />
+          <div className="col-sm-10">
+            <div className="success">{this.state.result.success}</div>
+            {this.state.result.error && <div className="error">{this.state.result.error}</div>}
+          </div>
+        </div>
       </Page>
     );
   }
