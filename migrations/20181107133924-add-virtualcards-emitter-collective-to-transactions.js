@@ -11,10 +11,8 @@ module.exports = {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
         allowNull: true,
-        description:
-          'References the collective that created the virtual card used for this order',
+        description: 'References the collective that created the virtual card used for this order',
       })
-      .then(() => queryInterface.sequelize.sync())
       .then(() => {
         return queryInterface.sequelize.query(`
           UPDATE  "Transactions" t
@@ -25,16 +23,10 @@ module.exports = {
           AND     pm.type = 'virtualcard'
         `);
       })
-      .then(() => queryInterface.sequelize.sync())
       .then(async () => {
         // Fetch all transactions made using a virtual card
         const transactions = await models.Transaction.findAll({
-          attributes: [
-            'CollectiveId',
-            'FromCollectiveId',
-            'UsingVirtualCardFromCollectiveId',
-            'CreatedByUserId',
-          ],
+          attributes: ['CollectiveId', 'FromCollectiveId', 'UsingVirtualCardFromCollectiveId', 'CreatedByUserId'],
           include: [
             {
               model: models.Collective,
@@ -73,9 +65,6 @@ module.exports = {
   },
 
   down: queryInterface => {
-    return queryInterface.removeColumn(
-      'Transactions',
-      'UsingVirtualCardFromCollectiveId',
-    );
+    return queryInterface.removeColumn('Transactions', 'UsingVirtualCardFromCollectiveId');
   },
 };

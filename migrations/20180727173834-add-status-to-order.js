@@ -19,7 +19,6 @@ module.exports = {
           allowNull: false,
         }),
       )
-      .then(() => sequelize.sync())
       .then(() =>
         queryInterface.sequelize.transaction(transaction => {
           const updatePaidOrders = models.Transaction.findAll({
@@ -90,22 +89,20 @@ module.exports = {
               },
             );
           });
-          const updateCancelledSubscriptionOrders = models.Subscription.findAll(
-            {
-              include: [
-                {
-                  model: models.Order,
-                  required: true,
-                  attributes: ['id', 'status'],
-                },
-              ],
-              where: {
-                deactivatedAt: {
-                  [Op.not]: null,
-                },
+          const updateCancelledSubscriptionOrders = models.Subscription.findAll({
+            include: [
+              {
+                model: models.Order,
+                required: true,
+                attributes: ['id', 'status'],
+              },
+            ],
+            where: {
+              deactivatedAt: {
+                [Op.not]: null,
               },
             },
-          ).then(subscriptions => {
+          }).then(subscriptions => {
             const orders = subscriptions.map(sub => sub.Order.id);
             console.log(`Updating ${orders.length} orders to CANCELLED`);
             return models.Order.update(
