@@ -79,7 +79,11 @@ const createCollectiveQuery = gql`
   mutation createCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
+      name
       slug
+      type
+      website
+      twitterHandle
     }
   }
 `;
@@ -314,6 +318,10 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
       return await mutate({ variables: { collective: CollectiveInputType } });
     },
   }),
+  options: {
+    refetchQueries: ['LoggedInUser'],
+    awaitRefetchQueries: true,
+  },
 });
 
 export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
