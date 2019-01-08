@@ -82,7 +82,7 @@ const SeparatorLine = styled(Box)`
 
 const getBubbleContent = (idx, checked, loading) => {
   if (loading) {
-    return <StyledSpinner color={checked && 'white'} size={14} />;
+    return <StyledSpinner color={checked ? 'white.full' : 'primary.700'} size={14} />;
   } else if (checked) {
     return <Check color="white" size={14} />;
   }
@@ -119,7 +119,7 @@ const StepsProgress = ({
               <SeparatorLine active={checked || focused} transparent={idx === 0} />
               <Bubble
                 disabled={disabled}
-                onClick={!disabled && onStepSelect && (() => onStepSelect(step))}
+                onClick={disabled ? undefined : onStepSelect && (() => onStepSelect(step))}
                 checked={checked}
                 focus={focused}
               >
