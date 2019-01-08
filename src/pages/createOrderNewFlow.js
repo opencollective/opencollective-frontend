@@ -267,7 +267,7 @@ class CreateOrderPage extends React.Component {
           amountOptions={(tier && tier.presets) || [500, 1000, 2000, 5000]}
           currency={(tier && tier.currency) || data.Collective.currency}
           onChange={data => this.setState({ stepDetails: data })}
-          showFrequency={TierId}
+          showFrequency={Boolean(TierId)}
         />
       );
     } else if (step === 'payment') {
