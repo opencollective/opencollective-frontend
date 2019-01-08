@@ -20,10 +20,10 @@ const frequencyOptions = {
 };
 
 const enhance = compose(
-  withState('state', 'setState', ({ amountOptions, showFrequency }) => ({
-    amount: amountOptions[0] / 100,
-    totalAmount: amountOptions[0],
-    interval: showFrequency ? Object.keys(frequencyOptions)[0] : undefined,
+  withState('state', 'setState', ({ amountOptions, showFrequency, totalAmount, interval }) => ({
+    amount: (totalAmount || amountOptions[0]) / 100,
+    totalAmount: totalAmount || amountOptions[0],
+    interval: showFrequency ? interval || Object.keys(frequencyOptions)[0] : undefined,
   })),
   withHandlers({
     onChange: ({ state, setState, onChange }) => newState => {
@@ -115,7 +115,11 @@ ContributeDetails.propTypes = {
   amountOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
   currency: PropTypes.string.isRequired,
   onChange: PropTypes.func,
+  /** initial value for frequency select, defatuls to the first option */
+  interval: PropTypes.string,
   showFrequency: PropTypes.bool,
+  /** initial value for amount Options, defaults to the first option */
+  totalAmount: PropTypes.number,
 };
 
 ContributeDetails.defaultProps = {
