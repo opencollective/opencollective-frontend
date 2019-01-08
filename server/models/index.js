@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import config from 'config';
 import debug from 'debug';
 
+import logger from '../lib/logger';
 import { getDBConf } from '../lib/db';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
@@ -14,7 +15,7 @@ const dbConfig = getDBConf('database');
 /**
  * Database connection.
  */
-console.log(`Connecting to postgres://${dbConfig.host}/${dbConfig.database}`);
+logger.info(`Connecting to postgres://${dbConfig.host}/${dbConfig.database}`);
 
 // If we launch the process with DEBUG=psql, we log the postgres queries
 if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
@@ -39,9 +40,10 @@ if (config.database.options.logging) {
   }
 }
 
-export const sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
+export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
   host: dbConfig.host,
   port: dbConfig.port,
+  dialect: dbConfig.dialect,
   ...config.database.options,
 });
 

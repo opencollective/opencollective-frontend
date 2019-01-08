@@ -37,8 +37,8 @@ async function createUser(client, name, password) {
 async function main() {
   /* Connect with maintainance account */
   const client = await libdb.getConnectedClient(libdb.getDBUrl('maintenancedb'));
-  const { user, password } = libdb.getDBConf('database');
-  await createUser(client, user, password);
+  const { username, password } = libdb.getDBConf('database');
+  await createUser(client, username, password);
   const [clientMaint, clientApp] = await libdb.recreateDatabase(false);
   await Promise.all([client.end(), clientMaint.end(), clientApp.end()]);
 }
