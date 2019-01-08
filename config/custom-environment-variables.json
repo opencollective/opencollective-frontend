@@ -4,7 +4,7 @@
     "url": "PG_URL",
     "override": {
       "database": "PG_DATABASE",
-      "user": "PG_USERNAME",
+      "username": "PG_USERNAME",
       "password": "PG_PASSWORD",
       "host": "PG_HOST",
       "port": "PG_PORT"

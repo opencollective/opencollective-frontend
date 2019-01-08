@@ -1,19 +1,20 @@
 import pg from 'pg';
-import pgConnectionString from 'pg-connection-string';
 import Sequelize from 'sequelize';
 import config from 'config';
 import debug from 'debug';
+
+import { getDBConf } from '../lib/db';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
 // like in case of the key totalOrders and raw query (like User.getTopBackers())
 pg.defaults.parseInt8 = true;
 
-const db = { ...pgConnectionString.parse(config.database.url), ...config.database.override };
+const dbConfig = getDBConf('database');
 
 /**
  * Database connection.
  */
-console.log(`Connecting to postgres://${db.host}/${db.database}`);
+console.log(`Connecting to postgres://${dbConfig.host}/${dbConfig.database}`);
 
 // If we launch the process with DEBUG=psql, we log the postgres queries
 if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
@@ -38,10 +39,9 @@ if (config.database.options.logging) {
   }
 }
 
-export const sequelize = new Sequelize(db.database, db.user, db.password, {
-  dialect: 'postgres',
-  host: db.host,
-  port: db.port,
+export const sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
+  host: dbConfig.host,
+  port: dbConfig.port,
   ...config.database.options,
 });
 
