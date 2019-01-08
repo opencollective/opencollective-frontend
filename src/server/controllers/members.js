@@ -4,7 +4,9 @@ import { get } from 'lodash';
 import { days, getGraphqlUrl } from '../../lib/utils';
 import { json2csv } from '../../lib/export_file';
 
-export async function list(req, res) {
+import { logger } from '../logger';
+
+export async function list(req, res, next) {
   const { collectiveSlug, eventSlug, role, tierSlug } = req.params;
 
   let backerType;
@@ -91,7 +93,17 @@ export async function list(req, res) {
     vars.limit = Math.min(req.query.limit, 50);
   }
 
-  const result = await client.request(query, vars);
+  let result;
+  try {
+    result = await client.request(query, vars);
+  } catch (err) {
+    if (err.message.match(/No collective found/)) {
+      return res.status(404).send('Not found');
+    }
+    logger.debug('>>> members.list error', err);
+    return next(err);
+  }
+
   const members = result.Collective.members;
 
   const isActive = r => {
