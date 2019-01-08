@@ -4,7 +4,6 @@ import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import StripeProvider from '../src/components/StripeProvider';
 import theme from '../src/constants/theme';
 import AppGlobalStyles from '../src/pages/global-styles';
-import { createGlobalStyle } from 'styled-components';
 import { IntlProvider } from 'react-intl';
 
 const StyleguideGlobalStyles = createGlobalStyle`
