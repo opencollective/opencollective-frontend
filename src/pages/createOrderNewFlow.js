@@ -213,7 +213,11 @@ class CreateOrderPage extends React.Component {
     }
 
     return (
-      <PrevNextButton onClick={() => this.changeStep(STEPS[prevStepIdx])} buttonStyle="standard">
+      <PrevNextButton
+        onClick={() => this.changeStep(STEPS[prevStepIdx])}
+        buttonStyle="standard"
+        disabled={this.state.submitting}
+      >
         &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
       </PrevNextButton>
     );
@@ -234,12 +238,11 @@ class CreateOrderPage extends React.Component {
     }
 
     const isLast = stepIdx + 1 >= STEPS.length;
-    const nextStep = isLast ? 'submit' : STEPS[stepIdx + 1];
     return (
       <PrevNextButton
-        onClick={() => this.changeStep(nextStep)}
         buttonStyle="primary"
-        disabled={stepIdx + 1 > this.getMaxStepIdx()}
+        onClick={() => (isLast ? this.submitOrder() : this.changeStep(STEPS[stepIdx + 1]))}
+        disabled={this.state.submitting || stepIdx + 1 > this.getMaxStepIdx()}
       >
         {isLast ? (
           <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
@@ -308,6 +311,10 @@ class CreateOrderPage extends React.Component {
   }
 
   changeStep = step => {
+    if (this.props.loadingLoggedInUser || this.state.loading || this.state.submitting) {
+      return false;
+    }
+
     const { verb, data } = this.props;
     const params = {
       collectiveSlug: data.Collective.slug,
@@ -331,7 +338,7 @@ class CreateOrderPage extends React.Component {
         allCompleted={currentStep === 'submit'}
         onStepSelect={this.changeStep}
         loadingStep={loading ? currentStep : undefined}
-        disabledSteps={STEPS.slice(this.getMaxStepIdx() + 1, STEPS.length)}
+        disabledSteps={loading ? STEPS : STEPS.slice(this.getMaxStepIdx() + 1, STEPS.length)}
       >
         {({ step }) => {
           let label = null;
