@@ -1,5 +1,6 @@
 import debug from 'debug';
 import dotenv from 'dotenv';
+import { has, get } from 'lodash';
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'development';
@@ -17,6 +18,12 @@ if (process.env.MEMCACHIER_USERNAME) {
 }
 if (process.env.MEMCACHIER_PASSWORD) {
   process.env.MEMCACHE_PASSWORD = process.env.MEMCACHIER_PASSWORD;
+}
+
+// Compute PG_URL based on PG_URL_ENVIRONMENT_VARIABLE, look in DATABASE_URL by default
+const pgUrlEnvironmentVariable = get(process.env, 'PG_URL_ENVIRONMENT_VARIABLE', 'DATABASE_URL');
+if (has(process.env, pgUrlEnvironmentVariable) && !has(process.env, 'PG_URL')) {
+  process.env.PG_URL = get(process.env, pgUrlEnvironmentVariable);
 }
 
 // Only load newrelic when we explicitly want it

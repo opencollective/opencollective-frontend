@@ -24,7 +24,9 @@ if [[ ! -d ${DBDUMPS_DIR} ]]; then
 fi
 
 if [[ ! -s ${DBDUMPS_DIR}${FILENAME} ]]; then
-  PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
+  PG_URL_ENVIRONMENT_VARIABLE=`heroku config:get PG_URL_ENVIRONMENT_VARIABLE -a "opencollective-${ENV}-api"`
+  PG_URL_ENVIRONMENT_VARIABLE="${PG_URL_ENVIRONMENT_VARIABLE:-DATABASE_URL}"
+  PG_URL=`heroku config:get ${PG_URL_ENVIRONMENT_VARIABLE} -a "opencollective-${ENV}-api"`
   echo "Dumping ${ENV} database"
   pg_dump -O -F t "${PG_URL}" > "${DBDUMPS_DIR}${FILENAME}"
 fi

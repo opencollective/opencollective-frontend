@@ -7,6 +7,7 @@
 import config from 'config';
 import path from 'path';
 import pg from 'pg';
+import pgConnectionString from 'pg-connection-string';
 import format from 'pg-format';
 import { promisify } from 'util';
 import { exec } from 'child_process';
@@ -47,12 +48,24 @@ export async function loadDB(name) {
  *  defaults to 5432.
  */
 export function getDBConf(name) {
-  if (!has(config, name)) {
-    throw new Error(`Configuration missing key "${name}"`);
+  if (!has(config, [name, 'url'])) {
+    throw new Error(`Configuration missing key "${name}.url"`);
   }
-  const { database, username, password } = get(config, name);
-  const { host, port } = get(config, [name, 'options']);
-  return { database, username, password, host, port: port || 5432 };
+  let dbConfig = parseDBUrl(get(config, [name, 'url']));
+  if (name === 'database') {
+    const dbConfigOverride = get(config, [name, 'override'], {});
+    dbConfig = { ...dbConfig, ...dbConfigOverride };
+  }
+  return dbConfig;
+}
+
+/** Get a config object from an URL
+ *
+ * @param {string} url of a database
+ */
+export function parseDBUrl(url) {
+  const { database, user, password, host, port, dialect } = pgConnectionString.parse(url);
+  return { database, username: user, password, host, port: port || 5432, dialect: dialect || 'postgres' };
 }
 
 /** Assemble an URL from database connection options.
@@ -111,7 +124,7 @@ export async function dropDatabaseQuery(client, database) {
        WHERE datname = '${database}';`,
     );
     await client.query(format('DROP DATABASE %s;', database));
-    console.log(`database ${database} droped`);
+    console.log(`database ${database} dropped`);
   } else {
     console.log('database did not exist');
   }

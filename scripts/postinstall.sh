@@ -29,7 +29,7 @@ else
     ./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
   fi
   echo "- running migration if any"
-  PG_DATABASE=opencollective_dvl npm run db:migrate:dev
+  PG_DATABASE=opencollective_dvl npm run db:migrate
 fi
 
 echo ""

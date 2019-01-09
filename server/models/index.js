@@ -1,34 +1,36 @@
-/**
- * Dependencies.
- */
 import pg from 'pg';
 import Sequelize from 'sequelize';
-import { database as config } from 'config';
+import config from 'config';
 import debug from 'debug';
+
+import logger from '../lib/logger';
+import { getDBConf } from '../lib/db';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
 // like in case of the key totalOrders and raw query (like User.getTopBackers())
 pg.defaults.parseInt8 = true;
 
+const dbConfig = getDBConf('database');
+
 /**
  * Database connection.
  */
-console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
+logger.info(`Connecting to postgres://${dbConfig.host}/${dbConfig.database}`);
 
 // If we launch the process with DEBUG=psql, we log the postgres queries
 if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
-  config.options.logging = true;
+  config.database.options.logging = true;
 }
 
-if (config.options.logging) {
+if (config.database.options.logging) {
   if (process.env.NODE_ENV === 'production') {
-    config.options.logging = (query, executionTime) => {
+    config.database.options.logging = (query, executionTime) => {
       if (executionTime > 50) {
         debug('psql')(query.replace(/(\n|\t| +)/g, ' ').slice(0, 100), '|', executionTime, 'ms');
       }
     };
   } else {
-    config.options.logging = (query, executionTime) => {
+    config.database.options.logging = (query, executionTime) => {
       debug('psql')(
         '\n-------------------- <query> --------------------\n',
         query,
@@ -38,11 +40,15 @@ if (config.options.logging) {
   }
 }
 
-config.options.operatorsAliases = false;
-
-export const sequelize = new Sequelize(config.database, config.username, config.password, config.options);
+export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+  host: dbConfig.host,
+  port: dbConfig.port,
+  dialect: dbConfig.dialect,
+  ...config.database.options,
+});
 
 const models = setupModels(sequelize);
+
 export default models;
 
 /**
