@@ -103,7 +103,8 @@ const ContributeDetails = enhance(({ amountOptions, currency, showFrequency, onC
           <Span color="primary.500">
             {moment()
               .add(1, state.interval)
-              .format('MMM d, YYYY')}
+              .date(1)
+              .format('MMM D, YYYY')}
           </Span>
         </P>
       </Flex>
