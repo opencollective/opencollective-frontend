@@ -48,7 +48,7 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
     throw new errors.ValidationFailed('Invalid status, status must be one of ', Object.keys(statuses).join(', '));
   }
 
-  const expense = await models.Expense.findById(expenseId, {
+  const expense = await models.Expense.findByPk(expenseId, {
     include: [{ model: models.Collective, as: 'collective' }],
   });
 
@@ -95,7 +95,7 @@ export async function createExpense(remoteUser, expenseData) {
   }
   expenseData.UserId = remoteUser.id;
 
-  const collective = await models.Collective.findById(expenseData.collective.id);
+  const collective = await models.Collective.findByPk(expenseData.collective.id);
 
   if (expenseData.currency && expenseData.currency !== collective.currency) {
     throw new errors.ValidationFailed(
@@ -144,7 +144,7 @@ export async function editExpense(remoteUser, expenseData) {
     throw new errors.Unauthorized('You need to be logged in to edit an expense');
   }
 
-  const expense = await models.Expense.findById(expenseData.id, {
+  const expense = await models.Expense.findByPk(expenseData.id, {
     include: [{ model: models.Collective, as: 'collective' }],
   });
 
@@ -187,7 +187,7 @@ export async function deleteExpense(remoteUser, expenseId) {
     throw new errors.Unauthorized('You need to be logged in to delete an expense');
   }
 
-  const expense = await models.Expense.findById(expenseId, {
+  const expense = await models.Expense.findByPk(expenseId, {
     include: [{ model: models.Collective, as: 'collective' }],
   });
 
@@ -269,7 +269,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to pay an expense');
   }
-  const expense = await models.Expense.findById(expenseId, {
+  const expense = await models.Expense.findByPk(expenseId, {
     include: [{ model: models.Collective, as: 'collective' }],
   });
   if (!expense) {
@@ -291,7 +291,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   if (expense.payoutMethod === 'donation') {
     const transaction = await createTransactionFromPaidExpense(host, null, expense, null, expense.UserId);
     await createTransactionFromInKindDonation(transaction);
-    const user = await models.User.findById(expense.UserId);
+    const user = await models.User.findByPk(expense.UserId);
     await expense.collective.addUserWithRole(user, 'BACKER');
     return markExpenseAsPaid(expense);
   }

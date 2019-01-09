@@ -126,11 +126,11 @@ async function notifySubscribers(users, activity, options = {}) {
 }
 
 async function notifyUserId(UserId, activity, options = {}) {
-  const user = await models.User.findById(UserId);
+  const user = await models.User.findByPk(UserId);
   debug('notifyUserId', UserId, user && user.email, activity.type);
 
   if (activity.type === activityType.TICKET_CONFIRMED) {
-    const event = await models.Collective.findById(activity.data.EventCollectiveId);
+    const event = await models.Collective.findByPk(activity.data.EventCollectiveId);
     const parentCollective = await event.getParentCollective();
     const ics = await event.getICS();
     options.attachments = [{ filename: `${event.slug}.ics`, content: ics }];
@@ -144,7 +144,7 @@ async function notifyUserId(UserId, activity, options = {}) {
 
 export async function notifyAdminsOfCollective(CollectiveId, activity, options = {}) {
   debug('notify admins of CollectiveId', CollectiveId);
-  const collective = await models.Collective.findById(CollectiveId);
+  const collective = await models.Collective.findByPk(CollectiveId);
   if (!collective) {
     throw new Error(
       `notifyAdminsOfCollective> can't notify ${activity.type}: no collective found with id ${CollectiveId}`,
@@ -161,7 +161,7 @@ export async function notifyAdminsOfCollective(CollectiveId, activity, options =
 
 async function w9bot(activity) {
   const HostCollectiveId = get(activity, 'data.host.id');
-  const host = await models.Collective.findById(HostCollectiveId);
+  const host = await models.Collective.findByPk(HostCollectiveId);
 
   if (!host) {
     throw new Error(`w9bot: Host id ${HostCollectiveId} not found`);
@@ -224,7 +224,7 @@ async function w9bot(activity) {
 
 async function notifyMembersOfCollective(CollectiveId, activity, options) {
   debug('notify members of CollectiveId', CollectiveId);
-  const collective = await models.Collective.findById(CollectiveId);
+  const collective = await models.Collective.findByPk(CollectiveId);
   const allUsers = await collective.getUsers();
   debug('Total users to notify:', allUsers.length);
   activity.CollectiveId = collective.id;
@@ -245,11 +245,11 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_UPDATE_PUBLISHED:
       twitter.tweetActivity(activity);
-      activity.data.update = await models.Update.findById(activity.data.update.id, {
+      activity.data.update = await models.Update.findByPk(activity.data.update.id, {
         include: [{ model: models.Collective, as: 'fromCollective' }],
       });
       notifyMembersOfCollective(activity.data.update.CollectiveId, activity, {
-        from: `${activity.data.collective.name} 
+        from: `${activity.data.collective.name}
         <hello@${activity.data.collective.slug}.opencollective.com>`,
       });
       break;
@@ -270,14 +270,14 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_COMMENT_CREATED:
-      activity.data.collective = await models.Collective.findById(activity.CollectiveId);
-      activity.data.fromCollective = await models.Collective.findById(activity.data.FromCollectiveId);
+      activity.data.collective = await models.Collective.findByPk(activity.CollectiveId);
+      activity.data.fromCollective = await models.Collective.findByPk(activity.data.FromCollectiveId);
       if (activity.data.ExpenseId) {
-        activity.data.expense = await models.Expense.findById(activity.data.ExpenseId);
+        activity.data.expense = await models.Expense.findByPk(activity.data.ExpenseId);
         activity.data.UserId = activity.data.expense.UserId;
         activity.data.path = `/${activity.data.collective.slug}/expenses/${activity.data.expense.id}`;
       } else {
-        activity.data.update = await models.Update.findById(activity.data.UpdateId);
+        activity.data.update = await models.Update.findByPk(activity.data.UpdateId);
         activity.data.UserId = activity.data.update.CreatedByUserId;
         activity.data.path = `/${activity.data.collective.slug}/updates/${activity.data.update.slug}`;
       }

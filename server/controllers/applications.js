@@ -9,7 +9,7 @@ const { Application } = models;
 async function getApp(appId) {
   appId = parseInt(appId, 10);
   if (appId) {
-    const app = await Application.findById(appId);
+    const app = await Application.findByPk(appId);
     if (app) {
       return app;
     } else {
@@ -66,7 +66,7 @@ export const update = async (req, res, next) => {
     if (props) {
       await app.update(props);
     }
-    const updatedApp = await Application.findById(app.id);
+    const updatedApp = await Application.findByPk(app.id);
     res.send(updatedApp.info);
   } catch (e) {
     next(e);

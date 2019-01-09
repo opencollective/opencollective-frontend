@@ -549,7 +549,7 @@ export default function(Sequelize, DataTypes) {
         if (!options.ForCollectiveId) {
           throw new Error('Please provide a ForCollectiveId');
         }
-        const collective = await models.Collective.findById(options.ForCollectiveId);
+        const collective = await models.Collective.findByPk(options.ForCollectiveId);
         if (intersection(collective.tags, pm.limitedToTags).length === 0) {
           throw new Error('This matching fund is not available to collectives in this category');
         }

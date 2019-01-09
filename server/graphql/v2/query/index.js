@@ -16,7 +16,7 @@ const query = {
   loggedInAccount: {
     type: Account,
     resolve(_, args, req) {
-      return models.Collective.findById(req.remoteUser.CollectiveId);
+      return models.Collective.findByPk(req.remoteUser.CollectiveId);
     },
   },
 };

@@ -240,7 +240,7 @@ export default function(Sequelize, DataTypes) {
 
   Order.prototype.getUser = function() {
     if (this.createdByUser) return Promise.resolve(this.createdByUser);
-    return models.User.findById(this.CreatedByUserId).then(user => {
+    return models.User.findByPk(this.CreatedByUserId).then(user => {
       this.createdByUser = user;
       debug('getUser', user.dataValues);
       return user.populateRoles();
@@ -261,7 +261,7 @@ export default function(Sequelize, DataTypes) {
       const promise = () => {
         if (this[attribute]) return Promise.resolve(this[attribute]);
         if (!this[fk]) return Promise.resolve(null);
-        return models[model].findById(this[fk]);
+        return models[model].findByPk(this[fk]);
       };
       return promise().then(obj => {
         this[attribute] = obj;
@@ -273,7 +273,7 @@ export default function(Sequelize, DataTypes) {
     return user.populateRoles().then(() => {
       // this check is necessary to cover organizations as well as user collective
       if (user.isAdmin(this.FromCollectiveId)) {
-        return models.PaymentMethod.findById(this.PaymentMethodId);
+        return models.PaymentMethod.findByPk(this.PaymentMethodId);
       } else {
         return null;
       }

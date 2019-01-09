@@ -305,7 +305,7 @@ describe('createOrder', () => {
     const {
       createdByUser: { id },
     } = res.data.createOrder;
-    const user = await models.User.findById(id);
+    const user = await models.User.findByPk(id);
     expect(user.newsletterOptIn).to.be.true;
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
@@ -430,7 +430,7 @@ describe('createOrder', () => {
     // make sure the payment has been recorded in the connected
     // Stripe Account of the host
     expect(transaction.data.charge.currency).to.equal('eur');
-    const createdOrder = await models.Order.findById(res.data.createOrder.id);
+    const createdOrder = await models.Order.findByPk(res.data.createOrder.id);
     expect(createdOrder.status).to.equal('PAID');
   });
 
@@ -538,7 +538,7 @@ describe('createOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
     expect(transaction.CollectiveId).to.equal(collective.id);
     expect(transaction.currency).to.equal(collective.currency);
-    const createdOrder = await models.Order.findById(res.data.createOrder.id);
+    const createdOrder = await models.Order.findByPk(res.data.createOrder.id);
     expect(createdOrder.status).to.equal('ACTIVE');
   });
 

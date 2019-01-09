@@ -17,7 +17,7 @@ export async function editConnectedAccount(remoteUser, connectedAccountData) {
     throw new errors.Unauthorized('You need to be logged in to edit a connected account');
   }
 
-  const connectedAccount = await models.ConnectedAccount.findById(connectedAccountData.id);
+  const connectedAccount = await models.ConnectedAccount.findByPk(connectedAccountData.id);
 
   if (!connectedAccount) {
     throw new errors.Unauthorized('Connected account not found');
@@ -36,7 +36,7 @@ export async function deleteConnectedAccount(remoteUser, connectedAccountId) {
     throw new errors.Unauthorized('You need to be logged in to delete a connected account');
   }
 
-  const connectedAccount = await models.ConnectedAccount.findById(connectedAccountId);
+  const connectedAccount = await models.ConnectedAccount.findByPk(connectedAccountId);
 
   if (!connectedAccount) {
     throw new errors.Unauthorized('Connected account not found');

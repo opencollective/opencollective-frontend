@@ -136,7 +136,7 @@ export default (Sequelize, DataTypes) => {
       getterMethods: {
         // Collective of type USER corresponding to this user
         userCollective() {
-          return models.Collective.findById(this.CollectiveId).then(userCollective => {
+          return models.Collective.findByPk(this.CollectiveId).then(userCollective => {
             if (!userCollective) {
               logger.info(
                 `No Collective attached to this user id ${this.id} (User.CollectiveId: ${this.CollectiveId})`,

@@ -41,7 +41,7 @@ export async function createComment(_, args, req) {
 }
 
 async function fetchComment(id) {
-  const comment = await models.Comment.findById(id);
+  const comment = await models.Comment.findByPk(id);
   if (!comment) throw new errors.NotFound({ message: `Comment with id ${id} not found` });
   return comment;
 }

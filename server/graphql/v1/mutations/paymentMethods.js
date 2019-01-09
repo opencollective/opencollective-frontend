@@ -62,7 +62,7 @@ export async function claimPaymentMethod(args, remoteUser) {
   });
   const { initialBalance, monthlyLimitPerMember, currency, name, expiryDate } = paymentMethod;
   const amount = initialBalance || monthlyLimitPerMember;
-  const emitter = await models.Collective.findById(paymentMethod.sourcePaymentMethod.CollectiveId);
+  const emitter = await models.Collective.findByPk(paymentMethod.sourcePaymentMethod.CollectiveId);
 
   const qs = queryString.stringify({
     code: paymentMethod.uuid.substring(0, 8),

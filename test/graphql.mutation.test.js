@@ -23,7 +23,7 @@ describe('Mutation Tests', () => {
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
     executeOrderStub = sandbox.stub(payments, 'executeOrder').callsFake((user, order) => {
       // assumes payment goes through and marks Order as confirmedAt
-      return models.Tier.findById(order.TierId)
+      return models.Tier.findByPk(order.TierId)
         .then(tier => {
           if (tier.interval) {
             return models.Subscription.create({
@@ -35,7 +35,7 @@ describe('Mutation Tests', () => {
           }
         })
         .then(SubscriptionId => order.update({ SubscriptionId, processedAt: new Date() }))
-        .then(() => models.Collective.findById(order.CollectiveId))
+        .then(() => models.Collective.findByPk(order.CollectiveId))
         .then(collective =>
           collective.addUserWithRole(user, roles.BACKER, {
             MemberCollectiveId: order.FromCollectiveId,
@@ -351,7 +351,7 @@ describe('Mutation Tests', () => {
       });
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal('You need to be logged in to delete a collective');
-      return models.Collective.findById(event1.id).then(event => {
+      return models.Collective.findByPk(event1.id).then(event => {
         expect(event).to.not.be.null;
       });
     });
@@ -362,7 +362,7 @@ describe('Mutation Tests', () => {
       expect(result.errors[0].message).to.equal(
         'You need to be logged in as a core contributor or as a host to delete this collective',
       );
-      return models.Collective.findById(event1.id).then(event => {
+      return models.Collective.findByPk(event1.id).then(event => {
         expect(event).to.not.be.null;
       });
     });
@@ -371,7 +371,7 @@ describe('Mutation Tests', () => {
       const res = await utils.graphqlQuery(deleteCollectiveQuery, { id: event1.id }, user1);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
-      return models.Collective.findById(event1.id).then(event => {
+      return models.Collective.findByPk(event1.id).then(event => {
         expect(event).to.be.null;
       });
     });

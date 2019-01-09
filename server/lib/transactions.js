@@ -134,7 +134,7 @@ export async function createFromPaidExpense(
 
   transaction.hostCurrencyFxRate = hostCurrencyFxRate;
   transaction.amountInHostCurrency = -Math.round(hostCurrencyFxRate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
-  const user = await models.User.findById(UserId);
+  const user = await models.User.findByPk(UserId);
   transaction.FromCollectiveId = user.CollectiveId;
   return models.Transaction.createDoubleEntry(transaction);
 }

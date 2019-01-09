@@ -64,7 +64,7 @@ export default {
 
       let collective, response;
 
-      return models.Collective.findById(CollectiveId)
+      return models.Collective.findByPk(CollectiveId)
         .then(c => {
           collective = c;
           return convertToCurrency(2000, 'USD', collective.currency).then(limit => {

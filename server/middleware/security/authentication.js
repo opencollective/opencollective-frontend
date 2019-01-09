@@ -84,7 +84,7 @@ export function authenticateUserByJwtNoExpiry() {
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
   const userid = req.jwtPayload.sub;
-  User.findById(userid)
+  User.findByPk(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
       user.update({ seenAt: new Date() });

@@ -200,9 +200,9 @@ export function parseLedgerTransactionToApiFormat(legacyId, transactions, legacy
  * @return {Object} returns an api transaction with nested models
  */
 export async function getTransactionWithNestedProperties(transaction) {
-  const fromCollective = await models.Collective.findById(transaction.FromCollectiveId);
+  const fromCollective = await models.Collective.findByPk(transaction.FromCollectiveId);
   const fromCollectiveHost = await fromCollective.getHostCollective();
-  const collective = await models.Collective.findById(transaction.CollectiveId);
+  const collective = await models.Collective.findByPk(transaction.CollectiveId);
   const collectiveHost = await collective.getHostCollective();
   transaction.fromCollectiveSlug = fromCollective.slug;
   transaction.FromCollectiveHostId = fromCollectiveHost && fromCollectiveHost.id;
@@ -220,49 +220,49 @@ export async function getTransactionWithNestedProperties(transaction) {
   });
   transaction.debitId = debitTransaction.id;
   if (transaction.HostCollectiveId) {
-    const hostCollective = await models.Collective.findById(transaction.HostCollectiveId);
+    const hostCollective = await models.Collective.findByPk(transaction.HostCollectiveId);
     transaction.hostCollectiveSlug = hostCollective.slug;
-    const paymentMethod = await models.PaymentMethod.findById(transaction.PaymentMethodId);
+    const paymentMethod = await models.PaymentMethod.findByPk(transaction.PaymentMethodId);
     transaction.paymentMethodService = paymentMethod.service;
     transaction.paymentMethodType = paymentMethod.type;
     if (paymentMethod.CollectiveId) {
       transaction.paymentMethodCollectiveId = paymentMethod.CollectiveId;
-      const pmCollective = await models.Collective.findById(paymentMethod.CollectiveId);
+      const pmCollective = await models.Collective.findByPk(paymentMethod.CollectiveId);
       transaction.paymentMethodCollectiveSlug = pmCollective.slug;
     }
   }
   if (transaction.OrderId) {
-    const order = await models.Order.findById(transaction.OrderId);
+    const order = await models.Order.findByPk(transaction.OrderId);
     if (order.FromCollectiveId) {
       transaction.orderFromCollectiveId = order.FromCollectiveId;
-      const orderFromCollective = await models.Collective.findById(order.FromCollectiveId);
+      const orderFromCollective = await models.Collective.findByPk(order.FromCollectiveId);
       transaction.orderFromCollectiveSlug = orderFromCollective.slug;
     }
     if (order.PaymentMethodId) {
-      const orderPaymentMethod = await models.PaymentMethod.findById(order.PaymentMethodId);
+      const orderPaymentMethod = await models.PaymentMethod.findByPk(order.PaymentMethodId);
       transaction.orderPaymentMethodService = orderPaymentMethod.service;
       transaction.orderPaymentMethodType = orderPaymentMethod.type;
       if (orderPaymentMethod.CollectiveId) {
         transaction.orderPaymentMethodCollectiveId = orderPaymentMethod.CollectiveId;
-        const orderPaymentMethodCollective = await models.Collective.findById(orderPaymentMethod.CollectiveId);
+        const orderPaymentMethodCollective = await models.Collective.findByPk(orderPaymentMethod.CollectiveId);
         transaction.orderPaymentMethodCollectiveSlug = orderPaymentMethodCollective.slug;
       }
     }
   }
   if (transaction.ExpenseId) {
-    const expense = await models.Expense.findById(transaction.ExpenseId);
+    const expense = await models.Expense.findByPk(transaction.ExpenseId);
     transaction.expensePayoutMethod = expense.payoutMethod;
     if (expense.UserId) {
       transaction.expenseUserId = expense.UserId;
-      const expenseUser = await models.User.findById(expense.UserId);
+      const expenseUser = await models.User.findByPk(expense.UserId);
       transaction.expenseUserPaypalEmail = expenseUser.paypalEmail;
       if (expenseUser.CollectiveId) {
-        const expenseUserCollective = await models.Collective.findById(expenseUser.CollectiveId);
+        const expenseUserCollective = await models.Collective.findByPk(expenseUser.CollectiveId);
         transaction.expenseUserCollectiveSlug = expenseUserCollective.slug;
       }
     }
     if (expense.CollectiveId) {
-      const expenseCollective = await models.Collective.findById(expense.CollectiveId);
+      const expenseCollective = await models.Collective.findByPk(expense.CollectiveId);
       transaction.expenseCollectiveId = expense.CollectiveId;
       transaction.expenseCollectiveSlug = expenseCollective.slug;
     }

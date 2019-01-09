@@ -73,7 +73,7 @@ async function getBalance(paymentMethod) {
  * @return {models.Transaction} the double entry generated transactions.
  */
 async function processOrder(order) {
-  const paymentMethod = await models.PaymentMethod.findById(order.paymentMethod.id);
+  const paymentMethod = await models.PaymentMethod.findByPk(order.paymentMethod.id);
   // check if payment Method has expired
   if (!paymentMethod.expiryDate || moment(paymentMethod.expiryDate) < moment()) {
     throw new Error('Payment method has already expired');
@@ -99,7 +99,7 @@ async function processOrder(order) {
     throw new Error('Gift Card payment method must have a value a "SourcePaymentMethodId" defined');
   }
   // finding Source Payment method and update order payment method properties
-  const sourcePaymentMethod = await models.PaymentMethod.findById(paymentMethod.SourcePaymentMethodId);
+  const sourcePaymentMethod = await models.PaymentMethod.findByPk(paymentMethod.SourcePaymentMethodId);
   // modifying original order to then process the order of the source payment method
   order.PaymentMethodId = sourcePaymentMethod.id;
   order.paymentMethod = sourcePaymentMethod;
@@ -152,7 +152,7 @@ async function processOrder(order) {
  */
 async function create(args, remoteUser) {
   const totalAmount = args.amount || args.monthlyLimitPerMember;
-  const collective = await models.Collective.findById(args.CollectiveId);
+  const collective = await models.Collective.findByPk(args.CollectiveId);
   if (!collective) {
     throw new Error('Collective does not exist');
   } else if (!(await checkCreateLimit(collective, 1, totalAmount))) {
@@ -184,7 +184,7 @@ export async function bulkCreateVirtualCards(args, remoteUser, count) {
 
   // Check rate limit
   const totalAmount = (args.amount || args.monthlyLimitPerMember) * count;
-  const collective = await models.Collective.findById(args.CollectiveId);
+  const collective = await models.Collective.findByPk(args.CollectiveId);
   if (!collective) {
     throw new Error('Collective does not exist');
   } else if (!(await checkCreateLimit(collective, count, totalAmount))) {
@@ -218,7 +218,7 @@ export async function createVirtualCardsForEmails(args, remoteUser, emails, cust
   }
   // Check rate limit
   const totalAmount = (args.amount || args.monthlyLimitPerMember) * emails.length;
-  const collective = await models.Collective.findById(args.CollectiveId);
+  const collective = await models.Collective.findByPk(args.CollectiveId);
   if (!collective) {
     throw new Error('Collective does not exist');
   } else if (!(await checkCreateLimit(collective, emails.length, totalAmount))) {
@@ -256,7 +256,7 @@ async function getSourcePaymentMethodFromCreateArgs(args, collective) {
       throw Error(`Collective id ${collective.id} needs to have a Credit Card attached to create Gift Cards.`);
     }
   } else {
-    paymentMethod = await models.PaymentMethod.findById(args.PaymentMethodId);
+    paymentMethod = await models.PaymentMethod.findByPk(args.PaymentMethodId);
     if (!paymentMethod || paymentMethod.CollectiveId !== collective.id) {
       throw Error('Invalid PaymentMethodId');
     }
@@ -469,7 +469,7 @@ async function claim(args, remoteUser) {
   if (!virtualCardPaymentMethod) {
     throw Error(`Gift Card code "${args.code}" is invalid`);
   }
-  const sourcePaymentMethod = await models.PaymentMethod.findById(virtualCardPaymentMethod.SourcePaymentMethodId);
+  const sourcePaymentMethod = await models.PaymentMethod.findByPk(virtualCardPaymentMethod.SourcePaymentMethodId);
   // if the virtual card PM Collective Id is different than the Source PM Collective Id
   // it means this virtual card was already claimend
   if (!sourcePaymentMethod || sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId) {

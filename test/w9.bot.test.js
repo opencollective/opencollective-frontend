@@ -287,7 +287,7 @@ describe('w9.bot.test.js', () => {
       );
 
       // And then find Updated Host Collection to check if it includes the userId in its data.w9UserIds field
-      const updatedHostCollective = await models.Collective.findById(hostCollective.id);
+      const updatedHostCollective = await models.Collective.findByPk(hostCollective.id);
       expect(updatedHostCollective).to.exist;
       expect(updatedHostCollective.data).to.exist;
       expect(updatedHostCollective.data.W9.requestSentToUserIds).to.exist;
@@ -345,7 +345,7 @@ describe('w9.bot.test.js', () => {
       expect(emailSendMessageSpy.secondCall.args[1]).to.contain('New comment on your expense');
 
       // And then find Updated Host Collection to check if it includes the userId in its data.W9.requestSentToUserIds field
-      const updatedHostCollective = await models.Collective.findById(hostCollective.id);
+      const updatedHostCollective = await models.Collective.findByPk(hostCollective.id);
       expect(updatedHostCollective).to.exist;
       expect(updatedHostCollective.data).to.exist;
       expect(updatedHostCollective.data.W9.requestSentToUserIds).to.exist;
@@ -467,7 +467,7 @@ describe('w9.bot.test.js', () => {
       });
 
       // And then the host data has to be null
-      const updatedHost = await models.Collective.findById(hostCollective.id);
+      const updatedHost = await models.Collective.findByPk(hostCollective.id);
       expect(updatedHost.data).to.be.null;
     }); /* End of "Host Data must NOT include user in W9 Received List if he didn\'t spend more than W9 Threshold after Expense is Approved" */
 
@@ -519,7 +519,7 @@ describe('w9.bot.test.js', () => {
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('New comment');
 
       // And then the host must have the user included in his W9.requestSentToUserIds List
-      const hostAfterCreatedExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterCreatedExpense = await models.Collective.findByPk(collective.HostCollectiveId);
       expect(hostAfterCreatedExpense.data).to.exist;
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')).to.exist;
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')).to.have.lengthOf(1);
@@ -558,7 +558,7 @@ describe('w9.bot.test.js', () => {
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
 
       // Refetching host data again after expense is approved
-      const hostAfterPaidExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterPaidExpense = await models.Collective.findByPk(collective.HostCollectiveId);
       // Host.data.W9.receivedFromUserIds must include user
       expect(hostAfterPaidExpense.data).to.exist;
       expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')).to.exist;
@@ -603,7 +603,7 @@ describe('w9.bot.test.js', () => {
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('New comment');
 
       // And then the host must have the user included in his W9.requestSentToUserIds List
-      const hostAfterCreatedExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterCreatedExpense = await models.Collective.findByPk(collective.HostCollectiveId);
       expect(hostAfterCreatedExpense.data).to.exist;
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')).to.exist;
       expect(get(hostAfterCreatedExpense, 'data.W9.requestSentToUserIds')).to.have.lengthOf(1);
@@ -642,7 +642,7 @@ describe('w9.bot.test.js', () => {
       await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
 
       // Refetching host data again after expense is approved
-      const hostAfterPaidExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterPaidExpense = await models.Collective.findByPk(collective.HostCollectiveId);
       // Host.data.W9.receivedFromUserIds must include user
       expect(hostAfterPaidExpense.data).to.exist;
       expect(get(hostAfterPaidExpense, 'data.W9.receivedFromUserIds')).to.exist;
@@ -670,7 +670,7 @@ describe('w9.bot.test.js', () => {
       await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Refetching host data again after expense is approved
-      const hostAfterThirdExpense = await models.Collective.findById(collective.HostCollectiveId);
+      const hostAfterThirdExpense = await models.Collective.findByPk(collective.HostCollectiveId);
       // Host.data.W9.receivedFromUserIds must include user ONLY ONE time
       expect(hostAfterThirdExpense.data).to.exist;
       expect(get(hostAfterThirdExpense, 'data.W9.receivedFromUserIds')).to.exist;

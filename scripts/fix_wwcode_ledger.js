@@ -19,7 +19,7 @@ const findUserCollectives = userId => {
   let user;
   const collectives = [];
 
-  return models.User.findById(userId)
+  return models.User.findByPk(userId)
     .then(u => (user = u))
     .then(() => collectives.push(user.CollectiveId))
     .then(() => {
@@ -70,12 +70,7 @@ const checkAndFixExpenses = () => {
       return expenses;
     })
     .each(expense => {
-      console.log(
-        '>>> processing expense id: ',
-        expense.id,
-        'for collective id',
-        expense.CollectiveId,
-      );
+      console.log('>>> processing expense id: ', expense.id, 'for collective id', expense.CollectiveId);
 
       let validUserCollectives;
       return findUserCollectives(expense.UserId)
@@ -107,10 +102,7 @@ const checkAndFixExpenses = () => {
               validUserCollectives.find(c => c === credit.CollectiveId)
             )
           ) {
-            console.log(
-              '\t>>> FromCollectiveId mismatch for Expense Id',
-              expense.id,
-            );
+            console.log('\t>>> FromCollectiveId mismatch for Expense Id', expense.id);
             console.log(
               '\t\t>>> debit.FromCollectiveId',
               debit.FromCollectiveId,
@@ -123,9 +115,7 @@ const checkAndFixExpenses = () => {
             //return Promise.resolve();
             return debit
               .update({ FromCollectiveId: validUserCollectives[0] })
-              .then(() =>
-                credit.update({ CollectiveId: validUserCollectives[0] }),
-              );
+              .then(() => credit.update({ CollectiveId: validUserCollectives[0] }));
           }
           return Promise.resolve();
         });
@@ -167,57 +157,45 @@ const checkAndFixOrders = () => {
     })
     .each(order => {
       let validUserCollectives;
-      return findUserCollectives(order.CreatedByUserId).then(
-        userCollectives => {
-          validUserCollectives = userCollectives;
-          if (validUserCollectives.length === 0) {
-            throw new Error('no valid user collective found');
-          }
-          if (!validUserCollectives.find(c => c === order.FromCollectiveId)) {
-            console.log(
-              '>>> processing order id',
-              order.id,
-              'for collective id',
-              order.CollectiveId,
-              order.collective.slug,
-            );
-            console.log(
-              '\t>>> FromCollectiveId mismatch for Order Id',
-              order.id,
-            );
-            console.log(
-              '\t\t>>> order.FromCollectiveId',
-              order.FromCollectiveId,
-            );
-            console.log('\t\t>>> Should be: ', validUserCollectives);
+      return findUserCollectives(order.CreatedByUserId).then(userCollectives => {
+        validUserCollectives = userCollectives;
+        if (validUserCollectives.length === 0) {
+          throw new Error('no valid user collective found');
+        }
+        if (!validUserCollectives.find(c => c === order.FromCollectiveId)) {
+          console.log(
+            '>>> processing order id',
+            order.id,
+            'for collective id',
+            order.CollectiveId,
+            order.collective.slug,
+          );
+          console.log('\t>>> FromCollectiveId mismatch for Order Id', order.id);
+          console.log('\t\t>>> order.FromCollectiveId', order.FromCollectiveId);
+          console.log('\t\t>>> Should be: ', validUserCollectives);
 
-            return models.Transaction.findAll({
-              where: {
-                OrderId: order.id,
-              },
-            }).then(transactions => {
-              if (transactions.length !== 2) {
-                throw new Error('transaction.length !== 2 check failed');
-              }
-              // should only be one of each
-              const credit = transactions.find(t => t.type === 'CREDIT');
-              const debit = transactions.find(t => t.type === 'DEBIT');
+          return models.Transaction.findAll({
+            where: {
+              OrderId: order.id,
+            },
+          }).then(transactions => {
+            if (transactions.length !== 2) {
+              throw new Error('transaction.length !== 2 check failed');
+            }
+            // should only be one of each
+            const credit = transactions.find(t => t.type === 'CREDIT');
+            const debit = transactions.find(t => t.type === 'DEBIT');
 
-              ordersFixed.push(order.id);
+            ordersFixed.push(order.id);
 
-              return credit
-                .update({ FromCollectiveId: validUserCollectives[0] })
-                .then(() =>
-                  debit.update({ CollectiveId: validUserCollectives[0] }),
-                )
-                .then(() =>
-                  order.update({ FromCollectiveId: validUserCollectives[0] }),
-                );
-            });
-          }
-          return Promise.resolve();
-        },
-      );
+            return credit
+              .update({ FromCollectiveId: validUserCollectives[0] })
+              .then(() => debit.update({ CollectiveId: validUserCollectives[0] }))
+              .then(() => order.update({ FromCollectiveId: validUserCollectives[0] }));
+          });
+        }
+        return Promise.resolve();
+      });
     })
     .then(() => {
       console.log('>>> orders fixed', ordersFixed.length);

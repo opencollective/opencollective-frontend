@@ -20,7 +20,7 @@ const TransactionQuery = {
     let transaction;
     if (args.id) {
       const id = idDecode(args.id, 'transaction');
-      transaction = await models.Transaction.findById(id);
+      transaction = await models.Transaction.findByPk(id);
     } else {
       return new Error('Please provide an id');
     }

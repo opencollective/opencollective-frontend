@@ -236,7 +236,7 @@ describe('groups.routes.test.js', () => {
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          models.Collective.findById(parseInt(res.body.id))
+          models.Collective.findByPk(parseInt(res.body.id))
             .then(g => {
               publicCollective = g;
               done();
@@ -450,7 +450,7 @@ describe('groups.routes.test.js', () => {
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          models.Collective.findById(parseInt(res.body.id))
+          models.Collective.findByPk(parseInt(res.body.id))
             .then(g => {
               group = g;
               done();

@@ -167,7 +167,7 @@ describe('graphql.orders.test.js', () => {
       expect(result.errors).to.not.exist;
       const { markOrderAsPaid } = result.data;
       expect(markOrderAsPaid.status).to.equal('PAID');
-      const order = await models.Order.findById(orders[0].id);
+      const order = await models.Order.findByPk(orders[0].id);
       expect(order.status).to.equal('PAID');
       expect(order.processedAt).to.not.equal(null);
       const transactions = await models.Transaction.findAll({

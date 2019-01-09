@@ -260,7 +260,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
               token: 'tok_1BvCA5DjPFcHOcTmg1234567',
             },
           });
-          const updatedOrder = await models.Order.findById(order.id);
+          const updatedOrder = await models.Order.findByPk(order.id);
           expect(updatedOrder.PaymentMethodId).to.equal(newPM.id);
         });
       });
@@ -269,7 +269,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
         let pastDueSubscription, clock;
 
         beforeEach(async () => {
-          pastDueSubscription = await models.Subscription.findById(1);
+          pastDueSubscription = await models.Subscription.findByPk(1);
           const nextChargeDate = new Date('2018-01-29');
 
           pastDueSubscription = await pastDueSubscription.update({
@@ -412,7 +412,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
             },
           ],
         });
-        const updatedOrder = await models.Order.findById(order.id);
+        const updatedOrder = await models.Order.findByPk(order.id);
         const activeOrder = activeOrders && activeOrders[0];
 
         expect(updatedOrder.totalAmount).to.equal(order.totalAmount);

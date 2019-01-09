@@ -502,7 +502,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       // And given that the above expense was already PAID
-      await (await models.Expense.findById(expense.id)).update({
+      await (await models.Expense.findByPk(expense.id)).update({
         status: 'PAID',
       });
       // When there's an attempt to approve an already paid expense
@@ -788,7 +788,7 @@ describe('GraphQL Expenses API', () => {
         expect(callPaypal.firstCall.args[1].memo).to.equal('Reimbursement from WWCode Berlin: Pizza');
         expect(res.errors).to.exist;
         expect(res.errors[0].message).to.contain('Not enough funds in your existing Paypal preapproval');
-        const updatedExpense = await models.Expense.findById(expense.id);
+        const updatedExpense = await models.Expense.findByPk(expense.id);
         expect(updatedExpense.status).to.equal('APPROVED');
         const transactions = await models.Transaction.findAll({ where: { ExpenseId: expense.id } });
         expect(transactions.length).to.equal(0);
@@ -1063,7 +1063,7 @@ describe('GraphQL Expenses API', () => {
       // Then there should be no errors
       expect(result.errors).to.not.exist;
       // And then the expense should be deleted from the database
-      expect(await models.Expense.findById(expense.id)).to.be.null;
+      expect(await models.Expense.findByPk(expense.id)).to.be.null;
     }); /* End of "works if logged in as author" */
 
     it('works if logged in as admin of collective', async () => {
@@ -1092,7 +1092,7 @@ describe('GraphQL Expenses API', () => {
       // Then there should be no errors
       expect(result.errors).to.not.exist;
       // And then the expense should be deleted from the database
-      expect(await models.Expense.findById(expense.id)).to.be.null;
+      expect(await models.Expense.findByPk(expense.id)).to.be.null;
     }); /* End of "works if logged in as admin of collective" */
 
     it('works if logged in as admin of host collective', async () => {
@@ -1118,7 +1118,7 @@ describe('GraphQL Expenses API', () => {
       // Then there should be no errors
       expect(result.errors).to.not.exist;
       // And then the expense should be deleted from the database
-      expect(await models.Expense.findById(expense.id)).to.be.null;
+      expect(await models.Expense.findByPk(expense.id)).to.be.null;
     }); /* End of "works if logged in as admin of host collective" */
   }); /* End of "#deleteExpense" */
 }); /* End of "GraphQL Expenses API" */

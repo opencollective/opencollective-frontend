@@ -135,7 +135,7 @@ export default {
         return collective.save();
       };
 
-      return models.Collective.findById(CollectiveId)
+      return models.Collective.findByPk(CollectiveId)
         .then(c => {
           collective = c;
           redirectUrl = redirectUrl || `${config.host.website}/${collective.slug}`;

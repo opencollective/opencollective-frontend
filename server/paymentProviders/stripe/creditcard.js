@@ -162,7 +162,7 @@ export default {
     const chargeId = _.result(transaction.data, 'charge.id');
 
     /* From which stripe account it's going to be refunded */
-    const collective = await models.Collective.findById(
+    const collective = await models.Collective.findByPk(
       transaction.type === 'CREDIT' ? transaction.CollectiveId : transaction.FromCollectiveId,
     );
     const hostStripeAccount = await collective.getHostStripeAccount();
@@ -199,7 +199,7 @@ export default {
     const chargeId = _.result(transaction.data, 'charge.id');
 
     /* From which stripe account it's going to be refunded */
-    const collective = await models.Collective.findById(
+    const collective = await models.Collective.findByPk(
       transaction.type === 'CREDIT' ? transaction.CollectiveId : transaction.FromCollectiveId,
     );
     const hostStripeAccount = await collective.getHostStripeAccount();
