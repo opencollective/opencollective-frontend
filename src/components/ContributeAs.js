@@ -113,7 +113,7 @@ const ContributeAs = enhance(
       personal,
       ...profiles,
       { id: 'new-org', name: 'A new organization' },
-      { id: 'anonymous', name: 'Anonymously' },
+      // { id: 'anonymous', name: 'Anonymously' },
     ];
     const lastIndex = Object.keys(options).length - 1;
     const showSearch = Object.keys(profiles).length >= 5 || state.search;
