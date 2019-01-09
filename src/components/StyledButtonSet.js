@@ -37,7 +37,7 @@ const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChang
   <Flex {...props}>
     {items.map(item => (
       <StyledButtonItem
-        combo={combo}
+        combo={combo || undefined}
         key={item}
         buttonSize={size}
         buttonStyle={item === selected ? 'primary' : 'standard'}
