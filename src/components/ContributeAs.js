@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, withHandlers, withState } from 'recompose';
-import { capitalize, omit } from 'lodash';
+import { capitalize, omit, uniqBy } from 'lodash';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 import { FormattedMessage } from 'react-intl';
@@ -33,7 +33,11 @@ const enhance = compose(
     getFieldError: ({ state }) => name => state.errors[name],
     onChange: ({ onChange, state }) => selected => {
       if (selected.key === 'new-org') {
-        return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
+        if (state.orgName) {
+          return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
+        } else {
+          return onChange(null);
+        }
       }
 
       if (selected.key === 'anonymous') {
@@ -46,6 +50,11 @@ const enhance = compose(
       event.stopPropagation();
 
       const { target } = event;
+      if (!target.validity.valid) {
+        target.reportValidity();
+        return;
+      }
+
       setState(state => {
         const newState = {
           ...state,
@@ -58,13 +67,30 @@ const enhance = compose(
         };
       });
     },
-    onInvalid: ({ setState }) => event => {
+    onInvalid: ({ onChange, setState }) => event => {
       event.persist();
       event.preventDefault();
-      setState(state => ({
-        ...state,
-        errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
-      }));
+
+      const { target } = event;
+
+      let error;
+      if (target.validity.valueMissing) {
+        error = 'This field is required';
+      }
+
+      if (target.validity.typeMismatch) {
+        if (target.type === 'url') {
+          error = 'URL must begin with http:// or https://';
+        }
+      }
+
+      setState(state => {
+        onChange(null);
+        return {
+          ...state,
+          errors: { ...state.errors, [target.name]: error },
+        };
+      });
     },
     onSearch: ({ setState }) => ({ target }) => {
       setState(state => ({
@@ -104,17 +130,18 @@ const ContributeAs = enhance(
   }) => {
     if (state.search) {
       const test = new RegExp(state.search, 'i');
-      profiles = Object.keys(profiles)
-        .filter(key => profiles[key].name.match(test))
-        .reduce((result, key) => ({ ...result, [key]: profiles[key] }), {});
+      profiles = profiles.filter(profile => profile.name.match(test));
     }
 
-    const options = [
-      personal,
-      ...profiles,
-      { id: 'new-org', name: 'A new organization' },
-      // { id: 'anonymous', name: 'Anonymously' },
-    ];
+    const options = uniqBy(
+      [
+        personal,
+        ...profiles,
+        { id: 'new-org', name: 'A new organization' },
+        // { id: 'anonymous', name: 'Anonymously' }
+      ],
+      'id',
+    );
     const lastIndex = Object.keys(options).length - 1;
     const showSearch = Object.keys(profiles).length >= 5 || state.search;
 
@@ -181,7 +208,7 @@ const ContributeAs = enhance(
               {key === 'new-org' && checked && (
                 <Container as="fieldset" border="none" width={1} py={3} onChange={onFieldChange}>
                   <Box mb={3}>
-                    <StyledInputField label="Org Name" htmlFor="orgName" error={getFieldError('orgName')}>
+                    <StyledInputField label="Organization Name" htmlFor="orgName" error={getFieldError('orgName')}>
                       {inputProps => (
                         <StyledInput
                           {...inputProps}
@@ -236,6 +263,8 @@ const ContributeAs = enhance(
     );
   },
 );
+
+ContributeAs.displayName = 'ContributeAs';
 
 ContributeAs.propTypes = {
   /**
