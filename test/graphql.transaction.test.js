@@ -1,6 +1,6 @@
 /**
  * Note: to update the snapshots run:
- * TZ=UTC CHAI_JEST_SNAPSHOT_UPDATE_ALL=true mocha test/graphql.transactions.test.js
+ * TZ=UTC CHAI_JEST_SNAPSHOT_UPDATE_ALL=true npx mocha test/graphql.transaction.test.js
  */
 
 import { expect } from 'chai';
