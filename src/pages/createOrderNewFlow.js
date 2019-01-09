@@ -90,11 +90,15 @@ class CreateOrderPage extends React.Component {
 
   constructor(props) {
     super(props);
+
+    const tier = this.getTier();
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
+    const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
+    const defaultAmount = amountOptions[Math.floor(amountOptions.length / 2)];
     const initialDetails = {
       quantity: parseInt(props.quantity, 10) || 1,
       interval: ['month', 'year'].includes(interval) ? interval : null,
-      totalAmount: parseInt(props.totalAmount, 10) || null,
+      totalAmount: parseInt(props.totalAmount, 10) || defaultAmount,
     };
 
     this.state = {
@@ -258,6 +262,7 @@ class CreateOrderPage extends React.Component {
     const { data, LoggedInUser, TierId } = this.props;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
+    const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
 
     if (step === 'contributeAs') {
       return (
@@ -276,10 +281,10 @@ class CreateOrderPage extends React.Component {
     } else if (step === 'details') {
       return (
         <ContributeDetails
-          amountOptions={(tier && tier.presets) || [500, 1000, 2000, 5000]}
+          amountOptions={amountOptions}
           currency={(tier && tier.currency) || data.Collective.currency}
           onChange={data => this.setState({ stepDetails: data })}
-          showFrequency={Boolean(TierId)}
+          showFrequency={Boolean(TierId) || undefined}
           interval={get(this.state, 'stepDetails.interval')}
           totalAmount={get(this.state, 'stepDetails.totalAmount')}
         />
@@ -422,7 +427,7 @@ class CreateOrderPage extends React.Component {
 
     const step = this.props.step || 'contributeAs';
     return (
-      <Flex flexDirection="column" alignItems="center">
+      <Flex flexDirection="column" alignItems="center" mx={3}>
         <Box>{this.renderStep(step)}</Box>
         <Flex mt={5}>
           {this.renderPrevStepButton(step)}
