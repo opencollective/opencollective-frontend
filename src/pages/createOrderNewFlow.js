@@ -91,11 +91,12 @@ class CreateOrderPage extends React.Component {
   constructor(props) {
     super(props);
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
-    this.order = {
+    const initialDetails = {
       quantity: parseInt(props.quantity, 10) || 1,
-      interval: ['month', 'year'].indexOf(interval) !== -1 ? interval : null,
+      interval: ['month', 'year'].includes(interval) ? interval : null,
       totalAmount: parseInt(props.totalAmount, 10) || null,
     };
+
     this.state = {
       loading: false,
       submitting: false,
@@ -103,7 +104,7 @@ class CreateOrderPage extends React.Component {
       unknownEmail: false,
       signIn: true,
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
-      stepDetails: null,
+      stepDetails: initialDetails,
       stepPayment: null,
     };
   }
@@ -221,7 +222,7 @@ class CreateOrderPage extends React.Component {
   /** Return the index of the last step user can switch to */
   getMaxStepIdx() {
     if (!this.state.stepProfile) return 0;
-    if (!this.state.stepDetails) return 1;
+    if (!this.state.stepDetails || !this.state.stepDetails.totalAmount) return 1;
     if (!this.state.stepPayment) return 2;
     return STEPS.length;
   }
@@ -276,6 +277,8 @@ class CreateOrderPage extends React.Component {
           currency={(tier && tier.currency) || data.Collective.currency}
           onChange={data => this.setState({ stepDetails: data })}
           showFrequency={Boolean(TierId)}
+          interval={get(this.state, 'stepDetails.interval')}
+          totalAmount={get(this.state, 'stepDetails.totalAmount')}
         />
       );
     } else if (step === 'payment') {
@@ -338,7 +341,7 @@ class CreateOrderPage extends React.Component {
             details = get(stepProfile, 'name', null);
           } else if (step === 'details') {
             label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
-            if (stepDetails) {
+            if (stepDetails && stepDetails.totalAmount) {
               const amount = formatCurrency(stepDetails.totalAmount, get(this.props, 'data.Collective.currency'));
               details = !stepDetails.interval ? (
                 amount
