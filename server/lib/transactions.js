@@ -219,6 +219,6 @@ export function difference(tr) {
 export async function sum(where) {
   const totalAttr = sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0);
   const attributes = [[totalAttr, 'total']];
-  const result = await models.Transaction.find({ attributes, where });
+  const result = await models.Transaction.findOne({ attributes, where });
   return result.dataValues.total;
 }

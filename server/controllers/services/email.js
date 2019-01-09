@@ -206,7 +206,7 @@ export const webhook = (req, res, next) => {
   // and we send the email to the admins of the collective for approval
   // once approved, we will fetch the original email from the server and send it to all recipients
   let subscribers;
-  models.Collective.find({ where: { slug: collectiveSlug } })
+  models.Collective.findOne({ where: { slug: collectiveSlug } })
     .tap(g => {
       if (!g) throw new Error('collective_not_found');
       collective = g;

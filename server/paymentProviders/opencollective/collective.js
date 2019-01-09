@@ -18,7 +18,7 @@ paymentMethodProvider.getBalance = paymentMethod => {
     // For gift cards turned into opencollective credit
     // overloaded 'monthlyLimitPerMember' to use as a one-time limit
     if (paymentMethod.monthlyLimitPerMember) {
-      return models.Transaction.find({
+      return models.Transaction.findOne({
         attributes: [
           [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount'],
         ],
@@ -38,7 +38,7 @@ paymentMethodProvider.getBalance = paymentMethod => {
     }
 
     // Otherwise we compute the balance based on all previous transactions for this collective
-    return models.Transaction.find({
+    return models.Transaction.findOne({
       attributes: [
         [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount'],
       ],

@@ -151,7 +151,7 @@ export async function createRefundTransaction(transaction, refundedPaymentProces
   const collectiveLedger =
     transaction.type === 'CREDIT'
       ? transaction
-      : await models.Transaction.find({
+      : await models.Transaction.findOne({
           where: {
             TransactionGroup: transaction.TransactionGroup,
             id: { [Op.ne]: transaction.id },
