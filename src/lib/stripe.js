@@ -56,20 +56,20 @@ const getStripeToken = (type = 'cc', data) => {
 /**
  * Convert a stripe token as returned by `createToken` into a PaymentMethod object.
  */
-export const stripeTokenToPaymentMethod = stripeToken => {
+export const stripeTokenToPaymentMethod = ({ id, card }) => {
   return {
-    name: stripeToken.card.last4,
-    token: stripeToken.id,
+    name: card.last4,
+    token: id,
     service: 'stripe',
     type: 'creditcard',
     data: {
-      fullName: stripeToken.card.full_name,
-      expMonth: stripeToken.card.exp_month,
-      expYear: stripeToken.card.exp_year,
-      brand: stripeToken.card.brand,
-      country: stripeToken.card.country,
-      funding: stripeToken.card.funding,
-      zip: stripeToken.card.address_zip,
+      fullName: card.full_name,
+      expMonth: card.exp_month,
+      expYear: card.exp_year,
+      brand: card.brand,
+      country: card.country,
+      funding: card.funding,
+      zip: card.address_zip,
     },
   };
 };

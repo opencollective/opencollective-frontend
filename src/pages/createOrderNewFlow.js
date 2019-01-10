@@ -26,7 +26,7 @@ import * as api from '../lib/api';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency } from '../lib/utils';
 import withIntl from '../lib/withIntl';
-import { getRecaptcha, getRecaptchaSiteKey } from '../lib/recaptcha';
+import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../lib/recaptcha';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
@@ -96,6 +96,8 @@ class CreateOrderPage extends React.Component {
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
   };
 
+  static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";
+
   constructor(props) {
     super(props);
     this.recaptcha = null;
@@ -125,9 +127,14 @@ class CreateOrderPage extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.recaptcha = getRecaptcha();
+  async componentDidMount() {
     this.props.loadStripe();
+
+    try {
+      this.recaptcha = await getRecaptcha();
+    } catch {
+      this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -136,24 +143,22 @@ class CreateOrderPage extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    unloadRecaptcha();
+  }
+
   fetchRecaptchaToken = () => {
     if (this.recaptchaToken) {
       return Promise.resolve(this.recaptchaToken);
     }
 
     return new Promise(resolve =>
-      this.recaptcha
-        .then(recaptcha =>
-          recaptcha.ready(() =>
-            recaptcha.execute(getRecaptchaSiteKey(), { action: 'OrderForm' }).then(recaptchaToken => {
-              this.recaptchaToken = recaptchaToken;
-              resolve(recaptchaToken);
-            }),
-          ),
-        )
-        .catch(err => {
-          console.error('Recaptcha error', err);
+      this.recaptcha.ready(() =>
+        this.recaptcha.execute(getRecaptchaSiteKey(), { action: 'OrderForm' }).then(recaptchaToken => {
+          this.recaptchaToken = recaptchaToken;
+          resolve(recaptchaToken);
         }),
+      ),
     );
   };
 
@@ -183,8 +188,11 @@ class CreateOrderPage extends React.Component {
     if (!paymentMethod) {
       return false;
     }
-
     const recaptchaToken = await this.fetchRecaptchaToken();
+    if (!recaptchaToken) {
+      this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+    }
+
     const tier = this.getTier();
     const order = {
       quantity: this.props.quantity || 1,
