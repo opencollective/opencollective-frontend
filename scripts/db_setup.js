@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /**
  * Script for setting up user & database.
  *

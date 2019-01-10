@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import '../server/env';
+
 /**
  * This script subscribes all members of a collective (core contributors)
  * to the `collective.monthlyreport` notification (for all collectives)

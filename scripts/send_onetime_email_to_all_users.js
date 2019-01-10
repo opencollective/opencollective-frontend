@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../server/env';
 
 /*
  * This script is useful for sending a one-time email to all users.

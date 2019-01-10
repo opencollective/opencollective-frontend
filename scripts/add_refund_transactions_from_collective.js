@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
  * Given an array of fromCollective Ids(field FromCollectiveId from Transactions model),
  * This script creates refund transactions.

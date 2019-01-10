@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../../server/env';
+
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import { Op } from 'sequelize';

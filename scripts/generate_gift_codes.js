@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 import { createGiftcards } from '../server/paymentProviders/opencollective/giftcard';
 import { sequelize } from '../server/models';
 

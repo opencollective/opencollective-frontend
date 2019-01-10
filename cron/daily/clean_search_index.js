@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../../server/env';
+
 import { Op } from 'sequelize';
 import moment from 'moment-timezone';
 import debugLib from 'debug';

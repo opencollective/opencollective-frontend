@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../../server/env';
+
 /*
  * This script runs through a few checks and lets us know if something is off
  */

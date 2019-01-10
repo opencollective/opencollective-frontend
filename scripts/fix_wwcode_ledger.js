@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
  * This is a one-time use script to fix wwcode ledger
  */

@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 import config from 'config';
 import models from '../server/models';
 

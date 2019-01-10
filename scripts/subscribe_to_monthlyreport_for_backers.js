@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import '../server/env';
+
 /**
  * This script subscribes all users to the user.monthlyreport notification
  */

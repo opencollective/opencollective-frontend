@@ -1,4 +1,6 @@
-import '../server/env'; // important to load first for environment config
+#!/usr/bin/env node
+import '../server/env';
+
 import models from '../server/models';
 
 const exec = require('child-process-promise').exec;

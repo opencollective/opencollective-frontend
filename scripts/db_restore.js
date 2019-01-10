@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 import { ArgumentParser } from 'argparse';
 import * as libdb from '../server/lib/db';
 

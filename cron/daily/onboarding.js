@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../../server/env';
+
 import Promise from 'bluebird';
 import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';

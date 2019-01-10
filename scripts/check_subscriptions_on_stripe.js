@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
  * This script tells us which Stripe subscriptions are inactive
  */

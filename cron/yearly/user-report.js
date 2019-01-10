@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../../server/env';
 
 // Only run on the first of the year
 const today = new Date();

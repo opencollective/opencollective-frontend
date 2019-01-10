@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 import argparse from 'argparse';
 
 import models from '../server/models';
