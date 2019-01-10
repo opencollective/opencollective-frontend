@@ -33,6 +33,10 @@ const StyledButtonItem = styled(StyledButton)`
   }
 `;
 
+StyledButtonItem.propTypes = {
+  combo: PropTypes.bool,
+};
+
 const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, ...props }) => (
   <Flex {...props}>
     {items.map(item => (
