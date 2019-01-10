@@ -40,18 +40,16 @@ function getCharge(transaction) {
   return transaction.Collective.getStripeAccount()
     .then(stripeAccount => {
       if (stripeAccount && transaction.data && transaction.data.charge) {
-        return retrieveCharge(stripeAccount, transaction.data.charge.id).then(
-          charge => {
-            if (charge) {
-              if (charge.refunded) {
-                refundCount++;
-                console.log('Charge Refunded, txn id: ', transaction.id);
-              }
-            } else {
-              console.log('Charge not found: ', transaction.data.charge.id);
+        return retrieveCharge(stripeAccount, transaction.data.charge.id).then(charge => {
+          if (charge) {
+            if (charge.refunded) {
+              refundCount++;
+              console.log('Charge Refunded, txn id: ', transaction.id);
             }
-          },
-        );
+          } else {
+            console.log('Charge not found: ', transaction.data.charge.id);
+          }
+        });
       }
       return Promise.resolve();
     })
@@ -72,9 +70,7 @@ function run() {
     include: [{ model: models.Collective }],
     order: [['id', 'DESC']],
   })
-    .tap(transactions =>
-      console.log('Transactions found: ', transactions.length),
-    )
+    .tap(transactions => console.log('Transactions found: ', transactions.length))
     .then(transactions => promiseSeq(transactions, (txn, ix) => getCharge(txn)))
     .then(() => console.log('Refund count: ', refundCount))
     .then(() => done())

@@ -52,36 +52,20 @@ models.Transaction.findAll({
 
         const currency = stripeSubscription.plan.currency.toUpperCase();
         const amount = stripeSubscription.plan.amount / 100;
-        const url = `https://dashboard.stripe.com/${accountId}/plans/${
-          stripeSubscription.plan.id
-        }`;
+        const url = `https://dashboard.stripe.com/${accountId}/plans/${stripeSubscription.plan.id}`;
 
         if (amount !== transaction.amount) {
-          message.push(
-            `transaction.amount mismatch: ${transaction.id}, url: ${url}`,
-          );
+          message.push(`transaction.amount mismatch: ${transaction.id}, url: ${url}`);
         }
 
         if (!transaction.Subscription.interval) {
-          message.push(
-            `subscription.interval missing: ${
-              transaction.Subscription.id
-            }, url: ${url}`,
-          );
-        } else if (
-          transaction.Subscription.interval !== stripeSubscription.plan.interval
-        ) {
-          message.push(
-            `subscription.interval mismatch: ${
-              transaction.Subscription.id
-            }, url: ${url}`,
-          );
+          message.push(`subscription.interval missing: ${transaction.Subscription.id}, url: ${url}`);
+        } else if (transaction.Subscription.interval !== stripeSubscription.plan.interval) {
+          message.push(`subscription.interval mismatch: ${transaction.Subscription.id}, url: ${url}`);
         }
 
         if (currency !== transaction.currency) {
-          message.push(
-            `transaction.currency mismatch: ${transaction.id}, url: ${url}`,
-          );
+          message.push(`transaction.currency mismatch: ${transaction.id}, url: ${url}`);
         }
       });
   })

@@ -27,17 +27,13 @@ const processRow = row => {
 
   /* Don't run this again because it would add duplicate rows
    * For some reason, the unique key on type,userid,collectiveid doesn't complain if collectiveid is null
-  */
+   */
   return Notification.create({
     UserId: row.id,
     type,
   })
-    .then(notification =>
-      console.log(`> UserId ${row.id} is now subscribed to ${type}`),
-    )
-    .catch(() =>
-      console.error(`UserId ${row.id} already subscribed to ${type}`),
-    );
+    .then(notification => console.log(`> UserId ${row.id} is now subscribed to ${type}`))
+    .catch(() => console.error(`UserId ${row.id} already subscribed to ${type}`));
 };
 
 init();

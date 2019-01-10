@@ -20,12 +20,8 @@ models.Order.findAll({
       console.log(`Donation id ${order.id} already processed`);
       return;
     }
-    const description = capitalize(
-      `${order.Subscription.interval}ly ${order.description.toLowerCase()}`,
-    );
-    console.log(
-      `Updating donation #${order.id}'s description to ${description}`,
-    );
+    const description = capitalize(`${order.Subscription.interval}ly ${order.description.toLowerCase()}`);
+    console.log(`Updating donation #${order.id}'s description to ${description}`);
     return order.update({ description });
   })
   .then(() => done())

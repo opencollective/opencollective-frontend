@@ -26,21 +26,13 @@ const processRow = row => {
   lists['BACKER'] = 'backers';
   lists['ADMIN'] = 'members';
   const type = `mailinglist.${lists[row.role]}`;
-  debug(
-    `Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${
-      row.CollectiveId
-    }`,
-  );
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
     CollectiveId: row.CollectiveId,
     type,
   }).catch(() =>
-    console.error(
-      `UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${
-        row.CollectiveId
-      }`,
-    ),
+    console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`),
   );
 };
 

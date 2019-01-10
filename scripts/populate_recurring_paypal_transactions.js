@@ -26,16 +26,10 @@ const endDate = moment().format('YYYY-MM-DD');
 // Promisify the paypal-rest-sdk
 const searchTransactions = (billingAgreementId, paypalConfig) => {
   return new Promise((resolve, reject) => {
-    paypal.billingAgreement.searchTransactions(
-      billingAgreementId,
-      startDate,
-      endDate,
-      paypalConfig,
-      (err, res) => {
-        if (err) return reject(err);
-        return resolve(res.agreement_transaction_list);
-      },
-    );
+    paypal.billingAgreement.searchTransactions(billingAgreementId, startDate, endDate, paypalConfig, (err, res) => {
+      if (err) return reject(err);
+      return resolve(res.agreement_transaction_list);
+    });
   });
 };
 
@@ -47,17 +41,9 @@ const findUnregisteredTransaction = (transactions, paypalTransactions) => {
   });
 };
 
-const updateTransactions = (
-  subscription,
-  collective,
-  user,
-  paypalTransactions,
-) => {
+const updateTransactions = (subscription, collective, user, paypalTransactions) => {
   // Find the missing transactions in our db and create them
-  const missingPaypalTransactions = findUnregisteredTransaction(
-    subscription.Transactions,
-    paypalTransactions,
-  );
+  const missingPaypalTransactions = findUnregisteredTransaction(subscription.Transactions, paypalTransactions);
 
   return Bluebird.map(missingPaypalTransactions, pt => {
     const transaction = {
@@ -79,11 +65,7 @@ const updateTransactions = (
   });
 };
 
-const updateFirstTransaction = (
-  transaction,
-  subscription,
-  paypalTransaction,
-) => {
+const updateFirstTransaction = (transaction, subscription, paypalTransaction) => {
   const updateTransaction = () => {
     transaction.data = paypalTransaction;
     return transaction.save();
@@ -120,12 +102,7 @@ const log = message => {
   return message; // for testing
 };
 
-export const handlePaypalTransactions = (
-  paypalTransactions,
-  transaction,
-  subscription,
-  billingAgreementId,
-) => {
+export const handlePaypalTransactions = (paypalTransactions, transaction, subscription, billingAgreementId) => {
   const collective = transaction.Collective;
   const user = transaction.User;
   const completedList = _.filter(paypalTransactions, { status: 'Completed' });
@@ -140,19 +117,13 @@ export const handlePaypalTransactions = (
     // No completed events, it takes up to one day for paypal to process the subscription,
     // so we will just pass
     if (completedList.length === 0) {
-      return log(
-        `Billing agreement (${billingAgreementId}) not processed yet, no completed event`,
-      );
+      return log(`Billing agreement (${billingAgreementId}) not processed yet, no completed event`);
 
       // Only one completed item means that it is the first payment, no
       // need to create a new Transaction. We just need to activate the subscription
       // and save the paypalTransaction in our transaction.
     } else if (completedList.length === 1) {
-      return updateFirstTransaction(
-        transaction,
-        subscription,
-        completedList[0],
-      );
+      return updateFirstTransaction(transaction, subscription, completedList[0]);
     } else {
       return log(
         `Invalid subscription ${
@@ -182,41 +153,22 @@ export const populateTransactions = subscription => {
   const user = transaction.User;
 
   if (!billingAgreementId) {
-    return log(
-      `No billingAgreementId, subscription.id ${
-        subscription.id
-      }, transaction.id ${transaction.id}`,
-    );
+    return log(`No billingAgreementId, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
   }
 
   if (!user) {
-    return log(
-      `No user, subscription.id ${subscription.id}, transaction.id ${
-        transaction.id
-      }`,
-    );
+    return log(`No user, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
   }
 
   if (!collective) {
-    return log(
-      `No collective, subscription.id ${subscription.id}, transaction.id ${
-        transaction.id
-      }`,
-    );
+    return log(`No collective, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
   }
 
   return collective
     .getConnectedAccount()
-    .then(connectedAccount =>
-      searchTransactions(billingAgreementId, connectedAccount.paypalConfig),
-    )
+    .then(connectedAccount => searchTransactions(billingAgreementId, connectedAccount.paypalConfig))
     .then(paypalTransactions => {
-      return handlePaypalTransactions(
-        paypalTransactions,
-        transaction,
-        subscription,
-        billingAgreementId,
-      );
+      return handlePaypalTransactions(paypalTransactions, transaction, subscription, billingAgreementId);
     });
 };
 

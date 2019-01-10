@@ -102,10 +102,7 @@ const calculateBackersPerCollective = () => {
           countOrderInStats(order, false);
         } else {
           //results[order.CollectiveId] = { id: order.CollectiveId, slug: order.collective.slug, newBackerCount: 0, oldBackerCount: 1};
-          results[order.CollectiveId] = initiateNewCollectiveStats(
-            order,
-            false,
-          );
+          results[order.CollectiveId] = initiateNewCollectiveStats(order, false);
         }
       } else {
         // means this is a new backer
@@ -125,13 +122,7 @@ const calculateBackersPerCollective = () => {
         .map(Number.call, Number)
         .slice(0, -1);
 
-      array.map(
-        n =>
-          (csvFields = csvFields.concat([
-            `month${n + 1}NewBackerCount`,
-            `month${n + 1}OldBackerCount`,
-          ])),
-      );
+      array.map(n => (csvFields = csvFields.concat([`month${n + 1}NewBackerCount`, `month${n + 1}OldBackerCount`])));
 
       console.log(csvFields);
 
@@ -143,10 +134,8 @@ const calculateBackersPerCollective = () => {
         const obj = { id: results[key].id, slug: results[key].slug };
         array.map(n => {
           console.log(`${n + 1}`, results[key].months[`${n + 1}`]);
-          obj[`month${n + 1}NewBackerCount`] =
-            results[key].months[`${n + 1}`].newBackerCount;
-          obj[`month${n + 1}OldBackerCount`] =
-            results[key].months[`${n + 1}`].oldBackerCount;
+          obj[`month${n + 1}NewBackerCount`] = results[key].months[`${n + 1}`].newBackerCount;
+          obj[`month${n + 1}OldBackerCount`] = results[key].months[`${n + 1}`].oldBackerCount;
         });
         return obj;
       });

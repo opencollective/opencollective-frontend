@@ -47,9 +47,7 @@ models.Transaction.findAll({
 
     // one-time donations
     if (!transaction.SubscriptionId) {
-      return createDonation(transaction).then(order =>
-        updateTransaction(donation, transaction),
-      );
+      return createDonation(transaction).then(order => updateTransaction(donation, transaction));
     } else {
       // recurring donations
 
@@ -60,9 +58,7 @@ models.Transaction.findAll({
         },
       }).then(order => {
         if (!order) {
-          return createDonation(transaction).then(order =>
-            updateTransaction(donation, transaction),
-          );
+          return createDonation(transaction).then(order => updateTransaction(donation, transaction));
         } else {
           return updateTransaction(donation, transaction);
         }
