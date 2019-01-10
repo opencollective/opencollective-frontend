@@ -141,6 +141,9 @@ const getMembershipsQuery = gql`
           }
           yearlyBudget
         }
+        parentCollective {
+          slug
+        }
       }
     }
   }

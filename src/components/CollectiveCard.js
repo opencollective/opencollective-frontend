@@ -67,16 +67,16 @@ class CollectiveCard extends React.Component {
       (collective.longDescription && firstSentence(collective.longDescription, 80));
     const description = collective.description;
 
-    let route = 'collective';
-    let params = {
-      slug: collective.slug,
-    };
+    let route, params;
     if (collective.type === 'EVENT') {
       route = 'event';
       params = {
         parentCollectiveSlug: collective.parentCollective && collective.parentCollective.slug,
         eventSlug: collective.slug,
       };
+    } else {
+      route = 'collective';
+      params = { slug: collective.slug };
     }
 
     if (LoggedInUser) {
