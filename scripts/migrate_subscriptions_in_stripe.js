@@ -31,38 +31,21 @@ const done = err => {
   if (err) console.log('err', err);
   console.log('\n');
   console.log('Non-shared customers found: ', nonSharedCustomersCount);
-  console.log(
-    'Shared customers only on old stripe account found: ',
-    sharedCustomersOnOldStripeAccountCount,
-  );
+  console.log('Shared customers only on old stripe account found: ', sharedCustomersOnOldStripeAccountCount);
   console.log(
     'Shared customers on both old and new stripe accounts found: ',
     sharedCustomersOnOldAndNewStripeAccountsCount,
   );
   console.log('Total subscriptions updated: ', subsUpdatedCount);
-  console.log(
-    'Total subscriptions skipped (customer not found): ',
-    subsSkippedCustomerNotFoundCount,
-  );
-  console.log(
-    'Total subscriptions skipped (mismatched HostCollectiveId)',
-    subsSkippedMismatchedHostCollectiveId,
-  );
+  console.log('Total subscriptions skipped (customer not found): ', subsSkippedCustomerNotFoundCount);
+  console.log('Total subscriptions skipped (mismatched HostCollectiveId)', subsSkippedMismatchedHostCollectiveId);
   console.log('\n');
   console.log('done!');
   process.exit();
 };
 
 const migrateSubscriptions = options => {
-  const {
-    oldHostCollectiveId,
-    newHostCollectiveId,
-    limit,
-    dryRun,
-    startingAfter,
-    endingBefore,
-    plan,
-  } = options;
+  const { oldHostCollectiveId, newHostCollectiveId, limit, dryRun, startingAfter, endingBefore, plan } = options;
 
   let oldStripeAccount, newStripeAccount, currentOCSubscription;
   // fetch old stripe account
@@ -109,10 +92,7 @@ const migrateSubscriptions = options => {
       )
 
       .then(oldStripeSubscriptionList => {
-        console.log(
-          'Subscriptions fetched: ',
-          oldStripeSubscriptionList.data.length,
-        );
+        console.log('Subscriptions fetched: ', oldStripeSubscriptionList.data.length);
         return oldStripeSubscriptionList.data;
       })
       .each(oldStripeSubscription => {
@@ -124,9 +104,7 @@ const migrateSubscriptions = options => {
           console.log('\nProcessing subscription: ', oldStripeSubscription.id);
         }
 
-        let platformCustomerId,
-          customerIdOnOldStripeAccount,
-          customerIdOnNewStripeAccount;
+        let platformCustomerId, customerIdOnOldStripeAccount, customerIdOnNewStripeAccount;
 
         // fetch the subscription from our database
         return (
@@ -138,16 +116,13 @@ const migrateSubscriptions = options => {
                 console.log('Subscription found in our DB:', ocSubscription.id);
                 currentOCSubscription = ocSubscription;
               } else {
-                throw new Error(
-                  'Subscription not found in our DB: ',
-                  oldStripeSubscription.id,
-                );
+                throw new Error('Subscription not found in our DB: ', oldStripeSubscription.id);
               }
             })
 
             // fetch order with paymentMethod and other info used for this subscription
             .then(() => {
-              return models.Order.find({
+              return models.Order.findOne({
                 where: {
                   SubscriptionId: currentOCSubscription.id,
                 },
@@ -167,28 +142,20 @@ const migrateSubscriptions = options => {
             })
             .then(order => {
               if (!order) {
-                console.log(
-                  `HostCollectiveId !== ${newHostCollectiveId}, skipping`,
-                );
+                console.log(`HostCollectiveId !== ${newHostCollectiveId}, skipping`);
                 subsSkippedMismatchedHostCollectiveId += 1;
                 return Promise.resolve();
               } else {
-                console.log(
-                  'HostCollectiveId',
-                  order.collective.HostCollectiveId,
-                );
+                console.log('HostCollectiveId', order.collective.HostCollectiveId);
               }
               const pm = order.paymentMethod;
-              const customerIdForHostsList =
-                pm.data && pm.data.customerIdForHost;
+              const customerIdForHostsList = pm.data && pm.data.customerIdForHost;
 
               platformCustomerId = pm.customerId;
               customerIdOnOldStripeAccount =
-                customerIdForHostsList &&
-                customerIdForHostsList[oldStripeAccount.username];
+                customerIdForHostsList && customerIdForHostsList[oldStripeAccount.username];
               customerIdOnNewStripeAccount =
-                customerIdForHostsList &&
-                customerIdForHostsList[newStripeAccount.username];
+                customerIdForHostsList && customerIdForHostsList[newStripeAccount.username];
 
               console.log('platformCustomerId', platformCustomerId);
               console.log('Old customerId', customerIdOnOldStripeAccount);
@@ -196,9 +163,7 @@ const migrateSubscriptions = options => {
 
               const processSubscription = () => {
                 if (dryRun) {
-                  console.log(
-                    'Dry run: Exiting without making any changes on Stripe',
-                  );
+                  console.log('Dry run: Exiting without making any changes on Stripe');
                   subsUpdatedCount += 1;
                   return Promise.resolve();
                 }
@@ -220,8 +185,7 @@ const migrateSubscriptions = options => {
                         application_fee_percent: constants.OC_FEE_PERCENT,
                         metadata: oldStripeSubscription.metadata,
                         // needed to make sure we don't double charge them
-                        billing_cycle_anchor:
-                          oldStripeSubscription.current_period_end,
+                        billing_cycle_anchor: oldStripeSubscription.current_period_end,
                         prorate: false,
                       };
                       return stripeGateway.createSubscription(
@@ -237,12 +201,8 @@ const migrateSubscriptions = options => {
 
                       // storing this for any subscriptions still in trial period
                       // since they have no past data recorded
-                      preMigrationData.stripeSubscriptionId =
-                        oldStripeSubscription.id;
-                      console.log(
-                        'New stripeSubscriptionId',
-                        newStripeSubscription.id,
-                      );
+                      preMigrationData.stripeSubscriptionId = oldStripeSubscription.id;
+                      console.log('New stripeSubscriptionId', newStripeSubscription.id);
                       return currentOCSubscription.updateAttributes({
                         data: Object.assign({}, newStripeSubscription, {
                           preMigrationData,
@@ -251,12 +211,7 @@ const migrateSubscriptions = options => {
                       });
                     })
                     // delete new subscription from stripe
-                    .then(() =>
-                      stripeGateway.cancelSubscription(
-                        oldStripeAccount,
-                        oldStripeSubscription.id,
-                      ),
-                    )
+                    .then(() => stripeGateway.cancelSubscription(oldStripeAccount, oldStripeSubscription.id))
                     .then(() => (subsUpdatedCount += 1))
                     .catch(err => {
                       console.log('ERROR: ', err, oldStripeSubscription);
@@ -268,10 +223,7 @@ const migrateSubscriptions = options => {
               // we shouldn't have any active subscriptions on stripe without customerId
               // on paymentMethod
               if (!platformCustomerId) {
-                throw new Error(
-                  'Payment Method found without Customer Id: ',
-                  pm.id,
-                );
+                throw new Error('Payment Method found without Customer Id: ', pm.id);
               }
 
               // figure out which of the three cases this payment method falls into
@@ -287,53 +239,35 @@ const migrateSubscriptions = options => {
             -- Nothing needed in terms of Customer Id in this case
         */
 
-              if (
-                !customerIdOnOldStripeAccount &&
-                !customerIdOnNewStripeAccount
-              ) {
+              if (!customerIdOnOldStripeAccount && !customerIdOnNewStripeAccount) {
                 // Case 3
-                console.log(
-                  'Non-shared customer Id found, checking for customer on new Stripe Account',
-                );
+                console.log('Non-shared customer Id found, checking for customer on new Stripe Account');
 
                 nonSharedCustomersCount += 1;
                 return (
                   stripeGateway
-                    .retrieveCustomer(
-                      newStripeAccount,
-                      oldStripeSubscription.customer,
-                    )
+                    .retrieveCustomer(newStripeAccount, oldStripeSubscription.customer)
                     .then(() => {
-                      customerIdOnNewStripeAccount =
-                        oldStripeSubscription.customer;
+                      customerIdOnNewStripeAccount = oldStripeSubscription.customer;
                       return processSubscription();
                     })
                     // if customer not found, stripe will throw this error
                     .catch(err => {
                       if (err.message.indexOf('No such customer') !== -1) {
-                        console.log(
-                          'Customer not found on new stripe account, skipping',
-                        );
+                        console.log('Customer not found on new stripe account, skipping');
                         subsSkippedCustomerNotFoundCount += 1;
                       } else {
                         return done(err);
                       }
                     })
                 );
-              } else if (
-                customerIdOnOldStripeAccount &&
-                !customerIdOnNewStripeAccount
-              ) {
+              } else if (customerIdOnOldStripeAccount && !customerIdOnNewStripeAccount) {
                 // Case 2
-                console.log(
-                  'Shared Customer id found on old stripe account, creating one on new stripe acount',
-                );
+                console.log('Shared Customer id found on old stripe account, creating one on new stripe acount');
 
                 sharedCustomersOnOldStripeAccountCount += 1;
                 if (dryRun) {
-                  console.log(
-                    'Dry run: Exiting without making any changes on Stripe',
-                  );
+                  console.log('Dry run: Exiting without making any changes on Stripe');
                   return Promise.resolve();
                 }
                 return stripeGateway
@@ -347,19 +281,13 @@ const migrateSubscriptions = options => {
                     console.log('New customerId created: ', stripeCustomer.id);
                     customerIdOnNewStripeAccount = stripeCustomer.id;
                     const pmData = pm.data;
-                    pmData.customerIdForHost = Object.assign(
-                      {},
-                      pmData.customerIdForHost,
-                      { [newStripeAccount.username]: stripeCustomer.id },
-                    );
-                    return pm
-                      .update({ data: pmData })
-                      .then(() => processSubscription());
+                    pmData.customerIdForHost = Object.assign({}, pmData.customerIdForHost, {
+                      [newStripeAccount.username]: stripeCustomer.id,
+                    });
+                    return pm.update({ data: pmData }).then(() => processSubscription());
                   });
               } else {
-                console.log(
-                  'Shared Customer id with customer on both old and new stripe account',
-                );
+                console.log('Shared Customer id with customer on both old and new stripe account');
                 sharedCustomersOnOldAndNewStripeAccountsCount += 1;
 
                 return processSubscription();

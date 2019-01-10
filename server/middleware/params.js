@@ -27,7 +27,7 @@ const parseIdOrUUID = param => {
  * Get a record by id or by name
  */
 function getByKeyValue(model, key, value) {
-  return model.find({ where: { [key]: value.toLowerCase() } }).tap(result => {
+  return model.findOne({ where: { [key]: value.toLowerCase() } }).tap(result => {
     if (!result) throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
   });
 }

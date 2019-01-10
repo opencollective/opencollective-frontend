@@ -1542,7 +1542,7 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getBalance = function(until) {
     until = until || new Date();
-    return models.Transaction.find({
+    return models.Transaction.findOne({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total'],
       ],
@@ -1612,7 +1612,7 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id,
     };
     if (startDate) where.createdAt[Op.gte] = startDate;
-    return models.Transaction.find({
+    return models.Transaction.findOne({
       attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']],
       where,
     }).then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
@@ -1626,7 +1626,7 @@ export default function(Sequelize, DataTypes) {
     endDate = endDate || new Date();
     const createdAt = startDate ? { [Op.lt]: endDate, [Op.gte]: startDate } : { [Op.lt]: endDate };
 
-    return models.Transaction.find({
+    return models.Transaction.findOne({
       attributes: [
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total'],
       ],
@@ -1776,7 +1776,7 @@ export default function(Sequelize, DataTypes) {
     if (startDate) where.createdAt[Op.gte] = startDate;
     if (type === 'donation') where.amount = { [Op.gt]: 0 };
     if (type === 'expense') where.amount = { [Op.lt]: 0 };
-    return models.Transaction.find({
+    return models.Transaction.findOne({
       attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col(attribute)), 0), 'total']],
       where,
     }).then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
