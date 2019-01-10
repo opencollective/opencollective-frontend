@@ -330,7 +330,7 @@ class CreateExpenseForm extends React.Component {
               id="expense.disclaimer"
               defaultMessage="You must upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address."
             />
-            <a href="https://opencollective.com/faq#expense">
+            &nbsp;<a href="https://opencollective.com/faq/expenses">
               <FormattedMessage id="needHelp" defaultMessage="Need help?" />
             </a>
           </div>
