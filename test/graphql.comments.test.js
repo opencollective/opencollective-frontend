@@ -59,16 +59,25 @@ describe('graphql.comments.test', () => {
   );
   before(() => collective1.addUserWithRole(collectiveAdmin, roles.ADMIN));
   before(() => host.addUserWithRole(hostAdmin, roles.ADMIN));
-  before(() => collective1.addHost(host, collectiveAdmin));
 
-  before(() => {
-    return models.Comment.create({
+  before(async () => {
+    await collective1.addHost(host, collectiveAdmin);
+
+    await utils.waitForCondition(() => sendEmailSpy.callCount === 2);
+
+    sendEmailSpy.resetHistory();
+
+    await models.Comment.create({
       CollectiveId: collective1.id,
       FromCollectiveId: collectiveAdmin.CollectiveId,
       CreatedByUserId: collectiveAdmin.id,
       markdown: 'first comment & "love"',
       ExpenseId: expense1.id,
     }).then(u => (comment1 = u));
+
+    await utils.waitForCondition(() => sendEmailSpy.callCount === 1);
+
+    sendEmailSpy.resetHistory();
   });
 
   before('create an event collective', () =>
@@ -120,23 +129,19 @@ describe('graphql.comments.test', () => {
       result.errors && console.error(result.errors[0]);
       const createdComment = result.data.createComment;
       expect(createdComment.html).to.equal('<p>This is the <strong>comment</strong></p>');
-      await utils.waitForCondition(() => sendEmailSpy.callCount === 3);
+      await utils.waitForCondition(() => sendEmailSpy.callCount === 2);
       // utils.inspectSpy(sendEmailSpy, 2);
-      expect(sendEmailSpy.callCount).to.equal(3);
-      expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
+      expect(sendEmailSpy.callCount).to.equal(2);
       expect(sendEmailSpy.firstCall.args[1]).to.contain(
-        `webpack: New comment on your expense ${expense1.description} by ${collectiveAdmin.firstName}`,
+        `webpack: New comment on expense ${expense1.description} by ${user1.firstName}`,
       );
       expect(sendEmailSpy.secondCall.args[1]).to.contain(
         `webpack: New comment on expense ${expense1.description} by ${user1.firstName}`,
       );
-      expect(sendEmailSpy.thirdCall.args[1]).to.contain(
-        `webpack: New comment on expense ${expense1.description} by ${user1.firstName}`,
-      );
-      const firstRecipient = sendEmailSpy.args[1][0] === hostAdmin.email ? hostAdmin : collectiveAdmin;
-      const secondRecipient = sendEmailSpy.args[1][0] === hostAdmin.email ? collectiveAdmin : hostAdmin;
-      expect(sendEmailSpy.args[1][0]).to.equal(firstRecipient.email);
-      expect(sendEmailSpy.args[2][0]).to.equal(secondRecipient.email);
+      const firstRecipient = sendEmailSpy.args[0][0] === hostAdmin.email ? hostAdmin : collectiveAdmin;
+      const secondRecipient = sendEmailSpy.args[0][0] === hostAdmin.email ? collectiveAdmin : hostAdmin;
+      expect(sendEmailSpy.args[0][0]).to.equal(firstRecipient.email);
+      expect(sendEmailSpy.args[1][0]).to.equal(secondRecipient.email);
     });
   });
 
