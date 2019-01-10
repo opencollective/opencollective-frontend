@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, pick } from 'lodash';
+import { get, omit, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
@@ -19,7 +19,7 @@ import CreateProfile from '../components/CreateProfile';
 import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
 
-import { addCreateOrderMutation, createUserQuery } from '../graphql/mutations';
+import { addCreateCollectiveMutation, addCreateOrderMutation, createUserQuery } from '../graphql/mutations';
 
 import * as api from '../lib/api';
 import withIntl from '../lib/withIntl';
@@ -90,11 +90,15 @@ class CreateOrderPage extends React.Component {
 
   constructor(props) {
     super(props);
+
+    const tier = this.getTier();
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
+    const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
+    const defaultAmount = amountOptions[Math.floor(amountOptions.length / 2)];
     const initialDetails = {
       quantity: parseInt(props.quantity, 10) || 1,
       interval: ['month', 'year'].includes(interval) ? interval : null,
-      totalAmount: parseInt(props.totalAmount, 10) || null,
+      totalAmount: parseInt(props.totalAmount, 10) || defaultAmount,
     };
 
     this.state = {
@@ -258,6 +262,7 @@ class CreateOrderPage extends React.Component {
     const { data, LoggedInUser, TierId } = this.props;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
+    const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
 
     if (step === 'contributeAs') {
       return (
@@ -276,10 +281,10 @@ class CreateOrderPage extends React.Component {
     } else if (step === 'details') {
       return (
         <ContributeDetails
-          amountOptions={(tier && tier.presets) || [500, 1000, 2000, 5000]}
+          amountOptions={amountOptions}
           currency={(tier && tier.currency) || data.Collective.currency}
           onChange={data => this.setState({ stepDetails: data })}
-          showFrequency={Boolean(TierId)}
+          showFrequency={Boolean(TierId) || undefined}
           interval={get(this.state, 'stepDetails.interval')}
           totalAmount={get(this.state, 'stepDetails.totalAmount')}
         />
@@ -310,16 +315,29 @@ class CreateOrderPage extends React.Component {
     return null;
   }
 
-  changeStep = step => {
+  changeStep = async step => {
     if (this.props.loadingLoggedInUser || this.state.loading || this.state.submitting) {
       return false;
     }
 
-    const { verb, data } = this.props;
+    const { createCollective, verb, data, refetchLoggedInUser } = this.props;
+    const { stepProfile, step: currentStep } = this.state;
     const params = {
       collectiveSlug: data.Collective.slug,
       step: step === 'contributeAs' ? undefined : step,
     };
+
+    // check if we're creating a new organization
+    if (!currentStep && stepProfile.orgName) {
+      const { data: result } = await createCollective({
+        name: stepProfile.orgName,
+        ...omit(stepProfile, ['orgName']),
+      });
+      if (result && result.createCollective) {
+        await refetchLoggedInUser();
+        this.setState({ stepProfile: result.createCollective });
+      }
+    }
 
     if (verb) {
       Router.pushRoute('donate', { ...params, verb });
@@ -409,7 +427,7 @@ class CreateOrderPage extends React.Component {
 
     const step = this.props.step || 'contributeAs';
     return (
-      <Flex flexDirection="column" alignItems="center">
+      <Flex flexDirection="column" alignItems="center" mx={3}>
         <Box>{this.renderStep(step)}</Box>
         <Flex mt={5}>
           {this.renderPrevStepButton(step)}
@@ -523,6 +541,7 @@ const addCreateUserMutation = graphql(createUserQuery, {
 
 const addGraphQL = compose(
   addData,
+  addCreateCollectiveMutation,
   addCreateOrderMutation,
   addCreateUserMutation,
 );

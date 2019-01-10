@@ -12,7 +12,7 @@ const StyledInputField = ({ children, label, htmlFor, error, success, disabled }
         {label}
       </P>
     )}
-    {children({ name: htmlFor, id: htmlFor, error: Boolean(error), success, disabled })}
+    {children({ name: htmlFor, id: htmlFor, error: Boolean(error) || undefined, success, disabled })}
     {error && (
       <Span display="block" color="red.500" pt={2} fontSize="Tiny">
         {error}
