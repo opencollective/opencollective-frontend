@@ -29,29 +29,17 @@ const init = () => {
 
 const processRow = row => {
   const type = 'collective.monthlyreport';
-  debug(
-    `Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${
-      row.CollectiveId
-    }`,
-  );
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
     CollectiveId: row.CollectiveId,
     type,
   })
     .then(notification =>
-      console.log(
-        `> UserId ${row.UserId} is now subscribed to ${type} of CollectiveId ${
-          row.CollectiveId
-        }`,
-      ),
+      console.log(`> UserId ${row.UserId} is now subscribed to ${type} of CollectiveId ${row.CollectiveId}`),
     )
     .catch(() =>
-      console.error(
-        `UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${
-          row.CollectiveId
-        }`,
-      ),
+      console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`),
     );
 };
 

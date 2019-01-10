@@ -36,9 +36,7 @@ const init = () => {
 
   // get all active collectives
   return Collective.findAll(collectiveQuery)
-    .tap(collectives =>
-      console.log(`Active collectives found: ${collectives.length}`),
-    )
+    .tap(collectives => console.log(`Active collectives found: ${collectives.length}`))
     .map(collective => collective.id)
     .then(collectiveIds =>
       sequelize.query(
@@ -54,11 +52,7 @@ const init = () => {
       ),
     )
     .tap(coreContributorsOfActiveCollectives =>
-      console.log(
-        `Core contributors found: ${
-          coreContributorsOfActiveCollectives.length
-        }`,
-      ),
+      console.log(`Core contributors found: ${coreContributorsOfActiveCollectives.length}`),
     )
     .then(sendEmail)
     .then(() => {

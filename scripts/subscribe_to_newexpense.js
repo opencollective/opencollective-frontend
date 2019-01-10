@@ -23,21 +23,13 @@ const init = () => {
 
 const processRow = row => {
   const type = `collective.expense.created`;
-  debug(
-    `Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${
-      row.CollectiveId
-    }`,
-  );
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
     CollectiveId: row.CollectiveId,
     type,
   }).catch(() =>
-    console.error(
-      `UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${
-        row.CollectiveId
-      }`,
-    ),
+    console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`),
   );
 };
 

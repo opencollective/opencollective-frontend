@@ -35,9 +35,7 @@ import libemail from '../server/lib/email';
 const REPORT_EMAIL = 'ops@opencollective.com';
 
 /** The script won't ever touch transaction groups in this list */
-const DONT_TOUCH_THESE_TRANSACTION_GROUPS = [
-  '4747823b-9924-4109-bb64-bed45f1ae151',
-];
+const DONT_TOUCH_THESE_TRANSACTION_GROUPS = ['4747823b-9924-4109-bb64-bed45f1ae151'];
 
 /** Helper that shows an icon transaction status */
 const icon = good => (good ? '✅' : '❌');
@@ -84,11 +82,7 @@ export class Migration {
 
   /** Ensure that `tr` has the `hostCurrencyFxRate` field filled in */
   ensureHostCurrencyFxRate = tr => {
-    if (
-      tr.amount === tr.amountInHostCurrency &&
-      tr.currency === tr.hostCurrency &&
-      !tr.hostCurrencyFxRate
-    ) {
+    if (tr.amount === tr.amountInHostCurrency && tr.currency === tr.hostCurrency && !tr.hostCurrencyFxRate) {
       tr.hostCurrencyFxRate = 1;
       this.saveTransactionChange(tr, 'hostCurrencyFxRate', null, 1);
       return true;
@@ -104,9 +98,7 @@ export class Migration {
   rewriteFees = (credit, debit) => {
     const changed = [];
     // Update hostFeeInHostCurrency
-    const newHostFeeInHostCurrency = toNegative(
-      credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency,
-    );
+    const newHostFeeInHostCurrency = toNegative(credit.hostFeeInHostCurrency || debit.hostFeeInHostCurrency);
     if (newHostFeeInHostCurrency || newHostFeeInHostCurrency === 0) {
       if (newHostFeeInHostCurrency !== credit.hostFeeInHostCurrency) {
         this.saveTransactionChange(
@@ -157,17 +149,10 @@ export class Migration {
     }
     // Update paymentProcessorFeeInHostCurrency
     const newPaymentProcessorFeeInHostCurrency = toNegative(
-      credit.paymentProcessorFeeInHostCurrency ||
-        debit.paymentProcessorFeeInHostCurrency,
+      credit.paymentProcessorFeeInHostCurrency || debit.paymentProcessorFeeInHostCurrency,
     );
-    if (
-      newPaymentProcessorFeeInHostCurrency ||
-      newPaymentProcessorFeeInHostCurrency === 0
-    ) {
-      if (
-        newPaymentProcessorFeeInHostCurrency !==
-        credit.paymentProcessorFeeInHostCurrency
-      ) {
+    if (newPaymentProcessorFeeInHostCurrency || newPaymentProcessorFeeInHostCurrency === 0) {
+      if (newPaymentProcessorFeeInHostCurrency !== credit.paymentProcessorFeeInHostCurrency) {
         this.saveTransactionChange(
           credit,
           'paymentProcessorFeeInHostCurrency',
@@ -177,10 +162,7 @@ export class Migration {
         credit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
         if (!changed.includes(credit)) changed.push(credit);
       }
-      if (
-        newPaymentProcessorFeeInHostCurrency !==
-        debit.paymentProcessorFeeInHostCurrency
-      ) {
+      if (newPaymentProcessorFeeInHostCurrency !== debit.paymentProcessorFeeInHostCurrency) {
         this.saveTransactionChange(
           debit,
           'paymentProcessorFeeInHostCurrency',
@@ -199,9 +181,7 @@ export class Migration {
     let changed = false;
 
     /* Rewrite amountInHostCurrency for credit */
-    const newAmountInHostCurrencyCredit = Math.round(
-      credit.amount * credit.hostCurrencyFxRate,
-    );
+    const newAmountInHostCurrencyCredit = Math.round(credit.amount * credit.hostCurrencyFxRate);
     if (newAmountInHostCurrencyCredit !== credit.amountInHostCurrency) {
       this.saveTransactionChange(
         credit,
@@ -215,9 +195,7 @@ export class Migration {
 
     /* Rewrite netAmountInCollectiveCurrency for credit */
     const newNetAmountInCollectiveCurrency = transactionsLib.netAmount(credit);
-    if (
-      newNetAmountInCollectiveCurrency !== credit.netAmountInCollectiveCurrency
-    ) {
+    if (newNetAmountInCollectiveCurrency !== credit.netAmountInCollectiveCurrency) {
       this.saveTransactionChange(
         credit,
         'netAmountInCollectiveCurrency',
@@ -237,32 +215,19 @@ export class Migration {
     /* Rewrite amount & amountInHostCurrency for debit */
     const newAmountInHostCurrency = -credit.netAmountInCollectiveCurrency;
     if (debit.amount !== newAmountInHostCurrency) {
-      this.saveTransactionChange(
-        debit,
-        'amount',
-        debit.amount,
-        newAmountInHostCurrency,
-      );
+      this.saveTransactionChange(debit, 'amount', debit.amount, newAmountInHostCurrency);
       debit.amount = newAmountInHostCurrency;
       changed = true;
     }
     if (debit.amountInHostCurrency !== newAmountInHostCurrency) {
-      this.saveTransactionChange(
-        debit,
-        'amountInHostCurrency',
-        debit.amountInHostCurrency,
-        newAmountInHostCurrency,
-      );
+      this.saveTransactionChange(debit, 'amountInHostCurrency', debit.amountInHostCurrency, newAmountInHostCurrency);
       debit.amountInHostCurrency = newAmountInHostCurrency;
       changed = true;
     }
 
     /* Rewrite netAmountInCollectiveCurrency for debit */
     const newNetAmountInCollectiveCurrencyDebit = -credit.amountInHostCurrency;
-    if (
-      debit.netAmountInCollectiveCurrency !==
-      newNetAmountInCollectiveCurrencyDebit
-    ) {
+    if (debit.netAmountInCollectiveCurrency !== newNetAmountInCollectiveCurrencyDebit) {
       this.saveTransactionChange(
         debit,
         'netAmountInCollectiveCurrency',
@@ -302,14 +267,10 @@ export class Migration {
       throw new Error('Wrong transaction pair detected');
     }
     if (tr1.ExpenseId !== tr2.ExpenseId) {
-      throw new Error(
-        'Wrong transaction pair detected: ExpenseId does not match',
-      );
+      throw new Error('Wrong transaction pair detected: ExpenseId does not match');
     }
     if (tr1.OrderId !== tr2.OrderId) {
-      throw new Error(
-        'Wrong transaction pair detected: OrderId does not match',
-      );
+      throw new Error('Wrong transaction pair detected: OrderId does not match');
     }
     if (tr1.OrderId && tr1.ExpenseId) {
       throw new Error('tr1 cannot be order & expense');
@@ -337,22 +298,12 @@ export class Migration {
     // Try to set up hostCurrencyFxRate if it's null
     if (this.ensureHostCurrencyFxRate(credit) && this.verify(credit)) {
       this.incr('fix hostFeeInHostCurrency');
-      this.log(
-        'report.txt',
-        ` ${icon(true)} CREDIT ${type} ${
-          credit.id
-        } true # after updating hostCurrencyFxRate`,
-      );
+      this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating hostCurrencyFxRate`);
       fixed.push(credit);
     }
     if (this.ensureHostCurrencyFxRate(debit) && this.verify(debit)) {
       this.incr('fix hostFeeInHostCurrency');
-      this.log(
-        'report.txt',
-        ` ${icon(true)} DEBIT ${type} ${
-          debit.id
-        } true # after updating hostCurrencyFxRate'`,
-      );
+      this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating hostCurrencyFxRate'`);
       fixed.push(debit);
     }
 
@@ -362,83 +313,42 @@ export class Migration {
         const changed = this.rewriteFees(credit, debit);
         if (changed.includes(credit) && this.verify(credit)) {
           this.incr('rewrite fees');
-          this.log(
-            'report.txt',
-            ` ${icon(true)} CREDIT ${type} ${
-              credit.id
-            } true # after updating fees`,
-          );
+          this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after updating fees`);
           fixed.push(credit);
         }
         if (changed.includes(debit) && this.verify(debit)) {
           this.incr('rewrite fees');
-          this.log(
-            'report.txt',
-            ` ${icon(true)} DEBIT ${type} ${
-              debit.id
-            } true # after updating fees`,
-          );
+          this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after updating fees`);
           fixed.push(debit);
         }
       }
     }
 
     // Don't do anything for now since these are not in the same currency
-    if (
-      credit.currency !== credit.hostCurrency ||
-      debit.currency !== debit.hostCurrency
-    ) {
+    if (credit.currency !== credit.hostCurrency || debit.currency !== debit.hostCurrency) {
       const [vc, vd] = [this.verify(credit), this.verify(debit)];
       if (!vc) {
         this.incr('not touched due to different currency');
-        this.log(
-          'report.txt',
-          ` ${icon(vc)} CREDIT ${
-            credit.id
-          } ${vc} # not touched because currency is different`,
-        );
+        this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because currency is different`);
       }
       if (!vd) {
         this.incr('not touched due to different currency');
-        this.log(
-          'report.txt',
-          ` ${icon(vd)} DEBIT ${
-            debit.id
-          } ${vd} # not touched because currency is different`,
-        );
+        this.log('report.txt', ` ${icon(vd)} DEBIT ${debit.id} ${vd} # not touched because currency is different`);
       }
       return fixed;
     }
 
     // Try to rewrite amounts on the credit
-    if (
-      !isFixed(credit) &&
-      this.rewriteCreditAmounts(credit) &&
-      this.verify(credit)
-    ) {
+    if (!isFixed(credit) && this.rewriteCreditAmounts(credit) && this.verify(credit)) {
       this.incr('recalculate net amount');
-      this.log(
-        'report.txt',
-        ` ${icon(true)} CREDIT ${type} ${
-          credit.id
-        } true # after recalculating amounts`,
-      );
+      this.log('report.txt', ` ${icon(true)} CREDIT ${type} ${credit.id} true # after recalculating amounts`);
       fixed.push(credit);
     }
 
     // Try to rewrite amounts on the debit
-    if (
-      !isFixed(debit) &&
-      this.rewriteDebitAmounts(credit, debit) &&
-      this.verify(debit)
-    ) {
+    if (!isFixed(debit) && this.rewriteDebitAmounts(credit, debit) && this.verify(debit)) {
       this.incr('recalculate net amount');
-      this.log(
-        'report.txt',
-        ` ${icon(true)} DEBIT ${type} ${
-          debit.id
-        } true # after recalculating amounts`,
-      );
+      this.log('report.txt', ` ${icon(true)} DEBIT ${type} ${debit.id} true # after recalculating amounts`);
       fixed.push(debit);
     }
 
@@ -495,21 +405,11 @@ export class Migration {
       const [vc, vd] = [this.verify(credit), this.verify(debit)];
       if (!vc) {
         this.incr('blacklisted');
-        this.log(
-          'report.txt',
-          ` ${icon(vc)} CREDIT ${
-            credit.id
-          } ${vc} # not touched because it's blacklisted`,
-        );
+        this.log('report.txt', ` ${icon(vc)} CREDIT ${credit.id} ${vc} # not touched because it's blacklisted`);
       }
       if (!vd) {
         this.incr('blacklisted');
-        this.log(
-          'report.txt',
-          ` ${icon(vd)} DEBIT ${
-            debit.id
-          } ${vd} # not touched because it's blacklisted`,
-        );
+        this.log('report.txt', ` ${icon(vd)} DEBIT ${debit.id} ${vd} # not touched because it's blacklisted`);
       }
     }
 
@@ -550,14 +450,9 @@ export class Migration {
     this.writeFileHeaders();
     let rowsChanged = 0;
     const allTransactions = await this.countValidTransactions();
-    const count = this.options.limit
-      ? Math.min(this.options.limit, allTransactions)
-      : allTransactions;
+    const count = this.options.limit ? Math.min(this.options.limit, allTransactions) : allTransactions;
 
-    this.log(
-      'report.txt',
-      `Ledger Fixer Report (dryRun: ${this.options.dryRun})`,
-    );
+    this.log('report.txt', `Ledger Fixer Report (dryRun: ${this.options.dryRun})`);
     this.log('report.txt', `Analyzing ${count} of ${allTransactions}\n`);
 
     while (this.offset < count) {
@@ -573,13 +468,8 @@ export class Migration {
         dbTransaction = await sequelize.transaction();
         for (let i = 0; i < transactions.length; i += 2) {
           /* Sanity check */
-          if (
-            transactions[i].TransactionGroup !==
-            transactions[i + 1].TransactionGroup
-          ) {
-            throw new Error(
-              `Cannot find pair for the transaction id ${transactions[i].id}`,
-            );
+          if (transactions[i].TransactionGroup !== transactions[i + 1].TransactionGroup) {
+            throw new Error(`Cannot find pair for the transaction id ${transactions[i].id}`);
           }
 
           /* Migrate the pair that we just found & log if migration fixed the row */
@@ -668,9 +558,7 @@ export class Migration {
     for (const k of Object.keys(fields)) {
       this.log(
         'changes.csv',
-        `${tr.id},${tr.type},${tr.TransactionGroup},${k},${
-          fields[k].oldValue
-        },${fields[k].newValue}`,
+        `${tr.id},${tr.type},${tr.TransactionGroup},${k},${fields[k].oldValue},${fields[k].newValue}`,
       );
     }
   };

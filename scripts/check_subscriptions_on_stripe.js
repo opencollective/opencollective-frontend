@@ -48,12 +48,7 @@ const getSubscriptionFromStripe = (order, options) => {
   //console.log(`Processing SubscriptionId: ${order.SubscriptionId}`);
   return order.collective
     .getHostStripeAccount()
-    .then(stripeAccount =>
-      retrieveSubscription(
-        stripeAccount,
-        order.Subscription.stripeSubscriptionId,
-      ),
-    )
+    .then(stripeAccount => retrieveSubscription(stripeAccount, order.Subscription.stripeSubscriptionId))
     .then(stripeSubscription => {
       // if reached here, means subscription found
       // Note: when we upgrade stripe API, this will fail. New API returns cancelled subscriptions as well
@@ -62,11 +57,9 @@ const getSubscriptionFromStripe = (order, options) => {
 
         const amountKey = stripeSubscription.plan.currency;
         if (amountKey in subStatus[stripeSubscription.status]) {
-          subStatus[stripeSubscription.status][amountKey] +=
-            stripeSubscription.plan.amount;
+          subStatus[stripeSubscription.status][amountKey] += stripeSubscription.plan.amount;
         } else {
-          subStatus[stripeSubscription.status][amountKey] =
-            stripeSubscription.plan.amount;
+          subStatus[stripeSubscription.status][amountKey] = stripeSubscription.plan.amount;
         }
       } else {
         subStatus[stripeSubscription.status] = { subCount: 0 };
@@ -133,19 +126,8 @@ const checkSubscriptions = options => {
         return orders;
       }
     })
-    .tap(orders =>
-      console.log(
-        'Total subscriptions to be processed (from -l arg): ',
-        orders.length,
-      ),
-    )
-    .then(orders =>
-      promiseSeq(
-        orders,
-        order => getSubscriptionFromStripe(order, options),
-        options.batchSize,
-      ),
-    )
+    .tap(orders => console.log('Total subscriptions to be processed (from -l arg): ', orders.length))
+    .then(orders => promiseSeq(orders, order => getSubscriptionFromStripe(order, options), options.batchSize))
     .then(() => done())
     .catch(done);
 };

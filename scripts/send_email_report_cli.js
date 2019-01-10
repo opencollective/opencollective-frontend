@@ -44,9 +44,7 @@ async function getConfig() {
   let res;
 
   try {
-    res = await execPromise(
-      'heroku config --app opencollective-prod-api | grep MAILGUN',
-    );
+    res = await execPromise('heroku config --app opencollective-prod-api | grep MAILGUN');
   } catch (e) {
     throw new Error(
       'Unable to fetch the config vars from heroku. Make sure you have the heroku client installed and that you have access to the production environmnent',
@@ -102,9 +100,7 @@ async function runReport(responses) {
 async function main({ argv }) {
   // console.log('hi', argv)
 
-  console.log(
-    'This utility generates one of the automatic email reports for users or hosts.',
-  );
+  console.log('This utility generates one of the automatic email reports for users or hosts.');
   console.log('Useful for resending a report or for testing.');
   console.log('');
   console.log(`PG_DATABASE=${PG_DATABASE}`);
@@ -121,8 +117,7 @@ async function main({ argv }) {
     {
       type: !process.env.SLUGS && 'list',
       name: 'slugs',
-      message:
-        'List of slugs of the collectives to process (leave empty to process all)',
+      message: 'List of slugs of the collectives to process (leave empty to process all)',
     },
     {
       type: !process.env.START_DATE && 'text',
@@ -140,8 +135,7 @@ async function main({ argv }) {
     {
       type: prev => (process.env.ONLY || prev ? 'text' : null),
       name: 'recipient',
-      message:
-        'Recipient email (leave empty to send to the default recipients)',
+      message: 'Recipient email (leave empty to send to the default recipients)',
       validate: val => !val || val.match(/.+@.+\..+/),
     },
   ];

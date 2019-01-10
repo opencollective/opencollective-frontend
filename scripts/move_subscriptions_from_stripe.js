@@ -30,13 +30,9 @@ function successLine(order, stripeStatus, nextChargeDate, nextPeriodStart) {
     interval: order.Subscription.interval,
     stripeStatus,
     nextChargeDate,
-    nextChargeDateHuman: nextChargeDate
-      ? moment(nextChargeDate * 1000).format()
-      : null,
+    nextChargeDateHuman: nextChargeDate ? moment(nextChargeDate * 1000).format() : null,
     nextPeriodStart,
-    nextPeriodStartHuman: nextPeriodStart
-      ? moment(nextPeriodStart * 1000).format()
-      : null,
+    nextPeriodStartHuman: nextPeriodStart ? moment(nextPeriodStart * 1000).format() : null,
     state: 'done',
     error: '',
   };
@@ -105,10 +101,7 @@ async function eachOrder(order, options) {
     return errorLine(order, 'getStripeHost', error);
   }
   try {
-    stripeSubscription = await stripeGateway.retrieveSubscription(
-      stripeAccount,
-      stripeSubscriptionId,
-    );
+    stripeSubscription = await stripeGateway.retrieveSubscription(stripeAccount, stripeSubscriptionId);
   } catch (error) {
     return errorLine(order, 'getStripeAccount', error);
   }
@@ -128,22 +121,14 @@ async function eachOrder(order, options) {
   // Then cancel the subscription on stripe if we're doing it for real
   if (!options.dryRun) {
     try {
-      await stripeGateway.cancelSubscription(
-        stripeAccount,
-        stripeSubscriptionId,
-      );
+      await stripeGateway.cancelSubscription(stripeAccount, stripeSubscriptionId);
     } catch (error) {
       return errorLine(order, 'cancelStripeSubscription', error);
     }
   }
 
   // All good, just save important info
-  return successLine(
-    order,
-    updates.status,
-    updates.nextChargeDate,
-    updates.nextPeriodStart,
-  );
+  return successLine(order, updates.status, updates.nextChargeDate, updates.nextPeriodStart);
 }
 
 /** Run the script with parameters read from the command line */
@@ -152,9 +137,7 @@ async function run(options) {
   const orders = options.limit ? allOrders.slice(0, options.limit) : allOrders;
   vprint(
     options,
-    `Migrating ${orders.length} subscriptions from a total of ${
-      allOrders.length
-    } (dryRun: ${options.dryRun})`,
+    `Migrating ${orders.length} subscriptions from a total of ${allOrders.length} (dryRun: ${options.dryRun})`,
   );
   const data = [];
   await promiseSeq(
@@ -165,9 +148,7 @@ async function run(options) {
       vprint(
         options,
         `orderId: ${line.orderId}, subId: ${line.localSubscriptionId} ` +
-          `stripeSubId: ${line.stripeSubscriptionId}, stripeStatus: ${
-            line.stripeStatus
-          } ` +
+          `stripeSubId: ${line.stripeSubscriptionId}, stripeStatus: ${line.stripeStatus} ` +
           `state: ${line.state}, error: ${line.error}.`,
       );
     },

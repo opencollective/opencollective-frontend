@@ -34,37 +34,23 @@ const processRow = row => {
   // If we already have a core contributor (member) registered to the notification, we don't add another person
   if (collectives[row.CollectiveId]) {
     console.error(
-      `Collective ${row.CollectiveId} has already userid ${
-        collectives[row.CollectiveId]
-      } subscribed to ${type}`,
+      `Collective ${row.CollectiveId} has already userid ${collectives[row.CollectiveId]} subscribed to ${type}`,
     );
     return;
   }
   collectives[row.CollectiveId] = row.UserId;
 
-  debug(
-    `Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${
-      row.CollectiveId
-    }`,
-  );
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
     CollectiveId: row.CollectiveId,
     type,
   })
     .then(notification =>
-      console.log(
-        `> UserId ${row.UserId} is now subscribed to ${type} of CollectiveId ${
-          row.CollectiveId
-        }`,
-      ),
+      console.log(`> UserId ${row.UserId} is now subscribed to ${type} of CollectiveId ${row.CollectiveId}`),
     )
     .catch(() =>
-      console.error(
-        `UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${
-          row.CollectiveId
-        }`,
-      ),
+      console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`),
     );
 };
 

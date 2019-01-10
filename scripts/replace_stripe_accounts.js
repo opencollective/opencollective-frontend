@@ -50,17 +50,13 @@ const done = err => {
 };
 
 const createConnectedAccount = hostname => {
-  return models.ConnectedAccount.create(testStripeAccounts[hostname]).catch(
-    e => {
-      // will fail if the host is not present
-      console.log(
-        `[warning] Unable to create a connected account for ${hostname}`,
-      );
-      if (process.env.DEBUG) {
-        console.error(e);
-      }
-    },
-  );
+  return models.ConnectedAccount.create(testStripeAccounts[hostname]).catch(e => {
+    // will fail if the host is not present
+    console.log(`[warning] Unable to create a connected account for ${hostname}`);
+    if (process.env.DEBUG) {
+      console.error(e);
+    }
+  });
 };
 
 models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true })

@@ -36,10 +36,8 @@ exec('make dropdb && make database')
     models.ConnectedAccount.create({
       provider: 'paypal',
       // Sandbox api keys
-      clientId:
-        'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
-      secret:
-        'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8',
+      clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8',
     }),
   )
   .then(connectedAccount => connectedAccount.setUser(data.user))
@@ -61,12 +59,8 @@ exec('make dropdb && make database')
   )
   .then(collective => collective.addUserWithRole(data.user, roles.HOST))
   .then(() => {
-    console.log(
-      'Please login on development with `user@opencollective.com` and `password` or ',
-    );
-    console.log(
-      'Please login on development with `stripeuser@opencollective.com` and `password`',
-    );
+    console.log('Please login on development with `user@opencollective.com` and `password` or ');
+    console.log('Please login on development with `stripeuser@opencollective.com` and `password`');
     console.log('Script successful');
     process.exit();
   })
