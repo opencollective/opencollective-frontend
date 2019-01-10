@@ -9,6 +9,8 @@ import { Box, Flex } from '@rebass/grid';
 
 import { Search } from 'styled-icons/octicons/Search.cjs';
 
+import { escapeInput } from '../lib/utils';
+
 import Avatar from './Avatar';
 import Container from './Container';
 import Logo from './Logo';
@@ -25,6 +27,9 @@ const SearchIcon = styled(Search)`
 
 const ContributeAsEntryContainer = styled(Container)`
   cursor: pointer;
+  &:hover {
+    background: ${themeGet('colors.black.50')};
+  }
 `;
 
 const enhance = compose(
@@ -129,7 +134,7 @@ const ContributeAs = enhance(
     ...fieldProps
   }) => {
     if (state.search) {
-      const test = new RegExp(state.search, 'i');
+      const test = new RegExp(escapeInput(state.search), 'i');
       profiles = profiles.filter(profile => profile.name.match(test));
     }
 
