@@ -81,7 +81,7 @@
     "node-fetch": "2.3.0",
     "node-slack": "0.0.7",
     "node-slug": "0.0.2",
-    "nodemailer": "5.0.1",
+    "nodemailer": "5.1.1",
     "p-queue": "3.0.0",
     "passport": "0.4.0",
     "passport-github": "1.1.0",
