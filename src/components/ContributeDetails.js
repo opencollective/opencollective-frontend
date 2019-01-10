@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose, withHandlers, withState } from 'recompose';
+import { compose, lifecycle, withHandlers, withState } from 'recompose';
 import moment from 'moment';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -15,16 +15,24 @@ import { P, Span } from './Text';
 import Currency from './Currency';
 
 const frequencyOptions = {
-  year: 'Yearly',
   month: 'Monthly',
+  year: 'Yearly',
 };
 
 const enhance = compose(
-  withState('state', 'setState', ({ amountOptions, showFrequency, totalAmount, interval }) => ({
-    amount: (totalAmount || amountOptions[0]) / 100,
-    totalAmount: totalAmount || amountOptions[0],
-    interval: showFrequency ? interval || Object.keys(frequencyOptions)[0] : undefined,
-  })),
+  withState('state', 'setState', ({ amountOptions, showFrequency, totalAmount, interval }) => {
+    const defaultAmount = totalAmount || amountOptions[Math.floor(amountOptions.length / 2)];
+    return {
+      amount: defaultAmount / 100,
+      totalAmount: defaultAmount,
+      interval: showFrequency ? interval || Object.keys(frequencyOptions)[0] : undefined,
+    };
+  }),
+  lifecycle({
+    componentDidMount() {
+      this.props.onChange(pick(this.props.state, ['totalAmount', 'interval']));
+    },
+  }),
   withHandlers({
     onChange: ({ state, setState, onChange }) => newState => {
       newState = { ...state, ...newState };
@@ -68,6 +76,7 @@ const ContributeDetails = enhance(({ amountOptions, currency, showFrequency, onC
             <StyledInput
               type="number"
               step="any"
+              min="0"
               {...fieldProps}
               value={state.amount}
               fontSize="Paragraph"
@@ -82,7 +91,7 @@ const ContributeDetails = enhance(({ amountOptions, currency, showFrequency, onC
       </Container>
     </Flex>
     {showFrequency && (
-      <Flex mt={3} alignItems="flex-end" width={0.5}>
+      <Flex mt={3} alignItems="flex-end" width={1}>
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
           htmlFor="interval"
