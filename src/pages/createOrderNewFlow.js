@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
@@ -10,7 +10,8 @@ import styled from 'styled-components';
 import { ErrorCircle } from 'styled-icons/boxicons-regular/ErrorCircle.cjs';
 
 import { Router } from '../server/pages';
-import { H2, P, Span } from '../components/Text';
+
+import { H2, H5, P, Span } from '../components/Text';
 import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -105,12 +106,10 @@ class CreateOrderPage extends React.Component {
 
     const tier = this.getTier();
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
-    const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
-    const defaultAmount = amountOptions[Math.floor(amountOptions.length / 2)];
     const initialDetails = {
       quantity: parseInt(props.quantity, 10) || 1,
       interval: ['month', 'year'].includes(interval) ? interval : null,
-      totalAmount: parseInt(props.totalAmount, 10) || defaultAmount,
+      totalAmount: parseInt(props.totalAmount, 10) || null,
     };
 
     this.state = {
@@ -364,7 +363,14 @@ class CreateOrderPage extends React.Component {
 
     if (step === 'contributeAs') {
       return (
-        <StyledInputField htmlFor="contributeAs" label="Contribute as:">
+        <StyledInputField
+          htmlFor="contributeAs"
+          label={
+            <H5 textAlign="left" mb={3}>
+              <FormattedMessage id="contribute.profile.label" defaultMessage="Contribute As:" />
+            </H5>
+          }
+        >
           {fieldProps => (
             <ContributeAs
               {...fieldProps}
@@ -378,17 +384,26 @@ class CreateOrderPage extends React.Component {
       );
     } else if (step === 'details') {
       return (
-        <ContributeDetails
-          amountOptions={amountOptions}
-          currency={(tier && tier.currency) || data.Collective.currency}
-          onChange={data => this.setState({ stepDetails: data })}
-          showFrequency={Boolean(TierId) || undefined}
-          interval={get(this.state, 'stepDetails.interval')}
-          totalAmount={get(this.state, 'stepDetails.totalAmount')}
-        />
+        <Fragment>
+          <H5 textAlign="left" mb={3}>
+            <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
+          </H5>
+          <ContributeDetails
+            amountOptions={amountOptions}
+            currency={(tier && tier.currency) || data.Collective.currency}
+            onChange={data => this.setState({ stepDetails: data })}
+            showFrequency={Boolean(TierId) || undefined}
+            interval={get(this.state, 'stepDetails.interval')}
+            totalAmount={get(this.state, 'stepDetails.totalAmount')}
+          />
+        </Fragment>
       );
     } else if (step === 'payment') {
       return (
+        <Fragment>
+          <H5 textAlign="left" mb={3}>
+            <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
+          </H5>
         <ContributePayment
           onChange={stepPayment => this.setState({ stepPayment })}
           paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
@@ -396,6 +411,7 @@ class CreateOrderPage extends React.Component {
           defaultValue={this.state.stepPayment}
           onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
         />
+        </Fragment>
       );
     }
 
@@ -518,7 +534,7 @@ class CreateOrderPage extends React.Component {
     const step = this.props.step || 'contributeAs';
     return (
       <Flex flexDirection="column" alignItems="center" mx={3}>
-        <Box>{this.renderStep(step)}</Box>
+        <Box width={1}>{this.renderStep(step)}</Box>
         <Flex mt={5}>
           {this.renderPrevStepButton(step)}
           {this.renderNextStepButton(step)}
