@@ -36,6 +36,7 @@ Support: support@opencollective.com
 ## Talks
 Subscribe to our [Talks Playlist on YouTube](https://www.youtube.com/playlist?list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw)
 
+- [Collaborating with Money](https://www.youtube.com/watch?v=kZleX383-VQ), Alanna Irving, New Frontiers, New Zealand November 2018
 - [Transparent by Design](https://www.youtube.com/watch?v=yrXO6c6Q7wU&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw&index=4&t=0s), Pia Mancini, Monki Gras, London 2018
 - [From the democracy of our voices, to the democracy of our actions](https://www.youtube.com/watch?v=9Lx2Dk4VaUA&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw&index=6) - Xavier Damman, Crowdsourcing Week, Luleå (Sweden) March 2018
 - [Cities as Open Collectives](https://www.youtube.com/watch?v=S74uMkmNdh0&index=1&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw) - Pia Mancini, OuiShare Fest, Paris 2017
