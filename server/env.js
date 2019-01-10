@@ -25,8 +25,3 @@ const pgUrlEnvironmentVariable = get(process.env, 'PG_URL_ENVIRONMENT_VARIABLE',
 if (has(process.env, pgUrlEnvironmentVariable) && !has(process.env, 'PG_URL')) {
   process.env.PG_URL = get(process.env, pgUrlEnvironmentVariable);
 }
-
-// Only load newrelic when we explicitly want it
-if (process.env.NEW_RELIC_LICENSE_KEY) {
-  require('newrelic');
-}
