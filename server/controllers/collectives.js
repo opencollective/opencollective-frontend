@@ -229,7 +229,7 @@ export const create = (req, res, next) => {
     })
     .tap(() => {
       // find Host
-      return models.Collective.findById(collectiveData.hostId || collectiveData.HostCollectiveId).then(h => {
+      return models.Collective.findByPk(collectiveData.hostId || collectiveData.HostCollectiveId).then(h => {
         if (!h) {
           throw new Error('Host not found: ', collectiveData.hostId);
         }
@@ -291,7 +291,7 @@ export const createFromGithub = (req, res, next) => {
     .then(ca => {
       debug('connected account found', ca && ca.username);
       creatorCollective = ca.collective;
-      return models.User.findById(creatorCollective.CreatedByUserId);
+      return models.User.findByPk(creatorCollective.CreatedByUserId);
     })
     .then(user => {
       creatorUser = user;
@@ -334,7 +334,7 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => debug('createdCollective', g && g.dataValues))
     .tap(g => (createdCollective = g))
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
-    .then(() => models.Collective.findById(defaultHostCollective('opensource').CollectiveId))
+    .then(() => models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId))
     .tap(hostCollective => createdCollective.addHost(hostCollective, creatorUser))
     .tap(host =>
       Activity.create({

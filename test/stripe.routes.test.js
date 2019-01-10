@@ -193,7 +193,7 @@ describe('stripe.routes.test.js', () => {
           checkHost: [
             'checkStripeAccount',
             (cb, results) => {
-              return models.Collective.findById(results.checkStripeAccount.CollectiveId)
+              return models.Collective.findByPk(results.checkStripeAccount.CollectiveId)
                 .then(collective => {
                   expect(collective.id).to.be.equal(collective.id);
                   expect(collective.currency).to.equal('EUR');

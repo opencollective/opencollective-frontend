@@ -55,13 +55,13 @@ async function refundTransaction(transaction) {
 
     // if the order has a subscription, mark it with isActive as false and deactivedAt now.
     if (order.SubscriptionId) {
-      const subscription = await models.Subscription.findById(order.SubscriptionId);
+      const subscription = await models.Subscription.findByPk(order.SubscriptionId);
       subscription.isActive = false;
       subscription.deactivatedAt = new Date();
       await subscription.save();
     }
   }
-  return models.Transaction.findById(transaction.id);
+  return models.Transaction.findByPk(transaction.id);
 }
 
 async function run() {

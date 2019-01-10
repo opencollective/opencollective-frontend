@@ -208,7 +208,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     let tier;
     if (order.tier) {
-      tier = await models.Tier.findById(order.tier.id);
+      tier = await models.Tier.findByPk(order.tier.id);
 
       if (!tier) {
         throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${order.collective.slug}`);
@@ -412,7 +412,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       });
     }
 
-    order = await models.Order.findById(orderCreated.id);
+    order = await models.Order.findByPk(orderCreated.id);
 
     // If there was a referral for this order, we add it as a FUNDRAISER role
     if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
@@ -640,7 +640,7 @@ export async function updateSubscription(remoteUser, args) {
 
 export async function refundTransaction(_, args, req) {
   // 0. Retrieve transaction from database
-  const transaction = await models.Transaction.findById(args.id, {
+  const transaction = await models.Transaction.findByPk(args.id, {
     include: [models.Order, models.PaymentMethod],
   });
   if (!transaction) {
@@ -682,8 +682,8 @@ export async function refundTransaction(_, args, req) {
 export async function addFundsToOrg(args, remoteUser) {
   if (!remoteUser.isRoot()) throw new Error('Only site admins can perform this operation');
   const [fromCollective, hostCollective] = await Promise.all([
-    models.Collective.findById(args.CollectiveId),
-    models.Collective.findById(args.HostCollectiveId),
+    models.Collective.findByPk(args.CollectiveId),
+    models.Collective.findByPk(args.HostCollectiveId),
   ]);
   // creates a new Payment method
   const paymentMethod = await models.PaymentMethod.create({
@@ -712,7 +712,7 @@ export async function markOrderAsPaid(remoteUser, id) {
   }
 
   // fetch the order
-  const order = await models.Order.findById(id);
+  const order = await models.Order.findByPk(id);
   if (!order) {
     throw new errors.NotFound({ message: 'Order not found' });
   }

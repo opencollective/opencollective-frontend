@@ -161,15 +161,15 @@ const TransactionFields = () => {
         let HostCollectiveId = transaction.HostCollectiveId;
         // if the transaction is from the perspective of the fromCollective
         if (!HostCollectiveId) {
-          const fromCollective = await models.Collective.findById(FromCollectiveId);
+          const fromCollective = await models.Collective.findByPk(FromCollectiveId);
           HostCollectiveId = await fromCollective.getHostCollectiveId();
           // if fromCollective has no host, we try the collective
           if (!HostCollectiveId) {
-            const collective = await models.Collective.findById(CollectiveId);
+            const collective = await models.Collective.findByPk(CollectiveId);
             HostCollectiveId = await collective.getHostCollectiveId();
           }
         }
-        return models.Collective.findById(HostCollectiveId);
+        return models.Collective.findByPk(HostCollectiveId);
       },
     },
     createdByUser: {
@@ -192,7 +192,7 @@ const TransactionFields = () => {
           return transaction.getFromCollective();
         }
         if (get(transaction, 'fromCollective.id')) {
-          return models.Collective.findById(get(transaction, 'fromCollective.id'));
+          return models.Collective.findByPk(get(transaction, 'fromCollective.id'));
         }
         return null;
       },
@@ -206,7 +206,7 @@ const TransactionFields = () => {
           return transaction.getVirtualCardEmitterCollective();
         }
         if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
-          return models.Collective.findById(transaction.UsingVirtualCardFromCollectiveId);
+          return models.Collective.findByPk(transaction.UsingVirtualCardFromCollectiveId);
         }
         return null;
       },
@@ -220,7 +220,7 @@ const TransactionFields = () => {
           return transaction.getCollective();
         }
         if (get(transaction, 'collective.id')) {
-          return models.Collective.findById(get(transaction, 'collective.id'));
+          return models.Collective.findByPk(get(transaction, 'collective.id'));
         }
         return null;
       },

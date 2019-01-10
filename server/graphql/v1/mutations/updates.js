@@ -29,7 +29,7 @@ export async function createUpdate(_, args, req) {
 }
 
 async function fetchUpdate(id) {
-  const update = await models.Update.findById(id);
+  const update = await models.Update.findByPk(id);
   if (!update) throw new errors.NotFound({ message: `Update with id ${id} not found` });
   return update;
 }

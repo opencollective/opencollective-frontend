@@ -262,7 +262,7 @@ describe('graphql.updates.test', () => {
       });
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal('You must be logged in to delete this update');
-      return models.Update.findById(update1.id).then(updateFound => {
+      return models.Update.findByPk(update1.id).then(updateFound => {
         expect(updateFound).to.not.be.null;
       });
     });
@@ -271,7 +271,7 @@ describe('graphql.updates.test', () => {
       const result = await utils.graphqlQuery(deleteUpdateQuery, { id: update1.id }, user2);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal("You don't have sufficient permissions to delete this update");
-      return models.Update.findById(update1.id).then(updateFound => {
+      return models.Update.findByPk(update1.id).then(updateFound => {
         expect(updateFound).to.not.be.null;
       });
     });
@@ -280,7 +280,7 @@ describe('graphql.updates.test', () => {
       const res = await utils.graphqlQuery(deleteUpdateQuery, { id: update1.id }, user1);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
-      return models.Update.findById(update1.id).then(updateFound => {
+      return models.Update.findByPk(update1.id).then(updateFound => {
         expect(updateFound).to.be.null;
       });
     });

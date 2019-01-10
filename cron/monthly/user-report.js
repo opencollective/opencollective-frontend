@@ -107,7 +107,7 @@ const init = async () => {
 };
 
 const processBacker = async FromCollectiveId => {
-  const backerCollective = await models.Collective.findById(FromCollectiveId);
+  const backerCollective = await models.Collective.findByPk(FromCollectiveId);
   console.log('>>> Processing backer', backerCollective.slug);
   const query = {
     attributes: ['CollectiveId', 'HostCollectiveId'],
@@ -156,7 +156,7 @@ const processBacker = async FromCollectiveId => {
   if (get(backerCollective, 'settings.sendInvoiceByEmail')) {
     const distinctHostCollectiveIds = uniq(distinctTransactions.map(t => t.dataValues.HostCollectiveId));
     const hosts = await Promise.map(distinctHostCollectiveIds, HostCollectiveId =>
-      models.Collective.findById(HostCollectiveId, {
+      models.Collective.findByPk(HostCollectiveId, {
         attributes: ['id', 'slug'],
       }),
     );
@@ -301,7 +301,7 @@ const collectivesData = {};
 const processCollective = async CollectiveId => {
   if (collectivesData[CollectiveId]) return collectivesData[CollectiveId];
 
-  const collective = await models.Collective.findById(CollectiveId);
+  const collective = await models.Collective.findByPk(CollectiveId);
   const promises = [
     collective.getBackersStats(startDate, endDate),
     collective.getBalance(endDate),

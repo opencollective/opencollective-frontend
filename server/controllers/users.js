@@ -182,7 +182,7 @@ export const show = (req, res, next) => {
 
   if (req.remoteUser && req.remoteUser.id === req.user.id) {
     Promise.all([
-      models.Collective.findById(req.user.CollectiveId),
+      models.Collective.findByPk(req.user.CollectiveId),
       models.ConnectedAccount.findOne({
         where: { service: 'stripe', CollectiveId: req.remoteUser.CollectiveId },
       }),

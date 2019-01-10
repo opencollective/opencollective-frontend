@@ -219,7 +219,7 @@ describe('graphql.matchingFund.test.js', () => {
     expect(subscriptions.length).to.equal(1);
     expect(subscriptions[0].interval).to.equal('month');
     expect(subscriptions[0].amount).to.equal(order.totalAmount);
-    const dbOrder = await models.Order.findById(orderCreated.id);
+    const dbOrder = await models.Order.findByPk(orderCreated.id);
     expect(dbOrder.SubscriptionId).to.equal(subscriptions[0].id);
     const matchingTransaction = await models.Transaction.findOne({
       where: {

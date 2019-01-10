@@ -268,7 +268,7 @@ describe('opencollective.virtualcard', () => {
         // and collective id of "original" virtual card should be different than the one returned
         expect(virtualCardPaymentMethod.CollectiveId).not.to.be.equal(paymentMethod.CollectiveId);
         // then find collective of created user
-        const userCollective = await models.Collective.findById(paymentMethod.CollectiveId);
+        const userCollective = await models.Collective.findByPk(paymentMethod.CollectiveId);
         // then find the user
         const user = await models.User.findOne({
           where: {
@@ -364,8 +364,8 @@ describe('opencollective.virtualcard', () => {
             code: virtualCardPaymentMethod.uuid.substring(0, 8),
           })
           .then(async pm => {
-            virtualCardPaymentMethod = await models.PaymentMethod.findById(pm.id);
-            userCollective = await models.Collective.findById(virtualCardPaymentMethod.CollectiveId);
+            virtualCardPaymentMethod = await models.PaymentMethod.findByPk(pm.id);
+            userCollective = await models.Collective.findByPk(virtualCardPaymentMethod.CollectiveId);
             user = await models.User.findOne({
               where: {
                 CollectiveId: userCollective.id,
@@ -586,7 +586,7 @@ describe('opencollective.virtualcard', () => {
         gqlResult.errors && console.error(gqlResult.errors[0]);
         expect(gqlResult.errors).to.be.undefined;
 
-        const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.createPaymentMethod.id);
+        const paymentMethod = await models.PaymentMethod.findByPk(gqlResult.data.createPaymentMethod.id);
         expect(paymentMethod).to.exist;
         expect(paymentMethod.limitedToTags).to.contain('open source');
         expect(paymentMethod.CreatedByUserId).to.be.equal(user1.id);
@@ -740,7 +740,7 @@ describe('opencollective.virtualcard', () => {
         gqlResult.errors && console.error(gqlResult.errors[0]);
         expect(gqlResult.errors).to.be.undefined;
 
-        const paymentMethod = await models.PaymentMethod.findById(gqlResult.data.claimPaymentMethod.id);
+        const paymentMethod = await models.PaymentMethod.findByPk(gqlResult.data.claimPaymentMethod.id);
 
         // payment method should exist
         expect(paymentMethod).to.exist;
@@ -749,7 +749,7 @@ describe('opencollective.virtualcard', () => {
         // and collective id of "original" virtual card should be different than the one returned
         expect(virtualCardPaymentMethod.CollectiveId).not.to.be.equal(paymentMethod.CollectiveId);
         // then find collective of created user
-        const userCollective = await models.Collective.findById(paymentMethod.CollectiveId);
+        const userCollective = await models.Collective.findByPk(paymentMethod.CollectiveId);
         // then find the user
         const user = await models.User.findOne({
           where: {
@@ -869,8 +869,8 @@ describe('opencollective.virtualcard', () => {
             code: virtualCardPaymentMethod.uuid.substring(0, 8),
           })
           .then(async pm => {
-            virtualCardPaymentMethod = await models.PaymentMethod.findById(pm.id);
-            userVirtualCardCollective = await models.Collective.findById(virtualCardPaymentMethod.CollectiveId);
+            virtualCardPaymentMethod = await models.PaymentMethod.findByPk(pm.id);
+            userVirtualCardCollective = await models.Collective.findByPk(virtualCardPaymentMethod.CollectiveId);
             userVirtualCard = await models.User.findOne({
               where: {
                 CollectiveId: userVirtualCardCollective.id,

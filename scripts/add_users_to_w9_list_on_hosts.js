@@ -19,7 +19,7 @@ const done = err => {
 // look for a host data given an array of userIds that were supposed to be in
 // both data.W9.requestSentToUserIds and data.W9.receivedFromUserIds
 async function checkAndInsertUserIntoHostList(hostId, userIds) {
-  const host = await models.Collective.findById(hostId);
+  const host = await models.Collective.findByPk(hostId);
   const requestSentToUserIds = get(host, 'data.W9.requestSentToUserIds', []);
   const receivedFromUserIds = get(host, 'data.W9.receivedFromUserIds', []);
   for (let i = 0; i < userIds.length; i++) {
@@ -40,7 +40,7 @@ function run() {
     .query(
       `
   select host.id as "HostId", u.id as "UserId" from "Comments" c -- distinct(col."CreatedByUserId")
-    left join "Expenses" e on c."ExpenseId"=e.id 
+    left join "Expenses" e on c."ExpenseId"=e.id
     left join "Users" u on e."UserId"=u.id
     left join "Collectives" col on c."CollectiveId"=col.id
     left join "Collectives" host on col."HostCollectiveId"=host.id

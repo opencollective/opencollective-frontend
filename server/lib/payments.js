@@ -248,7 +248,7 @@ export const addBackerToCollective = async (user, collective, TierId) => {
 };
 
 export const processMatchingFund = async (order, options) => {
-  const matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
+  const matchingFundCollective = await models.Collective.findByPk(order.matchingFund.CollectiveId);
   // if there is a matching fund, we execute the order
   // also adds the owner of the matching fund as a BACKER of collective
   const matchingOrder = {
@@ -417,7 +417,7 @@ const sendOrderConfirmedEmail = async order => {
 
     let matchingFundCollective;
     if (order.matchingFund) {
-      matchingFundCollective = await models.Collective.findById(order.matchingFund.CollectiveId);
+      matchingFundCollective = await models.Collective.findByPk(order.matchingFund.CollectiveId);
       data.matchingFund = {
         collective: pick(matchingFundCollective, ['slug', 'name', 'image']),
         matching: order.matchingFund.matching,

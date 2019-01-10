@@ -675,13 +675,13 @@ const CollectiveFields = () => {
     createdByUser: {
       type: UserType,
       resolve(collective) {
-        return models.User.findById(collective.CreatedByUserId);
+        return models.User.findByPk(collective.CreatedByUserId);
       },
     },
     parentCollective: {
       type: CollectiveInterfaceType,
       resolve(collective) {
-        return models.Collective.findById(collective.ParentCollectiveId);
+        return models.Collective.findByPk(collective.ParentCollectiveId);
       },
     },
     type: {

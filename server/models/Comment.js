@@ -192,7 +192,7 @@ export default function(Sequelize, DataTypes) {
 
   // Returns the User model of the User that created this Update
   Comment.prototype.getUser = function() {
-    return models.User.findById(this.CreatedByUserId);
+    return models.User.findByPk(this.CreatedByUserId);
   };
 
   Comment.createMany = (comments, defaultValues) => {

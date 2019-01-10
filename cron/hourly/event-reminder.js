@@ -79,7 +79,7 @@ function processEvent(event, template) {
       const user = await models.User.findOne({
         where: { CollectiveId: get(order, 'fromCollective.id') },
       });
-      const fromCollective = await models.Collective.findById(get(order, 'fromCollective.id'));
+      const fromCollective = await models.Collective.findByPk(get(order, 'fromCollective.id'));
       event.path = await event.getUrlPath();
       const recipient = user.email;
       const data = {

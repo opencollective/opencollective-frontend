@@ -553,7 +553,7 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getParentCollective = function() {
     if (!this.ParentCollectiveId) return Promise.resolve(null);
     if (this.parentCollective) return Promise.resolve(this.parentCollective);
-    return models.Collective.findById(this.ParentCollectiveId);
+    return models.Collective.findByPk(this.ParentCollectiveId);
   };
 
   Collective.prototype.getICS = function() {
@@ -677,7 +677,7 @@ export default function(Sequelize, DataTypes) {
   // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
   Collective.prototype.getUrlPath = function() {
     if (this.type === types.EVENT) {
-      return models.Collective.findById(this.ParentCollectiveId, {
+      return models.Collective.findByPk(this.ParentCollectiveId, {
         attributes: ['id', 'slug'],
       }).then(parent => {
         return `/${parent.slug}/events/${this.slug}`;
@@ -692,7 +692,7 @@ export default function(Sequelize, DataTypes) {
     switch (this.type) {
       case types.USER:
       case types.ORGANIZATION:
-        return models.User.findById(this.CreatedByUserId);
+        return models.User.findByPk(this.CreatedByUserId);
       default:
         return Promise.resolve(null);
     }
@@ -1087,14 +1087,14 @@ export default function(Sequelize, DataTypes) {
     debug('addUserWithRole', user.id, role, 'member', member);
     return Promise.all([
       models.Member.create(member, sequelizeParams),
-      models.User.findById(
+      models.User.findByPk(
         member.CreatedByUserId,
         {
           include: [{ model: models.Collective, as: 'collective' }],
         },
         sequelizeParams,
       ),
-      models.User.findById(
+      models.User.findByPk(
         user.id,
         {
           include: [{ model: models.Collective, as: 'collective' }],
@@ -1111,7 +1111,7 @@ export default function(Sequelize, DataTypes) {
         case roles.ATTENDEE:
         case roles.FOLLOWER:
           return Promise.props({
-            memberCollective: models.Collective.findById(member.MemberCollectiveId, sequelizeParams),
+            memberCollective: models.Collective.findByPk(member.MemberCollectiveId, sequelizeParams),
             order: models.Order.findOne(
               {
                 where: {
@@ -1333,7 +1333,7 @@ export default function(Sequelize, DataTypes) {
     this.HostCollectiveId = null;
     this.isActive = false; // we should rename isActive to isApproved (by the host)
     if (newHostCollectiveId) {
-      const newHostCollective = await models.Collective.findById(newHostCollectiveId);
+      const newHostCollective = await models.Collective.findByPk(newHostCollectiveId);
       if (!newHostCollective) {
         throw new Error('Host not found');
       }
@@ -1837,7 +1837,7 @@ export default function(Sequelize, DataTypes) {
   // get the host of the parent collective if any, or of this collective
   Collective.prototype.getHostCollective = function() {
     if (this.HostCollectiveId) {
-      return models.Collective.findById(this.HostCollectiveId);
+      return models.Collective.findByPk(this.HostCollectiveId);
     }
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],

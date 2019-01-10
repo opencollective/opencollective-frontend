@@ -55,7 +55,7 @@ const queries = {
       if (args.slug) {
         collective = models.Collective.findBySlug(args.slug.toLowerCase());
       } else if (args.id) {
-        collective = models.Collective.findById(args.id);
+        collective = models.Collective.findByPk(args.id);
       } else {
         return new Error('Please provide a slug or an id');
       }
@@ -72,7 +72,7 @@ const queries = {
       id: { type: new GraphQLNonNull(GraphQLInt) },
     },
     resolve(_, args) {
-      return models.Tier.findById(args.id);
+      return models.Tier.findByPk(args.id);
     },
   },
 
@@ -100,7 +100,7 @@ const queries = {
   AuthenticatedUser: {
     type: CollectiveInterfaceType,
     resolve(_, args, req) {
-      return models.Collective.findById(req.remoteUser.CollectiveId);
+      return models.Collective.findByPk(req.remoteUser.CollectiveId);
     },
   },
 
@@ -137,7 +137,7 @@ const queries = {
         const HostCollectiveId = transaction.HostCollectiveId;
         hostsById[HostCollectiveId] =
           hostsById[HostCollectiveId] ||
-          (await models.Collective.findById(HostCollectiveId, {
+          (await models.Collective.findByPk(HostCollectiveId, {
             attributes: ['id', 'slug'],
           }));
         const createdAt = new Date(transaction.createdAt);
@@ -425,7 +425,7 @@ const queries = {
     },
     async resolve(_, args) {
       if (args.id) {
-        return models.Update.findById(args.id);
+        return models.Update.findByPk(args.id);
       }
       const CollectiveId = await fetchCollectiveId(args.collectiveSlug);
       return models.Update.findOne({
@@ -441,7 +441,7 @@ const queries = {
     },
     async resolve(_, args) {
       if (args.id) {
-        return models.Application.findById(args.id);
+        return models.Application.findByPk(args.id);
       } else {
         return new Error('Please provide an id.');
       }
@@ -699,7 +699,7 @@ const queries = {
       id: { type: new GraphQLNonNull(GraphQLInt) },
     },
     resolve(_, args) {
-      return models.Expense.findById(args.id);
+      return models.Expense.findByPk(args.id);
     },
   },
 
@@ -1120,7 +1120,7 @@ const queries = {
     },
     resolve(_, args) {
       if (args.id) {
-        return models.PaymentMethod.findById(args.id);
+        return models.PaymentMethod.findByPk(args.id);
       } else if (args.code) {
         return models.PaymentMethod.findOne({
           where: sequelize.and(
@@ -1254,7 +1254,7 @@ const queries = {
       },
     },
     resolve: async (_, args) => {
-      const order = await models.Order.findById(args.id);
+      const order = await models.Order.findByPk(args.id);
       return order;
     },
   },

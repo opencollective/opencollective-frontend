@@ -29,7 +29,7 @@ export async function createApplication(_, args, req) {
 }
 
 export async function updateApplication(_, args, req) {
-  const app = await Application.findById(args.id);
+  const app = await Application.findByPk(args.id);
   if (!app) {
     throw new errors.NotFound({
       message: `Application with id ${args.id} not found`,
@@ -46,7 +46,7 @@ export async function updateApplication(_, args, req) {
 }
 
 export async function deleteApplication(_, args, req) {
-  const app = await Application.findById(args.id);
+  const app = await Application.findByPk(args.id);
   if (!app) {
     throw new errors.NotFound({
       message: `Application with id ${args.id} not found`,

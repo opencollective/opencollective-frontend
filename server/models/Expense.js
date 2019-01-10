@@ -177,8 +177,8 @@ export default function(Sequelize, DataTypes) {
    * Instance Methods
    */
   Expense.prototype.createActivity = async function(type) {
-    const user = this.user || (await models.User.findById(this.UserId));
-    const userCollective = await models.Collective.findById(user.CollectiveId);
+    const user = this.user || (await models.User.findByPk(this.UserId));
+    const userCollective = await models.Collective.findByPk(user.CollectiveId);
     if (!this.collective) {
       this.collective = await this.getCollective();
     }

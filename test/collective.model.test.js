@@ -323,7 +323,7 @@ describe('Collective model', () => {
       website: 'https://opencollective.com',
     }).then(collective => {
       expect(collective.image).to.equal('https://logo.clearbit.com/opencollective.com');
-      models.Collective.findById(collective.id).then(c => {
+      models.Collective.findByPk(collective.id).then(c => {
         expect(c.image).to.equal('https://logo.clearbit.com/opencollective.com');
         done();
       });
@@ -352,7 +352,7 @@ describe('Collective model', () => {
     }).then(user => {
       expect(user.collective.image).to.equal(undefined);
       setTimeout(() => {
-        models.Collective.findById(user.collective.id).then(c => {
+        models.Collective.findByPk(user.collective.id).then(c => {
           expect(c.image).to.equal('https://www.gravatar.com/avatar/a97d0fcd96579015da610aa284f8d8df?default=404');
           done();
         });

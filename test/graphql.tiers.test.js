@@ -237,7 +237,7 @@ describe('graphql.tiers.test', () => {
             CollectiveId: collective1.id,
           },
         });
-        // const subscription = await models.Subscription.findById(orders[0].SubscriptionId);
+        // const subscription = await models.Subscription.findByPk(orders[0].SubscriptionId);
         const transactions = await models.Transaction.findAll({
           where: {
             FromCollectiveId: user1.CollectiveId,

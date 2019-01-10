@@ -211,7 +211,7 @@ export default function(Sequelize, DataTypes) {
   Update.prototype.edit = async function(remoteUser, newUpdateData) {
     mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'edit this update');
     if (newUpdateData.TierId) {
-      const tier = await models.Tier.findById(newUpdateData.TierId);
+      const tier = await models.Tier.findByPk(newUpdateData.TierId);
       if (!tier) {
         throw new errors.ValidationFailed({ message: 'Tier not found' });
       }
@@ -233,7 +233,7 @@ export default function(Sequelize, DataTypes) {
   Update.prototype.publish = async function(remoteUser) {
     mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'publish this update');
     this.publishedAt = new Date();
-    this.collective = this.collective || (await models.Collective.findById(this.CollectiveId));
+    this.collective = this.collective || (await models.Collective.findByPk(this.CollectiveId));
     models.Activity.create({
       type: activities.COLLECTIVE_UPDATE_PUBLISHED,
       UserId: remoteUser.id,
@@ -261,7 +261,7 @@ export default function(Sequelize, DataTypes) {
 
   // Returns the User model of the User that created this Update
   Update.prototype.getUser = function() {
-    return models.User.findById(this.CreatedByUserId);
+    return models.User.findByPk(this.CreatedByUserId);
   };
 
   /*

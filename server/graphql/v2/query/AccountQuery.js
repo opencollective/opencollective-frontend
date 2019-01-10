@@ -27,7 +27,7 @@ const AccountQuery = {
       collective = await models.Collective.findBySlug(slug);
     } else if (args.id) {
       const id = idDecode(args.id, 'account');
-      collective = await models.Collective.findById(id);
+      collective = await models.Collective.findByPk(id);
     } else {
       return new Error('Please provide a slug or an id');
     }

@@ -192,7 +192,7 @@ describe('graphql.comments.test', () => {
       });
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal('You must be logged in to delete this comment');
-      return models.Comment.findById(comment1.id).then(commentFound => {
+      return models.Comment.findByPk(comment1.id).then(commentFound => {
         expect(commentFound).to.not.be.null;
       });
     });
@@ -203,7 +203,7 @@ describe('graphql.comments.test', () => {
       expect(result.errors[0].message).to.equal(
         'You need to be logged in as a core contributor or as a host to delete this comment',
       );
-      return models.Comment.findById(comment1.id).then(commentFound => {
+      return models.Comment.findByPk(comment1.id).then(commentFound => {
         expect(commentFound).to.not.be.null;
       });
     });
@@ -212,7 +212,7 @@ describe('graphql.comments.test', () => {
       const res = await utils.graphqlQuery(deleteCommentQuery, { id: comment1.id }, collectiveAdmin);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
-      return models.Comment.findById(comment1.id).then(commentFound => {
+      return models.Comment.findByPk(comment1.id).then(commentFound => {
         expect(commentFound).to.be.null;
       });
     });

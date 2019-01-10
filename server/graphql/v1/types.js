@@ -528,7 +528,7 @@ export const ExpenseType = new GraphQLObjectType({
                 } -- has the user been deleted?`,
               );
             }
-            return models.Collective.findById(u.CollectiveId);
+            return models.Collective.findByPk(u.CollectiveId);
           });
         },
       },
@@ -796,13 +796,13 @@ export const CommentType = new GraphQLObjectType({
       expense: {
         type: ExpenseType,
         resolve(comment) {
-          return models.Expense.findById(comment.ExpenseId);
+          return models.Expense.findByPk(comment.ExpenseId);
         },
       },
       update: {
         type: UpdateType,
         resolve(comment) {
-          return models.Update.findById(comment.UpdateId);
+          return models.Update.findByPk(comment.UpdateId);
         },
       },
     };
@@ -1413,7 +1413,7 @@ export const PaymentMethodType = new GraphQLObjectType({
         async resolve(paymentMethod, args, req) {
           // TODO: could we have a getter for SourcePaymentMethod?
           if (paymentMethod.SourcePaymentMethodId) {
-            const sourcePaymentMethod = await models.PaymentMethod.findById(paymentMethod.SourcePaymentMethodId);
+            const sourcePaymentMethod = await models.PaymentMethod.findByPk(paymentMethod.SourcePaymentMethodId);
             if (sourcePaymentMethod) {
               return req.loaders.collective.findById.load(sourcePaymentMethod.CollectiveId);
             }

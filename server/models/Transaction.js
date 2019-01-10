@@ -221,12 +221,12 @@ export default (Sequelize, DataTypes) => {
    * Instance Methods
    */
   Transaction.prototype.getUser = function() {
-    return models.User.findById(this.CreatedByUserId);
+    return models.User.findByPk(this.CreatedByUserId);
   };
 
   Transaction.prototype.getVirtualCardEmitterCollective = function() {
     if (this.UsingVirtualCardFromCollectiveId) {
-      return models.Collective.findById(this.UsingVirtualCardFromCollectiveId);
+      return models.Collective.findByPk(this.UsingVirtualCardFromCollectiveId);
     }
   };
 
@@ -234,10 +234,10 @@ export default (Sequelize, DataTypes) => {
     let HostCollectiveId = this.HostCollectiveId;
     // if the transaction is from the perspective of the fromCollective
     if (!HostCollectiveId) {
-      const fromCollective = await models.Collective.findById(this.FromCollectiveId);
+      const fromCollective = await models.Collective.findByPk(this.FromCollectiveId);
       HostCollectiveId = await fromCollective.getHostCollectiveId();
     }
-    return models.Collective.findById(HostCollectiveId);
+    return models.Collective.findByPk(HostCollectiveId);
   };
 
   Transaction.prototype.getExpenseForViewer = function(viewer) {
@@ -279,7 +279,7 @@ export default (Sequelize, DataTypes) => {
 
   Transaction.prototype.getRefundTransaction = function() {
     if (!this.RefundTransactionId) return null;
-    return Transaction.findById(this.RefundTransactionId);
+    return Transaction.findByPk(this.RefundTransactionId);
   };
 
   /**
@@ -434,7 +434,7 @@ export default (Sequelize, DataTypes) => {
       return Promise.reject(new Error('transaction.amount cannot be null or zero'));
     }
 
-    return models.Collective.findById(CollectiveId)
+    return models.Collective.findByPk(CollectiveId)
       .then(c => c.getHostCollectiveId())
       .then(HostCollectiveId => {
         if (!HostCollectiveId && !transaction.HostCollectiveId) {
@@ -470,7 +470,7 @@ export default (Sequelize, DataTypes) => {
       return Promise.resolve();
     }
     return (
-      Transaction.findById(transaction.id, {
+      Transaction.findByPk(transaction.id, {
         include: [
           { model: models.Collective, as: 'fromCollective' },
           { model: models.Collective, as: 'collective' },

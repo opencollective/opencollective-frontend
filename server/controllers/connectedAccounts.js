@@ -61,7 +61,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
           attrs.clientId = profile.id;
           attrs.data = profile;
           attrs.CreatedByUserId = user.id;
-          return models.Collective.findById(user.CollectiveId);
+          return models.Collective.findByPk(user.CollectiveId);
         })
         .then(c => {
           userCollective = c;
@@ -111,7 +111,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       let collective;
       const profile = data.profile._json;
 
-      return models.Collective.findById(req.query.CollectiveId)
+      return models.Collective.findByPk(req.query.CollectiveId)
         .then(c => {
           collective = c;
           collective.image =
@@ -209,7 +209,7 @@ export const getOrgMemberships = async (req, res, next) => {
 
 function createConnectedAccountForCollective(CollectiveId, service) {
   const attrs = { service };
-  return models.Collective.findById(CollectiveId)
+  return models.Collective.findByPk(CollectiveId)
     .then(collective => (attrs.CollectiveId = collective.id))
     .then(() => ConnectedAccount.findOne({ where: attrs }))
     .then(ca => ca || ConnectedAccount.create(attrs));

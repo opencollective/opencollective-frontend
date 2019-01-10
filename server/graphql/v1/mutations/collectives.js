@@ -151,7 +151,7 @@ export async function createCollective(_, args, req) {
   if (collective.type !== types.COLLECTIVE) {
     return collective;
   }
-  const remoteUserCollective = await models.Collective.findById(req.remoteUser.CollectiveId);
+  const remoteUserCollective = await models.Collective.findByPk(req.remoteUser.CollectiveId);
   models.Activity.create({
     type: activities.COLLECTIVE_CREATED,
     UserId: req.remoteUser.id,
@@ -286,7 +286,7 @@ export async function approveCollective(remoteUser, CollectiveId) {
     });
   }
 
-  const collective = await models.Collective.findById(CollectiveId);
+  const collective = await models.Collective.findByPk(CollectiveId);
   if (!collective) {
     throw new errors.NotFound({
       message: `Collective with id ${CollectiveId} not found`,
@@ -325,7 +325,7 @@ export function deleteCollective(_, args, req) {
     });
   }
 
-  return models.Collective.findById(args.id).then(collective => {
+  return models.Collective.findByPk(args.id).then(collective => {
     if (!collective)
       throw new errors.NotFound({
         message: `Collective with id ${args.id} not found`,
@@ -347,7 +347,7 @@ export async function claimCollective(_, args, req) {
     });
   }
 
-  let collective = await models.Collective.findById(args.id);
+  let collective = await models.Collective.findByPk(args.id);
   if (!collective) {
     throw new errors.NotFound({
       message: `Collective with id ${args.id} not found`,
@@ -412,7 +412,7 @@ export async function claimCollective(_, args, req) {
   // add opensource collective as host
   // set collective as active
   // create default tiers
-  const host = await models.Collective.findById(defaultHostCollective('opensource').CollectiveId);
+  const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
 
   collective = await collective.addHost(host, {
     ...req.remoteUser.minimal,
