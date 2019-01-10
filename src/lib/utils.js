@@ -322,9 +322,9 @@ export const abbreviateNumber = (number, precision = 0) => {
   return round(scaled) + SI_PREFIXES[tier];
 };
 
-export const loadScriptAsync = url =>
+export const loadScriptAsync = (url, opts = {}) =>
   new Promise((resolve, reject) => {
-    loadScript(url, (err, script) => {
+    loadScript(url, opts, (err, script) => {
       if (err) {
         reject(err);
       } else {
