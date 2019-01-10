@@ -53,6 +53,27 @@ const getStripeToken = (type = 'cc', data) => {
   }
 };
 
+/**
+ * Convert a stripe token as returned by `createToken` into a PaymentMethod object.
+ */
+export const stripeTokenToPaymentMethod = stripeToken => {
+  return {
+    name: stripeToken.card.last4,
+    token: stripeToken.id,
+    service: 'stripe',
+    type: 'creditcard',
+    data: {
+      fullName: stripeToken.card.full_name,
+      expMonth: stripeToken.card.exp_month,
+      expYear: stripeToken.card.exp_year,
+      brand: stripeToken.card.brand,
+      country: stripeToken.card.country,
+      funding: stripeToken.card.funding,
+      zip: stripeToken.card.address_zip,
+    },
+  };
+};
+
 const isValidCard = card => {
   if (typeof card.cvc !== 'string') {
     card.cvc = `${card.cvc}`;
