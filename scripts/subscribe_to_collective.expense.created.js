@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import '../server/env';
+
 /**
  * This script subscribes the first member of a collective (core contributor)
  * to the `collective.expense.created` notification

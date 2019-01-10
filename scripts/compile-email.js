@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /**
  * Use ./scripts/watch_email_template.sh [template] to compile an email template
  */

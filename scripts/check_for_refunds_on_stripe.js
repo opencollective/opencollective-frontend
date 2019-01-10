@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
  * This script tells us which transactions have been refunded on Stripe
  */

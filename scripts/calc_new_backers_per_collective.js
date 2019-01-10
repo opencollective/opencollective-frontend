@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
  * This script runs breaks out how many new and old backers are added per active month per collective
  */

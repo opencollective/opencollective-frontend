@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
  * This script finds all expenses that are paid and don't have a transaction
  */
@@ -21,14 +24,14 @@ function run() {
   return sequelize
     .query(
       `
-    SELECT 
+    SELECT
       e.id AS id
     FROM "Expenses" e
     LEFT JOIN "Transactions" t ON t."ExpenseId" = e.id
-    WHERE 
-      e.status ILIKE 'paid' 
-      AND t.id IS NULL 
-      AND e."deletedAt" IS NULL 
+    WHERE
+      e.status ILIKE 'paid'
+      AND t.id IS NULL
+      AND e."deletedAt" IS NULL
       AND (e."payoutMethod" ILIKE 'other' OR e."payoutMethod" ILIKE 'manual')
     ORDER BY "ExpenseId" DESC, e."updatedAt"
     `,

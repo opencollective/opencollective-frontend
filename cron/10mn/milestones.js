@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../../server/env';
 
 process.env.PORT = 3066;
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import '../server/env';
+
 /**
  * This script subscribes all hosts
  * to the collective.expense.created event

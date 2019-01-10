@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 const _ = require('lodash');
 const app = require('../server/index');
 const config = require('config');

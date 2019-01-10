@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 const Stripe = require('stripe');
 const app = require('../server/index');
 import models from '../server/models';

@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /**
  * PayPal REST API webhooks don't support billing agreements and subscription related
  * events (https://github.com/paypal/PayPal-Python-SDK/issues/69). There are two

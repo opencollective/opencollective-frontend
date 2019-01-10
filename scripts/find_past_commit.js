@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /**
  * This script will go back to past commits until the test function returns true
  * Useful to find out when something changed in the code

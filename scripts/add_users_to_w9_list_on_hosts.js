@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /*
   Script to update the W9 data with users that have already received the request
   and sent the form(we are considering that once the expense is paid by the host

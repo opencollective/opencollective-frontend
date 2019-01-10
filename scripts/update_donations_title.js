@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 import config from 'config';
 import models, { Op } from '../server/models';
 import { capitalize } from '../server/lib/utils';

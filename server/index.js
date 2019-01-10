@@ -1,4 +1,4 @@
-import './env'; // important to load first for environment config
+import './env';
 
 import os from 'os';
 import config from 'config';

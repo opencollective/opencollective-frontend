@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../../server/env';
+
 import fs from 'fs';
 import json2csv from 'json2csv';
 import { ArgumentParser } from 'argparse';

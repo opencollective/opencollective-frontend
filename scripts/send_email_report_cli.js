@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 const util = require('util');
 const exec = require('child_process').exec;
 const execPromise = util.promisify(exec);

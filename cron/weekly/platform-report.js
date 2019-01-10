@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../../server/env';
+
 import Promise from 'bluebird';
 import moment from 'moment-timezone';
 import _ from 'lodash';

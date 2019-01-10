@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 const slack = require('../server/lib/slack');
 
 /**

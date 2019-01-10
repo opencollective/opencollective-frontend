@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+import '../server/env';
+
 /**
  * These are some recommendations for using the script in
  * *development* mode. We currently have ~70000 transactions in our
