@@ -992,6 +992,7 @@ const queries = {
               createdAt: collective.dataValues.createdAt,
               CollectiveId: collective.dataValues.CollectiveId,
               MemberCollectiveId: collective.dataValues.MemberCollectiveId,
+              ParentCollectiveId: collective.dataValues.ParentCollectiveId,
               totalDonations: collective.dataValues.totalDonations,
               TierId: collective.dataValues.TierId,
             };
