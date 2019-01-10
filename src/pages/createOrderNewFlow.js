@@ -52,7 +52,7 @@ class CreateOrderPage extends React.Component {
     query: {
       collectiveSlug,
       eventSlug,
-      TierId,
+      tierSlug,
       amount,
       quantity,
       totalAmount,
@@ -67,7 +67,7 @@ class CreateOrderPage extends React.Component {
   }) {
     return {
       slug: eventSlug || collectiveSlug,
-      TierId,
+      tierSlug,
       quantity,
       totalAmount: totalAmount || amount * 100,
       interval,
@@ -82,7 +82,7 @@ class CreateOrderPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string, // for addData
-    TierId: PropTypes.string,
+    tierSlug: PropTypes.string,
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     interval: PropTypes.string,
@@ -291,8 +291,10 @@ class CreateOrderPage extends React.Component {
 
   /** Return the currently selected tier, or a falsy value if none selected */
   getTier() {
-    const { data, TierId } = this.props;
-    return TierId && get(data, 'Collective.tiers', []).find(t => t.id == TierId);
+    const { data, tierSlug } = this.props;
+    if (tierSlug) {
+      return get(data, 'Collective.tiers', []).find(t => t.slug == tierSlug);
+    }
   }
 
   getContributorTypeName() {
@@ -355,7 +357,7 @@ class CreateOrderPage extends React.Component {
   }
 
   renderStep(step) {
-    const { data, LoggedInUser, TierId } = this.props;
+    const { data, LoggedInUser, tierSlug } = this.props;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
     const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
@@ -391,7 +393,7 @@ class CreateOrderPage extends React.Component {
             amountOptions={amountOptions}
             currency={(tier && tier.currency) || data.Collective.currency}
             onChange={data => this.setState({ stepDetails: data })}
-            showFrequency={Boolean(TierId) || undefined}
+            showFrequency={tierSlug ? true : false}
             interval={get(this.state, 'stepDetails.interval')}
             totalAmount={get(this.state, 'stepDetails.totalAmount')}
           />
@@ -419,7 +421,8 @@ class CreateOrderPage extends React.Component {
   }
 
   changeStep = async (step, options) => {
-    const { createCollective, verb, data, refetchLoggedInUser, TierId } = this.props;
+    const { createCollective, data, refetchLoggedInUser } = this.props;
+
     const { stepProfile, step: currentStep } = this.state;
     const routeSuffix = step === 'success' ? 'Success' : '';
     const params = {
@@ -440,11 +443,14 @@ class CreateOrderPage extends React.Component {
       }
     }
 
-    if (verb) {
-      Router.pushRoute(`donate${routeSuffix}`, { ...params, verb });
+    let route;
+    if (this.props.tierSlug) {
+      route = `orderCollectiveTierNew${routeSuffix}`;
     } else {
-      Router.pushRoute(`orderCollectiveTier${routeSuffix}`, { ...params, TierId });
+      route = `orderCollectiveNew${routeSuffix}`;
     }
+
+    Router.pushRoute(route, { ...params, ...pick(this.props, ['verb', 'tierSlug']) });
   };
 
   renderContributeDetailsSummary(amount, currency, interval) {
