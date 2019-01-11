@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, omit, pick } from 'lodash';
+import { debounce, get, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
@@ -317,7 +317,8 @@ class CreateOrderPage extends React.Component {
 
   /** Return the index of the last step user can switch to */
   getMaxStepIdx() {
-    if (!this.state.stepProfile) return 0;
+    if (!get(this.state, 'stepProfile.name')) return 0;
+    if (!get(this.state, 'stepProfile.id') && !get(this.state, 'stepProfile.website')) return 0;
     if (!this.state.stepDetails || !this.state.stepDetails.totalAmount) return 1;
     if (!this.state.stepPayment || this.state.stepPayment.error) return 2;
     return STEPS.length;
@@ -346,6 +347,10 @@ class CreateOrderPage extends React.Component {
     );
   }
 
+  updateProfile = debounce(stepProfile => {
+    this.setState({ stepProfile, stepPayment: null });
+  }, 300);
+
   renderStep(step) {
     const { data, LoggedInUser, tierSlug } = this.props;
     const [personal, profiles] = this.getProfiles();
@@ -365,7 +370,7 @@ class CreateOrderPage extends React.Component {
           {fieldProps => (
             <ContributeAs
               {...fieldProps}
-              onChange={profile => this.setState({ stepProfile: profile, stepPayment: null })}
+              onChange={this.updateProfile}
               profiles={profiles}
               personal={personal}
               defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
@@ -423,14 +428,17 @@ class CreateOrderPage extends React.Component {
     };
 
     // check if we're creating a new organization
-    if (!currentStep && stepProfile.orgName) {
-      const { data: result } = await createCollective({
-        name: stepProfile.orgName,
-        ...omit(stepProfile, ['orgName']),
-      });
-      if (result && result.createCollective) {
+    if (!currentStep && stepProfile.name && stepProfile.website && !stepProfile.id) {
+      this.setState({ error: null, submitting: true });
+
+      try {
+        const { data: result } = await createCollective(stepProfile);
+        const createdOrg = result.createCollective;
+
         await refetchLoggedInUser();
-        this.setState({ stepProfile: result.createCollective });
+        this.setState({ stepProfile: createdOrg, submitting: false });
+      } catch (error) {
+        this.setState({ error: error.message, submitting: false });
       }
     }
 
