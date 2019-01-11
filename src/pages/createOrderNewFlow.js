@@ -394,8 +394,8 @@ class CreateOrderPage extends React.Component {
             currency={(tier && tier.currency) || data.Collective.currency}
             onChange={data => this.setState({ stepDetails: data })}
             showFrequency={tierSlug ? true : false}
-            interval={get(this.state, 'stepDetails.interval')}
-            totalAmount={get(this.state, 'stepDetails.totalAmount')}
+            interval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
+            totalAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
           />
         </Fragment>
       );
