@@ -403,13 +403,13 @@ class CreateOrderPage extends React.Component {
           <H5 textAlign="left" mb={3}>
             <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
           </H5>
-        <ContributePayment
-          onChange={stepPayment => this.setState({ stepPayment })}
-          paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
-          collective={this.state.stepProfile}
-          defaultValue={this.state.stepPayment}
-          onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-        />
+          <ContributePayment
+            onChange={stepPayment => this.setState({ stepPayment })}
+            paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
+            collective={this.state.stepProfile}
+            defaultValue={this.state.stepPayment}
+            onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+          />
         </Fragment>
       );
     }
