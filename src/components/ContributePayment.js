@@ -84,19 +84,38 @@ StyledCardElement.defaultProps = {
   style: { base: { fontSize: '14px', color: '#313233' } },
 };
 
-const NewCreditCardForm = injectStripe(({ name, onChange, error }) => (
-  <Flex flexDirection="column">
-    <StyledCardElement onChange={value => onChange({ name, type: 'StripeCreditCard', value })} />
-    {error && (
-      <Span display="block" color="red.500" pt={2} fontSize="Tiny">
-        {error}
-      </Span>
-    )}
-    <Flex mt={3} alignItems="center">
-      <StyledCheckbox defaultChecked name="saveCreditCard" label="Save this card to my account" onChange={onChange} />
-    </Flex>
-  </Flex>
-));
+class NewCreditCardFormWithoutStripe extends React.Component {
+  componentDidMount() {
+    if (this.props.onReady && this.props.stripe) {
+      this.props.onReady({ stripe: this.props.stripe });
+    }
+  }
+
+  componentDidUpdate(oldProps) {
+    if (this.props.onReady && !oldProps.stripe && this.props.stripe) {
+      this.props.onReady({ stripe: this.props.stripe });
+    }
+  }
+
+  render() {
+    const { name, onChange, error } = this.props;
+    return (
+      <Flex flexDirection="column">
+        <StyledCardElement onChange={value => onChange({ name, type: 'StripeCreditCard', value })} />
+        {error && (
+          <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+            {error}
+          </Span>
+        )}
+        <Flex mt={3} alignItems="center">
+          <StyledCheckbox defaultChecked name="save" label="Save this card to my account" onChange={onChange} />
+        </Flex>
+      </Flex>
+    );
+  }
+}
+
+const NewCreditCardForm = injectStripe(NewCreditCardFormWithoutStripe);
 
 /**
  * A radio list to select a payment method.
@@ -125,9 +144,9 @@ class ContributePayment extends React.Component {
     const paymentMethodsOptions = this.generatePaymentsOptions();
     this.state = {
       paymentMethodsOptions: paymentMethodsOptions,
-      selectedOption: paymentMethodsOptions[0],
+      selectedOption: props.defaultValue || paymentMethodsOptions[0],
       newCreditCardInfo: null,
-      saveCreditCard: true,
+      save: true,
       errors: {},
     };
   }
@@ -136,11 +155,13 @@ class ContributePayment extends React.Component {
     // We load stripe script as soon as the component mount
     this.props.loadStripe();
 
-    // Generate an onChange event with default value on first mount
-    this.dispatchChangeEvent(this.state.selectedOption);
+    // Generate an onChange event with default value on first mount if no default provided
+    if (!this.props.defaultValue) {
+      this.dispatchChangeEvent(this.state.selectedOption);
+    }
   }
 
-  dispatchChangeEvent(selectedOption, newCreditCardInfo, saveCreditCard) {
+  dispatchChangeEvent(selectedOption, newCreditCardInfo, save) {
     if (this.props.onChange) {
       const isNew = selectedOption.key === 'newCreditCard';
       this.props.onChange({
@@ -148,8 +169,9 @@ class ContributePayment extends React.Component {
         title: selectedOption.title,
         subtitle: selectedOption.subtitle,
         isNew,
-        saveCreditCard,
+        save,
         key: selectedOption.key,
+        error: isNew && get(newCreditCardInfo, 'error'),
       });
     }
   }
@@ -159,7 +181,7 @@ class ContributePayment extends React.Component {
     this.setState(state => {
       const errors = state.errors;
       let selectedOption = state.selectedOption;
-      let saveCreditCard = state.saveCreditCard;
+      let save = state.save;
       let newCreditCardInfo = state.newCreditCardInfo;
 
       if (name === 'PaymentMethod') {
@@ -171,15 +193,15 @@ class ContributePayment extends React.Component {
         } else {
           delete errors['newCreditCardInfo'];
         }
-      } else if (name === 'saveCreditCard') {
-        saveCreditCard = checked;
+      } else if (name === 'save') {
+        save = checked;
       }
 
       if (this.props.onChange) {
-        this.dispatchChangeEvent(selectedOption, newCreditCardInfo, saveCreditCard);
+        this.dispatchChangeEvent(selectedOption, newCreditCardInfo, save);
       }
 
-      return { ...state, selectedOption, saveCreditCard, errors };
+      return { ...state, selectedOption, save, errors };
     });
   }
 
@@ -244,6 +266,7 @@ class ContributePayment extends React.Component {
                       name="newCreditCardInfo"
                       error={errors.newCreditCardInfo}
                       onChange={this.onChange}
+                      onReady={this.props.onNewCardFormReady}
                     />
                   </Elements>
                 </Box>
@@ -268,6 +291,12 @@ ContributePayment.propTypes = {
   onChange: PropTypes.func,
   /** Wether PayPal should be enabled */
   withPaypal: PropTypes.bool,
+  /** Default value */
+  defaultValue: PropTypes.object,
+  /** Called with an object like {stripe} when new card form is mounted */
+  onNewCardFormReady: PropTypes.func,
+  /** From withStripeLoader */
+  loadStripe: PropTypes.func.isRequired,
 };
 
 ContributePayment.defaultProps = {

@@ -10,6 +10,8 @@ const getRecaptchaScriptUrl = () => {
   return `https://www.google.com/recaptcha/api.js?render=${apiKey}`;
 };
 
+const RECAPTCHA_SCRIPT_ID = 'recaptcha';
+
 const loadRecaptcha = async () => {
   if (typeof window == 'undefined') {
     return;
@@ -17,7 +19,7 @@ const loadRecaptcha = async () => {
   if (typeof window.grecaptcha !== 'undefined') {
     return;
   }
-  return loadScriptAsync(getRecaptchaScriptUrl());
+  return loadScriptAsync(getRecaptchaScriptUrl(), { attrs: { id: RECAPTCHA_SCRIPT_ID } });
 };
 
 const getRecaptcha = async () => {
@@ -26,4 +28,25 @@ const getRecaptcha = async () => {
   return window.grecaptcha;
 };
 
-export { getRecaptchaScriptUrl, loadRecaptcha, getRecaptcha, getRecaptchaSiteKey };
+const unloadRecaptcha = () => {
+  if (typeof window == 'undefined') {
+    return;
+  }
+
+  // Remove widget
+  const widget = document.querySelector('.grecaptcha-badge');
+  if (widget) {
+    widget.remove();
+  }
+
+  // Remove script
+  const script = document.getElementById(RECAPTCHA_SCRIPT_ID);
+  if (script) {
+    script.remove();
+  }
+
+  // Remove global instance
+  delete window.grecaptcha;
+};
+
+export { getRecaptchaScriptUrl, loadRecaptcha, getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha };
