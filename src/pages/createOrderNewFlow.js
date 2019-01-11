@@ -558,7 +558,7 @@ class CreateOrderPage extends React.Component {
 
     const collective = data.Collective;
     const logo = collective.image || get(collective.parentCollective, 'image');
-    const tierName = this.getContributorTypeName();
+    const tier = this.getTier();
 
     return (
       <Page
@@ -585,13 +585,19 @@ class CreateOrderPage extends React.Component {
             </H2>
           </Link>
 
-          <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3}>
-            <FormattedMessage
-              id="contribute.contributorType"
-              defaultMessage="Become a {name}"
-              values={{ name: tierName }}
-            />
-          </P>
+          {tier && (
+            <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3}>
+              {tier.button ? (
+                tier.button
+              ) : (
+                <FormattedMessage
+                  id="contribute.contributorType"
+                  defaultMessage="Contribute to '{name}' tier"
+                  values={{ name: tier.name }}
+                />
+              )}
+            </P>
+          )}
         </Flex>
         <Flex id="content" flexDirection="column" alignItems="center" mb={6}>
           <Box mb={3} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
@@ -638,6 +644,7 @@ const addData = graphql(gql`
         currency
         interval
         presets
+        button
       }
     }
   }
