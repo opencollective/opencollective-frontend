@@ -479,7 +479,7 @@ class CreateOrderPage extends React.Component {
         allCompleted={submitted}
         onStepSelect={!loading && !submitted ? this.changeStep : undefined}
         loadingStep={loading ? currentStep : undefined}
-        disabledSteps={STEPS.slice(this.getMaxStepIdx() + 1, STEPS.length)}
+        disabledSteps={STEPS.slice(this.getMaxStepIdx(), STEPS.length)}
       >
         {({ step }) => {
           let label = null;
