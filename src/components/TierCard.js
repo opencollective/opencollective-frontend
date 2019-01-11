@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import { get, uniqBy } from 'lodash';
-import Avatar from './Avatar';
-import Logo from './Logo';
-import { Link } from '../server/pages';
-import Currency from './Currency';
-import colors from '../constants/colors';
-import { formatCurrency } from '../lib/utils';
 import Markdown from 'react-markdown';
+import { get, uniqBy } from 'lodash';
+import { defineMessages, FormattedMessage } from 'react-intl';
+
+import Avatar from './Avatar';
+import Currency from './Currency';
+import Logo from './Logo';
+
+import colors from '../constants/colors';
+import withIntl from '../lib/withIntl';
+import { Link } from '../server/pages';
+import { getEnvVar, formatCurrency, parseToBoolean } from '../lib/utils';
 
 class TierCard extends React.Component {
   static propTypes = {
@@ -126,11 +128,21 @@ class TierCard extends React.Component {
 
     const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`], formatValues) : '';
 
-    const linkRoute = {
-      name: 'orderCollectiveTier',
-      params: { collectiveSlug: collective.slug, TierId: tier.id },
-      anchor: '#content',
-    };
+    let linkRoute;
+    if (parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER'))) {
+      linkRoute = {
+        name: 'orderCollectiveTierNew',
+        params: { collectiveSlug: collective.slug, tierSlug: tier.slug, verb: 'contribute' },
+        anchor: '#content',
+      };
+    } else {
+      linkRoute = {
+        name: 'orderCollectiveTier',
+        params: { collectiveSlug: collective.slug, TierId: tier.id },
+        anchor: '#content',
+      };
+    }
+
     if (referral) {
       linkRoute.params.referral = referral;
     }

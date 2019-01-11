@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
+
 import withIntl from '../lib/withIntl';
 import { Link } from '../server/pages';
 
@@ -251,7 +252,7 @@ class Collective extends React.Component {
                         />
                       ))}
                       <div className="CustomDonationTierCard">
-                        <Link route={`/${collective.slug}/donate`}>
+                        <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
                           <a>
                             <FormattedMessage
                               id="collective.tiers.donate"

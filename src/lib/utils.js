@@ -77,6 +77,18 @@ export function getCurrencySymbol(currency) {
 /** Retrieve variables set in the environment */
 export const getEnvVar = v => (process.browser ? get(window, ['__NEXT_DATA__', 'env', v]) : get(process, ['env', v]));
 
+export function parseToBoolean(value) {
+  let lowerValue = value;
+  // check whether it's string
+  if (lowerValue && (typeof lowerValue === 'string' || lowerValue instanceof String)) {
+    lowerValue = lowerValue.trim().toLowerCase();
+  }
+  if (['on', 'enabled', '1', 'true', 'yes', 1].includes(lowerValue)) {
+    return true;
+  }
+  return false;
+}
+
 export const getBaseImagesUrl = () => getEnvVar('IMAGES_URL');
 
 export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
