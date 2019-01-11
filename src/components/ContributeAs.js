@@ -38,7 +38,7 @@ const enhance = compose(
     getFieldError: ({ state }) => name => state.errors[name],
     onChange: ({ onChange, state }) => selected => {
       if (selected.key === 'new-org') {
-        if (state.orgName) {
+        if (state.name && state.website) {
           return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
         } else {
           return onChange(null);
@@ -51,28 +51,26 @@ const enhance = compose(
 
       return onChange(selected.value);
     },
-    onFieldChange: ({ onChange, setState }) => event => {
+    onFieldChange: ({ onChange, setState, state }) => event => {
       event.stopPropagation();
 
       const { target } = event;
       if (!target.validity.valid) {
-        target.reportValidity();
+        onChange(null);
         return;
       }
 
-      setState(state => {
-        const newState = {
-          ...state,
-          [target.name]: target.value,
-        };
-        onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
-        return {
-          ...newState,
-          errors: { ...state.errors, [target.name]: null },
-        };
+      const newState = {
+        ...state,
+        [target.name]: target.value,
+      };
+      setState({
+        ...newState,
+        errors: { ...state.errors, [target.name]: null },
       });
+      onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
     },
-    onInvalid: ({ onChange, setState }) => event => {
+    onInvalid: ({ setState }) => event => {
       event.persist();
       event.preventDefault();
 
@@ -90,7 +88,6 @@ const enhance = compose(
       }
 
       setState(state => {
-        onChange(null);
         return {
           ...state,
           errors: { ...state.errors, [target.name]: error },
@@ -110,6 +107,7 @@ const enhance = compose(
       defaultValue: state[name] || '',
       fontSize: 'Paragraph',
       lineHeight: 'Paragraph',
+      onBlur: event => event.target.reportValidity(),
       onInvalid,
       type: 'text',
       width: 1,
@@ -213,7 +211,7 @@ const ContributeAs = enhance(
               {key === 'new-org' && checked && (
                 <Container as="fieldset" border="none" width={1} py={3} onChange={onFieldChange}>
                   <Box mb={3}>
-                    <StyledInputField label="Organization Name" htmlFor="orgName" error={getFieldError('orgName')}>
+                    <StyledInputField label="Organization Name" htmlFor="name" error={getFieldError('name')}>
                       {inputProps => (
                         <StyledInput
                           {...inputProps}
@@ -227,7 +225,15 @@ const ContributeAs = enhance(
 
                   <Box mb={3}>
                     <StyledInputField label="Website" htmlFor="website" error={getFieldError('website')}>
-                      {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} type="url" />}
+                      {inputProps => (
+                        <StyledInput
+                          {...inputProps}
+                          {...getFieldProps(inputProps.name)}
+                          placeholder="https://example.com"
+                          type="url"
+                          required
+                        />
+                      )}
                     </StyledInputField>
                   </Box>
 
