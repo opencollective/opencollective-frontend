@@ -409,6 +409,7 @@ class CreateOrderPage extends React.Component {
             collective={this.state.stepProfile}
             defaultValue={this.state.stepPayment}
             onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+            withPaypal={false}
           />
         </Fragment>
       );
