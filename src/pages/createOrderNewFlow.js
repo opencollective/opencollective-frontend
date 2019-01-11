@@ -104,7 +104,6 @@ class CreateOrderPage extends React.Component {
     this.recaptcha = null;
     this.recaptchaToken = null;
 
-    const tier = this.getTier();
     const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
     const initialDetails = {
       quantity: parseInt(props.quantity, 10) || 1,
