@@ -88,7 +88,7 @@
     "passport-twitter": "1.0.4",
     "paypal-adaptive": "0.4.2",
     "paypal-rest-sdk": "1.8.1",
-    "pg": "7.7.1",
+    "pg": "7.8.0",
     "pg-connection-string": "2.0.0",
     "pg-format": "1.0.4",
     "pg-hstore": "2.3.2",
