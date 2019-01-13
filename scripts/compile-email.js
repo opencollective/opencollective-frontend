@@ -6,7 +6,7 @@ import '../server/env';
  */
 import config from 'config';
 import nodemailer from 'nodemailer';
-import config from 'config';
+import { has, get } from 'lodash';
 import juice from 'juice';
 
 import libEmailTemplates from '../server/lib/emailTemplates';
