@@ -77,18 +77,12 @@ export default NewComponent;
 
 Check out the [React-Styleguidist docs](https://react-styleguidist.js.org/docs/documenting.html) for more details about documenting components with [JSDoc](http://usejsdoc.org/) annotations and writing interactive code examples.
 
-### Build for deployment
-
-```
-npm run styleguide:build
-```
-
 ### Deploy
 
 If you have access the Open Collective `now` team account:
 
 ```
-npx now styleguide && npx now alias -A styleguide/now.json
+npm run styleguide:deploy
 ```
 
 ## Tests
