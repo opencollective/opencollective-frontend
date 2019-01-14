@@ -116,6 +116,12 @@ class CreateOrderPage extends React.Component {
   }
 
   async componentDidMount() {
+    // Redirect to previous step if data is missing
+    if (!this.isCurrentStepValid()) {
+      const maxStepIdx = this.getMaxStepIdx();
+      this.changeStep(maxStepIdx === 0 ? 'contributeAs' : STEPS[maxStepIdx - 1]);
+    }
+
     this.props.loadStripe();
 
     try {
@@ -126,8 +132,15 @@ class CreateOrderPage extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    // Set user as default profile when loggin in
     if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
       this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
+    }
+
+    // Redirect to previous step if data is missing
+    if (!this.isCurrentStepValid()) {
+      const maxStepIdx = this.getMaxStepIdx();
+      this.changeStep(maxStepIdx === 0 ? 'contributeAs' : STEPS[maxStepIdx - 1]);
     }
   }
 
@@ -287,6 +300,21 @@ class CreateOrderPage extends React.Component {
     }
   }
 
+  /** Return the index of the last step user can switch to */
+  getMaxStepIdx() {
+    if (!this.state.stepProfile) return 0;
+    if (!this.state.stepDetails || !this.state.stepDetails.totalAmount) return 1;
+    if (!this.state.stepPayment || this.state.stepPayment.error) return 2;
+    return STEPS.length;
+  }
+
+  /** Return true if we're not missing data from previous steps */
+  isCurrentStepValid() {
+    const stepIdx = STEPS.indexOf(this.props.step);
+    const maxStepIdx = this.getMaxStepIdx();
+    return stepIdx === -1 || stepIdx <= maxStepIdx || maxStepIdx >= STEPS.length;
+  }
+
   getContributorTypeName() {
     const tier = this.getTier();
     if (tier) {
@@ -313,15 +341,6 @@ class CreateOrderPage extends React.Component {
         &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
       </PrevNextButton>
     );
-  }
-
-  /** Return the index of the last step user can switch to */
-  getMaxStepIdx() {
-    if (!get(this.state, 'stepProfile.name')) return 0;
-    if (!get(this.state, 'stepProfile.id') && !get(this.state, 'stepProfile.website')) return 0;
-    if (!this.state.stepDetails || !this.state.stepDetails.totalAmount) return 1;
-    if (!this.state.stepPayment || this.state.stepPayment.error) return 2;
-    return STEPS.length;
   }
 
   renderNextStepButton(step) {
@@ -428,7 +447,7 @@ class CreateOrderPage extends React.Component {
     };
 
     // check if we're creating a new organization
-    if (!currentStep && stepProfile.name && stepProfile.website && !stepProfile.id) {
+    if (!currentStep && stepProfile && stepProfile.name && stepProfile.website && !stepProfile.id) {
       this.setState({ error: null, submitting: true });
 
       try {
@@ -557,6 +576,7 @@ class CreateOrderPage extends React.Component {
 
     const collective = data.Collective;
     const logo = collective.image || get(collective.parentCollective, 'image');
+    const isLoadingContent = loadingLoggedInUser || data.loading || !this.isCurrentStepValid();
     const tier = this.getTier();
 
     return (
@@ -609,7 +629,7 @@ class CreateOrderPage extends React.Component {
               {this.state.error.replace('GraphQL error: ', '')}
             </StyledCard>
           )}
-          {loadingLoggedInUser || data.loading ? <Loading /> : this.renderContent()}
+          {isLoadingContent ? <Loading /> : this.renderContent()}
         </Flex>
       </Page>
     );
