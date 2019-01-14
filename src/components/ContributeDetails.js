@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, lifecycle, withHandlers, withState } from 'recompose';
 import moment from 'moment';
-import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -15,34 +14,40 @@ import { P, Span } from './Text';
 import Currency from './Currency';
 
 const frequencyOptions = {
+  oneTime: 'One time',
   month: 'Monthly',
   year: 'Yearly',
 };
 
+const getChangeFromState = state => ({
+  totalAmount: state.totalAmount,
+  interval: state.interval === 'oneTime' ? null : state.interval,
+});
+
 const enhance = compose(
-  withState('state', 'setState', ({ amountOptions, showFrequency, totalAmount, interval }) => {
+  withState('state', 'setState', ({ amountOptions, totalAmount, interval }) => {
     const defaultAmount = totalAmount || amountOptions[Math.floor(amountOptions.length / 2)];
     return {
       amount: defaultAmount / 100,
       totalAmount: defaultAmount,
-      interval: showFrequency ? interval || Object.keys(frequencyOptions)[0] : undefined,
+      interval: interval || Object.keys(frequencyOptions)[0],
     };
   }),
   lifecycle({
     componentDidMount() {
-      this.props.onChange(pick(this.props.state, ['totalAmount', 'interval']));
+      this.props.onChange(getChangeFromState(this.props.state));
     },
   }),
   withHandlers({
     onChange: ({ state, setState, onChange }) => newState => {
       newState = { ...state, ...newState };
       setState(newState);
-      onChange(pick(newState, ['totalAmount', 'interval']));
+      onChange(getChangeFromState(newState));
     },
   }),
 );
 
-const ContributeDetails = enhance(({ amountOptions, currency, showFrequency, onChange, state }) => (
+const ContributeDetails = enhance(({ amountOptions, currency, disabledInterval, onChange, state }) => (
   <Container as="fieldset" border="none">
     <Flex>
       <StyledInputField
@@ -90,23 +95,24 @@ const ContributeDetails = enhance(({ amountOptions, currency, showFrequency, onC
         </StyledInputField>
       </Container>
     </Flex>
-    {showFrequency && (
-      <Flex mt={3} alignItems="flex-end" width={1}>
-        <StyledInputField
-          label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
-          htmlFor="interval"
-        >
-          {fieldProps => (
-            <StyledSelect
-              {...fieldProps}
-              options={frequencyOptions}
-              defaultValue={frequencyOptions[state.interval]}
-              onChange={({ key }) => onChange({ interval: key })}
-            >
-              {({ value }) => <Container minWidth={100}>{value}</Container>}
-            </StyledSelect>
-          )}
-        </StyledInputField>
+    <Flex mt={3} alignItems="flex-end" width={1}>
+      <StyledInputField
+        label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
+        htmlFor="interval"
+        disabled={disabledInterval}
+      >
+        {fieldProps => (
+          <StyledSelect
+            {...fieldProps}
+            options={frequencyOptions}
+            defaultValue={frequencyOptions[state.interval]}
+            onChange={({ key }) => onChange({ interval: key })}
+          >
+            {({ value }) => <Container minWidth={100}>{value}</Container>}
+          </StyledSelect>
+        )}
+      </StyledInputField>
+      {state.interval !== 'oneTime' && (
         <P color="black.500" ml={3} pb={2}>
           <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next contribution: " />
           <Span color="primary.500">
@@ -116,8 +122,8 @@ const ContributeDetails = enhance(({ amountOptions, currency, showFrequency, onC
               .format('MMM D, YYYY')}
           </Span>
         </P>
-      </Flex>
-    )}
+      )}
+    </Flex>
   </Container>
 ));
 
@@ -125,16 +131,18 @@ ContributeDetails.propTypes = {
   amountOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
   currency: PropTypes.string.isRequired,
   onChange: PropTypes.func,
-  /** initial value for frequency select, defatuls to the first option */
+  /** Initial value for frequency select, defatuls to one time. */
   interval: PropTypes.string,
-  showFrequency: PropTypes.bool,
+  /** If true, the select for interval will be disabled */
+  disabledInterval: PropTypes.bool,
   /** initial value for amount Options, defaults to the first option */
   totalAmount: PropTypes.number,
 };
 
 ContributeDetails.defaultProps = {
   onChange: () => {},
-  showFrequency: false,
+  disabledInterval: false,
+  interval: null,
 };
 
 export default ContributeDetails;
