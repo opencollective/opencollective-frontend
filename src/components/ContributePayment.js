@@ -224,7 +224,7 @@ class ContributePayment extends React.Component {
   render() {
     const { paymentMethodsOptions, errors } = this.state;
     return (
-      <StyledCard maxWidth={500}>
+      <StyledCard maxWidth={500} mx="auto">
         <StyledRadioList
           id="PaymentMethod"
           name="PaymentMethod"
@@ -289,7 +289,10 @@ ContributePayment.propTypes = {
   collective: PropTypes.object,
   /** Called when the payment method changes */
   onChange: PropTypes.func,
-  /** Wether PayPal should be enabled */
+  /**
+   * Wether PayPal should be enabled. Note that this component does not render
+   * PayPal button - this is up to parent component to do it.
+   */
   withPaypal: PropTypes.bool,
   /** Default value */
   defaultValue: PropTypes.object,

@@ -26,6 +26,7 @@ import { addCreateCollectiveMutation, createUserQuery } from '../graphql/mutatio
 import * as api from '../lib/api';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency } from '../lib/utils';
+import { getPaypal } from '../lib/paypal';
 import withIntl from '../lib/withIntl';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../lib/recaptcha';
 import { withStripeLoader } from '../components/StripeProvider';
@@ -36,17 +37,36 @@ import Loading from '../components/Loading';
 import StyledButton from '../components/StyledButton';
 import StepsProgress from '../components/StepsProgress';
 import StyledCard from '../components/StyledCard';
+import PayWithPaypalButton from '../components/PayWithPaypalButton';
+import { fadeIn } from '../components/StyledKeyframes';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
 
+// Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
   text-transform: uppercase;
 `;
 StepLabel.defaultProps = { color: 'black.400', fontSize: 'Tiny', mt: 1 };
 
-const PrevNextButton = styled(StyledButton)``;
-PrevNextButton.defaultProps = { buttonSize: 'large', fontWeight: 'bold', mx: 2 };
+// Styles for the previous, next and submit buttons
+const PrevNextButton = styled(StyledButton)`
+  animation: ${fadeIn} 0.3s;
+`;
+PrevNextButton.defaultProps = { buttonSize: 'large', fontWeight: 'bold', m: 2, minWidth: '255px' };
 
+// Styles for Paypal button
+const PaypalButtonContainer = styled(Box)`
+  animation: ${fadeIn} 0.3s;
+`;
+PaypalButtonContainer.defaultProps = {
+  width: PrevNextButton.defaultProps.minWidth,
+  m: PrevNextButton.defaultProps.m,
+};
+
+/**
+ * Main contribution flow entrypoint. Render all the steps from contributeAs
+ * to payment.
+ */
 class CreateOrderPage extends React.Component {
   static getInitialProps({
     query: {
@@ -122,7 +142,9 @@ class CreateOrderPage extends React.Component {
       this.changeStep(maxStepIdx === 0 ? 'contributeAs' : STEPS[maxStepIdx - 1]);
     }
 
+    // Load payment providers scripts in the background
     this.props.loadStripe();
+    getPaypal();
 
     try {
       this.recaptcha = await getRecaptcha();
@@ -182,10 +204,10 @@ class CreateOrderPage extends React.Component {
     return { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save };
   }
 
-  async submitOrder() {
+  async submitOrder(paymentMethodOverride = null) {
     this.setState({ submitting: true, error: null });
     const { stepDetails } = this.state;
-    const paymentMethod = await this.getPaymentMethodToSubmit();
+    const paymentMethod = paymentMethodOverride || (await this.getPaymentMethodToSubmit());
     if (!paymentMethod) {
       return false;
     }
@@ -198,7 +220,7 @@ class CreateOrderPage extends React.Component {
     const order = {
       quantity: this.props.quantity || 1,
       totalAmount: stepDetails.totalAmount,
-      currency: get(tier, 'currency') || get(this.props, 'data.Collective.currency'),
+      currency: this.getCurrency(),
       interval: stepDetails.interval,
       paymentMethod,
       referral: this.props.referral,
@@ -315,6 +337,12 @@ class CreateOrderPage extends React.Component {
     return stepIdx === -1 || stepIdx <= maxStepIdx || maxStepIdx >= STEPS.length;
   }
 
+  /** Get currency from the current tier, or fallback on collective currency */
+  getCurrency() {
+    const tier = this.getTier();
+    return get(tier, 'currency', this.props.data.Collective.currency);
+  }
+
   getContributorTypeName() {
     const tier = this.getTier();
     if (tier) {
@@ -350,11 +378,25 @@ class CreateOrderPage extends React.Component {
     }
 
     const isLast = stepIdx + 1 >= STEPS.length;
-    return (
+    const canGoNext = stepIdx + 1 <= this.getMaxStepIdx();
+    const isPaypal = canGoNext && isLast && get(this.state, 'stepPayment.paymentMethod') === 'paypal';
+    return isPaypal ? (
+      <PaypalButtonContainer>
+        <PayWithPaypalButton
+          totalAmount={get(this.state, 'stepDetails.totalAmount')}
+          currency={this.getCurrency()}
+          style={{ size: 'responsive', height: 55 }}
+          onClick={() => this.setState({ submitting: true })}
+          onAuthorize={pm => this.submitOrder(pm)}
+          onCancel={() => this.setState({ submitting: false })}
+          onError={e => this.setState({ submitting: false, error: `PayPal error: ${e.message}` })}
+        />
+      </PaypalButtonContainer>
+    ) : (
       <PrevNextButton
         buttonStyle="primary"
         onClick={() => (isLast ? this.submitOrder() : this.changeStep(STEPS[stepIdx + 1]))}
-        disabled={this.state.submitting || stepIdx + 1 > this.getMaxStepIdx() || this.state.submitted}
+        disabled={this.state.submitting || !canGoNext || this.state.submitted}
       >
         {isLast ? (
           <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
@@ -370,8 +412,13 @@ class CreateOrderPage extends React.Component {
     this.setState({ stepProfile, stepPayment: null });
   }, 300);
 
+  /* We only support paypal for one time donations to the open source collective for now. */
+  hasPaypal() {
+    return get(this.props.data, 'Collective.host.id') === 11004 && !get(this.state, 'stepDetails.interval');
+  }
+
   renderStep(step) {
-    const { data, LoggedInUser, tierSlug } = this.props;
+    const { LoggedInUser, tierSlug } = this.props;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
     const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
@@ -405,7 +452,7 @@ class CreateOrderPage extends React.Component {
           </H5>
           <ContributeDetails
             amountOptions={amountOptions}
-            currency={(tier && tier.currency) || data.Collective.currency}
+            currency={this.getCurrency()}
             onChange={data => this.setState({ stepDetails: data })}
             showFrequency={tierSlug ? true : false}
             interval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
@@ -426,7 +473,8 @@ class CreateOrderPage extends React.Component {
             collective={this.state.stepProfile}
             defaultValue={this.state.stepPayment}
             onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-            withPaypal={false}
+            withPaypal={this.hasPaypal()}
+            margins="0 auto"
           />
         </Fragment>
       );
@@ -508,7 +556,7 @@ class CreateOrderPage extends React.Component {
           } else if (step === 'details') {
             label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
             if (stepDetails && stepDetails.totalAmount) {
-              const currency = get(this.getTier(), 'currency') || this.props.data.Collective.currency;
+              const currency = this.getCurrency();
               details = this.renderContributeDetailsSummary(stepDetails.totalAmount, currency, stepDetails.interval);
             }
           } else if (step === 'payment') {
@@ -559,7 +607,7 @@ class CreateOrderPage extends React.Component {
     return (
       <Flex flexDirection="column" alignItems="center" mx={3}>
         <Box width={1}>{this.renderStep(step)}</Box>
-        <Flex mt={5}>
+        <Flex mt={4} justifyContent="center" flexWrap="wrap">
           {this.renderPrevStepButton(step)}
           {this.renderNextStepButton(step)}
         </Flex>
@@ -650,6 +698,9 @@ const addData = graphql(gql`
       backgroundImage
       currency
       tags
+      host {
+        id
+      }
       parentCollective {
         image
       }
