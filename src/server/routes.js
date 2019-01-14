@@ -1,18 +1,22 @@
+import url from 'url';
 import path from 'path';
 import { template } from 'lodash';
 import fs from 'fs';
 import pdf from 'html-pdf';
 import moment from 'moment';
-import request from 'request';
+import express from 'express';
+import proxy from 'express-http-proxy';
 
 import pages from './pages';
 import controllers from './controllers';
 import { maxAge } from './middlewares';
 import { logger } from './logger';
-import { translateApiUrl } from '../lib/utils';
+import { getBaseApiUrl } from '../lib/utils';
 import email from './lib/email';
 
 export default (server, app) => {
+  const urlencodedParser = express.urlencoded({ extended: false });
+
   // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
   // note: only for production/staging (NextJS overrides this in development env)
   server.get('*', maxAge(30));
@@ -25,26 +29,24 @@ export default (server, app) => {
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
-  server.all('/api/*', (req, res) => {
-    const apiUrl = translateApiUrl(req.url);
-    logger.debug('>>> API request %s', apiUrl);
-    req
-      .pipe(
-        request(apiUrl, {
-          followRedirect: false,
-          headers: {
-            'oc-frontend-api-proxy': '1',
-            'oc-frontend-ip': req.ip,
-            'X-Forwarded-For': req.ip,
-          },
-        }),
-      )
-      .on('error', e => {
-        logger.error('>>> Error calling API %s', apiUrl, e);
-        res.status(500).send(e);
-      })
-      .pipe(res);
-  });
+  server.use(
+    '/api',
+    proxy(getBaseApiUrl({ internal: true }), {
+      parseReqBody: false,
+      proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
+        proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
+        proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
+        return proxyReqOpts;
+      },
+      proxyReqPathResolver: req => {
+        const [pathname, search] = req.url.split('?');
+        const searchParams = new url.URLSearchParams(search);
+        searchParams.set('api_key', process.env.API_KEY);
+        return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
+      },
+    }),
+  );
 
   /**
    * Prevent indexation from search engines
@@ -152,7 +154,7 @@ export default (server, app) => {
 
   // Form submission in Marketing pages
 
-  server.post('/:pageSlug(gift-of-giving|gift-cards)', (req, res, next) => {
+  server.post('/:pageSlug(gift-of-giving|gift-cards)', urlencodedParser, (req, res, next) => {
     email.sendMessage({
       to: 'Open Collective <info@opencollective.com>',
       from: 'Open Collective <info@opencollective.com>',
