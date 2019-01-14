@@ -56,7 +56,6 @@ class CreateOrderPage extends React.Component {
       amount,
       quantity,
       totalAmount,
-      interval,
       description,
       verb,
       step,
@@ -70,7 +69,6 @@ class CreateOrderPage extends React.Component {
       tierSlug,
       quantity,
       totalAmount: totalAmount || amount * 100,
-      interval,
       description,
       verb,
       step,
@@ -85,7 +83,6 @@ class CreateOrderPage extends React.Component {
     tierSlug: PropTypes.string,
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
-    interval: PropTypes.string,
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
@@ -104,13 +101,6 @@ class CreateOrderPage extends React.Component {
     this.recaptcha = null;
     this.recaptchaToken = null;
 
-    const interval = (props.interval || '').toLowerCase().replace(/ly$/, '');
-    const initialDetails = {
-      quantity: parseInt(props.quantity, 10) || 1,
-      interval: ['month', 'year'].includes(interval) ? interval : null,
-      totalAmount: parseInt(props.totalAmount, 10) || null,
-    };
-
     this.state = {
       loading: false,
       submitting: false,
@@ -118,7 +108,7 @@ class CreateOrderPage extends React.Component {
       unknownEmail: false,
       signIn: true,
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
-      stepDetails: initialDetails,
+      stepDetails: null,
       stepPayment: null,
       error: null,
       stripe: null,
@@ -396,6 +386,7 @@ class CreateOrderPage extends React.Component {
             showFrequency={tierSlug ? true : false}
             interval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
             totalAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
+            disabledInterval={Boolean(tier)}
           />
         </Fragment>
       );
