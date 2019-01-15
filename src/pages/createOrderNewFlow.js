@@ -633,17 +633,37 @@ class CreateOrderPage extends React.Component {
           />
         </Flex>
       ) : (
-        <Flex justifyContent="center" width="100%">
-          <Box width={[0, null, null, 1 / 6]} />
-          <CreateProfile
-            onPersonalSubmit={this.createProfile}
-            onOrgSubmit={this.createProfile}
-            onSecondaryAction={() => this.setState({ signIn: true })}
-            submitting={submitting}
-            mx={4}
-            width={490}
-          />
-          <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 6} minWidth="335px" />
+        <Flex flexDirection="column" width={1} alignItems="center">
+          <Flex justifyContent="center" width={1}>
+            <Box width={[0, null, null, 1 / 5]} />
+            <CreateProfile
+              onPersonalSubmit={this.createProfile}
+              onOrgSubmit={this.createProfile}
+              onSecondaryAction={() => this.setState({ signIn: true })}
+              submitting={submitting}
+              mx={4}
+              width={490}
+            />
+            <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          </Flex>
+          <P mt={4} color="black.500" fontSize="Caption">
+            <FormattedMessage
+              id="contributeFlow.createProfile.legal"
+              defaultMessage="By joining, you agree to our {tosLink} and {privacyPolicyLink}."
+              values={{
+                tosLink: (
+                  <Link route="/tos">
+                    <FormattedMessage id="tos" defaultMessage="Terms of Service" />
+                  </Link>
+                ),
+                privacyPolicyLink: (
+                  <Link route="/privacypolicy">
+                    <FormattedMessage id="privacyPolicy" defaultMessage="Privacy Policy" />
+                  </Link>
+                ),
+              }}
+            />
+          </P>
         </Flex>
       );
     }
