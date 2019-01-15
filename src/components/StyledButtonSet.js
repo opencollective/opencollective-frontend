@@ -11,6 +11,7 @@ const comboStyle = ({ combo }) => (combo ? '0' : `0 ${borderRadius} ${borderRadi
 
 const StyledButtonItem = styled(StyledButton)`
   border-radius: 0;
+  flex-grow: 1;
   &:active p {
     color: white;
   }

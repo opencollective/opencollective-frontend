@@ -39,6 +39,8 @@ import StepsProgress from '../components/StepsProgress';
 import StyledCard from '../components/StyledCard';
 import PayWithPaypalButton from '../components/PayWithPaypalButton';
 import CreateProfileFAQ from '../components/faqs/CreateProfileFAQ';
+import ContributeDetailsFAQ from '../components/faqs/ContributeDetailsFAQ';
+import Container from '../components/Container';
 import { fadeIn } from '../components/StyledKeyframes';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
@@ -447,20 +449,24 @@ class CreateOrderPage extends React.Component {
       );
     } else if (step === 'details') {
       return (
-        <Fragment>
-          <H5 textAlign="left" mb={3}>
-            <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
-          </H5>
-          <ContributeDetails
-            amountOptions={amountOptions}
-            currency={this.getCurrency()}
-            onChange={data => this.setState({ stepDetails: data })}
-            showFrequency={tierSlug ? true : false}
-            interval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
-            totalAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
-            disabledInterval={Boolean(tier)}
-          />
-        </Fragment>
+        <Flex justifyContent="center" width={1}>
+          <Box width={[0, null, null, 1 / 5]} />
+          <Container mx={5} width={[0.95, null, 3 / 5]} maxWidth="465px">
+            <H5 textAlign="left" mb={3}>
+              <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
+            </H5>
+            <ContributeDetails
+              amountOptions={amountOptions}
+              currency={this.getCurrency()}
+              onChange={data => this.setState({ stepDetails: data })}
+              showFrequency={tierSlug ? true : false}
+              interval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
+              totalAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
+              disabledInterval={Boolean(tier)}
+            />
+          </Container>
+          <ContributeDetailsFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+        </Flex>
       );
     } else if (step === 'payment') {
       return (
@@ -610,8 +616,8 @@ class CreateOrderPage extends React.Component {
 
     const step = this.props.step || 'contributeAs';
     return (
-      <Flex flexDirection="column" alignItems="center" mx={3}>
-        <Box width={1}>{this.renderStep(step)}</Box>
+      <Flex flexDirection="column" alignItems="center" mx={3} width={1}>
+        {this.renderStep(step)}
         <Flex mt={4} justifyContent="center" flexWrap="wrap">
           {this.renderPrevStepButton(step)}
           {this.renderNextStepButton(step)}
