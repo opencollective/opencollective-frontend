@@ -47,8 +47,8 @@ const enhance = compose(
   }),
 );
 
-const ContributeDetails = enhance(({ amountOptions, currency, disabledInterval, onChange, state }) => (
-  <Container as="fieldset" border="none">
+const ContributeDetails = enhance(({ amountOptions, currency, disabledInterval, onChange, state, ...props }) => (
+  <Container as="fieldset" border="none" {...props}>
     <Flex>
       <StyledInputField
         label={
@@ -59,6 +59,7 @@ const ContributeDetails = enhance(({ amountOptions, currency, disabledInterval, 
           />
         }
         htmlFor="totalAmount"
+        css={{ flexGrow: 1 }}
       >
         {fieldProps => (
           <StyledButtonSet
@@ -72,7 +73,7 @@ const ContributeDetails = enhance(({ amountOptions, currency, disabledInterval, 
           </StyledButtonSet>
         )}
       </StyledInputField>
-      <Container maxWidth={100}>
+      <Container minWidth={90} maxWidth={100}>
         <StyledInputField
           label={<FormattedMessage id="contribution.amount.other.label" defaultMessage="Other" />}
           htmlFor="totalAmount"
