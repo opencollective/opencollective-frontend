@@ -8,6 +8,8 @@ import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 
+import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle.cjs';
+
 import { formatCurrency, imagePreview } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import { pickLogo } from '../lib/collective.lib';
@@ -177,6 +179,16 @@ class OrderSuccessPage extends React.Component {
     return (
       <Page title={'Contribute'}>
         <OrderSuccessContainer id="content" flexDirection="column" alignItems="center" mb={6}>
+          {order.status === 'PENDING' && !order.paymentMethod && (
+            <StyledCard borders={1} borderColor="yellow.500" bg="yellow.100" color="yellow.700" p={3} mt={4} mx={2}>
+              <InfoCircle size="1.2em" />{' '}
+              <FormattedMessage
+                id="collective.user.orderProcessing.manual"
+                defaultMessage="Your donation is pending. Please follow the instructions in the confirmation email to manually pay the host of the collective."
+              />
+            </StyledCard>
+          )}
+
           <StyledCollectiveCard mt={[4, 5]} mb={32} collective={collective} showCover={false}>
             <Flex flexDirection="column" p={12} alignItems="center">
               <Span fontSize="10px">
@@ -241,6 +253,7 @@ const addData = graphql(gql`
       totalAmount
       interval
       currency
+      status
       fromCollective {
         id
         name
@@ -253,6 +266,9 @@ const addData = graphql(gql`
       }
       tier {
         name
+      }
+      paymentMethod {
+        id
       }
     }
   }

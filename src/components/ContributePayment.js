@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { uniqBy, get } from 'lodash';
 
 import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck.cjs';
+import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt.cjs';
 
 import { withStripeLoader } from './StripeProvider';
 import Container from './Container';
@@ -47,6 +48,8 @@ const getPaymentMethodIcon = (pm, collective) => {
   } else if (pm.type === 'collective' && collective) {
     const { image, type, name } = collective;
     return <Avatar src={image} type={type} size="3.6rem" name={name} />;
+  } else if (pm.type === 'manual') {
+    return <ExchangeAlt size="1.5em" color="#c9ced4" />;
   }
 };
 
@@ -142,6 +145,16 @@ class ContributePayment extends React.Component {
       });
     }
 
+    if (props.manual) {
+      this.staticPaymentMethodsOptions.push({
+        key: 'manual',
+        title: props.manual.title || 'Bank transfer',
+        paymentMethod: { type: 'manual' },
+        icon: getPaymentMethodIcon({ type: 'manual' }, props.collective),
+        data: props.manual,
+      });
+    }
+
     const paymentMethodsOptions = this.generatePaymentsOptions();
     this.state = {
       paymentMethodsOptions: paymentMethodsOptions,
@@ -234,7 +247,7 @@ class ContributePayment extends React.Component {
           onChange={this.onChange}
           defaultValue={this.state.selectedOption.key}
         >
-          {({ radio, checked, index, value: { key, title, subtitle, icon } }) => (
+          {({ radio, checked, index, value: { key, title, subtitle, icon, data } }) => (
             <PaymentEntryContainer
               px={[3, 24]}
               py={3}
@@ -272,6 +285,11 @@ class ContributePayment extends React.Component {
                   </Elements>
                 </Box>
               )}
+              {key === 'manual' && checked && data.instructions && (
+                <Box my={3} color="black.600" fontSize="Paragraph">
+                  {data.instructions}
+                </Box>
+              )}
             </PaymentEntryContainer>
           )}
         </StyledRadioList>
@@ -295,6 +313,8 @@ ContributePayment.propTypes = {
    * PayPal button - this is up to parent component to do it.
    */
   withPaypal: PropTypes.bool,
+  /** Manual payment method instruction. Should be null if an interval is set */
+  manual: PropTypes.shape({ title: PropTypes.string, instructions: PropTypes.string }),
   /** Default value */
   defaultValue: PropTypes.object,
   /** Called with an object like {stripe} when new card form is mounted */
