@@ -147,7 +147,9 @@ class CreateOrderPage extends React.Component {
 
     // Load payment providers scripts in the background
     this.props.loadStripe();
-    getPaypal();
+    if (this.hasPaypal()) {
+      getPaypal();
+    }
 
     try {
       this.recaptcha = await getRecaptcha();
@@ -166,6 +168,11 @@ class CreateOrderPage extends React.Component {
     if (!this.isCurrentStepValid()) {
       const maxStepIdx = this.getMaxStepIdx();
       this.changeStep(maxStepIdx === 0 ? 'contributeAs' : STEPS[maxStepIdx - 1]);
+    }
+
+    // Collective was loaded
+    if (!prevProps.data.Collective && this.props.data.Collective && this.hasPaypal()) {
+      getPaypal();
     }
   }
 
@@ -382,7 +389,7 @@ class CreateOrderPage extends React.Component {
 
     const isLast = stepIdx + 1 >= STEPS.length;
     const canGoNext = stepIdx + 1 <= this.getMaxStepIdx();
-    const isPaypal = canGoNext && isLast && get(this.state, 'stepPayment.paymentMethod') === 'paypal';
+    const isPaypal = canGoNext && isLast && get(this.state, 'stepPayment.paymentMethod.type') === 'paypal';
     return isPaypal ? (
       <PaypalButtonContainer>
         <PayWithPaypalButton
