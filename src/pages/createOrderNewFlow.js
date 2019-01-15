@@ -525,13 +525,13 @@ class CreateOrderPage extends React.Component {
   }
 
   changeStep = async (step, options) => {
-    const { createCollective, data, refetchLoggedInUser } = this.props;
-
+    const { createCollective, slug, refetchLoggedInUser } = this.props;
     const { stepProfile, step: currentStep } = this.state;
     const routeSuffix = step === 'success' ? 'Success' : '';
+
     const params = {
       ...options,
-      collectiveSlug: data.Collective.slug,
+      collectiveSlug: slug,
       step: ['contributeAs', 'success'].includes(step) ? undefined : step,
     };
 
