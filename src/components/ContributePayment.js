@@ -129,6 +129,7 @@ class ContributePayment extends React.Component {
         key: 'newCreditCard',
         title: <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />,
         icon: <CreditCardInactive />,
+        paymentMethod: { type: 'creditcard' },
       },
     ];
 
@@ -136,8 +137,8 @@ class ContributePayment extends React.Component {
       this.staticPaymentMethodsOptions.push({
         key: 'paypal',
         title: 'PayPal',
-        paymentMethod: 'paypal',
-        icon: <PayPal />,
+        paymentMethod: { type: 'paypal' },
+        icon: getPaymentMethodIcon({ type: 'paypal' }, props.collective),
       });
     }
 
@@ -303,7 +304,7 @@ ContributePayment.propTypes = {
 };
 
 ContributePayment.defaultProps = {
-  withPaypal: true,
+  withPaypal: false,
   paymentMethods: [],
   collective: null,
 };
