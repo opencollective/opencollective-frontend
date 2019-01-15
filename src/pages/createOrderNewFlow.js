@@ -198,7 +198,7 @@ class CreateOrderPage extends React.Component {
   async getPaymentMethodToSubmit() {
     const { stepPayment } = this.state;
     if (!stepPayment.isNew) {
-      return pick(stepPayment.paymentMethod, ['uuid']);
+      return pick(stepPayment.paymentMethod, ['type', 'uuid']);
     } else if (!this.state.stripe) {
       this.setState({
         submitting: false,
@@ -353,6 +353,32 @@ class CreateOrderPage extends React.Component {
     return get(tier, 'currency', this.props.data.Collective.currency);
   }
 
+  /** Returns manual payment method if supported by the host, null otherwise */
+  getManualPaymentMethod() {
+    const pm = get(this.props.data, 'Collective.host.settings.paymentMethods.manual');
+    if (!pm || get(this.state, 'stepDetails.interval')) {
+      return null;
+    }
+
+    return {
+      ...pm,
+      instructions: this.props.intl.formatMessage(
+        {
+          id: 'host.paymentMethod.manual.instructions',
+          defaultMessage:
+            'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
+        },
+        {
+          amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
+          email: get(this.props, 'LoggedInUser.email', ''),
+          collective: get(this.props, 'loggedInUser.collective.slug', ''),
+          host: get(this.props.data, 'Collective.host.name'),
+          TierId: get(this.getTier(), 'id'),
+        },
+      ),
+    };
+  }
+
   getContributorTypeName() {
     const tier = this.getTier();
     if (tier) {
@@ -488,6 +514,7 @@ class CreateOrderPage extends React.Component {
             defaultValue={this.state.stepPayment}
             onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
             withPaypal={this.hasPaypal()}
+            manual={this.getManualPaymentMethod()}
             margins="0 auto"
           />
         </Fragment>
@@ -718,6 +745,8 @@ const addData = graphql(gql`
       tags
       host {
         id
+        name
+        settings
       }
       parentCollective {
         image
