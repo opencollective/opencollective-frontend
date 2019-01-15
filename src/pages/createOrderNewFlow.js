@@ -38,6 +38,7 @@ import StyledButton from '../components/StyledButton';
 import StepsProgress from '../components/StepsProgress';
 import StyledCard from '../components/StyledCard';
 import PayWithPaypalButton from '../components/PayWithPaypalButton';
+import CreateProfileFAQ from '../components/faqs/CreateProfileFAQ';
 import { fadeIn } from '../components/StyledKeyframes';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
@@ -592,13 +593,17 @@ class CreateOrderPage extends React.Component {
           />
         </Flex>
       ) : (
-        <Flex justifyContent="center">
+        <Flex justifyContent="center" width="100%">
+          <Box width={[0, null, null, 1 / 6]} />
           <CreateProfile
             onPersonalSubmit={this.createProfile}
             onOrgSubmit={this.createProfile}
             onSecondaryAction={() => this.setState({ signIn: true })}
             submitting={submitting}
+            mx={4}
+            width={490}
           />
+          <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 6} minWidth="335px" />
         </Flex>
       );
     }
