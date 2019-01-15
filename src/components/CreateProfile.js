@@ -67,8 +67,18 @@ const enhance = compose(
  * Component for handling the creation of profiles, either personal or organizational
  */
 const CreateProfile = enhance(
-  ({ getFieldError, getFieldProps, onPersonalSubmit, onOrgSubmit, onSecondaryAction, state, setState, submitting }) => (
-    <StyledCard maxWidth={480} width={1}>
+  ({
+    getFieldError,
+    getFieldProps,
+    onPersonalSubmit,
+    onOrgSubmit,
+    onSecondaryAction,
+    state,
+    setState,
+    submitting,
+    ...props
+  }) => (
+    <StyledCard maxWidth={480} {...props}>
       <Flex>
         <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
           <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
@@ -238,6 +248,8 @@ CreateProfile.propTypes = {
   onSecondaryAction: PropTypes.func.isRequired,
   /** Disable submit and show a spinner on button when set to true */
   submitting: PropTypes.bool,
+  /** All props from `StyledCard` */
+  ...StyledCard.propTypes,
 };
 
 CreateProfile.defaultProps = {

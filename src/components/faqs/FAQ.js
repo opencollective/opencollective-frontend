@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
+import { themeGet, display, minWidth } from 'styled-system';
+import { Box } from '@rebass/grid';
 
-import { P } from './Text';
+import { P } from '../Text';
+
+/** Main FAQ's container */
+const MainContainer = styled(Box)`
+  ${display};
+  ${minWidth};
+`;
 
 /** A simple wrapper to group entries */
-const Container = styled(Box)``;
+const EntryContainer = styled(Box)``;
 
 /** Main entry container */
 const Entry = styled.details`
@@ -83,8 +89,8 @@ export default class FAQ extends Component {
     children: PropTypes.func.isRequired,
     /** The title to display above entries */
     title: PropTypes.string,
-    /** All properties from `Flex` */
-    ...Flex.propTypes,
+    /** All properties from `Box` */
+    ...Box.propTypes,
   };
 
   static defaultProps = {
@@ -94,12 +100,12 @@ export default class FAQ extends Component {
   render() {
     const { title, children, ...props } = this.props;
     return (
-      <Flex flexDirection="column" {...props}>
+      <MainContainer {...props}>
         <P fontWeight="bold" mb={1}>
           {title}
         </P>
-        {children({ Container, Entry, Title, Content, Separator })}
-      </Flex>
+        {children({ Container: EntryContainer, Entry, Title, Content, Separator })}
+      </MainContainer>
     );
   }
 }
