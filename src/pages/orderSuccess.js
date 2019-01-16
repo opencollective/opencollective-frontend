@@ -178,7 +178,7 @@ class OrderSuccessPage extends React.Component {
 
     return (
       <Page title={'Contribute'}>
-        <OrderSuccessContainer id="content" flexDirection="column" alignItems="center" mb={6}>
+        <OrderSuccessContainer id="page-order-success" flexDirection="column" alignItems="center" mb={6}>
           {order.status === 'PENDING' && !order.paymentMethod && (
             <StyledCard borders={1} borderColor="yellow.500" bg="yellow.100" color="yellow.700" p={3} mt={4} mx={2}>
               <InfoCircle size="1.2em" />{' '}

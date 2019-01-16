@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import styled, { css } from 'styled-components';
 import { themeGet } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
@@ -106,7 +107,7 @@ const StepsProgress = ({
 }) => {
   const focusIdx = focus ? steps.indexOf(focus) : -1;
   return (
-    <Flex>
+    <Flex className="steps-progress">
       {steps.map((step, idx) => {
         const checked = idx < focusIdx || allCompleted;
         const focused = idx === focusIdx;
@@ -114,7 +115,13 @@ const StepsProgress = ({
         const loading = step === loadingStep;
 
         return (
-          <Flex key={step} flexDirection="column" alignItems="center" css={{ flexGrow: 1, flexBasis: stepWidth }}>
+          <Flex
+            key={step}
+            className={classNames(`step-${step}`, { disabled })}
+            flexDirection="column"
+            alignItems="center"
+            css={{ flexGrow: 1, flexBasis: stepWidth }}
+          >
             <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
               <SeparatorLine active={checked || focused} transparent={idx === 0} />
               <Bubble
