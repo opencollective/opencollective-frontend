@@ -151,6 +151,7 @@ const StyledSelect = ({ children, error, defaultValue, disabled, id, name, onCha
             {getItems(options).map((item, index) => (
               // eslint-disable-next-line react/jsx-key
               <ListItem
+                className={`select-${item.key}`}
                 {...getItemProps({
                   key: item.key,
                   index,
