@@ -100,9 +100,18 @@ describe('edit collective', () => {
       .first()
       .find('a.action')
       .click();
-    cy.get('.OrderForm', { timeout: 20000 });
-    cy.get('.tier .selectPreset label').contains('Select monthly amount');
-    cy.get('.tier .presetBtn', { timeout: 5000 }).should('have.length', 3);
+
+    // Ensure the new tiers are properly displayed on order form
+    if (Cypress.env('USE_NEW_CREATE_ORDER')) {
+      cy.contains('button', 'Next step', { timeout: 20000 }).click();
+      cy.get('#interval').contains('Monthly');
+      cy.get('#totalAmount > button').should('have.length', 3);
+    } else {
+      cy.get('.OrderForm', { timeout: 20000 });
+      cy.get('.tier .selectPreset label').contains('Select monthly amount');
+      cy.get('.tier .presetBtn', { timeout: 5000 }).should('have.length', 3);
+    }
+
     cy.visit('/testcollective/edit/tiers');
     cy.get('.EditTiers .tier')
       .first()

@@ -7,6 +7,7 @@ jobs:
     - image: circleci/postgres:9.6.8-alpine-postgis-ram
     environment:
       NODE_ENV: circleci
+      USE_NEW_CREATE_ORDER: 'true'
     steps:
     - checkout
     - setup_remote_docker
