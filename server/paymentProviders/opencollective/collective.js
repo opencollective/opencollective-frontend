@@ -1,9 +1,12 @@
+import Promise from 'bluebird';
+
+import logger from '../../lib/logger';
 import models, { sequelize } from '../../models';
 import { TransactionTypes } from '../../constants/transactions';
-import Promise from 'bluebird';
 import { getFxRate } from '../../lib/currency';
 import * as paymentsLib from '../../lib/payments';
 import { formatCurrency } from '../../lib/utils';
+import { maxInteger } from '../../constants/math';
 
 const paymentMethodProvider = {};
 
@@ -33,7 +36,7 @@ paymentMethodProvider.getBalance = paymentMethod => {
     if (collective.type === 'ORGANIZATION' || collective.type === 'USER') {
       return collective.isHost().then(isHost => {
         if (!isHost) return 0;
-        else return 10000000; // GraphQL doesn't like Infinity
+        else return maxInteger; // GraphQL doesn't like Infinity
       });
     }
 
@@ -63,11 +66,17 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     order.paymentMethod.CollectiveId === fromCollectiveHost.id &&
     fromCollectiveHost.id === collectiveHost.id
   ) {
-    order.paymentMethod = await models.PaymentMethod.findOne({
-      where: { CollectiveId: order.fromCollective.id },
-    });
+    // Defensive code that might be deleted if not used. Check the logs.
+    if (!order.paymentMethod) {
+      logger.warn('opencollective.collective.processOrder: no paymentMethod set in order');
+      order.paymentMethod = await models.PaymentMethod.findOne({
+        where: { CollectiveId: order.fromCollective.id },
+      });
+    }
     // We need to recheck the balance
     const balance = await paymentMethodProvider.getBalance(order.paymentMethod);
+    // FIXME: balance and totalAmount should be tested according to their respective currencies
+    // https://github.com/opencollective/opencollective/issues/1634
     if (balance < order.totalAmount) {
       throw new Error(
         `You don't have enough funds available (${formatCurrency(

@@ -9,6 +9,7 @@ import twitter from '../server/lib/twitter';
 import * as utils from './utils';
 import * as store from './features/support/stores';
 import emailLib from '../server/lib/email';
+import { maxInteger } from '../server/constants/math';
 
 const baseOrder = Object.freeze({
   quantity: 1,
@@ -761,7 +762,7 @@ describe('createOrder', () => {
       order.collective = { id: collective.id };
       order.paymentMethod = { uuid: paymentMethod.uuid };
       order.interval = null;
-      order.totalAmount = 10000000;
+      order.totalAmount = maxInteger;
       delete order.tier;
       // And add some funds to the fromCollective
       await models.Transaction.create({
@@ -778,7 +779,7 @@ describe('createOrder', () => {
       const res = await utils.graphqlQuery(createOrderQuery, { order }, hostAdmin);
       expect(res.errors).to.exist;
       expect(res.errors[0].message).to.equal(
-        "You don't have enough funds available ($7,461 left) to execute this order ($100,000)",
+        "You don't have enough funds available ($7,461 left) to execute this order ($21,474,836)",
       );
     });
 
@@ -825,14 +826,14 @@ describe('createOrder', () => {
     order.collective = { id: collective.id };
     order.paymentMethod = { uuid: paymentMethod.uuid };
     order.interval = null;
-    order.totalAmount = 10000000;
+    order.totalAmount = maxInteger;
     delete order.tier;
 
     // Should fail if not enough funds in the fromCollective
     let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal(
-      "You don't have enough funds available ($7,461 left) to execute this order ($100,000)",
+      "You don't have enough funds available ($7,461 left) to execute this order ($21,474,836)",
     );
 
     order.totalAmount = 20000;

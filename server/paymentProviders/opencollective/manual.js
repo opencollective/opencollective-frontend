@@ -1,6 +1,7 @@
 import { pick } from 'lodash';
 import models from '../../models';
 import { TransactionTypes } from '../../constants/transactions';
+import { maxInteger } from '../../constants/math';
 
 /**
  * Manual Payment method
@@ -10,10 +11,10 @@ import { TransactionTypes } from '../../constants/transactions';
 
 /** Get the balance
  * Since we don't have a way to check the balance of the donor, we return Infinity
- * note: since GraphQL doesn't like Infinity, we use 10000000
+ * note: since GraphQL doesn't like Infinity, we use maxInteger
  */
 async function getBalance() {
-  return 10000000;
+  return maxInteger;
 }
 
 /** Process an order with a manual payment method

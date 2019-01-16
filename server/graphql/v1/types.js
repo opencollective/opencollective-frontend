@@ -22,6 +22,7 @@ import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../../lib/utils';
 import status from '../../constants/expense_status';
 import orderStatus from '../../constants/order_status';
+import { maxInteger } from '../../constants/math';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -842,7 +843,7 @@ export const TierStatsType = new GraphQLObjectType({
             tier
               .availableQuantity()
               // graphql doesn't like infinity value
-              .then(availableQuantity => (availableQuantity === Infinity ? 10000000 : availableQuantity))
+              .then(availableQuantity => (availableQuantity === Infinity ? maxInteger : availableQuantity))
           );
         },
       },

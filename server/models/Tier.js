@@ -1,9 +1,12 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
-import { capitalize, pluralize, days, formatCurrency } from '../lib/utils';
 import debugLib from 'debug';
-const debug = debugLib('tier');
+
 import CustomDataTypes from './DataTypes';
+import { maxInteger } from '../constants/math';
+import { capitalize, pluralize, days, formatCurrency } from '../lib/utils';
+
+const debug = debugLib('tier');
 
 export default function(Sequelize, DataTypes) {
   const { models, Op } = Sequelize;
@@ -231,7 +234,7 @@ export default function(Sequelize, DataTypes) {
       } else if (this.maxQuantity) {
         return this.maxQuantity;
       } else {
-        return 10000000; // GraphQL doesn't like infinity
+        return maxInteger; // GraphQL doesn't like infinity
       }
     });
   };
