@@ -11,6 +11,7 @@ import virtualcard from '../server/paymentProviders/opencollective/virtualcard';
 import * as store from './features/support/stores';
 import emailLib from '../server/lib/email';
 import initNock from './paymentMethods.opencollective.virtualcard.nock';
+import { maxInteger } from '../server/constants/math';
 
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
@@ -381,7 +382,7 @@ describe('opencollective.virtualcard', () => {
           FromCollectiveId: userCollective.id,
           CollectiveId: collective2.id,
           PaymentMethodId: virtualCardPaymentMethod.id,
-          totalAmount: 10000000,
+          totalAmount: maxInteger,
           currency: 'USD',
         });
         order.fromCollective = userCollective;

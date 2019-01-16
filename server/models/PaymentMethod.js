@@ -14,6 +14,8 @@ import CustomDataTypes from './DataTypes';
 import * as stripe from '../paymentProviders/stripe/gateway';
 import * as libpayments from '../lib/payments';
 
+import { maxInteger } from '../constants/math';
+
 const debug = libdebug('PaymentMethod');
 
 export default function(Sequelize, DataTypes) {
@@ -370,7 +372,7 @@ export default function(Sequelize, DataTypes) {
 
     const paymentProvider = libpayments.findPaymentMethodProvider(this);
     const getBalance =
-      paymentProvider && paymentProvider.getBalance ? paymentProvider.getBalance : () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
+      paymentProvider && paymentProvider.getBalance ? paymentProvider.getBalance : () => Promise.resolve(maxInteger); // GraphQL doesn't like Infinity
 
     // Paypal Preapproved Key
     if (this.service === 'paypal' && !this.type) {

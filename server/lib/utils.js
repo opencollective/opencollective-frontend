@@ -516,7 +516,7 @@ export function formatCurrency(amount, currency, precision = 0) {
       locale = 'en-EU';
       break;
     default:
-      locale = currency;
+      locale = 'en-US';
   }
   return amount.toLocaleString(locale, {
     style: 'currency',
