@@ -1,12 +1,13 @@
 import mockRecaptcha from '../mocks/recaptcha';
 
+const visitParams = { onBeforeLoad: mockRecaptcha };
+
 describe('Contribution Flow: Donate', () => {
   it('Can donate as new user', () => {
     // Mock clock so we can check next contribution date in a consistent way
     cy.clock(Date.parse('2042/05/25'));
 
     const userParams = { firstName: 'Donate', lastName: 'Tester' };
-    const visitParams = { onBeforeLoad: mockRecaptcha };
     cy.signup({ user: userParams, redirect: '/apex/donate', visitParams }).then(user => {
       // ---- Step 1: Select profile ----
       // Personnal account must be the first entry, and it must be checked
@@ -80,6 +81,35 @@ describe('Contribution Flow: Donate', () => {
       // Submit a new order with existing card
       cy.contains('button', 'Submit').click();
       cy.get('#page-order-success', { timeout: 20000 }).contains('Woot woot!');
+    });
+  });
+
+  it('Can donate as new organization', () => {
+    cy.signup({ redirect: '/apex/donate', visitParams }).then(() => {
+      cy.contains('#contributeAs > label', 'A new organization').click();
+
+      // Submit is disabled by default
+      cy.contains('button', 'Next step').should('be.disabled');
+
+      // Name must be shown on step
+      cy.get('#contributeAs input[name=name]').type('Evil Corp');
+      cy.get('.step-contributeAs').contains('Evil Corp');
+
+      // Fill form
+      cy.get('#contributeAs input[name=website]').type('https://www.youtube.com/watch?v=oHg5SJYRHA0');
+      cy.get('#contributeAs input[name=githubHandle]').type('test');
+      cy.get('#contributeAs input[name=twitterHandle]').type('test');
+
+      // Submit form
+      cy.contains('Next step').click();
+      cy.contains('Next step').click();
+      cy.wait(2000);
+      cy.fillStripeInput();
+      cy.contains('button', 'Submit').click();
+
+      // ---- Final: Success ----
+      cy.get('#page-order-success', { timeout: 20000 }).contains('$20.00');
+      cy.contains(/Evil Corp is now .+'s backer/);
     });
   });
 });
