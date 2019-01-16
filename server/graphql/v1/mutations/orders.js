@@ -318,6 +318,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       throw new Error(`Invalid currency. Expected ${currency}.`);
     }
 
+    // ---- Checks on totalAmount ----
+    if (order.totalAmount < 0) {
+      throw new Error('Total amount cannot be a negative value');
+    }
+
     const quantity = order.quantity || 1;
 
     let totalAmount;
