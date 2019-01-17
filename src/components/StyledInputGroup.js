@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { themeGet } from 'styled-system';
 import { withState } from 'recompose';
+import { get } from 'lodash';
 
 import Container from './Container';
 import { Span } from './Text';
@@ -11,6 +12,16 @@ import StyledInput from './StyledInput';
 const InputContainer = styled(Container)`
   &:hover {
     border-color: ${themeGet('colors.primary.300')};
+  }
+
+  &:focus-within {
+    border-color: ${themeGet('colors.primary.500')};
+  }
+
+  input {
+    border: none;
+    outline: none;
+    box-shadow: none;
   }
 
   input:focus ~ div svg {
@@ -71,7 +82,19 @@ const getBorderColor = ({ error, focused, success }) => {
  * @see See [StyledInput](/#!/StyledInput) for details about props passed to it
  */
 const StyledInputGroup = withState('focused', 'setFocus', false)(
-  ({ append, prepend, focused, setFocus, disabled, success, error, maxWidth, ...inputProps }) => (
+  ({
+    append,
+    prepend,
+    focused,
+    setFocus,
+    disabled,
+    success,
+    error,
+    maxWidth,
+    containerProps,
+    prependProps,
+    ...inputProps
+  }) => (
     <React.Fragment>
       <InputContainer
         bg={disabled ? 'black.50' : 'white.full'}
@@ -81,12 +104,20 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
         borderRadius="4px"
         display="flex"
         alignItems="center"
+        {...containerProps}
       >
         {prepend && (
-          <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" py={2} px={3}>
-            <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
-              {prepend}
-            </Span>
+          <Container
+            fontSize="Paragraph"
+            borderRadius="4px 0 0 4px"
+            py={2}
+            pl={2}
+            pr={2}
+            color={getColor({ error, focused, success })}
+            {...prependProps}
+            bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
+          >
+            {prepend}
           </Container>
         )}
         <StyledInput
@@ -133,6 +164,10 @@ StyledInputGroup.propTypes = {
   success: PropTypes.bool,
   /** Passed to internal StyledInput */
   type: PropTypes.string,
+  /** Props passed to the `InputContainer` */
+  containerProps: PropTypes.object,
+  /** Props passed to the prepend `Container` */
+  prependProps: PropTypes.object,
 };
 
 export default StyledInputGroup;
