@@ -328,11 +328,16 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     // Don't allow custom values if using a tier with fixed amount
     if (tier && tier.amount && !tier.presets && tier.amount * order.quantity !== order.totalAmount) {
-      const prettyTotalAmount = formatCurrency(order.totalAmount, currency);
-      const prettyExpectedAmount = formatCurrency(tier.amount * order.quantity, currency);
-      throw new Error(
-        `This tier uses a fixed amount. Order total must be ${prettyExpectedAmount}. You set: ${prettyTotalAmount}`,
-      );
+      if (isNil(order.totalAmount)) {
+        // Manually force the totalAmount if it has no been passed
+        order.totalAmount = order.quantity * tier.amount;
+      } else {
+        const prettyTotalAmount = formatCurrency(order.totalAmount, currency);
+        const prettyExpectedAmount = formatCurrency(tier.amount * order.quantity, currency);
+        throw new Error(
+          `This tier uses a fixed amount. Order total must be ${prettyExpectedAmount}. You set: ${prettyTotalAmount}`,
+        );
+      }
     }
 
     // If using a tier, amount can never be less than the minimum amount
