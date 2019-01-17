@@ -439,6 +439,7 @@ class CreateOrderPage extends React.Component {
         buttonStyle="primary"
         onClick={() => (isLast ? this.submitOrder() : this.changeStep(STEPS[stepIdx + 1]))}
         disabled={this.state.submitting || !canGoNext || this.state.submitted}
+        loading={this.state.submitting}
       >
         {isLast ? (
           <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
@@ -450,9 +451,9 @@ class CreateOrderPage extends React.Component {
     );
   }
 
-  updateProfile = debounce(stepProfile => {
-    this.setState({ stepProfile, stepPayment: null });
-  }, 300);
+  // Debounce state update functions that may be called successively
+  updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
+  updateDetails = debounce(stepDetails => this.setState({ stepDetails }), 100, { leading: true, maxWait: 500 });
 
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
@@ -497,7 +498,7 @@ class CreateOrderPage extends React.Component {
               <ContributeDetails
                 amountOptions={this.getAmountsPresets()}
                 currency={this.getCurrency()}
-                onChange={data => this.setState({ stepDetails: data })}
+                onChange={this.updateDetails}
                 showFrequency={tierSlug ? true : false}
                 defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
                 defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
@@ -512,7 +513,7 @@ class CreateOrderPage extends React.Component {
       );
     } else if (step === 'payment') {
       return (
-        <Fragment>
+        <Flex flexDirection="column">
           <H5 textAlign="left" mb={3}>
             <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
           </H5>
@@ -526,7 +527,7 @@ class CreateOrderPage extends React.Component {
             manual={this.getManualPaymentMethod()}
             margins="0 auto"
           />
-        </Fragment>
+        </Flex>
       );
     }
 

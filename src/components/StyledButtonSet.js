@@ -15,7 +15,8 @@ const StyledButtonItem = styled(StyledButton)`
   &:active p {
     color: white;
   }
-  &:hover {
+  &:hover,
+  &:focus {
     /* Use a higher z-index on hover to get all the borders colored */
     z-index: 9;
   }
@@ -36,6 +37,10 @@ const StyledButtonItem = styled(StyledButton)`
 
 StyledButtonItem.propTypes = {
   combo: PropTypes.bool,
+};
+
+StyledButtonItem.defaultProps = {
+  blacklist: StyledButton.defaultProps.blacklist.concat('combo'),
 };
 
 const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, disabled, ...props }) => (

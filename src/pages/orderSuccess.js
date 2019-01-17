@@ -13,11 +13,11 @@ import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle.cjs';
 import { formatCurrency, imagePreview } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import { pickLogo } from '../lib/collective.lib';
+import { Link } from '../server/pages';
 import { withUser } from '../components/UserProvider';
 import { H3, H5, P, Span } from '../components/Text';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-import Link from '../components/Link';
 import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 import Loading from '../components/Loading';
@@ -42,6 +42,7 @@ ShareLink.defaultProps = {
   fontWeight: 600,
   mx: 2,
   target: '_blank',
+  blacklist: StyledLink.defaultProps.blacklist,
 };
 
 const CollectiveLogoContainer = styled(Flex)`
@@ -97,10 +98,10 @@ StyledCollectiveCard.defaultProps = { width: 144 };
 class OrderSuccessPage extends React.Component {
   static propTypes = {
     OrderId: PropTypes.number.isRequired,
-    LoggedInUser: PropTypes.object.isRequired, // from withUser
-    loggedInUserLoading: PropTypes.bool.isRequired, // from withUser
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from withIntl
+    loggedInUserLoading: PropTypes.bool, // from withUser
+    LoggedInUser: PropTypes.object, // from withUser
   };
 
   static getInitialProps({ query: { OrderId } }) {
