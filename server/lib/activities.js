@@ -222,6 +222,7 @@ export default {
     } else {
       collective = collectiveName;
     }
+
     switch (activity.type) {
       // Currently used for both new donation and expense
       case activities.COLLECTIVE_TRANSACTION_CREATED:
@@ -278,6 +279,11 @@ export default {
 
       case activities.COLLECTIVE_CREATED:
         return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
+
+      case activities.ORDERS_SUSPICIOUS:
+        return `Suspicious Order: ${userString} gave ${currency} ${amount} to ${collective}. Score: ${
+          activity.data.recaptchaResponse.score
+        }`;
 
       default:
         return '';
