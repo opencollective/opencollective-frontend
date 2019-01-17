@@ -47,6 +47,7 @@ const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChang
         buttonSize={size}
         buttonStyle={item === selected ? 'primary' : 'standard'}
         onClick={onChange && (() => onChange(item))}
+        className={item === selected ? 'selected' : undefined}
         {...buttonProps}
       >
         {children({ item, isSelected: item === selected })}
