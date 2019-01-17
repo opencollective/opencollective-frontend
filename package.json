@@ -47,7 +47,7 @@
     "load-script": "1.0.0",
     "lodash": "4.17.11",
     "lru-cache": "5.1.1",
-    "markdown-loader": "4.0.0",
+    "markdown-loader": "5.0.0",
     "moment": "2.22.2",
     "moment-timezone": "0.5.23",
     "newrelic": "5.0.0",
