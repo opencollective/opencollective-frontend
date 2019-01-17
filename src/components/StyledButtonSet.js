@@ -38,7 +38,7 @@ StyledButtonItem.propTypes = {
   combo: PropTypes.bool,
 };
 
-const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, ...props }) => (
+const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, disabled, ...props }) => (
   <Flex {...props}>
     {items.map(item => (
       <StyledButtonItem
@@ -48,6 +48,8 @@ const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChang
         buttonStyle={item === selected ? 'primary' : 'standard'}
         onClick={onChange && (() => onChange(item))}
         className={item === selected ? 'selected' : undefined}
+        disabled={disabled}
+        type="button"
         {...buttonProps}
       >
         {children({ item, isSelected: item === selected })}
@@ -69,6 +71,8 @@ StyledButtonSet.propTypes = {
   onChange: PropTypes.func,
   /** Setting to style last item to look good in combination with a text input */
   combo: PropTypes.bool,
+  /** Disable user input */
+  disabled: PropTypes.bool,
 };
 
 StyledButtonSet.defaultProps = {

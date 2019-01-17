@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick } from 'lodash';
+import { debounce, get, pick, isNil, min } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
@@ -123,7 +123,7 @@ class CreateOrderPage extends React.Component {
     super(props);
     this.recaptcha = null;
     this.recaptchaToken = null;
-
+    this.contributeDetailsFormRef = React.createRef();
     this.state = {
       loading: false,
       submitting: false,
@@ -332,6 +332,12 @@ class CreateOrderPage extends React.Component {
     }
   }
 
+  /** Returns tier presets, defaults presets, or null if using a tier with fixed amount */
+  getAmountsPresets() {
+    const tier = this.getTier() || {};
+    return tier.presets || (isNil(tier.amount) ? [500, 1000, 2000, 5000] : null);
+  }
+
   /** Return the index of the last step user can switch to */
   getMaxStepIdx() {
     if (!this.state.stepProfile) return 0;
@@ -457,7 +463,6 @@ class CreateOrderPage extends React.Component {
     const { LoggedInUser, tierSlug } = this.props;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
-    const amountOptions = (tier && tier.presets) || [500, 1000, 2000, 5000];
 
     if (step === 'contributeAs') {
       return (
@@ -488,15 +493,19 @@ class CreateOrderPage extends React.Component {
             <H5 textAlign="left" mb={3}>
               <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
             </H5>
-            <ContributeDetails
-              amountOptions={amountOptions}
-              currency={this.getCurrency()}
-              onChange={data => this.setState({ stepDetails: data })}
-              showFrequency={tierSlug ? true : false}
-              interval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
-              totalAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
-              disabledInterval={Boolean(tier)}
-            />
+            <form ref={this.contributeDetailsFormRef}>
+              <ContributeDetails
+                amountOptions={this.getAmountsPresets()}
+                currency={this.getCurrency()}
+                onChange={data => this.setState({ stepDetails: data })}
+                showFrequency={tierSlug ? true : false}
+                defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
+                defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
+                disabledInterval={Boolean(tier)}
+                disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
+                minAmount={min(isNil(get(tier, 'amount')) ? get(tier, 'presets') : [...tier.presets, tier.amount])}
+              />
+            </form>
           </Container>
           <ContributeDetailsFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
         </Flex>
@@ -525,8 +534,8 @@ class CreateOrderPage extends React.Component {
   }
 
   changeStep = async (step, options) => {
-    const { createCollective, slug, refetchLoggedInUser } = this.props;
-    const { stepProfile, step: currentStep } = this.state;
+    const { createCollective, slug, refetchLoggedInUser, step: currentStep } = this.props;
+    const { stepProfile } = this.state;
     const routeSuffix = step === 'success' ? 'Success' : '';
 
     const params = {
@@ -547,6 +556,13 @@ class CreateOrderPage extends React.Component {
         this.setState({ stepProfile: createdOrg, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
+      }
+    }
+
+    // Validate ContributeDetails step before going next
+    if (currentStep === 'details' && step === 'payment') {
+      if (!this.contributeDetailsFormRef.current || !this.contributeDetailsFormRef.current.reportValidity()) {
+        return false;
       }
     }
 
@@ -672,7 +688,7 @@ class CreateOrderPage extends React.Component {
     return (
       <Flex flexDirection="column" alignItems="center" mx={3} width={1}>
         {this.renderStep(step)}
-        <Flex mt={4} justifyContent="center" flexWrap="wrap">
+        <Flex mt={[4, null, 5]} justifyContent="center" flexWrap="wrap">
           {this.renderPrevStepButton(step)}
           {this.renderNextStepButton(step)}
         </Flex>
@@ -718,7 +734,7 @@ class CreateOrderPage extends React.Component {
           </Link>
 
           {tier && (
-            <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3}>
+            <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3} textAlign="center">
               {tier.button ? (
                 tier.button
               ) : (
@@ -732,7 +748,7 @@ class CreateOrderPage extends React.Component {
           )}
         </Flex>
         <Flex id="content" flexDirection="column" alignItems="center" mb={6}>
-          <Box mb={3} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+          <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
             {this.renderStepsProgress(this.props.step || 'contributeAs')}
           </Box>
           {this.state.error && (
