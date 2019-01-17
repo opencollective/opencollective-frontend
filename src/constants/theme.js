@@ -26,13 +26,14 @@ export const colors = {
     100: '#E6FAEF',
   },
   primary: {
+    800: '#0041A3',
     700: '#145ECC',
     500: '#3385FF',
     400: '#66A3FF',
     300: '#99C9FF',
-    200: '#DBECFF',
+    200: '#B8DEFF',
     100: '#EBF4FF',
-    50: '#F2F8FF',
+    50: '#F0F8FF',
   },
   red: {
     700: '#CC1836',
@@ -108,6 +109,11 @@ const theme = {
         color: colors.primary[400],
       },
 
+      '&:focus': {
+        backgroundColor: 'white',
+        borderColor: colors.primary[400],
+      },
+
       '&:active': {
         backgroundColor: colors.primary[500],
         borderColor: colors.primary[500],
@@ -124,21 +130,31 @@ const theme = {
 
     primary: {
       backgroundColor: colors.primary[500],
+      border: '1px solid',
       borderRadius: '100px',
+      borderColor: colors.primary[500],
       color: 'white',
 
       '&:hover': {
-        backgroundColor: colors.primary[400],
-        color: 'white',
-      },
-
-      '&:active': {
         backgroundColor: colors.primary[700],
         color: 'white',
       },
 
+      '&:focus': {
+        backgroundColor: colors.primary[500],
+        borderColor: colors.primary[700],
+      },
+
+      '&:active': {
+        backgroundColor: colors.primary[800],
+        borderColor: colors.primary[800],
+        color: 'white',
+      },
+
       '&:disabled': {
-        backgroundColor: colors.primary[200],
+        backgroundColor: colors.primary[50],
+        color: colors.primary[200],
+        borderColor: colors.primary[50],
         cursor: 'not-allowed',
       },
     },

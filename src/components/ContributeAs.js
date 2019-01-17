@@ -160,6 +160,7 @@ const ContributeAs = enhance(
               lineHeight="Paragraph"
               placeholder="Filter by name..."
               onChange={onSearch}
+              ml={2}
             />
           </Container>
         )}
