@@ -25,10 +25,10 @@ describe('Contribution Flow: Donate', () => {
       cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
 
       // Has default amount selected
-      cy.get('fieldset .selected').should('exist');
+      cy.get('#totalAmount button.selected').should('exist');
 
       // Change amount
-      cy.get('fieldset input[type=number][name=totalAmount]').type('{selectall}1337');
+      cy.get('input[type=number][name=totalAmount]').type('{selectall}1337');
       cy.contains('.step-details', '$1,337.00');
 
       // Change frequency - monthly
