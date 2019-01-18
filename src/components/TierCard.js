@@ -109,7 +109,7 @@ class TierCard extends React.Component {
     const { collective, tier, referral, intl } = this.props;
     const amount = tier.presets ? Math.min(tier.presets[0], tier.amount) : tier.amount;
     const disabled = (amount > 0 && !collective.isActive) || tier.stats.availableQuantity === 0;
-    const totalOrders = tier.stats.totalOrders;
+    const totalActiveDistinctOrders = tier.stats.totalActiveDistinctOrders;
     let errorMsg;
     if (!collective.host) {
       errorMsg = 'hostMissing';
@@ -306,16 +306,16 @@ class TierCard extends React.Component {
             </p>
           )}
         </div>
-        {tier.stats.totalOrders > 0 && (
+        {totalActiveDistinctOrders > 0 && (
           <div>
             <div className="divider" />
             <div className="footer">
               <div className="lastOrders">
-                {totalOrders > 0 && (
+                {totalActiveDistinctOrders > 0 && (
                   <div className="totalOrders">
-                    {totalOrders}{' '}
+                    {totalActiveDistinctOrders}{' '}
                     {intl.formatMessage(this.messages['contribution'], {
-                      n: totalOrders,
+                      n: totalActiveDistinctOrders,
                     })}
                   </div>
                 )}
