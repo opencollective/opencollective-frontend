@@ -836,6 +836,13 @@ export const TierStatsType = new GraphQLObjectType({
           return req.loaders.tiers.totalDistinctOrders.load(tier.id);
         },
       },
+      totalActiveDistinctOrders: {
+        description: 'total number of active people/organizations in this tier',
+        type: GraphQLInt,
+        resolve(tier, args, req) {
+          return req.loaders.tiers.totalActiveDistinctOrders.load(tier.id);
+        },
+      },
       availableQuantity: {
         type: GraphQLInt,
         resolve(tier) {
