@@ -70,31 +70,10 @@ Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/${collectiveSlug}/edit/payment-methods` });
   cy.get('.editPaymentMethodsActions button').click();
   cy.wait(2000);
-  cy.get('.__PrivateStripeElement iframe').then(iframe => {
-    const body = iframe.contents().find('body');
-
-    cy.wrap(body)
-      .find('input:eq(1)')
-      .type('4242424242424242');
-
-    cy.wrap(body)
-      .find('input:eq(2)')
-      .type('1222');
-
-    cy.wrap(body)
-      .find('input:eq(3)')
-      .type('123');
-
-    cy.wrap(body)
-      .find('input:eq(4)')
-      .type('42222');
-
-    cy.wait(1000);
-
-    cy.get('button[type="submit"]').click();
-
-    cy.wait(2000);
-  });
+  fillStripeInput();
+  cy.wait(1000);
+  cy.get('button[type="submit"]').click();
+  cy.wait(2000);
 });
 
 /**
@@ -107,41 +86,7 @@ Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
  *    - cvcCode
  *    - postalCode
  */
-Cypress.Commands.add(
-  'fillStripeInput',
-  (
-    container,
-    cardParams = {
-      creditCardNumber: '4242424242424242',
-      expirationDate: '1250',
-      cvcCode: '123',
-      postalCode: '42222',
-    },
-  ) => {
-    const stripeIframeSelector = '.__PrivateStripeElement iframe';
-    const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
-
-    return iframePromise.then(iframe => {
-      const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
-      const body = iframe.contents().find('body');
-      const fillInput = (index, value) => {
-        if (value === undefined) {
-          return;
-        }
-
-        return cy
-          .wrap(body)
-          .find(`input:eq(${index})`)
-          .type(`{selectall}${value}`);
-      };
-
-      fillInput(1, creditCardNumber);
-      fillInput(2, expirationDate);
-      fillInput(3, cvcCode);
-      fillInput(4, postalCode);
-    });
-  },
-);
+Cypress.Commands.add('fillStripeInput', fillStripeInput);
 
 /**
  * A helper for the `StepsProgress` component to check that the steps in params
@@ -192,5 +137,38 @@ function graphqlQuery(token, body) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+  });
+}
+
+function fillStripeInput(
+  container,
+  cardParams = {
+    creditCardNumber: '4242424242424242',
+    expirationDate: '1250',
+    cvcCode: '123',
+    postalCode: '42222',
+  },
+) {
+  const stripeIframeSelector = '.__PrivateStripeElement iframe';
+  const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
+
+  return iframePromise.then(iframe => {
+    const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
+    const body = iframe.contents().find('body');
+    const fillInput = (index, value) => {
+      if (value === undefined) {
+        return;
+      }
+
+      return cy
+        .wrap(body)
+        .find(`input:eq(${index})`)
+        .type(`{selectall}${value}`);
+    };
+
+    fillInput(1, creditCardNumber);
+    fillInput(2, expirationDate);
+    fillInput(3, cvcCode);
+    fillInput(4, postalCode);
   });
 }

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
@@ -123,7 +123,6 @@ class CreateOrderPage extends React.Component {
     super(props);
     this.recaptcha = null;
     this.recaptchaToken = null;
-    this.contributeDetailsFormRef = React.createRef();
     this.state = {
       loading: false,
       submitting: false,
@@ -439,6 +438,7 @@ class CreateOrderPage extends React.Component {
         buttonStyle="primary"
         onClick={() => (isLast ? this.submitOrder() : this.changeStep(STEPS[stepIdx + 1]))}
         disabled={this.state.submitting || !canGoNext || this.state.submitted}
+        loading={this.state.submitting}
       >
         {isLast ? (
           <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
@@ -450,9 +450,9 @@ class CreateOrderPage extends React.Component {
     );
   }
 
-  updateProfile = debounce(stepProfile => {
-    this.setState({ stepProfile, stepPayment: null });
-  }, 300);
+  // Debounce state update functions that may be called successively
+  updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
+  updateDetails = debounce(stepDetails => this.setState({ stepDetails }), 100, { leading: true, maxWait: 500 });
 
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
@@ -493,26 +493,24 @@ class CreateOrderPage extends React.Component {
             <H5 textAlign="left" mb={3}>
               <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
             </H5>
-            <form ref={this.contributeDetailsFormRef}>
-              <ContributeDetails
-                amountOptions={this.getAmountsPresets()}
-                currency={this.getCurrency()}
-                onChange={data => this.setState({ stepDetails: data })}
-                showFrequency={tierSlug ? true : false}
-                defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
-                defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
-                disabledInterval={Boolean(tier)}
-                disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
-                minAmount={min(isNil(get(tier, 'amount')) ? get(tier, 'presets') : [...tier.presets, tier.amount])}
-              />
-            </form>
+            <ContributeDetails
+              amountOptions={this.getAmountsPresets()}
+              currency={this.getCurrency()}
+              onChange={this.updateDetails}
+              showFrequency={tierSlug ? true : false}
+              defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
+              defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
+              disabledInterval={Boolean(tier)}
+              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
+              minAmount={min(isNil(get(tier, 'amount')) ? get(tier, 'presets') : [...tier.presets, tier.amount])}
+            />
           </Container>
           <ContributeDetailsFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
         </Flex>
       );
     } else if (step === 'payment') {
       return (
-        <Fragment>
+        <Flex flexDirection="column">
           <H5 textAlign="left" mb={3}>
             <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
           </H5>
@@ -526,7 +524,7 @@ class CreateOrderPage extends React.Component {
             manual={this.getManualPaymentMethod()}
             margins="0 auto"
           />
-        </Fragment>
+        </Flex>
       );
     }
 
@@ -556,13 +554,6 @@ class CreateOrderPage extends React.Component {
         this.setState({ stepProfile: createdOrg, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
-      }
-    }
-
-    // Validate ContributeDetails step before going next
-    if (currentStep === 'details' && step === 'payment') {
-      if (!this.contributeDetailsFormRef.current || !this.contributeDetailsFormRef.current.reportValidity()) {
-        return false;
       }
     }
 

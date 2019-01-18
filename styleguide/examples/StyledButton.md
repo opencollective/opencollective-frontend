@@ -1,24 +1,36 @@
-Default styling example using the `standard` button style theme:
+### Standard button
 
 ```js
-<StyledButton>Standard Button</StyledButton>
+<React.Fragment>
+  <StyledButton mr={3} buttonSize="large" disabled>
+    Disabled
+  </StyledButton>
+  <StyledButton mr={3} buttonSize="large">
+    Default
+  </StyledButton>
+  <StyledButton mr={3} buttonSize="large" loading>
+    Loading
+  </StyledButton>
+</React.Fragment>
 ```
 
-`primary` button style theme:
+### Primary button
 
 ```js
-<StyledButton buttonStyle="primary">Primary Button</StyledButton>
+<React.Fragment>
+  <StyledButton mr={3} buttonStyle="primary" buttonSize="large" disabled>
+    Disabled
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="primary" buttonSize="large">
+    Default
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="primary" buttonSize="large" loading>
+    Loading
+  </StyledButton>
+</React.Fragment>
 ```
 
-loading button with `primary` button style theme:
-
-```js
-<StyledButton buttonStyle="primary" loading>
-  Whatever
-</StyledButton>
-```
-
-Defaults to the `medium` button size:
+### Defaults to the `medium` button size
 
 ```js
 initialState = { buttonSize: 'medium' };

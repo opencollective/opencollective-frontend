@@ -30,6 +30,7 @@ describe('Contribution Flow: Order', () => {
 
       // Change amount
       cy.contains('button', '$500').click();
+      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$500.00 per month');
 
       // Frequency must be disabled

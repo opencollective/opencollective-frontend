@@ -29,17 +29,20 @@ describe('Contribution Flow: Donate', () => {
 
       // Change amount
       cy.get('input[type=number][name=totalAmount]').type('{selectall}1337');
+      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00');
 
       // Change frequency - monthly
       cy.get('#interval').click();
       cy.get('.select-month').click();
+      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per month');
       cy.contains('Next contribution: Jun 1, 2042');
 
       // Change frequency - yearly
       cy.get('#interval').click();
       cy.get('.select-year').click();
+      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per year');
       cy.contains('Next contribution: May 1, 2043');
 
