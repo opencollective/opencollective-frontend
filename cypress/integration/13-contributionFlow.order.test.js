@@ -49,7 +49,7 @@ describe('Contribution Flow: Order', () => {
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$500.00 per month');
-      cy.contains(new RegExp(`${user.firstName} ${user.lastName} is now .+'s Sponsors`));
+      cy.contains(`${user.firstName} ${user.lastName} is now a member of APEX's 'Sponsors' tier.`);
     });
   });
 });

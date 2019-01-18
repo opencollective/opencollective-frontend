@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { compose, lifecycle, withHandlers, withState } from 'recompose';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
+import { get, isNil } from 'lodash';
 
 import Container from './Container';
 import { Flex } from '@rebass/grid';
@@ -27,7 +27,13 @@ const getChangeFromState = state => ({
 
 const enhance = compose(
   withState('state', 'setState', ({ amountOptions, defaultAmount, defaultInterval }) => {
-    const totalAmount = defaultAmount || amountOptions[Math.floor(amountOptions.length / 2)];
+    let totalAmount = 500;
+    if (!isNil(defaultAmount)) {
+      totalAmount = defaultAmount;
+    } else if (amountOptions && amountOptions.length > 0) {
+      totalAmount = amountOptions[Math.floor(amountOptions.length / 2)];
+    }
+
     return {
       totalAmount,
       amount: totalAmount / 100,

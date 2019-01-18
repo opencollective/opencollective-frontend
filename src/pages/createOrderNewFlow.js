@@ -7,6 +7,7 @@ import { debounce, get, pick, isNil, min } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
+import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle.cjs';
 import { ErrorCircle } from 'styled-icons/boxicons-regular/ErrorCircle.cjs';
 
 import { Router } from '../server/pages';
@@ -195,20 +196,20 @@ class CreateOrderPage extends React.Component {
   };
 
   async getPaymentMethodToSubmit() {
-    const { stepPayment } = this.state;
+    const { stepDetails, stepPayment } = this.state;
+
+    if (this.isFreeTier() && stepDetails.totalAmount === 0) {
+      return null;
+    }
+
     if (!stepPayment.isNew) {
       return pick(stepPayment.paymentMethod, ['type', 'uuid']);
     } else if (!this.state.stripe) {
-      this.setState({
-        submitting: false,
-        error: 'There was a problem initializing the payment form. Please reload the page and try again',
-      });
-      return null;
+      throw new Error('There was a problem initializing the payment form. Please reload the page and try again');
     }
     const { token, error } = await this.state.stripe.createToken();
     if (error) {
-      this.setState({ submitting: false, error: error.message });
-      return null;
+      throw new Error(error.message);
     }
     return { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save };
   }
@@ -216,8 +217,11 @@ class CreateOrderPage extends React.Component {
   async submitOrder(paymentMethodOverride = null) {
     this.setState({ submitting: true, error: null });
     const { stepDetails } = this.state;
-    const paymentMethod = paymentMethodOverride || (await this.getPaymentMethodToSubmit());
-    if (!paymentMethod) {
+    let paymentMethod = null;
+    try {
+      paymentMethod = paymentMethodOverride || (await this.getPaymentMethodToSubmit());
+    } catch (e) {
+      this.setState({ submitting: false, error: e.message });
       return false;
     }
     const recaptchaToken = await this.fetchRecaptchaToken();
@@ -337,10 +341,29 @@ class CreateOrderPage extends React.Component {
     return tier.presets || (isNil(tier.amount) ? [500, 1000, 2000, 5000] : null);
   }
 
+  /** Get the min authorized amount for order, in cents */
+  getOrderMinAmount() {
+    const { amount, presets } = this.getTier() || {};
+    if (isNil(amount) && isNil(presets)) return 0;
+    return min(isNil(amount) ? presets : [...(presets || []), amount]);
+  }
+
+  /** Teturn true if current order doesn't need any payment */
+  isFreeTier() {
+    return this.getOrderMinAmount() === 0;
+  }
+
   /** Return the index of the last step user can switch to */
   getMaxStepIdx() {
+    // Validate step profile
     if (!this.state.stepProfile) return 0;
-    if (!this.state.stepDetails || !this.state.stepDetails.totalAmount) return 1;
+
+    // Validate step details
+    if (!this.state.stepDetails || isNil(this.state.stepDetails.totalAmount)) return 1;
+    if (this.state.stepDetails.totalAmount === 0 && !this.isFreeTier()) return 1;
+
+    // Validate step payment
+    if (this.state.stepDetails.totalAmount === 0 && this.isFreeTier()) return 3;
     if (!this.state.stepPayment || this.state.stepPayment.error) return 2;
     return STEPS.length;
   }
@@ -502,14 +525,22 @@ class CreateOrderPage extends React.Component {
               defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
               disabledInterval={Boolean(tier)}
               disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
-              minAmount={min(isNil(get(tier, 'amount')) ? get(tier, 'presets') : [...tier.presets, tier.amount])}
+              minAmount={this.getOrderMinAmount()}
             />
           </Container>
           <ContributeDetailsFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
         </Flex>
       );
     } else if (step === 'payment') {
-      return (
+      return get(this.state, 'stepDetails.totalAmount') === 0 ? (
+        <StyledCard borders={1} borderColor="green.500" bg="green.100" color="green.700" p={3}>
+          <CheckCircle size="1em" />{' '}
+          <FormattedMessage
+            id="contribute.freeTier"
+            defaultMessage="This is a free tier, you can submit your order directly."
+          />
+        </StyledCard>
+      ) : (
         <Flex flexDirection="column">
           <H5 textAlign="left" mb={3}>
             <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
@@ -606,10 +637,16 @@ class CreateOrderPage extends React.Component {
             if (stepDetails && stepDetails.totalAmount) {
               const currency = this.getCurrency();
               details = this.renderContributeDetailsSummary(stepDetails.totalAmount, currency, stepDetails.interval);
+            } else if (stepDetails && stepDetails.totalAmount === 0 && this.isFreeTier()) {
+              details = 'Free';
             }
           } else if (step === 'payment') {
             label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
-            details = get(stepPayment, 'title', null);
+            if (this.isFreeTier() && get(stepDetails, 'totalAmount') === 0) {
+              details = 'No payment required';
+            } else {
+              details = get(stepPayment, 'title', null);
+            }
           }
 
           return (
