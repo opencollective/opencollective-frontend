@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import md5 from 'md5';
 import Promise from 'bluebird';
-import { pick, omit, get } from 'lodash';
+import { pick, omit, get, min, isNil } from 'lodash';
 import config from 'config';
 
 import models from '../../../models';
@@ -13,7 +13,7 @@ import * as github from '../../../lib/github';
 import recaptcha from '../../../lib/recaptcha';
 import slackLib from '../../../lib/slack';
 import * as libPayments from '../../../lib/payments';
-import { capitalize, pluralize } from '../../../lib/utils';
+import { capitalize, pluralize, formatCurrency } from '../../../lib/utils';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount } from '../../../lib/subscriptions';
 
 import roles from '../../../constants/roles';
@@ -121,6 +121,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
   await checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
   try {
+    // ---- Set defaults ----
+    order.quantity = order.quantity || 1;
+
     if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
       throw new Error('You need to be logged in to be able to use a payment method on file');
     }
@@ -319,14 +322,32 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       throw new Error(`Invalid currency. Expected ${currency}.`);
     }
 
-    const quantity = order.quantity || 1;
+    // ---- Checks on totalAmount ----
+    if (order.totalAmount < 0) {
+      throw new Error('Total amount cannot be a negative value');
+    }
 
-    let totalAmount;
-    if (tier && tier.amount && !tier.presets) {
-      // if the tier has presets, we can't enforce tier.amount
-      totalAmount = tier.amount * quantity;
-    } else {
-      totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
+    // Don't allow custom values if using a tier with fixed amount
+    if (tier && tier.amount && !tier.presets && tier.amount * order.quantity !== order.totalAmount) {
+      if (isNil(order.totalAmount)) {
+        // Manually force the totalAmount if it has no been passed
+        order.totalAmount = order.quantity * tier.amount;
+      } else {
+        const prettyTotalAmount = formatCurrency(order.totalAmount, currency);
+        const prettyExpectedAmount = formatCurrency(tier.amount * order.quantity, currency);
+        throw new Error(
+          `This tier uses a fixed amount. Order total must be ${prettyExpectedAmount}. You set: ${prettyTotalAmount}`,
+        );
+      }
+    }
+
+    // If using a tier, amount can never be less than the minimum amount
+    if (tier && tier.presets) {
+      const minValue = min(isNil(tier.amount) ? tier.presets : [...tier.presets, tier.amount]);
+      if (order.totalAmount < order.quantity * minValue) {
+        const prettyMinTotal = formatCurrency(order.quantity * minValue, currency);
+        throw new Error(`The amount you set is below minimum tier value, it should be at least ${prettyMinTotal}`);
+      }
     }
 
     const tierNameInfo = tier && tier.name ? ` (${tier.name})` : '';
@@ -335,9 +356,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.interval) {
       defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
     } else {
-      defaultDescription = `${totalAmount === 0 || collective.type === types.EVENT ? 'Registration' : 'Donation'} to ${
-        collective.name
-      }${tierNameInfo}`;
+      defaultDescription = `${
+        order.totalAmount === 0 || collective.type === types.EVENT ? 'Registration' : 'Donation'
+      } to ${collective.name}${tierNameInfo}`;
     }
     debug('defaultDescription', defaultDescription, 'collective.type', collective.type);
 
@@ -346,8 +367,8 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       FromCollectiveId: fromCollective.id,
       CollectiveId: collective.id,
       TierId: tier && tier.id,
-      quantity,
-      totalAmount,
+      quantity: order.quantity,
+      totalAmount: order.totalAmount,
       currency,
       interval: order.interval,
       description: order.description || defaultDescription,
