@@ -55,7 +55,7 @@ class CollectivePage extends React.Component {
   render() {
     const { data, query, LoggedInUser } = this.props;
 
-    if (!data.Collective) {
+    if (!data.loading && !data.Collective) {
       ssrNotFoundError(data);
     }
 
