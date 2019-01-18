@@ -370,9 +370,10 @@ const getCollectiveQuery = gql`
         stats {
           id
           totalOrders
+          totalActiveDistinctOrders
           availableQuantity
         }
-        orders(limit: 30) {
+        orders(limit: 30, isActive: true) {
           fromCollective {
             id
             slug
