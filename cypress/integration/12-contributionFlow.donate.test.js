@@ -66,7 +66,7 @@ describe('Contribution Flow: Donate', () => {
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$1,337.00 per year');
-      cy.contains(new RegExp(`${user.firstName} ${user.lastName} is now .+'s backer`));
+      cy.contains(`${user.firstName} ${user.lastName} is now a backer of APEX.`);
 
       // ---- Let's go back ---
       cy.go('back');
@@ -112,7 +112,7 @@ describe('Contribution Flow: Donate', () => {
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$20.00');
-      cy.contains(/Evil Corp is now .+'s backer/);
+      cy.contains('Evil Corp is now a backer of APEX.');
     });
   });
 });

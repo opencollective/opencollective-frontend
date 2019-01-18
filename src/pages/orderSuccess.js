@@ -176,11 +176,13 @@ class OrderSuccessPage extends React.Component {
     const websiteUrl = process.env.WEBSITE_URL || 'https://opencollective.com';
     const referralURL = `${websiteUrl}${collective.path}${referralOpts}`;
     const message = this.getTwitterMessage();
+    const isFreeTier = get(tier, 'amount') === 0 || (get(tier, 'presets') || []).includes(0);
+    const isManualDonation = order.status === 'PENDING' && !order.paymentMethod && !isFreeTier;
 
     return (
       <Page title={'Contribute'}>
         <OrderSuccessContainer id="page-order-success" flexDirection="column" alignItems="center" mb={6}>
-          {order.status === 'PENDING' && !order.paymentMethod && (
+          {isManualDonation && (
             <StyledCard borders={1} borderColor="yellow.500" bg="yellow.100" color="yellow.700" p={3} mt={4} mx={2}>
               <InfoCircle size="1.2em" />{' '}
               <FormattedMessage
@@ -192,12 +194,16 @@ class OrderSuccessPage extends React.Component {
 
           <StyledCollectiveCard mt={[4, 5]} mb={32} collective={collective} showCover={false}>
             <Flex flexDirection="column" p={12} alignItems="center">
-              <Span fontSize="10px">
-                <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
-              </Span>
-              <Span fontWeight="bold" fontSize="Caption">
-                {this.renderContributeDetailsSummary(totalAmount, currency, interval)}
-              </Span>
+              {totalAmount !== 0 && (
+                <React.Fragment>
+                  <Span fontSize="10px">
+                    <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
+                  </Span>
+                  <Span fontWeight="bold" fontSize="Caption">
+                    {this.renderContributeDetailsSummary(totalAmount, currency, interval)}
+                  </Span>
+                </React.Fragment>
+              )}
               {collective.tags && (
                 <Flex mt={3} flexWrap="wrap" justifyContent="center">
                   {collective.tags.map(tag => (
@@ -215,15 +221,26 @@ class OrderSuccessPage extends React.Component {
             <FormattedMessage id="contributeFlow.successTitle" defaultMessage="Woot woot! 🎉" />
           </H3>
           <P mb={4}>
-            <FormattedMessage
-              id="contributeFlow.successMessage"
-              defaultMessage="{fromCollectiveName} is now {collectiveName}'s {role}"
-              values={{
-                fromCollectiveName: fromCollective.name,
-                collectiveName: collective.name,
-                role: get(tier, 'name', 'backer'),
-              }}
-            />
+            {tier ? (
+              <FormattedMessage
+                id="contributeFlow.successMessage"
+                defaultMessage="{fromCollectiveName} is now a member of {collectiveName}'s '{tierName}' tier."
+                values={{
+                  fromCollectiveName: fromCollective.name,
+                  collectiveName: collective.name,
+                  tierName: get(tier, 'name', 'backer'),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="contributeFlow.successMessageBacker"
+                defaultMessage="{fromCollectiveName} is now a backer of {collectiveName}."
+                values={{
+                  fromCollectiveName: fromCollective.name,
+                  collectiveName: collective.name,
+                }}
+              />
+            )}
           </P>
           <Flex>
             <ShareLink href={tweetURL({ url: referralURL, text: message })}>
@@ -267,6 +284,8 @@ const addData = graphql(gql`
       }
       tier {
         name
+        amount
+        presets
       }
       paymentMethod {
         id
