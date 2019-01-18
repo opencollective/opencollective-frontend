@@ -989,7 +989,9 @@ export const TierType = new GraphQLObjectType({
             query.where = { processedAt: { [Op.ne]: null } };
           }
           if (args.isActive) {
-            query.include = [{ model: models.Subscription, where: { isActive: true } }];
+            if (tier.interval) {
+              query.include = [{ model: models.Subscription, where: { isActive: true } }];
+            }
           }
           return tier.getOrders(query);
         },
