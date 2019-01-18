@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
@@ -123,7 +123,6 @@ class CreateOrderPage extends React.Component {
     super(props);
     this.recaptcha = null;
     this.recaptchaToken = null;
-    this.contributeDetailsFormRef = React.createRef();
     this.state = {
       loading: false,
       submitting: false,
@@ -494,19 +493,17 @@ class CreateOrderPage extends React.Component {
             <H5 textAlign="left" mb={3}>
               <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
             </H5>
-            <form ref={this.contributeDetailsFormRef}>
-              <ContributeDetails
-                amountOptions={this.getAmountsPresets()}
-                currency={this.getCurrency()}
-                onChange={this.updateDetails}
-                showFrequency={tierSlug ? true : false}
-                defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
-                defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
-                disabledInterval={Boolean(tier)}
-                disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
-                minAmount={min(isNil(get(tier, 'amount')) ? get(tier, 'presets') : [...tier.presets, tier.amount])}
-              />
-            </form>
+            <ContributeDetails
+              amountOptions={this.getAmountsPresets()}
+              currency={this.getCurrency()}
+              onChange={this.updateDetails}
+              showFrequency={tierSlug ? true : false}
+              defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
+              defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
+              disabledInterval={Boolean(tier)}
+              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
+              minAmount={min(isNil(get(tier, 'amount')) ? get(tier, 'presets') : [...tier.presets, tier.amount])}
+            />
           </Container>
           <ContributeDetailsFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
         </Flex>
@@ -557,13 +554,6 @@ class CreateOrderPage extends React.Component {
         this.setState({ stepProfile: createdOrg, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
-      }
-    }
-
-    // Validate ContributeDetails step before going next
-    if (currentStep === 'details' && step === 'payment') {
-      if (!this.contributeDetailsFormRef.current || !this.contributeDetailsFormRef.current.reportValidity()) {
-        return false;
       }
     }
 
