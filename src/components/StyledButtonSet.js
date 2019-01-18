@@ -11,10 +11,12 @@ const comboStyle = ({ combo }) => (combo ? '0' : `0 ${borderRadius} ${borderRadi
 
 const StyledButtonItem = styled(StyledButton)`
   border-radius: 0;
+  flex-grow: 1;
   &:active p {
     color: white;
   }
-  &:hover {
+  &:hover,
+  &:focus {
     /* Use a higher z-index on hover to get all the borders colored */
     z-index: 9;
   }
@@ -33,15 +35,26 @@ const StyledButtonItem = styled(StyledButton)`
   }
 `;
 
-const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, ...props }) => (
+StyledButtonItem.propTypes = {
+  combo: PropTypes.bool,
+};
+
+StyledButtonItem.defaultProps = {
+  blacklist: StyledButton.defaultProps.blacklist.concat('combo'),
+};
+
+const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, disabled, ...props }) => (
   <Flex {...props}>
     {items.map(item => (
       <StyledButtonItem
-        combo={combo}
+        combo={combo || undefined}
         key={item}
         buttonSize={size}
         buttonStyle={item === selected ? 'primary' : 'standard'}
         onClick={onChange && (() => onChange(item))}
+        className={item === selected ? 'selected' : undefined}
+        disabled={disabled}
+        type="button"
         {...buttonProps}
       >
         {children({ item, isSelected: item === selected })}
@@ -63,6 +76,8 @@ StyledButtonSet.propTypes = {
   onChange: PropTypes.func,
   /** Setting to style last item to look good in combination with a text input */
   combo: PropTypes.bool,
+  /** Disable user input */
+  disabled: PropTypes.bool,
 };
 
 StyledButtonSet.defaultProps = {

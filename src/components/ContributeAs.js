@@ -1,11 +1,17 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, withHandlers, withState } from 'recompose';
-import { capitalize, omit } from 'lodash';
+import { capitalize, omit, uniqBy } from 'lodash';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
+import { FormattedMessage } from 'react-intl';
+import { Box, Flex } from '@rebass/grid';
+
+import { Search } from 'styled-icons/octicons/Search.cjs';
+
+import { escapeInput } from '../lib/utils';
 
 import Avatar from './Avatar';
-import { Box, Flex } from '@rebass/grid';
 import Container from './Container';
 import Logo from './Logo';
 import { P } from './Text';
@@ -14,54 +20,79 @@ import StyledRadioList from './StyledRadioList';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
-import { Search } from 'styled-icons/octicons/Search.cjs';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
+`;
+
+const ContributeAsEntryContainer = styled(Container)`
+  cursor: pointer;
+  &:hover {
+    background: ${themeGet('colors.black.50')};
+  }
 `;
 
 const enhance = compose(
   withState('state', 'setState', ({ errors = {} }) => ({ errors })),
   withHandlers({
     getFieldError: ({ state }) => name => state.errors[name],
-    onChange: ({ onChange, personal, profiles, state }) => value => {
-      if (value === 'new-org') {
-        return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
+    onChange: ({ onChange, state }) => selected => {
+      if (selected.key === 'new-org') {
+        if (state.name && state.website) {
+          return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
+        } else {
+          return onChange(null);
+        }
       }
 
-      if (value === 'anonymous') {
+      if (selected.key === 'anonymous') {
         return onChange({ name: 'anonymous' });
       }
 
-      if (value === '0') {
-        return onChange(personal);
-      }
-
-      return onChange(profiles[value]);
+      return onChange(selected.value);
     },
-    onFieldChange: ({ onChange, setState }) => event => {
+    onFieldChange: ({ onChange, setState, state }) => event => {
       event.stopPropagation();
 
       const { target } = event;
-      setState(state => {
-        const newState = {
-          ...state,
-          [target.name]: target.value,
-        };
-        onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
-        return {
-          ...newState,
-          errors: { ...state.errors, [target.name]: null },
-        };
+      if (!target.validity.valid) {
+        onChange(null);
+        return;
+      }
+
+      const newState = {
+        ...state,
+        [target.name]: target.value,
+      };
+      setState({
+        ...newState,
+        errors: { ...state.errors, [target.name]: null },
       });
+      onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
     },
     onInvalid: ({ setState }) => event => {
       event.persist();
       event.preventDefault();
-      setState(state => ({
-        ...state,
-        errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
-      }));
+
+      const { target } = event;
+
+      let error;
+      if (target.validity.valueMissing) {
+        error = 'This field is required';
+      }
+
+      if (target.validity.typeMismatch) {
+        if (target.type === 'url') {
+          error = 'URL must begin with http:// or https://';
+        }
+      }
+
+      setState(state => {
+        return {
+          ...state,
+          errors: { ...state.errors, [target.name]: error },
+        };
+      });
     },
     onSearch: ({ setState }) => ({ target }) => {
       setState(state => ({
@@ -76,6 +107,7 @@ const enhance = compose(
       defaultValue: state[name] || '',
       fontSize: 'Paragraph',
       lineHeight: 'Paragraph',
+      onBlur: event => event.target.reportValidity(),
       onInvalid,
       type: 'text',
       width: 1,
@@ -87,29 +119,32 @@ const enhance = compose(
  * Search is displayed if 5 or more profiles are passed in.
  */
 const ContributeAs = enhance(
-  ({ getFieldProps, getFieldError, onChange, onFieldChange, onSearch, personal, profiles, state, ...fieldProps }) => {
-    profiles = {
-      '0': personal, // personal should always be first
-      ...profiles,
-    };
-
+  ({
+    getFieldProps,
+    getFieldError,
+    onChange,
+    onFieldChange,
+    onSearch,
+    personal,
+    profiles,
+    state,
+    defaultSelectedProfile,
+    ...fieldProps
+  }) => {
     if (state.search) {
-      const test = new RegExp(state.search, 'i');
-      profiles = Object.keys(profiles)
-        .filter(key => profiles[key].name.match(test))
-        .reduce((result, key) => ({ ...result, [key]: profiles[key] }), {});
+      const test = new RegExp(escapeInput(state.search), 'i');
+      profiles = profiles.filter(profile => profile.name.match(test));
     }
 
-    const options = {
-      ...profiles,
-      'new-org': {
-        name: 'A new organization',
-      },
-      anonymous: {
-        name: 'Anonymously',
-      },
-    };
-    const firstProfile = Object.keys(options)[0];
+    const options = uniqBy(
+      [
+        personal,
+        ...profiles,
+        { id: 'new-org', name: 'A new organization' },
+        // { id: 'anonymous', name: 'Anonymously' }
+      ],
+      'id',
+    );
     const lastIndex = Object.keys(options).length - 1;
     const showSearch = Object.keys(profiles).length >= 5 || state.search;
 
@@ -125,12 +160,19 @@ const ContributeAs = enhance(
               lineHeight="Paragraph"
               placeholder="Filter by name..."
               onChange={onSearch}
+              ml={2}
             />
           </Container>
         )}
-        <StyledRadioList {...fieldProps} options={options} onChange={onChange} defaultValue={firstProfile}>
+        <StyledRadioList
+          {...fieldProps}
+          options={options}
+          keyGetter="id"
+          defaultValue={defaultSelectedProfile.id}
+          onChange={onChange}
+        >
           {({ key, value, radio, checked, index }) => (
-            <Container
+            <ContributeAsEntryContainer
               display="flex"
               alignItems="center"
               px={4}
@@ -155,14 +197,22 @@ const ContributeAs = enhance(
                 </P>
                 {value.type && (
                   <P fontSize="Caption" lineHeight="Caption" color="black.500">
-                    {key === '0' ? `Personal account - ${value.email}` : capitalize(value.type)}
+                    {value.type === 'USER' ? (
+                      <FormattedMessage
+                        id="contributeAs.personal"
+                        defaultMessage="Personal account - {email}"
+                        values={{ email: value.email }}
+                      />
+                    ) : (
+                      capitalize(value.type)
+                    )}
                   </P>
                 )}
               </Flex>
               {key === 'new-org' && checked && (
                 <Container as="fieldset" border="none" width={1} py={3} onChange={onFieldChange}>
                   <Box mb={3}>
-                    <StyledInputField label="Org Name" htmlFor="orgName" error={getFieldError('orgName')}>
+                    <StyledInputField label="Organization Name" htmlFor="name" error={getFieldError('name')}>
                       {inputProps => (
                         <StyledInput
                           {...inputProps}
@@ -176,7 +226,15 @@ const ContributeAs = enhance(
 
                   <Box mb={3}>
                     <StyledInputField label="Website" htmlFor="website" error={getFieldError('website')}>
-                      {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} type="url" />}
+                      {inputProps => (
+                        <StyledInput
+                          {...inputProps}
+                          {...getFieldProps(inputProps.name)}
+                          placeholder="https://example.com"
+                          type="url"
+                          required
+                        />
+                      )}
                     </StyledInputField>
                   </Box>
 
@@ -206,17 +264,19 @@ const ContributeAs = enhance(
                 </Container>
               )}
               {key === 'anonymous' && checked && (
-                <Container flex="1 1 auto" textAlign="right">
+                <Flex flex="1 1 auto" justifyContent="flex-end">
                   <Logo name={key} height="3rem" />
-                </Container>
+                </Flex>
               )}
-            </Container>
+            </ContributeAsEntryContainer>
           )}
         </StyledRadioList>
       </StyledCard>
     );
   },
 );
+
+ContributeAs.displayName = 'ContributeAs';
 
 ContributeAs.propTypes = {
   /**
@@ -226,14 +286,19 @@ ContributeAs.propTypes = {
    * else the data passed to `profiles` or `personal` is returned
    */
   onChange: PropTypes.func,
+  defaultSelectedProfile: PropTypes.shape({
+    id: PropTypes.number,
+  }),
   personal: PropTypes.shape({
+    id: PropTypes.number,
     email: PropTypes.string,
     image: PropTypes.string,
     name: PropTypes.string,
     type: PropTypes.string,
   }),
-  profiles: PropTypes.objectOf(
+  profiles: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.number,
       email: PropTypes.string,
       image: PropTypes.string,
       name: PropTypes.string,

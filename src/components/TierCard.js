@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import { get, uniqBy } from 'lodash';
-import Avatar from './Avatar';
-import Logo from './Logo';
-import { Link, Router } from '../server/pages';
-import Currency from './Currency';
-import colors from '../constants/colors';
-import { formatCurrency } from '../lib/utils';
 import Markdown from 'react-markdown';
+import { get, uniqBy } from 'lodash';
+import { defineMessages, FormattedMessage } from 'react-intl';
+
+import Avatar from './Avatar';
+import Currency from './Currency';
+import Logo from './Logo';
+
+import colors from '../constants/colors';
+import withIntl from '../lib/withIntl';
+import { Link } from '../server/pages';
+import { getEnvVar, formatCurrency, parseToBoolean } from '../lib/utils';
 
 class TierCard extends React.Component {
   static propTypes = {
@@ -126,25 +128,24 @@ class TierCard extends React.Component {
 
     const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`], formatValues) : '';
 
-    const linkRoute = {
-      name: 'orderCollectiveTier',
-      params: { collectiveSlug: collective.slug, TierId: tier.id },
-      anchor: '#content',
-    };
+    let linkRoute;
+    if (parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER'))) {
+      linkRoute = {
+        name: 'orderCollectiveTierNew',
+        params: { collectiveSlug: collective.slug, tierSlug: tier.slug, verb: 'contribute' },
+        anchor: '#content',
+      };
+    } else {
+      linkRoute = {
+        name: 'orderCollectiveTier',
+        params: { collectiveSlug: collective.slug, TierId: tier.id },
+        anchor: '#content',
+      };
+    }
+
     if (referral) {
       linkRoute.params.referral = referral;
     }
-
-    const onClick = e => {
-      e.preventDefault();
-      if (!disabled) {
-        // For better UX, we redirect to #content after the route is loaded
-        // without that, we would either scroll to the top or don't scroll at all
-        Router.pushRoute(linkRoute.name, linkRoute.params).then(() => {
-          window.location.hash = linkRoute.anchor;
-        });
-      }
-    };
 
     return (
       <div className={classNames('TierCard', this.props.className, this.anchor)}>
@@ -326,7 +327,7 @@ class TierCard extends React.Component {
           </div>
         )}
         <Link route={linkRoute.name} params={linkRoute.params}>
-          <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick}>
+          <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip}>
             {tier.button ? tier.button : <FormattedMessage id="tier.contribute" defaultMessage="contribute" />}
           </a>
         </Link>

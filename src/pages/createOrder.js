@@ -19,7 +19,7 @@ import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import { isValidUrl, getDomain } from '../lib/utils';
 
-class CreateOrderPage extends React.Component {
+class CreateOrderLegacyPage extends React.Component {
   static getInitialProps({
     query: {
       collectiveSlug,
@@ -392,4 +392,4 @@ const addGraphQL = compose(
   addCreateOrderMutation,
 );
 
-export default withIntl(addGraphQL(withUser(CreateOrderPage)));
+export default withIntl(addGraphQL(withUser(CreateOrderLegacyPage)));

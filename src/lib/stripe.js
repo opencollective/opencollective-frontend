@@ -4,9 +4,9 @@ import { getEnvVar, loadScriptAsync } from './utils';
 
 let stripe;
 
-const getStripe = async () => {
+const getStripe = async token => {
   if (!stripe) {
-    const stripeKey = getEnvVar('STRIPE_KEY');
+    const stripeKey = token || getEnvVar('STRIPE_KEY');
     if (stripeKey) {
       if (typeof window.Stripe === 'undefined') {
         await loadScriptAsync('https://js.stripe.com/v3/');
@@ -51,6 +51,27 @@ const getStripeToken = (type = 'cc', data) => {
           return { token: res.token.id, card: res.token.card };
         });
   }
+};
+
+/**
+ * Convert a stripe token as returned by `createToken` into a PaymentMethod object.
+ */
+export const stripeTokenToPaymentMethod = ({ id, card }) => {
+  return {
+    name: card.last4,
+    token: id,
+    service: 'stripe',
+    type: 'creditcard',
+    data: {
+      fullName: card.full_name,
+      expMonth: card.exp_month,
+      expYear: card.exp_year,
+      brand: card.brand,
+      country: card.country,
+      funding: card.funding,
+      zip: card.address_zip,
+    },
+  };
 };
 
 const isValidCard = card => {

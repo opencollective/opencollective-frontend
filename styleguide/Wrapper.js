@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
+
+import StripeProvider from '../src/components/StripeProvider';
 import theme from '../src/constants/theme';
 import AppGlobalStyles from '../src/pages/global-styles';
-import { createGlobalStyle } from 'styled-components';
 import { IntlProvider } from 'react-intl';
 
 const StyleguideGlobalStyles = createGlobalStyle`
@@ -11,6 +12,8 @@ const StyleguideGlobalStyles = createGlobalStyle`
   }
 `;
 
+const STRIPE_KEY = process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB';
+
 export default class ThemeWrapper extends Component {
   render() {
     return (
@@ -18,7 +21,11 @@ export default class ThemeWrapper extends Component {
         <AppGlobalStyles />
         <StyleguideGlobalStyles />
         <ThemeProvider theme={theme}>
-          <IntlProvider locale="en">{this.props.children}</IntlProvider>
+          <IntlProvider locale="en">
+            <StripeProvider token={STRIPE_KEY} loadOnMount>
+              {this.props.children}
+            </StripeProvider>
+          </IntlProvider>
         </ThemeProvider>
       </Fragment>
     );

@@ -77,6 +77,18 @@ export function getCurrencySymbol(currency) {
 /** Retrieve variables set in the environment */
 export const getEnvVar = v => (process.browser ? get(window, ['__NEXT_DATA__', 'env', v]) : get(process, ['env', v]));
 
+export function parseToBoolean(value) {
+  let lowerValue = value;
+  // check whether it's string
+  if (lowerValue && (typeof lowerValue === 'string' || lowerValue instanceof String)) {
+    lowerValue = lowerValue.trim().toLowerCase();
+  }
+  if (['on', 'enabled', '1', 'true', 'yes', 1].includes(lowerValue)) {
+    return true;
+  }
+  return false;
+}
+
 export const getBaseImagesUrl = () => getEnvVar('IMAGES_URL');
 
 export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
@@ -322,9 +334,9 @@ export const abbreviateNumber = (number, precision = 0) => {
   return round(scaled) + SI_PREFIXES[tier];
 };
 
-export const loadScriptAsync = url =>
+export const loadScriptAsync = (url, opts = {}) =>
   new Promise((resolve, reject) => {
-    loadScript(url, (err, script) => {
+    loadScript(url, opts, (err, script) => {
       if (err) {
         reject(err);
       } else {
@@ -332,3 +344,7 @@ export const loadScriptAsync = url =>
       }
     });
   });
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Using_special_characters
+// From section about escapting user input
+export const escapeInput = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

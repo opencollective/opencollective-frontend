@@ -1,4 +1,5 @@
 import nextRoutes from 'next-routes';
+import { getEnvVar, parseToBoolean } from '../lib/utils';
 
 const pages = nextRoutes();
 
@@ -12,6 +13,7 @@ pages
   )
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
+  .add('signinLinkSent', '/signin/sent')
   .add('signin', '/signin/:token?')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
@@ -29,13 +31,6 @@ pages
   .add('editCollective', '/:slug/edit/:section?')
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
-  .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', 'createOrder')
-  .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder')
-  .add(
-    'donate',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?',
-    'createOrder',
-  )
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
@@ -59,7 +54,48 @@ pages
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('discover', '/discover');
 
+// Contribute Flow
+// ---------------
+
+const createOrderPage = parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER')) ? 'createOrderNewFlow' : 'createOrder';
+
+// Generic Route -> Feature Flag
+pages.add('orderCollective', '/:collectiveSlug/:verb(donate|pay|contribute)', createOrderPage);
+
+// Special route to force New Flow
+pages.add('orderCollectiveNewForce', '/:collectiveSlug/:verb(donate|pay|contribute)/newFlow', 'createOrderNewFlow');
+
+// Special route to force Legacy Flow
+pages.add('orderCollectiveLegacyForce', '/:collectiveSlug/:verb(donate|pay|contribute)/legacy', 'createOrder');
+
+// Old Route -> Old Flow (should be handled by a redirect once feature flag is gone)
+pages.add('orderCollectiveTier', '/:collectiveSlug/order/:TierId', 'createOrder');
+
+// New Routes -> New flow
+pages
+  .add(
+    'orderCollectiveNew',
+    '/:collectiveSlug/:verb(donate|pay|contribute)/:step(contributeAs|details|payment)?',
+    'createOrderNewFlow',
+  )
+  .add(
+    'orderCollectiveTierNew',
+    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierSlug/:step(contributeAs|details|payment)?',
+    'createOrderNewFlow',
+  )
+  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute)/success', 'orderSuccess')
+  .add(
+    'orderCollectiveTierNewSuccess',
+    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierSlug/success',
+    'orderSuccess',
+  );
+
+// New contribution flow not applied to events yet
+pages.add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder');
+
 // Pledges
+// -------
+
 pages
   .add('createPledge', '/pledges/new')
   .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
@@ -67,12 +103,15 @@ pages
   .add('claimCollective', '/:collectiveSlug/claim');
 
 // Application management
+// ----------------------
+
 pages
   .add('applications', '/:collectiveSlug/applications')
   .add('createApplication', '/:collectiveSlug/applications/:type(apiKey|oauth)?/new')
   .add('editApplication', '/:collectiveSlug/applications/:applicationId/edit');
 
 // Marketing Pages
+// ---------------
 
 pages.add(
   'marketing',
@@ -81,6 +120,7 @@ pages.add(
 );
 
 // Collective
+// ----------
 
 pages.add('collective', '/:slug');
 

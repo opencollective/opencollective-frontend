@@ -4,7 +4,9 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
+
 import UserProvider from '../components/UserProvider';
+import StripeProviderSSR from '../components/StripeProvider';
 import withData from '../lib/withData';
 
 import theme from '../constants/theme';
@@ -51,9 +53,11 @@ class OpenCollectiveFrontendApp extends App {
       <Container>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
-            <UserProvider>
-              <Component {...pageProps} />
-            </UserProvider>
+            <StripeProviderSSR>
+              <UserProvider apiKey={process.env.STRIPE_KEY}>
+                <Component {...pageProps} />
+              </UserProvider>
+            </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
         {Object.keys(scripts).map(key => (

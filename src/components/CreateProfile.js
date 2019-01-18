@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, withHandlers, withState } from 'recompose';
 import { pick } from 'lodash';
@@ -10,6 +11,7 @@ import StyledCard from './StyledCard';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
+import { FormattedMessage } from 'react-intl';
 
 const Tab = ({ active, children, setActive }) => (
   <Container
@@ -31,7 +33,7 @@ const Tab = ({ active, children, setActive }) => (
 const enhance = compose(
   withState('state', 'setState', ({ errors }) => ({ errors, tab: 'personal' })),
   withHandlers({
-    getFieldError: ({ state }) => name => state.errors[name],
+    getFieldError: ({ state, errors }) => name => (errors && errors[name]) || state.errors[name],
     onChange: ({ setState }) => ({ target }) =>
       setState(state => ({
         ...state,
@@ -65,14 +67,24 @@ const enhance = compose(
  * Component for handling the creation of profiles, either personal or organizational
  */
 const CreateProfile = enhance(
-  ({ getFieldError, getFieldProps, onPersonalSubmit, onOrgSubmit, onSecondaryAction, state, setState }) => (
-    <StyledCard maxWidth={480}>
+  ({
+    getFieldError,
+    getFieldProps,
+    onPersonalSubmit,
+    onOrgSubmit,
+    onSecondaryAction,
+    state,
+    setState,
+    submitting,
+    ...props
+  }) => (
+    <StyledCard maxWidth={480} {...props}>
       <Flex>
         <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
-          Create Personal Profile
+          <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
         </Tab>
         <Tab active={state.tab === 'organization'} setActive={() => setState({ ...state, tab: 'organization' })}>
-          Create Organization Profile
+          <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
         </Tab>
       </Flex>
 
@@ -112,8 +124,15 @@ const CreateProfile = enhance(
             </StyledInputField>
           </Box>
 
-          <StyledButton buttonStyle="primary" disabled={!state.email} width={1} type="submit" fontWeight="600">
-            Create personal profile
+          <StyledButton
+            buttonStyle="primary"
+            disabled={!state.email}
+            width={1}
+            type="submit"
+            fontWeight="600"
+            loading={submitting}
+          >
+            <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
           </StyledButton>
         </Box>
       )}
@@ -201,16 +220,17 @@ const CreateProfile = enhance(
             width={1}
             type="submit"
             fontWeight="600"
+            loading={submitting}
           >
-            Create organization profile
+            <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
           </StyledButton>
         </Box>
       )}
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
         <P color="black.700">Already have an account?</P>
-        <StyledButton fontWeight="600" onClick={onSecondaryAction}>
-          Sign In
+        <StyledButton fontWeight="600" onClick={onSecondaryAction} disabled={submitting}>
+          <FormattedMessage id="signIn" defaultMessage="Sign In" />
         </StyledButton>
       </Container>
     </StyledCard>
@@ -226,10 +246,15 @@ CreateProfile.propTypes = {
   onOrgSubmit: PropTypes.func.isRequired,
   /** handles redirect from profile create, i.e. Sign In */
   onSecondaryAction: PropTypes.func.isRequired,
+  /** Disable submit and show a spinner on button when set to true */
+  submitting: PropTypes.bool,
+  /** All props from `StyledCard` */
+  ...StyledCard.propTypes,
 };
 
 CreateProfile.defaultProps = {
   errors: {},
+  submitting: false,
 };
 
 export default CreateProfile;
