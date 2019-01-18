@@ -14,6 +14,10 @@
       "apiKey": "circleci-1510egmf4a23d80342403fb599qd"
     }
   },
+  "virtualCards": {
+    "maxPerDay": 1000,
+    "maxAmountPerDay": 5000000
+  },
   "log": {
     "level": "warn"
   }
