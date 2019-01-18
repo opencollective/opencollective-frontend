@@ -271,6 +271,25 @@ export const loaders = req => {
           .then(results => sortResults(ids, results, 'TierId'))
           .map(result => get(result, 'dataValues.count') || 0),
       ),
+      totalActiveDistinctOrders: new DataLoader(ids =>
+        models.Order.findAll({
+          attributes: [
+            'TierId',
+            [
+              sequelize.fn(
+                'COALESCE',
+                sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))),
+                0,
+              ),
+              'count',
+            ],
+          ],
+          where: { TierId: { [Op.in]: ids }, processedAt: { [Op.ne]: null }, status: { [Op.in]: ['ACTIVE', 'PAID'] } },
+          group: ['TierId'],
+        })
+          .then(results => sortResults(ids, results, 'TierId'))
+          .map(result => get(result, 'dataValues.count') || 0),
+      ),
     },
     paymentMethods: {
       findById: new DataLoader(ids =>

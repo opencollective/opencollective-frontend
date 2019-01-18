@@ -836,6 +836,13 @@ export const TierStatsType = new GraphQLObjectType({
           return req.loaders.tiers.totalDistinctOrders.load(tier.id);
         },
       },
+      totalActiveDistinctOrders: {
+        description: 'total number of active people/organizations in this tier',
+        type: GraphQLInt,
+        resolve(tier, args, req) {
+          return req.loaders.tiers.totalActiveDistinctOrders.load(tier.id);
+        },
+      },
       availableQuantity: {
         type: GraphQLInt,
         resolve(tier) {
@@ -982,7 +989,9 @@ export const TierType = new GraphQLObjectType({
             query.where = { processedAt: { [Op.ne]: null } };
           }
           if (args.isActive) {
-            query.include = [{ model: models.Subscription, where: { isActive: true } }];
+            if (tier.interval) {
+              query.include = [{ model: models.Subscription, where: { isActive: true } }];
+            }
           }
           return tier.getOrders(query);
         },
