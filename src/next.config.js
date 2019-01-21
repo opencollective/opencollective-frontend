@@ -11,9 +11,9 @@ const nextConfig = {
   webpack: (config, { webpack }) => {
     config.plugins.push(
       // Ignore __tests__
-      new webpack.IgnorePlugin(/\/__tests__\//),
+      new webpack.IgnorePlugin(/[\\/]__tests__[\\/]/),
       // Only include our supported locales
-      new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
+      new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /en|fr|es|ja/),
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
@@ -45,7 +45,7 @@ const nextConfig = {
     // Inspired by https://github.com/rohanray/next-fonts
     // Load Bootstrap and Font-Awesome fonts
     config.module.rules.push({
-      test: /fonts\/.*\.(woff|woff2|eot|ttf|otf|svg)$/,
+      test: /fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
       use: [
         {
           loader: 'url-loader',
@@ -63,19 +63,19 @@ const nextConfig = {
     // Configuration for static/marketing pages
     config.module.rules.unshift(
       {
-        test: /static\/.*\.(html)$/,
+        test: /static[\\/].*\.(html)$/,
         use: {
           loader: 'html-loader',
         },
       },
       {
-        test: /static\/.*\.(css)$/,
+        test: /static[\\/].*\.(css)$/,
         use: {
           loader: 'raw-loader',
         },
       },
       {
-        test: /static\/.*\.(jpg|gif|png|svg)$/,
+        test: /static[\\/].*\.(jpg|gif|png|svg)$/,
         use: {
           loader: 'file-loader',
           options: {
