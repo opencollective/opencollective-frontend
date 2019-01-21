@@ -26,6 +26,7 @@
     "classnames": "2.2.6",
     "clean-tag": "2.0.2",
     "cloudflare-ip": "0.0.7",
+    "cross-env": "^5.2.0",
     "cross-fetch": "3.0.0",
     "currency-symbol-map": "4.0.4",
     "dotenv": "6.2.0",
@@ -111,11 +112,11 @@
     "test:e2e": "TZ=UTC ./scripts/run_e2e_tests.sh",
     "test:update": "npm run test:src -- --updateSnapshot",
     "build:langs": "rm -rf build/messages && babel src/**/*.js > /dev/null && babel src/apps/**/*.js > /dev/null && babel-node scripts/translate.js",
-    "deploy:production": "./scripts/pre-deploy.sh production && git push production master",
-    "deploy:staging": "./scripts/pre-deploy.sh staging && git push -f staging master && heroku ps:scale web=1 -a opencollective-staging-api && heroku ps:scale web=1 -a oc-staging-frontend && heroku ps:scale web=1 -a opencollective-staging-website",
+    "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production master",
+    "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging master && heroku ps:scale web=1 -a opencollective-staging-api && heroku ps:scale web=1 -a oc-staging-frontend && heroku ps:scale web=1 -a opencollective-staging-website",
     "stop:staging": "heroku ps:scale web=0 -a oc-staging-frontend && heroku ps:scale web=0 -a opencollective-staging-website && heroku ps:scale web=0 -a opencollective-staging-api",
-    "git:clean": "./scripts/git_clean.sh",
-    "postinstall": "if test \"$NODE_ENV\" = \"\" || test \"$NODE_ENV\" = \"development\" ; then echo \"Skipping postinstall build because NODE_ENV is '${NODE_ENV}'\" ; else npm run build ; fi",
+    "git:clean": "cross-env ./scripts/git_clean.sh",
+    "postinstall": "cross-env ./scripts/postinstall.sh",
     "lint": "eslint \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
@@ -180,7 +181,9 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
       "\\.(css|less)$": "<rootDir>/test/mocks/styleMock.js"
     },
-    "setupFiles": ["<rootDir>/test/setup.js"]
+    "setupFiles": [
+      "<rootDir>/test/setup.js"
+    ]
   },
   "config": {
     "commitizen": {
@@ -205,7 +208,13 @@
     }
   },
   "lint-staged": {
-    "*.js": ["prettier --write", "git add"]
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
-  "cacheDirectories": [".cache", "node_modules"]
+  "cacheDirectories": [
+    ".cache",
+    "node_modules"
+  ]
 }
