@@ -47,11 +47,13 @@ class ExpenseWithData extends React.Component {
 
     return (
       <div className="ExpenseWithData">
-        <style jsx>{`
-          .comments {
-            margin-top: 3rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .comments {
+              margin-top: 3rem;
+            }
+          `}
+        </style>
         <Expense
           key={expense.id}
           collective={collective}
