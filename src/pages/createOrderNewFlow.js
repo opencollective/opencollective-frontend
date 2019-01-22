@@ -595,7 +595,8 @@ class CreateOrderPage extends React.Component {
       route = `orderCollectiveNew${routeSuffix}`;
     }
 
-    Router.pushRoute(route, { ...params, ...pick(this.props, ['verb', 'tierSlug']) });
+    await Router.pushRoute(route, { ...params, ...pick(this.props, ['verb', 'tierSlug']) });
+    window.scrollTo(0, 0);
   };
 
   renderContributeDetailsSummary(amount, currency, interval) {
