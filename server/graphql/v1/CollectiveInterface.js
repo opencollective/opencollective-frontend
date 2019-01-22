@@ -575,7 +575,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         type: new GraphQLList(TierType),
         args: {
           id: { type: GraphQLInt },
-          slug: { type: GraphQLString },
+          slug: { type: new GraphQLList(GraphQLString) },
         },
       },
       orders: {
@@ -1016,7 +1016,7 @@ const CollectiveFields = () => {
       type: new GraphQLList(TierType),
       args: {
         id: { type: GraphQLInt },
-        slug: { type: GraphQLString },
+        slug: { type: new GraphQLList(GraphQLString) },
       },
       resolve(collective, args) {
         return collective.getTiers({
