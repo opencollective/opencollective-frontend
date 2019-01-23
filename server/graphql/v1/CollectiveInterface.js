@@ -575,7 +575,8 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         type: new GraphQLList(TierType),
         args: {
           id: { type: GraphQLInt },
-          slug: { type: new GraphQLList(GraphQLString) },
+          slug: { type: GraphQLString },
+          slugs: { type: new GraphQLList(GraphQLString) },
         },
       },
       orders: {
@@ -1016,11 +1017,22 @@ const CollectiveFields = () => {
       type: new GraphQLList(TierType),
       args: {
         id: { type: GraphQLInt },
-        slug: { type: new GraphQLList(GraphQLString) },
+        slug: { type: GraphQLString },
+        slugs: { type: new GraphQLList(GraphQLString) },
       },
       resolve(collective, args) {
+        const where = {};
+
+        if (args.id) {
+          where.id = args.id;
+        } else if (args.slug) {
+          where.slug = args.slug;
+        } else if (args.slugs && args.slugs.length > 0) {
+          where.slug = { [Op.in]: args.slugs };
+        }
+
         return collective.getTiers({
-          where: args,
+          where,
           order: [['amount', 'ASC']],
         });
       },
