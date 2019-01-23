@@ -164,7 +164,8 @@ const sendTweet = async (twitterAccount, data) => {
     totalBackers: stats.backers.lastMonth,
     totalActiveBackers: stats.backers.totalActive,
     balance: formatCurrency(Math.abs(stats.balance), data.collective.currency),
-    totalAmountSpent: formatCurrency(Math.abs(stats.totalSpent), data.collective.currency),
+    totalAmountSpent:
+      Math.abs(stats.totalSpent) > 0 ? formatCurrency(Math.abs(stats.totalSpent), data.collective.currency) : 0,
     totalAmountReceived: formatCurrency(stats.totalReceived, data.collective.currency),
     topBackersTwitterHandles: compileTwitterHandles(data.topBackers, 0, 3),
     newBackersTwitterHandles: compileTwitterHandles(data.topNewBackers, stats.backers.new, 5),
@@ -181,7 +182,7 @@ const sendTweet = async (twitterAccount, data) => {
   const template = stats.totalReceived === 0 ? 'monthlyStatsNoNewDonation' : 'monthlyStats';
   const tweet = twitter.compileTweet(template, replacements);
 
-  // We thread the tweet with the previos monthly stats
+  // We thread the tweet with the previous monthly stats
   const in_reply_to_status_id = get(twitterAccount, 'settings.monthlyStats.lastTweetId');
   try {
     const res = await twitter.tweetStatus(twitterAccount, tweet, `https://opencollective.com/${data.collective.slug}`, {
