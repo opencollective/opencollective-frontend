@@ -128,18 +128,19 @@ Support them too!`,
 Support them too!`,
       updatePublished: 'Latest update from the collective: {title}',
       monthlyStats: `In {month}, {totalNewBackers, select,
-  0 {no new backer joined. 😑}
-  1 {one new backer joined.}
-  other {{totalNewBackers} {totalNewBackers, plural, one {backer} other {backers}} joined ({newBackersTwitterHandles}) - you are the best! 🙌 }
-}
+  0 {we}
+  1 {one new backer joined. We}
+  other {{totalNewBackers} {totalNewBackers, plural, one {backer} other {backers}} joined ({newBackersTwitterHandles}) - you are the best! 🙌 
 
-We received {totalAmountReceived} from {totalActiveBackers} {totalActiveBackers, plural, one {backer} other {backers}} and we spent {topExpenseCategories, select,
-  none {{totalAmountSpent}}
-  other {{totalAmountSpent} on {topExpenseCategories}}
-}. Our current balance is {balance}.
+We}
+} received {totalAmountReceived} from {totalActiveBackers} {totalActiveBackers, plural, one {backer} other {backers}}{totalAmountSpent, plural,
+  =0 {.}
+  other { and we spent {topExpenseCategories, select,
+      none {{totalAmountSpent}}
+      other {{totalAmountSpent} on {topExpenseCategories}}}.}} Our current balance is {balance}.
 
 Top backers: {topBackersTwitterHandles}`,
-      monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation. 😑
+      monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation. 
 
 Our current balance is {balance}.
 
@@ -157,7 +158,6 @@ Become a backer! 😃`,
   }
 
   const thankyou = '\n\nThank you! 🙏';
-
   const compiled = new IntlMessageFormat(messages['en-US'][template], 'en-US');
   let tweet = compiled.format(data);
 

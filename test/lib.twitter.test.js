@@ -14,7 +14,7 @@ describe('lib.twitter.test.js', () => {
       collectiveUrl: 'https://opencollective.com/preact',
       totalNewBackers: 2,
       totalActiveBackers: 82,
-      totalAmountSpent: '$0',
+      totalAmountSpent: 0,
       balance: '$1,200',
       totalAmountReceived: '$1,277',
       topBackersTwitterHandles: '@webflowapp, @dalmaer, @stickermule',
@@ -24,7 +24,7 @@ describe('lib.twitter.test.js', () => {
 
     it('with no amount spent', () => {
       const tweet = twitter.compileTweet('monthlyStats', data);
-      expect(tweet).to.contain('we spent $0.');
+      expect(tweet).to.not.contain('we spent $0.');
     });
 
     it('with amount spent', () => {
@@ -36,9 +36,10 @@ describe('lib.twitter.test.js', () => {
 
     it('with no new backer', () => {
       data.totalNewBackers = 0;
+      data.totalAmountSpent = 0;
       data.newBackersTwitterHandles = '';
       const tweet = twitter.compileTweet('monthlyStats', data);
-      expect(tweet).to.contain('no new backer joined');
+      expect(tweet).to.not.contain('no new backer joined');
     });
 
     it('with 1 new backer', () => {
@@ -50,7 +51,7 @@ describe('lib.twitter.test.js', () => {
 
     it('with long new backers list', () => {
       data.totalNewBackers = 20;
-      data.newBackersTwitterHandles = '@xdamman, @piamancini, @asood123, @opencollect, @storify';
+      data.newBackersTwitterHandles = '@xdamman, @piamancini, @asood123, @opencollect, @storify, @znarf, @hipsterbrown';
       const tweet = twitter.compileTweet('monthlyStats', data);
       expect(tweet).to.not.contain('Thank you');
     });
