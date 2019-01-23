@@ -7,9 +7,6 @@ import { debounce, get, pick, isNil, min } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
-import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle.cjs';
-import { ErrorCircle } from 'styled-icons/boxicons-regular/ErrorCircle.cjs';
-
 import { Router } from '../server/pages';
 
 import { H2, H5, P, Span } from '../components/Text';
@@ -37,12 +34,12 @@ import ContributeDetails from '../components/ContributeDetails';
 import Loading from '../components/Loading';
 import StyledButton from '../components/StyledButton';
 import StepsProgress from '../components/StepsProgress';
-import StyledCard from '../components/StyledCard';
 import PayWithPaypalButton from '../components/PayWithPaypalButton';
 import CreateProfileFAQ from '../components/faqs/CreateProfileFAQ';
 import ContributeDetailsFAQ from '../components/faqs/ContributeDetailsFAQ';
 import Container from '../components/Container';
 import { fadeIn } from '../components/StyledKeyframes';
+import MessageBox from '../components/MessageBox';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
 
@@ -533,13 +530,12 @@ class CreateOrderPage extends React.Component {
       );
     } else if (step === 'payment') {
       return get(this.state, 'stepDetails.totalAmount') === 0 ? (
-        <StyledCard borders={1} borderColor="green.500" bg="green.100" color="green.700" p={3}>
-          <CheckCircle size="1em" />{' '}
+        <MessageBox type="success" withIcon>
           <FormattedMessage
             id="contribute.freeTier"
             defaultMessage="This is a free tier, you can submit your order directly."
           />
-        </StyledCard>
+        </MessageBox>
       ) : (
         <Flex flexDirection="column">
           <H5 textAlign="left" mb={3}>
@@ -781,11 +777,9 @@ class CreateOrderPage extends React.Component {
             {this.renderStepsProgress(this.props.step || 'contributeAs')}
           </Box>
           {this.state.error && (
-            <StyledCard borders={1} borderColor="red.500" bg="red.100" color="red.700" p={3} mb={3} mx={2}>
-              <ErrorCircle size="1.2em" />
-              &nbsp;
+            <MessageBox type="error" mb={3} mx={2} withIcon>
               {this.state.error.replace('GraphQL error: ', '')}
-            </StyledCard>
+            </MessageBox>
           )}
           {isLoadingContent ? <Loading /> : this.renderContent()}
         </Flex>
