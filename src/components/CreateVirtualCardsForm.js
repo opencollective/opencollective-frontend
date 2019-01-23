@@ -103,7 +103,7 @@ class CreateVirtualCardsForm extends Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.state = {
       deliverType: 'email', // email or manual
-      values: { amount: '', onlyOpensource: true, emails: [], customMessage: '', numberOfVirtualCards: 1 },
+      values: { amount: MIN_AMOUNT, onlyOpensource: true, emails: [], customMessage: '', numberOfVirtualCards: 1 },
       errors: { emails: [] },
       multiEmailsInitialState: null,
       submitting: false,
