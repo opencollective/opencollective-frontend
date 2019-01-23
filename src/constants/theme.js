@@ -1,4 +1,5 @@
 import { variant } from 'styled-system';
+import { transparentize } from 'polished';
 
 export const colors = {
   black: {
@@ -184,6 +185,37 @@ const theme = {
       paddingTop: toPx(space[1]),
     },
   },
+  messageTypes: {
+    white: {
+      backgroundColor: colors.white.full,
+      borderColor: colors.black[200],
+    },
+    dark: {
+      backgroundColor: transparentize(0.2, colors.black[900]),
+      borderColor: colors.black[900],
+      color: colors.white.full,
+    },
+    info: {
+      backgroundColor: colors.primary[50],
+      borderColor: colors.primary[500],
+      color: colors.primary[700],
+    },
+    success: {
+      backgroundColor: colors.green[100],
+      borderColor: colors.green[500],
+      color: colors.green[700],
+    },
+    warning: {
+      backgroundColor: colors.yellow[100],
+      borderColor: colors.yellow[700],
+      color: colors.yellow[700],
+    },
+    error: {
+      backgroundColor: colors.red[100],
+      borderColor: colors.red[500],
+      color: colors.red[700],
+    },
+  },
 };
 
 export const buttonStyle = variant({
@@ -194,6 +226,11 @@ export const buttonStyle = variant({
 export const buttonSize = variant({
   key: 'buttonSizes',
   prop: 'buttonSize',
+});
+
+export const messageType = variant({
+  key: 'messageTypes',
+  prop: 'type',
 });
 
 export default theme;
