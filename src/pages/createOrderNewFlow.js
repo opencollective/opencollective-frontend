@@ -316,13 +316,13 @@ class CreateOrderPage extends React.Component {
 
   /** Returns an array like [personnalProfile, otherProfiles] */
   getProfiles() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, data } = this.props;
     return !LoggedInUser
       ? [{}, {}]
       : [
           { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective },
           LoggedInUser.memberOf
-            .filter(m => m.role === 'ADMIN' && m.collective.id !== this.props.data.Collective.id)
+            .filter(m => m.role === 'ADMIN' && m.collective.id !== data.Collective.id && m.collective.type !== 'EVENT')
             .map(({ collective }) => collective),
         ];
   }
