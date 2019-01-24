@@ -8,8 +8,6 @@ import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 
-import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle.cjs';
-
 import { formatCurrency, imagePreview } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import { pickLogo } from '../lib/collective.lib';
@@ -25,6 +23,7 @@ import StyledCard from '../components/StyledCard';
 
 import orderSuccessBackgroundUrl from '../static/images/order-success-background.svg';
 import { tweetURL, facebooKShareURL, objectToQueryString } from '../lib/url_helpers';
+import MessageBox from '../components/MessageBox';
 
 const OrderSuccessContainer = styled(Flex)`
   background: white url(${orderSuccessBackgroundUrl}) 0 0/100% no-repeat;
@@ -183,13 +182,12 @@ class OrderSuccessPage extends React.Component {
       <Page title={'Contribute'}>
         <OrderSuccessContainer id="page-order-success" flexDirection="column" alignItems="center" mb={6}>
           {isManualDonation && (
-            <StyledCard borders={1} borderColor="yellow.500" bg="yellow.100" color="yellow.700" p={3} mt={4} mx={2}>
-              <InfoCircle size="1.2em" />{' '}
+            <MessageBox type="warning" mt={4} mx={2}>
               <FormattedMessage
                 id="collective.user.orderProcessing.manual"
                 defaultMessage="Your donation is pending. Please follow the instructions in the confirmation email to manually pay the host of the collective."
               />
-            </StyledCard>
+            </MessageBox>
           )}
 
           <StyledCollectiveCard mt={[4, 5]} mb={32} collective={collective} showCover={false}>
