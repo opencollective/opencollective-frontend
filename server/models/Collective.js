@@ -1271,6 +1271,8 @@ export default function(Sequelize, DataTypes) {
             'id',
             'slug',
             'name',
+            'currency',
+            'hostFeePercent',
             'description',
             'twitterHandle',
             'githubHandle',
