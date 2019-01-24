@@ -47,6 +47,10 @@ export async function createCollective(_, args, req) {
   if (args.collective.HostCollectiveId) {
     if (args.collective.HostCollectiveId === 858) {
       // opencollective.com/meetups
+      // we assign them to a host based on their location
+      // the host will have to approve them
+      collectiveData.tags.push('Tech meetups');
+      collectiveData.ParentCollectiveId = collectiveData.ParentCollectiveId || 858;
       if (collectiveData.timezone) {
         if (collectiveData.timezone.match(/Europe/)) {
           collectiveData.currency = 'EUR';
@@ -64,8 +68,13 @@ export async function createCollective(_, args, req) {
           collectiveData.currency = 'GBP';
           args.collective.HostCollectiveId = 9806; // Open Collective UK Host
         }
+        if (collectiveData.timezone.match(/^US/)) {
+          collectiveData.currency = 'USD';
+          args.collective.HostCollectiveId = 8674; // Open Collective Inc Host
+        }
+      } else {
+        args.collective.HostCollectiveId = null;
       }
-      collectiveData.tags.push('Tech meetups');
     }
   }
 
