@@ -123,7 +123,7 @@ export async function createCollective(_, args, req) {
   }
 
   try {
-    collective = await models.Collective.create(omit(collectiveData, 'HostCollectiveId'));
+    collective = await models.Collective.create(omit(collectiveData, ['HostCollectiveId', 'hostFeePercent']));
   } catch (e) {
     let msg;
     switch (e.name) {
@@ -190,17 +190,17 @@ export function editCollective(_, args, req) {
 
   const location = args.collective.location || {};
 
-  const updatedCollectiveData = {
+  const newCollectiveData = {
     ...args.collective,
     locationName: location.name,
     address: location.address,
     LastEditedByUserId: req.remoteUser.id,
   };
 
-  updatedCollectiveData.type = updatedCollectiveData.type || 'COLLECTIVE';
+  newCollectiveData.type = newCollectiveData.type || 'COLLECTIVE';
 
   if (location.lat) {
-    updatedCollectiveData.geoLocationLatLong = {
+    newCollectiveData.geoLocationLatLong = {
       type: 'Point',
       coordinates: [location.lat, location.long],
     };
@@ -226,13 +226,13 @@ export function editCollective(_, args, req) {
   }
   return Promise.all(promises)
     .then(() => {
-      if (args.collective.slug && updatedCollectiveData.type === 'EVENT') {
+      if (args.collective.slug && newCollectiveData.type === 'EVENT') {
         // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
         // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
         const slug = slugify(args.collective.slug.replace(/(\-[0-9]+[a-z]{2})$/i, '') || args.collective.name);
-        updatedCollectiveData.slug = `${slug}-${parentCollective.id}${collective.type.substr(0, 2)}`.toLowerCase();
+        newCollectiveData.slug = `${slug}-${parentCollective.id}${collective.type.substr(0, 2)}`.toLowerCase();
       }
-      if (updatedCollectiveData.type === 'EVENT') {
+      if (newCollectiveData.type === 'EVENT') {
         return (
           req.remoteUser.id === collective.CreatedByUserId ||
           req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id)
@@ -240,14 +240,14 @@ export function editCollective(_, args, req) {
       } else {
         return (
           req.remoteUser.id === collective.CreatedByUserId ||
-          req.remoteUser.hasRole(['ADMIN', 'HOST'], updatedCollectiveData.id)
+          req.remoteUser.hasRole(['ADMIN', 'HOST'], newCollectiveData.id)
         );
       }
     })
     .then(canEditCollective => {
       if (!canEditCollective) {
         let errorMsg;
-        switch (updatedCollectiveData.type) {
+        switch (newCollectiveData.type) {
           case types.EVENT:
             errorMsg = `You must be logged in as the creator of this Event or as an admin of the ${
               parentCollective.slug
@@ -255,11 +255,11 @@ export function editCollective(_, args, req) {
             break;
 
           case types.USER:
-            errorMsg = `You must be logged in as ${updatedCollectiveData.name} to edit this User Collective`;
+            errorMsg = `You must be logged in as ${newCollectiveData.name} to edit this User Collective`;
             break;
 
           default:
-            errorMsg = `You must be logged in as an admin or as the host of this ${updatedCollectiveData.type.toLowerCase()} collective to edit it`;
+            errorMsg = `You must be logged in as an admin or as the host of this ${newCollectiveData.type.toLowerCase()} collective to edit it`;
         }
         return Promise.reject(new errors.Unauthorized({ message: errorMsg }));
       }
@@ -267,13 +267,26 @@ export function editCollective(_, args, req) {
     .then(() => {
       // If we try to change the host
       if (
-        updatedCollectiveData.HostCollectiveId !== undefined &&
-        updatedCollectiveData.HostCollectiveId !== collective.HostCollectiveId
+        newCollectiveData.HostCollectiveId !== undefined &&
+        newCollectiveData.HostCollectiveId !== collective.HostCollectiveId
       ) {
-        return collective.changeHost(updatedCollectiveData.HostCollectiveId, req.remoteUser);
+        return collective.changeHost(newCollectiveData.HostCollectiveId, req.remoteUser);
       }
     })
-    .then(() => collective.update(updatedCollectiveData))
+    .then(() => {
+      // If we try to change the `hostFeePercent`
+      if (newCollectiveData.hostFeePercent) {
+        if (collective.type === 'COLLECTIVE') {
+          // only an admin of the host of the collective can edit `hostFeePercent` of a COLLECTIVE
+          if (!req.remoteUser.isAdmin(collective.HostCollectiveId)) {
+            throw new errors.Unauthorized(
+              'Only an admin of the host collective can edit the host fee for this collective',
+            );
+          }
+        }
+      }
+    })
+    .then(() => collective.update(newCollectiveData))
     .then(() => collective.editTiers(args.collective.tiers))
     .then(() =>
       collective.editMembers(args.collective.members, {
