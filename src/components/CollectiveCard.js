@@ -67,15 +67,24 @@ class CollectiveCard extends React.Component {
       (collective.longDescription && firstSentence(collective.longDescription, 80));
     const description = collective.description;
 
-    const params = {
-      slug: collective.slug,
-    };
+    let route, params;
+    if (collective.type === 'EVENT') {
+      route = 'event';
+      params = {
+        parentCollectiveSlug: collective.parentCollective && collective.parentCollective.slug,
+        eventSlug: collective.slug,
+      };
+    } else {
+      route = 'collective';
+      params = { slug: collective.slug };
+    }
+
     if (LoggedInUser) {
       params.referral = LoggedInUser.CollectiveId;
     }
 
     return (
-      <Link route="collective" target="_top" params={params}>
+      <Link route={route} target="_top" params={params}>
         <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>
             {`

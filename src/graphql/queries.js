@@ -428,6 +428,9 @@ const getCollectiveQuery = gql`
             description
             longDescription
             backgroundImage
+            parentCollective {
+              slug
+            }
           }
         }
       }
@@ -451,6 +454,9 @@ const getCollectiveQuery = gql`
             description
             longDescription
             backgroundImage
+            parentCollective {
+              slug
+            }
           }
         }
       }
