@@ -7,39 +7,89 @@ Subject: {{collective.name}} would love to be hosted by {{host.name}}
 <h1>{{collective.name}}</h1>
 
 <style>
-  th { text-align: left; }
+  th {
+    text-align: left;
+  }
 </style>
 
+Dear admin of {{host.name}},
+
+<p>
+  {{user.collective.name}} would love you to host their {{collective.name}} collective.
+</p>
+
+<p>By hosting them, you accept to collect money on their behalf and account for all of their transactions in your
+  books. For that service you will receive a commission of {{collective.hostFeePercent}}% on all their donations (you
+  can edit that commission in the settings of your host on <a href="https://opencollective.com/{{host.slug}}/edit">https://opencollective.com/{{host.slug}}/edit</a>.
+  You can read more about what it entails to be a host in our <a href="https://opencollective.com/faq/hosts">FAQ</a>.</p>
 
 <h2>Collective details</h2>
 <table>
-  <tr><th>Name</th><td>{{collective.name}}</td></tr>
-  <tr><th>Url</th><td><a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a></td></tr>
-  <tr><th>Website</th><td>{{collective.website}}</td></tr>
+  <tr>
+    <th>Name</th>
+    <td>{{collective.name}}</td>
+  </tr>
+  <tr>
+    <th>Url</th>
+    <td><a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a></td>
+  </tr>
+  <tr>
+    <th>Website</th>
+    <td>{{collective.website}}</td>
+  </tr>
   {{#if collective.data.meetupSlug}}
-    <tr><th>Meetup</th><td>https://meetup.com/{{collective.data.meetupSlug}}</td></tr>
+  <tr>
+    <th>Meetup</th>
+    <td>https://meetup.com/{{collective.data.meetupSlug}}</td>
+  </tr>
   {{/if}}
   {{#if collective.data.members}}
-    <tr><th>Members</th><td>{{collective.data.members}}</td></tr>
+  <tr>
+    <th>Members</th>
+    <td>{{collective.data.members}}</td>
+  </tr>
   {{/if}}
-  <tr><th>Twitter</th><td>{{collective.twitterHandle}}</td></tr>
-  <tr><th>Description</th><td>{{collective.description}}</td></tr>
-  <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
+  <tr>
+    <th>Twitter</th>
+    <td>{{collective.twitterHandle}}</td>
+  </tr>
+  <tr>
+    <th>Description</th>
+    <td>{{collective.description}}</td>
+  </tr>
+  <tr>
+    <th>Tags</th>
+    <td>{{{json collective.tags}}}</td>
+  </tr>
 </table>
 
 <h2>Creator</h2>
 https://opencollective.com/{{user.collective.slug}}
 <br /><br />
 <table>
-  <tr><th>Name</th><td>{{user.collective.name}}</td></tr>
-  <tr><th>Email</th><td>{{user.email}}</td></tr>
-  <tr><th>Website</th><td>{{user.collective.website}}</td></tr>
-  <tr><th>Twitter</th><td>{{user.collective.twitterHandle}}</td></tr>
+  <tr>
+    <th>Name</th>
+    <td>{{user.collective.name}}</td>
+  </tr>
+  <tr>
+    <th>Email</th>
+    <td>{{user.email}}</td>
+  </tr>
+  <tr>
+    <th>Website</th>
+    <td>{{user.collective.website}}</td>
+  </tr>
+  <tr>
+    <th>Twitter</th>
+    <td>{{user.collective.twitterHandle}}</td>
+  </tr>
 </table>
 
 <br /><br />
 <center>
-  <a href="{{actions.approve}}" class="btn blue"><div>APPROVE</div></a>
+  <a href="{{actions.approve}}" class="btn blue">
+    <div>APPROVE</div>
+  </a>
 </center>
 
 {{> footer}}
