@@ -203,6 +203,7 @@ const getCollectiveToEditQuery = gql`
       createdAt
       isActive
       isHost
+      hostFeePercent
       expensePolicy
       stats {
         id
