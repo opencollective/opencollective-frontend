@@ -85,7 +85,15 @@ class CreateCollective extends React.Component {
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = this.host.id;
     if (CollectiveInputType.tags) {
-      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+      // Meetup returns an array of tags, while the regular input stores a string
+      if (typeof CollectiveInputType.tags === 'string') {
+        CollectiveInputType.tags.split(',');
+      }
+
+      CollectiveInputType.tags =
+        Array.isArray(CollectiveInputType.tags) && CollectiveInputType.tags.length > 0
+          ? CollectiveInputType.tags.map(t => t.trim())
+          : null;
     }
     CollectiveInputType.tags = [...(CollectiveInputType.tags || []), ...(this.host.tags || [])] || [];
     if (CollectiveInputType.category) {
