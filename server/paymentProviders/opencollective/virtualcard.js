@@ -347,11 +347,11 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
     throw Error('Min monthly limit per member for gift card is $5');
   }
 
-  // Set a default expirity date to 3 months by default
+  // Set a default expirity date to 2 years by default
   const expiryDate = args.expiryDate
     ? moment(args.expiryDate).format()
     : moment()
-        .add(3, 'months')
+        .add(24, 'months')
         .format();
 
   // If monthlyLimitPerMember is defined, we ignore the amount field and

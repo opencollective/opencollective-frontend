@@ -137,7 +137,7 @@ describe('opencollective.virtualcard', () => {
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(
           moment()
-            .add(3, 'months')
+            .add(24, 'months')
             .format('YYYY-MM-DD'),
         );
         expect(paymentMethod.description).to.be.equal(args.description);
@@ -177,7 +177,7 @@ describe('opencollective.virtualcard', () => {
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(
           moment()
-            .add(3, 'months')
+            .add(24, 'months')
             .format('YYYY-MM-DD'),
         );
         expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
@@ -690,7 +690,7 @@ describe('opencollective.virtualcard', () => {
         expect(paymentMethod.type).to.be.equal('virtualcard');
         expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(
           moment()
-            .add(3, 'months')
+            .add(24, 'months')
             .format('YYYY-MM-DD'),
         );
       }); /** End of "should create a U$100 virtual card payment method" */
@@ -1190,7 +1190,7 @@ describe('opencollective.virtualcard', () => {
             expect(paymentMethod.limitedToHostCollectiveIds[0]).to.be.equal(args.limitedToHostCollectiveIds[0]);
             expect(moment(paymentMethod.expiryDate).format('YYYY-MM-DD')).to.be.equal(
               moment()
-                .add(3, 'months')
+                .add(24, 'months')
                 .format('YYYY-MM-DD'),
             );
             expect(paymentMethod.monthlyLimitPerMember).to.be.equal(args.monthlyLimitPerMember);
