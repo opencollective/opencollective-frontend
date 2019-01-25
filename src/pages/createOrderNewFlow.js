@@ -14,14 +14,11 @@ import Logo from '../components/Logo';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Link from '../components/Link';
-import SignIn from '../components/SignIn';
-import CreateProfile from '../components/CreateProfile';
 import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
 
-import { addCreateCollectiveMutation, createUserQuery } from '../graphql/mutations';
+import { addCreateCollectiveMutation } from '../graphql/mutations';
 
-import * as api from '../lib/api';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency } from '../lib/utils';
 import { getPaypal } from '../lib/paypal';
@@ -35,11 +32,11 @@ import Loading from '../components/Loading';
 import StyledButton from '../components/StyledButton';
 import StepsProgress from '../components/StepsProgress';
 import PayWithPaypalButton from '../components/PayWithPaypalButton';
-import CreateProfileFAQ from '../components/faqs/CreateProfileFAQ';
 import ContributeDetailsFAQ from '../components/faqs/ContributeDetailsFAQ';
 import Container from '../components/Container';
 import { fadeIn } from '../components/StyledKeyframes';
 import MessageBox from '../components/MessageBox';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 
 const STEPS = ['contributeAs', 'details', 'payment'];
 
@@ -125,8 +122,6 @@ class CreateOrderPage extends React.Component {
       loading: false,
       submitting: false,
       submitted: false,
-      unknownEmail: false,
-      signIn: true,
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
       stepDetails: null,
       stepPayment: null,
@@ -249,53 +244,6 @@ class CreateOrderPage extends React.Component {
       this.setState({ submitting: false, error: e.message });
     }
   }
-
-  signIn = email => {
-    if (this.state.submitting) {
-      return false;
-    }
-
-    this.setState({ submitting: true });
-    return api
-      .checkUserExistence(email)
-      .then(exists => {
-        if (exists) {
-          return api.signin({ email }, Router.asPath).then(() => {
-            Router.pushRoute('signinLinkSent', { email });
-          });
-        } else {
-          this.setState({ unknownEmail: true, submitting: false });
-        }
-      })
-      .catch(e => {
-        this.setState({ error: e.message, submitting: false });
-      });
-  };
-
-  createProfile = data => {
-    if (this.state.submitting) {
-      return false;
-    }
-
-    const redirect = window.location.pathname;
-    const user = pick(data, ['email', 'firstName', 'lastName']);
-    const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
-    const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
-    if (organization) {
-      organization.name = organization.orgName;
-      delete organization.orgName;
-    }
-
-    this.setState({ submitting: true });
-    this.props
-      .createUser({ user, organization, redirect })
-      .then(() => {
-        Router.pushRoute('signinLinkSent', { email: user.email });
-      })
-      .catch(error => {
-        this.setState({ error: error.message, submitting: false });
-      });
-  };
 
   getLoggedInUserDefaultContibuteProfile() {
     if (get(this.state, 'stepProfile')) {
@@ -661,52 +609,9 @@ class CreateOrderPage extends React.Component {
 
   renderContent() {
     const { LoggedInUser } = this.props;
-    const { loading, submitting, unknownEmail } = this.state;
 
     if (!LoggedInUser) {
-      return this.state.signIn ? (
-        <Flex justifyContent="center">
-          <SignIn
-            onSubmit={this.signIn}
-            onSecondaryAction={() => this.setState({ signIn: false })}
-            loading={loading || submitting}
-            unknownEmail={unknownEmail}
-          />
-        </Flex>
-      ) : (
-        <Flex flexDirection="column" width={1} alignItems="center">
-          <Flex justifyContent="center" width={1}>
-            <Box width={[0, null, null, 1 / 5]} />
-            <CreateProfile
-              onPersonalSubmit={this.createProfile}
-              onOrgSubmit={this.createProfile}
-              onSecondaryAction={() => this.setState({ signIn: true })}
-              submitting={submitting}
-              mx={4}
-              width={490}
-            />
-            <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
-          </Flex>
-          <P mt={4} color="black.500" fontSize="Caption">
-            <FormattedMessage
-              id="contributeFlow.createProfile.legal"
-              defaultMessage="By joining, you agree to our {tosLink} and {privacyPolicyLink}."
-              values={{
-                tosLink: (
-                  <Link route="/tos">
-                    <FormattedMessage id="tos" defaultMessage="Terms of Service" />
-                  </Link>
-                ),
-                privacyPolicyLink: (
-                  <Link route="/privacypolicy">
-                    <FormattedMessage id="privacyPolicy" defaultMessage="Privacy Policy" />
-                  </Link>
-                ),
-              }}
-            />
-          </P>
-        </Flex>
-      );
+      return <SignInOrJoinFree redirect={Router.asPath} />;
     }
 
     const step = this.props.step || 'contributeAs';
@@ -722,7 +627,7 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { data, loadingLoggedInUser } = this.props;
+    const { data, loadingLoggedInUser, LoggedInUser } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
@@ -772,10 +677,13 @@ class CreateOrderPage extends React.Component {
             </P>
           )}
         </Flex>
-        <Flex id="content" flexDirection="column" alignItems="center" mb={6}>
-          <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
-            {this.renderStepsProgress(this.props.step || 'contributeAs')}
-          </Box>
+        <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
+          {loadingLoggedInUser ||
+            (LoggedInUser && (
+              <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+                {this.renderStepsProgress(this.props.step || 'contributeAs')}
+              </Box>
+            ))}
           {this.state.error && (
             <MessageBox type="error" mb={3} mx={2} withIcon>
               {this.state.error.replace('GraphQL error: ', '')}
@@ -826,12 +734,6 @@ const addData = graphql(gql`
   }
 `);
 
-const addCreateUserMutation = graphql(createUserQuery, {
-  props: ({ mutate }) => ({
-    createUser: variables => mutate({ variables }),
-  }),
-});
-
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
@@ -850,7 +752,6 @@ const addGraphQL = compose(
   addData,
   addCreateCollectiveMutation,
   addCreateOrderMutation,
-  addCreateUserMutation,
 );
 
 export default withIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
