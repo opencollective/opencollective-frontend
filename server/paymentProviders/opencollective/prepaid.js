@@ -22,7 +22,7 @@ async function getBalance(paymentMethod) {
   /* Result will be negative (We're looking for DEBIT transactions) */
   const allTransactions = await models.Transaction.findAll({
     attributes: ['netAmountInCollectiveCurrency', 'currency'],
-    where: { type: 'DEBIT' },
+    where: { type: 'DEBIT', RefundTransactionId: null },
     include: [
       {
         model: models.PaymentMethod,
@@ -109,6 +109,14 @@ async function processOrder(order) {
   return transactions;
 }
 
+async function refundTransaction(transaction, user) {
+  /* Create negative transactions for the received transaction */
+  const refundTransaction = await libpayments.createRefundTransaction(transaction, 0, null, user);
+
+  /* Associate RefundTransactionId to all the transactions created */
+  return libpayments.associateTransactionRefundId(transaction, refundTransaction);
+}
+
 /* Expected API of a Payment Method Type */
 export default {
   features: {
@@ -117,4 +125,5 @@ export default {
   },
   getBalance,
   processOrder,
+  refundTransaction,
 };

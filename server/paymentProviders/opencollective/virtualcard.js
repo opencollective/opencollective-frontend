@@ -33,6 +33,7 @@ async function getBalance(paymentMethod) {
   let query = {
     PaymentMethodId: paymentMethod.id,
     type: 'DEBIT',
+    RefundTransactionId: null,
   };
   let initialBalance = paymentMethod.initialBalance;
   if (paymentMethod.monthlyLimitPerMember) {
@@ -536,6 +537,14 @@ async function registerCreateInCache(collectiveId, count, amount) {
   cache.set(amountCacheKey, existingAmount + amount, oneDayInSeconds);
 }
 
+async function refundTransaction(transaction, user) {
+  /* Create negative transactions for the received transaction */
+  const refundTransaction = await libpayments.createRefundTransaction(transaction, 0, null, user);
+
+  /* Associate RefundTransactionId to all the transactions created */
+  return libpayments.associateTransactionRefundId(transaction, refundTransaction);
+}
+
 /* Expected API of a Payment Method Type */
 export default {
   features: {
@@ -546,4 +555,5 @@ export default {
   processOrder,
   create,
   claim,
+  refundTransaction,
 };

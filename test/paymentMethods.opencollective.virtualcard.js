@@ -512,6 +512,99 @@ describe('opencollective.virtualcard', () => {
         expect(collectiveMember).to.exist;
       }); /** End Of "Process order of a virtual card" */
     }); /** End Of "#processOrder" */
+
+    describe('#refundTransaction', () => {
+      const INITIAL_BALANCE = 5000;
+      const CURRENCY = 'USD';
+      let user = null;
+      let hostCollective = null;
+      let targetCollective = null;
+      let sourcePm = null;
+      let virtualCardPm = null;
+
+      before(async () => {
+        hostCollective = await models.Collective.create({
+          type: 'HOST',
+          name: 'Test HOST',
+          currency: CURRENCY,
+          isActive: true,
+        });
+        await store.stripeConnectedAccount(hostCollective.id);
+      });
+
+      before(async () => {
+        user = await models.User.createUserWithCollective({
+          name: 'Test Prepaid Donator',
+          email: store.randEmail('prepaid-donator@opencollective.com'),
+        });
+      });
+
+      before(
+        'create a credit card payment method',
+        async () =>
+          (sourcePm = await models.PaymentMethod.create({
+            name: '4242',
+            service: 'stripe',
+            type: 'creditcard',
+            token: 'tok_123456781234567812345678',
+            CollectiveId: user.collective.id,
+            monthlyLimitPerMember: null,
+          })),
+      );
+
+      before(async () => {
+        targetCollective = await models.Collective.create({
+          name: 'Test Collective',
+          currency: CURRENCY,
+          isActive: true,
+        }).then(c => (targetCollective = c));
+        await targetCollective.addHost(hostCollective);
+      });
+
+      before(async () => {
+        virtualCardPm = await models.PaymentMethod.create({
+          name: 'Test VC',
+          SourcePaymentMethodId: sourcePm.id,
+          initialBalance: INITIAL_BALANCE,
+          monthlyLimitPerMember: null,
+          currency: CURRENCY,
+          CollectiveId: user.collective.id,
+          customerId: user.id,
+          data: { HostCollectiveId: hostCollective.id },
+          service: 'opencollective',
+          type: 'virtualcard',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          expiryDate: new Date(2042, 22, 10),
+        });
+      });
+
+      it('refunds transaction and restore balance', async () => {
+        const initialBalance = await virtualcard.getBalance(virtualCardPm);
+        const orderData = {
+          createdByUser: user,
+          fromCollective: user.collective,
+          FromCollectiveId: user.collective.id,
+          collective: targetCollective,
+          CollectiveId: targetCollective.id,
+          paymentMethod: virtualCardPm,
+          totalAmount: 1000,
+          currency: 'USD',
+        };
+
+        const transaction = await virtualcard.processOrder(orderData);
+        expect(transaction).to.exist;
+
+        // Check balance decreased
+        const balanceAfterOrder = await virtualcard.getBalance(virtualCardPm);
+        expect(balanceAfterOrder.amount).to.be.equal(initialBalance.amount - 1000);
+
+        // Make refund
+        await virtualcard.refundTransaction(transaction, user);
+        const balanceAfterRefund = await virtualcard.getBalance(virtualCardPm);
+        expect(balanceAfterRefund.amount).to.be.equal(initialBalance.amount);
+      });
+    });
   }); /** End Of "paymentProviders.opencollective.virtualcard" */
 
   describe('graphql.mutations.paymentMethods.virtualcard', () => {
