@@ -73,6 +73,7 @@ class CreateOrderPage extends React.Component {
     query: {
       collectiveSlug,
       eventSlug,
+      tierId,
       tierSlug,
       amount,
       quantity,
@@ -87,6 +88,7 @@ class CreateOrderPage extends React.Component {
   }) {
     return {
       slug: eventSlug || collectiveSlug,
+      tierId,
       tierSlug,
       quantity,
       totalAmount: totalAmount || amount * 100,
@@ -326,9 +328,9 @@ class CreateOrderPage extends React.Component {
 
   /** Return the currently selected tier, or a falsy value if none selected */
   getTier() {
-    const { data, tierSlug } = this.props;
-    if (tierSlug) {
-      return get(data, 'Collective.tiers', []).find(t => t.slug == tierSlug);
+    const { data, tierId } = this.props;
+    if (tierId) {
+      return get(data, 'Collective.tiers', []).find(t => t.id == tierId);
     }
   }
 
@@ -480,7 +482,7 @@ class CreateOrderPage extends React.Component {
   }
 
   renderStep(step) {
-    const { LoggedInUser, tierSlug } = this.props;
+    const { LoggedInUser, tierId } = this.props;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
 
@@ -517,7 +519,7 @@ class CreateOrderPage extends React.Component {
               amountOptions={this.getAmountsPresets()}
               currency={this.getCurrency()}
               onChange={this.updateDetails}
-              showFrequency={tierSlug ? true : false}
+              showFrequency={Boolean(tierId)}
               defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
               defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
               disabledInterval={Boolean(tier)}
@@ -585,13 +587,13 @@ class CreateOrderPage extends React.Component {
     }
 
     let route;
-    if (this.props.tierSlug) {
+    if (this.props.tierId) {
       route = `orderCollectiveTierNew${routeSuffix}`;
     } else {
       route = `orderCollectiveNew${routeSuffix}`;
     }
 
-    await Router.pushRoute(route, { ...params, ...pick(this.props, ['verb', 'tierSlug']) });
+    await Router.pushRoute(route, { ...params, ...pick(this.props, ['verb', 'tierId', 'tierSlug']) });
     window.scrollTo(0, 0);
   };
 

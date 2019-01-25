@@ -132,13 +132,13 @@ class TierCard extends React.Component {
     if (parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER'))) {
       linkRoute = {
         name: 'orderCollectiveTierNew',
-        params: { collectiveSlug: collective.slug, tierSlug: tier.slug, verb: 'contribute' },
+        params: { collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' },
         anchor: '#content',
       };
     } else {
       linkRoute = {
         name: 'orderCollectiveTier',
-        params: { collectiveSlug: collective.slug, TierId: tier.id },
+        params: { collectiveSlug: collective.slug, tierId: tier.id },
         anchor: '#content',
       };
     }
