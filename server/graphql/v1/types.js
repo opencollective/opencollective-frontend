@@ -1297,7 +1297,12 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       uuid: {
         type: GraphQLString,
-        resolve(paymentMethod) {
+        resolve(paymentMethod, _, req) {
+          const isUnconfirmedVirtualCard = paymentMethod.type === 'virtualcard' && !paymentMethod.confirmedAt;
+          if (isUnconfirmedVirtualCard && (!req.remoteUser || !req.remoteUser.isAdmin(paymentMethod.CollectiveId))) {
+            return null;
+          }
+
           return paymentMethod.uuid;
         },
       },
