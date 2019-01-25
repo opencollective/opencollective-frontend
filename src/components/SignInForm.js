@@ -7,6 +7,9 @@ import { isValidEmail } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import * as api from '../lib/api';
 
+/**
+ * @deprecated Since 2019/01/25 - Use `SignIn` component instead.
+ */
 class LoginForm extends React.Component {
   static propTypes = {
     signin: PropTypes.bool,
