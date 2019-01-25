@@ -4,17 +4,20 @@ import { FormattedMessage } from 'react-intl';
 
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
+import { withUser } from './UserProvider';
+import StyledSpinner from './StyledSpinner';
 
 /**
- * A user login button with proper redirect function. This will **not** check
- * if user is already logged in.
+ * A user login button with proper redirect function.
+ * If user is currently loggin in, button will be disabled and will show a spinner.
  */
-export default class LoginBtn extends React.Component {
+class LoginBtn extends React.Component {
   static propTypes = {
     /**
-     * Login button label. Default: "Login"
+     * Login button label. Default: "Sign In"
      */
     children: PropTypes.node,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -32,6 +35,14 @@ export default class LoginBtn extends React.Component {
     }
   }
 
+  renderContent() {
+    if (this.props.loadingLoggedInUser) {
+      return <StyledSpinner size="1em" />;
+    }
+
+    return this.props.children || <FormattedMessage id="login.button" defaultMessage="Sign In" />;
+  }
+
   render() {
     return (
       <Link route="signin" params={{ next: this.redirectAfterSignin }} passHref>
@@ -44,9 +55,11 @@ export default class LoginBtn extends React.Component {
           px={3}
           py={2}
         >
-          {this.props.children || <FormattedMessage id="login.button" defaultMessage="Login" />}
+          {this.renderContent()}
         </StyledLink>
       </Link>
     );
   }
 }
+
+export default withUser(LoginBtn);

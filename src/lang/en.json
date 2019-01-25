@@ -229,7 +229,7 @@
   "collective.create.button": "Create Collective",
   "organization.create": "Create organization",
   "events.create.login": "You need to be logged in as a core contributor of this collective to be able to create an event.",
-  "login.button": "login",
+  "login.button": "Sign In",
   "collective.connectedAccounts.stripe.button": "Connect Stripe",
   "collective.connectedAccounts.stripe.description": "Connect a Stripe account to start accepting donations",
   "host.types.label": "Type of host entity",
