@@ -294,6 +294,11 @@ export async function approveCollective(remoteUser, CollectiveId) {
   }
 
   const hostCollective = await collective.getHostCollective();
+  if (!hostCollective) {
+    throw new errors.ValidationFailed({
+      message: 'We could not get the Host data for the Collective. Maybe they cancel their application.',
+    });
+  }
 
   if (!remoteUser.isAdmin(hostCollective.id)) {
     throw new errors.Unauthorized({
