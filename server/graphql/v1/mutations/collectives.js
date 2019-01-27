@@ -275,18 +275,14 @@ export function editCollective(_, args, req) {
     })
     .then(() => {
       // If we try to change the `hostFeePercent`
-      if (newCollectiveData.hostFeePercent) {
-        if (collective.type === 'COLLECTIVE') {
-          // only an admin of the host of the collective can edit `hostFeePercent` of a COLLECTIVE
-          if (!req.remoteUser.isAdmin(collective.HostCollectiveId)) {
-            throw new errors.Unauthorized(
-              'Only an admin of the host collective can edit the host fee for this collective',
-            );
-          }
-        }
+      if (
+        newCollectiveData.hostFeePercent !== undefined &&
+        newCollectiveData.hostFeePercent !== collective.hostFeePercent
+      ) {
+        return collective.updateHostFee(newCollectiveData.hostFeePercent, req.remoteUser);
       }
     })
-    .then(() => collective.update(newCollectiveData))
+    .then(() => collective.update(omit(newCollectiveData, ['HostCollectiveId', 'hostFeePercent']))) // we omit those attributes that have already been updated above
     .then(() => collective.editTiers(args.collective.tiers))
     .then(() =>
       collective.editMembers(args.collective.members, {

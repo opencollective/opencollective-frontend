@@ -278,7 +278,9 @@ describe('Mutation Tests', () => {
         expect(emailSendMessageSpy.args[3][1]).to.contain('Welcome to Open Collective!');
       });
     });
+  });
 
+  describe('editCollective tests', () => {
     describe('edit tiers', () => {
       const editTiersQuery = `
       mutation editTiers($id: Int!, $tiers: [TierInputType]) {
@@ -332,6 +334,57 @@ describe('Mutation Tests', () => {
         expect(updatedTiers).to.have.length(3);
         expect(updatedTiers[0].goal).to.equal(tiers[0].goal);
         expect(updatedTiers[1].amount).to.equal(tiers[1].amount);
+      });
+    });
+
+    describe('change the hostFeePercent of the host', () => {
+      const updateQuery = `
+      mutation editCollective($collective: CollectiveInputType!) {
+        editCollective(collective: $collective) {
+          id,
+          slug,
+          hostFeePercent,
+          host {
+            id
+            hostFeePercent
+          }
+        }
+      }
+      `;
+
+      it('fails if not authenticated as an admin of the host', async () => {
+        const result = await utils.graphqlQuery(
+          updateQuery,
+          { collective: { id: collective1.id, hostFeePercent: 11 } },
+          user1,
+        );
+        expect(result.errors).to.exist;
+        expect(result.errors[0].message).to.contain(
+          'Only an admin of the host collective can edit the host fee for this collective',
+        );
+      });
+
+      it('updates the hostFeePercent of the collective, not of the host', async () => {
+        const result = await utils.graphqlQuery(
+          updateQuery,
+          { collective: { id: collective1.id, hostFeePercent: 11 } },
+          host,
+        );
+        expect(result.data.editCollective.hostFeePercent).to.equal(11);
+        expect(result.data.editCollective.host.hostFeePercent).to.equal(5);
+      });
+
+      it('updates the hostFeePercent of the host and of the hosted collectives', async () => {
+        const result = await utils.graphqlQuery(
+          updateQuery,
+          { collective: { id: host.collective.id, hostFeePercent: 9 } },
+          host,
+        );
+        expect(result.data.editCollective.hostFeePercent).to.equal(9);
+        const hostedCollectives = await models.Collective.findAll({ where: { HostCollectiveId: host.collective.id } });
+        hostedCollectives.map(c => {
+          expect(c.hostFeePercent).to.equal(9);
+        });
       });
     });
   });
