@@ -229,7 +229,7 @@ const CreateProfile = enhance(
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
         <P color="black.700">Already have an account?</P>
-        <StyledButton fontWeight="600" onClick={onSecondaryAction} disabled={submitting}>
+        <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={submitting}>
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
         </StyledButton>
       </Container>

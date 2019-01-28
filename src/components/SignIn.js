@@ -78,7 +78,7 @@ const SignIn = withState('state', 'setState', { email: '', error: null, showErro
         <P color="black.700">
           <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
         </P>
-        <StyledButton fontWeight="600" onClick={onSecondaryAction} disabled={loading}>
+        <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={loading}>
           <FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />
         </StyledButton>
       </Container>

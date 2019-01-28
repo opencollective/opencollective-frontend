@@ -35,20 +35,6 @@ const StyledButtonContent = styled(tag.button)`
   ${buttonStyle}
   ${buttonSize}
 
-  ${bgColor}
-  ${border}
-  ${borderRadius}
-  ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontWeight}
-  ${minWidth}
-  ${maxWidth}
-  ${space}
-  ${textAlign}
-  ${width}
-
   ${props =>
     props.asLink &&
     css`
@@ -63,6 +49,20 @@ const StyledButtonContent = styled(tag.button)`
         color: ${themeGet('colors.primary.400')};
       }
     `}
+
+  ${bgColor}
+  ${border}
+  ${borderRadius}
+  ${color}
+  ${display}
+  ${fontFamily}
+  ${fontSize}
+  ${fontWeight}
+  ${minWidth}
+  ${maxWidth}
+  ${space}
+  ${textAlign}
+  ${width}
 `;
 
 const StyledButton = ({ loading, ...props }) =>
