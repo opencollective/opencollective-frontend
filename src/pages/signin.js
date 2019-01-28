@@ -1,19 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { Flex } from '@rebass/grid';
 
 import { Router } from '../server/pages';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import ErrorPage from '../components/ErrorPage';
-import SignInForm from '../components/SignInForm';
 
 import { isValidUrl } from '../lib/utils';
 
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
+import Loading from '../components/Loading';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next } }) {
@@ -24,54 +26,72 @@ class SigninPage extends React.Component {
   static propTypes = {
     token: PropTypes.string,
     next: PropTypes.string,
+    login: PropTypes.func,
+    errorLoggedInUser: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-    // Record the login error
-    this.state = { error: null };
-  }
+  state = { error: null, success: null };
 
   async componentDidMount() {
     if (this.props.token) {
-      window.localStorage.setItem('accessToken', this.props.token);
-      await this.props.login();
-      Router.replaceRoute(this.props.next || '/');
+      const user = await this.props.login(this.props.token);
+      if (!user) {
+        this.setState({ error: 'Token rejected' });
+      }
+    } else {
+      this.props.login();
     }
   }
 
-  render() {
-    if (this.props.token && !this.state.error) {
-      return <ErrorPage loading />;
+  componentDidUpdate(oldProps) {
+    if (!this.props.errorLoggedInUser && !oldProps.LoggedInUser && this.props.LoggedInUser) {
+      this.setState({ success: true });
+      Router.replaceRoute(this.props.next || '/').then(window.scroll(0, 0));
     }
+  }
+
+  renderContent() {
+    if (this.props.loadingLoggedInUser || this.state.success) {
+      return <Loading />;
+    }
+
+    const error = this.props.errorLoggedInUser || this.state.error;
+    return (
+      <React.Fragment>
+        {error && (
+          <MessageBox type="error" withIcon mb={4}>
+            <strong>
+              <FormattedMessage
+                id="login.failed"
+                defaultMessage="Sign In failed: {message}."
+                values={{ message: error }}
+              />
+            </strong>
+            <br />
+            <FormattedMessage
+              id="login.askAnother"
+              defaultMessage="You can ask for a new sign in link using the form below."
+            />
+          </MessageBox>
+        )}
+        <SignInOrJoinFree redirect={this.props.next || '/'} />
+      </React.Fragment>
+    );
+  }
+
+  render() {
     return (
       <div className="LoginPage">
         <Header
-          title="Sign Up"
+          title="Login"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
         />
-        <style jsx>
-          {`
-            .signin {
-              max-width: 70rem;
-              margin: 15rem auto;
-              text-align: center;
-            }
-            h2 {
-              font-size: 2rem;
-              padding: 2rem;
-            }
-          `}
-        </style>
         <Body>
-          <div className="signin">
-            {this.state.error && <h1>Authentication Failed. Please try to generate a new token.</h1>}
-
-            <h2>
-              <FormattedMessage id="loginform.title" defaultMessage="Sign in or Create an Account" />
-            </h2>
-            <SignInForm next={this.props.next} />
-          </div>
+          <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>
+            {this.renderContent()}
+          </Flex>
         </Body>
         <Footer />
       </div>
