@@ -44,27 +44,26 @@ class SignInOrJoinFree extends React.Component {
     window.scrollTo(0, 0);
   };
 
-  signIn = email => {
+  signIn = async email => {
     if (this.state.submitting) {
       return false;
     }
 
     this.setState({ submitting: true });
-    return api
-      .checkUserExistence(email)
-      .then(exists => {
-        if (exists) {
-          return api.signin({ email }, this.props.redirect).then(() => {
-            Router.pushRoute('signinLinkSent', { email });
-          });
-        } else {
-          this.setState({ unknownEmailError: true, submitting: false });
-        }
-      })
-      .catch(e => {
-        this.setState({ error: e.message, submitting: false });
+
+    try {
+      const userExists = await api.checkUserExistence(email);
+      if (userExists) {
+        await api.signin({ email }, this.props.redirect);
+        await Router.pushRoute('signinLinkSent', { email });
         window.scrollTo(0, 0);
-      });
+      } else {
+        this.setState({ unknownEmailError: true, submitting: false });
+      }
+    } catch (e) {
+      this.setState({ error: e.message || 'Server error', submitting: false });
+      window.scrollTo(0, 0);
+    }
   };
 
   createProfile = data => {

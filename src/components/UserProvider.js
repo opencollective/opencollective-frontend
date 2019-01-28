@@ -1,12 +1,15 @@
 import React from 'react';
 import { isEqual } from 'lodash';
+import PropTypes from 'prop-types';
 
 import { withApollo } from 'react-apollo';
 import withLoggedInUser from '../lib/withLoggedInUser';
 import UserClass from '../classes/LoggedInUser';
+import { Router } from '../server/pages';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
+  errorLoggedInUser: null,
   LoggedInUser: null,
   logout() {},
   login() {},
@@ -14,14 +17,26 @@ export const UserContext = React.createContext({
 });
 
 class UserProvider extends React.Component {
+  static propTypes = {
+    getLoggedInUser: PropTypes.func.isRequired,
+    token: PropTypes.string,
+    client: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+  };
+
   state = {
     loadingLoggedInUser: true,
     LoggedInUser: null,
+    errorLoggedInUser: null,
   };
 
   async componentDidMount() {
     window.addEventListener('storage', this.checkLogin);
-    await this.login();
+
+    // Disable auto-login on SignIn page
+    if (Router.pathname !== '/signin') {
+      await this.login();
+    }
   }
 
   componentWillUnmount() {
@@ -51,21 +66,22 @@ class UserProvider extends React.Component {
     window.localStorage.removeItem('accessToken');
     window.localStorage.removeItem('LoggedInUser');
     this.props.client.resetStore();
-    this.setState({ LoggedInUser: null });
+    this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
 
-  login = async () => {
+  login = async token => {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = await getLoggedInUser();
+      const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
+        errorLoggedInUser: null,
         LoggedInUser,
       });
+      return LoggedInUser;
     } catch (error) {
-      this.setState({ loadingLoggedInUser: false });
+      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
     }
-    return true;
   };
 
   /**
@@ -79,11 +95,12 @@ class UserProvider extends React.Component {
     try {
       const LoggedInUser = await getLoggedInUser({ ignoreLocalStorage: true });
       this.setState({
+        errorLoggedInUser: null,
         loadingLoggedInUser: false,
         LoggedInUser,
       });
     } catch (error) {
-      this.setState({ loadingLoggedInUser: false });
+      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error });
     }
     return true;
   };
