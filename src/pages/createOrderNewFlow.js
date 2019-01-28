@@ -485,7 +485,7 @@ class CreateOrderPage extends React.Component {
           />
         </MessageBox>
       ) : (
-        <Flex flexDirection="column">
+        <Flex flexDirection="column" width={1} css={{ maxWidth: 480 }}>
           <H5 textAlign="left" mb={3}>
             <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
           </H5>
@@ -616,7 +616,7 @@ class CreateOrderPage extends React.Component {
 
     const step = this.props.step || 'contributeAs';
     return (
-      <Flex flexDirection="column" alignItems="center" mx={3} width={1}>
+      <Flex flexDirection="column" alignItems="center" mx={3} width={0.95}>
         {this.renderStep(step)}
         <Flex mt={[4, null, 5]} justifyContent="center" flexWrap="wrap">
           {this.renderPrevStepButton(step)}
