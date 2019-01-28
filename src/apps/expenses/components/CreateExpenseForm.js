@@ -152,6 +152,11 @@ class CreateExpenseForm extends React.Component {
     if (e) {
       e.preventDefault();
     }
+
+    this.setState({
+      loading: true,
+    });
+
     try {
       await this.props.onSubmit(this.state.expense);
       this.setState({
