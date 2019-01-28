@@ -7,7 +7,7 @@ Subject: Your expense to {{collective.name}} for {{{currency expense.amount curr
 
 <center>
   <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
-  <div><a href="{{config.host.website}}/expenses/{{expense.id}}">{{expense.description}}</a></div>
+  <div><a href="{{config.host.website}}/{{collective.slug}}/expenses/{{expense.id}}">{{expense.description}}</a></div>
 </center>
 
 <br />
