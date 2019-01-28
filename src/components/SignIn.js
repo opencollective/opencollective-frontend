@@ -44,6 +44,7 @@ const SignIn = withState('state', 'setState', { email: '', error: null, showErro
             }}
             placeholder="i.e. yourname@yourhost.com"
             required
+            value={state.email}
             type="email"
             width={1}
           />
