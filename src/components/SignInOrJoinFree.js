@@ -125,7 +125,6 @@ class SignInOrJoinFree extends React.Component {
                 onSecondaryAction={() => this.switchForm('signIn')}
                 submitting={submitting}
                 mx={[2, 4]}
-                width={490}
               />
               <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
             </Flex>

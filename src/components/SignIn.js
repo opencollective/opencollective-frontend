@@ -15,7 +15,7 @@ import { FormattedMessage } from 'react-intl';
  */
 const SignIn = withState('state', 'setState', { email: '', error: null, showError: false })(
   ({ state, setState, onSubmit, onSecondaryAction, loading, unknownEmail }) => (
-    <StyledCard maxWidth={450} width={1}>
+    <StyledCard maxWidth={480} width={1}>
       <Box py={4} px={[3, 4]}>
         <H5 as="label" fontWeight="bold" htmlFor="email" mb={3} textAlign="left" display="block">
           <FormattedMessage id="signin.usingEmail" defaultMessage="Sign in using your email address:" />

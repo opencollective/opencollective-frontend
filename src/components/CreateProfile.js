@@ -78,7 +78,7 @@ const CreateProfile = enhance(
     submitting,
     ...props
   }) => (
-    <StyledCard maxWidth={480} {...props}>
+    <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
         <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
           <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
