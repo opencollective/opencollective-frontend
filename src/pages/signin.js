@@ -46,18 +46,16 @@ class SigninPage extends React.Component {
   }
 
   async componentDidUpdate(oldProps) {
-    // User logged in
     if (!this.props.errorLoggedInUser && !oldProps.LoggedInUser && this.props.LoggedInUser) {
+      // --- User logged in ---
       this.setState({ success: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
       const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
       await Router.replaceRoute(redirect || '/');
       window.scroll(0, 0);
-    }
-
-    // There's a new token in town
-    else if (this.props.token && oldProps.token !== this.props.token) {
+    } else if (this.props.token && oldProps.token !== this.props.token) {
+      // --- There's a new token in town ---
       const user = await this.props.login(this.props.token);
       if (!user) {
         this.setState({ error: 'Token rejected' });

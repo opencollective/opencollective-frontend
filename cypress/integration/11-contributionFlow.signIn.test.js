@@ -26,7 +26,10 @@ describe('Contribution Flow: Sign In', () => {
     cy.visit('/apex/donate');
     cy.get('#content input[name=email]').type(validUserEmail);
     cy.get('#content button[type=submit]').click();
-    cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${validUserEmail}.`);
+
+    // Test user are logged in directly
+    cy.contains('Contribute As');
+    cy.contains('anonymous');
+    cy.contains('TestOrg');
   });
 });

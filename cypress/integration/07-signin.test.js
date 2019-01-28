@@ -40,7 +40,7 @@ describe('signin', () => {
     cy.contains('Validation error: Email must be valid');
 
     // Submit the form with correct values
-    const email = randomEmail();
+    const email = randomEmail(false);
     cy.get('input[name=email]').type(`{selectall}${email}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
@@ -68,7 +68,7 @@ describe('signin', () => {
     cy.contains('Validation error: Email must be valid');
 
     // Submit the form with correct values
-    const email = randomEmail();
+    const email = randomEmail(false);
     cy.get('input[name=email]').type(`{selectall}${email}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
