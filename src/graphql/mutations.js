@@ -105,6 +105,7 @@ const editCollectiveQuery = gql`
       twitterHandle
       githubHandle
       isActive
+      hostFeePercent
       host {
         id
         createdAt
@@ -361,6 +362,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'image',
         'backgroundImage',
         'settings',
+        'hostFeePercent',
       ]);
       if (collective.paymentMethods && collective.paymentMethods.length > 0) {
         CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm =>

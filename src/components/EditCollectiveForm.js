@@ -182,6 +182,15 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.sendInvoiceByEmail.description',
         defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email',
       },
+      'hostFeePercent.label': {
+        id: 'collective.hostFeePercent.label',
+        defaultMessage: 'Host fee',
+      },
+      'hostFeePercent.description': {
+        id: 'collective.hostFeePercent.description',
+        defaultMessage:
+          'Commission on all the donations received by the collectives that you are hosting to cover your administrative costs.',
+      },
       'location.label': {
         id: 'collective.location.label',
         defaultMessage: 'City',
@@ -372,19 +381,30 @@ class EditCollectiveForm extends React.Component {
       advanced: [
         {
           name: 'slug',
+          className: 'horizontal',
           pre: 'https://opencollective.com/',
           placeholder: '',
           when: () => this.state.section === 'advanced',
         },
         {
           name: 'sendInvoiceByEmail',
+          className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
           when: () =>
             this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
         {
+          name: 'hostFeePercent',
+          type: 'number',
+          className: 'horizontal',
+          post: '%',
+          defaultValue: get(this.state.collective, 'settings.hostFeePercent'),
+          when: () => this.state.section === 'advanced' && collective.isHost,
+        },
+        {
           name: 'markdown',
+          className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
           when: () =>
@@ -616,6 +636,7 @@ class EditCollectiveForm extends React.Component {
                               placeholder={field.placeholder}
                               type={field.type}
                               pre={field.pre}
+                              post={field.post}
                               context={this.state.collective}
                               onChange={value => this.handleChange(field.name, value)}
                             />

@@ -133,7 +133,6 @@ class AddFundsForm extends React.Component {
         name: 'hostFeePercent',
         when: () => !this.isAddFundsToOrg,
         type: 'number',
-        className: 'right',
         post: '%',
       },
       {

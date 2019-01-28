@@ -458,7 +458,7 @@ class InputField extends React.Component {
         this.input = (
           <FormGroup controlId={field.name} help={field.description}>
             {horizontal && (
-              <div>
+              <React.Fragment>
                 {field.label && (
                   <Col componentClass={ControlLabel} sm={2}>
                     {capitalize(field.label)}
@@ -472,10 +472,10 @@ class InputField extends React.Component {
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Col>
-              </div>
+              </React.Fragment>
             )}
             {!horizontal && (
-              <div>
+              <React.Fragment>
                 {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
                 <div className="switch">
                   <InputSwitch
@@ -485,7 +485,7 @@ class InputField extends React.Component {
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </div>
-              </div>
+              </React.Fragment>
             )}
           </FormGroup>
         );
@@ -552,13 +552,16 @@ class InputField extends React.Component {
             .inputField textarea {
               font-size: 1.6rem;
             }
+            .horizontal .form-group label {
+              margin-top: 5px;
+            }
             .form-horizontal .form-group label {
               padding-top: 3px;
             }
             .inputField .checkbox label {
               width: auto;
             }
-            .inputField .right input[type='number'] {
+            .inputField input[type='number'] {
               text-align: right;
             }
             .inputField .currency input[type='number'] {
