@@ -9,7 +9,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-import { isValidUrl } from '../lib/utils';
+import { isValidRelativeUrl } from '../lib/utils';
 
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
@@ -19,7 +19,7 @@ import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next } }) {
-    next = isValidUrl(next) && next.substr(0, 1) === '/' ? next : null;
+    next = next && isValidRelativeUrl(next) ? next : null;
     return { token, next };
   }
 
