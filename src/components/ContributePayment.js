@@ -72,7 +72,7 @@ const getPaymentMethodMetadata = pm => {
 };
 
 const StyledCardElement = styled(CardElement)`
-  max-width: 350px;
+  max-width: 450px;
   max-height: 55px;
   margin: 0px;
   border-width: 1px;
@@ -238,7 +238,7 @@ class ContributePayment extends React.Component {
   render() {
     const { paymentMethodsOptions, errors } = this.state;
     return (
-      <StyledCard maxWidth={500} mx="auto">
+      <StyledCard width={1} maxWidth={500} mx="auto">
         <StyledRadioList
           id="PaymentMethod"
           name="PaymentMethod"
