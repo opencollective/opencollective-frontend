@@ -145,6 +145,7 @@ class CreateOrderPage extends React.Component {
       stepPayment: null,
       error: null,
       stripe: null,
+      email: '',
     };
   }
 
