@@ -49,7 +49,11 @@ class SigninPage extends React.Component {
     // User logged in
     if (!this.props.errorLoggedInUser && !oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.setState({ success: true });
-      Router.replaceRoute(this.props.next || '/').then(window.scroll(0, 0));
+      // Avoid redirect loop: replace '/signin' redirects by '/'
+      const { next } = this.props;
+      const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
+      await Router.replaceRoute(redirect || '/');
+      window.scroll(0, 0);
     }
 
     // There's a new token in town
