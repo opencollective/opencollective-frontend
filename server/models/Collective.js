@@ -1209,6 +1209,36 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  Collective.prototype.updateHostFee = async function(hostFeePercent, remoteUser) {
+    if (!hostFeePercent || !remoteUser || hostFeePercent === this.hostFeePercent) {
+      return;
+    }
+    if (this.type === types.COLLECTIVE || this.type === types.EVENT) {
+      // only an admin of the host of the collective can edit `hostFeePercent` of a COLLECTIVE
+      if (!remoteUser || !remoteUser.isAdmin(this.HostCollectiveId)) {
+        throw new Error('Only an admin of the host collective can edit the host fee for this collective');
+      }
+      return this.update({ hostFeePercent });
+    } else {
+      const isHost = await this.isHost();
+      if (isHost) {
+        if (!remoteUser.isAdmin(this.id)) {
+          throw new Error('You must be an admin of this host to change the host fee');
+        }
+        const hostedCollectives = await models.Member.findAll({
+          where: { MemberCollectiveId: this.id, role: roles.HOST },
+        });
+        const hostedCollectiveIds = hostedCollectives.map(m => m.CollectiveId);
+        const collectives = await models.Collective.findAll({ where: { id: { [Op.in]: hostedCollectiveIds } } });
+        // for some reason models.Collective.update({ hostFeePercent } , { where: { id: { [Op.in]: hostedCollectivesIds }}}) doesn't work :-/
+        const promises = collectives.map(c => c.update({ hostFeePercent }));
+        await Promise.all(promises);
+        return this.update({ hostFeePercent });
+      }
+    }
+    return this;
+  };
+
   /**
    * Add the host in the Members table and updates HostCollectiveId
    * @param {*} hostCollective instanceof models.Collective
