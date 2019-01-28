@@ -78,7 +78,7 @@ const CreateProfile = enhance(
     submitting,
     ...props
   }) => (
-    <StyledCard maxWidth={480} {...props}>
+    <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
         <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
           <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
@@ -229,7 +229,7 @@ const CreateProfile = enhance(
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
         <P color="black.700">Already have an account?</P>
-        <StyledButton fontWeight="600" onClick={onSecondaryAction} disabled={submitting}>
+        <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={submitting}>
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
         </StyledButton>
       </Container>

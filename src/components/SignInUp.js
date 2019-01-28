@@ -6,6 +6,9 @@ import { debounce } from 'lodash';
 import { isValidEmail, capitalize } from '../lib/utils';
 import { defineMessages, injectIntl } from 'react-intl';
 
+/**
+ * @deprecated Since 2019/01/25 - Use `SignInOrJoinFree` component instead.
+ */
 class SignInUp extends React.Component {
   static propTypes = {
     label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
