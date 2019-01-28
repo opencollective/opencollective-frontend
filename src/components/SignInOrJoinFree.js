@@ -54,8 +54,15 @@ class SignInOrJoinFree extends React.Component {
     try {
       const userExists = await api.checkUserExistence(email);
       if (userExists) {
-        await api.signin({ email }, this.props.redirect);
-        await Router.pushRoute('signinLinkSent', { email });
+        const response = await api.signin({ email }, this.props.redirect);
+
+        // In dev/test, API directly returns a redirect URL for emails like
+        // test*@opencollective.com.
+        if (response.redirect) {
+          await Router.replaceRoute(response.redirect);
+        } else {
+          await Router.pushRoute('signinLinkSent', { email });
+        }
         window.scrollTo(0, 0);
       } else {
         this.setState({ unknownEmailError: true, submitting: false });

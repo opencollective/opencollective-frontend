@@ -45,10 +45,19 @@ class SigninPage extends React.Component {
     }
   }
 
-  componentDidUpdate(oldProps) {
+  async componentDidUpdate(oldProps) {
+    // User logged in
     if (!this.props.errorLoggedInUser && !oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.setState({ success: true });
       Router.replaceRoute(this.props.next || '/').then(window.scroll(0, 0));
+    }
+
+    // There's a new token in town
+    else if (this.props.token && oldProps.token !== this.props.token) {
+      const user = await this.props.login(this.props.token);
+      if (!user) {
+        this.setState({ error: 'Token rejected' });
+      }
     }
   }
 
