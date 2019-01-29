@@ -26,7 +26,7 @@ const SignIn = withState('state', 'setState', { error: null, showError: false })
           noValidate
           onSubmit={event => {
             event.preventDefault();
-            onSubmit(state.email);
+            onSubmit(email);
           }}
         >
           <StyledInput
@@ -98,7 +98,7 @@ SignIn.propTypes = {
   /** Set this to true to display the unknown email message */
   unknownEmail: PropTypes.bool,
   /** Set the value of email input */
-  email: PropTypes.func.isRequired,
+  email: PropTypes.string.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
 };

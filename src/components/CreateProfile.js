@@ -105,7 +105,8 @@ const CreateProfile = enhance(
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            onPersonalSubmit(pick(state, ['email', 'firstName', 'lastName']));
+            const data = pick(state, ['firstName', 'lastName']);
+            onPersonalSubmit({ ...data, email });
           }}
           method="POST"
         >
@@ -155,9 +156,8 @@ const CreateProfile = enhance(
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            onOrgSubmit(
-              pick(state, ['email', 'firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']),
-            );
+            const data = pick(state, ['firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']);
+            onOrgSubmit({ ...data, email });
           }}
           method="POST"
         >
