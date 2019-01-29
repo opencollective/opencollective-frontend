@@ -499,6 +499,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       expensePolicy: { type: GraphQLString },
       mission: { type: GraphQLString },
       tags: { type: new GraphQLList(GraphQLString) },
+      countryISO: { type: GraphQLString },
       location: {
         type: LocationType,
         description: 'Name, address, lat, long of the location.',
@@ -737,6 +738,12 @@ const CollectiveFields = () => {
       type: new GraphQLList(GraphQLString),
       resolve(collective) {
         return collective.tags;
+      },
+    },
+    countryISO: {
+      type: GraphQLString,
+      resolve(collective) {
+        return collective.countryISO;
       },
     },
     location: {
