@@ -19,6 +19,11 @@ import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next } }) {
+    // Decode next URL if URI encoded
+    if (next && next.startsWith('%2F')) {
+      next = decodeURIComponent(next);
+    }
+
     next = next && isValidRelativeUrl(next) ? next : null;
     return { token, next };
   }
