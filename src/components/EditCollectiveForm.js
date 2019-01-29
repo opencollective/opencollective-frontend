@@ -23,6 +23,7 @@ import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
+import countries from '../lib/countries';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -192,6 +193,10 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.location.label',
         defaultMessage: 'City',
       },
+      'countryISO.label': {
+        id: 'collective.country.label',
+        defaultMessage: 'Country',
+      },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -270,7 +275,6 @@ class EditCollectiveForm extends React.Component {
 
   render() {
     const { collective, status, intl, LoggedInUser } = this.props;
-
     const isNew = !(collective && collective.id);
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
     if (['loading', 'saved'].includes(status)) {
@@ -330,6 +334,12 @@ class EditCollectiveForm extends React.Component {
         //     types: ['cities']
         //   }
         // },
+        {
+          name: 'countryISO',
+          type: 'country',
+          placeholder: 'Select country',
+          options: countries,
+        },
         {
           name: 'longDescription',
           type: 'textarea',
