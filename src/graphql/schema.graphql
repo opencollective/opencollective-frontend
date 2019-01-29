@@ -58,6 +58,7 @@ type Collective implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: [String]
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -164,6 +165,7 @@ input CollectiveAttributesInputType {
   currency: String
   settings: JSON
   tags: [String]
+  countryISO: String
 }
 
 """Input type for CollectiveType"""
@@ -188,6 +190,7 @@ input CollectiveInputType {
   image: String
   backgroundImage: String
   tags: [String]
+  countryISO: String
   tiers: [TierInputType]
   settings: JSON
   data: JSON
@@ -215,6 +218,7 @@ interface CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -485,6 +489,7 @@ type Event implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -1102,6 +1107,7 @@ type Organization implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType

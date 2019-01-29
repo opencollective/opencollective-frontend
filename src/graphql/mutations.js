@@ -104,6 +104,7 @@ const editCollectiveQuery = gql`
       website
       twitterHandle
       githubHandle
+      countryISO
       isActive
       hostFeePercent
       host {
@@ -285,6 +286,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'description',
         'longDescription',
         'location',
+        'countryISO',
         'twitterHandle',
         'githubHandle',
         'website',
@@ -298,6 +300,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'HostCollectiveId',
         'ParentCollectiveId',
         'data',
+        CollectiveInputType,
       ]);
       CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
         pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
@@ -335,6 +338,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'website',
         'twitterHandle',
         'githubHandle',
+        'countryISO',
         'location',
         'startsAt',
         'endsAt',

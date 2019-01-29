@@ -145,6 +145,7 @@ const getTiersQuery = gql`
       backgroundImage
       twitterHandle
       description
+      countryISO
       currency
       settings
       tiers {
@@ -195,6 +196,7 @@ const getCollectiveToEditQuery = gql`
       description
       longDescription
       tags
+      countryISO
       twitterHandle
       githubHandle
       website
@@ -325,6 +327,7 @@ const getCollectiveQuery = gql`
       twitterHandle
       githubHandle
       website
+      countryISO
       currency
       settings
       createdAt
@@ -497,6 +500,7 @@ const getEventCollectiveQuery = gql`
       startsAt
       endsAt
       timezone
+      countryISO
       currency
       settings
       location {
