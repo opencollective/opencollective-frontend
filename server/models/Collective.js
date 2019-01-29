@@ -225,6 +225,8 @@ export default function(Sequelize, DataTypes) {
 
       address: DataTypes.STRING,
 
+      countryISO: DataTypes.STRING,
+
       geoLocationLatLong: DataTypes.GEOMETRY('POINT'),
 
       settings: {
