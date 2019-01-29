@@ -67,8 +67,6 @@ export default (server, app) => {
    * `/:collectiveSlug/members/:backerType(all|users|organizations)`
    */
 
-  server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', controllers.collectives.website);
-
   server.get('/:collectiveSlug.:format(json)', controllers.collectives.info);
   server.get('/:collectiveSlug/members.:format(json|csv)', controllers.members.list);
   server.get(
@@ -78,10 +76,6 @@ export default (server, app) => {
   server.get(
     '/:collectiveSlug/tiers/:tierSlug/:backerType(all|users|organizations).:format(json|csv)',
     controllers.members.list,
-  );
-  server.get(
-    '/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?',
-    controllers.collectives.website,
   );
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {

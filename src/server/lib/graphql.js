@@ -1,5 +1,4 @@
 import { GraphQLClient } from 'graphql-request';
-import { uniqBy } from 'lodash';
 
 import { getGraphqlUrl } from '../../lib/utils';
 
@@ -34,87 +33,6 @@ export async function fetchCollective(collectiveSlug) {
 
   const result = await getClient().request(query, { collectiveSlug });
   return result.Collective;
-}
-
-export async function fetchMembers({ collectiveSlug, tierSlug, backerType, isActive }, options = {}) {
-  let query, processResult, type, role;
-  if (backerType === 'contributors') {
-    query = `
-    query Collective($collectiveSlug: String) {
-      Collective(slug:$collectiveSlug) {
-        id
-        data
-      }
-    }
-    `;
-    processResult = res => {
-      const users = res.Collective.data.githubContributors;
-      return Object.keys(users).map(username => {
-        const commits = users[username];
-        return {
-          slug: username,
-          type: 'USER',
-          image: `https://avatars.githubusercontent.com/${username}?s=96`,
-          website: `https://github.com/${username}`,
-          stats: { c: commits },
-        };
-      });
-    };
-  } else if (backerType) {
-    type = backerType.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
-    if (backerType.match(/(backer|sponsor)/)) {
-      role = 'BACKER';
-    }
-    query = `
-    query allMembers($collectiveSlug: String!, $type: String!, $role: String!, $isActive: Boolean) {
-      allMembers(collectiveSlug: $collectiveSlug, type: $type, role: $role, isActive: $isActive, orderBy: "totalDonations") {
-        id
-        createdAt
-        member {
-          id
-          type
-          slug
-          image
-          website
-          twitterHandle
-        }
-      }
-    }
-    `;
-    processResult = res => uniqBy(res.allMembers.map(m => m.member), m => m.id);
-  } else if (tierSlug) {
-    query = `
-    query Collective($collectiveSlug: String, $tierSlug: String!, $isActive: Boolean) {
-      Collective(slug:$collectiveSlug) {
-        tiers(slug: $tierSlug) {
-          orders(isActive: $isActive) {
-            id
-            createdAt
-            fromCollective {
-              id
-              type
-              slug
-              image
-              website
-              twitterHandle
-            }
-          }
-        }
-      }
-    }
-    `;
-    processResult = res => uniqBy(res.Collective.tiers[0].orders.map(o => o.fromCollective), m => m.id);
-  }
-
-  const result = await (options.client || getClient()).request(query, {
-    collectiveSlug,
-    tierSlug,
-    type,
-    role,
-    isActive,
-  });
-  const members = processResult(result);
-  return members;
 }
 
 export async function fetchEvents(parentCollectiveSlug, options = { limit: 10 }) {
