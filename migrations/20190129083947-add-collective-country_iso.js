@@ -1,9 +1,11 @@
 'use strict';
 
+const size = 32;
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Collectives', 'countryISO', Sequelize.STRING).then(() => {
-      queryInterface.addColumn('CollectiveHistories', 'countryISO', Sequelize.STRING);
+    return queryInterface.addColumn('Collectives', 'countryISO', Sequelize.STRING(size)).then(() => {
+      queryInterface.addColumn('CollectiveHistories', 'countryISO', Sequelize.STRING(size));
     });
   },
 
