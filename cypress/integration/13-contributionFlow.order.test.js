@@ -11,7 +11,7 @@ describe('Contribution Flow: Order', () => {
 
     const userParams = { firstName: 'Order', lastName: 'Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
-    cy.signup({ user: userParams, redirect: '/apex/contribute/tier/sponsors', visitParams }).then(user => {
+    cy.signup({ user: userParams, redirect: '/apex/contribute/tier/470-sponsors', visitParams }).then(user => {
       // ---- Step 1: Select profile ----
       // Personnal account must be the first entry, and it must be checked
       cy.contains('#contributeAs > label:first', `${user.firstName} ${user.lastName}`);

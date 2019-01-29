@@ -80,13 +80,13 @@ pages
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierSlug/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment)?',
     'createOrderNewFlow',
   )
   .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute)/success', 'orderSuccess')
   .add(
     'orderCollectiveTierNewSuccess',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierSlug/success',
+    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierId-:tierSlug?/success',
     'orderSuccess',
   );
 
