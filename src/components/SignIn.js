@@ -97,6 +97,10 @@ SignIn.propTypes = {
   loading: PropTypes.bool,
   /** Set this to true to display the unknown email message */
   unknownEmail: PropTypes.bool,
+  /** Set the value of email input */
+  email: PropTypes.func.isRequired,
+  /** handles changes in the email input */
+  onEmailChange: PropTypes.func.isRequired,
 };
 
 export default SignIn;
