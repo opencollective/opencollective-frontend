@@ -405,7 +405,7 @@ class InputField extends React.Component {
             disabled={field.disabled}
             step={get(field, 'options.step') || '0.01'}
             min={(field.min || 0) / 100}
-            label={field.label && `${capitalize(field.label)}`}
+            label={typeof field.label === 'string' ? `${capitalize(field.label)}` : field.label}
             help={field.description}
             placeholder={field.placeholder}
             className={`currency ${field.className}`}
