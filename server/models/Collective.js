@@ -225,7 +225,13 @@ export default function(Sequelize, DataTypes) {
 
       address: DataTypes.STRING,
 
-      countryISO: DataTypes.STRING,
+      countryISO: {
+        type: DataTypes.STRING,
+        validate: {
+          len: 2,
+          isISO31661Alpha2: true,
+        },
+      },
 
       geoLocationLatLong: DataTypes.GEOMETRY('POINT'),
 
