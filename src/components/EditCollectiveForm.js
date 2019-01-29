@@ -80,9 +80,7 @@ class EditCollectiveForm extends React.Component {
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
     this.members = collective.members && collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
-    this.showVirtualCards =
-      collective.type === 'ORGANIZATION' &&
-      (get(collective, 'settings.canCreateVirtualCards') || props.router.query.showGiftCards);
+    this.showVirtualCards = collective.type === 'ORGANIZATION';
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
