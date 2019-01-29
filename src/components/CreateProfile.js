@@ -262,7 +262,7 @@ CreateProfile.propTypes = {
   /** Disable submit and show a spinner on button when set to true */
   submitting: PropTypes.bool,
   /** Set the value of email input */
-  email: PropTypes.func.isRequired,
+  email: PropTypes.string.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
   /** All props from `StyledCard` */
