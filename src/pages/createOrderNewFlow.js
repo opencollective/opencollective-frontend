@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { debounce, get, pick, isNil, min } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
+import { isURL } from 'validator';
 
 import { Router } from '../server/pages';
 
@@ -75,6 +76,7 @@ class CreateOrderPage extends React.Component {
       amount,
       quantity,
       totalAmount,
+      interval,
       description,
       verb,
       step,
@@ -83,13 +85,27 @@ class CreateOrderPage extends React.Component {
       referral,
     },
   }) {
+    // Convert totalAmount from string to number
+    totalAmount = parseInt(totalAmount) || null;
+    if (!totalAmount && parseInt(amount)) {
+      totalAmount = parseInt(amount) * 100;
+    }
+
+    // Whitelist interval
+    if (['monthly', 'yearly'].includes(interval)) {
+      interval = interval.replace('ly', '');
+    } else if (!['month', 'year'].includes(interval)) {
+      interval = null;
+    }
+
     return {
       slug: eventSlug || collectiveSlug,
       tierId,
       tierSlug,
       quantity,
-      totalAmount: totalAmount || amount * 100,
+      totalAmount,
       description,
+      interval,
       verb,
       step,
       redeem,
@@ -235,13 +251,21 @@ class CreateOrderPage extends React.Component {
       collective: pick(this.props.data.Collective, ['id']),
       tier: tier ? pick(this.getTier(), ['id', 'amount']) : undefined,
       recaptchaToken,
+      description: decodeURIComponent(this.props.description || ''),
     };
 
     try {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
       this.setState({ submitting: false, submitted: true, error: null });
-      this.changeStep('success', { OrderId: orderCreated.id });
+      if (this.props.redirect && isURL(this.props.redirect)) {
+        const transactionId = get(orderCreated, 'transactions[0].id', null);
+        const status = orderCreated.status;
+        const redirectTo = `${this.props.redirect}?transactionid=${transactionId}&status=${status}`;
+        window.location.href = redirectTo;
+      } else {
+        this.changeStep('success', { OrderId: orderCreated.id });
+      }
     } catch (e) {
       this.setState({ submitting: false, error: e.message });
     }
@@ -430,7 +454,8 @@ class CreateOrderPage extends React.Component {
   }
 
   renderStep(step) {
-    const { LoggedInUser, tierId } = this.props;
+    const { LoggedInUser } = this.props;
+    const { stepDetails } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
 
@@ -464,14 +489,13 @@ class CreateOrderPage extends React.Component {
               <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
             </H5>
             <ContributeDetails
-              amountOptions={this.getAmountsPresets()}
+              amountOptions={this.props.totalAmount ? null : this.getAmountsPresets()}
               currency={this.getCurrency()}
               onChange={this.updateDetails}
-              showFrequency={Boolean(tierId)}
-              defaultInterval={get(this.state, 'stepDetails.interval') || get(tier, 'interval')}
-              defaultAmount={get(this.state, 'stepDetails.totalAmount') || get(tier, 'amount')}
-              disabledInterval={Boolean(tier)}
-              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount'))}
+              defaultInterval={get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval}
+              defaultAmount={get(stepDetails, 'totalAmount') || get(tier, 'amount') || this.props.totalAmount}
+              disabledInterval={tier || Boolean(this.props.interval)}
+              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.totalAmount)}
               minAmount={this.getOrderMinAmount()}
             />
           </Container>
@@ -479,7 +503,7 @@ class CreateOrderPage extends React.Component {
         </Flex>
       );
     } else if (step === 'payment') {
-      return get(this.state, 'stepDetails.totalAmount') === 0 ? (
+      return get(stepDetails, 'totalAmount') === 0 ? (
         <MessageBox type="success" withIcon>
           <FormattedMessage
             id="contribute.freeTier"
@@ -541,7 +565,10 @@ class CreateOrderPage extends React.Component {
       route = `orderCollectiveNew${routeSuffix}`;
     }
 
-    await Router.pushRoute(route, { ...params, ...pick(this.props, ['verb', 'tierId', 'tierSlug']) });
+    await Router.pushRoute(route, {
+      ...params,
+      ...pick(this.props, ['verb', 'tierId', 'tierSlug', 'totalAmount', 'interval', 'description', 'redirect']),
+    });
     window.scrollTo(0, 0);
   };
 
@@ -740,6 +767,10 @@ const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
       id
+      status
+      transactions {
+        id
+      }
     }
   }
 `;

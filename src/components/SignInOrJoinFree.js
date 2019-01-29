@@ -44,6 +44,10 @@ class SignInOrJoinFree extends React.Component {
     window.scrollTo(0, 0);
   };
 
+  getRedirectURL() {
+    return encodeURIComponent(this.props.redirect || window.location.pathname || '/');
+  }
+
   signIn = async email => {
     if (this.state.submitting) {
       return false;
@@ -54,7 +58,7 @@ class SignInOrJoinFree extends React.Component {
     try {
       const userExists = await api.checkUserExistence(email);
       if (userExists) {
-        const response = await api.signin({ email }, this.props.redirect);
+        const response = await api.signin({ email }, this.getRedirectURL());
 
         // In dev/test, API directly returns a redirect URL for emails like
         // test*@opencollective.com.
@@ -78,7 +82,6 @@ class SignInOrJoinFree extends React.Component {
       return false;
     }
 
-    const redirect = window.location.pathname;
     const user = pick(data, ['email', 'firstName', 'lastName']);
     const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
     const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
@@ -89,7 +92,7 @@ class SignInOrJoinFree extends React.Component {
 
     this.setState({ submitting: true });
     this.props
-      .createUser({ user, organization, redirect })
+      .createUser({ user, organization, redirect: this.getRedirectURL() })
       .then(() => {
         Router.pushRoute('signinLinkSent', { email: user.email }).then(() => window.scrollTo(0, 0));
       })
