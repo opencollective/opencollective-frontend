@@ -129,6 +129,7 @@ class CreateOrderPage extends React.Component {
     super(props);
     this.recaptcha = null;
     this.recaptchaToken = null;
+    this.contributeDetailsFormRef = React.createRef();
     this.state = {
       loading: false,
       submitting: false,
@@ -484,7 +485,14 @@ class CreateOrderPage extends React.Component {
       return (
         <Flex justifyContent="center" width={1}>
           <Box width={[0, null, null, 1 / 5]} />
-          <Container mx={5} width={[0.95, null, 3 / 5]} maxWidth="465px">
+          <Container
+            as="form"
+            onSubmit={e => e.preventDefault()}
+            ref={this.contributeDetailsFormRef}
+            mx={5}
+            width={[0.95, null, 3 / 5]}
+            maxWidth="465px"
+          >
             <H5 textAlign="left" mb={3}>
               <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
             </H5>
@@ -494,7 +502,7 @@ class CreateOrderPage extends React.Component {
               onChange={this.updateDetails}
               defaultInterval={get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval}
               defaultAmount={this.getDefaultTotalAmount()}
-              disabledInterval={tier || Boolean(this.props.interval)}
+              disabledInterval={Boolean(tier) || Boolean(this.props.interval)}
               disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.amount)}
               minAmount={this.getOrderMinAmount()}
             />
@@ -555,6 +563,11 @@ class CreateOrderPage extends React.Component {
         this.setState({ stepProfile: createdOrg, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
+      }
+    } else if (currentStep === 'details' && step === 'payment') {
+      // Validate ContributeDetails step before going next
+      if (!this.contributeDetailsFormRef.current || !this.contributeDetailsFormRef.current.reportValidity()) {
+        return false;
       }
     }
 
