@@ -75,7 +75,6 @@ class CreateOrderPage extends React.Component {
       tierSlug,
       amount,
       quantity,
-      totalAmount,
       interval,
       description,
       verb,
@@ -85,12 +84,6 @@ class CreateOrderPage extends React.Component {
       referral,
     },
   }) {
-    // Convert totalAmount from string to number
-    totalAmount = parseInt(totalAmount) || null;
-    if (!totalAmount && parseInt(amount)) {
-      totalAmount = parseInt(amount) * 100;
-    }
-
     // Whitelist interval
     if (['monthly', 'yearly'].includes(interval)) {
       interval = interval.replace('ly', '');
@@ -100,10 +93,10 @@ class CreateOrderPage extends React.Component {
 
     return {
       slug: eventSlug || collectiveSlug,
+      amount: parseInt(amount) || null,
       tierId,
       tierSlug,
       quantity,
-      totalAmount,
       description,
       interval,
       verb,
@@ -319,6 +312,13 @@ class CreateOrderPage extends React.Component {
     return min(isNil(amount) ? presets : [...(presets || []), amount]);
   }
 
+  /** Get default total amount, or undefined if we don't have any info on this */
+  getDefaultTotalAmount() {
+    const tier = this.getTier();
+    const amountFromUrl = this.props.amount ? this.props.amount * 100 : undefined;
+    return get(this.state.stepDetails, 'totalAmount') || get(tier, 'amount') || amountFromUrl;
+  }
+
   /** Teturn true if current order doesn't need any payment */
   isFreeTier() {
     return this.getOrderMinAmount() === 0;
@@ -489,13 +489,13 @@ class CreateOrderPage extends React.Component {
               <FormattedMessage id="contribute.details.label" defaultMessage="Contribution Details:" />
             </H5>
             <ContributeDetails
-              amountOptions={this.props.totalAmount ? null : this.getAmountsPresets()}
+              amountOptions={this.props.amount ? null : this.getAmountsPresets()}
               currency={this.getCurrency()}
               onChange={this.updateDetails}
               defaultInterval={get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval}
-              defaultAmount={get(stepDetails, 'totalAmount') || get(tier, 'amount') || this.props.totalAmount}
+              defaultAmount={this.getDefaultTotalAmount()}
               disabledInterval={tier || Boolean(this.props.interval)}
-              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.totalAmount)}
+              disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.amount)}
               minAmount={this.getOrderMinAmount()}
             />
           </Container>
@@ -567,7 +567,7 @@ class CreateOrderPage extends React.Component {
 
     await Router.pushRoute(route, {
       ...params,
-      ...pick(this.props, ['verb', 'tierId', 'tierSlug', 'totalAmount', 'interval', 'description', 'redirect']),
+      ...pick(this.props, ['verb', 'tierId', 'tierSlug', 'amount', 'interval', 'description', 'redirect']),
     });
     window.scrollTo(0, 0);
   };
