@@ -37,6 +37,7 @@ class SignInOrJoinFree extends React.Component {
     error: null,
     submitting: false,
     unknownEmailError: false,
+    email: '',
   };
 
   switchForm = form => {
@@ -81,7 +82,6 @@ class SignInOrJoinFree extends React.Component {
     if (this.state.submitting) {
       return false;
     }
-
     const user = pick(data, ['email', 'firstName', 'lastName']);
     const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
     const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
@@ -103,7 +103,7 @@ class SignInOrJoinFree extends React.Component {
   };
 
   render() {
-    const { form, submitting, error, unknownEmailError } = this.state;
+    const { form, submitting, error, unknownEmailError, email } = this.state;
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
         {error && (
@@ -113,6 +113,8 @@ class SignInOrJoinFree extends React.Component {
         )}
         {form === 'signIn' ? (
           <SignIn
+            email={email}
+            onEmailChange={email => this.setState({ email })}
             onSecondaryAction={() => this.switchForm('signUp')}
             onSubmit={this.signIn}
             loading={submitting}
@@ -123,6 +125,8 @@ class SignInOrJoinFree extends React.Component {
             <Flex justifyContent="center" width={1}>
               <Box width={[0, null, null, 1 / 5]} />
               <CreateProfile
+                email={email}
+                onEmailChange={email => this.setState({ email })}
                 onPersonalSubmit={this.createProfile}
                 onOrgSubmit={this.createProfile}
                 onSecondaryAction={() => this.switchForm('signIn')}

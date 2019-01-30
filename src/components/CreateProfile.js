@@ -34,12 +34,22 @@ const enhance = compose(
   withState('state', 'setState', ({ errors }) => ({ errors, tab: 'personal' })),
   withHandlers({
     getFieldError: ({ state, errors }) => name => (errors && errors[name]) || state.errors[name],
-    onChange: ({ setState }) => ({ target }) =>
-      setState(state => ({
-        ...state,
-        [target.name]: target.value,
-        errors: { ...state.errors, [target.name]: null },
-      })),
+    onChange: ({ setState, onEmailChange }) => ({ target }) => {
+      // Email state is not local so any changes should be handled seprately
+      if (target.name === 'email') {
+        onEmailChange(target.value);
+        setState(state => ({
+          ...state,
+          errors: { ...state.errors, [target.name]: null },
+        }));
+      } else {
+        setState(state => ({
+          ...state,
+          [target.name]: target.value,
+          errors: { ...state.errors, [target.name]: null },
+        }));
+      }
+    },
     onInvalid: ({ setState }) => event => {
       event.persist();
       event.preventDefault();
@@ -76,6 +86,7 @@ const CreateProfile = enhance(
     state,
     setState,
     submitting,
+    email,
     ...props
   }) => (
     <StyledCard width={1} maxWidth={480} {...props}>
@@ -94,7 +105,8 @@ const CreateProfile = enhance(
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            onPersonalSubmit(pick(state, ['email', 'firstName', 'lastName']));
+            const data = pick(state, ['firstName', 'lastName']);
+            onPersonalSubmit({ ...data, email });
           }}
           method="POST"
         >
@@ -106,6 +118,7 @@ const CreateProfile = enhance(
                   {...getFieldProps(inputProps.name)}
                   type="email"
                   placeholder="i.e. yourname@yourhost.com"
+                  value={email}
                   required
                 />
               )}
@@ -126,7 +139,7 @@ const CreateProfile = enhance(
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!state.email}
+            disabled={!email}
             width={1}
             type="submit"
             fontWeight="600"
@@ -143,9 +156,8 @@ const CreateProfile = enhance(
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            onOrgSubmit(
-              pick(state, ['email', 'firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']),
-            );
+            const data = pick(state, ['firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']);
+            onOrgSubmit({ ...data, email });
           }}
           method="POST"
         >
@@ -159,6 +171,7 @@ const CreateProfile = enhance(
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
                   type="email"
+                  value={email}
                   placeholder="i.e. yourname@yourhost.com"
                   required
                 />
@@ -216,7 +229,7 @@ const CreateProfile = enhance(
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!state.email || !state.orgName}
+            disabled={!email || !state.orgName}
             width={1}
             type="submit"
             fontWeight="600"
@@ -248,6 +261,10 @@ CreateProfile.propTypes = {
   onSecondaryAction: PropTypes.func.isRequired,
   /** Disable submit and show a spinner on button when set to true */
   submitting: PropTypes.bool,
+  /** Set the value of email input */
+  email: PropTypes.string.isRequired,
+  /** handles changes in the email input */
+  onEmailChange: PropTypes.func.isRequired,
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
 };

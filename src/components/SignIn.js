@@ -13,8 +13,8 @@ import { FormattedMessage } from 'react-intl';
 /**
  * Component for handing user sign-in or redirecting to sign-up
  */
-const SignIn = withState('state', 'setState', { email: '', error: null, showError: false })(
-  ({ state, setState, onSubmit, onSecondaryAction, loading, unknownEmail }) => (
+const SignIn = withState('state', 'setState', { error: null, showError: false })(
+  ({ state, setState, onSubmit, onSecondaryAction, loading, unknownEmail, email, onEmailChange }) => (
     <StyledCard maxWidth={480} width={1}>
       <Box py={4} px={[3, 4]}>
         <H5 as="label" fontWeight="bold" htmlFor="email" mb={3} textAlign="left" display="block">
@@ -26,7 +26,7 @@ const SignIn = withState('state', 'setState', { email: '', error: null, showErro
           noValidate
           onSubmit={event => {
             event.preventDefault();
-            onSubmit(state.email);
+            onSubmit(email);
           }}
         >
           <StyledInput
@@ -34,9 +34,10 @@ const SignIn = withState('state', 'setState', { email: '', error: null, showErro
             fontSize="Paragraph"
             id="email"
             name="email"
-            onChange={({ target }) =>
-              setState({ email: target.value, error: target.validationMessage, showError: false })
-            }
+            onChange={({ target }) => {
+              onEmailChange(target.value);
+              setState({ error: target.validationMessage, showError: false });
+            }}
             onBlur={() => setState({ ...state, showError: true })}
             onInvalid={event => {
               event.preventDefault();
@@ -44,13 +45,14 @@ const SignIn = withState('state', 'setState', { email: '', error: null, showErro
             }}
             placeholder="i.e. yourname@yourhost.com"
             required
+            value={email}
             type="email"
             width={1}
           />
           <StyledButton
             buttonStyle="primary"
             fontWeight="600"
-            disabled={!state.email || state.error}
+            disabled={!email || state.error}
             loading={loading}
             minWidth={100}
             ml={3}
@@ -95,6 +97,10 @@ SignIn.propTypes = {
   loading: PropTypes.bool,
   /** Set this to true to display the unknown email message */
   unknownEmail: PropTypes.bool,
+  /** Set the value of email input */
+  email: PropTypes.string.isRequired,
+  /** handles changes in the email input */
+  onEmailChange: PropTypes.func.isRequired,
 };
 
 export default SignIn;
