@@ -231,7 +231,9 @@ export default function(Sequelize, DataTypes) {
         validate: {
           len: 2,
           isCountryISO(value) {
-            return isISO31661Alpha2(value);
+            if (!isISO31661Alpha2(value)) {
+              throw new Error('Invalid Country ISO.');
+            }
           },
         },
       },
