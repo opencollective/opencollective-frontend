@@ -115,4 +115,17 @@ describe('Contribution Flow: Donate', () => {
       cy.contains('Evil Corp is now a backer of APEX.');
     });
   });
+
+  it('Forces params if given in URL', () => {
+    cy.signup({ redirect: '/apex/donate/42/year', visitParams }).then(() => {
+      cy.contains('Next step').click();
+
+      // Amount must be disabled
+      cy.get('#totalAmount[disabled]').should('have.value', '42');
+      // Frequency must be disabled
+      cy.contains('#interval[disabled]', 'Yearly');
+      // Ensure all values are dispatched in state
+      cy.contains('.step-details', '$42.00 per year');
+    });
+  });
 });

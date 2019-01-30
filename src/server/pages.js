@@ -59,17 +59,25 @@ pages
 
 const createOrderPage = parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER')) ? 'createOrderNewFlow' : 'createOrder';
 
-// Generic Route -> Feature Flag
-pages.add('orderCollective', '/:collectiveSlug/:verb(donate|pay|contribute)', createOrderPage);
-
 // Special route to force New Flow
 pages.add('orderCollectiveNewForce', '/:collectiveSlug/:verb(donate|pay|contribute)/newFlow', 'createOrderNewFlow');
 
 // Special route to force Legacy Flow
 pages.add('orderCollectiveLegacyForce', '/:collectiveSlug/:verb(donate|pay|contribute)/legacy', 'createOrder');
 
+// Generic Route -> Feature Flag
+pages.add(
+  'orderCollective',
+  '/:collectiveSlug/:verb(donate|pay|contribute)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+  createOrderPage,
+);
+
 // Old Route -> Old Flow (should be handled by a redirect once feature flag is gone)
-pages.add('orderCollectiveTier', '/:collectiveSlug/order/:TierId', 'createOrder');
+pages.add(
+  'orderCollectiveTier',
+  '/:collectiveSlug/order/:TierId/:amount(\\d+)?/:interval(month|monthly|year|yearly)?',
+  'createOrder',
+);
 
 // New Routes -> New flow
 pages
