@@ -140,7 +140,7 @@ LoggedInUser.prototype.canEditSubscription = function(order) {
 };
 
 LoggedInUser.prototype.isRoot = function() {
-  return intersection(this.roles['opencollective-company'], ['ADMIN']).length > 0;
+  return intersection(this.roles['opencollective'], ['ADMIN']).length > 0;
 };
 
 LoggedInUser.prototype.hostsUserIsAdminOf = function() {
