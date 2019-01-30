@@ -13,6 +13,7 @@ import crypto from 'crypto';
 import moment from 'moment';
 import * as ics from 'ics';
 import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
+import { isISO31661Alpha2 } from 'validator';
 
 import CustomDataTypes from './DataTypes';
 
@@ -229,7 +230,9 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.STRING,
         validate: {
           len: 2,
-          isISO31661Alpha2: true,
+          isCountryISO(value) {
+            return isISO31661Alpha2(value);
+          },
         },
       },
 
