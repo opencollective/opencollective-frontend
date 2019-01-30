@@ -1,6 +1,6 @@
 'use strict';
 
-const size = 32;
+const size = 2;
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
