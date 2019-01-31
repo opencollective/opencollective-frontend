@@ -198,6 +198,9 @@ const getCollectiveToEditQuery = gql`
       backgroundImage
       description
       longDescription
+      location {
+        address
+      }
       tags
       countryISO
       twitterHandle
@@ -327,6 +330,9 @@ const getCollectiveQuery = gql`
       backgroundImage
       description
       longDescription
+      location {
+        address
+      }
       twitterHandle
       githubHandle
       website
