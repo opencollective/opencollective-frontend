@@ -45,7 +45,7 @@ describe('Contribution Flow: Order', () => {
       cy.get('input[type=checkbox][name=save]').should('be.checked');
       cy.wait(1000); // Wait for stripe to be loaded
       cy.fillStripeInput();
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$500.00 per month');

@@ -57,12 +57,12 @@ describe('Contribution Flow: Donate', () => {
 
       // Ensure we display errors
       cy.fillStripeInput(null, { creditCardNumber: 123 });
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
       cy.contains('Your card number is incomplete.');
 
       // Submit with valid credit card
       cy.fillStripeInput();
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$1,337.00 per year');
@@ -82,7 +82,7 @@ describe('Contribution Flow: Donate', () => {
       cy.get('#PaymentMethod label:first input[type=radio][name=PaymentMethod]').should('be.checked');
 
       // Submit a new order with existing card
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
       cy.get('#page-order-success', { timeout: 20000 }).contains('Woot woot!');
     });
   });
@@ -105,7 +105,7 @@ describe('Contribution Flow: Donate', () => {
       cy.contains('button:not([disabled])', 'Next step').click();
       cy.wait(2000);
       cy.fillStripeInput();
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$20.00');

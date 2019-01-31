@@ -40,7 +40,7 @@ const getPaymentMethodIcon = (pm, collective) => {
     return <CreditCard />;
   } else if (pm.type === 'virtualcard') {
     return <GiftCard />;
-  } else if (pm.type === 'paypal') {
+  } else if (pm.service === 'paypal') {
     return <PayPal />;
   } else if (pm.type === 'prepaid') {
     return <MoneyCheck width="26px" height="18px" />;
@@ -82,7 +82,7 @@ class ContributePayment extends React.Component {
         key: 'newCreditCard',
         title: <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />,
         icon: <CreditCardInactive />,
-        paymentMethod: { type: 'creditcard' },
+        paymentMethod: { type: 'creditcard', service: 'stripe' },
       },
     ];
 
@@ -90,8 +90,8 @@ class ContributePayment extends React.Component {
       this.staticPaymentMethodsOptions.push({
         key: 'paypal',
         title: 'PayPal',
-        paymentMethod: { type: 'paypal' },
-        icon: getPaymentMethodIcon({ type: 'paypal' }, props.collective),
+        paymentMethod: { service: 'paypal', type: 'payment' },
+        icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, props.collective),
       });
     }
 
@@ -129,7 +129,8 @@ class ContributePayment extends React.Component {
     if (this.props.onChange) {
       const isNew = selectedOption.key === 'newCreditCard';
       this.props.onChange({
-        paymentMethod: isNew ? newCreditCardInfo : selectedOption.paymentMethod,
+        paymentMethod: selectedOption.paymentMethod,
+        data: newCreditCardInfo,
         title: selectedOption.title,
         subtitle: selectedOption.subtitle,
         isNew,

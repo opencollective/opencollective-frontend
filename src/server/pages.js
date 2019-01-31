@@ -76,12 +76,12 @@ pages.add(
 pages
   .add(
     'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute|order)/success', 'orderSuccess')
