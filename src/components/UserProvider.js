@@ -25,7 +25,7 @@ class UserProvider extends React.Component {
   };
 
   state = {
-    loadingLoggedInUser: true,
+    loadingLoggedInUser: false,
     LoggedInUser: null,
     errorLoggedInUser: null,
   };
