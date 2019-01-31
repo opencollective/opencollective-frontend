@@ -36,7 +36,11 @@ const SignIn = withState('state', 'setState', { error: null, showError: false })
             name="email"
             onChange={({ target }) => {
               onEmailChange(target.value);
-              setState({ error: target.validationMessage, showError: false });
+              // Feel free to remove the setTimeout when that issue is fixed
+              // https://bugzilla.mozilla.org/show_bug.cgi?id=1524212
+              setTimeout(() => {
+                setState({ error: target.validationMessage, showError: false });
+              }, 0);
             }}
             onBlur={() => setState({ ...state, showError: true })}
             onInvalid={event => {
