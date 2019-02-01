@@ -68,7 +68,6 @@ class SigninPage extends React.Component {
   }
 
   renderContent() {
-    console.log(this.props.token, this.props.loadingLoggedInUser, this.state.success);
     if ((this.props.loadingLoggedInUser || this.state.success) && this.props.token) {
       return <Loading />;
     }
