@@ -9,7 +9,7 @@ import models from '../server/models';
 // What's being tested
 import creditcard from '../server/paymentProviders/stripe/creditcard';
 
-async function createOrderWithPaymentMethod(paymentMethodName) {
+async function createOrderWithPaymentMethod(paymentMethodName, orderParams = {}) {
   const user = await models.User.createUserWithCollective({
     name: 'TestMcTesterson',
     email: 'tmct@mct.com',
@@ -32,15 +32,20 @@ async function createOrderWithPaymentMethod(paymentMethodName) {
     monthlyLimitPerMember: 10000,
     CollectiveId: collective.id,
   });
-  const order = await models.Order.create({
-    CreatedByUserId: user.id,
-    FromCollectiveId: user.CollectiveId,
-    CollectiveId: collective.id,
-    PaymentMethodId: paymentMethod.id,
-    TierId: tier.id,
-    totalAmount: 1000,
-    currency: 'USD',
-  });
+  const order = await models.Order.create(
+    Object.assign(
+      {
+        CreatedByUserId: user.id,
+        FromCollectiveId: user.CollectiveId,
+        CollectiveId: collective.id,
+        PaymentMethodId: paymentMethod.id,
+        TierId: tier.id,
+        totalAmount: 1000,
+        currency: 'USD',
+      },
+      orderParams,
+    ),
+  );
   order.fromCollective = user.collective;
   order.collective = collective;
   order.createdByUser = user;
@@ -92,6 +97,14 @@ describe('stripe.creditcard', () => {
       const { order } = await createOrderWithPaymentMethod('name');
       await creditcard.processOrder(order);
       expect(secondCallToCreateCustomer.isDone()).to.be.true;
+    });
+
+    it('has tax information stored in transaction', async () => {
+      const taxAmount = 100;
+      const { order } = await createOrderWithPaymentMethod('name', { taxAmount });
+      console.log(order.dataValues);
+      const transaction = await creditcard.processOrder(order);
+      expect(transaction.taxAmount).to.be.equal(taxAmount);
     });
   });
 });
