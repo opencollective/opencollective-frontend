@@ -1,4 +1,4 @@
-import './env';
+import '../env';
 
 import path from 'path';
 import http from 'http';
@@ -15,13 +15,13 @@ const server = express();
 
 server.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV;
 const dev = env === 'development' || env === 'docker';
 
 const app = next({ dev, dir: path.dirname(__dirname) });
 server.next = app;
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.prepare().then(() => {
   server.use(loggerMiddleware.logger);

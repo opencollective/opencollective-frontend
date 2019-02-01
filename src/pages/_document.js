@@ -2,6 +2,7 @@ import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
+import { pick } from 'lodash';
 import GlobalStyles from './global-styles';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
@@ -31,14 +32,17 @@ export default class IntlDocument extends Document {
 
   constructor(props) {
     super(props);
-    props.__NEXT_DATA__.env = {
-      IMAGES_URL: process.env.IMAGES_URL || 'https://images.opencollective.com',
-      PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
-      STRIPE_KEY: process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
-      GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
-      RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY || '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
-      USE_NEW_CREATE_ORDER: process.env.USE_NEW_CREATE_ORDER || false,
-    };
+    // We pick the environment variables that we want to access from the client
+    // They can later be read with getEnvVar()
+    // Please, NEVER SECRETS!
+    props.__NEXT_DATA__.env = pick(process.env, [
+      'IMAGES_URL',
+      'PAYPAL_ENVIRONMENT',
+      'STRIPE_KEY',
+      'GOOGLE_MAPS_API_KEY',
+      'RECAPTCHA_SITE_KEY',
+      'USE_NEW_CREATE_ORDER',
+    ]);
   }
 
   render() {
