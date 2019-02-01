@@ -37,8 +37,8 @@ npm install
 
 This project requires an access to the Open Collective API. You have two options:
 
-- `cp .env-staging .env` to connect to the Open Collective staging API
-- `cp .env-local .env` to connect to the API running locally
+- `cp .env.staging .env` to connect to the Open Collective staging API
+- `cp .env.local .env` to connect to the API running locally
 
 If you decide to pick the local strategy, make sure you install and run the [opencollective-api](https://github.com/opencollective/opencollective-api) project.
 
