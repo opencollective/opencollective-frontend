@@ -50,7 +50,6 @@
     "markdown-loader": "5.0.0",
     "moment": "2.24.0",
     "moment-timezone": "0.5.23",
-    "newrelic": "5.2.1",
     "next": "7.0.2",
     "next-routes": "1.4.2",
     "node-fetch": "2.3.0",
