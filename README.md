@@ -146,3 +146,9 @@ npm run deploy:production
 ```
 
 URL: https://opencollective.com/
+
+## Discussion
+
+If you have any questions, ping us on Slack
+(https://slack.opencollective.org) or on Twitter
+([@opencollect](https://twitter.com/opencollect)).
