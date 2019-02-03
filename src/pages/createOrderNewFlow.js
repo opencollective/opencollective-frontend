@@ -551,9 +551,11 @@ class CreateOrderPage extends React.Component {
       step: ['contributeAs', 'success'].includes(step) ? undefined : step,
     };
 
+    if (this.state.error) this.setState({ error: null });
+
     // check if we're creating a new organization
     if (!currentStep && stepProfile && stepProfile.name && !stepProfile.id) {
-      this.setState({ error: null, submitting: true });
+      this.setState({ submitting: true });
 
       try {
         const { data: result } = await createCollective(stepProfile);
