@@ -552,7 +552,7 @@ class CreateOrderPage extends React.Component {
     };
 
     // check if we're creating a new organization
-    if (!currentStep && stepProfile && stepProfile.name && stepProfile.website && !stepProfile.id) {
+    if (!currentStep && stepProfile && stepProfile.name && !stepProfile.id) {
       this.setState({ error: null, submitting: true });
 
       try {
@@ -563,6 +563,8 @@ class CreateOrderPage extends React.Component {
         this.setState({ stepProfile: createdOrg, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
+        window.scrollTo(0, 0);
+        return false;
       }
     } else if (currentStep === 'details' && step === 'payment') {
       // Validate ContributeDetails step before going next
