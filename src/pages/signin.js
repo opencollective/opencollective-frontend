@@ -49,7 +49,6 @@ class SigninPage extends React.Component {
       this.props.login();
     }
   }
-
   async componentDidUpdate(oldProps) {
     if (!this.props.errorLoggedInUser && !oldProps.LoggedInUser && this.props.LoggedInUser) {
       // --- User logged in ---
@@ -69,7 +68,7 @@ class SigninPage extends React.Component {
   }
 
   renderContent() {
-    if (this.props.loadingLoggedInUser || this.state.success) {
+    if ((this.props.loadingLoggedInUser || this.state.success) && this.props.token) {
       return <Loading />;
     }
 
