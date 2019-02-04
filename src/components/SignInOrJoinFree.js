@@ -26,6 +26,13 @@ class SignInOrJoinFree extends React.Component {
     redirect: PropTypes.string,
     /** createUserQuery binding */
     createUser: PropTypes.func,
+    /** Use this prop to use this as a controlled component */
+    form: PropTypes.oneOf(['signin', 'create-account']),
+    /** If provided, component will use links instead of buttons to make the switch */
+    routes: PropTypes.shape({
+      signin: PropTypes.string,
+      join: PropTypes.string,
+    }),
   };
 
   static defaultProps = {
@@ -33,7 +40,7 @@ class SignInOrJoinFree extends React.Component {
   };
 
   state = {
-    form: 'signIn',
+    form: 'signin',
     error: null,
     submitting: false,
     unknownEmailError: false,
@@ -41,8 +48,8 @@ class SignInOrJoinFree extends React.Component {
   };
 
   switchForm = form => {
+    // Update local state
     this.setState({ form });
-    window.scrollTo(0, 0);
   };
 
   getRedirectURL() {
@@ -103,7 +110,10 @@ class SignInOrJoinFree extends React.Component {
   };
 
   render() {
-    const { form, submitting, error, unknownEmailError, email } = this.state;
+    const { submitting, error, unknownEmailError, email } = this.state;
+    const displayedForm = this.props.form || this.state.form;
+    const routes = this.props.routes || {};
+
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
         {error && (
@@ -111,11 +121,11 @@ class SignInOrJoinFree extends React.Component {
             {error.replace('GraphQL error: ', 'Error: ')}
           </MessageBox>
         )}
-        {form === 'signIn' ? (
+        {displayedForm !== 'create-account' ? (
           <SignIn
             email={email}
             onEmailChange={email => this.setState({ email })}
-            onSecondaryAction={() => this.switchForm('signUp')}
+            onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
             onSubmit={this.signIn}
             loading={submitting}
             unknownEmail={unknownEmailError}
@@ -129,7 +139,7 @@ class SignInOrJoinFree extends React.Component {
                 onEmailChange={email => this.setState({ email })}
                 onPersonalSubmit={this.createProfile}
                 onOrgSubmit={this.createProfile}
-                onSecondaryAction={() => this.switchForm('signIn')}
+                onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                 submitting={submitting}
                 mx={[2, 4]}
               />

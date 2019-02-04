@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, withHandlers, withState } from 'recompose';
 import { pick } from 'lodash';
-
 import { Box, Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
+
+import { Link } from '../server/pages';
 import Container from './Container';
 import { P } from './Text';
 import StyledButton from './StyledButton';
@@ -11,7 +13,7 @@ import StyledCard from './StyledCard';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
-import { FormattedMessage } from 'react-intl';
+import StyledLink from './StyledLink';
 
 const Tab = ({ active, children, setActive }) => (
   <Container
@@ -72,6 +74,20 @@ const enhance = compose(
     }),
   }),
 );
+
+const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
+  return typeof onSecondaryAction === 'string' ? (
+    <Link route={onSecondaryAction} passHref>
+      <StyledLink disabled={loading} fontSize="Paragraph" fontWeight="bold">
+        {children}
+      </StyledLink>
+    </Link>
+  ) : (
+    <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={loading}>
+      {children}
+    </StyledButton>
+  );
+};
 
 /**
  * Component for handling the creation of profiles, either personal or organizational
@@ -242,9 +258,9 @@ const CreateProfile = enhance(
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
         <P color="black.700">Already have an account?</P>
-        <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={submitting}>
+        <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
-        </StyledButton>
+        </SecondaryAction>
       </Container>
     </StyledCard>
   ),
@@ -258,7 +274,7 @@ CreateProfile.propTypes = {
   /** handles submission of organization profile form */
   onOrgSubmit: PropTypes.func.isRequired,
   /** handles redirect from profile create, i.e. Sign In */
-  onSecondaryAction: PropTypes.func.isRequired,
+  onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
   /** Disable submit and show a spinner on button when set to true */
   submitting: PropTypes.bool,
   /** Set the value of email input */

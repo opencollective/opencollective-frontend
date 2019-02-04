@@ -15,6 +15,7 @@ pages
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
   .add('signin', '/signin/:token?')
+  .add('create-account', '/:form(create-account)', 'signin')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
   .add('hosts', '/hosts')
