@@ -1,5 +1,8 @@
 import fetch from 'cross-fetch';
 import { isValidEmail } from './utils';
+
+const websiteUrl = process.env.WEBSITE_URL;
+
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
 
@@ -113,7 +116,7 @@ export function signin(user, redirect) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ user, redirect }),
+    body: JSON.stringify({ user, redirect, websiteUrl }),
   }).then(checkResponseStatus);
 }
 
