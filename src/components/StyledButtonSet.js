@@ -43,7 +43,18 @@ StyledButtonItem.defaultProps = {
   blacklist: StyledButton.defaultProps.blacklist.concat('combo'),
 };
 
-const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChange, combo, disabled, ...props }) => (
+const StyledButtonSet = ({
+  size,
+  items,
+  children,
+  selected,
+  buttonProps,
+  buttonPropsBuilder,
+  onChange,
+  combo,
+  disabled,
+  ...props
+}) => (
   <Flex {...props}>
     {items.map(item => (
       <StyledButtonItem
@@ -56,6 +67,7 @@ const StyledButtonSet = ({ size, items, children, selected, buttonProps, onChang
         disabled={disabled}
         type="button"
         {...buttonProps}
+        {...(buttonPropsBuilder ? buttonPropsBuilder({ item }) : {})}
       >
         {children({ item, isSelected: item === selected })}
       </StyledButtonItem>
@@ -78,6 +90,8 @@ StyledButtonSet.propTypes = {
   combo: PropTypes.bool,
   /** Disable user input */
   disabled: PropTypes.bool,
+  /** Similar to `buttonProps` but allow props to be added dynamically based on item */
+  buttonPropsBuilder: PropTypes.func,
 };
 
 StyledButtonSet.defaultProps = {
