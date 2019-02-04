@@ -39,21 +39,20 @@ export default function fetchUser(username) {
 }
 
 export function getOctokit(accessToken) {
-  const octokit = octokitRest({
-    headers: {
-      accept: 'application/vnd.github.mercy-preview+json',
-    },
-  });
+  const octokitParams = {};
+
+  octokitParams.previews = ['mercy-preview'];
+
   if (accessToken) {
-    octokit.authenticate({ type: 'oauth', token: accessToken });
+    octokitParams.auth = `token ${accessToken}`;
   } else if (has(config, 'github.clientID') && has(config, 'github.clientSecret')) {
-    octokit.authenticate({
-      type: 'oauth',
-      key: get(config, 'github.clientID'),
-      secret: get(config, 'github.clientSecret'),
-    });
+    octokitParams.auth = {
+      clientId: get(config, 'github.clientID'),
+      clientSecret: get(config, 'github.clientSecret'),
+    };
   }
-  return octokit;
+
+  return octokitRest(octokitParams);
 }
 
 export function getData(res) {
