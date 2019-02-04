@@ -136,6 +136,10 @@ const mutations = {
         description: 'The redirect URL for the login email sent to the user',
         defaultValue: '/',
       },
+      websiteUrl: {
+        type: GraphQLString,
+        description: 'The website URL originating the request',
+      },
     },
     resolve(_, args) {
       return sequelize.transaction(async transaction => {
@@ -145,10 +149,10 @@ const mutations = {
         }
 
         const user = await models.User.createUserWithCollective(args.user, transaction);
-        const loginLink = user.generateLoginLink(args.redirect);
+        const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl);
 
         if (!args.organization) {
-          emailLib.send('user.new.token', user.email, { loginLink }, { bcc: 'ops@opencollective.com' });
+          emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
           return { user, organization: null };
         }
 
@@ -160,7 +164,7 @@ const mutations = {
         const organization = await models.Collective.create(organizationParams, { transaction });
         await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, transaction);
 
-        emailLib.send('user.new.token', user.email, { loginLink }, { bcc: 'ops@opencollective.com' });
+        emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
         return { user, organization };
       });
     },
