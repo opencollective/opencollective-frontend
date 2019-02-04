@@ -54,9 +54,28 @@ const enhance = compose(
   }),
 );
 
+/** Build a map of display props for the options */
+const buildDisplayMap = options => {
+  return options.reduce((map, value, idx) => {
+    // Ensure first and last values are always displayed
+    if (idx === 0 || idx === options.length - 1 || Object.keys(map).length < 2) {
+      map[value] = 'block';
+    } else if (Object.keys(map).length < 4) {
+      // Limit to 3 on mobile
+      map[value] = ['none', 'block'];
+    } else {
+      // Never show more than 5 options
+      map[value] = 'none';
+    }
+
+    return map;
+  }, {});
+};
+
 const ContributeDetails = enhance(
   ({ amountOptions, currency, disabledInterval, disabledAmount, minAmount, onChange, state, ...props }) => {
     const hasOptions = get(amountOptions, 'length', 0) > 0;
+    const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
     return (
       <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap" {...props}>
         <Flex mb={3}>
@@ -80,6 +99,7 @@ const ContributeDetails = enhance(
                   items={amountOptions}
                   selected={state.totalAmount}
                   onChange={totalAmount => onChange({ totalAmount, amount: totalAmount / 100 })}
+                  buttonPropsBuilder={({ item }) => ({ display: displayMap[item] })}
                 >
                   {({ item }) => <Currency value={item} currency={currency} />}
                 </StyledButtonSet>
@@ -157,7 +177,9 @@ const ContributeDetails = enhance(
 ContributeDetails.propTypes = {
   /**
    * The list of amounts that user can pick directly. If not provided, only the
-   * custom input will be shown.
+   * custom input will be shown. Note that the number of items actually displayed
+   * may vary from the list length as we limit the number of options displayed,
+   * especially on mobile.
    */
   amountOptions: PropTypes.arrayOf(PropTypes.number),
   currency: PropTypes.string.isRequired,
