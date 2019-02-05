@@ -65,13 +65,6 @@ pages.add('orderCollectiveNewForce', '/:collectiveSlug/:verb(donate|pay|contribu
 // Special route to force Legacy Flow
 pages.add('orderCollectiveLegacyForce', '/:collectiveSlug/:verb(donate|pay|contribute)/legacy', 'createOrder');
 
-// Generic Route -> Feature Flag
-pages.add(
-  'orderCollective',
-  '/:collectiveSlug/:verb(donate|pay|contribute)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
-  createOrderPage,
-);
-
 // Old Route -> Old Flow (should be handled by a redirect once feature flag is gone)
 pages.add(
   'orderCollectiveTier',
@@ -97,6 +90,13 @@ pages
     '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierId-:tierSlug?/success',
     'orderSuccess',
   );
+
+// Generic Route -> Feature Flag
+pages.add(
+  'orderCollective',
+  '/:collectiveSlug/:verb(donate|pay|contribute)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+  createOrderPage,
+);
 
 // New contribution flow not applied to events yet
 pages.add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder');
