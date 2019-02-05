@@ -88,20 +88,30 @@ class EditHost extends React.Component {
           </Box>
           <Box>
             {!collective.isActive && (
-              <p>
-                <FormattedMessage
-                  id="editCollective.host.pending"
-                  defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. As soon as the host accepts, you will be able to start collecting money for your collective."
-                  values={{
-                    host: get(collective, 'host.name'),
-                    date: formatDate(get(hostMembership, 'createdAt'), {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    }),
-                  }}
-                />
-              </p>
+              <div>
+                <p>
+                  <FormattedMessage
+                    id="editCollective.host.pending"
+                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. As soon as the host accepts, you will be able to start collecting money for your collective."
+                    values={{
+                      host: get(collective, 'host.name'),
+                      date: formatDate(get(hostMembership, 'createdAt'), {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      }),
+                    }}
+                  />
+                </p>
+                <p>
+                  <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} className="removeHostBtn">
+                    <FormattedMessage
+                      id="editCollective.host.cancelApplicationBtn"
+                      defaultMessage="Withdraw application"
+                    />
+                  </Button>
+                </p>
+              </div>
             )}
             <p>
               <FormattedMessage
