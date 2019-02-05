@@ -5,11 +5,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 debug.enable(process.env.DEBUG);
 
-// Only load newrelic when we explicitly want it
-if (process.env.NEW_RELIC_LICENSE_KEY) {
-  require('newrelic');
-}
-
 const defaults = {
   PORT: 3000,
   NODE_ENV: 'development',
