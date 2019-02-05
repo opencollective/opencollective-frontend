@@ -17,9 +17,17 @@ import email from './lib/email';
 export default (server, app) => {
   const urlencodedParser = express.urlencoded({ extended: false });
 
-  // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
-  // note: only for production/staging (NextJS overrides this in development env)
-  server.get('*', maxAge(30));
+  server.use((req, res, next) => {
+    if (req.locale !== 'en') {
+      // Prevent server side caching of non english content
+      res.set('Cache-Control', 'no-store, no-cache, max-age=0');
+    } else {
+      // When using Cloudflare, there might be a default cache
+      // We're setting that for all requests to reduce the default to 1 minute
+      res.set('Cache-Control', 'public, max-age=60');
+    }
+    next();
+  });
 
   server.get('/static/*', maxAge(7200));
 

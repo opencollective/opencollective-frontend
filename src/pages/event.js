@@ -14,8 +14,8 @@ class EventPage extends React.Component {
   static getInitialProps({ req, res, query }) {
     const { parentCollectiveSlug, eventSlug } = query;
 
-    if (res && req && req.locale == 'en') {
-      res.setHeader('Cache-Control', 's-maxage=300');
+    if (res && req && req.locale === 'en') {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
 
     const scripts = { googleMaps: true }; // Used in <Event> -> <Location> -> <Map>

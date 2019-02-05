@@ -14,8 +14,8 @@ import { withUser } from '../components/UserProvider';
 
 class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query }) {
-    if (res && req && req.locale == 'en') {
-      res.setHeader('Cache-Control', 's-maxage=300');
+    if (res && req && req.locale === 'en') {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
 
     return { slug: query && query.slug, query };
