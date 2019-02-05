@@ -33,7 +33,6 @@ app.prepare().then(() => {
     req.locale = locale;
     req.localeDataScript = getLocaleDataScript(locale);
     req.messages = getMessages(locale);
-    // req.messages = dev ? {} : getMessages(locale)
     next();
   });
 

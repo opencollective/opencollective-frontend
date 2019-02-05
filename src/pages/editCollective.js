@@ -15,7 +15,7 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 class EditCollectivePage extends React.Component {
   static getInitialProps({ query, res }) {
     if (res) {
-      res.setHeader('Cache-Control', 'no-cache');
+      res.set('Cache-Control', 'no-cache');
     }
 
     const scripts = { googleMaps: true }; // Used in <InputTypeLocation>
