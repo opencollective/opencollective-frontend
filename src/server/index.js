@@ -28,11 +28,14 @@ app.prepare().then(() => {
 
   server.use((req, res, next) => {
     const accept = accepts(req);
-    const locale = accept.language(languages) || 'en';
-    logger.debug('url %s locale %s', req.url, locale);
-    req.locale = locale;
-    req.localeDataScript = getLocaleDataScript(locale);
-    req.messages = getMessages(locale);
+    // Detect language as query string in the URL
+    if (req.query.language && languages.includes(req.query.language)) {
+      req.language = req.query.language;
+    }
+    req.locale = req.language || accept.language(languages) || 'en';
+    logger.debug('url %s locale %s', req.url, req.locale);
+    req.localeDataScript = getLocaleDataScript(req.locale);
+    req.messages = getMessages(req.locale);
     next();
   });
 

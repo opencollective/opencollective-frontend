@@ -18,7 +18,7 @@ export default (server, app) => {
   const urlencodedParser = express.urlencoded({ extended: false });
 
   server.use((req, res, next) => {
-    if (req.locale !== 'en') {
+    if (!req.language && req.locale !== 'en') {
       // Prevent server side caching of non english content
       res.set('Cache-Control', 'no-store, no-cache, max-age=0');
     } else {
