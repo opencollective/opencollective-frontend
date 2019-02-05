@@ -250,7 +250,7 @@ class LoginForm extends React.Component {
       name: 'email',
       button: (
         <Button disabled={true}>
-          <FormattedMessage id="login.button" defaultMessage="login" />
+          <FormattedMessage id="login.button" defaultMessage="Sign In" />
         </Button>
       ),
       required: true,
@@ -283,7 +283,7 @@ class LoginForm extends React.Component {
       } else if (this.state.isNewUser === false) {
         inputEmail.button = (
           <Button className="login" onClick={() => this.signin()}>
-            <FormattedMessage id="login.button" defaultMessage="login" />
+            <FormattedMessage id="login.button" defaultMessage="Sign In" />
           </Button>
         );
         inputEmail.description = (
@@ -295,7 +295,7 @@ class LoginForm extends React.Component {
         if (this.state.loginSent) {
           inputEmail.button = (
             <Button disabled={true}>
-              <FormattedMessage id="login.button" defaultMessage="login" />
+              <FormattedMessage id="login.button" defaultMessage="Sign In" />
             </Button>
           );
           inputEmail.description = (

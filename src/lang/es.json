@@ -238,7 +238,7 @@
   "collective.create.button": "Create Collective",
   "organization.create": "Create organization",
   "events.create.login": "Necesitas ser un colaborador de este colective para crear un evento.",
-  "login.button": "login",
+  "login.button": "Sign In",
   "collective.connectedAccounts.stripe.button": "Conectar Stripe",
   "collective.connectedAccounts.stripe.description": "Conectar una cuenta de Stripe para crear colectivos y comenzar a recibir donaciones para los mismos.",
   "host.types.label": "Type of host entity",
