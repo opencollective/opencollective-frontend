@@ -8,6 +8,9 @@ import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 
+import { Facebook } from 'styled-icons/fa-brands/Facebook.cjs';
+import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
+
 import { formatCurrency, imagePreview } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import { pickLogo } from '../lib/collective.lib';
@@ -34,12 +37,21 @@ const OrderSuccessContainer = styled(Flex)`
   }
 `;
 
-const ShareLink = styled(StyledLink)``;
+const ShareLink = styled(StyledLink)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    margin-right: 8px;
+  }
+`;
 ShareLink.defaultProps = {
+  width: 160,
   buttonStyle: 'standard',
   buttonSize: 'medium',
   fontWeight: 600,
   mx: 2,
+  mb: 2,
   target: '_blank',
   blacklist: StyledLink.defaultProps.blacklist,
 };
@@ -92,7 +104,7 @@ StyledCollectiveCard.propTypes = {
   }).isRequired,
 };
 
-StyledCollectiveCard.defaultProps = { width: 144 };
+StyledCollectiveCard.defaultProps = { minWidth: 144 };
 
 class OrderSuccessPage extends React.Component {
   static propTypes = {
@@ -195,7 +207,10 @@ class OrderSuccessPage extends React.Component {
               {totalAmount !== 0 && (
                 <React.Fragment>
                   <Span fontSize="10px">
-                    <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
+                    <FormattedMessage
+                      id="contributeFlow.contributedTotal"
+                      defaultMessage="You've contributed a total of:"
+                    />
                   </Span>
                   <Span fontWeight="bold" fontSize="Caption">
                     {this.renderContributeDetailsSummary(totalAmount, currency, interval)}
@@ -215,14 +230,14 @@ class OrderSuccessPage extends React.Component {
               )}
             </Flex>
           </StyledCollectiveCard>
-          <H3 fontWeight={800} color="black.900" mb={3}>
+          <H3 fontWeight={800} color="black.900" mb={3} textAlign="center">
             <FormattedMessage id="contributeFlow.successTitle" defaultMessage="Woot woot! 🎉" />
           </H3>
-          <P mb={4}>
+          <P mb={4} p={2} textAlign="center">
             {tier ? (
               <FormattedMessage
                 id="contributeFlow.successMessage"
-                defaultMessage="{fromCollectiveName} is now a member of {collectiveName}'s '{tierName}' tier."
+                defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier."
                 values={{
                   fromCollectiveName: fromCollective.name,
                   collectiveName: collective.name,
@@ -232,7 +247,7 @@ class OrderSuccessPage extends React.Component {
             ) : (
               <FormattedMessage
                 id="contributeFlow.successMessageBacker"
-                defaultMessage="{fromCollectiveName} is now a backer of {collectiveName}."
+                defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}."
                 values={{
                   fromCollectiveName: fromCollective.name,
                   collectiveName: collective.name,
@@ -240,18 +255,20 @@ class OrderSuccessPage extends React.Component {
               />
             )}
           </P>
-          <Flex>
+          <Flex flexWrap="wrap" justifyContent="center">
             <ShareLink href={tweetURL({ url: referralURL, text: message })}>
+              <Twitter size="1.2em" color="#38A1F3" />
               <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
             </ShareLink>
             <ShareLink href={facebooKShareURL({ u: referralURL })}>
+              <Facebook size="1.2em" color="#3c5a99" />
               <FormattedMessage id="shareIt" defaultMessage="Share it" />
             </ShareLink>
           </Flex>
-          <Box width={64} my={4} bg="black.300" css={{ height: '1px' }} />
+          <Box width={64} my={3} bg="black.300" css={{ height: '1px' }} />
           {!LoggedInUser && this.renderUserProfileBtn(true)}
           {LoggedInUser && !loggedInUserLoading && (
-            <Link route="collective" params={{ slug: get(LoggedInUser, 'collective.slug', '') }}>
+            <Link route="collective" params={{ slug: get(LoggedInUser, 'collective.slug', '') }} passHref>
               {this.renderUserProfileBtn()}
             </Link>
           )}
