@@ -88,60 +88,79 @@ class EditHost extends React.Component {
           </Box>
           <Box>
             {!collective.isActive && (
-              <p>
-                <FormattedMessage
-                  id="editCollective.host.pending"
-                  defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. As soon as the host accepts, you will be able to start collecting money for your collective."
-                  values={{
-                    host: get(collective, 'host.name'),
-                    date: formatDate(get(hostMembership, 'createdAt'), {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    }),
-                  }}
-                />
-              </p>
-            )}
-            <p>
-              <FormattedMessage
-                id="editCollective.host.label"
-                defaultMessage="Your host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
-                values={{
-                  collectives: get(collective, 'host.stats.collectives.hosted'),
-                  host: get(collective, 'host.name'),
-                }}
-              />
-            </p>
-            {collective.stats.balance > 0 && (
-              <p>
-                <FormattedMessage
-                  id="editCollective.host.balance"
-                  defaultMessage="Your host currently holds {balance} on behalf of your collective."
-                  values={{
-                    balance: formatCurrency(collective.stats.balance, collective.currency),
-                  }}
-                />
-                <br />
-                <FormattedMessage
-                  id="editCollective.host.change.balanceNotEmpty"
-                  defaultMessage="If you would like to change host, you first need to empty your balance by filing expenses or transfering funds to another collective."
-                />
-              </p>
-            )}
-            {collective.stats.balance === 0 && (
               <div>
                 <p>
+                  <FormattedMessage
+                    id="editCollective.host.pending"
+                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. As soon as the host accepts, you will be able to start collecting money for your collective."
+                    values={{
+                      host: get(collective, 'host.name'),
+                      date: formatDate(get(hostMembership, 'createdAt'), {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      }),
+                    }}
+                  />
+                </p>
+                <p>
                   <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} className="removeHostBtn">
-                    <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
+                    <FormattedMessage
+                      id="editCollective.host.cancelApplicationBtn"
+                      defaultMessage="Withdraw application"
+                    />
                   </Button>
                 </p>
-                <Fineprint>
+              </div>
+            )}
+            {collective.isActive && (
+              <div>
+                <p>
                   <FormattedMessage
-                    id="editCollective.host.change.removeFirst"
-                    defaultMessage="Once removed, you won't be able to accept donations anymore. But you will be able to select another host for your collective."
+                    id="editCollective.host.label"
+                    defaultMessage="Your host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
+                    values={{
+                      collectives: get(collective, 'host.stats.collectives.hosted'),
+                      host: get(collective, 'host.name'),
+                    }}
                   />
-                </Fineprint>
+                </p>
+                {collective.stats.balance > 0 && (
+                  <p>
+                    <FormattedMessage
+                      id="editCollective.host.balance"
+                      defaultMessage="Your host currently holds {balance} on behalf of your collective."
+                      values={{
+                        balance: formatCurrency(collective.stats.balance, collective.currency),
+                      }}
+                    />
+                    <br />
+                    <FormattedMessage
+                      id="editCollective.host.change.balanceNotEmpty"
+                      defaultMessage="If you would like to change host, you first need to empty your balance by filing expenses or transfering funds to another collective."
+                    />
+                  </p>
+                )}
+                {collective.stats.balance === 0 && (
+                  <div>
+                    <p>
+                      <Button
+                        bsStyle="primary"
+                        type="submit"
+                        onClick={() => this.changeHost()}
+                        className="removeHostBtn"
+                      >
+                        <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
+                      </Button>
+                    </p>
+                    <Fineprint>
+                      <FormattedMessage
+                        id="editCollective.host.change.removeFirst"
+                        defaultMessage="Once removed, you won't be able to accept donations anymore. But you will be able to select another host for your collective."
+                      />
+                    </Fineprint>
+                  </div>
+                )}
               </div>
             )}
           </Box>
