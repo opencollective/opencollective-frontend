@@ -80,7 +80,7 @@ class NametagsPage extends React.Component {
   renderNametag = (order, index) => {
     const userCollective = order.fromCollective || {};
     return (
-      <div className="nametag" key={index}>
+      <div className="nametag" key={order.id || `empty-${index}`}>
         <h1>
           <span className="firstName">{userCollective.name}</span>
         </h1>
@@ -107,7 +107,7 @@ class NametagsPage extends React.Component {
       orders.push({});
     }
     return (
-      <div className="page" key={this.pageNumber}>
+      <div className="page" key={pageNumber}>
         <div className="nametags">{orders.map(this.renderNametag)}</div>
       </div>
     );
