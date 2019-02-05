@@ -372,6 +372,7 @@ class MenuBar extends React.Component {
               padding: 0;
               flex-direction: row;
               justify-content: space-evenly;
+              flex-wrap: wrap;
             }
             .item {
               color: #fafafa;
