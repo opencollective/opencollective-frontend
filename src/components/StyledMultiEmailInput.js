@@ -127,7 +127,7 @@ export default class StyledMultiEmailInput extends Component {
         {this.state.showErrors && invalids && invalids.length > 0 && (
           <Span className="multiemails-errors" display="block" color="red.500" pt={2} fontSize="Tiny">
             <strong>
-              <FormattedMessage id="multiemail.invalids" defaultMessage="Invalid emails: " />
+              <FormattedMessage id="multiemail.invalids" defaultMessage="Invalid emails:" />{' '}
             </strong>
             {invalids.join(', ')}
           </Span>
