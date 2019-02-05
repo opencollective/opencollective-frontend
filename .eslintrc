@@ -14,7 +14,6 @@
     "graphql/template-strings": ["error", {"env": "apollo"}],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],
-    "graphql/no-deprecated-fields": ["error"],
-    "react/no-array-index-key": ["warn"]
+    "graphql/no-deprecated-fields": ["error"]
   }
 }
