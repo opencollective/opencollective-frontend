@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import { graphql } from 'react-apollo';
+import moment from 'moment';
 
 import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle.cjs';
 import { RadioButtonChecked } from 'styled-icons/material/RadioButtonChecked.cjs';
@@ -103,7 +104,16 @@ class CreateVirtualCardsForm extends Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.state = {
       deliverType: 'email', // email or manual
-      values: { amount: MIN_AMOUNT, onlyOpensource: true, emails: [], customMessage: '', numberOfVirtualCards: 1 },
+      values: {
+        amount: MIN_AMOUNT,
+        onlyOpensource: true,
+        emails: [],
+        customMessage: '',
+        numberOfVirtualCards: 1,
+        expiryDate: moment()
+          .add(12, 'months')
+          .format('YYYY-MM-DD'),
+      },
       errors: { emails: [] },
       multiEmailsInitialState: null,
       submitting: false,
@@ -143,6 +153,8 @@ class CreateVirtualCardsForm extends Component {
       this.setState(state => ({ ...state, values: { ...state.values, onlyOpensource: value } }));
     } else if (fieldName === 'customMessage') {
       this.setState(state => ({ ...state, values: { ...state.values, customMessage: value } }));
+    } else if (fieldName === 'expiryDate') {
+      this.setState(state => ({ ...state, values: { ...state.values, expiryDate: value } }));
     }
   }
 
@@ -166,6 +178,7 @@ class CreateVirtualCardsForm extends Component {
         amount: values.amount * 100,
         PaymentMethodId: values.PaymentMethodId || this.getDefaultPaymentMethod().id,
         limitedToOpenSourceCollectives: values.onlyOpensource,
+        expiryDate: values.expiryDate,
       };
 
       if (deliverType === 'email') {
@@ -360,8 +373,11 @@ class CreateVirtualCardsForm extends Component {
     const loading = get(this.props, 'data.loading');
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []);
 
-    if (loading) return <Loading />;
-    if (paymentMethods.length === 0) return this.renderNoPaymentMethodMessage();
+    if (loading) {
+      return <Loading />;
+    } else if (paymentMethods.length === 0) {
+      return this.renderNoPaymentMethodMessage();
+    }
 
     const { submitting, values, createdVirtualCards, serverError, deliverType } = this.state;
 
@@ -415,6 +431,24 @@ class CreateVirtualCardsForm extends Component {
               defaultValue={values.onlyOpensource}
               onChange={value => this.onChange('onlyOpensource', value)}
               type="switch"
+            />
+          </InlineField>
+
+          <InlineField
+            name="expiryDate"
+            isLabelClickable
+            label={<FormattedMessage id="virtualCards.create.expiryDate" defaultMessage="Expiry date" />}
+          >
+            <StyledInput
+              id="virtualcard-expiryDate"
+              name="expiryDate"
+              value={values.expiryDate}
+              onChange={e => this.onChange('expiryDate', e.target.value)}
+              type="date"
+              required
+              min={moment()
+                .add(1, 'day')
+                .format('YYYY-MM-DD')}
             />
           </InlineField>
 
