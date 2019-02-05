@@ -104,8 +104,8 @@ describe('Contribution Flow: Donate', () => {
       cy.get('#contributeAs input[name=twitterHandle]').type('test');
 
       // Submit form
-      cy.contains('Next step').click();
-      cy.contains('Next step').click();
+      cy.contains('button:not([disabled])', 'Next step').click();
+      cy.contains('button:not([disabled])', 'Next step').click();
       cy.wait(2000);
       cy.fillStripeInput();
       cy.contains('button', 'Submit').click();
@@ -118,7 +118,7 @@ describe('Contribution Flow: Donate', () => {
 
   it('Forces params if given in URL', () => {
     cy.signup({ redirect: '/apex/donate/42/year', visitParams }).then(() => {
-      cy.contains('Next step').click();
+      cy.contains('button', 'Next step').click();
 
       // Amount must be disabled
       cy.get('#totalAmount[disabled]').should('have.value', '42');
