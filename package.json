@@ -95,6 +95,7 @@
     "prepend-http": "2.0.0",
     "query-string": "6.2.0",
     "querystring": "0.2.0",
+    "redis": "^2.8.0",
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.2",
     "sanitize-html": "1.20.0",
