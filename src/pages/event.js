@@ -14,7 +14,7 @@ class EventPage extends React.Component {
   static getInitialProps({ req, res, query }) {
     const { parentCollectiveSlug, eventSlug } = query;
 
-    if (res && req && req.locale === 'en') {
+    if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
 
