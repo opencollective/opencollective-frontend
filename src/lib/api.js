@@ -1,6 +1,8 @@
 import fetch from 'cross-fetch';
 import { isValidEmail, getBrowserWebsiteUrl } from './utils';
 
+const MIN_REPO_STARS = 100;
+
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
 
@@ -156,4 +158,12 @@ export function get(path, options = {}) {
     if (format === 'blob') return response.blob();
     return checkResponseStatus(response);
   });
+}
+
+export function getGithubRepos(token) {
+  return fetch(`/api/github-repositories?access_token=${token}`)
+    .then(checkResponseStatus)
+    .then(repos => {
+      return repos.filter(repo => repo.stargazers_count >= MIN_REPO_STARS);
+    });
 }
