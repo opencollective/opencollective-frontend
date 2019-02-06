@@ -15,6 +15,24 @@ import { isEmailInternal } from './utils';
 
 const debug = debugLib('email');
 
+const getMailer = () => {
+  if (process.env.MAILDEV) {
+    return nodemailer.createTransport({
+      ignoreTLS: true,
+      port: 1025,
+    });
+  }
+  if (get(config, 'mailgun.user') && get(config, 'mailgun.password')) {
+    return nodemailer.createTransport({
+      service: 'Mailgun',
+      auth: {
+        user: get(config, 'mailgun.user'),
+        pass: get(config, 'mailgun.password'),
+      },
+    });
+  }
+};
+
 const render = (template, data) => {
   let text;
   data.imageNotSvg = data.collective && data.collective.image && !data.collective.image.endsWith('.svg');
@@ -132,7 +150,14 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     if (!to) {
       return Promise.reject(new Error('emailLib.sendMessage error: No recipient defined'));
     }
-    to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
+    let sendToBcc = true;
+    // Don't send to BCC if sendEvenIfNotProduction and NOT in testing env
+    if (options.sendEvenIfNotProduction === true && config.env !== 'test' && config.env !== 'circleci') {
+      sendToBcc = false;
+    }
+    if (sendToBcc) {
+      to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
+    }
   }
 
   debug(`sending email to ${to}`);
@@ -140,21 +165,8 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     debug('emailLib.sendMessage error: No recipient to send to, only sending to bcc', options.bcc);
   }
 
-  if ((get(config, 'mailgun.user') && get(config, 'mailgun.password')) || process.env.MAILDEV) {
-    const transport = process.env.MAILDEV
-      ? {
-          ignoreTLS: true,
-          port: 1025,
-        }
-      : {
-          service: 'Mailgun',
-          auth: {
-            user: get(config, 'mailgun.user'),
-            pass: get(config, 'mailgun.password'),
-          },
-        };
-    const mailgun = nodemailer.createTransport(transport);
-
+  const mailer = getMailer();
+  if (mailer) {
     return new Promise((resolve, reject) => {
       const from = options.from || config.email.from;
       const cc = options.cc;
@@ -165,20 +177,20 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       // only attach tag in production to keep data clean
       const tag = config.env === 'production' ? options.tag : 'internal';
       const headers = { 'X-Mailgun-Tag': tag, 'X-Mailgun-Dkim': 'yes' };
-      debug('mailgun> sending email to ', to, 'bcc', bcc);
+      debug('mailer> sending email to ', to, 'bcc', bcc);
 
-      return mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      return mailer.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
-          debug('>>> mailgun.sendMail error', err);
+          debug('>>> mailer.sendMail error', err);
           return reject(err);
         } else {
-          debug('>>> mailgun.sendMail success', info);
+          debug('>>> mailer.sendMail success', info);
           return resolve(info);
         }
       });
     });
   } else {
-    debug('>>> mailgun not configured');
+    debug('>>> mailer not configured');
     debugLib('text')(options.text);
     debugLib('html')(html);
     return Promise.resolve();
