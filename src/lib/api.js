@@ -1,7 +1,5 @@
 import fetch from 'cross-fetch';
-import { isValidEmail } from './utils';
-
-const websiteUrl = process.env.WEBSITE_URL;
+import { isValidEmail, getBrowserWebsiteUrl } from './utils';
 
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
@@ -109,6 +107,7 @@ export function addFunds(CollectiveId, order) {
 }
 
 export function signin(user, redirect) {
+  const websiteUrl = getBrowserWebsiteUrl() || process.env.WEBSITE_URL;
   return fetch('/api/users/signin', {
     method: 'POST',
     headers: {

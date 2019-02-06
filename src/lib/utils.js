@@ -364,3 +364,9 @@ export const loadScriptAsync = (url, opts = {}) =>
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Using_special_characters
 // From section about escapting user input
 export const escapeInput = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+export const getBrowserWebsiteUrl = () => {
+  if (window && window.location) {
+    return `${window.location.protocol}//${window.location.host}`;
+  }
+};
