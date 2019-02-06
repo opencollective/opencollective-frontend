@@ -57,6 +57,7 @@ const enhance = compose(
       const { target } = event;
       if (!target.validity.valid) {
         onChange(null);
+        setState({ ...state, [target.name]: undefined });
         return;
       }
 
@@ -68,7 +69,9 @@ const enhance = compose(
         ...newState,
         errors: { ...state.errors, [target.name]: null },
       });
-      onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
+      if (newState.name && newState.website) {
+        onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
+      }
     },
     onInvalid: ({ setState }) => event => {
       event.persist();
