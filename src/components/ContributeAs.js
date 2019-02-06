@@ -110,7 +110,11 @@ const enhance = compose(
       defaultValue: state[name] || '',
       fontSize: 'Paragraph',
       lineHeight: 'Paragraph',
-      onBlur: event => event.target.reportValidity(),
+      onBlur: event => {
+        const hasValue = event.target.value;
+        const wasUpdatedOnce = state.hasOwnProperty(event.target.name);
+        if (hasValue || wasUpdatedOnce) event.target.reportValidity();
+      },
       onInvalid,
       type: 'text',
       width: 1,
