@@ -108,6 +108,13 @@ Array [
   padding-bottom: 8px;
 }
 
+.c13[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c14 {
   display: inline-block;
   vertical-align: middle;
@@ -412,6 +419,13 @@ Array [
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
+}
+
+.c8[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c5 {
@@ -748,6 +762,13 @@ Array [
   padding: 0;
 }
 
+.c17[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c15 {
   box-sizing: border-box;
   padding-left: 0px;
@@ -1023,10 +1044,10 @@ Array [
             >
               <a
                 className="c17"
-                href="/signin"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Sign Up
+                Join Free
               </a>
             </li>
             <li
@@ -1381,6 +1402,13 @@ Array [
   padding-bottom: 8px;
 }
 
+.c13[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c14 {
   display: inline-block;
   vertical-align: middle;
@@ -1685,6 +1713,13 @@ Array [
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
+}
+
+.c8[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c5 {
@@ -2021,6 +2056,13 @@ Array [
   padding: 0;
 }
 
+.c17[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c15 {
   box-sizing: border-box;
   padding-left: 0px;
@@ -2296,10 +2338,10 @@ Array [
             >
               <a
                 className="c17"
-                href="/signin"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Sign Up
+                Join Free
               </a>
             </li>
             <li
@@ -2810,6 +2852,13 @@ exports[`Search Page renders error message 1`] = `
   padding-bottom: 8px;
 }
 
+.c19[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c37 {
   list-style: none;
   margin-bottom: 8px;
@@ -2979,6 +3028,13 @@ exports[`Search Page renders error message 1`] = `
   fontweight: 400;
   margin: 0;
   padding: 0;
+}
+
+.c38[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c36 {
@@ -3525,10 +3581,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c38"
-                href="/signin"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Sign Up
+                Join Free
               </a>
             </li>
             <li
@@ -3881,6 +3937,13 @@ Array [
   padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+}
+
+.c13[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c14 {
@@ -4625,6 +4688,13 @@ Array [
   padding: 0;
 }
 
+.c17[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c15 {
   box-sizing: border-box;
   padding-left: 0px;
@@ -4900,10 +4970,10 @@ Array [
             >
               <a
                 className="c17"
-                href="/signin"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Sign Up
+                Join Free
               </a>
             </li>
             <li
@@ -5258,6 +5328,13 @@ Array [
   padding-bottom: 8px;
 }
 
+.c13[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
 .c14 {
   display: inline-block;
   vertical-align: middle;
@@ -5532,7 +5609,7 @@ Array [
   justify-content: center;
 }
 
-.c13 {
+.c14 {
   box-sizing: border-box;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -5615,7 +5692,7 @@ Array [
   margin-bottom: 16px;
 }
 
-.c14 {
+.c15 {
   display: block;
   font-size: Paragraph;
   font-weight: bold;
@@ -5625,6 +5702,20 @@ Array [
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
+}
+
+.c15[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.c13[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c12 {
@@ -5892,7 +5983,7 @@ Array [
             </span>
           </div>
           <a
-            className=""
+            className="c13"
             href="mock-route"
             onClick={[Function]}
           >
@@ -5901,7 +5992,7 @@ Array [
         </div>
       </div>
       <div
-        className="c13"
+        className="c14"
         width={1}
       >
         <p>
@@ -5910,7 +6001,7 @@ Array [
           </em>
         </p>
         <a
-          className="c14"
+          className="c15"
           href="/pledges/new?name=Test"
           onClick={[Function]}
         >
@@ -6124,6 +6215,13 @@ Array [
   fontweight: 400;
   margin: 0;
   padding: 0;
+}
+
+.c17[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c15 {
@@ -6401,10 +6499,10 @@ Array [
             >
               <a
                 className="c17"
-                href="/signin"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Sign Up
+                Join Free
               </a>
             </li>
             <li

@@ -18,17 +18,18 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
-  static getInitialProps({ query: { token, next } }) {
+  static getInitialProps({ query: { token, next, form } }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
       next = decodeURIComponent(next);
     }
 
     next = next && isValidRelativeUrl(next) ? next : null;
-    return { token, next };
+    return { token, next, form: form || 'signin' };
   }
 
   static propTypes = {
+    form: PropTypes.oneOf(['signin', 'create-account']).isRequired,
     token: PropTypes.string,
     next: PropTypes.string,
     login: PropTypes.func,
@@ -36,6 +37,8 @@ class SigninPage extends React.Component {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
   };
+
+  static routes = { signin: '/signin', join: '/create-account' };
 
   state = { error: null, success: null };
 
@@ -50,7 +53,8 @@ class SigninPage extends React.Component {
     }
   }
   async componentDidUpdate(oldProps) {
-    if (!this.props.errorLoggedInUser && !oldProps.LoggedInUser && this.props.LoggedInUser) {
+    const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
+    if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
       // --- User logged in ---
       this.setState({ success: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
@@ -68,11 +72,23 @@ class SigninPage extends React.Component {
   }
 
   renderContent() {
-    if ((this.props.loadingLoggedInUser || this.state.success) && this.props.token) {
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
+
+    if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
+    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
+      return (
+        <MessageBox type="warning" withIcon>
+          <FormattedMessage
+            id="createAccount.alreadyLoggedIn"
+            defaultMessage="It seems like you're already signed in as '{email}'. If you want to create a new account, please log out first."
+            values={{ email: LoggedInUser.email }}
+          />
+        </MessageBox>
+      );
     }
 
-    const error = this.props.errorLoggedInUser || this.state.error;
+    const error = errorLoggedInUser || this.state.error;
     return (
       <React.Fragment>
         {error && (
@@ -91,7 +107,7 @@ class SigninPage extends React.Component {
             />
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={this.props.next || '/'} />
+        <SignInOrJoinFree redirect={next || '/'} form={form} routes={SigninPage.routes} />
       </React.Fragment>
     );
   }

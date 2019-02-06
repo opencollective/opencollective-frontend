@@ -15,6 +15,7 @@ import {
   style,
   textAlign,
   width,
+  themeGet,
 } from 'styled-system';
 import tag from 'clean-tag';
 import { whiteSpace } from './Text';
@@ -48,6 +49,13 @@ const StyledLink = styled(tag.a)`
 
   ${buttonStyle}
   ${buttonSize}
+
+  &[disabled] {
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+    color: ${themeGet('colors.black.300')};
+  }
 `;
 
 StyledLink.propTypes = {
@@ -82,6 +90,8 @@ StyledLink.propTypes = {
   textAlign: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'text-decoration' value */
   textDecoration: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  /** Disable the link, make it unclickable */
+  disabled: PropTypes.bool,
 };
 
 StyledLink.defaultProps = {

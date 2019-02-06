@@ -27,7 +27,7 @@ describe('signin', () => {
     cy.visit('/signin');
 
     // Go to CreateProfile
-    cy.contains('button', 'Join Free').click();
+    cy.contains('a', 'Join Free').click();
 
     // Test frontend validations
     cy.get('input[name=email]').type('Incorrect value');
@@ -51,7 +51,7 @@ describe('signin', () => {
     cy.visit('/signin');
 
     // Go to CreateProfile
-    cy.contains('button', 'Join Free').click();
+    cy.contains('a', 'Join Free').click();
 
     // Select "Create oganization"
     cy.contains('Create Organization Profile').click();
