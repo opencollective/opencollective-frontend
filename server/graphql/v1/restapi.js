@@ -126,7 +126,11 @@ export const getTransaction = async (req, res) => {
       throw new Error(response.errors[0]);
     }
     const result = get(response, 'data.Transaction');
-    res.send({ result });
+    if (req.params.collectiveSlug !== result.collective.slug) {
+      res.status(404).send({ error: 'Not a collective transaction.' });
+    } else {
+      res.send({ result });
+    }
   } catch (error) {
     res.status(400).send({ error: error.toString() });
   }
