@@ -54,8 +54,8 @@ const enhance = compose(
 );
 
 const RepositoryEntry = enhance(
-  ({ getFieldError, getFieldProps, onCreateCollective, radio, value, checked, state }) => {
-    const { type } = value.owner;
+  ({ getFieldError, getFieldProps, onCreateCollective, radio, value, checked, state, creatingCollective }) => {
+    const { type, login } = value.owner;
     const repositoryTypeName = type === 'User' ? 'Personal Repo' : 'Organization Repo';
 
     return (
@@ -99,6 +99,7 @@ const RepositoryEntry = enhance(
               onSubmit={event => {
                 event.preventDefault();
                 const data = pick(state, ['name', 'slug']);
+                data.githubHandle = login;
                 onCreateCollective(data);
               }}
             >
@@ -137,6 +138,7 @@ const RepositoryEntry = enhance(
                   width={1}
                   buttonSize="medium"
                   disabled={!state.name || !state.slug}
+                  loading={creatingCollective}
                   type="submit"
                 >
                   Create collective
@@ -165,6 +167,7 @@ RepositoryEntry.propTypes = {
     name: PropTypes.string,
   }),
   checked: PropTypes.bool,
+  creatingCollective: PropTypes.bool,
   onCreateCollective: PropTypes.func,
 };
 
