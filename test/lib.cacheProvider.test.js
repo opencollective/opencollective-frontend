@@ -1,11 +1,15 @@
 import { assert } from 'chai';
 import { has } from 'lodash';
 import config from 'config';
-import { getProvider, PROVIDER_TYPES } from '../server/lib/cacheProvider';
+import { getProvider, PROVIDER_TYPES } from '../server/lib/cache';
 
 const providersToTest = [PROVIDER_TYPES.MEMORY];
-if (has(config, 'memcache.servers')) providersToTest.push(PROVIDER_TYPES.MEMCACHE);
-if (has(config, 'redis.serverUrl')) providersToTest.push(PROVIDER_TYPES.REDIS);
+if (has(config, 'memcache.servers')) {
+  providersToTest.push(PROVIDER_TYPES.MEMCACHE);
+}
+if (has(config, 'redis.serverUrl')) {
+  providersToTest.push(PROVIDER_TYPES.REDIS);
+}
 
 providersToTest.forEach(provider => {
   describe(`${provider} provider get / set`, () => {
