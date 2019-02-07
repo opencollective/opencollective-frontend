@@ -57,6 +57,7 @@ const enhance = compose(
       const { target } = event;
       if (!target.validity.valid) {
         onChange(null);
+        setState({ ...state, [target.name]: undefined });
         return;
       }
 
@@ -68,7 +69,9 @@ const enhance = compose(
         ...newState,
         errors: { ...state.errors, [target.name]: null },
       });
-      onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
+      if (newState.name && newState.website) {
+        onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
+      }
     },
     onInvalid: ({ setState }) => event => {
       event.persist();
@@ -107,7 +110,11 @@ const enhance = compose(
       defaultValue: state[name] || '',
       fontSize: 'Paragraph',
       lineHeight: 'Paragraph',
-      onBlur: event => event.target.reportValidity(),
+      onBlur: event => {
+        const hasValue = event.target.value;
+        const wasUpdatedOnce = state.hasOwnProperty(event.target.name);
+        if (hasValue || wasUpdatedOnce) event.target.reportValidity();
+      },
       onInvalid,
       type: 'text',
       width: 1,

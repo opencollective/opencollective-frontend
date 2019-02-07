@@ -129,7 +129,7 @@ class CreateOrderPage extends React.Component {
     super(props);
     this.recaptcha = null;
     this.recaptchaToken = null;
-    this.contributeDetailsFormRef = React.createRef();
+    this.activeFormRef = React.createRef();
     this.state = {
       loading: false,
       submitting: false,
@@ -327,9 +327,6 @@ class CreateOrderPage extends React.Component {
 
   /** Return the index of the last step user can switch to */
   getMaxStepIdx() {
-    // Validate step profile
-    if (!this.state.stepProfile) return 0;
-
     // Validate step details
     if (!this.state.stepDetails || isNil(this.state.stepDetails.totalAmount)) return 1;
     if (this.state.stepDetails.totalAmount === 0 && !this.isFreeTier()) return 1;
@@ -471,13 +468,15 @@ class CreateOrderPage extends React.Component {
           }
         >
           {fieldProps => (
-            <ContributeAs
-              {...fieldProps}
-              onChange={this.updateProfile}
-              profiles={profiles}
-              personal={personal}
-              defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
-            />
+            <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
+              <ContributeAs
+                {...fieldProps}
+                onChange={this.updateProfile}
+                profiles={profiles}
+                personal={personal}
+                defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
+              />
+            </Container>
           )}
         </StyledInputField>
       );
@@ -488,7 +487,7 @@ class CreateOrderPage extends React.Component {
           <Container
             as="form"
             onSubmit={e => e.preventDefault()}
-            ref={this.contributeDetailsFormRef}
+            ref={this.activeFormRef}
             mx={5}
             width={[0.95, null, 3 / 5]}
             maxWidth="465px"
@@ -570,7 +569,11 @@ class CreateOrderPage extends React.Component {
       }
     } else if (currentStep === 'details' && step === 'payment') {
       // Validate ContributeDetails step before going next
-      if (!this.contributeDetailsFormRef.current || !this.contributeDetailsFormRef.current.reportValidity()) {
+      if (!this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
+        return false;
+      }
+    } else if (!currentStep || currentStep === 'contributeAs') {
+      if (this.activeFormRef.current && !this.activeFormRef.current.reportValidity()) {
         return false;
       }
     }
