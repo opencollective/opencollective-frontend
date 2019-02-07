@@ -13,6 +13,7 @@ import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
 
 const debugClaim = debug('claim');
+const debugGithub = debug('github');
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -174,6 +175,74 @@ export async function createCollective(_, args, req) {
       },
     },
   });
+  return collective;
+}
+
+export async function createCollectiveFromGithub(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to create a collective',
+    });
+  }
+
+  if (!args.collective.name) {
+    throw new errors.ValidationFailed({ message: 'collective.name required' });
+  }
+
+  let collective;
+  const collectiveData = { ...args.collective };
+  const user = await models.User.findByPk(req.remoteUser.id);
+  if (!user) {
+    return Promise.reject(new Error(`No user with Id ${req.remoteUser.id} found`));
+  }
+
+  const existingCollective = await models.Collective.findOne({
+    where: { slug: collectiveData.slug.toLowerCase() },
+  });
+
+  if (existingCollective) {
+    collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
+  }
+
+  collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
+  collectiveData.currency = 'USD';
+  collectiveData.CreatedByUserId = user.id;
+  collectiveData.LastEditedByUserId = user.id;
+
+  try {
+    collective = await models.Collective.create(collectiveData);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+
+  debugGithub('createdCollective', collective && collective.dataValues);
+  const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
+  const promises = [
+    collective.addUserWithRole(user, roles.ADMIN),
+    collective.addHost(host, user),
+    collective.update({ isActive: true }),
+  ];
+
+  await Promise.all(promises);
+
+  const data = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    collective: collective.info,
+  };
+  debug('sending github.signup to', user.email, 'with data', data);
+  await emailLib.send('github.signup', user.email, data);
+  models.Activity.create({
+    type: activities.COLLECTIVE_CREATED,
+    UserId: user.id,
+    CollectiveId: collective.id,
+    data: {
+      collective: collective.info,
+      host: host.info,
+      user: user.info,
+    },
+  });
+
   return collective;
 }
 
