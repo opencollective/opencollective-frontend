@@ -1,6 +1,5 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 
 import Page from '../components/Page';
@@ -20,26 +19,6 @@ import { Router } from '../server/pages';
 import { getGithubRepos } from '../lib/api';
 
 const { WEBSITE_URL } = process.env;
-
-const repositoriesDummy = [
-  {
-    description: 'Adblock Plus browser extension',
-    fork: true,
-    full_name: 'flickz/adblockpluschrome',
-    name: 'adblockpluschrome',
-    owner: { login: 'flickz', type: 'Organization' },
-    stargazers_count: 113,
-  },
-  {
-    description:
-      'A new form of association, transparent by design. Please report issues there. Feature requests and ideas welcome!',
-    fork: true,
-    full_name: 'flickz/jobtweets',
-    name: 'JobTweets',
-    owner: { login: 'flickz', type: 'User' },
-    stargazers_count: 103,
-  },
-];
 
 class OpenSourceApplyPage extends Component {
   static async getInitialProps({ query }) {
