@@ -191,7 +191,7 @@ export async function createCollectiveFromGithub(_, args, req) {
 
   let collective;
   const collectiveData = { ...args.collective };
-  const user = await models.User.findByPk(req.remoteUser.id);
+  const user = await models.User.findByPk(user.id);
   if (!user) {
     return Promise.reject(new Error(`No user with Id ${req.remoteUser.id} found`));
   }
@@ -230,7 +230,7 @@ export async function createCollectiveFromGithub(_, args, req) {
     lastName: user.lastName,
     collective: collective.info,
   };
-  debug('sending github.signup to', user.email, 'with data', data);
+  debugGithub('sending github.signup to', user.email, 'with data', data);
   await emailLib.send('github.signup', user.email, data);
   models.Activity.create({
     type: activities.COLLECTIVE_CREATED,
