@@ -8,20 +8,13 @@ Following example has a resizable container.
 initialState = { focus: null };
 <div style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', maxWidth: '95%' }}>
   <StepsProgress
-    steps={['BUY POTATOES', 'COOK POTATOES', 'EAT POTATOES']}
+    steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }]}
     focus={state.focus}
     onStepSelect={focus => setState({ focus })}
   >
-    {({ step }) => <div style={{ textAlign: 'center' }}>{step}</div>}
+    {({ step }) => <div style={{ textAlign: 'center' }}>{step.name}</div>}
   </StepsProgress>
 </div>;
-```
-
-### Without labels
-
-```js
-initialState = { focus: null };
-<StepsProgress steps={['a', 'b', 'c', 'd', 'e']} focus={state.focus} onStepSelect={focus => setState({ focus })} />;
 ```
 
 ### With disabled steps
@@ -29,11 +22,13 @@ initialState = { focus: null };
 ```js
 initialState = { focus: null };
 <StepsProgress
-  steps={['a', 'b', 'c', 'd', 'e']}
-  disabledSteps={['c', 'd']}
+  steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }, { name: 'THEN START AGAIN' }]}
+  disabledStepNames={['THEN START AGAIN']}
   focus={state.focus}
   onStepSelect={focus => setState({ focus })}
-/>;
+>
+  {({ step }) => <div style={{ textAlign: 'center' }}>{step.name}</div>}
+</StepsProgress>;
 ```
 
 ### With a step loading
@@ -41,9 +36,20 @@ initialState = { focus: null };
 ```js
 initialState = { focus: null };
 <StepsProgress
-  steps={['a', 'b', 'c']}
-  loadingStep="b"
+  steps={[{ name: 'a' }, { name: 'b' }, { name: 'c' }, { name: 'd' }, { name: 'e' }, { name: 'f' }]}
+  loadingStep={{ name: 'c' }}
   focus={state.focus}
   onStepSelect={focus => setState({ focus })}
+/>;
+```
+
+### All completed
+
+```js
+initialState = { focus: null };
+<StepsProgress
+  steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }]}
+  onStepSelect={focus => setState({ focus })}
+  allCompleted
 />;
 ```
