@@ -125,6 +125,13 @@ class TopBar extends React.Component {
                 </Link>
               </Box>
               <Box as="li" px={3}>
+                <a href="https://docs.opencollective.com">
+                  <NavLink>
+                    <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
+                  </NavLink>
+                </a>
+              </Box>
+              <Box as="li" px={3}>
                 <NavLink href="https://medium.com/open-collective">
                   <FormattedMessage id="menu.blog" defaultMessage="Blog" />
                 </NavLink>
