@@ -73,7 +73,7 @@ Object {
 
 exports[`api.v1.test.js #get get one transaction details by uuid 1`] = `
 Object {
-  "amount": -20000,
+  "amount": 5000,
   "collective": Object {
     "id": 3,
     "image": null,
@@ -81,7 +81,7 @@ Object {
     "slug": "scouts",
   },
   "currency": "USD",
-  "description": "Homepage design",
+  "description": "Donation to that great project",
   "fromCollective": Object {
     "id": 1,
     "image": null,
@@ -94,14 +94,15 @@ Object {
     "name": "WWCode",
     "slug": "wwcode",
   },
-  "hostCurrency": "USD",
+  "hostCurrency": null,
   "hostCurrencyFxRate": null,
   "hostFeeInHostCurrency": null,
-  "netAmountInCollectiveCurrency": null,
+  "netAmountInCollectiveCurrency": 4500,
+  "order": null,
   "paymentMethod": null,
   "paymentProcessorFeeInHostCurrency": null,
   "platformFeeInHostCurrency": null,
-  "type": "DEBIT",
+  "type": "CREDIT",
   "uuid": null,
 }
 `;
