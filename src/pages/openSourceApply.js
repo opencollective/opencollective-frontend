@@ -6,7 +6,7 @@ import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { withUser } from '../components/UserProvider';
 import withIntl from '../lib/withIntl';
-import { addCreateCollectiveMutation } from '../graphql/mutations';
+import { addCreateCollectiveFromGithubMutation } from '../graphql/mutations';
 import StyledCard from '../components/StyledCard';
 import { H3, P } from '../components/Text';
 import StyledButton from '../components/StyledButton';
@@ -31,7 +31,7 @@ class OpenSourceApplyPage extends Component {
     token: PropTypes.string,
     loadingLoggedInUser: PropTypes.bool,
     LoggedInUser: PropTypes.object,
-    createCollective: PropTypes.func,
+    createCollectiveFromGithub: PropTypes.func,
   };
 
   state = {
@@ -63,7 +63,6 @@ class OpenSourceApplyPage extends Component {
         loadingRepos: false,
         result: { type: 'error', mesg: 'Error: An unknown error occured' },
       });
-      console.log(error);
     }
   }
 
@@ -83,9 +82,14 @@ class OpenSourceApplyPage extends Component {
   async createCollectives(collectiveInputType) {
     collectiveInputType.type = 'COLLECTIVE';
     try {
-      const res = await this.props.createCollective(collectiveInputType);
-      const collective = res.data.createCollective;
-      Router.pushRoute('collective', { slug: collective.slug });
+      const res = await this.props.createCollectiveFromGithub(collectiveInputType);
+      const collective = res.data.createCollectiveFromGithub;
+      Router.pushRoute('collective', {
+        slug: collective.slug,
+        status: 'collectiveCreated',
+        CollectiveId: collective.id,
+        CollectiveSlug: collective.slug,
+      });
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err)); // TODO - Remove
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
@@ -147,10 +151,10 @@ class OpenSourceApplyPage extends Component {
     const { loadingLoggedInUser } = this.props;
     const { result } = this.state;
     return (
-      <Page>
+      <Page title="Sign up GitHub repository">
         <Flex alignItems="center" flexDirection="column" mx="auto" maxWidth={500} pt={4} my={4}>
           {result.mesg && (
-            <Box>
+            <Box mb={2}>
               <MessageBox withIcon type={result.type}>
                 {result.mesg}
               </MessageBox>
@@ -163,4 +167,4 @@ class OpenSourceApplyPage extends Component {
   }
 }
 
-export default withIntl(withUser(addCreateCollectiveMutation(OpenSourceApplyPage)));
+export default withIntl(withUser(addCreateCollectiveFromGithubMutation(OpenSourceApplyPage)));
