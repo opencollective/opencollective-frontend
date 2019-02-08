@@ -118,6 +118,7 @@ export default app => {
   app.param('transactionuuid', params.transactionuuid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
+  app.param('idOrUuid', params.idOrUuid);
 
   /**
    * GraphQL v1
@@ -244,7 +245,7 @@ export default app => {
 
   // Get transactions of a collective given its slug.
   app.get('/v1/collectives/:collectiveSlug/transactions', RestApi.getLatestTransactions);
-  app.get('/v1/collectives/:collectiveSlug/transactions/:IdOrUUID', RestApi.getTransaction);
+  app.get('/v1/collectives/:collectiveSlug/transactions/:idOrUuid', RestApi.getTransaction);
 
   // xdamman: Is this route still being used anywhere? If not, we should deprecate this
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details

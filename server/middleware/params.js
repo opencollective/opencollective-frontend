@@ -136,3 +136,17 @@ export function expenseid(req, res, next, expenseid) {
     })
     .catch(next);
 }
+
+export function idOrUuid(req, res, next, idOrUuid) {
+  parseIdOrUUID(idOrUuid)
+    .then(({ id, uuid }) => {
+      if (id) {
+        req.params.id = id;
+      }
+      if (uuid) {
+        req.params.uuid = uuid;
+      }
+      next();
+    })
+    .catch(next);
+}
