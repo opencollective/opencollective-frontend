@@ -91,6 +91,17 @@ const createCollectiveQuery = gql`
   }
 `;
 
+const createCollectiveFromGithubQuery = gql`
+  mutation createCollectiveFromGithub($collective: CollectiveInputType!) {
+    createCollectiveFromGithub(collective: $collective) {
+      id
+      name
+      slug
+      type
+    }
+  }
+`;
+
 const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
@@ -314,6 +325,51 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
           data.LoggedInUser.memberOf.push({
             __typename: 'Member',
             collective: createCollective,
+            role: 'ADMIN',
+          });
+          store.writeQuery({ query: getLoggedInUserQuery, data });
+        },
+      });
+    },
+  }),
+});
+
+export const addCreateCollectiveFromGithubMutation = graphql(createCollectiveFromGithubQuery, {
+  props: ({ mutate }) => ({
+    createCollectiveFromGithub: async collective => {
+      const CollectiveInputType = pick(collective, [
+        'slug',
+        'type',
+        'name',
+        'image',
+        'description',
+        'longDescription',
+        'location',
+        'twitterHandle',
+        'githubHandle',
+        'website',
+        'tags',
+        'startsAt',
+        'endsAt',
+        'timezone',
+        'maxAmount',
+        'currency',
+        'quantity',
+        'HostCollectiveId',
+        'ParentCollectiveId',
+        'data',
+      ]);
+      CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
+        pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
+      );
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
+      return await mutate({
+        variables: { collective: CollectiveInputType },
+        update: (store, { data: { createCollectiveFromGithub } }) => {
+          const data = store.readQuery({ query: getLoggedInUserQuery });
+          data.LoggedInUser.memberOf.push({
+            __typename: 'Member',
+            collective: createCollectiveFromGithub,
             role: 'ADMIN',
           });
           store.writeQuery({ query: getLoggedInUserQuery, data });
