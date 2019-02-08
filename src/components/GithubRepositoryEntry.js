@@ -55,7 +55,7 @@ const enhance = compose(
 
 const RepositoryEntry = enhance(
   ({ getFieldError, getFieldProps, onCreateCollective, radio, value, checked, state, creatingCollective }) => {
-    const { type, login } = value.owner;
+    const { type } = value.owner;
     const repositoryTypeName = type === 'User' ? 'Personal Repo' : 'Organization Repo';
 
     return (
@@ -99,7 +99,7 @@ const RepositoryEntry = enhance(
               onSubmit={event => {
                 event.preventDefault();
                 const data = pick(state, ['name', 'slug']);
-                data.githubHandle = login;
+                data.githubHandle = value.full_name;
                 onCreateCollective(data);
               }}
             >
