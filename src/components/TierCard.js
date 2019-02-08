@@ -138,7 +138,7 @@ class TierCard extends React.Component {
     } else {
       linkRoute = {
         name: 'orderCollectiveTier',
-        params: { collectiveSlug: collective.slug, tierId: tier.id },
+        params: { collectiveSlug: collective.slug, TierId: tier.id },
         anchor: '#content',
       };
     }
