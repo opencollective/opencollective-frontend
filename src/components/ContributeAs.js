@@ -69,9 +69,7 @@ const enhance = compose(
         ...newState,
         errors: { ...state.errors, [target.name]: null },
       });
-      if (newState.name && newState.website) {
-        onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
-      }
+      onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
     },
     onInvalid: ({ setState }) => event => {
       event.persist();

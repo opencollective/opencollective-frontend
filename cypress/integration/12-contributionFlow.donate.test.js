@@ -91,9 +91,6 @@ describe('Contribution Flow: Donate', () => {
     cy.signup({ redirect: '/apex/donate', visitParams }).then(() => {
       cy.contains('#contributeAs > label', 'A new organization').click();
 
-      // Submit is disabled by default
-      cy.contains('button', 'Next step').should('be.disabled');
-
       // Name must be shown on step
       cy.get('#contributeAs input[name=name]').type('Evil Corp');
       cy.get('.step-contributeAs').contains('Evil Corp');

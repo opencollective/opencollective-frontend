@@ -550,9 +550,18 @@ class CreateOrderPage extends React.Component {
       step: ['contributeAs', 'success'].includes(step) ? undefined : step,
     };
 
-    if (this.state.error) this.setState({ error: null });
+    if (this.state.error) {
+      this.setState({ error: null });
+    }
 
-    // check if we're creating a new organization
+    // Validate step if it has a form
+    if (!currentStep || currentStep === 'details' || currentStep === 'contributeAs') {
+      if (!this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
+        return false;
+      }
+    }
+
+    // Check if we're creating a new organization
     if (!currentStep && stepProfile && stepProfile.name && !stepProfile.id) {
       this.setState({ submitting: true });
 
@@ -565,15 +574,6 @@ class CreateOrderPage extends React.Component {
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
         window.scrollTo(0, 0);
-        return false;
-      }
-    } else if (currentStep === 'details' && step === 'payment') {
-      // Validate ContributeDetails step before going next
-      if (!this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
-        return false;
-      }
-    } else if (!currentStep || currentStep === 'contributeAs') {
-      if (this.activeFormRef.current && !this.activeFormRef.current.reportValidity()) {
         return false;
       }
     }
