@@ -71,7 +71,7 @@ export default class SignIn extends React.Component {
               id="email"
               name="email"
               onChange={({ target }) => {
-                onEmailChange(target.value);
+                onEmailChange(target.value.trim());
                 // Feel free to remove the setTimeout when that issue is fixed
                 // https://bugzilla.mozilla.org/show_bug.cgi?id=1524212
                 setTimeout(() => {

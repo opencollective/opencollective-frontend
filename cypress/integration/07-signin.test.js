@@ -19,6 +19,12 @@ describe('signin', () => {
   it('trims the email when it has trailing spaces', () => {
     cy.visit('/signin');
     cy.get('input[name=email]').type('  user@opencollective.com  ');
+    cy.get('input[name=email]').should('have.value', 'user@opencollective.com');
+  });
+
+  it('does not disable submit button when email has trailing spaces', () => {
+    cy.visit('/signin');
+    cy.get('input[name=email]').type('  user@opencollective.com  ');
     cy.get('button[type=submit]').should('not.be.disabled');
   });
 
