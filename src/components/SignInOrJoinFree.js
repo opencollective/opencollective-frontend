@@ -124,7 +124,7 @@ class SignInOrJoinFree extends React.Component {
         {displayedForm !== 'create-account' ? (
           <SignIn
             email={email}
-            onEmailChange={email => this.setState({ email })}
+            onEmailChange={email => this.setState({ email: email.trim() })}
             onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
             onSubmit={this.signIn}
             loading={submitting}

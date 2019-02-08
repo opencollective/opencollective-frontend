@@ -16,6 +16,12 @@ describe('signin', () => {
     cy.get('input[name=email]').should('exist');
   });
 
+  it('trims the email when it has trailing spaces', () => {
+    cy.visit('/signin');
+    cy.get('input[name=email]').type('  user@opencollective.com  ');
+    cy.get('button[type=submit]').should('not.be.disabled');
+  });
+
   it("doesn't go into redirect loop if given own address in redirect", () => {
     cy.visit('/signin?next=/signin');
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
