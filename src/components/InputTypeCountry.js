@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { countries } from 'country-data';
+
 import StyledSelect from './StyledSelect';
 
 class InputTypeCountry extends Component {
   static propTypes = {
-    options: PropTypes.arrayOf(
-      PropTypes.shape({
-        country: PropTypes.string.isRequired,
-        abbreviation: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
     name: PropTypes.string,
     onChange: PropTypes.func,
     defaultValue: PropTypes.string,
@@ -33,18 +29,16 @@ class InputTypeCountry extends Component {
   };
 
   getCountryName(countryISO) {
-    const { options } = this.props;
-    const { country, abbreviation } = options.find(({ abbreviation }) => abbreviation === countryISO);
-
-    if (country && abbreviation) {
-      return `${country} - ${abbreviation}`;
+    const { name } = countries[countryISO];
+    if (name) {
+      return `${name} - ${countryISO}`;
     }
   }
 
   render() {
     const { error } = this.state;
-    const { name, options, defaultValue } = this.props;
-    const countryNames = options.map(({ country, abbreviation }) => `${country} - ${abbreviation}`);
+    const { name, defaultValue } = this.props;
+    const countryNames = countries.all.map(({ name, alpha2 }) => `${name} - ${alpha2}`);
 
     return (
       <StyledSelect

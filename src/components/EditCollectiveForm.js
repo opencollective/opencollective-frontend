@@ -23,7 +23,6 @@ import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
-import countries from '../lib/countries';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -338,7 +337,6 @@ class EditCollectiveForm extends React.Component {
           name: 'countryISO',
           type: 'country',
           placeholder: 'Select country',
-          options: countries,
         },
         {
           name: 'longDescription',
