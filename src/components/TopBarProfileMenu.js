@@ -281,6 +281,16 @@ class TopBarProfileMenu extends React.Component {
               </Link>
             </ListItem>
             <ListItem py={1}>
+              <StyledLink
+                color="#494D52"
+                fontSize="1.2rem"
+                fontFamily="montserratlight, arial"
+                href="https://docs.opencollective.com"
+              >
+                <FormattedMessage id="menu.help" defaultMessage="Help" />
+              </StyledLink>
+            </ListItem>
+            <ListItem py={1}>
               <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" onClick={this.logout}>
                 <FormattedMessage id="menu.logout" defaultMessage="Log out" />
               </StyledLink>

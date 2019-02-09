@@ -59,12 +59,11 @@ const navigation = {
     'Open Source': '/opensource',
     'Report an issue': 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
-    Wiki: 'https://github.com/opencollective/opencollective/wiki',
+    'Docs & help': 'https://docs.opencollective.com',
     'Email Support': 'mailto:support@opencollective.com',
   },
   COMPANY: {
     About: '/about',
-    FAQ: '/faq',
     Blog: 'https://medium.com/open-collective',
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',

@@ -304,6 +304,21 @@ Array [
               className="c11"
             >
               <a
+                href="https://docs.opencollective.com"
+              >
+                <a
+                  className="c12"
+                >
+                  <span>
+                    Docs & Help
+                  </span>
+                </a>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
                 className="c12"
                 href="https://medium.com/open-collective"
               >
@@ -1194,10 +1209,10 @@ Array [
             >
               <a
                 className="c17"
-                href="https://github.com/opencollective/opencollective/wiki"
+                href="https://docs.opencollective.com"
                 onClick={[Function]}
               >
-                Wiki
+                Docs & help
               </a>
             </li>
             <li
@@ -1240,17 +1255,6 @@ Array [
                 onClick={[Function]}
               >
                 About
-              </a>
-            </li>
-            <li
-              className="c16"
-            >
-              <a
-                className="c17"
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
               </a>
             </li>
             <li
@@ -1598,6 +1602,21 @@ Array [
               className="c11"
             >
               <a
+                href="https://docs.opencollective.com"
+              >
+                <a
+                  className="c12"
+                >
+                  <span>
+                    Docs & Help
+                  </span>
+                </a>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
                 className="c12"
                 href="https://medium.com/open-collective"
               >
@@ -2488,10 +2507,10 @@ Array [
             >
               <a
                 className="c17"
-                href="https://github.com/opencollective/opencollective/wiki"
+                href="https://docs.opencollective.com"
                 onClick={[Function]}
               >
-                Wiki
+                Docs & help
               </a>
             </li>
             <li
@@ -2534,17 +2553,6 @@ Array [
                 onClick={[Function]}
               >
                 About
-              </a>
-            </li>
-            <li
-              className="c16"
-            >
-              <a
-                className="c17"
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
               </a>
             </li>
             <li
@@ -3342,6 +3350,21 @@ exports[`Search Page renders error message 1`] = `
               className="c17"
             >
               <a
+                href="https://docs.opencollective.com"
+              >
+                <a
+                  className="c18"
+                >
+                  <span>
+                    Docs & Help
+                  </span>
+                </a>
+              </a>
+            </li>
+            <li
+              className="c17"
+            >
+              <a
                 className="c18"
                 href="https://medium.com/open-collective"
               >
@@ -3731,10 +3754,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c38"
-                href="https://github.com/opencollective/opencollective/wiki"
+                href="https://docs.opencollective.com"
                 onClick={[Function]}
               >
-                Wiki
+                Docs & help
               </a>
             </li>
             <li
@@ -3777,17 +3800,6 @@ exports[`Search Page renders error message 1`] = `
                 onClick={[Function]}
               >
                 About
-              </a>
-            </li>
-            <li
-              className="c37"
-            >
-              <a
-                className="c38"
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
               </a>
             </li>
             <li
@@ -4129,6 +4141,21 @@ Array [
                 <span>
                   How it Works
                 </span>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
+                href="https://docs.opencollective.com"
+              >
+                <a
+                  className="c12"
+                >
+                  <span>
+                    Docs & Help
+                  </span>
+                </a>
               </a>
             </li>
             <li
@@ -5120,10 +5147,10 @@ Array [
             >
               <a
                 className="c17"
-                href="https://github.com/opencollective/opencollective/wiki"
+                href="https://docs.opencollective.com"
                 onClick={[Function]}
               >
-                Wiki
+                Docs & help
               </a>
             </li>
             <li
@@ -5166,17 +5193,6 @@ Array [
                 onClick={[Function]}
               >
                 About
-              </a>
-            </li>
-            <li
-              className="c16"
-            >
-              <a
-                className="c17"
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
               </a>
             </li>
             <li
@@ -5518,6 +5534,21 @@ Array [
                 <span>
                   How it Works
                 </span>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
+                href="https://docs.opencollective.com"
+              >
+                <a
+                  className="c12"
+                >
+                  <span>
+                    Docs & Help
+                  </span>
+                </a>
               </a>
             </li>
             <li
@@ -6649,10 +6680,10 @@ Array [
             >
               <a
                 className="c17"
-                href="https://github.com/opencollective/opencollective/wiki"
+                href="https://docs.opencollective.com"
                 onClick={[Function]}
               >
-                Wiki
+                Docs & help
               </a>
             </li>
             <li
@@ -6695,17 +6726,6 @@ Array [
                 onClick={[Function]}
               >
                 About
-              </a>
-            </li>
-            <li
-              className="c16"
-            >
-              <a
-                className="c17"
-                href="/faq"
-                onClick={[Function]}
-              >
-                FAQ
               </a>
             </li>
             <li
