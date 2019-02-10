@@ -6,7 +6,8 @@
     "jest": true,
   },
   "plugins": [
-    "graphql"
+    "graphql",
+    "react-hooks"
   ],
   "rules": {
     "no-console": "warn",
@@ -14,6 +15,7 @@
     "graphql/template-strings": ["error", {"env": "apollo"}],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],
-    "graphql/no-deprecated-fields": ["error"]
+    "graphql/no-deprecated-fields": ["error"],
+    "react-hooks/rules-of-hooks": ["error"]
   }
 }
