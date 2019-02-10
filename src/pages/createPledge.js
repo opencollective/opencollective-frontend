@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import slugify from 'slugify';
-import { withState } from 'recompose';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
 import { get } from 'lodash';
@@ -60,56 +59,62 @@ const Details = styled.details`
   }
 `;
 
-const WordCountTextarea = withState('wordCount', 'setWordCount', 140)(({ wordCount, setWordCount }) => (
-  <Flex flexDirection="column">
-    <Flex justifyContent="space-between">
-      <P {...labelStyles} htmlFor="publicMessage">
-        A message for the community <Span fontWeight="200">- Optional</Span>
-      </P>
-      <P {...labelStyles} as="p">
-        {wordCount}
-      </P>
-    </Flex>
-    <StyledInput
-      border="1px solid"
-      borderColor="black.300"
-      borderRadius="4px"
-      fontSize="Paragraph"
-      as="textarea"
-      id="publicMessage"
-      name="publicMessage"
-      placeholder="This will be public and it is also optional"
-      onChange={({ target }) => setWordCount(() => 140 - target.value.length)}
-      px={2}
-      py={1}
-      rows={4}
-    />
-  </Flex>
-));
-
-const AmountField = withState('amount', 'setAmount', 20)(({ amount, setAmount, LoggedInUser }) => (
-  <Flex justifyContent="space-between" alignItems="flex-end" flexWrap="wrap">
-    <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
-      <P {...labelStyles} htmlFor="presetAmount">
-        Amount ({LoggedInUser && LoggedInUser.collective.currency})
-      </P>
-      <ButtonGroup onChange={value => setAmount(() => value)} value={amount} values={[5, 10, 15, 20, 50, 100, 250]} />
-    </Flex>
-
-    <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
-      <P {...labelStyles} htmlFor="totalAmount">
-        Custom
-      </P>
-      <TextInput
-        id="totalAmount"
-        name="totalAmount"
-        width={[1, null, 70]}
-        onChange={({ target }) => setAmount(() => target.value)}
-        value={amount}
+const WordCountTextarea = () => {
+  const [wordCount, setWordCount] = useState(140);
+  return (
+    <Flex flexDirection="column">
+      <Flex justifyContent="space-between">
+        <P {...labelStyles} htmlFor="publicMessage">
+          A message for the community <Span fontWeight="200">- Optional</Span>
+        </P>
+        <P {...labelStyles} as="p">
+          {wordCount}
+        </P>
+      </Flex>
+      <StyledInput
+        border="1px solid"
+        borderColor="black.300"
+        borderRadius="4px"
+        fontSize="Paragraph"
+        as="textarea"
+        id="publicMessage"
+        name="publicMessage"
+        placeholder="This will be public and it is also optional"
+        onChange={({ target }) => setWordCount(() => 140 - target.value.length)}
+        px={2}
+        py={1}
+        rows={4}
       />
     </Flex>
-  </Flex>
-));
+  );
+};
+
+const AmountField = ({ LoggedInUser }) => {
+  const [amount, setAmount] = useState(20);
+  return (
+    <Flex justifyContent="space-between" alignItems="flex-end" flexWrap="wrap">
+      <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
+        <P {...labelStyles} htmlFor="presetAmount">
+          Amount ({LoggedInUser && LoggedInUser.collective.currency})
+        </P>
+        <ButtonGroup onChange={value => setAmount(() => value)} value={amount} values={[5, 10, 15, 20, 50, 100, 250]} />
+      </Flex>
+
+      <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
+        <P {...labelStyles} htmlFor="totalAmount">
+          Custom
+        </P>
+        <TextInput
+          id="totalAmount"
+          name="totalAmount"
+          width={[1, null, 70]}
+          onChange={({ target }) => setAmount(() => target.value)}
+          value={amount}
+        />
+      </Flex>
+    </Flex>
+  );
+};
 
 class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
