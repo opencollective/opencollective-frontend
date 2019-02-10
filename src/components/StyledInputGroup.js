@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { themeGet } from 'styled-system';
-import { withState } from 'recompose';
 import { get } from 'lodash';
 
 import Container from './Container';
@@ -81,20 +80,20 @@ const getBorderColor = ({ error, focused, success }) => {
  * A styled input with a prepended or appended field element.
  * @see See [StyledInput](/#!/StyledInput) for details about props passed to it
  */
-const StyledInputGroup = withState('focused', 'setFocus', false)(
-  ({
-    append,
-    prepend,
-    focused,
-    setFocus,
-    disabled,
-    success,
-    error,
-    maxWidth,
-    containerProps,
-    prependProps,
-    ...inputProps
-  }) => (
+const StyledInputGroup = ({
+  append,
+  prepend,
+  disabled,
+  success,
+  error,
+  maxWidth,
+  containerProps,
+  prependProps,
+  ...inputProps
+}) => {
+  const [focused, setFocus] = useState(false);
+
+  return (
     <React.Fragment>
       <InputContainer
         bg={disabled ? 'black.50' : 'white.full'}
@@ -148,8 +147,8 @@ const StyledInputGroup = withState('focused', 'setFocus', false)(
         </Span>
       )}
     </React.Fragment>
-  ),
-);
+  );
+};
 
 StyledInputGroup.propTypes = {
   /** Text shown after input */
