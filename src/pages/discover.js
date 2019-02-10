@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import fetch from 'node-fetch';
-import { compose, lifecycle, withHandlers } from 'recompose';
-import { isEqual, pick } from 'lodash';
+import { pick } from 'lodash';
 
 import { withRouter } from 'next/router';
 import withIntl from '../lib/withIntl';
@@ -17,83 +17,61 @@ import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 
-const fetchCollectives = lifecycle({
-  async componentDidMount() {
-    const { query } = this.props.router;
-    const params = {
-      offset: query.offset || 0,
-      show: query.show || 'all',
-      sort: query.sort || 'most popular',
-    };
+const _transformData = collective => ({
+  ...collective,
+  stats: {
+    backers: {
+      all: collective.backersCount,
+    },
+    yearlyBudget: collective.yearlyIncome,
+  },
+  type: 'COLLECTIVE',
+});
 
+function useCollectives(query) {
+  const [responseData, setResponseData] = useState({});
+  const params = {
+    offset: query.offset || 0,
+    show: query.show || 'all',
+    sort: query.sort || 'most popular',
+  };
+
+  const fetchDiscoverData = async () => {
     try {
       const endpoints = [`/discover?${queryString(params)}`, '/groups/tags'];
       const [data, tags] = await Promise.all(endpoints.map(e => fetch(`${getBaseApiUrl()}${e}`).then(r => r.json())));
-      this.setState({
+      setResponseData({
         ...pick(data, ['offset', 'total']),
         ...params,
         tags,
-        collectives: data.collectives.map(this.transformData),
-        router: this.props.router,
+        collectives: data.collectives.map(_transformData),
       });
     } catch (error) {
-      this.setState({ error });
+      console.log(error);
     }
-  },
+  };
 
-  async componentDidUpdate(prevProps) {
-    const { query } = this.props.router;
+  useEffect(() => {
+    fetchDiscoverData();
+    console.log(query, 'I triggerd');
+  }, [query]);
 
-    if (!isEqual(query, prevProps.router.query)) {
-      const params = {
-        offset: query.offset || 0,
-        show: query.show || 'all',
-        sort: query.sort || 'most popular',
-      };
+  return responseData;
+}
 
-      try {
-        const response = await fetch(`${getBaseApiUrl()}/discover?${queryString(params)}`);
-        const data = await response.json();
-        this.setState({
-          ...pick(data, ['offset', 'total']),
-          ...params,
-          collectives: data.collectives.map(this.transformData),
-          router: this.props.router,
-        });
-      } catch (error) {
-        this.setState({ error });
-      }
-    }
-  },
-
-  // needed to match data expected by CollectiveCard
-  transformData(collective) {
-    return {
-      ...collective,
-      stats: {
-        backers: {
-          all: collective.backersCount,
-        },
-        yearlyBudget: collective.yearlyIncome,
-      },
-      type: 'COLLECTIVE',
-    };
-  },
-});
-
-const handleChange = withHandlers({
-  onChange: props => event => {
-    const { name, value } = event.target;
-    props.router.push({
-      pathname: props.router.pathname,
-      query: { ...props.router.query, offset: 0, [name]: value },
-    });
-  },
-});
-
-const DiscoverPage = ({ collectives, onChange, offset, total, show, sort, tags = [] }) => {
+const DiscoverPage = ({ router }) => {
+  const { query } = router;
+  const { collectives, offset, total, show, sort, tags = [] } = useCollectives(query);
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
+
+  const onChange = event => {
+    const { name, value } = event.target;
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, offset: 0, [name]: value },
+    });
+  };
 
   return (
     <Page title="Discover">
@@ -183,11 +161,8 @@ const DiscoverPage = ({ collectives, onChange, offset, total, show, sort, tags =
   );
 };
 
-export default withIntl(
-  withRouter(
-    compose(
-      fetchCollectives,
-      handleChange,
-    )(DiscoverPage),
-  ),
-);
+DiscoverPage.propTypes = {
+  router: PropTypes.object,
+};
+
+export default withIntl(withRouter(DiscoverPage));
