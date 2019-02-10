@@ -1,11 +1,8 @@
-import { Component, createRef } from 'react';
+import { Component, createRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { withState } from 'recompose';
 
 import Container from './Container';
 import StyledCard from './StyledCard';
-
-const addShowState = withState('show', 'setState', false);
 
 class Popup extends Component {
   state = {
@@ -70,7 +67,8 @@ class Popup extends Component {
   }
 }
 
-const StyledTooltip = addShowState(({ children, content, show, setState, ...styleProps }) => {
+const StyledTooltip = ({ children, content, ...styleProps }) => {
+  const [show, setShow] = useState(false);
   const containerRef = createRef();
 
   return (
@@ -81,16 +79,16 @@ const StyledTooltip = addShowState(({ children, content, show, setState, ...styl
         </Popup>
       )}
       {children({
-        onBlur: () => setState(false),
-        onClick: () => setState(state => !state),
-        onFocus: () => setState(true),
-        onMouseEnter: () => setState(true),
-        onMouseLeave: () => setState(false),
+        onBlur: () => setShow(false),
+        onClick: () => setShow(state => !state),
+        onFocus: () => setShow(true),
+        onMouseEnter: () => setShow(true),
+        onMouseLeave: () => setShow(false),
         tabIndex: 0,
       })}
     </Container>
   );
-});
+};
 
 StyledTooltip.propTypes = {
   /**
