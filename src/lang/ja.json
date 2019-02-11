@@ -208,7 +208,7 @@
   "contribution.amount.currency.label": "Amount ({currency})",
   "contribution.amount.other.label": "Other",
   "contribution.interval.label": "Frequency",
-  "contribution.subscription.next.label": "Next contribution:",
+  "contribution.subscription.next.label": "Next charge:",
   "contribute.newcreditcard": "New credit/debit card",
   "host.apply.title": "Apply to create a new {hostname} collective",
   "collective.create.title": "Create an Open Collective",
