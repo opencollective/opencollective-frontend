@@ -152,7 +152,7 @@ describe('lib/email', () => {
       );
       expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedCollectives[0].name);
       expect(nm.sendMail.lastCall.args[0].html).to.contain(
-        `${config.host.website}/${data.collective.slug}/transactions/${data.transaction.uuid}/invoice.pdf`,
+        `${config.host.invoices}/${data.collective.slug}/transactions/${data.transaction.uuid}/invoice.pdf`,
       );
     });
   });

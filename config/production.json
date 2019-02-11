@@ -16,7 +16,9 @@
   "host": {
     "api": "https://api.opencollective.com",
     "webapp": "https://app.opencollective.com",
-    "website": "https://opencollective.com"
+    "website": "https://opencollective.com",
+    "images": "https://images.opencollective.com",
+    "invoices": "https://invoices.opencollective.com"
   },
   "stripe": {
     "redirectUri": "https://api.opencollective.com/connected-accounts/stripe/callback"
