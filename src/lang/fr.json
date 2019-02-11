@@ -775,7 +775,7 @@
   "orders.byCategory": "Commandes de {category}",
   "orders.byRecipient": "Commandes par {recipient}",
   "viewYourProfile": "Voir votre profil",
-  "contributeFlow.contributedTotal": "A contributé un total de:",
+  "contributeFlow.contributedTotal": "A contribué un total de:",
   "contributeFlow.successTitle": "Woot woot! 🎉",
   "contributeFlow.successMessage": "{fromCollectiveName} est maintenant un membre de {collectiveName}'s '{tierName}' tier.",
   "contributeFlow.successMessageBacker": "{fromCollectiveName} est maintenant un supporter de {collectiveName}.",
