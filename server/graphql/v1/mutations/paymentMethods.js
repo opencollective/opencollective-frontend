@@ -1,7 +1,9 @@
+import { pick } from 'lodash';
+import queryString from 'query-string';
+
 import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
 import emailLib from '../../../lib/email';
-import models from '../../../models';
-import queryString from 'query-string';
+import models, { Op } from '../../../models';
 
 /** Create a Payment Method through a collective(organization or user)
  *
@@ -9,11 +11,23 @@ import queryString from 'query-string';
  * @param {Object} remoteUser logged in user
  */
 export async function createPaymentMethod(args, remoteUser) {
-  // We only support the creation of virtual cards payment methods at the moment
-  if (!args || !args.type || args.type != 'virtualcard') {
-    throw Error('Creation of Payment Method not allowed.');
+  if (!remoteUser) {
+    throw new Error('You need to be logged in to create this payment method.');
+  } else if (!remoteUser.isAdmin(args.CollectiveId)) {
+    throw new Error('You must be an admin of this Collective.');
+  } else if (!args || !args.type) {
+    throw Error('Missing PaymentMethod type');
+  } else if (args.type === 'virtualcard') {
+    // either amount or monthlyLimitPerMember needs to be present
+    if (!args.amount && !args.monthlyLimitPerMember) {
+      throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
+    }
+    return createVirtualPaymentMethod(args, remoteUser);
+  } else if (args.service === 'stripe' && args.type === 'creditcard') {
+    return createStripeCreditCard(args, remoteUser);
+  } else {
+    throw Error('Payment method type not supported');
   }
-  return createVirtualPaymentMethod(args, remoteUser);
 }
 
 /** Create the Virtual Card Payment Method through an organization
@@ -34,18 +48,41 @@ export async function createPaymentMethod(args, remoteUser) {
  * @returns {models.PaymentMethod} return the virtual card payment method.
  */
 async function createVirtualPaymentMethod(args, remoteUser) {
-  if (!remoteUser) {
-    throw new Error('You need to be logged in to create this payment method.');
-  }
-  if (!remoteUser.isAdmin(args.CollectiveId)) {
-    throw new Error('You must be an admin of this Collective.');
-  }
   // making sure it's a string, trim and uppercase it.
   args.currency = args.currency.toString().toUpperCase();
   if (!['USD', 'EUR'].includes(args.currency)) {
     throw new Error(`Currency ${args.currency} not supported. We only support USD and EUR at the moment.`);
   }
   const paymentMethod = await virtualcard.create(args, remoteUser);
+  return paymentMethod;
+}
+
+/** Add a stripe credit card to given collective */
+async function createStripeCreditCard(args) {
+  const collective = models.Collective.findByPk(args.CollectiveId);
+  if (!collective) {
+    throw Error('This collective does not exists');
+  }
+
+  const paymentMethod = await models.PaymentMethod.createFromStripeSourceToken({
+    ...args,
+    type: 'creditcard',
+    service: 'stripe',
+    currency: args.currency || collective.currency,
+  });
+
+  // We must unset the `primary` flag on all other payment methods
+  await models.PaymentMethod.update(
+    { primary: false },
+    {
+      where: {
+        id: { [Op.ne]: paymentMethod.id },
+        CollectiveId: collective.id,
+        archivedAt: { [Op.eq]: null },
+      },
+    },
+  );
+
   return paymentMethod;
 }
 
@@ -83,4 +120,33 @@ export async function claimPaymentMethod(args, remoteUser) {
   }
 
   return paymentMethod;
+}
+
+/** Archive the given payment method */
+const permissionError = "This payment method does not exist or you don't have the permission to edit it.";
+
+export async function removePaymentMethod(paymentMethodId, remoteUser) {
+  if (!remoteUser) {
+    throw Error(permissionError);
+  }
+
+  // Try to load payment method. Throw permission error if it doesn't exist
+  // to prevent attackers from guessing which id is valid and which one is not
+  const paymentMethod = await models.PaymentMethod.findByPk(paymentMethodId);
+  if (!paymentMethod || !remoteUser.isAdmin(paymentMethod.CollectiveId)) {
+    throw Error(permissionError);
+  }
+
+  return paymentMethod.update({ archivedAt: new Date() });
+}
+
+/** Update payment method with given args */
+export async function updatePaymentMethod(args, remoteUser) {
+  const allowedFields = ['name', 'monthlyLimitPerMember'];
+  const paymentMethod = await models.PaymentMethod.findByPk(args.id);
+  if (!paymentMethod || !remoteUser || !remoteUser.isAdmin(paymentMethod.CollectiveId)) {
+    throw Error(permissionError);
+  }
+
+  return models.PaymentMethod.update(pick(args, allowedFields), { where: { id: paymentMethod.id } });
 }
