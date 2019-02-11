@@ -304,15 +304,12 @@ Array [
               className="c11"
             >
               <a
+                className="c12"
                 href="https://docs.opencollective.com"
               >
-                <a
-                  className="c12"
-                >
-                  <span>
-                    Docs & Help
-                  </span>
-                </a>
+                <span>
+                  Docs & Help
+                </span>
               </a>
             </li>
             <li
@@ -1602,15 +1599,12 @@ Array [
               className="c11"
             >
               <a
+                className="c12"
                 href="https://docs.opencollective.com"
               >
-                <a
-                  className="c12"
-                >
-                  <span>
-                    Docs & Help
-                  </span>
-                </a>
+                <span>
+                  Docs & Help
+                </span>
               </a>
             </li>
             <li
@@ -3350,15 +3344,12 @@ exports[`Search Page renders error message 1`] = `
               className="c17"
             >
               <a
+                className="c18"
                 href="https://docs.opencollective.com"
               >
-                <a
-                  className="c18"
-                >
-                  <span>
-                    Docs & Help
-                  </span>
-                </a>
+                <span>
+                  Docs & Help
+                </span>
               </a>
             </li>
             <li
@@ -4147,15 +4138,12 @@ Array [
               className="c11"
             >
               <a
+                className="c12"
                 href="https://docs.opencollective.com"
               >
-                <a
-                  className="c12"
-                >
-                  <span>
-                    Docs & Help
-                  </span>
-                </a>
+                <span>
+                  Docs & Help
+                </span>
               </a>
             </li>
             <li
@@ -5540,15 +5528,12 @@ Array [
               className="c11"
             >
               <a
+                className="c12"
                 href="https://docs.opencollective.com"
               >
-                <a
-                  className="c12"
-                >
-                  <span>
-                    Docs & Help
-                  </span>
-                </a>
+                <span>
+                  Docs & Help
+                </span>
               </a>
             </li>
             <li
