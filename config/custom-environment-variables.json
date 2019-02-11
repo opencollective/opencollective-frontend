@@ -74,7 +74,8 @@
     "api": "API_URL",
     "images": "IMAGES_URL",
     "webapp": "WEBAPP_URL",
-    "website": "WEBSITE_URL"
+    "website": "WEBSITE_URL",
+    "invoices": "INVOICES_URL"
   },
   "limits": {
     "ordersPerHour": {

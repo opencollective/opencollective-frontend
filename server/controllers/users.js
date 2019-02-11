@@ -87,23 +87,16 @@ export const refreshTokenByEmail = (req, res, next) => {
     return next(new Unauthorized('Invalid payload'));
   }
 
-  let redirect;
-  if (req.body.redirect) {
-    ({ redirect } = req.body);
-  } else {
-    redirect = '/';
-  }
+  const { redirect, websiteUrl } = req.body;
   const user = req.remoteUser;
 
   return emailLib
     .send(
       'user.new.token',
       req.remoteUser.email,
-      {
-        loginLink: user.generateLoginLink(redirect),
-      },
-      { bcc: 'ops@opencollective.com' },
-    ) // allows us to log in as users to debug issue)
+      { loginLink: user.generateLoginLink(redirect || '/', websiteUrl) },
+      { sendEvenIfNotProduction: true },
+    )
     .then(() => res.send({ success: true }))
     .catch(next);
 };
@@ -112,7 +105,7 @@ export const refreshTokenByEmail = (req, res, next) => {
  * Send an email with the new token #deprecated
  */
 export const sendNewTokenByEmail = (req, res, next) => {
-  const redirect = req.body.redirect || '/';
+  const { redirect, websiteUrl } = req.body;
   return User.findOne({
     where: {
       email: req.required.email,
@@ -125,9 +118,9 @@ export const sendNewTokenByEmail = (req, res, next) => {
         return emailLib.send(
           'user.new.token',
           req.body.email,
-          { loginLink: user.generateLoginLink(redirect) },
-          { bcc: 'ops@opencollective.com' },
-        ); // allows us to log in as users to debug issue
+          { loginLink: user.generateLoginLink(redirect || '/', websiteUrl) },
+          { sendEvenIfNotProduction: true },
+        );
       }
       return null;
     })
@@ -139,17 +132,16 @@ export const sendNewTokenByEmail = (req, res, next) => {
  * Login or create a new user
  */
 export const signin = (req, res, next) => {
-  const { user, redirect } = req.body;
+  const { user, redirect, websiteUrl } = req.body;
   let loginLink;
   return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
-      loginLink = u.generateLoginLink(redirect || '/');
-      return emailLib.send('user.new.token', u.email, { loginLink }, { bcc: 'ops@opencollective.com' }); // allows us to log in as users to debug issue
+      loginLink = u.generateLoginLink(redirect || '/', websiteUrl);
+      return emailLib.send('user.new.token', u.email, { loginLink }, { sendEvenIfNotProduction: true });
     })
     .then(() => {
       const response = { success: true };
-
       // For e2e testing, we enable testuser+(admin|member)@opencollective.com to automatically receive the login link
       if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
         response.redirect = loginLink;

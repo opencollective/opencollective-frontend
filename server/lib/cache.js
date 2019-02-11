@@ -5,6 +5,7 @@ import LRU from 'lru-cache';
 import memjs from 'memjs';
 import { has, get } from 'lodash';
 
+import logger from './logger';
 import models from '../models';
 
 const debugCache = debug('cache');
@@ -25,62 +26,81 @@ if (has(config, 'memcache.servers')) {
 }
 
 async function cacheGet(key, { unserialize = JSON.parse } = {}) {
-  debugCache(`get ${key}`);
-  if (memcache) {
-    const data = await memcache.get(key);
-    if (data.value) {
-      const value = data.value.toString();
-      try {
-        return unserialize(value);
-      } catch (err) {
-        debugCache(`Invalid JSON (${value}): ${err}`);
+  try {
+    debugCache(`get ${key}`);
+    if (memcache) {
+      const data = await memcache.get(key);
+      if (data.value) {
+        const value = data.value.toString();
+        try {
+          return unserialize(value);
+        } catch (err) {
+          debugCache(`Invalid JSON (${value}): ${err}`);
+        }
       }
+    } else if (lruCache) {
+      return lruCache.get(key);
     }
-  } else if (lruCache) {
-    return lruCache.get(key);
+  } catch (err) {
+    logger.warn(`Error while fetching from cache: ${err.message}`);
   }
 }
 
 async function cacheSet(key, value, maxAgeInSeconds = 0, { serialize = JSON.stringify } = {}) {
-  debugCache(`set ${key}`);
-  // debugCache(`set ${key} ${value}`);
-  if (memcache) {
-    if (value !== undefined) {
-      memcache.set(key, serialize(value), { expires: maxAgeInSeconds });
+  try {
+    debugCache(`set ${key}`);
+    // debugCache(`set ${key} ${value}`);
+    if (memcache) {
+      if (value !== undefined) {
+        memcache.set(key, serialize(value), { expires: maxAgeInSeconds });
+      }
+    } else if (lruCache) {
+      lruCache.set(key, value, maxAgeInSeconds * 1000);
     }
-  } else if (lruCache) {
-    lruCache.set(key, value, maxAgeInSeconds * 1000);
+  } catch (err) {
+    logger.warn(`Error while writing to cache: ${err.message}`);
   }
 }
 
 async function cacheDel(key) {
-  debugCache(`del ${key}`);
-  if (memcache) {
-    memcache.delete(key);
-  } else if (lruCache) {
-    lruCache.del(key);
+  try {
+    debugCache(`del ${key}`);
+    if (memcache) {
+      memcache.delete(key);
+    } else if (lruCache) {
+      lruCache.del(key);
+    }
+  } catch (err) {
+    logger.warn(`Error while deleting from cache: ${err.message}`);
   }
 }
 
 async function cacheClear() {
-  debugCache('clear');
-  if (memcache) {
-    memcache.flush();
-  } else if (lruCache) {
-    lruCache.reset();
+  try {
+    debugCache('clear');
+    if (memcache) {
+      memcache.flush();
+    } else if (lruCache) {
+      lruCache.reset();
+    }
+  } catch (err) {
+    logger.warn(`Error while clearing cache: ${err.message}`);
   }
 }
 
 async function cacheHas(key) {
-  debugCache(`has ${key}`);
-  if (memcache) {
-    const value = await memcache.get(key);
-    return value !== undefined;
-  } else if (lruCache) {
-    return lruCache.has(key);
-  } else {
-    return false;
+  try {
+    debugCache(`has ${key}`);
+    if (memcache) {
+      const value = await memcache.get(key);
+      return value !== undefined;
+    } else if (lruCache) {
+      return lruCache.has(key);
+    }
+  } catch (err) {
+    logger.warn(`Error while checking from cache: ${err.message}`);
   }
+  return false;
 }
 
 export async function fetchCollectiveId(collectiveSlug) {

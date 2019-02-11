@@ -66,6 +66,20 @@ export const PaymentMethodDataVirtualCardInputType = new GraphQLInputObjectType(
   }),
 });
 
+export const StripeCreditCardDataInputType = new GraphQLInputObjectType({
+  name: 'StripeCreditCardDataInputType',
+  description: 'Input for stripe credit card data',
+  fields: () => ({
+    fullName: { type: GraphQLString },
+    expMonth: { type: GraphQLInt },
+    expYear: { type: GraphQLInt },
+    brand: { type: GraphQLString },
+    country: { type: GraphQLString },
+    funding: { type: GraphQLString },
+    zip: { type: GraphQLString },
+  }),
+});
+
 export const UserInputType = new GraphQLInputObjectType({
   name: 'UserInputType',
   description: 'Input type for UserType',

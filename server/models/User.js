@@ -249,9 +249,15 @@ export default (Sequelize, DataTypes) => {
     return auth.createJwt(this.id, data, expiration);
   };
 
-  User.prototype.generateLoginLink = function(redirect) {
+  User.prototype.generateLoginLink = function(redirect = '/', websiteUrl) {
     const token = this.jwt({ scope: 'login' });
-    return `${config.host.website}/signin/${token}?next=${redirect}`;
+    // if a different websiteUrl is passed
+    // we don't accept that in production to avoid fishing related issues
+    if (websiteUrl && config.env !== 'production') {
+      return `${websiteUrl}/signin/${token}?next=${redirect}`;
+    } else {
+      return `${config.host.website}/signin/${token}?next=${redirect}`;
+    }
   };
 
   User.prototype.generateConnectedAccountVerifiedToken = function(connectedAccountId, username) {

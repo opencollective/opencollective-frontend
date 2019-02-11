@@ -289,11 +289,16 @@ export function editCollective(_, args, req) {
         CreatedByUserId: req.remoteUser.id,
       }),
     )
-    .then(() =>
-      collective.editPaymentMethods(args.collective.paymentMethods, {
-        CreatedByUserId: req.remoteUser.id,
-      }),
-    )
+    .then(() => {
+      // TODO Deprecated since 2019-02-06 - We now use specific graphql queries
+      if (args.collective.paymentMethods) {
+        return collective.editPaymentMethods(args.collective.paymentMethods, {
+          CreatedByUserId: req.remoteUser.id,
+        });
+      } else {
+        return collective;
+      }
+    })
     .then(() => collective);
 }
 
@@ -312,6 +317,11 @@ export async function approveCollective(remoteUser, CollectiveId) {
   }
 
   const hostCollective = await collective.getHostCollective();
+  if (!hostCollective) {
+    throw new errors.ValidationFailed({
+      message: 'We could not get the Host data for the Collective. Maybe they cancel their application.',
+    });
+  }
 
   if (!remoteUser.isAdmin(hostCollective.id)) {
     throw new errors.Unauthorized({

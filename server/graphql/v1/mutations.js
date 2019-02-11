@@ -19,7 +19,7 @@ import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
-import { createPaymentMethod, claimPaymentMethod } from './mutations/paymentMethods';
+import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
@@ -60,6 +60,7 @@ import {
   PaymentMethodInputType,
   PaymentMethodDataVirtualCardInputType,
   UserInputType,
+  StripeCreditCardDataInputType,
 } from './inputTypes';
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
 import models, { sequelize } from '../../models';
@@ -136,6 +137,10 @@ const mutations = {
         description: 'The redirect URL for the login email sent to the user',
         defaultValue: '/',
       },
+      websiteUrl: {
+        type: GraphQLString,
+        description: 'The website URL originating the request',
+      },
     },
     resolve(_, args) {
       return sequelize.transaction(async transaction => {
@@ -145,10 +150,10 @@ const mutations = {
         }
 
         const user = await models.User.createUserWithCollective(args.user, transaction);
-        const loginLink = user.generateLoginLink(args.redirect);
+        const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl);
 
         if (!args.organization) {
-          emailLib.send('user.new.token', user.email, { loginLink }, { bcc: 'ops@opencollective.com' });
+          emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
           return { user, organization: null };
         }
 
@@ -160,7 +165,7 @@ const mutations = {
         const organization = await models.Collective.create(organizationParams, { transaction });
         await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, transaction);
 
-        emailLib.send('user.new.token', user.email, { loginLink }, { bcc: 'ops@opencollective.com' });
+        emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
         return { user, organization };
       });
     },
@@ -486,11 +491,36 @@ const mutations = {
       data: { type: PaymentMethodDataVirtualCardInputType, description: 'The data attached to this PaymentMethod' },
     },
     resolve: async (_, args, req) => {
-      // either amount or monthlyLimitPerMember needs to be present
-      if (!args.amount && !args.monthlyLimitPerMember) {
-        throw Error('you need to define either the amount or the monthlyLimitPerMember of the payment method.');
-      }
-      return createPaymentMethod(args, req.remoteUser);
+      return paymentMethodsMutation.createPaymentMethod(args, req.remoteUser);
+    },
+  },
+  updatePaymentMethod: {
+    type: PaymentMethodType,
+    description: 'Update a payment method',
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      name: { type: GraphQLString },
+      monthlyLimitPerMember: { type: GraphQLInt },
+    },
+    resolve: async (_, args, req) => {
+      return paymentMethodsMutation.updatePaymentMethod(args, req.remoteUser);
+    },
+  },
+  createCreditCard: {
+    type: PaymentMethodType,
+    description: 'Add a new credit card to the given collective',
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      token: { type: new GraphQLNonNull(GraphQLString) },
+      data: { type: new GraphQLNonNull(StripeCreditCardDataInputType) },
+      monthlyLimitPerMember: { type: GraphQLInt },
+    },
+    resolve: async (_, args, req) => {
+      return paymentMethodsMutation.createPaymentMethod(
+        { ...args, service: 'stripe', type: 'creditcard' },
+        req.remoteUser,
+      );
     },
   },
   createVirtualCards: {
@@ -576,7 +606,20 @@ const mutations = {
       code: { type: new GraphQLNonNull(GraphQLString) },
       user: { type: UserInputType },
     },
-    resolve: async (_, args, req) => claimPaymentMethod(args, req.remoteUser),
+    resolve: async (_, args, req) => paymentMethodsMutation.claimPaymentMethod(args, req.remoteUser),
+  },
+  removePaymentMethod: {
+    type: new GraphQLNonNull(PaymentMethodType),
+    description: 'Removes the payment method',
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the payment method to remove',
+      },
+    },
+    resolve: async (_, args, req) => {
+      return paymentMethodsMutation.removePaymentMethod(args.id, req.remoteUser);
+    },
   },
 };
 
