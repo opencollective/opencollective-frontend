@@ -69,7 +69,6 @@ class EditCollectiveForm extends React.Component {
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
       goals: collective.settings.goals || [{}],
-      paymentMethods: collective.paymentMethods || [{}],
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
@@ -238,7 +237,6 @@ class EditCollectiveForm extends React.Component {
       this.setState({
         collective: collective,
         tiers: collective.tiers,
-        paymentMethods: collective.paymentMethods,
       });
     } else if (oldProps.router.query.section !== router.query.section) {
       this.setState({ section: router.query.section });
@@ -265,7 +263,6 @@ class EditCollectiveForm extends React.Component {
       tiers: this.state.tiers,
       goals: this.state.goals,
       members: this.state.members,
-      paymentMethods: this.state.paymentMethods,
     };
     this.props.onSubmit(collective);
     this.setState({ modified: false });
@@ -497,7 +494,7 @@ class EditCollectiveForm extends React.Component {
         </style>
 
         <Flex flexWrap="wrap">
-          <Flex flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexBasis: '100px', flexGrow: 1 }}>
+          <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
             <MenuItem
               selected={this.state.section === 'info'}
               route="editCollective"
@@ -612,7 +609,7 @@ class EditCollectiveForm extends React.Component {
             </MenuItem>
           </Flex>
 
-          <Box width={4 / 5} css={{ flexGrow: 1 }}>
+          <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
             <div className="FormInputs">
               {Object.keys(this.fields).map(
                 section =>
@@ -678,13 +675,7 @@ class EditCollectiveForm extends React.Component {
                   editCollectiveMutation={this.props.onSubmit}
                 />
               )}
-              {this.state.section === 'payment-methods' && (
-                <EditPaymentMethods
-                  paymentMethods={this.state.paymentMethods}
-                  collective={collective}
-                  onChange={this.handleObjectChange}
-                />
-              )}
+              {this.state.section === 'payment-methods' && <EditPaymentMethods collectiveSlug={collective.slug} />}
               {this.state.section === 'gift-cards' && (
                 <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />
               )}
@@ -711,9 +702,15 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
-            {['export', 'connected-accounts', 'host', 'gift-cards', 'gift-cards-create', 'gift-cards-send'].indexOf(
-              this.state.section,
-            ) === -1 && (
+            {[
+              'export',
+              'connected-accounts',
+              'host',
+              'gift-cards',
+              'gift-cards-create',
+              'gift-cards-send',
+              'payment-methods',
+            ].indexOf(this.state.section) === -1 && (
               <div className="actions">
                 <Button
                   bsStyle="primary"
@@ -734,7 +731,7 @@ class EditCollectiveForm extends React.Component {
                 </div>
               </div>
             )}
-          </Box>
+          </Flex>
         </Flex>
       </div>
     );

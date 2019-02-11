@@ -163,6 +163,7 @@ const theme = {
   buttonSizes: {
     large: {
       fontSize: toPx(fontSizes.LeadParagraph),
+      lineHeight: toPx(fontSizes.LeadParagraph + 2),
       paddingBottom: toPx(space[3]),
       paddingLeft: toPx(space[5]),
       paddingRight: toPx(space[5]),
@@ -171,6 +172,7 @@ const theme = {
 
     medium: {
       fontSize: toPx(fontSizes.Paragraph),
+      lineHeight: toPx(fontSizes.Paragraph + 7),
       paddingBottom: toPx(space[2]),
       paddingLeft: toPx(space[3]),
       paddingRight: toPx(space[3]),
@@ -179,6 +181,7 @@ const theme = {
 
     small: {
       fontSize: toPx(fontSizes.Caption),
+      lineHeight: toPx(fontSizes.Caption + 2),
       paddingBottom: toPx(space[1]),
       paddingLeft: toPx(space[2]),
       paddingRight: toPx(space[2]),

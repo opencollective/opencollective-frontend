@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages } from 'react-intl';
+
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -7,8 +9,6 @@ import SignInForm from './SignInForm';
 import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveCover from './CollectiveCover';
 import { defaultBackgroundImage } from '../constants/collectives';
-import { getStripeToken } from '../lib/stripe';
-import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
 import Loading from './Loading';
@@ -41,7 +41,6 @@ class EditCollective extends React.Component {
   }
 
   async validate(CollectiveInputType) {
-    const { intl } = this.props;
     const tiers = this.cleanTiers(CollectiveInputType.tiers);
     if (tiers) {
       CollectiveInputType.tiers = tiers;
@@ -67,49 +66,7 @@ class EditCollective extends React.Component {
     delete CollectiveInputType.sendInvoiceByEmail;
     delete CollectiveInputType.tos;
 
-    if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
-
-    let newPaymentMethod, index;
-    CollectiveInputType.paymentMethods.forEach((pm, i) => {
-      if (pm.id) return;
-      newPaymentMethod = pm;
-      index = i;
-      return;
-    });
-
-    if (!newPaymentMethod) return CollectiveInputType;
-
-    const card = newPaymentMethod.card;
-    let res;
-    try {
-      res = await getStripeToken('cc', card);
-      const last4 = res.card.last4;
-      const paymentMethod = {
-        name: last4,
-        token: res.token,
-        monthlyLimitPerMember: newPaymentMethod.monthlyLimitPerMember,
-        currency: CollectiveInputType.currency,
-        data: {
-          last4,
-          fullName: res.card.full_name,
-          expMonth: res.card.exp_month,
-          expYear: res.card.exp_year,
-          brand: res.card.brand,
-          country: res.card.country,
-          funding: res.card.funding,
-          zip: res.card.address_zip,
-        },
-      };
-      CollectiveInputType.paymentMethods[index] = paymentMethod;
-      return CollectiveInputType;
-    } catch (e) {
-      this.setState({
-        result: {
-          error: `${intl.formatMessage(this.messages['creditcard.error'])}: ${e}`,
-        },
-      });
-      return false;
-    }
+    return CollectiveInputType;
   }
 
   cleanTiers(tiers) {
