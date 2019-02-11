@@ -1,29 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import Router from 'next/router';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
-import InputField from './InputField';
+
+import { Link } from '../server/pages';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
+import withIntl from '../lib/withIntl';
+import InputField from './InputField';
+import StyledButton from './StyledButton';
+import { Flex, Box } from '@rebass/grid';
+import StyledLink from './StyledLink';
 
 class EditPaymentMethod extends React.Component {
   static propTypes = {
     paymentMethod: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    editMode: PropTypes.bool,
-    slug: PropTypes.string,
+    onRemove: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    collectiveSlug: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
+    hasMonthlyLimitPerMember: PropTypes.bool,
+    /** Indicates that the payment method is being updated on the backend. Shows spinner. */
+    isSaving: PropTypes.bool,
+    /** From withIntl */
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
     const { paymentMethod } = props;
 
-    this.state = { paymentMethod, editMode: props.editMode || false };
+    this.state = { paymentMethod };
     this.removePaymentMethod = this.removePaymentMethod.bind(this);
-    this.onChange = props.onChange.bind(this);
 
     this.messages = defineMessages({
       'paymentMethod.edit': {
@@ -51,21 +59,32 @@ class EditPaymentMethod extends React.Component {
   }
 
   removePaymentMethod() {
-    this.onChange(null);
+    this.props.onRemove(this.props.paymentMethod);
   }
 
   handleChange(obj) {
-    const updatedPaymentMethod = { ...this.state.paymentMethod, ...obj };
-    this.setState({ paymentMethod: updatedPaymentMethod });
-    this.onChange(updatedPaymentMethod);
+    this.setState(state => ({
+      ...state,
+      paymentMethod: {
+        ...state.paymentMethod,
+        ...obj,
+        monthlyLimitPerMember: obj.monthlyLimitPerMember || null,
+      },
+    }));
   }
 
+  save = () => {
+    this.props.onSave(this.state.paymentMethod);
+  };
+
   render() {
-    const { intl, paymentMethod, currency } = this.props;
+    const { intl, paymentMethod, currency, isSaving } = this.props;
     const { service, type, orders } = paymentMethod;
     const hasOrders = orders && orders.length > 0;
     const isStripeCreditCard = service === 'stripe' && type === 'creditcard';
     const canRemove = !hasOrders && isStripeCreditCard;
+    const saved = this.state.paymentMethod.monthlyLimitPerMember === paymentMethod.monthlyLimitPerMember;
+    const hasActions = !saved || canRemove || hasOrders;
 
     return (
       <div className="EditPaymentMethod">
@@ -77,79 +96,87 @@ class EditPaymentMethod extends React.Component {
           `}
         </style>
 
-        <div>
-          {this.state.editMode && (
-            <InputField
-              label="Credit Card"
-              type="creditcard"
-              name="creditcard"
-              defaultValue={paymentMethod}
-              className="horizontal"
-              onChange={creditcard => this.handleChange({ card: creditcard })}
-            />
-          )}
-          {!this.state.editMode && (
-            <Row>
-              <Col sm={12}>
-                <div className="form-group">
-                  <label className="col-sm-2 control-label">
-                    <FormattedMessage
-                      id="paymentMethod.typeSelect"
-                      values={{ type }}
-                      defaultMessage="{type, select, virtualcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
-                    />
-                  </label>
-                  <Col sm={9}>
-                    <div className="name col">{paymentMethodLabelWithIcon(intl, paymentMethod)}</div>
-                    {hasOrders && (
-                      <div className="actions">
-                        <FormattedMessage
-                          id="paymentMethod.activeSubscriptions"
-                          defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}"
-                          values={{ n: orders.length }}
-                        />
-                        &nbsp;
-                        <Button
-                          bsStyle="default"
-                          bsSize="xsmall"
-                          onClick={() =>
-                            Router.push(
-                              `/subscriptions?collectiveSlug=${this.props.slug}`,
-                              `/${this.props.slug}/subscriptions`,
-                            )
-                          }
-                        >
-                          {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
-                        </Button>
-                      </div>
-                    )}
-                    {canRemove && (
-                      <div className="actions">
-                        <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>
-                          {intl.formatMessage(this.messages['paymentMethod.remove'])}
-                        </Button>
-                      </div>
-                    )}
-                  </Col>
-                </div>
-              </Col>
-            </Row>
-          )}
-          {this.props.monthlyLimitPerMember && (
-            <Row>
-              <InputField
-                className="horizontal"
-                label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
-                type="currency"
-                name="monthlyLimitPerMember"
-                pre={getCurrencySymbol(currency)}
-                defaultValue={paymentMethod.monthlyLimitPerMember}
-                description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
-                onChange={value => this.handleChange({ monthlyLimitPerMember: value })}
+        <Flex flexDirection={['column-reverse', null, 'row']}>
+          <Flex alignItems="center" css={{ flexGrow: 1 }}>
+            <Box as="label" className="control-label">
+              <FormattedMessage
+                id="paymentMethod.typeSelect"
+                values={{ type }}
+                defaultMessage="{type, select, virtualcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}"
               />
-            </Row>
+            </Box>
+            <Box>
+              <div className="name col">{paymentMethodLabelWithIcon(intl, paymentMethod)}</div>
+              {hasOrders && (
+                <div className="actions">
+                  <FormattedMessage
+                    id="paymentMethod.activeSubscriptions"
+                    defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}"
+                    values={{ n: orders.length }}
+                  />
+                </div>
+              )}
+            </Box>
+          </Flex>
+          {hasActions && (
+            <Flex
+              mb={[3, 2, 0]}
+              justifyContent={['center', null, 'flex-end']}
+              alignItems={['center', null, 'flex-start']}
+              css={{ minWidth: 230 }}
+            >
+              {!saved && (
+                <StyledButton
+                  loading={isSaving}
+                  disabled={isSaving}
+                  buttonStyle="primary"
+                  buttonSize="medium"
+                  onClick={this.save}
+                  mx={1}
+                >
+                  <FormattedMessage id="save" defaultMessage="save" />
+                </StyledButton>
+              )}
+              {hasOrders && (
+                <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }} passHref>
+                  <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
+                    {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
+                  </StyledLink>
+                </Link>
+              )}
+              {canRemove && (
+                <div className="actions">
+                  <StyledButton
+                    disabled={isSaving}
+                    buttonStyle="standard"
+                    buttonSize="medium"
+                    onClick={() => this.removePaymentMethod()}
+                    mx={1}
+                  >
+                    {intl.formatMessage(this.messages['paymentMethod.remove'])}
+                  </StyledButton>
+                </div>
+              )}
+            </Flex>
           )}
-        </div>
+        </Flex>
+
+        {this.props.hasMonthlyLimitPerMember && (
+          <Row>
+            <InputField
+              className="horizontal"
+              label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
+              type="currency"
+              name="monthlyLimitPerMember"
+              pre={getCurrencySymbol(currency)}
+              value={paymentMethod.monthlyLimitPerMember}
+              description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
+              onChange={value => this.handleChange({ monthlyLimitPerMember: value })}
+              disabled={isSaving}
+              options={{ step: 1 }}
+            />
+          </Row>
+        )}
       </div>
     );
   }

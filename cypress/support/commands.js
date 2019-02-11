@@ -68,11 +68,11 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/${collectiveSlug}/edit/payment-methods` });
-  cy.get('.editPaymentMethodsActions button').click();
+  cy.contains('button', 'Add a payment method').click();
   cy.wait(2000);
   fillStripeInput();
   cy.wait(1000);
-  cy.get('button[type="submit"]').click();
+  cy.contains('button[type="submit"]', 'Save').click();
   cy.wait(2000);
 });
 

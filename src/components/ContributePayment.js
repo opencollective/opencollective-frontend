@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 import { Box, Flex } from '@rebass/grid';
-import { Elements, CardElement, injectStripe } from 'react-stripe-elements';
 import { FormattedMessage } from 'react-intl';
 import { uniqBy, get } from 'lodash';
 
@@ -12,7 +11,7 @@ import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt.cjs';
 
 import { withStripeLoader } from './StripeProvider';
 import Container from './Container';
-import { P, Span } from './Text';
+import { P } from './Text';
 import StyledCard from './StyledCard';
 import StyledRadioList from './StyledRadioList';
 import { getPaymentMethodName, paymentMethodExpiration } from '../lib/payment_method_label';
@@ -23,8 +22,8 @@ import CreditCard from './icons/CreditCard';
 import GiftCard from './icons/GiftCard';
 import PayPal from './icons/PayPal';
 import CreditCardInactive from './icons/CreditCardInactive';
-import StyledCheckbox from './StyledCheckbox';
 import Avatar from './Avatar';
+import NewCreditCardForm from './NewCreditCardForm';
 
 const PaymentEntryContainer = styled(Container)`
   display: flex;
@@ -70,55 +69,6 @@ const getPaymentMethodMetadata = pm => {
     return `${formatCurrency(pm.balance, pm.balance.curency)} available`;
   }
 };
-
-const StyledCardElement = styled(CardElement)`
-  max-width: 450px;
-  max-height: 55px;
-  margin: 0px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgb(204, 204, 204);
-  border-image: initial;
-  padding: 1rem;
-  border-radius: 3px;
-`;
-
-StyledCardElement.defaultProps = {
-  style: { base: { fontSize: '14px', color: '#313233' } },
-};
-
-class NewCreditCardFormWithoutStripe extends React.Component {
-  componentDidMount() {
-    if (this.props.onReady && this.props.stripe) {
-      this.props.onReady({ stripe: this.props.stripe });
-    }
-  }
-
-  componentDidUpdate(oldProps) {
-    if (this.props.onReady && !oldProps.stripe && this.props.stripe) {
-      this.props.onReady({ stripe: this.props.stripe });
-    }
-  }
-
-  render() {
-    const { name, onChange, error } = this.props;
-    return (
-      <Flex flexDirection="column">
-        <StyledCardElement onChange={value => onChange({ name, type: 'StripeCreditCard', value })} />
-        {error && (
-          <Span display="block" color="red.500" pt={2} fontSize="Tiny">
-            {error}
-          </Span>
-        )}
-        <Flex mt={3} alignItems="center">
-          <StyledCheckbox defaultChecked name="save" label="Save this card to my account" onChange={onChange} />
-        </Flex>
-      </Flex>
-    );
-  }
-}
-
-const NewCreditCardForm = injectStripe(NewCreditCardFormWithoutStripe);
 
 /**
  * A radio list to select a payment method.
@@ -275,14 +225,12 @@ class ContributePayment extends React.Component {
               </Flex>
               {key === 'newCreditCard' && checked && (
                 <Box my={3}>
-                  <Elements>
-                    <NewCreditCardForm
-                      name="newCreditCardInfo"
-                      error={errors.newCreditCardInfo}
-                      onChange={this.onChange}
-                      onReady={this.props.onNewCardFormReady}
-                    />
-                  </Elements>
+                  <NewCreditCardForm
+                    name="newCreditCardInfo"
+                    error={errors.newCreditCardInfo}
+                    onChange={this.onChange}
+                    onReady={this.props.onNewCardFormReady}
+                  />
                 </Box>
               )}
               {key === 'manual' && checked && data.instructions && (

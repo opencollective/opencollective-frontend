@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Jan 18 2019 12:03:41 GMT+0100 (Central European Standard Time)
+# timestamp: Thu Feb 07 2019 15:26:34 GMT+0100 (Central European Standard Time)
 
 """Application model"""
 type Application {
@@ -108,7 +108,7 @@ type Collective implements CollectiveInterface {
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
-  tiers(id: Int, slug: String): [Tier]
+  tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -194,6 +194,7 @@ input CollectiveInputType {
   members: [MemberInputType]
   paymentMethods: [PaymentMethodInputType]
   HostCollectiveId: Int
+  hostFeePercent: Int
   ParentCollectiveId: Int
   email: String
   firstName: String
@@ -272,7 +273,7 @@ interface CollectiveInterface {
   """List of all followers of this collective"""
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
-  tiers(id: Int, slug: String): [Tier]
+  tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
@@ -534,7 +535,7 @@ type Event implements CollectiveInterface {
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
-  tiers(id: Int, slug: String): [Tier]
+  tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -836,6 +837,12 @@ type Mutation {
     """The data attached to this PaymentMethod"""
     data: PaymentMethodDataVirtualCardInputType
   ): PaymentMethodType @deprecated(reason: "Please use createVirtualCards")
+
+  """Update a payment method"""
+  updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
+
+  """Add a new credit card to the given collective"""
+  createCreditCard(CollectiveId: Int!, name: String!, token: String!, data: StripeCreditCardDataInputType!, monthlyLimitPerMember: Int): PaymentMethodType
   createVirtualCards(
     CollectiveId: Int!
     PaymentMethodId: Int
@@ -883,6 +890,12 @@ type Mutation {
     expiryDate: String
   ): [PaymentMethodType]
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
+
+  """Removes the payment method"""
+  removePaymentMethod(
+    """ID of the payment method to remove"""
+    id: Int!
+  ): PaymentMethodType!
 }
 
 """Order model"""
@@ -1139,7 +1152,7 @@ type Organization implements CollectiveInterface {
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
-  tiers(id: Int, slug: String): [Tier]
+  tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -1460,6 +1473,17 @@ type StatsOrderType {
   totalTransactions: Int
 }
 
+"""Input for stripe credit card data"""
+input StripeCreditCardDataInputType {
+  fullName: String
+  expMonth: Int
+  expYear: Int
+  brand: String
+  country: String
+  funding: String
+  zip: String
+}
+
 """Subscription model"""
 type Subscription {
   id: Int
@@ -1720,7 +1744,7 @@ type User implements CollectiveInterface {
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   maxQuantity: Int
-  tiers(id: Int, slug: String): [Tier]
+  tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(

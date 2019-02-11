@@ -160,21 +160,6 @@ const editCollectiveQuery = gql`
         currency
         maxQuantity
       }
-      paymentMethods(types: ["creditcard", "virtualcard"], hasBalanceAboveZero: true) {
-        id
-        uuid
-        name
-        data
-        monthlyLimitPerMember
-        service
-        type
-        balance
-        currency
-        expiryDate
-        orders(hasActiveSubscription: true) {
-          id
-        }
-      }
     }
   }
 `;
@@ -220,7 +205,7 @@ export const deleteApplicationMutation = gql`
 `;
 
 export const createVirtualCardsMutationQuery = gql`
-  mutation createPaymentMethod(
+  mutation createVirtualCards(
     $CollectiveId: Int!
     $numberOfVirtualCards: Int
     $emails: [String]
@@ -364,13 +349,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'settings',
         'hostFeePercent',
       ]);
-      if (collective.paymentMethods && collective.paymentMethods.length > 0) {
-        CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm =>
-          pick(pm, ['id', 'name', 'token', 'data', 'monthlyLimitPerMember', 'currency']),
-        );
-      } else {
-        CollectiveInputType.paymentMethods = []; // force removing existing payment methods
-      }
+
       if (isArray(collective.tiers)) {
         CollectiveInputType.tiers = collective.tiers.map(tier =>
           pick(tier, [
