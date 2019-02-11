@@ -191,23 +191,82 @@ export async function createCollectiveFromGithub(_, args, req) {
 
   let collective;
   const collectiveData = { ...args.collective };
-  const user = await models.User.findByPk(user.id);
-  if (!user) {
-    return Promise.reject(new Error(`No user with Id ${req.remoteUser.id} found`));
-  }
+  const user = req.remoteUser;
+  const githubHandle = collectiveData.githubHandle;
 
   const existingCollective = await models.Collective.findOne({
     where: { slug: collectiveData.slug.toLowerCase() },
   });
 
   if (existingCollective) {
-    collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
+    throw new Error(
+      `The slug ${
+        collectiveData.slug
+      } is already taken. Please use another name for your ${collectiveData.type.toLowerCase()}.`,
+    );
+  }
+
+  const githubAccount = await models.ConnectedAccount.findOne({
+    where: { CollectiveId: req.remoteUser.CollectiveId, service: 'github' },
+  });
+
+  if (!githubAccount) {
+    throw new errors.Unauthorized({
+      message: 'You must have a connected GitHub Account to claim a collective',
+    });
+  }
+
+  if (githubHandle.includes('/')) {
+    // A repository GitHub Handle (most common)
+    const repo = await github.getRepo(githubHandle, githubAccount.token);
+    const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
+    if (!isGithubRepositoryAdmin) {
+      throw new errors.ValidationFailed({
+        message: "We could not verify that you're admin of the GitHub repository",
+      });
+    }
+    collectiveData.tags = repo.topics;
+    collectiveData.description = repo.description;
+    collectiveData.settings = {
+      githubRepo: repo.html_url,
+    };
+  } else {
+    // An organization GitHub Handle
+    const memberships = await github.getOrgMemberships(githubAccount.token);
+    const organizationAdminMembership =
+      memberships &&
+      memberships.find(m => m.organization.login === githubHandle && m.state === 'active' && m.role === 'admin');
+    if (!organizationAdminMembership) {
+      throw new errors.ValidationFailed({
+        message: "We could not verify that you're admin of the GitHub organization",
+      });
+    }
   }
 
   collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
   collectiveData.currency = 'USD';
   collectiveData.CreatedByUserId = user.id;
   collectiveData.LastEditedByUserId = user.id;
+  collectiveData.teirs = [
+    {
+      name: 'backer',
+      title: 'Backers',
+      description: 'Support us with a monthly donation and help us continue our activities.',
+      button: 'Become a backer',
+      range: [2, 100000],
+      presets: [2, 5, 10, 25, 50],
+      interval: 'monthly',
+    },
+    {
+      name: 'sponsor',
+      title: 'Sponsors',
+      description: 'Become a sponsor and get your logo on our README on Github with a link to your site.',
+      button: 'Become a sponsor',
+      range: [100, 500000],
+      presets: [100, 250, 500],
+      interval: 'monthly',
+    },
+  ];
 
   try {
     collective = await models.Collective.create(collectiveData);
