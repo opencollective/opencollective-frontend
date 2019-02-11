@@ -191,7 +191,7 @@ class CreateOrderLegacyPage extends React.Component {
             success: intl.formatMessage(this.messages['order.successRedirect'], { domain }),
           },
         });
-        const redirectTo = `${redirect}?transactionid=${get(orderCreated, 'transactions[0].id')}&status=${
+        const redirectTo = `${redirect}?transactionid=${get(orderCreated, 'transactions[0].uuid')}&status=${
           orderCreated.status
         }`;
         window.location.href = redirectTo;

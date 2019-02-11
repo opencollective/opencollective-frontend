@@ -23,6 +23,7 @@ const createOrderQuery = gql`
       }
       transactions(type: "CREDIT") {
         id
+        uuid
       }
     }
   }
