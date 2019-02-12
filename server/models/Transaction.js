@@ -269,7 +269,12 @@ export default (Sequelize, DataTypes) => {
   Transaction.prototype.getDetailsForUser = function(user) {
     const sourceCollective = this.paymentMethodProviderCollectiveId();
     return user.populateRoles().then(() => {
-      if (user.isAdmin(this.FromCollectiveId) || user.isAdmin(sourceCollective) || user.isRoot()) {
+      if (
+        user.isAdmin(this.CollectiveId) ||
+        user.isAdmin(this.FromCollectiveId) ||
+        user.isAdmin(sourceCollective) ||
+        user.isRoot()
+      ) {
         return this.uuid;
       } else {
         return null;
