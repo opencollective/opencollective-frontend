@@ -693,6 +693,10 @@ export default function(Sequelize, DataTypes) {
       return models.Collective.findByPk(this.ParentCollectiveId, {
         attributes: ['id', 'slug'],
       }).then(parent => {
+        if (!parent) {
+          logger.error(`Event (${this.id}) with an invalid parent (${this.ParentCollectiveId}).`);
+          return `/events/${this.slug}`;
+        }
         return `/${parent.slug}/events/${this.slug}`;
       });
     } else {
