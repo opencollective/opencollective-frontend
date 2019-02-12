@@ -253,7 +253,7 @@ class CreateOrderPage extends React.Component {
       const orderCreated = res.data.createOrder;
       this.setState({ submitting: false, submitted: true, error: null });
       if (this.props.redirect && isURL(this.props.redirect)) {
-        const transactionId = get(orderCreated, 'transactions[0].id', null);
+        const transactionId = get(orderCreated, 'transactions[0].uuid', null);
         const status = orderCreated.status;
         const redirectTo = `${this.props.redirect}?transactionid=${transactionId}&status=${status}`;
         window.location.href = redirectTo;
@@ -788,8 +788,9 @@ const createOrderQuery = gql`
     createOrder(order: $order) {
       id
       status
-      transactions {
+      transactions(type: "CREDIT") {
         id
+        uuid
       }
     }
   }
