@@ -287,8 +287,21 @@ export default function(Sequelize, DataTypes) {
       githubHandle: {
         type: DataTypes.STRING,
         set(githubHandle) {
-          if (typeof githubHandle !== 'string') return;
-          this.setDataValue('githubHandle', githubHandle.replace(/^@/, ''));
+          if (!githubHandle || githubHandle.length === 0) {
+            this.setDataValue('githubHandle', null);
+            return;
+          }
+
+          // Try to parse github URL, fallback on regular string
+          const githubUrlRegex = /https?:\/\/github\.com\/([^/\s]+)(\/([^/\s]+))?/;
+          const regexResult = githubHandle.match(githubUrlRegex);
+          if (regexResult) {
+            const [, username, , repository] = regexResult;
+            const formattedHandle = repository ? `${username}/${repository}` : username;
+            this.setDataValue('githubHandle', formattedHandle);
+          } else {
+            this.setDataValue('githubHandle', githubHandle.replace(/^@/, ''));
+          }
         },
       },
 
