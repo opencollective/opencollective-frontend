@@ -1,5 +1,4 @@
 import nextRoutes from 'next-routes';
-import { getEnvVar, parseToBoolean } from '../lib/utils';
 
 const pages = nextRoutes();
 
@@ -58,45 +57,40 @@ pages
 // Contribute Flow
 // ---------------
 
-const createOrderPage = parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER')) ? 'createOrderNewFlow' : 'createOrder';
-
-// Special route to force New Flow
-pages.add('orderCollectiveNewForce', '/:collectiveSlug/:verb(donate|pay|contribute)/newFlow', 'createOrderNewFlow');
-
 // Special route to force Legacy Flow
-pages.add('orderCollectiveLegacyForce', '/:collectiveSlug/:verb(donate|pay|contribute)/legacy', 'createOrder');
+pages.add('orderCollectiveLegacyForce', '/:collectiveSlug/:verb(donate|pay|contribute|order)/legacy', 'createOrder');
 
-// Old Route -> Old Flow (should be handled by a redirect once feature flag is gone)
+// Legacy create order route. Deprectated on 2019-02-12
 pages.add(
   'orderCollectiveTier',
-  '/:collectiveSlug/order/:TierId/:amount(\\d+)?/:interval(month|monthly|year|yearly)?',
-  'createOrder',
+  '/:collectiveSlug/:verb(order)/:tierId/:amount(\\d+)?/:interval(month|monthly|year|yearly)?',
+  'createOrderNewFlow',
 );
 
 // New Routes -> New flow
 pages
   .add(
     'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment)?',
     'createOrderNewFlow',
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment)?',
     'createOrderNewFlow',
   )
-  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute)/success', 'orderSuccess')
+  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute|order)/success', 'orderSuccess')
   .add(
     'orderCollectiveTierNewSuccess',
-    '/:collectiveSlug/:verb(donate|pay|contribute)/tier/:tierId-:tierSlug?/success',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/success',
     'orderSuccess',
   );
 
-// Generic Route -> Feature Flag
+// Generic Route
 pages.add(
   'orderCollective',
-  '/:collectiveSlug/:verb(donate|pay|contribute)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
-  createOrderPage,
+  '/:collectiveSlug/:verb(donate|pay|contribute|order)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+  'createOrderNewFlow',
 );
 
 // New contribution flow not applied to events yet

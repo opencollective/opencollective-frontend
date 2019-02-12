@@ -12,7 +12,7 @@ import Logo from './Logo';
 import colors from '../constants/colors';
 import withIntl from '../lib/withIntl';
 import { Link } from '../server/pages';
-import { getEnvVar, formatCurrency, parseToBoolean } from '../lib/utils';
+import { formatCurrency } from '../lib/utils';
 
 class TierCard extends React.Component {
   static propTypes = {
@@ -128,20 +128,11 @@ class TierCard extends React.Component {
 
     const tooltip = disabled ? intl.formatMessage(this.messages[`tier.error.${errorMsg}`], formatValues) : '';
 
-    let linkRoute;
-    if (parseToBoolean(getEnvVar('USE_NEW_CREATE_ORDER'))) {
-      linkRoute = {
-        name: 'orderCollectiveTierNew',
-        params: { collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' },
-        anchor: '#content',
-      };
-    } else {
-      linkRoute = {
-        name: 'orderCollectiveTier',
-        params: { collectiveSlug: collective.slug, TierId: tier.id },
-        anchor: '#content',
-      };
-    }
+    const linkRoute = {
+      name: 'orderCollectiveTierNew',
+      params: { collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' },
+      anchor: '#content',
+    };
 
     if (referral) {
       linkRoute.params.referral = referral;
