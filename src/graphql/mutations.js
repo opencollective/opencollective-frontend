@@ -98,6 +98,7 @@ const createCollectiveFromGithubQuery = gql`
       name
       slug
       type
+      githubHandle
     }
   }
 `;
