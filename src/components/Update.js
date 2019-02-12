@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { capitalize, formatDate } from '../lib/utils';
+import { formatDate } from '../lib/utils';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
@@ -177,12 +177,12 @@ class Update extends React.Component {
           {mode === 'summary' && (
             <div className="title">
               <Link route={`/${collective.slug}/updates/${update.slug}`}>
-                <a>{capitalize(update.title)}</a>
+                <a>{update.title}</a>
               </Link>
             </div>
           )}
 
-          {mode === 'details' && <div className="title">{capitalize(update.title)}</div>}
+          {mode === 'details' && <div className="title">{update.title}</div>}
 
           <div className="meta">
             <div className="author">
