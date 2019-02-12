@@ -228,7 +228,7 @@
   "collective.website.label": "Website",
   "collective.website.description": "Enter the URL of your website or Facebook Page",
   "collective.githubHandle.label": "Github",
-  "collective.githubHandle.description": "Enter your Github organization name if you have one",
+  "collective.githubHandle.description": "A Github profile or repository",
   "collective.location.label": "City",
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "Number of members",

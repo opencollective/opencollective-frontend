@@ -72,7 +72,7 @@ class CreateCollectiveForm extends React.Component {
       },
       'githubHandle.description': {
         id: 'collective.githubHandle.description',
-        defaultMessage: 'Enter your Github organization name if you have one',
+        defaultMessage: 'A Github profile or repository',
       },
       'location.label': {
         id: 'collective.location.label',
