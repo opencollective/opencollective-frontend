@@ -40,17 +40,18 @@ async function HostReport(year, month, hostId) {
 
   const d = new Date();
   d.setFullYear(year);
-
-  if (!month) {
-    // yearly report
-    previousStartDate = new Date(d.getFullYear() - 1, 0, 1);
-    startDate = new Date(d.getFullYear(), 0, 1);
-    endDate = new Date(d.getFullYear() + 1, 0, 1);
-  } else {
+  let yearlyReport = false;
+  if (typeof month === 'number') {
     d.setMonth(month);
     previousStartDate = new Date(d.getFullYear(), d.getMonth() - 1, 1);
     startDate = new Date(d.getFullYear(), d.getMonth(), 1);
     endDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+  } else {
+    // yearly report
+    yearlyReport = true;
+    previousStartDate = new Date(d.getFullYear() - 1, 0, 1);
+    startDate = new Date(d.getFullYear(), 0, 1);
+    endDate = new Date(d.getFullYear() + 1, 0, 1);
   }
 
   const endDateIncluded = moment(endDate)
@@ -65,9 +66,9 @@ async function HostReport(year, month, hostId) {
     createdAt: { [Op.gte]: previousStartDate, [Op.lt]: startDate },
   };
 
-  const emailTemplate = !month ? 'host.yearlyreport' : 'host.monthlyreport';
-  const reportName = !month ? `${year} Yearly Host Report` : `${year}/${month + 1} Monthly Host Report`;
-  const dateFormat = !month ? 'YYYY' : 'YYYYMM';
+  const emailTemplate = yearlyReport ? 'host.yearlyreport' : 'host.monthlyreport';
+  const reportName = yearlyReport ? `${year} Yearly Host Report` : `${year}/${month + 1} Monthly Host Report`;
+  const dateFormat = yearlyReport ? 'YYYY' : 'YYYYMM';
   const csv_filename = `${moment(d).format(dateFormat)}-transactions.csv`;
   const pdf_filename = `${moment(d).format(dateFormat)}-expenses.pdf`;
   console.log('startDate', startDate, 'endDate', endDate);
@@ -272,7 +273,7 @@ async function HostReport(year, month, hostId) {
     data.host = host;
     data.collective = host;
     data.reportDate = endDate;
-    data.month = month && moment(startDate).format('MMMM');
+    data.month = !yearlyReport && moment(startDate).format('MMMM');
     data.year = year;
     data.startDate = startDate;
     data.endDate = endDate;
@@ -459,7 +460,7 @@ async function HostReport(year, month, hostId) {
       if (!platformStats) return;
 
       summary.timeLapsed = timeLapsed;
-      summary.month = month && moment(startDate).format('MMMM');
+      summary.month = !yearlyReport && moment(startDate).format('MMMM');
       summary.year = year;
       summary.platformStats = {
         totalHostBalance: platformStats[0],
