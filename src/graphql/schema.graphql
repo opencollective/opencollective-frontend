@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Feb 07 2019 15:26:34 GMT+0100 (Central European Standard Time)
+# timestamp: Tue Feb 12 2019 11:11:53 GMT+0100 (GMT+01:00)
 
 """Application model"""
 type Application {
@@ -58,6 +58,7 @@ type Collective implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -157,6 +158,7 @@ input CollectiveAttributesInputType {
   twitterHandle: String
   githubHandle: String
   location: LocationInputType
+  countryISO: String
   startsAt: String
   endsAt: String
   timezone: String
@@ -180,6 +182,7 @@ input CollectiveInputType {
   longDescription: String
   expensePolicy: String
   location: LocationInputType
+  countryISO: String
   startsAt: String
   endsAt: String
   timezone: String
@@ -215,6 +218,7 @@ interface CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -485,6 +489,7 @@ type Event implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -782,6 +787,9 @@ type Mutation {
 
     """The redirect URL for the login email sent to the user"""
     redirect: String = "/"
+
+    """The website URL originating the request"""
+    websiteUrl: String
   ): CreateUserResult
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
@@ -1102,6 +1110,7 @@ type Organization implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -1694,6 +1703,7 @@ type User implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
+  countryISO: String
 
   """Name, address, lat, long of the location."""
   location: LocationType

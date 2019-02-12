@@ -8,6 +8,7 @@ import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import InputSwitch from './InputSwitch';
+import InputTypeCountry from './InputTypeCountry';
 
 import { capitalize } from '../lib/utils';
 
@@ -138,13 +139,23 @@ class InputField extends React.Component {
     return value;
   }
 
+  getCountryISOCode(value) {
+    if (value === null || typeof value !== 'string') return null;
+    // Example "Nigeria - NG" to "NG"
+    value = value.split('-')[1];
+    return value.trim();
+  }
+
   handleChange(value) {
     const { type } = this.props;
     if (type === 'number') {
       value = parseInt(value) || null;
     } else if (type === 'currency') {
       value = this.roundCurrencyValue(value);
+    } else if (type === 'country') {
+      value = this.getCountryISOCode(value);
     }
+
     if (this.validate(value)) {
       this.setState({ validationState: null });
     } else {
@@ -314,6 +325,30 @@ class InputField extends React.Component {
               options={field.options}
             />
             {field.description && <HelpBlock>{field.description}</HelpBlock>}
+          </FormGroup>
+        );
+        break;
+
+      case 'country':
+        this.input = (
+          <FormGroup>
+            {horizontal && (
+              <div>
+                <Col componentClass={ControlLabel} sm={2}>
+                  {capitalize(field.label)}
+                </Col>
+                <Col sm={10}>
+                  <InputTypeCountry {...field} onChange={value => this.handleChange(value)} />
+                </Col>
+              </div>
+            )}
+            {!horizontal && (
+              <div>
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+                <InputTypeCountry {...field} onChange={value => this.handleChange(value)} />
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
+              </div>
+            )}
           </FormGroup>
         );
         break;

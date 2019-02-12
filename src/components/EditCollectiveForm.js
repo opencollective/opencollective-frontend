@@ -192,6 +192,10 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.location.label',
         defaultMessage: 'City',
       },
+      'countryISO.label': {
+        id: 'collective.country.label',
+        defaultMessage: 'Country',
+      },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -270,7 +274,6 @@ class EditCollectiveForm extends React.Component {
 
   render() {
     const { collective, status, intl, LoggedInUser } = this.props;
-
     const isNew = !(collective && collective.id);
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
     if (['loading', 'saved'].includes(status)) {
@@ -330,6 +333,11 @@ class EditCollectiveForm extends React.Component {
         //     types: ['cities']
         //   }
         // },
+        {
+          name: 'countryISO',
+          type: 'country',
+          placeholder: 'Select country',
+        },
         {
           name: 'longDescription',
           type: 'textarea',
