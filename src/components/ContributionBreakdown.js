@@ -36,19 +36,14 @@ const calculateTaxAmount = (amount, tax) => {
   return amount * (tax.percentage / 100);
 };
 
-/**
- * Breakdowns a total amount to show the user where the money goes.
- */
-const ContributionBreakdown = ({ amount, currency, tax, platformFeePercent, hostFeePercent, paymentMethod }) => {
+const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMethod, currency }) => {
   const platformFee = amount * (platformFeePercent / 100);
   const hostFee = amount * (hostFeePercent / 100);
   const pmFeeInfo = getPaymentMethodFees(paymentMethod, amount);
   const netAmountForCollective = amount - platformFee - hostFee - pmFeeInfo.fee;
-  const { name: taxName, percentage: taxPercent } = tax || {};
-  const taxAmount = calculateTaxAmount(amount, tax);
 
   return (
-    <StyledCard width={1} maxWidth={464} px={[24, 48]} py={24}>
+    <React.Fragment>
       <AmountLine>
         <Label fontWeight={500} color="black.800">
           <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for collective" />
@@ -97,8 +92,37 @@ const ContributionBreakdown = ({ amount, currency, tax, platformFeePercent, host
           </Span>
         </AmountLine>
       )}
-
       <StyledHr borderStyle="dashed" my={3} />
+    </React.Fragment>
+  );
+};
+
+/**
+ * Breakdowns a total amount to show the user where the money goes.
+ */
+const ContributionBreakdown = ({
+  amount,
+  currency,
+  tax,
+  platformFeePercent,
+  hostFeePercent,
+  paymentMethod,
+  showFees,
+}) => {
+  const { name: taxName, percentage: taxPercent } = tax || {};
+  const taxAmount = calculateTaxAmount(amount, tax);
+
+  return (
+    <StyledCard width={1} maxWidth={464} px={[24, 48]} py={24}>
+      {showFees && (
+        <FeesBreakdown
+          platformFeePercent={platformFeePercent}
+          hostFeePercent={hostFeePercent}
+          paymentMethod={paymentMethod}
+          currency={currency}
+          amount={amount}
+        />
+      )}
       <AmountLine>
         <Label fontWeight="bold">
           <FormattedMessage id="contribution.your" defaultMessage="Your contribution" />
@@ -154,11 +178,14 @@ ContributionBreakdown.propTypes = {
     /** Payment method currency */
     currency: PropTypes.string,
   }),
+  /** Do we want to show the fees? */
+  showFees: PropTypes.bool,
 };
 
 ContributionBreakdown.defaultProps = {
   platformFeePercent: 5,
   hostFeePercent: 0,
+  showFees: true,
 };
 
 export default ContributionBreakdown;
