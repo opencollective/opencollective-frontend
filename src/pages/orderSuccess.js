@@ -221,7 +221,7 @@ class OrderSuccessPage extends React.Component {
                 <Flex mt={3} flexWrap="wrap" justifyContent="center" css={{ maxWidth: 130 }}>
                   {collective.tags.map(tag => (
                     <Link key={tag} route="search" params={{ q: tag }} passHref>
-                      <StyledLink fontSize="Paragraph" lineHeight="Caption" mr={1}>
+                      <StyledLink fontSize="Paragraph" lineHeight="Caption" mr={1} textAlign="center">
                         #{tag}
                       </StyledLink>
                     </Link>
