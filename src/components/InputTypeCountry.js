@@ -29,9 +29,11 @@ class InputTypeCountry extends Component {
   };
 
   getCountryName(countryISO) {
-    const { name } = countries[countryISO];
-    if (name) {
-      return `${name} - ${countryISO}`;
+    if (countryISO) {
+      const { name } = countries[countryISO];
+      if (name) {
+        return `${name} - ${countryISO}`;
+      }
     }
   }
 
