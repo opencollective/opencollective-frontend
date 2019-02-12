@@ -279,8 +279,20 @@ export default function(Sequelize, DataTypes) {
       twitterHandle: {
         type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
         set(twitterHandle) {
-          if (typeof twitterHandle !== 'string') return;
-          this.setDataValue('twitterHandle', twitterHandle.replace(/^@/, ''));
+          if (!twitterHandle || twitterHandle.length === 0) {
+            this.setDataValue('twitterHandle', null);
+            return;
+          }
+
+          // Try to parse Twitter URL, fallback on regular string
+          const twitterRegex = /https?:\/\/twitter\.com\/([^/\s]+)/;
+          const regexResult = twitterHandle.match(twitterRegex);
+          if (regexResult) {
+            const [, username] = regexResult;
+            this.setDataValue('twitterHandle', username);
+          } else {
+            this.setDataValue('twitterHandle', twitterHandle.replace(/^@/, ''));
+          }
         },
       },
 

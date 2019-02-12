@@ -17,6 +17,19 @@ module.exports = {
         queryInterface.changeColumn('CollectiveHistories', githubHandleColumn, {
           type: Sequelize.STRING(255),
         });
+      })
+      .then(() => {
+        return queryInterface.sequelize.query(`
+          UPDATE
+            "Collectives" 
+          SET
+            "twitterHandle" = regexp_replace("twitterHandle", '(https?://)?twitter.com/', ''),
+            "githubHandle" = regexp_replace("githubHandle", '(https?://)?github.com/', '')
+          WHERE
+            "twitterHandle" like '%twitter.com/%'
+          OR
+            "githubHandle" like '%github.com/%'
+      `);
       });
   },
 
