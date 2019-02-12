@@ -37,14 +37,14 @@ describe('Contribution Flow: Donate', () => {
       cy.get('.select-month').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per month');
-      cy.contains('Next contribution: Jun 1, 2042');
+      cy.contains('Next charge: Jun 1, 2042');
 
       // Change frequency - yearly
       cy.get('#interval').click();
       cy.get('.select-year').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per year');
-      cy.contains('Next contribution: May 1, 2043');
+      cy.contains('Next charge: May 1, 2043');
 
       cy.contains('Next step').click();
 

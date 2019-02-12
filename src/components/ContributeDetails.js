@@ -157,7 +157,12 @@ const ContributeDetails = enhance(
               </StyledSelect>
               {state.interval !== 'oneTime' && (
                 <P color="black.500" ml={3}>
-                  <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next contribution:" />{' '}
+                  <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />{' '}
+                  <Span color="primary.500">
+                    <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
+                  </Span>
+                  <br />
+                  <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
                   <Span color="primary.500">
                     {moment()
                       .add(1, state.interval)

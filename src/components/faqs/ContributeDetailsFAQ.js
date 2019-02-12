@@ -19,7 +19,7 @@ const ContributeDetailsFAQ = props => (
           <Content>
             <FormattedMessage
               id="ContributeDetails.faq.frequency.content"
-              defaultMessage="Subscriptions are charged at the beginning of the chosen period, so monthly donations will be charged on the 1st of each month and yearly donations on the 1st of January."
+              defaultMessage="You will be charged today, and then on the 1st of each month (for monthly subscriptions) or the 1st of the same month next year (for yearly subscriptions). Warning: you may be charged twice in a short time frame if you are setting up a monthly subscription close to the end of the month."
             />
           </Content>
         </Entry>

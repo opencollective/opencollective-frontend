@@ -35,7 +35,7 @@ describe('Contribution Flow: Order', () => {
 
       // Frequency must be disabled
       cy.get('#interval[disabled]').should('exist');
-      cy.contains('Next contribution: Jun 1, 2042');
+      cy.contains('Next charge: Jun 1, 2042');
       cy.contains('Next step').click();
 
       // ---- Step 3: Payment ----
