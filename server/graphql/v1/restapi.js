@@ -53,7 +53,7 @@ const getTransactionQuery = `
       type
       createdAt
       description
-      amount      
+      amount
       currency
       hostCurrency
       hostCurrencyFxRate
@@ -105,7 +105,7 @@ export const getLatestTransactions = async (req, res) => {
   try {
     const args = req.query;
     args.collectiveSlug = get(req, 'params.collectiveSlug');
-    const response = await utils.graphqlQuery(allTransactionsQuery, req.query);
+    const response = await utils.graphqlQuery(allTransactionsQuery, req.query, req.remoteUser);
     if (response.errors) {
       throw new Error(response.errors[0]);
     }
@@ -121,7 +121,7 @@ export const getLatestTransactions = async (req, res) => {
  */
 export const getTransaction = async (req, res) => {
   try {
-    const response = await utils.graphqlQuery(getTransactionQuery, pick(req.params, ['id', 'uuid']));
+    const response = await utils.graphqlQuery(getTransactionQuery, pick(req.params, ['id', 'uuid']), req.remoteUser);
     if (response.errors) {
       throw new Error(response.errors[0]);
     }
