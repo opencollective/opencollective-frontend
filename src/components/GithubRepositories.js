@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { themeGet } from 'styled-system';
 import { withHandlers, withState, compose } from 'recompose';
 import styled from 'styled-components';
-import { Search } from 'styled-icons/octicons/Search.cjs';
+import { Search } from 'styled-icons/octicons/Search';
 
 import { escapeInput } from '../lib/utils';
 import { H4 } from './Text';
