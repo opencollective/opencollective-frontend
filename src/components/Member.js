@@ -95,6 +95,7 @@ ${totalDonationsStr}`;
 
             .Member.viewMode-ORGANIZATION {
               width: 200px;
+              margin: 1rem;
             }
 
             .Member :global(.Avatar) {
