@@ -20,6 +20,14 @@
       "maxAmountPerDay": 5000000
     }
   },
+  "memcache": {
+    "servers": "localhost:11211",
+    "username": "",
+    "password": ""
+  },
+  "redis": {
+    "serverUrl": "redis://localhost"
+  },
   "log": {
     "level": "warn"
   }

@@ -20,6 +20,9 @@
     "username": "MEMCACHE_USERNAME",
     "password": "MEMCACHE_PASSWORD"
   },
+  "redis": {
+    "serverUrl": "REDIS_URL"
+  },
   "keys": {
     "opencollective": {
       "apiKey": "API_KEY",
