@@ -161,9 +161,5 @@ export function get(path, options = {}) {
 }
 
 export function getGithubRepos(token) {
-  return fetch(`/api/github-repositories?access_token=${token}`)
-    .then(checkResponseStatus)
-    .then(repos => {
-      return repos.filter(repo => repo.stargazers_count >= MIN_REPO_STARS);
-    });
+  return fetch(`/api/github-repositories?access_token=${token}`).then(checkResponseStatus);
 }
