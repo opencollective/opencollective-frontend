@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 
 import Page from '../components/Page';
 import Loading from '../components/Loading';
+import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
 import withIntl from '../lib/withIntl';
 import { addCreateCollectiveFromGithubMutation } from '../graphql/mutations';
 import StyledCard from '../components/StyledCard';
-import { H3, P } from '../components/Text';
+import { H3, P, H2 } from '../components/Text';
 import StyledButton from '../components/StyledButton';
 import GithubRepositories from '../components/GithubRepositories';
 import StyledInputField from '../components/StyledInputField';
@@ -87,8 +88,6 @@ class OpenSourceApplyPage extends Component {
       Router.pushRoute('collective', {
         slug: collective.slug,
         status: 'collectiveCreated',
-        CollectiveId: collective.id,
-        CollectiveSlug: collective.slug,
       });
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err)); // TODO - Remove
@@ -105,19 +104,30 @@ class OpenSourceApplyPage extends Component {
     const { repositories, creatingCollective } = this.state;
     if (repositories.length !== 0) {
       return (
-        <StyledInputField htmlFor="collective">
-          {fieldProps => (
-            <GithubRepositories
-              {...fieldProps}
-              repositories={repositories}
-              creatingCollective={creatingCollective}
-              onCreateCollective={data => {
-                this.setState({ creatingCollective: true });
-                this.createCollectives(data);
-              }}
-            />
-          )}
-        </StyledInputField>
+        <Fragment>
+          <Container maxWidth={500} mb={4}>
+            <H2 textAlign="center" mb={3} fontSize="3.2rem">
+              Pick a repository
+            </H2>
+            <P textAlign="center" fontSize="1.6rem" color="black.400">
+              Select a project you wish to create a collective for. Only repositories with at least 100 stars are
+              eligible.
+            </P>
+          </Container>
+          <StyledInputField htmlFor="collective">
+            {fieldProps => (
+              <GithubRepositories
+                {...fieldProps}
+                repositories={repositories}
+                creatingCollective={creatingCollective}
+                onCreateCollective={data => {
+                  this.setState({ creatingCollective: true });
+                  this.createCollectives(data);
+                }}
+              />
+            )}
+          </StyledInputField>
+        </Fragment>
       );
     }
   }
