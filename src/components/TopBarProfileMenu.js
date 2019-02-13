@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
@@ -11,7 +12,6 @@ import { Box, Flex } from '@rebass/grid';
 import Avatar from './Avatar';
 import Hide from './Hide';
 import { P } from './Text';
-import Caret from './Caret';
 import StyledLink from './StyledLink';
 import ListItem from './ListItem';
 import Container from './Container';
@@ -330,14 +330,7 @@ class TopBarProfileMenu extends React.Component {
             {LoggedInUser.username}
           </P>
         </Hide>
-        <Caret
-          color="#46b0ed"
-          display="inline-block"
-          height="0.6rem"
-          strokeWidth="0.2rem"
-          width="1.4rem"
-          cursor="pointer"
-        />
+        <ChevronDown color="#46b0ed" size="1.5em" cursor="pointer" />
         {showProfileMenu && this.renderProfileMenu()}
       </Flex>
     );

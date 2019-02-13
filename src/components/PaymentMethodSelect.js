@@ -11,7 +11,7 @@ const paymentMethodsToOptions = paymentMethods => {
   }, {});
 };
 
-const StyledPaymentMethodChooser = ({ intl, paymentMethods, defaultPaymentMethod, ...props }) => {
+const PaymentMethodSelect = ({ intl, paymentMethods, defaultPaymentMethod, ...props }) => {
   return (
     <StyledSelect
       name="paymentMethod"
@@ -24,7 +24,7 @@ const StyledPaymentMethodChooser = ({ intl, paymentMethods, defaultPaymentMethod
   );
 };
 
-StyledPaymentMethodChooser.propTypes = {
+PaymentMethodSelect.propTypes = {
   /** The payment methods to display. **Cannot be empty !** */
   paymentMethods: PropTypes.arrayOf(PropTypes.object).isRequired,
   /** The default payment method. Will use the first one if not provided. */
@@ -33,4 +33,4 @@ StyledPaymentMethodChooser.propTypes = {
   intl: PropTypes.object,
 };
 
-export default withIntl(StyledPaymentMethodChooser);
+export default withIntl(PaymentMethodSelect);

@@ -16,7 +16,7 @@ import { getCollectiveSourcePaymentMethodsQuery } from '../graphql/queries';
 import { createVirtualCardsMutationQuery } from '../graphql/mutations';
 import StyledInputAmount from './StyledInputAmount';
 import StyledButton from './StyledButton';
-import StyledPaymentMethodChooser from './StyledPaymentMethodChooser';
+import PaymentMethodSelect from './PaymentMethodSelect';
 import Loading from './Loading';
 import Link from './Link';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
@@ -407,7 +407,7 @@ class CreateVirtualCardsForm extends Component {
             name="paymentMethod"
             label={<FormattedMessage id="virtualCards.create.paymentMethod" defaultMessage="Payment Method" />}
           >
-            <StyledPaymentMethodChooser
+            <PaymentMethodSelect
               disabled={submitting}
               paymentMethods={paymentMethods}
               defaultPaymentMethod={this.getDefaultPaymentMethod()}
