@@ -9,6 +9,7 @@ import paymentProviders from '../paymentProviders';
 import * as github from '../lib/github';
 
 const { ConnectedAccount, User } = models;
+const GITHUB_REPO_MIN_STAR = 100;
 
 export const list = (req, res, next) => {
   const slug = req.params.slug.toLowerCase();
@@ -179,7 +180,12 @@ const getGithubAccount = async req => {
 export const fetchAllRepositories = async (req, res, next) => {
   const githubAccount = await getGithubAccount(req);
   try {
-    const repos = await github.getAllUserPublicRepos(githubAccount.token);
+    let repos = await github.getAllUserPublicRepos(githubAccount.token);
+    if (repos.length !== 0) {
+      repos = repos.filter(repo => {
+        return repo.stargazers_count >= GITHUB_REPO_MIN_STAR && repo.fork === false;
+      });
+    }
     res.send(repos);
   } catch (e) {
     next(e);

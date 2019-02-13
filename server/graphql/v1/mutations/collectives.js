@@ -13,6 +13,7 @@ import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
 
 const debugClaim = debug('claim');
+const debugGithub = debug('github');
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -174,6 +175,145 @@ export async function createCollective(_, args, req) {
       },
     },
   });
+  return collective;
+}
+
+export async function createCollectiveFromGithub(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to create a collective',
+    });
+  }
+
+  if (!args.collective.name) {
+    throw new errors.ValidationFailed({ message: 'collective.name required' });
+  }
+
+  let collective;
+  const collectiveData = { ...args.collective };
+  const user = req.remoteUser;
+  const githubHandle = collectiveData.githubHandle;
+
+  // For e2e testing, we enable testuser+(admin|member)@opencollective.com to create collective without github validation
+  if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
+    const existingCollective = models.Collective.findOne({
+      where: { slug: collectiveData.slug.toLowerCase() },
+    });
+    collectiveData.HostCollectiveId = defaultHostCollective('opensource').CollectiveId;
+    if (existingCollective) {
+      collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
+    }
+    return models.Collective.create(collectiveData);
+  }
+
+  const existingCollective = await models.Collective.findOne({
+    where: { slug: collectiveData.slug.toLowerCase() },
+  });
+
+  if (existingCollective) {
+    throw new Error(
+      `The slug ${
+        collectiveData.slug
+      } is already taken. Please use another name for your ${collectiveData.type.toLowerCase()}.`,
+    );
+  }
+
+  const githubAccount = await models.ConnectedAccount.findOne({
+    where: { CollectiveId: req.remoteUser.CollectiveId, service: 'github' },
+  });
+
+  if (!githubAccount) {
+    throw new errors.Unauthorized({
+      message: 'You must have a connected GitHub Account to claim a collective',
+    });
+  }
+
+  if (githubHandle.includes('/')) {
+    // A repository GitHub Handle (most common)
+    const repo = await github.getRepo(githubHandle, githubAccount.token);
+    const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
+    if (!isGithubRepositoryAdmin) {
+      throw new errors.ValidationFailed({
+        message: "We could not verify that you're admin of the GitHub repository",
+      });
+    }
+    collectiveData.tags = repo.topics;
+    collectiveData.description = repo.description;
+    collectiveData.settings = {
+      githubRepo: repo.html_url,
+    };
+  } else {
+    // An organization GitHub Handle
+    const memberships = await github.getOrgMemberships(githubAccount.token);
+    const organizationAdminMembership =
+      memberships &&
+      memberships.find(m => m.organization.login === githubHandle && m.state === 'active' && m.role === 'admin');
+    if (!organizationAdminMembership) {
+      throw new errors.ValidationFailed({
+        message: "We could not verify that you're admin of the GitHub organization",
+      });
+    }
+  }
+
+  collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
+  collectiveData.currency = 'USD';
+  collectiveData.CreatedByUserId = user.id;
+  collectiveData.LastEditedByUserId = user.id;
+  collectiveData.teirs = [
+    {
+      name: 'backer',
+      title: 'Backers',
+      description: 'Support us with a monthly donation and help us continue our activities.',
+      button: 'Become a backer',
+      range: [2, 100000],
+      presets: [2, 5, 10, 25, 50],
+      interval: 'monthly',
+    },
+    {
+      name: 'sponsor',
+      title: 'Sponsors',
+      description: 'Become a sponsor and get your logo on our README on Github with a link to your site.',
+      button: 'Become a sponsor',
+      range: [100, 500000],
+      presets: [100, 250, 500],
+      interval: 'monthly',
+    },
+  ];
+
+  try {
+    collective = await models.Collective.create(collectiveData);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+
+  debugGithub('createdCollective', collective && collective.dataValues);
+  const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
+  const promises = [
+    collective.addUserWithRole(user, roles.ADMIN),
+    collective.addHost(host, user),
+    collective.update({ isActive: true }),
+  ];
+
+  await Promise.all(promises);
+
+  const data = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    collective: collective.info,
+  };
+  debugGithub('sending github.signup to', user.email, 'with data', data);
+  await emailLib.send('github.signup', user.email, data);
+  models.Activity.create({
+    type: activities.COLLECTIVE_CREATED,
+    UserId: user.id,
+    CollectiveId: collective.id,
+    data: {
+      collective: collective.info,
+      host: host.info,
+      user: user.info,
+    },
+  });
+
   return collective;
 }
 

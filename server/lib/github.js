@@ -18,11 +18,13 @@ const compactRepo = repo => {
   ]);
   repo.owner = pick(repo.owner, [
     'login', // (1)
+    'type',
   ]);
   // 1) Required for the old website, according to:
   // https://github.com/opencollective/opencollective-website/blob/master/frontend/src/reducers/github.js
   // 2) Required for the pledge feature in /graphql/v1/orders.js
   // 3) Required for update-contributions
+  // 4) Required in the frontend for choosing repo to create collective from
   return repo;
 };
 
