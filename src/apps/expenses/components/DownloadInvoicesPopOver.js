@@ -13,7 +13,7 @@ import { defaultImage } from '../../../constants/collectives';
 import InputField from '../../../components/InputField';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 
-import { FileDownload } from 'styled-icons/material/FileDownload.cjs';
+import { FileDownload } from 'styled-icons/material/FileDownload';
 
 class Overlay extends React.Component {
   static propTypes = {

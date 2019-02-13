@@ -7,7 +7,7 @@ import { Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H3, P } from '../components/Text';
-import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane.cjs';
+import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane';
 
 const Icon = styled(PaperPlane)`
   color: ${themeGet('colors.primary.300')};

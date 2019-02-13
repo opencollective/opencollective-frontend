@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import Downshift from 'downshift';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
-import { SelectArrows } from 'styled-icons/boxicons-regular/SelectArrows.cjs';
+import { CaretDown } from 'styled-icons/fa-solid/CaretDown';
 
 import Container from './Container';
 import StyledInputGroup from './StyledInputGroup';
@@ -11,7 +11,7 @@ const ListItem = styled(Container)`
   list-style: none;
 `;
 
-const Icon = styled(SelectArrows)`
+const Icon = styled(CaretDown)`
   &:hover {
     color: ${themeGet('colors.primary.300')};
   }

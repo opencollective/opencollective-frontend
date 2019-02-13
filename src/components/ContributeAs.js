@@ -7,7 +7,7 @@ import { themeGet } from 'styled-system';
 import { FormattedMessage } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 
-import { Search } from 'styled-icons/octicons/Search.cjs';
+import { Search } from 'styled-icons/octicons/Search';
 
 import { escapeInput } from '../lib/utils';
 

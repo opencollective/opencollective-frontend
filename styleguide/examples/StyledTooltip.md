@@ -12,7 +12,7 @@ const content = (
 
 ```js
 const { P } = require('../../src/components/Text');
-const { Info } = require('styled-icons/feather/Info.cjs');
+const { Info } = require('styled-icons/feather/Info');
 
 const content = (
   <React.Fragment>
@@ -30,7 +30,7 @@ const content = (
 
 ```js
 const { P } = require('../../src/components/Text');
-const { Info } = require('styled-icons/feather/Info.cjs');
+const { Info } = require('styled-icons/feather/Info');
 const { Flex } = require('@rebass/grid');
 
 const content = (

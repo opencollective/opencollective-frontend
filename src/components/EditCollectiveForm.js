@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
-import { ArrowBack } from 'styled-icons/material/ArrowBack.cjs';
+import { ArrowBack } from 'styled-icons/material/ArrowBack';
 
 import { Router } from '../server/pages';
 import InputField from './InputField';

@@ -9,7 +9,7 @@ import { Modal, Row, Col } from 'react-bootstrap';
 
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { animateScroll } from 'react-scrollchor/lib/helpers';
-import { Pencil } from 'styled-icons/octicons/Pencil.cjs';
+import { Pencil } from 'styled-icons/octicons/Pencil';
 
 import colors from '../constants/colors';
 import withIntl from '../lib/withIntl';

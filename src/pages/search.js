@@ -21,7 +21,7 @@ import { addSearchQueryData } from '../graphql/queries';
 
 import withIntl from '../lib/withIntl';
 
-import { Search } from 'styled-icons/octicons/Search.cjs';
+import { Search } from 'styled-icons/octicons/Search';
 
 const SearchInput = styled(FormControl)`
   &&& {
