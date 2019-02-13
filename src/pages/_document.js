@@ -41,7 +41,6 @@ export default class IntlDocument extends Document {
       'STRIPE_KEY',
       'GOOGLE_MAPS_API_KEY',
       'RECAPTCHA_SITE_KEY',
-      'USE_NEW_CREATE_ORDER',
     ]);
   }
 
