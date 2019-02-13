@@ -24,6 +24,7 @@ jobs:
           key: dependency-cache-
       - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: npm ci
+      - run: npm run build
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:

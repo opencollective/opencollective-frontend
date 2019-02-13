@@ -187,8 +187,7 @@
     "db:sanitize": "babel-node scripts/replace_stripe_accounts",
     "db:reset": "babel-node scripts/reset",
     "postdb:migrate:dev": "npm run db:clean",
-    "postinstall": "npm run postinstall:build && sh ./scripts/postinstall.sh",
-    "postinstall:build": "if test \"$NODE_ENV\" = \"\" || test \"$NODE_ENV\" = \"development\" ; then echo \"Skipping postinstall build because NODE_ENV is '${NODE_ENV}'\" ; else npm run build ; fi",
+    "postinstall": "./scripts/postinstall.sh",
     "git:clean": "./scripts/git_clean.sh",
     "deploy:staging": "./scripts/pre-deploy.sh staging && bash -x scripts/deploy.sh staging",
     "deploy:production": "./scripts/pre-deploy.sh production && bash -x scripts/deploy.sh production",
@@ -231,5 +230,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/opencollective/opencollective-api.git"
-  }
+  },
+  "heroku-run-build-script": true
 }
