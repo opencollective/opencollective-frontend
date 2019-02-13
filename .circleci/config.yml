@@ -2,8 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:10.3.0
-        command: /sbin/init
+      - image: circleci/node:11.8.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
