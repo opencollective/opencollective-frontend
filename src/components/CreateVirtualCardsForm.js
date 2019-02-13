@@ -29,8 +29,11 @@ const MAX_AMOUNT = 10000;
 
 const InlineField = ({ name, children, label, isLabelClickable }) => (
   <Flex flexWrap="wrap" alignItems="center" mb="2.5em" className={`field-${name}`}>
-    <Box css={{ flexBasis: '12em' }}>
-      <label htmlFor={`virtualcard-${name}`} style={isLabelClickable && { cursor: 'pointer' }}>
+    <Box width={[1, 0.3]}>
+      <label
+        htmlFor={`virtualcard-${name}`}
+        style={{ cursor: isLabelClickable ? 'pointer' : 'inherit', width: '100%' }}
+      >
         {label}
       </label>
     </Box>
@@ -106,7 +109,7 @@ class CreateVirtualCardsForm extends Component {
       deliverType: 'email', // email or manual
       values: {
         amount: MIN_AMOUNT,
-        onlyOpensource: true,
+        onlyOpensource: false,
         emails: [],
         customMessage: '',
         numberOfVirtualCards: 1,
@@ -421,7 +424,14 @@ class CreateVirtualCardsForm extends Component {
             label={
               <FormattedMessage
                 id="virtualCards.create.onlyOpensource"
-                defaultMessage="Limit to opensource collectives"
+                defaultMessage="Limit to collectives hosted by the {openSourceCollectiveLink}"
+                values={{
+                  openSourceCollectiveLink: (
+                    <Link route="collective" params={{ slug: 'opensourcecollective' }}>
+                      Open Source Collective 501c6 (Non Profit)
+                    </Link>
+                  ),
+                }}
               />
             }
           >
