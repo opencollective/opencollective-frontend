@@ -36,7 +36,9 @@ const enhance = compose(
     },
   }),
 );
-
+/**
+ * Component for displaying list of public repositories
+ */
 const GithubRepositories = enhance(
   ({ repositories, onSearch, onCreateCollective, creatingCollective, state, ...fieldProps }) => {
     if (state.search) {
@@ -90,8 +92,11 @@ const GithubRepositories = enhance(
 );
 
 GithubRepositories.propTypes = {
+  /** List of public repositories */
   repositories: PropTypes.array.isRequired,
+  /** a boolean to know when a collective is being created */
   creatingCollective: PropTypes.bool,
+  /** handles the submitted collective */
   onCreateCollective: PropTypes.func.isRequired,
 };
 
