@@ -19,8 +19,7 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
-
-const { WEBSITE_URL } = process.env;
+import { getBrowserWebsiteUrl } from '../lib/utils';
 
 class OpenSourceApplyPage extends Component {
   static async getInitialProps({ query }) {
@@ -112,7 +111,7 @@ class OpenSourceApplyPage extends Component {
             </H2>
             <P textAlign="center" fontSize="1.6rem" color="black.400">
               <FormattedMessage
-                id="openSourceApply.GithubRepositories.title"
+                id="openSourceApply.GithubRepositories.description"
                 defaultMessage="Select a project you wish to create a collective for. Only repositories with at least 100 stars are eligible."
               />
             </P>
@@ -136,7 +135,7 @@ class OpenSourceApplyPage extends Component {
   }
 
   renderConnectGithubButton() {
-    const connectUrl = `/api/connected-accounts/github?redirect=${WEBSITE_URL}/opensource/apply`;
+    const connectUrl = `/api/connected-accounts/github?redirect=${getBrowserWebsiteUrl()}/opensource/apply`;
     return (
       <StyledCard minWidth={400} maxWidth={500} border="none" minHeight={350} p={4} textAlign="center">
         <H3 mb={2}>
