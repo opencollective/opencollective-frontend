@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
-import { Github } from 'styled-icons/fa-brands/Github.cjs';
-import { MediumM } from 'styled-icons/fa-brands/MediumM.cjs';
-import { Slack } from 'styled-icons/fa-brands/Slack.cjs';
-import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
-import { Mail } from 'styled-icons/material/Mail.cjs';
+import { Github } from 'styled-icons/fa-brands/Github';
+import { MediumM } from 'styled-icons/fa-brands/MediumM';
+import { Slack } from 'styled-icons/fa-brands/Slack';
+import { Twitter } from 'styled-icons/fa-brands/Twitter';
+import { Mail } from 'styled-icons/material/Mail';
 
 import { Link } from '../server/pages';
 

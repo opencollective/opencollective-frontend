@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import { themeGet } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
 import { transparentize } from 'polished';
-import { Check } from 'styled-icons/fa-solid/Check.cjs';
+import { Check } from 'styled-icons/fa-solid/Check';
 
 import { Span } from './Text';
 import StyledSpinner from './StyledSpinner';

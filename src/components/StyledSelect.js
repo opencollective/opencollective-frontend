@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Downshift from 'downshift';
 import styled from 'styled-components';
-import { SelectArrows } from 'styled-icons/boxicons-regular/SelectArrows.cjs';
+import { CaretDown } from 'styled-icons/fa-solid/CaretDown';
 import { themeGet } from 'styled-system';
 import { Box } from '@rebass/grid';
 
@@ -91,7 +91,7 @@ const ListItem = styled(Container)`
   margin: 0.2em !important;
 `;
 
-const Icon = styled(SelectArrows)`
+const Icon = styled(CaretDown)`
   color: ${themeGet('colors.black.400')};
 
   &:hover {

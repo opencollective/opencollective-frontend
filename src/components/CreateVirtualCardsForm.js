@@ -8,9 +8,9 @@ import { get } from 'lodash';
 import { graphql } from 'react-apollo';
 import moment from 'moment';
 
-import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle.cjs';
-import { RadioButtonChecked } from 'styled-icons/material/RadioButtonChecked.cjs';
-import { RadioButtonUnchecked } from 'styled-icons/material/RadioButtonUnchecked.cjs';
+import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle';
+import { RadioButtonChecked } from 'styled-icons/material/RadioButtonChecked';
+import { RadioButtonUnchecked } from 'styled-icons/material/RadioButtonUnchecked';
 
 import { getCollectiveSourcePaymentMethodsQuery } from '../graphql/queries';
 import { createVirtualCardsMutationQuery } from '../graphql/mutations';

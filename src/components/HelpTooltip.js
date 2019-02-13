@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import ReactTooltip from 'react-tooltip';
-import { Question } from 'styled-icons/fa-solid/Question.cjs';
+import { Question } from 'styled-icons/fa-solid/Question';
 
 const IconQuestion = styled(Question)`
   padding: 0.2em;

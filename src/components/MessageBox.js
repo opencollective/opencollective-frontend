@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import * as styledSystem from 'styled-system';
 import { Box } from '@rebass/grid';
 
-import { InfoCircle } from 'styled-icons/fa-solid/InfoCircle.cjs';
-import { CheckCircle } from 'styled-icons/fa-solid/CheckCircle.cjs';
-import { ExclamationCircle } from 'styled-icons/fa-solid/ExclamationCircle.cjs';
-import { ExclamationTriangle } from 'styled-icons/fa-solid/ExclamationTriangle.cjs';
+import { InfoCircle } from 'styled-icons/fa-solid/InfoCircle';
+import { CheckCircle } from 'styled-icons/fa-solid/CheckCircle';
+import { ExclamationCircle } from 'styled-icons/fa-solid/ExclamationCircle';
+import { ExclamationTriangle } from 'styled-icons/fa-solid/ExclamationTriangle';
 
 import { messageType } from '../constants/theme';
 import StyledCard from './StyledCard';

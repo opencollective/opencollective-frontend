@@ -6,7 +6,7 @@ import { get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 
-import { Add } from 'styled-icons/material/Add.cjs';
+import { Add } from 'styled-icons/material/Add';
 
 import withIntl from '../lib/withIntl';
 import { paymentMethodLabel } from '../lib/payment_method_label';

@@ -6,8 +6,8 @@ import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { uniqBy, get } from 'lodash';
 
-import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck.cjs';
-import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt.cjs';
+import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck';
+import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt';
 
 import { withStripeLoader } from './StripeProvider';
 import Container from './Container';

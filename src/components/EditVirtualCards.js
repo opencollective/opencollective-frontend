@@ -6,7 +6,7 @@ import { Flex } from '@rebass/grid';
 import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { Add } from 'styled-icons/material/Add.cjs';
+import { Add } from 'styled-icons/material/Add';
 
 import { getCollectiveVirtualCards } from '../graphql/queries';
 import VirtualCardDetails from './VirtualCardDetails';

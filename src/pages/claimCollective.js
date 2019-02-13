@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
-import { Github } from 'styled-icons/fa-brands/Github.cjs';
+import { Github } from 'styled-icons/fa-brands/Github';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';

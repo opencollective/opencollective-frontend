@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt.cjs';
+import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 
 import { Link } from '../server/pages';
 

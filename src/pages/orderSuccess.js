@@ -8,8 +8,8 @@ import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 
-import { Facebook } from 'styled-icons/fa-brands/Facebook.cjs';
-import { Twitter } from 'styled-icons/fa-brands/Twitter.cjs';
+import { Facebook } from 'styled-icons/fa-brands/Facebook';
+import { Twitter } from 'styled-icons/fa-brands/Twitter';
 
 import { formatCurrency, imagePreview } from '../lib/utils';
 import withIntl from '../lib/withIntl';

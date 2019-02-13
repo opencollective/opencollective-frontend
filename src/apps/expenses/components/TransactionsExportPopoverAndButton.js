@@ -10,7 +10,7 @@ import { exportFile } from '../../../lib/export_file';
 import withIntl from '../../../lib/withIntl';
 import InputField from '../../../components/InputField';
 
-import { FileDownload } from 'styled-icons/material/FileDownload.cjs';
+import { FileDownload } from 'styled-icons/material/FileDownload';
 
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */
