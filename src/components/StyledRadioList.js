@@ -24,7 +24,9 @@ const StyledRadioList = enhance(
         border="none"
         m={0}
         p={0}
-        onChange={({ target }) => {
+        onChange={event => {
+          event.stopPropagation();
+          const target = event.target;
           const selectedItem = find(items, item => item.key === target.value);
           onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
           setSelected(target.value);
