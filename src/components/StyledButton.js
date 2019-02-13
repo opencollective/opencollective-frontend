@@ -69,7 +69,7 @@ const StyledButton = ({ loading, ...props }) =>
   !loading ? (
     <StyledButtonContent {...props} />
   ) : (
-    <StyledButtonContent {...props}>
+    <StyledButtonContent {...props} onClick={undefined}>
       <StyledSpinner />
     </StyledButtonContent>
   );
