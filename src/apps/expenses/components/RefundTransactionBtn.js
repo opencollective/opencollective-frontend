@@ -18,6 +18,7 @@ class RefundTransactionBtn extends React.Component {
 
   constructor(props) {
     super(props);
+    this.setShowingState = this.setShowingState.bind(this);
 
     const canRefund = !props.isRefund;
     this.state = {
@@ -107,7 +108,7 @@ class RefundTransactionBtn extends React.Component {
                 className="refund"
                 bsStyle="danger"
                 bsSize="xsmall"
-                onClick={() => ::this.setShowingState({ confirmRefund: true })}
+                onClick={() => this.setShowingState({ confirmRefund: true })}
               >
                 <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
               </SmallButton>

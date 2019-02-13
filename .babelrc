@@ -10,7 +10,6 @@
     }]
   ],
   "plugins": [
-    "@babel/plugin-proposal-function-bind",
     "lodash",
     ["react-intl", {
       "messagesDir": "./dist/messages/"
