@@ -1,5 +1,5 @@
 ```js
-<StyledPaymentMethodChooser
+<PaymentMethodSelect
   defaultPaymentMethod={{
     id: 8771,
     uuid: 'ce4e0885-ebb4-4e1b-b644-4fa009370300',

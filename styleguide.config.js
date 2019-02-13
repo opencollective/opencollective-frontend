@@ -5,6 +5,7 @@ const fileExistsCaseInsensitive = require('react-styleguidist/scripts/utils/find
 module.exports = {
   assetsDir: 'styleguide',
   compilerConfig: {
+    objectAssign: 'Object.assign',
     transforms: {
       dangerousTaggedTemplateString: true,
     },
@@ -20,9 +21,20 @@ module.exports = {
   pagePerSection: true,
   sections: [
     {
+      name: 'Atoms',
+      components: 'src/components/Styled*.js',
+      description: 'Base design atoms.',
+    },
+    {
       name: 'UI',
       content: 'styleguide/pages/UI.md',
       components: 'src/components/*.js',
+      ignore: ['src/components/Contribute*.js', 'src/components/Styled*.js'],
+    },
+    {
+      name: 'Contribution Flow',
+      components: 'src/components/Contribute*.js',
+      description: 'These components are used on the donate/contribute flow.',
     },
     {
       name: 'Grid',
