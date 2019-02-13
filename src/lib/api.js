@@ -1,8 +1,6 @@
 import fetch from 'cross-fetch';
 import { isValidEmail, getBrowserWebsiteUrl } from './utils';
 
-const MIN_REPO_STARS = 100;
-
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
 
