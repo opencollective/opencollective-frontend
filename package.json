@@ -33,7 +33,7 @@
     "cloudflare-ip": "0.0.7",
     "config": "3.0.1",
     "connect-session-sequelize": "6.0.0",
-    "cookie-parser": "1.4.3",
+    "cookie-parser": "1.4.4",
     "cors": "2.8.5",
     "cucumber": "5.1.0",
     "dataloader": "1.4.0",
