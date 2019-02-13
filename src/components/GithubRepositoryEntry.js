@@ -17,7 +17,7 @@ import StyledCheckbox from './StyledCheckbox';
 import Link from './Link';
 
 const enhance = compose(
-  withState('state', 'setState', ({ errors = {} }) => ({ errors })),
+  withState('state', 'setState', ({ errors = {} }) => ({ errors, useOrg: false })),
   withHandlers({
     getFieldError: ({ state }) => name => state.errors[name],
     onChange: ({ setState }) => event => {
@@ -54,8 +54,18 @@ const enhance = compose(
 );
 
 const RepositoryEntry = enhance(
-  ({ getFieldError, getFieldProps, onCreateCollective, radio, value, checked, state, creatingCollective }) => {
-    const { type } = value.owner;
+  ({
+    getFieldError,
+    getFieldProps,
+    onCreateCollective,
+    radio,
+    value,
+    checked,
+    state,
+    creatingCollective,
+    setState,
+  }) => {
+    const { type, login } = value.owner;
     const repositoryTypeName = type === 'User' ? 'Personal Repo' : 'Organization Repo';
 
     return (
@@ -99,7 +109,11 @@ const RepositoryEntry = enhance(
               onSubmit={event => {
                 event.preventDefault();
                 const data = pick(state, ['name', 'slug']);
-                data.githubHandle = value.full_name;
+                if (state.useOrg) {
+                  data.githubHandle = login;
+                } else {
+                  data.githubHandle = value.full_name;
+                }
                 onCreateCollective(data);
               }}
             >
@@ -110,7 +124,12 @@ const RepositoryEntry = enhance(
                 <StyledCheckbox
                   name="useOrg"
                   label={`Use GitHub organization (${value.owner.login})`}
-                  onChange={() => {}}
+                  onChange={({ checked }) => {
+                    setState(state => ({
+                      ...state,
+                      useOrg: checked,
+                    }));
+                  }}
                 />
               )}
               <Box mb={3} mt={4}>
