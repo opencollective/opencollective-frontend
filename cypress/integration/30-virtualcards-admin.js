@@ -24,7 +24,6 @@ describe('Virtual cards admin', () => {
     cy.get('#virtualcard-amount').type('42');
     cy.get('.deliver-type-selector label[data-name="manual"] .radio-btn').click();
     cy.get('#virtualcard-numberOfVirtualCards').type(`{selectall}${numberOfVirtualCards}`);
-    cy.get('input[name="onlyOpensource"]').click();
     cy.get('.FormInputs button[type="submit"]').click();
 
     // Success page
@@ -72,7 +71,6 @@ describe('Virtual cards admin', () => {
     );
     cy.get('#virtualcard-amount').type('12');
     checkSubmit(true, 'Create 3 gift cards');
-    cy.get('input[name="onlyOpensource"]').click();
     cy.get('.FormInputs button[type="submit"]').click();
     cy.contains('Your 3 gift cards have been sent!');
   });

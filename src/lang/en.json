@@ -269,7 +269,7 @@
   "virtualCards.create.number": "Number of gift cards",
   "virtualCards.create.amount": "Amount",
   "virtualCards.create.paymentMethod": "Payment Method",
-  "virtualCards.create.onlyOpensource": "Limit to opensource collectives",
+  "virtualCards.create.onlyOpensource": "Limit to collectives hosted by the {openSourceCollectiveLink}",
   "virtualCards.create.expiryDate": "Expiry date",
   "virtualCards.create.sendEmails": "Send the cards by email",
   "virtualCards.create.generateCodes": "I'll send the codes myself",
