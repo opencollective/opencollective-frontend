@@ -279,16 +279,41 @@ export default function(Sequelize, DataTypes) {
       twitterHandle: {
         type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
         set(twitterHandle) {
-          if (typeof twitterHandle !== 'string') return;
-          this.setDataValue('twitterHandle', twitterHandle.replace(/^@/, ''));
+          if (!twitterHandle || twitterHandle.length === 0) {
+            this.setDataValue('twitterHandle', null);
+            return;
+          }
+
+          // Try to parse Twitter URL, fallback on regular string
+          const twitterRegex = /https?:\/\/twitter\.com\/([^/\s]+)/;
+          const regexResult = twitterHandle.match(twitterRegex);
+          if (regexResult) {
+            const [, username] = regexResult;
+            this.setDataValue('twitterHandle', username);
+          } else {
+            this.setDataValue('twitterHandle', twitterHandle.replace(/^@/, ''));
+          }
         },
       },
 
       githubHandle: {
         type: DataTypes.STRING,
         set(githubHandle) {
-          if (typeof githubHandle !== 'string') return;
-          this.setDataValue('githubHandle', githubHandle.replace(/^@/, ''));
+          if (!githubHandle || githubHandle.length === 0) {
+            this.setDataValue('githubHandle', null);
+            return;
+          }
+
+          // Try to parse github URL, fallback on regular string
+          const githubUrlRegex = /https?:\/\/github\.com\/([^/\s]+)(\/([^/\s]+))?/;
+          const regexResult = githubHandle.match(githubUrlRegex);
+          if (regexResult) {
+            const [, username, , repository] = regexResult;
+            const formattedHandle = repository ? `${username}/${repository}` : username;
+            this.setDataValue('githubHandle', formattedHandle);
+          } else {
+            this.setDataValue('githubHandle', githubHandle.replace(/^@/, ''));
+          }
         },
       },
 
