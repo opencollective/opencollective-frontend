@@ -338,32 +338,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
 export const addCreateCollectiveFromGithubMutation = graphql(createCollectiveFromGithubQuery, {
   props: ({ mutate }) => ({
     createCollectiveFromGithub: async collective => {
-      const CollectiveInputType = pick(collective, [
-        'slug',
-        'type',
-        'name',
-        'image',
-        'description',
-        'longDescription',
-        'location',
-        'twitterHandle',
-        'githubHandle',
-        'website',
-        'tags',
-        'startsAt',
-        'endsAt',
-        'timezone',
-        'maxAmount',
-        'currency',
-        'quantity',
-        'HostCollectiveId',
-        'ParentCollectiveId',
-        'data',
-      ]);
-      CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
-        pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
-      );
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
+      const CollectiveInputType = pick(collective, ['slug', 'type', 'name', 'description', 'githubHandle']);
       return await mutate({
         variables: { collective: CollectiveInputType },
         update: (store, { data: { createCollectiveFromGithub } }) => {
