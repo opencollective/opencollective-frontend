@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 
@@ -107,11 +108,13 @@ class OpenSourceApplyPage extends Component {
         <Fragment>
           <Container maxWidth={500} mb={4}>
             <H2 textAlign="center" mb={3} fontSize="3.2rem">
-              Pick a repository
+              <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
             </H2>
             <P textAlign="center" fontSize="1.6rem" color="black.400">
-              Select a project you wish to create a collective for. Only repositories with at least 100 stars are
-              eligible.
+              <FormattedMessage
+                id="openSourceApply.GithubRepositories.title"
+                defaultMessage="Select a project you wish to create a collective for. Only repositories with at least 100 stars are eligible."
+              />
             </P>
           </Container>
           <StyledInputField htmlFor="collective">
@@ -136,10 +139,15 @@ class OpenSourceApplyPage extends Component {
     const connectUrl = `/api/connected-accounts/github?redirect=${WEBSITE_URL}/opensource/apply`;
     return (
       <StyledCard minWidth={400} maxWidth={500} border="none" minHeight={350} p={4} textAlign="center">
-        <H3 mb={2}>For Open Source projects</H3>
+        <H3 mb={2}>
+          <FormattedMessage id="openSourceApply.title" defaultMessage="For Open Source projects" />
+        </H3>
         <P mb={4}>
-          You need a Github account and a repository with over 100 stars. If you run into trouble, file an issue in our
-          Github Issues section.
+          <FormattedMessage
+            id="openSourceApply.description"
+            defaultMessage="You need a Github account and a repository with over 100 stars. If you run into trouble, file an issue in our
+            Github Issues section."
+          />
         </P>
         <StyledButton
           textAlign="center"
