@@ -194,6 +194,18 @@ export async function createCollectiveFromGithub(_, args, req) {
   const user = req.remoteUser;
   const githubHandle = collectiveData.githubHandle;
 
+  // For e2e testing, we enable testuser+(admin|member)@opencollective.com to create collective without github validation
+  if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
+    const existingCollective = models.Collective.findOne({
+      where: { slug: collectiveData.slug.toLowerCase() },
+    });
+    collectiveData.HostCollectiveId = defaultHostCollective('opensource').CollectiveId;
+    if (existingCollective) {
+      collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
+    }
+    return models.Collective.create(collectiveData);
+  }
+
   const existingCollective = await models.Collective.findOne({
     where: { slug: collectiveData.slug.toLowerCase() },
   });
