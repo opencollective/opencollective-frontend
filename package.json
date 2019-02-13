@@ -194,7 +194,6 @@
       "@babel/cli",
       "@babel/core",
       "@babel/node",
-      "@babel/plugin-proposal-function-bind",
       "@babel/runtime",
       "react-mde",
       "styled-jsx",
