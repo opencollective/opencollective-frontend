@@ -19,7 +19,7 @@ const GithubRepositoriesFAQ = props => (
           <Content>
             <FormattedMessage
               id="GithubRepositories.faq.repoStar.content"
-              defaultMessage="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+              defaultMessage="In order to provide fiscal sponsorship to a project, we need to ensure that there is a community around that repo.  If your project doesn't need a fiscal sponsor (host) and has it's own bank account then, the you don't need 100 stars."
             />
           </Content>
         </Entry>
