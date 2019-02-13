@@ -16,6 +16,7 @@ import GithubRepositories from '../components/GithubRepositories';
 import StyledInputField from '../components/StyledInputField';
 import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
 import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
@@ -104,32 +105,35 @@ class OpenSourceApplyPage extends Component {
     const { repositories, creatingCollective } = this.state;
     if (repositories.length !== 0) {
       return (
-        <Fragment>
-          <Container maxWidth={500} mb={4}>
-            <H2 textAlign="center" mb={3} fontSize="3.2rem">
-              <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
-            </H2>
-            <P textAlign="center" fontSize="1.6rem" color="black.400">
-              <FormattedMessage
-                id="openSourceApply.GithubRepositories.description"
-                defaultMessage="Select a project you wish to create a collective for. Only repositories with at least 100 stars are eligible."
-              />
-            </P>
+        <Container maxWidth={500} mb={4} mr={4}>
+          <H2 textAlign="center" mb={3} fontSize="3.2rem">
+            <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
+          </H2>
+          <P textAlign="center" fontSize="1.6rem" mb={4} color="black.400">
+            <FormattedMessage
+              id="openSourceApply.GithubRepositories.description"
+              defaultMessage="Select a project you wish to create a collective for. Only repositories with at least 100 stars are eligible."
+            />
+          </P>
+          <Container display="flex">
+            <StyledInputField htmlFor="collective">
+              {fieldProps => (
+                <GithubRepositories
+                  {...fieldProps}
+                  repositories={repositories}
+                  creatingCollective={creatingCollective}
+                  onCreateCollective={data => {
+                    this.setState({ creatingCollective: true });
+                    this.createCollectives(data);
+                  }}
+                />
+              )}
+            </StyledInputField>
+            <Container ml={4}>
+              <GithubRepositoriesFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+            </Container>
           </Container>
-          <StyledInputField htmlFor="collective">
-            {fieldProps => (
-              <GithubRepositories
-                {...fieldProps}
-                repositories={repositories}
-                creatingCollective={creatingCollective}
-                onCreateCollective={data => {
-                  this.setState({ creatingCollective: true });
-                  this.createCollectives(data);
-                }}
-              />
-            )}
-          </StyledInputField>
-        </Fragment>
+        </Container>
       );
     }
   }
