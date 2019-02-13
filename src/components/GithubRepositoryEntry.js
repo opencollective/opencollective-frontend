@@ -111,6 +111,7 @@ const RepositoryEntry = enhance(
                 const data = pick(state, ['name', 'slug']);
                 if (state.useOrg) {
                   data.githubHandle = login;
+                  data.githubRepo = value.full_name;
                 } else {
                   data.githubHandle = value.full_name;
                 }
