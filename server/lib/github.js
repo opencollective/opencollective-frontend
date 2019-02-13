@@ -9,22 +9,22 @@ import logger from './logger';
 const compactRepo = repo => {
   repo = pick(repo, [
     'name', // (1)
-    'full_name', // (1)
+    'full_name', // (1) (4)
     'description', // (1)
-    'owner', // (1)
-    'stargazers_count', // (1) (2)
+    'owner', // (1) (4)
+    'stargazers_count', // (1) (2) (4)
     'topics', // (1)
     'fork', // (3)
   ]);
   repo.owner = pick(repo.owner, [
     'login', // (1)
-    'type',
+    'type', // (4)
   ]);
   // 1) Required for the old website, according to:
   // https://github.com/opencollective/opencollective-website/blob/master/frontend/src/reducers/github.js
   // 2) Required for the pledge feature in /graphql/v1/orders.js
   // 3) Required for update-contributions
-  // 4) Required in the frontend for choosing repo to create collective from
+  // 4) Required on the frontend in the "GitHub flow" (OpenSourceApplyPage)
   return repo;
 };
 
