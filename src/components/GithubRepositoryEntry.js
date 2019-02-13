@@ -13,11 +13,11 @@ import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
 import StyledButton from './StyledButton';
-import StyledCheckbox from './StyledCheckbox';
 import Link from './Link';
+import StyledRadioList from './StyledRadioList';
 
 const enhance = compose(
-  withState('state', 'setState', ({ errors = {} }) => ({ errors, useOrg: false })),
+  withState('state', 'setState', ({ errors = {} }) => ({ errors, useType: 'repository' })),
   withHandlers({
     getFieldError: ({ state }) => name => state.errors[name],
     onChange: ({ setState }) => event => {
@@ -109,7 +109,7 @@ const RepositoryEntry = enhance(
               onSubmit={event => {
                 event.preventDefault();
                 const data = pick(state, ['name', 'slug']);
-                if (state.useOrg) {
+                if (state.useType === 'organization') {
                   data.githubHandle = login;
                   data.githubRepo = value.full_name;
                 } else {
@@ -118,20 +118,45 @@ const RepositoryEntry = enhance(
                 onCreateCollective(data);
               }}
             >
-              <P fontSize="1.6rem" fontWeight="bold" mb={4}>
+              <P fontSize="1.6rem" fontWeight="bold" mb={3}>
                 {'Please enter the Collective’s info:'}
               </P>
               {type === 'Organization' && (
-                <StyledCheckbox
-                  name="useOrg"
-                  label={`Use GitHub organization (${value.owner.login})`}
-                  onChange={({ checked }) => {
+                <StyledRadioList
+                  id="useType"
+                  name="useType"
+                  options={['repository', 'organization']}
+                  defaultValue={'repository'}
+                  onChange={({ key }) => {
                     setState(state => ({
                       ...state,
-                      useOrg: checked,
+                      useType: key,
                     }));
                   }}
-                />
+                >
+                  {props => {
+                    return (
+                      <Container cursor="pointer">
+                        {props.value === 'repository' && (
+                          <Container fontWeight="400" fontSize="1.4rem" mb={4}>
+                            <Box as="span" mr={3}>
+                              {props.radio}
+                            </Box>
+                            Create a Collective for the Repository ({value.name}).
+                          </Container>
+                        )}
+                        {props.value === 'organization' && (
+                          <Container fontWeight="400" fontSize="1.4rem">
+                            <Box as="span" mr={3}>
+                              {props.radio}
+                            </Box>
+                            Create a Collective for the Organization ({login}).
+                          </Container>
+                        )}
+                      </Container>
+                    );
+                  }}
+                </StyledRadioList>
               )}
               <Box mb={3} mt={4}>
                 <StyledInputField label="Collective name" htmlFor="name" error={getFieldError('name')}>

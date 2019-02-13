@@ -19,6 +19,7 @@ import {
   flexDirection,
   flexWrap,
   fontSize,
+  fontWeight,
   height,
   justifyContent,
   left,
@@ -68,6 +69,7 @@ const Container = styled(tag)`
   ${flex}
   ${flexDirection}
   ${flexWrap}
+  ${fontWeight}
   ${float}
   ${fontSize}
   ${height}
