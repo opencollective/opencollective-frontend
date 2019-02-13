@@ -118,9 +118,6 @@ const RepositoryEntry = enhance(
                 onCreateCollective(data);
               }}
             >
-              <P fontSize="1.6rem" fontWeight="bold" mb={3}>
-                {'Please enter the Collective’s info:'}
-              </P>
               {type === 'Organization' && (
                 <StyledRadioList
                   id="useType"
@@ -138,19 +135,19 @@ const RepositoryEntry = enhance(
                     return (
                       <Container cursor="pointer">
                         {props.value === 'repository' && (
-                          <Container fontWeight="400" fontSize="1.4rem" mb={4}>
+                          <Container fontWeight="400" fontSize="1.2rem" mb={2}>
                             <Box as="span" mr={3}>
                               {props.radio}
                             </Box>
-                            Create a Collective for the Repository ({value.name}).
+                            Create a collective for the repository ({value.name})
                           </Container>
                         )}
                         {props.value === 'organization' && (
-                          <Container fontWeight="400" fontSize="1.4rem">
+                          <Container fontWeight="400" fontSize="1.2rem" mb={4}>
                             <Box as="span" mr={3}>
                               {props.radio}
                             </Box>
-                            Create a Collective for the Organization ({login}).
+                            Create a collective for the organization ({login})
                           </Container>
                         )}
                       </Container>
@@ -158,6 +155,11 @@ const RepositoryEntry = enhance(
                   }}
                 </StyledRadioList>
               )}
+
+              <P fontSize="1.6rem" fontWeight="bold" mb={3}>
+                {'Please enter the Collective’s info:'}
+              </P>
+
               <Box mb={3} mt={4}>
                 <StyledInputField label="Collective name" htmlFor="name" error={getFieldError('name')}>
                   {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} required width={1} />}

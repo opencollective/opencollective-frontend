@@ -22,6 +22,8 @@ import { Router } from '../server/pages';
 import { getGithubRepos } from '../lib/api';
 import { getBrowserWebsiteUrl } from '../lib/utils';
 
+const MIN_REPO_STARS = 100;
+
 class OpenSourceApplyPage extends Component {
   static async getInitialProps({ query }) {
     return {
@@ -51,7 +53,9 @@ class OpenSourceApplyPage extends Component {
     this.setState({ loadingRepos: true });
 
     try {
-      const repositories = await getGithubRepos(token);
+      const repositories = await getGithubRepos(token).then(repositories =>
+        repositories.filter(repo => repo.stargazers_count >= MIN_REPO_STARS),
+      );
       if (repositories.length !== 0) {
         this.setState({ repositories, loadingRepos: false, result: {} });
       } else {
