@@ -73,7 +73,7 @@ class EventsWithData extends React.Component {
   render() {
     const { loading, allEvents } = this.props.data;
 
-    if (loading) return <div />;
+    if (loading || !allEvents) return <div />;
 
     const now = new Date(),
       pastEvents = [],
