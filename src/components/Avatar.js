@@ -43,8 +43,11 @@ const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
 };
 
 Avatar.propTypes = {
+  /** Collective name */
   name: PropTypes.string,
+  /** Collective image url */
   src: PropTypes.string,
+  /** Collective type */
   type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
 };
 

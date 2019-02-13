@@ -17,6 +17,7 @@ import Button from './Button';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
+import UserCompany from './UserCompany';
 
 class CollectiveCover extends React.Component {
   static propTypes = {
@@ -349,12 +350,11 @@ ${description}`;
             {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
               <div>
-                {company && company.substr(0, 1) === '@' && (
+                {company && (
                   <p className="company">
-                    <Link route={`/${company.substr(1)}`}>{company.substr(1)}</Link>
+                    <UserCompany company={company} />
                   </p>
                 )}
-                {company && company.substr(0, 1) !== '@' && <p className="company">{company}</p>}
                 {collective.type !== 'EVENT' && (
                   <div className="contact">
                     {collective.host && collective.isActive && (
