@@ -2,8 +2,8 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import { pick } from 'lodash';
-import { Github } from 'styled-icons/fa-brands/Github.cjs';
-import { Star } from 'styled-icons/fa-solid/Star.cjs';
+import { Github } from 'styled-icons/fa-brands/Github';
+import { Star } from 'styled-icons/fa-solid/Star';
 import { withState, withHandlers, compose } from 'recompose';
 
 import { colors } from '../constants/theme';
