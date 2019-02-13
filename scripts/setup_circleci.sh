@@ -55,6 +55,8 @@ then
   cd "opencollective-api"
   echo "> Running npm install for api"
   npm install
+  echo "> Running build for api"
+  npm run build
   cd ..
 fi
 
