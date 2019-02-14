@@ -75,8 +75,8 @@ describe('api.json.test.js', () => {
         description: null,
         slug: 'vegandiningweek-407ev',
         image: null,
-        startsAt: 'Fri Nov 10 2017 22:00:00 GMT+0000 (UTC)',
-        endsAt: 'Sat Nov 18 2017 22:00:00 GMT+0000 (UTC)',
+        startsAt: 'Fri Nov 10 2017 22:00:00 GMT+0000 (Coordinated Universal Time)',
+        endsAt: 'Sat Nov 18 2017 22:00:00 GMT+0000 (Coordinated Universal Time)',
         timezone: 'Europe/Brussels',
         location: {
           name: 'Brussels',
@@ -99,8 +99,8 @@ describe('api.json.test.js', () => {
           'It is finally happening: Veganizer BXL is launching an incredibly tasty vegan burger, 100% plant-based and, in true Brussels style, infused with the bold flavor of Brussels Beer Project\'s Babylone beer! The seitan base is provided by a basis of Bertyn seitan. The hamburger bun prepared by Agribio\'s Laurent Pedrotti. For now, it will be exclusively available at the famous burger place Les Super Filles du Tram at Flagey. \n\n<center><img src="https://cl.ly/1M2f0N2K1W1I/veganizerbxl.jpg" style="max-width:100%" /></center>\n\nThe night of the event, orders can also be made through Deliveroo to have your burgers delivered at home in the Brussels area. ',
         slug: 'superfilles',
         image: null,
-        startsAt: 'Mon Apr 24 2017 17:00:00 GMT+0000 (UTC)',
-        endsAt: 'Mon Apr 24 2017 19:00:00 GMT+0000 (UTC)',
+        startsAt: 'Mon Apr 24 2017 17:00:00 GMT+0000 (Coordinated Universal Time)',
+        endsAt: 'Mon Apr 24 2017 19:00:00 GMT+0000 (Coordinated Universal Time)',
         timezone: 'Europe/Brussels',
         location: {
           name: 'Les Super Filles du Tram',

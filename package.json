@@ -7,8 +7,8 @@
   },
   "private": true,
   "engines": {
-    "node": "^10.10.0",
-    "npm": "^6.4.1"
+    "node": "11.8.0",
+    "npm": "6.5.0"
   },
   "dependencies": {
     "@material-ui/core": "3.9.1",
