@@ -51,8 +51,7 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, ...
         ))}
       </Container>
     );
-  },
-);
+  };
 
 StyledRadioList.propTypes = {
   /**
