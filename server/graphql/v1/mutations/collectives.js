@@ -202,6 +202,10 @@ export async function createCollectiveFromGithub(_, args, req) {
     if (existingCollective) {
       collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
     }
+    collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
+    collectiveData.currency = 'USD';
+    collectiveData.CreatedByUserId = user.id;
+    collectiveData.LastEditedByUserId = user.id;
     collective = await models.Collective.create(collectiveData);
     const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
     const promises = [
