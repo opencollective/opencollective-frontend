@@ -66,8 +66,7 @@ class MarketingPage extends React.Component {
       loadScriptAsync(sponsorPageScript);
     } else if (this.props.pageSlug === 'how-it-works') {
       loadScriptAsync(howItWorksPageScript);
-    }
-    else if (this.props.pageSlug === 'pricing') {
+    } else if (this.props.pageSlug === 'pricing') {
       loadScriptAsync(pricingPageScript);
     }
   }
@@ -82,13 +81,11 @@ class MarketingPage extends React.Component {
       html = sponsorPageHtml;
       style = sponsorPageStyle;
       className = 'sponsorPage';
-    }
-    else if (pageSlug === 'pricing') {
+    } else if (pageSlug === 'pricing') {
       html = pricingPageHtml;
       style = pricingPageStyle;
       className = ' PricePage';
-    }
-     else if (pageSlug === 'how-it-works') {
+    } else if (pageSlug === 'how-it-works') {
       html = howItWorksPageHtml;
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
