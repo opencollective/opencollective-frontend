@@ -12,6 +12,7 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 import { loadScriptAsync } from '../lib/utils';
 
 import sponsorPageHtml from '../static/sponsor-page/index.html';
+import pricingPageHtml from '../static/pricing-page/index.html';
 import howItWorksPageHtml from '../static/how-it-works-page/index.html';
 import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
 import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
@@ -22,6 +23,8 @@ import giftCardPageConfirmationHtml from '../static/gift-cards-page/confirmation
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
+import pricingPageScript from '!file-loader?publicPath=/_next/static/javascripts/&outputPath=static/javascripts/&name=[name]-[hash].[ext]!../static/pricing-page/javascripts/scripts.js'; // eslint-disable-line
+import pricingPageStyle from '!css-loader!../static/pricing-page/stylesheets/styles.css'; // eslint-disable-line
 import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
 import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
@@ -65,6 +68,8 @@ class MarketingPage extends React.Component {
       loadScriptAsync(sponsorPageScript);
     } else if (this.props.pageSlug === 'how-it-works') {
       loadScriptAsync(howItWorksPageScript);
+    } else if (this.props.pageSlug === 'pricing') {
+      loadScriptAsync(pricingPageScript);
     }
   }
 
@@ -86,6 +91,10 @@ class MarketingPage extends React.Component {
       }
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
+    } else if (pageSlug === 'pricing') {
+      html = pricingPageHtml;
+      style = pricingPageStyle;
+      className = 'PricePage';
     } else if (pageSlug === 'gift-of-giving') {
       html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
