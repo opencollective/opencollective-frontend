@@ -95,6 +95,10 @@ class MarketingPage extends React.Component {
       html = pricingPageHtml;
       style = pricingPageStyle;
       className = 'PricePage';
+    } else if (pageSlug === 'pricing') {
+      html = pricingPageHtml;
+      style = pricingPageStyle;
+      className = 'PricePage';
     } else if (pageSlug === 'gift-of-giving') {
       html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
