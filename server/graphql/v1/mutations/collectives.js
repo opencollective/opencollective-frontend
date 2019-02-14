@@ -199,11 +199,19 @@ export async function createCollectiveFromGithub(_, args, req) {
     const existingCollective = models.Collective.findOne({
       where: { slug: collectiveData.slug.toLowerCase() },
     });
-    collectiveData.HostCollectiveId = defaultHostCollective('opensource').CollectiveId;
     if (existingCollective) {
       collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
     }
-    return models.Collective.create(collectiveData);
+    collective = await models.Collective.create(collectiveData);
+    const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
+    const promises = [
+      collective.addUserWithRole(user, roles.ADMIN),
+      collective.addHost(host, user),
+      collective.update({ isActive: true }),
+    ];
+
+    await Promise.all(promises);
+    return collective;
   }
 
   const existingCollective = await models.Collective.findOne({
