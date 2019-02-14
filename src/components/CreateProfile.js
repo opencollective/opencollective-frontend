@@ -81,7 +81,7 @@ const useForm = ({ onEmailChange, errors }) => {
       },
     }),
     getFieldError: name => {
-      if (errors && errors[name]) {
+      if (state.errors && state.errors[name]) {
         return state.errors[name];
       }
     },
