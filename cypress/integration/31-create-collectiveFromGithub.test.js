@@ -38,7 +38,6 @@ describe('Create collective from Github', () => {
     cy.get('[type="submit"]')
       .first()
       .click();
-    cy.wait(6500);
     cy.location().should(location => {
       expect(location.search).to.eq('?status=collectiveCreated');
     });
