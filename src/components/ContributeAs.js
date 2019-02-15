@@ -196,7 +196,7 @@ const ContributeAs = enhance(
               ) : (
                 <Logo src={value.image} type={value.type} height="3.6rem" name={value.name} />
               )}
-              <Flex flexDirection="column" ml={2}>
+              <Flex flexDirection="column" ml={2} flex="1">
                 <P color="inherit" fontWeight={value.type ? 600 : 500}>
                   {value.name}
                 </P>
