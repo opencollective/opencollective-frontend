@@ -11,8 +11,12 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache: # special step to restore the dependency cache
+      - restore_cache:
+          # Find a cache corresponding to this specific package-lock.json checksum
+          # when this file is changed, this key will fail
           key: cache-{{ checksum "package.json" }}
+          # Find the most recently generated cache used from any branch
+          key: cache-
       - run: sudo apt -y update
       - run: sudo apt -y install postgresql-client
       # Cypress dependencies
@@ -27,11 +31,13 @@ jobs:
       - run: npm run build:server
       - run: npm run build:next
       - run: ./scripts/setup_circleci.sh
-      - save_cache: # special step to save the dependency cache
+      - save_cache:
           key: cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-            - ../.cache
+            #  This is where we store Cypress binary
+            - ../.cache #
+            # This is where we store the opencollective-api
             - ../cache
       - run: npm run test
       - store_test_results:
