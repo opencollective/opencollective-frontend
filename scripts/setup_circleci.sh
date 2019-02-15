@@ -9,8 +9,6 @@ else
   exit;
 fi
 
-sudo apt-get install GraphicsMagick
-
 mkdir -p ~/cache
 cd ~/cache
 
