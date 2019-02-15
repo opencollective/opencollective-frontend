@@ -52,7 +52,7 @@ then
   mv "opencollective-api-${BRANCH//\//-}" opencollective-api
   cd "opencollective-api"
   echo "> Running npm install for api"
-  npm install
+  npm ci
   echo "> Running build for api"
   npm run build
   cd ..
