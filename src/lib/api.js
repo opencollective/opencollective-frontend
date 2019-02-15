@@ -157,3 +157,7 @@ export function get(path, options = {}) {
     return checkResponseStatus(response);
   });
 }
+
+export function getGithubRepos(token) {
+  return fetch(`/api/github-repositories?access_token=${token}`).then(checkResponseStatus);
+}

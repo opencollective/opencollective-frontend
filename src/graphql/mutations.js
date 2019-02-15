@@ -91,6 +91,18 @@ const createCollectiveQuery = gql`
   }
 `;
 
+const createCollectiveFromGithubQuery = gql`
+  mutation createCollectiveFromGithub($collective: CollectiveInputType!) {
+    createCollectiveFromGithub(collective: $collective) {
+      id
+      name
+      slug
+      type
+      githubHandle
+    }
+  }
+`;
+
 const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
@@ -314,6 +326,26 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
           data.LoggedInUser.memberOf.push({
             __typename: 'Member',
             collective: createCollective,
+            role: 'ADMIN',
+          });
+          store.writeQuery({ query: getLoggedInUserQuery, data });
+        },
+      });
+    },
+  }),
+});
+
+export const addCreateCollectiveFromGithubMutation = graphql(createCollectiveFromGithubQuery, {
+  props: ({ mutate }) => ({
+    createCollectiveFromGithub: async collective => {
+      const CollectiveInputType = pick(collective, ['slug', 'type', 'name', 'description', 'githubHandle']);
+      return await mutate({
+        variables: { collective: CollectiveInputType },
+        update: (store, { data: { createCollectiveFromGithub } }) => {
+          const data = store.readQuery({ query: getLoggedInUserQuery });
+          data.LoggedInUser.memberOf.push({
+            __typename: 'Member',
+            collective: createCollectiveFromGithub,
             role: 'ADMIN',
           });
           store.writeQuery({ query: getLoggedInUserQuery, data });

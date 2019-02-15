@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {
+  textAlign,
   background,
   borderColor,
   borders,
@@ -36,6 +37,7 @@ const StyledCard = styled(Box)`
   ${minHeight}
   ${minWidth}
   ${overflow}
+  ${textAlign}
 `;
 
 StyledCard.propTypes = {
@@ -70,6 +72,8 @@ StyledCard.propTypes = {
    * see: https://github.com/jxnblk/styled-system/blob/master/docs/api.md#space
    */
   space: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  /** styled-system prop: accepts any css 'text-align' value */
+  textAlign: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
 };
 
 StyledCard.defaultProps = {

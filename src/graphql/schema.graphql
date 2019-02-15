@@ -770,6 +770,7 @@ input MemberInputType {
 """This is the root mutation"""
 type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
+  createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface

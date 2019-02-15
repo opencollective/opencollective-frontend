@@ -21,6 +21,7 @@ pages
   .add('createHost', '/:collectiveSlug/connect/stripe')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
+  .add('openSourceApply', '/opensource/(apply|create)')
   .add('createCollective', '/:hostCollectiveSlug?/(apply|create)')
   .add('createOrganization', '/organizations/new')
   .add('events-iframe', '/:collectiveSlug/events.html')
