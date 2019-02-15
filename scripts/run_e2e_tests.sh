@@ -3,7 +3,7 @@
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "> Starting api server"
   cd ~/cache/opencollective-api
-  PG_DATABASE=opencollective_dvl npm start &
+  PG_DATABASE=opencollective_dvl E2E_TEST=1 npm start &
   API_PID=$!
   cd -
   echo "> Starting frontend server"
