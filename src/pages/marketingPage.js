@@ -83,6 +83,10 @@ class MarketingPage extends React.Component {
       html = sponsorPageHtml;
       style = sponsorPageStyle;
       className = 'sponsorPage';
+    } else if (pageSlug === 'pricing') {
+      html = pricingPageHtml;
+      style = pricingPageStyle;
+      className = null;
     } else if (pageSlug === 'how-it-works') {
       if (locale === 'fr') {
         html = howItWorksPageHtmlFR;
@@ -91,14 +95,6 @@ class MarketingPage extends React.Component {
       }
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
-    } else if (pageSlug === 'pricing') {
-      html = pricingPageHtml;
-      style = pricingPageStyle;
-      className = 'PricePage';
-    } else if (pageSlug === 'pricing') {
-      html = pricingPageHtml;
-      style = pricingPageStyle;
-      className = 'PricePage';
     } else if (pageSlug === 'gift-of-giving') {
       html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
