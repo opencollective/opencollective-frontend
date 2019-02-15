@@ -39,6 +39,9 @@ jobs:
             - ../.cache #
             # This is where we store the opencollective-api
             - ../cache
+            # This is the global npm cache
+            - /root/.npm
+
       - run: npm run test
       - store_test_results:
           path: /tmp/circleci-test-results
