@@ -26,6 +26,7 @@ class CollectivePickerWithData extends React.Component {
     this.addFunds = this.addFunds.bind(this);
     this.toggleAddFunds = this.toggleAddFunds.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.canEdit = this.canEdit.bind(this);
     this.messages = defineMessages({
       'badge.tooltip.pending': {
         id: 'expenses.badge.tooltip.pending',
@@ -319,7 +320,7 @@ class CollectivePickerWithData extends React.Component {
                     </MenuItem>
                   ))}
                 </DropdownButton>
-                {selectedCollective && !this.state.showAddFunds && ::this.canEdit() && (
+                {selectedCollective && !this.state.showAddFunds && this.canEdit() && (
                   <a className="addFundsLink" onClick={this.toggleAddFunds}>
                     <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
                   </a>
@@ -327,7 +328,7 @@ class CollectivePickerWithData extends React.Component {
               </div>
             )}
           </div>
-          <div className="right">{::this.canEdit() && <ConnectPaypal collective={this.hostCollective} />}</div>
+          <div className="right">{this.canEdit() && <ConnectPaypal collective={this.hostCollective} />}</div>
         </div>
         <div>
           {selectedCollective && this.state.showAddFunds && (

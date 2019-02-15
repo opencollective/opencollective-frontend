@@ -3,14 +3,16 @@
     ["next/babel", {
       "preset-env": {
         "modules": "auto"
+      },
+      "transform-runtime": {
+        "useESModules": false
       }
     }]
   ],
   "plugins": [
-    "@babel/plugin-proposal-function-bind",
     "lodash",
     ["react-intl", {
-      "messagesDir": "./build/messages/"
+      "messagesDir": "./dist/messages/"
     }],
     "styled-components"
   ],
