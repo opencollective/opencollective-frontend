@@ -84,7 +84,7 @@ class MarketingPage extends React.Component {
     } else if (pageSlug === 'pricing') {
       html = pricingPageHtml;
       style = pricingPageStyle;
-      className = ' PricePage';
+      className = null;
     } else if (pageSlug === 'how-it-works') {
       html = howItWorksPageHtml;
       style = howItWorksPageStyle;
