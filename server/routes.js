@@ -20,7 +20,6 @@ import * as test from './controllers/test';
 import * as users from './controllers/users';
 import * as applications from './controllers/applications';
 import stripeWebhook from './controllers/webhooks';
-
 import * as email from './controllers/services/email';
 import syncMeetup from './controllers/services/meetup';
 
@@ -30,11 +29,12 @@ import * as aN from './middleware/security/authentication';
 import * as auth from './middleware/security/auth';
 import errorHandler from './middleware/error_handler';
 import * as params from './middleware/params';
-import errors from './lib/errors';
+import sanitizer from './middleware/sanitizer';
 
 import * as paypal from './paymentProviders/paypal/payment';
 
-import sanitizer from './middleware/sanitizer';
+import errors from './lib/errors';
+import logger from './lib/logger';
 import { sanitizeForLogs } from './lib/utils';
 
 import graphqlSchemaV1 from './graphql/v1/schema';
@@ -124,7 +124,11 @@ export default app => {
    * GraphQL v1
    */
   const graphqlServerV1 = GraphHTTP({
-    formatError,
+    formatError: error => {
+      logger.error(`GraphQL v1 error: ${error.message}`);
+      logger.debug(error);
+      return formatError(error);
+    },
     schema: graphqlSchemaV1,
     pretty: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
     graphiql: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
