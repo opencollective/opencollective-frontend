@@ -90,6 +90,11 @@ URL: https://api.opencollective.com/
 
 - [List of supported environment variables](docs/environment_variables.md)
 
+## Data exports
+
+We generate once a month data exports to https://drive.opencollective.com. This contains a list of top backers, top collectives and all transactions of the month.
+To run the data export, run: `npm run export:csv`.
+
 ## Discussion
 
 If you have any questions, ping us on Slack
