@@ -132,7 +132,7 @@ export async function createCollective(_, args, req) {
         msg = `The slug ${e.fields.slug.replace(
           /\-[0-9]+ev$/,
           '',
-        )} is already taken. Please use another name for your ${collectiveData.type.toLowerCase()}.`;
+        )} is already taken. Please use another slug for your ${collectiveData.type.toLowerCase()}.`;
         break;
       default:
         msg = e.message;
@@ -226,7 +226,7 @@ export async function createCollectiveFromGithub(_, args, req) {
     throw new Error(
       `The slug ${
         collectiveData.slug
-      } is already taken. Please use another name for your ${collectiveData.type.toLowerCase()}.`,
+      } is already taken. Please use another slug for your ${collectiveData.type.toLowerCase()}.`,
     );
   }
 
@@ -252,7 +252,7 @@ export async function createCollectiveFromGithub(_, args, req) {
     collectiveData.tags = repo.topics;
     collectiveData.description = repo.description;
     collectiveData.settings = {
-      githubRepo: repo.html_url,
+      githubRepo: githubHandle,
     };
   } else {
     // An organization GitHub Handle
@@ -265,6 +265,10 @@ export async function createCollectiveFromGithub(_, args, req) {
         message: "We could not verify that you're admin of the GitHub organization",
       });
     }
+    collectiveData.settings = {
+      githubOrg: githubHandle,
+    };
+    // TODO: we sometime still wants to store the main repository
   }
 
   collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
