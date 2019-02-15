@@ -152,8 +152,7 @@ class OpenSourceApplyPage extends Component {
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description"
-            defaultMessage="You need a Github account and a repository with over 100 stars. If you run into trouble, file an issue in our
-            Github Issues section."
+            defaultMessage="By clicking below you are applying to be hosted by the Open Source Collective 501c6 You need a GitHub account and a repository with over 100 stars. If you run into trouble, file an issue in our GitHub Issues section."
           />
         </P>
         <StyledButton
