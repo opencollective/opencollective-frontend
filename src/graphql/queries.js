@@ -410,6 +410,7 @@ const getCollectiveQuery = gql`
           type
           image
           backgroundImage
+          company
         }
       }
       ... on User {
