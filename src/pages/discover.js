@@ -30,6 +30,7 @@ const _transformData = collective => ({
 
 function useCollectives(query) {
   const [responseData, setResponseData] = useState({});
+  const [error, setError] = useState({});
   const params = {
     offset: query.offset || 0,
     show: query.show || 'all',
@@ -47,7 +48,7 @@ function useCollectives(query) {
         collectives: data.collectives.map(_transformData),
       });
     } catch (error) {
-      this.setState({ error });
+      setError(error);
     }
   };
 
