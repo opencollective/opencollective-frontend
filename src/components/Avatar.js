@@ -22,6 +22,7 @@ export const StyledAvatar = styled(Flex)`
   font-weight: bold;
   justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
   ${size}
 `;
 
