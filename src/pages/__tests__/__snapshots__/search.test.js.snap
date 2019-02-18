@@ -26,6 +26,7 @@ Array [
   padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
+  min-height: 68px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1321,6 +1322,7 @@ Array [
   padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
+  min-height: 68px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2717,6 +2719,7 @@ exports[`Search Page renders error message 1`] = `
   padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  min-height: 68px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3860,6 +3863,7 @@ Array [
   padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
+  min-height: 68px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5250,6 +5254,7 @@ Array [
   padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
+  min-height: 68px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;

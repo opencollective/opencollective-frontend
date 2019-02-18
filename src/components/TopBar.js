@@ -65,7 +65,14 @@ class TopBar extends React.Component {
     const shouldAnimate = (Array.isArray(className) && className.includes('loading')) || loadingLoggedInUser;
 
     return (
-      <Flex px={3} py={showSearch ? 2 : 3} alignItems="center" flexDirection="row" justifyContent="space-around">
+      <Flex
+        px={3}
+        py={showSearch ? 2 : 3}
+        alignItems="center"
+        flexDirection="row"
+        justifyContent="space-around"
+        css={{ minHeight: 68 }}
+      >
         <Link route="home" passHref>
           <Flex as="a" alignItems="center">
             <Logo width="24" height="24" animate={shouldAnimate} />
