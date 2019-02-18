@@ -47,13 +47,12 @@ function useCollectives(query) {
         collectives: data.collectives.map(_transformData),
       });
     } catch (error) {
-      console.log(error);
+      this.setState({ error });
     }
   };
 
   useEffect(() => {
     fetchDiscoverData();
-    console.log(query, 'I triggerd');
   }, [query]);
 
   return responseData;
