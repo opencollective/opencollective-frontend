@@ -75,3 +75,21 @@ initialState = { buttonSize: 'medium' };
   </fieldset>
 </React.Fragment>;
 ```
+
+### Button is not clickable when loading
+
+```js
+initialState = { loading: false, nbClicks: 0 };
+
+<StyledButton
+  buttonSize="large"
+  width={300}
+  loading={state.loading}
+  onClick={() => {
+    setState(state => ({ loading: true, nbClicks: state.nbClicks + 1 }));
+    setTimeout(() => setState({ loading: false }), 2000);
+  }}
+>
+  Clicked {state.nbClicks} times
+</StyledButton>;
+```
