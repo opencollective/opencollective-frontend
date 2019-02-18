@@ -124,11 +124,13 @@ class Footer extends React.Component {
                 <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
                   {Object.keys(navigation[key]).map(item => (
                     <ListItem key={item} textAlign={['center', null, 'left']} mb={2}>
-                      {
+                      {navigation[key][item][0] === '/' ? (
                         <Link route={navigation[key][item]} passHref>
                           <MenuLink>{item}</MenuLink>
                         </Link>
-                      }
+                      ) : (
+                        <MenuLink href={navigation[key][item]}>{item}</MenuLink>
+                      )}
                     </ListItem>
                   ))}
                 </FlexList>
