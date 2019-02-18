@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import colors from '../constants/colors';
-
+import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
+import { Flex } from '@rebass/grid';
+
+import colors from '../constants/colors';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
 import Link from './Link';
 import CollectiveCard from './CollectiveCard';
 import Avatar from './Avatar';
-import { get } from 'lodash';
 
 class Member extends React.Component {
   static propTypes = {
@@ -97,15 +98,9 @@ ${totalDonationsStr}`;
               width: 200px;
             }
 
-            .Member :global(.Avatar) {
-              float: left;
-              width: 45px;
-              height: 45px;
-              margin-top: 1rem;
-            }
-
             .bubble {
               padding: 1rem;
+              padding-top: 0;
               text-align: left;
               overflow: hidden;
             }
@@ -131,21 +126,23 @@ ${totalDonationsStr}`;
         <div>
           {viewMode === 'USER' && (
             <Link route={'collective'} params={{ slug: this.props.member.member.slug }} target="_top" title={title}>
-              <Avatar src={member.image} radius={45} name={name} type={member.type} mt={2} className="noFrame" />
-              <div className="bubble">
-                <div className="name">{name}</div>
-                <div className="description" style={{ color: colors.darkgray }}>
-                  {firstSentence(description || member.description, 64)}
-                </div>
-                <div className="meta since" style={{ color: colors.darkgray }}>
-                  {memberSinceStr}
-                </div>
-                {totalDonationsStr && (
-                  <div className="meta totalDonations" style={{ color: colors.darkgray }}>
-                    {totalDonationsStr}
+              <Flex mt={2}>
+                <Avatar src={member.image} radius={45} name={name} type={member.type} className="noFrame" />
+                <div className="bubble">
+                  <div className="name">{name}</div>
+                  <div className="description" style={{ color: colors.darkgray }}>
+                    {firstSentence(description || member.description, 64)}
                   </div>
-                )}
-              </div>
+                  <div className="meta since" style={{ color: colors.darkgray }}>
+                    {memberSinceStr}
+                  </div>
+                  {totalDonationsStr && (
+                    <div className="meta totalDonations" style={{ color: colors.darkgray }}>
+                      {totalDonationsStr}
+                    </div>
+                  )}
+                </div>
+              </Flex>
             </Link>
           )}
           {viewMode === 'ORGANIZATION' && <CollectiveCard collective={member} membership={membership} />}
