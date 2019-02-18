@@ -1186,7 +1186,6 @@ Array [
               <a
                 className="c17"
                 href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -1197,7 +1196,6 @@ Array [
               <a
                 className="c17"
                 href="https://slack.opencollective.com"
-                onClick={[Function]}
               >
                 Slack
               </a>
@@ -1208,7 +1206,6 @@ Array [
               <a
                 className="c17"
                 href="https://docs.opencollective.com"
-                onClick={[Function]}
               >
                 Docs & help
               </a>
@@ -1219,7 +1216,6 @@ Array [
               <a
                 className="c17"
                 href="mailto:support@opencollective.com"
-                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -1261,7 +1257,6 @@ Array [
               <a
                 className="c17"
                 href="https://medium.com/open-collective"
-                onClick={[Function]}
               >
                 Blog
               </a>
@@ -2482,7 +2477,6 @@ Array [
               <a
                 className="c17"
                 href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -2493,7 +2487,6 @@ Array [
               <a
                 className="c17"
                 href="https://slack.opencollective.com"
-                onClick={[Function]}
               >
                 Slack
               </a>
@@ -2504,7 +2497,6 @@ Array [
               <a
                 className="c17"
                 href="https://docs.opencollective.com"
-                onClick={[Function]}
               >
                 Docs & help
               </a>
@@ -2515,7 +2507,6 @@ Array [
               <a
                 className="c17"
                 href="mailto:support@opencollective.com"
-                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -2557,7 +2548,6 @@ Array [
               <a
                 className="c17"
                 href="https://medium.com/open-collective"
-                onClick={[Function]}
               >
                 Blog
               </a>
@@ -3727,7 +3717,6 @@ exports[`Search Page renders error message 1`] = `
               <a
                 className="c38"
                 href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -3738,7 +3727,6 @@ exports[`Search Page renders error message 1`] = `
               <a
                 className="c38"
                 href="https://slack.opencollective.com"
-                onClick={[Function]}
               >
                 Slack
               </a>
@@ -3749,7 +3737,6 @@ exports[`Search Page renders error message 1`] = `
               <a
                 className="c38"
                 href="https://docs.opencollective.com"
-                onClick={[Function]}
               >
                 Docs & help
               </a>
@@ -3760,7 +3747,6 @@ exports[`Search Page renders error message 1`] = `
               <a
                 className="c38"
                 href="mailto:support@opencollective.com"
-                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -3802,7 +3788,6 @@ exports[`Search Page renders error message 1`] = `
               <a
                 className="c38"
                 href="https://medium.com/open-collective"
-                onClick={[Function]}
               >
                 Blog
               </a>
@@ -5118,7 +5103,6 @@ Array [
               <a
                 className="c17"
                 href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -5129,7 +5113,6 @@ Array [
               <a
                 className="c17"
                 href="https://slack.opencollective.com"
-                onClick={[Function]}
               >
                 Slack
               </a>
@@ -5140,7 +5123,6 @@ Array [
               <a
                 className="c17"
                 href="https://docs.opencollective.com"
-                onClick={[Function]}
               >
                 Docs & help
               </a>
@@ -5151,7 +5133,6 @@ Array [
               <a
                 className="c17"
                 href="mailto:support@opencollective.com"
-                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -5193,7 +5174,6 @@ Array [
               <a
                 className="c17"
                 href="https://medium.com/open-collective"
-                onClick={[Function]}
               >
                 Blog
               </a>
@@ -6649,7 +6629,6 @@ Array [
               <a
                 className="c17"
                 href="https://github.com/opencollective/opencollective/issues"
-                onClick={[Function]}
               >
                 Report an issue
               </a>
@@ -6660,7 +6639,6 @@ Array [
               <a
                 className="c17"
                 href="https://slack.opencollective.com"
-                onClick={[Function]}
               >
                 Slack
               </a>
@@ -6671,7 +6649,6 @@ Array [
               <a
                 className="c17"
                 href="https://docs.opencollective.com"
-                onClick={[Function]}
               >
                 Docs & help
               </a>
@@ -6682,7 +6659,6 @@ Array [
               <a
                 className="c17"
                 href="mailto:support@opencollective.com"
-                onClick={[Function]}
               >
                 Email Support
               </a>
@@ -6724,7 +6700,6 @@ Array [
               <a
                 className="c17"
                 href="https://medium.com/open-collective"
-                onClick={[Function]}
               >
                 Blog
               </a>
