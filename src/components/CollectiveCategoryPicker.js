@@ -107,7 +107,7 @@ class CollectiveCategoryPicker extends React.Component {
               flex-wrap: wrap;
             }
             label {
-              margin-left: 5px;
+              margin-left: 0px;
               margin-right: 5px;
               width: auto;
             }
