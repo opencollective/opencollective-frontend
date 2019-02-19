@@ -249,12 +249,7 @@ const queries = {
         description: 'Slug of the transaction.',
       },
     },
-    async resolve(_, args, req) {
-      // Need to be authenticated
-      if (!req.remoteUser) {
-        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
-      }
-
+    async resolve(_, args) {
       // Fetch transaction
       const transaction = await models.Transaction.findOne({
         where: { uuid: args.transactionUuid },
@@ -266,11 +261,6 @@ const queries = {
 
       // If using a virtualcard, then billed collective will be the emitter
       const fromCollectiveId = transaction.paymentMethodProviderCollectiveId();
-
-      // Ensure user is admin of collective
-      if (!req.remoteUser.isAdmin(fromCollectiveId)) {
-        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
-      }
 
       // Load transaction host
       transaction.host = await transaction.getHostCollective();
