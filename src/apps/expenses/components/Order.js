@@ -49,6 +49,10 @@ class Order extends React.Component {
   render() {
     const { intl, collective, order, includeHostedCollectives, LoggedInUser, view, editable } = this.props;
 
+    if (!order.collective) {
+      console.warn('no collective attached to order', order);
+    }
+
     const title = order.description;
     const status = order.status.toLowerCase();
     const canMarkOrderAsPaid = LoggedInUser && collective.host && LoggedInUser.canEditCollective(collective.host);
@@ -218,7 +222,7 @@ class Order extends React.Component {
             <div className="meta">
               <Moment relative={true} value={order.createdAt} />
               {' | '}
-              {includeHostedCollectives && (
+              {includeHostedCollectives && order.collective && (
                 <span className="collective">
                   <Link route={`/${order.collective.slug}`}>{order.collective.slug}</Link>
                   {' | '}

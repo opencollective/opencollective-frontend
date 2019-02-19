@@ -297,7 +297,7 @@ class Expense extends React.Component {
             <div className="meta">
               <Moment relative={true} value={expense.incurredAt} />
               {' | '}
-              {includeHostedCollectives && (
+              {includeHostedCollectives && expense.collective && (
                 <span className="collective">
                   <Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance:{' '}
                   {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
