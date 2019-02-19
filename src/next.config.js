@@ -1,3 +1,4 @@
+/*  eslint-disable-next-line import/no-unresolved */
 import webpack from 'webpack';
 import withCSS from '@zeit/next-css';
 import { get } from 'lodash';

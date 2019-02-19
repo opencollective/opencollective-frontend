@@ -97,7 +97,6 @@
     "unified": "7.1.0",
     "uuid": "3.3.2",
     "validator": "10.11.0",
-    "webpack": "4.20.2",
     "winston": "3.2.1"
   },
   "scripts": {
@@ -195,8 +194,7 @@
       "@babel/node",
       "@babel/runtime",
       "react-mde",
-      "styled-jsx",
-      "webpack"
+      "styled-jsx"
     ]
   },
   "husky": {
