@@ -66,14 +66,6 @@ class CreateCollectiveForm extends React.Component {
         id: 'collective.website.description',
         defaultMessage: 'Enter the URL of your website or Facebook Page',
       },
-      'githubHandle.label': {
-        id: 'collective.githubHandle.label',
-        defaultMessage: 'Github',
-      },
-      'githubHandle.description': {
-        id: 'collective.githubHandle.description',
-        defaultMessage: 'Enter your Github organization name if you have one',
-      },
       'location.label': {
         id: 'collective.location.label',
         defaultMessage: 'City',
@@ -167,12 +159,6 @@ class CreateCollectiveForm extends React.Component {
           name: 'website',
           type: 'text',
           maxLength: 255,
-          placeholder: '',
-        },
-        {
-          name: 'githubHandle',
-          type: 'text',
-          maxLength: 39,
           placeholder: '',
         },
         {
@@ -374,102 +360,103 @@ class CreateCollectiveForm extends React.Component {
             }
           `}
         </style>
+        <div className="FormInputs">
+          {this.categories.length > 1 && (
+            <CollectiveCategoryPicker
+              categories={this.categories}
+              onChange={value => this.handleChange('category', value)}
+            />
+          )}
 
-        {this.categories.length > 1 && (
-          <CollectiveCategoryPicker
-            categories={this.categories}
-            onChange={value => this.handleChange('category', value)}
-          />
-        )}
+          {showForm && (
+            <div>
+              {Object.keys(this.fields).map(key => (
+                <div className="inputs" key={key}>
+                  {this.fields[key].map(
+                    field =>
+                      (!field.when || field.when()) && (
+                        <InputField
+                          key={`${this.masterKey}-${field.name}`}
+                          value={this.state.collective[field.name]}
+                          className={field.className}
+                          defaultValue={this.state.collective[field.name] || field.defaultValue}
+                          validate={field.validate}
+                          ref={field.name}
+                          name={field.name}
+                          focus={field.focus}
+                          label={field.label}
+                          description={field.description}
+                          options={field.options}
+                          placeholder={field.placeholder}
+                          type={field.type}
+                          help={field.help}
+                          pre={field.pre}
+                          context={this.state.collective}
+                          onChange={value => this.handleChange(field.name, value)}
+                        />
+                      ),
+                  )}
+                </div>
+              ))}
 
-        {showForm && (
-          <div className="FormInputs">
-            {Object.keys(this.fields).map(key => (
-              <div className="inputs" key={key}>
-                {this.fields[key].map(
-                  field =>
-                    (!field.when || field.when()) && (
-                      <InputField
-                        key={`${this.masterKey}-${field.name}`}
-                        value={this.state.collective[field.name]}
-                        className={field.className}
-                        defaultValue={this.state.collective[field.name] || field.defaultValue}
-                        validate={field.validate}
-                        ref={field.name}
-                        name={field.name}
-                        focus={field.focus}
-                        label={field.label}
-                        description={field.description}
-                        options={field.options}
-                        placeholder={field.placeholder}
-                        type={field.type}
-                        help={field.help}
-                        pre={field.pre}
-                        context={this.state.collective}
-                        onChange={value => this.handleChange(field.name, value)}
-                      />
-                    ),
-                )}
-              </div>
-            ))}
-
-            <div className="tos">
-              <label>{intl.formatMessage(this.messages['tos.label'])}</label>
-              <div>
-                <input
-                  type="checkbox"
-                  name="tos"
-                  required
-                  onChange={({ target }) => this.handleChange('tos', target.checked)}
-                />
-                <span>
-                  I agree with the{' '}
-                  <a href="/tos" target="_blank" rel="noopener noreferrer">
-                    terms of service of Open Collective
-                  </a>
-                </span>
-              </div>
-              {get(host, 'settings.tos') && (
+              <div className="tos">
+                <label>{intl.formatMessage(this.messages['tos.label'])}</label>
                 <div>
                   <input
                     type="checkbox"
-                    name="hostTos"
+                    name="tos"
                     required
-                    onChange={({ target }) => this.handleChange('hostTos', target.checked)}
+                    onChange={({ target }) => this.handleChange('tos', target.checked)}
                   />
                   <span>
                     I agree with the{' '}
-                    <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
-                      terms of service of the host
-                    </a>{' '}
-                    (
-                    <a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">
-                      {host.name}
+                    <a href="/tos" target="_blank" rel="noopener noreferrer">
+                      terms of service of Open Collective
                     </a>
-                    ) that will collect money on behalf of our collective
                   </span>
                 </div>
-              )}
-            </div>
+                {get(host, 'settings.tos') && (
+                  <div>
+                    <input
+                      type="checkbox"
+                      name="hostTos"
+                      required
+                      onChange={({ target }) => this.handleChange('hostTos', target.checked)}
+                    />
+                    <span>
+                      I agree with the{' '}
+                      <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
+                        terms of service of the host
+                      </a>{' '}
+                      (
+                      <a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">
+                        {host.name}
+                      </a>
+                      ) that will collect money on behalf of our collective
+                    </span>
+                  </div>
+                )}
+              </div>
 
-            <div className="actions">
-              <Button
-                bsStyle="primary"
-                type="submit"
-                onClick={this.handleSubmit}
-                disabled={loading || !this.state.modified}
-              >
-                {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-                {!loading && collective.type === 'COLLECTIVE' && (
-                  <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" />
-                )}
-                {!loading && collective.type === 'ORGANIZATION' && (
-                  <FormattedMessage id="organization.create" defaultMessage="Create organization" />
-                )}
-              </Button>
+              <div className="actions">
+                <Button
+                  bsStyle="primary"
+                  type="submit"
+                  onClick={this.handleSubmit}
+                  disabled={loading || !this.state.modified}
+                >
+                  {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                  {!loading && collective.type === 'COLLECTIVE' && (
+                    <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" />
+                  )}
+                  {!loading && collective.type === 'ORGANIZATION' && (
+                    <FormattedMessage id="organization.create" defaultMessage="Create organization" />
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
