@@ -66,14 +66,6 @@ class CreateCollectiveForm extends React.Component {
         id: 'collective.website.description',
         defaultMessage: 'Enter the URL of your website or Facebook Page',
       },
-      'githubHandle.label': {
-        id: 'collective.githubHandle.label',
-        defaultMessage: 'Github',
-      },
-      'githubHandle.description': {
-        id: 'collective.githubHandle.description',
-        defaultMessage: 'Enter your Github organization name if you have one',
-      },
       'location.label': {
         id: 'collective.location.label',
         defaultMessage: 'City',
@@ -167,12 +159,6 @@ class CreateCollectiveForm extends React.Component {
           name: 'website',
           type: 'text',
           maxLength: 255,
-          placeholder: '',
-        },
-        {
-          name: 'githubHandle',
-          type: 'text',
-          maxLength: 39,
           placeholder: '',
         },
         {
