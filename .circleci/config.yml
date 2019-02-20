@@ -82,7 +82,10 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
+            - .babelrc
+            - cypress
             - dist
+            - src
             - test
             - package.json
             - package-lock.json
