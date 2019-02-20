@@ -10,7 +10,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker
 
       - restore_cache:
           keys:
@@ -39,7 +38,6 @@ jobs:
       CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
-      - setup_remote_docker
 
       - restore_cache:
           keys:
@@ -63,7 +61,6 @@ jobs:
       CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
-      - setup_remote_docker
 
       - restore_cache:
           keys:
@@ -90,11 +87,7 @@ jobs:
       - image: memcached
     environment:
       NODE_ENV: circleci
-      CYPRESS_INSTALL_BINARY: 0
     steps:
-      - checkout
-      - setup_remote_docker
-
       - run: sudo apt -y update
       - run: sudo apt -y install postgresql-client
 
