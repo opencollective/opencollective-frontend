@@ -40,7 +40,7 @@ jobs:
             # This is where we store the opencollective-api
             - ../cache
             # This is the global npm cache
-            - /root/.npm
+            - ../.npm
 
       - run: npm run test
       - store_test_results:
