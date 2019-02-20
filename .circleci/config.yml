@@ -68,6 +68,7 @@ jobs:
           paths:
             - cypress
             - dist
+            - node_modules
             - scripts
             - src
             - test
@@ -94,10 +95,6 @@ jobs:
 
       - attach_workspace:
           at: .
-
-      - <<: *restore_cache
-      - run: CYPRESS_INSTALL_BINARY=0 npm ci
-      - <<: *persist_cache
 
       - restore_cache:
           keys:
