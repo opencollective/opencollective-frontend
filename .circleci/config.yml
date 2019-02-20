@@ -29,6 +29,7 @@ jobs:
             - ../.npm
 
       - run: npm run lint
+      - run: npm run prettier:check
 
   jest:
     docker:
