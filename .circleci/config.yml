@@ -78,16 +78,25 @@ jobs:
 
       - restore_cache:
           keys:
-            - npm-cypress-cache-{{ checksum "package.json" }}
-            - npm-cypress-cache-
+            - npm-cache-{{ checksum "package.json" }}
+            - npm-cache-
+
+      - restore_cache:
+          keys:
+            - cypress-cache-{{ checksum "package.json" }}
+            - cypress-cache-
 
       - run: npm ci
 
       - save_cache:
-          key: npm-cypress-cache-{{ checksum "package.json" }}
+          key: npm-cache-{{ checksum "package.json" }}
           paths:
             # This is the global npm cache
             - ../.npm
+
+      - save_cache:
+          key: cypress-cache-{{ checksum "package.json" }}
+          paths:
             # This is the cache for the cypress binary
             - ../.cache
 
