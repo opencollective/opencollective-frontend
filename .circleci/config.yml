@@ -54,6 +54,33 @@ jobs:
 
       - run: npm run test:jest
 
+  build:
+    docker:
+      - image: circleci/node:11.8.0
+    environment:
+      NODE_ENV: circleci
+      CYPRESS_INSTALL_BINARY: 0
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - restore_cache:
+          keys:
+            - npm-cache-{{ checksum "package.json" }}
+            - npm-cache-
+
+      - run: npm ci
+
+      - save_cache:
+          key: npm-cache-{{ checksum "package.json" }}
+          paths:
+            - ../.npm
+
+      - run: npm run build:clean
+      - run: npm run build:updates
+      - run: npm run build:server
+      - run: npm run build:next
+
   e2e:
     docker:
       - image: circleci/node:11.8.0
@@ -79,19 +106,6 @@ jobs:
 
       - restore_cache:
           keys:
-            - npm-cache-{{ checksum "package.json" }}
-            - npm-cache-
-
-      - run: npm ci
-
-      - save_cache:
-          key: npm-cache-{{ checksum "package.json" }}
-          paths:
-            # This is the global npm cache
-            - ../.npm
-
-      - restore_cache:
-          keys:
             - cypress-cache-{{ checksum "package.json" }}
             - cypress-cache-
 
@@ -103,11 +117,6 @@ jobs:
             # This is the cache for the cypress binary
             - ../.cache
 
-      - run: npm run build:clean
-      - run: npm run build:updates
-      - run: npm run build:server
-      - run: npm run build:next
-
       - run: ./scripts/setup_circleci.sh
 
       - run: npm run test:e2e
@@ -117,8 +126,11 @@ jobs:
 
 workflows:
   version: 2
-  lint-jest-build:
+  lint-jest-build-e2e:
     jobs:
       - lint
       - jest
-      - e2e
+      - build
+      - e2e:
+          requires:
+            - build
