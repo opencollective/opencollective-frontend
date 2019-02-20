@@ -83,7 +83,8 @@ jobs:
           root: .
           paths:
             - dist
-            - node_modules
+            - package.json
+            - package-lock.json
             - scripts
 
   e2e:
@@ -110,10 +111,22 @@ jobs:
 
       - restore_cache:
           keys:
+            - npm-cache-{{ checksum "package.json" }}
+            - npm-cache-
+
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+
+      - save_cache:
+          key: npm-cache-{{ checksum "package.json" }}
+          paths:
+            - ../.npm
+
+      - restore_cache:
+          keys:
             - cypress-cache-{{ checksum "package.json" }}
             - cypress-cache-
 
-      - run: CYPRESS_INSTALL_BINARY=true npx cypress install
+      - run: npx cypress install
 
       - save_cache:
           key: cypress-cache-{{ checksum "package.json" }}
