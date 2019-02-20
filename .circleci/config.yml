@@ -62,6 +62,7 @@ jobs:
       - image: memcached
     environment:
       NODE_ENV: circleci
+      CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
       - setup_remote_docker
@@ -81,11 +82,6 @@ jobs:
             - npm-cache-{{ checksum "package.json" }}
             - npm-cache-
 
-      - restore_cache:
-          keys:
-            - cypress-cache-{{ checksum "package.json" }}
-            - cypress-cache-
-
       - run: npm ci
 
       - save_cache:
@@ -93,6 +89,13 @@ jobs:
           paths:
             # This is the global npm cache
             - ../.npm
+
+      - restore_cache:
+          keys:
+            - cypress-cache-{{ checksum "package.json" }}
+            - cypress-cache-
+
+      - run: CYPRESS_INSTALL_BINARY=true npx cypress install
 
       - save_cache:
           key: cypress-cache-{{ checksum "package.json" }}
