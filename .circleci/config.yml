@@ -1,5 +1,33 @@
 version: 2
+
 jobs:
+
+  lint:
+    docker:
+      - image: circleci/node:11.8.0
+    environment:
+      NODE_ENV: circleci
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - restore_cache:
+          # Find a cache corresponding to this specific package-lock.json checksum
+          # when this file is changed, this key will fail
+          key: npm-cache-{{ checksum "package.json" }}
+          # Find the most recently generated cache used from any branch
+          key: npm-cache-
+
+      - run: npm ci
+
+      - save_cache:
+          key: npm-cache-{{ checksum "package.json" }}
+          paths:
+            # This is the global npm cache
+            - ../.npm
+
+      - run: npm run lint
+
   build:
     docker:
       - image: circleci/node:11.8.0
@@ -42,6 +70,15 @@ jobs:
             # This is the global npm cache
             - ../.npm
 
-      - run: npm run test
+      - run: npm run test:jest
+      - run: npm run test:e2e
+
       - store_test_results:
           path: /tmp/circleci-test-results
+
+workflows:
+  version: 2
+  lint-build:
+    jobs:
+      - lint
+      - build
