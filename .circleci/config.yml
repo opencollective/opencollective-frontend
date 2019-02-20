@@ -79,6 +79,13 @@ jobs:
       - run: npm run build:server
       - run: npm run build:next
 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+            - node_modules
+            - scripts
+
   e2e:
     docker:
       - image: circleci/node:11.8.0
@@ -97,6 +104,9 @@ jobs:
       - run: sudo apt -y install libnotify-dev
       - run: sudo apt -y install libgconf-2-4 libnss3 libxss1
       - run: sudo apt -y install libasound2 xvfb
+
+      - attach_workspace:
+          at: .
 
       - restore_cache:
           keys:
