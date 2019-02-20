@@ -1,5 +1,20 @@
 version: 2
 
+aliases:
+  restore_cache: &restore_cache
+    restore_cache:
+      name: Restore npm cache
+      keys:
+        - npm-cache-{{ checksum "package.json" }}
+        - npm-cache-
+
+  persist_cache: &persist_cache
+    save_cache:
+      name: Save npm cache
+      key: npm-cache-{{ checksum "package.json" }}
+      paths:
+        - ../.npm
+
 jobs:
   lint:
     docker:
@@ -10,22 +25,9 @@ jobs:
 
     steps:
       - checkout
-
-      - restore_cache:
-          keys:
-            # Find a cache corresponding to this specific package-lock.json checksum
-            # when this file is changed, this key will fail
-            - npm-cache-{{ checksum "package.json" }}
-            # Find the most recently generated cache used from any branch
-            - npm-cache-
-
+      - <<: *restore_cache
       - run: npm ci
-
-      - save_cache:
-          key: npm-cache-{{ checksum "package.json" }}
-          paths:
-            # This is the global npm cache
-            - ../.npm
+      - <<: *persist_cache
 
       - run: npm run lint
       - run: npm run prettier:check
@@ -38,18 +40,9 @@ jobs:
       CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
-
-      - restore_cache:
-          keys:
-            - npm-cache-{{ checksum "package.json" }}
-            - npm-cache-
-
+      - <<: *restore_cache
       - run: npm ci
-
-      - save_cache:
-          key: npm-cache-{{ checksum "package.json" }}
-          paths:
-            - ../.npm
+      - <<: *persist_cache
 
       - run: npm run test:jest
 
@@ -61,18 +54,9 @@ jobs:
       CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
-
-      - restore_cache:
-          keys:
-            - npm-cache-{{ checksum "package.json" }}
-            - npm-cache-
-
+      - <<: *restore_cache
       - run: npm ci
-
-      - save_cache:
-          key: npm-cache-{{ checksum "package.json" }}
-          paths:
-            - ../.npm
+      - <<: *persist_cache
 
       - run: npm run build:clean
       - run: npm run build:updates
@@ -110,17 +94,9 @@ jobs:
       - attach_workspace:
           at: .
 
-      - restore_cache:
-          keys:
-            - npm-cache-{{ checksum "package.json" }}
-            - npm-cache-
-
+      - <<: *restore_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
-
-      - save_cache:
-          key: npm-cache-{{ checksum "package.json" }}
-          paths:
-            - ../.npm
+      - <<: *persist_cache
 
       - restore_cache:
           keys:
