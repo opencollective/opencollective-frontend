@@ -7,6 +7,8 @@ jobs:
       - image: circleci/node:11.8.0
     environment:
       NODE_ENV: circleci
+      CYPRESS_INSTALL_BINARY: 0
+
     steps:
       - checkout
       - setup_remote_docker
@@ -27,6 +29,33 @@ jobs:
             - ../.npm
 
       - run: npm run lint
+
+  jest:
+    docker:
+      - image: circleci/node:11.8.0
+    environment:
+      NODE_ENV: circleci
+      CYPRESS_INSTALL_BINARY: 0
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - restore_cache:
+          # Find a cache corresponding to this specific package-lock.json checksum
+          # when this file is changed, this key will fail
+          key: npm-cache-{{ checksum "package.json" }}
+          # Find the most recently generated cache used from any branch
+          key: npm-cache-
+
+      - run: npm ci
+
+      - save_cache:
+          key: npm-cache-{{ checksum "package.json" }}
+          paths:
+            # This is the global npm cache
+            - ../.npm
+
+      - run: npm run test:jest
 
   build:
     docker:
@@ -70,7 +99,6 @@ jobs:
             # This is the global npm cache
             - ../.npm
 
-      - run: npm run test:jest
       - run: npm run test:e2e
 
       - store_test_results:
@@ -81,4 +109,5 @@ workflows:
   lint-build:
     jobs:
       - lint
+      - jest
       - build
