@@ -1,7 +1,6 @@
 version: 2
 
 jobs:
-
   lint:
     docker:
       - image: circleci/node:11.8.0
@@ -14,11 +13,12 @@ jobs:
       - setup_remote_docker
 
       - restore_cache:
-          # Find a cache corresponding to this specific package-lock.json checksum
-          # when this file is changed, this key will fail
-          key: npm-cache-{{ checksum "package.json" }}
-          # Find the most recently generated cache used from any branch
-          key: npm-cache-
+          keys:
+            # Find a cache corresponding to this specific package-lock.json checksum
+            # when this file is changed, this key will fail
+            - npm-cache-{{ checksum "package.json" }}
+            # Find the most recently generated cache used from any branch
+            - npm-cache-
 
       - run: npm ci
 
@@ -41,18 +41,15 @@ jobs:
       - setup_remote_docker
 
       - restore_cache:
-          # Find a cache corresponding to this specific package-lock.json checksum
-          # when this file is changed, this key will fail
-          key: npm-cache-{{ checksum "package.json" }}
-          # Find the most recently generated cache used from any branch
-          key: npm-cache-
+          keys:
+            - npm-cache-{{ checksum "package.json" }}
+            - npm-cache-
 
       - run: npm ci
 
       - save_cache:
           key: npm-cache-{{ checksum "package.json" }}
           paths:
-            # This is the global npm cache
             - ../.npm
 
       - run: npm run test:jest
@@ -80,29 +77,19 @@ jobs:
       - run: sudo apt -y install libasound2 xvfb
 
       - restore_cache:
-        # Find a cache corresponding to this specific package-lock.json checksum
-        # when this file is changed, this key will fail
-        key: npm-cache-{{ checksum "package.json" }}
-        # Find the most recently generated cache used from any branch
-        key: npm-cache-
-
-      - restore_cache:
-        key: cypress-cache-{{ checksum "package.json" }}
-        key: cypress-cache-
+          keys:
+            - npm-cypress-cache-{{ checksum "package.json" }}
+            - npm-cypress-cache-
 
       - run: npm ci
 
       - save_cache:
-        key: npm-cache-{{ checksum "package.json" }}
-        paths:
-          # This is the global npm cache
-          - ../.npm
-
-      - save_cache:
-        key: cypress-cache-{{ checksum "package.json" }}
-        paths:
-          # This is the cache for the cypress binary
-          - ../.cache
+          key: npm-cypress-cache-{{ checksum "package.json" }}
+          paths:
+            # This is the global npm cache
+            - ../.npm
+            # This is the cache for the cypress binary
+            - ../.cache
 
       - run: npm run build:clean
       - run: npm run build:updates
