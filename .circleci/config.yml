@@ -57,7 +57,7 @@ jobs:
 
       - run: npm run test:jest
 
-  build:
+  e2e:
     docker:
       - image: circleci/node:11.8.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
@@ -68,36 +68,48 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          # Find a cache corresponding to this specific package-lock.json checksum
-          # when this file is changed, this key will fail
-          key: cache-{{ checksum "package.json" }}
-          # Find the most recently generated cache used from any branch
-          key: cache-
+
       - run: sudo apt -y update
       - run: sudo apt -y install postgresql-client
+
       # Cypress dependencies
       # See: https://github.com/cypress-io/cypress-docker-images/blob/master/base/ubuntu16/Dockerfile
       - run: sudo apt -y install libgtk2.0-0
       - run: sudo apt -y install libnotify-dev
       - run: sudo apt -y install libgconf-2-4 libnss3 libxss1
       - run: sudo apt -y install libasound2 xvfb
+
+      - restore_cache:
+        # Find a cache corresponding to this specific package-lock.json checksum
+        # when this file is changed, this key will fail
+        key: npm-cache-{{ checksum "package.json" }}
+        # Find the most recently generated cache used from any branch
+        key: npm-cache-
+
+      - restore_cache:
+        key: cypress-cache-{{ checksum "package.json" }}
+        key: cypress-cache-
+
       - run: npm ci
+
+      - save_cache:
+        key: npm-cache-{{ checksum "package.json" }}
+        paths:
+          # This is the global npm cache
+          - ../.npm
+
+      - save_cache:
+        key: cypress-cache-{{ checksum "package.json" }}
+        paths:
+          # This is the cache for the cypress binary
+          - ../.cache
+
       - run: npm run build:clean
       - run: npm run build:updates
       - run: npm run build:server
       - run: npm run build:next
+
       - run: ./scripts/setup_circleci.sh
-      - save_cache:
-          key: cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-            #  This is where we store Cypress binary
-            - ../.cache #
-            # This is where we store the opencollective-api
-            - ../cache
-            # This is the global npm cache
-            - ../.npm
 
       - run: npm run test:e2e
 
@@ -106,8 +118,8 @@ jobs:
 
 workflows:
   version: 2
-  lint-build:
+  lint-jest-build:
     jobs:
       - lint
       - jest
-      - build
+      - e2e
