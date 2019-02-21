@@ -887,9 +887,9 @@ describe('graphql.collective.test.js', () => {
 
       expect(paymentMethods).to.have.length(3);
       expect(paymentMethods[1].uuid).to.have.length(36);
-      expect(paymentMethods[1].name).to.equal('4242');
+      expect(paymentMethods[1].name).to.equal('1212');
       expect(paymentMethods[2].uuid).to.have.length(36);
-      expect(paymentMethods[2].name).to.equal('1212');
+      expect(paymentMethods[2].name).to.equal('4242');
 
       query = `
     query Collective($slug: String) {
@@ -908,9 +908,9 @@ describe('graphql.collective.test.js', () => {
       paymentMethods = res.data.Collective.paymentMethods;
       expect(paymentMethods).to.have.length(3);
       expect(paymentMethods[1].uuid).to.have.length(36);
-      expect(paymentMethods[1].name).to.equal('4242');
+      expect(paymentMethods[1].name).to.equal('1212');
       expect(paymentMethods[2].uuid).to.have.length(36);
-      expect(paymentMethods[2].name).to.equal('1212');
+      expect(paymentMethods[2].name).to.equal('4242');
 
       // Should not return the credit cards if not logged in;
       res = await utils.graphqlQuery(query, { slug: 'pubnub' });
