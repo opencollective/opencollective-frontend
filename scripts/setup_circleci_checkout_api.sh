@@ -42,10 +42,4 @@ then
     rm -rf api
   fi
   mv "opencollective-api-${BRANCH//\//-}" api
-  cd "api"
-  echo "> Running npm install for api"
-  npm ci
-  echo "> Running build for api"
-  npm run build
-  cd ..
 fi
