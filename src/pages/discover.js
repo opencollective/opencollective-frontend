@@ -29,8 +29,7 @@ const _transformData = collective => ({
 });
 
 function useCollectives(query) {
-  const [responseData, setResponseData] = useState({});
-  const [error, setError] = useState({});
+  const [state, setState] = useState({ error: null });
   const params = {
     offset: query.offset || 0,
     show: query.show || 'all',
@@ -41,14 +40,14 @@ function useCollectives(query) {
     try {
       const endpoints = [`/discover?${queryString(params)}`, '/groups/tags'];
       const [data, tags] = await Promise.all(endpoints.map(e => fetch(`${getBaseApiUrl()}${e}`).then(r => r.json())));
-      setResponseData({
+      setState({
         ...pick(data, ['offset', 'total']),
         ...params,
         tags,
         collectives: data.collectives.map(_transformData),
       });
     } catch (error) {
-      setError(error);
+      setState({ error });
     }
   };
 
@@ -56,7 +55,7 @@ function useCollectives(query) {
     fetchDiscoverData();
   }, [query]);
 
-  return responseData;
+  return state;
 }
 
 const DiscoverPage = ({ router }) => {
