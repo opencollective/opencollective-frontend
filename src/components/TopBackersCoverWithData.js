@@ -51,7 +51,7 @@ class TopBackersCoverWithData extends React.Component {
             {`
               .org {
                 border-radius: 16px;
-                background: rgba(255, 255, 255, 0.5);
+                background: rgba(0, 0, 0, 0.5);
                 padding: 5px;
                 display: flex;
                 align-items: center;
