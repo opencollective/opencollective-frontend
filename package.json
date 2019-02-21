@@ -109,7 +109,7 @@
     "build:next": "next build dist",
     "test": "npm run test:jest && npm run test:e2e",
     "test:jest": "TZ=UTC jest src/*",
-    "test:server": "TZ=UTC jest test/server/*",
+    "test:server": "TZ=UTC ./scripts/run_server_tests.sh",
     "test:e2e": "TZ=UTC ./scripts/run_e2e_tests.sh",
     "test:update": "npm run test:src -- --updateSnapshot",
     "build:langs": "rm -rf dist/messages && babel src/**/*.js > /dev/null && babel src/apps/**/*.js > /dev/null && babel-node scripts/translate.js",

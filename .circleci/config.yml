@@ -108,7 +108,7 @@ jobs:
             - api/package.json
             - api/package-lock.json
 
-  e2e:
+  test-e2e:
     docker:
       - image: circleci/node:11.8.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
@@ -146,18 +146,40 @@ jobs:
 
       - run: npm run test:e2e
 
-      - store_test_results:
-          path: /tmp/circleci-test-results
+  test-server:
+    docker:
+      - image: circleci/node:11.8.0
+      - image: circleci/postgres:9.6.8-alpine-postgis-ram
+      - image: circleci/redis
+      - image: memcached
+    environment:
+      NODE_ENV: circleci
+    steps:
+      - run: sudo apt -y update
+
+      # Used in setup_circleci_db.sh (dropdb ,psql and pg_restore)
+      - run: sudo apt -y install postgresql-client
+
+      - attach_workspace:
+          at: ..
+
+      - run: ./scripts/setup_circleci_db.sh
+
+      - run: npm run test:server
 
 workflows:
   version: 2
-  lint-jest-build-e2e:
+  lint-build-test:
     jobs:
       - lint
       - jest
       - build
       - build-api
-      - e2e:
+      - test-e2e:
+          requires:
+            - build
+            - build-api
+      - test-server:
           requires:
             - build
             - build-api
