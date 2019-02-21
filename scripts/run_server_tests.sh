@@ -13,7 +13,7 @@ fi
 
 echo ""
 echo "> Starting server jest tests"
-jest test/server/*
+npx jest test/server/*
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with jest tests, exiting"

@@ -20,7 +20,7 @@ fi
 
 echo ""
 echo "> Running cypress tests"
-cypress run ${CYPRESS_RECORD} --config ${CYPRESS_CONFIG}
+npx cypress run ${CYPRESS_RECORD} --config ${CYPRESS_CONFIG}
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"

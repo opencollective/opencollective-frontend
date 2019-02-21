@@ -68,7 +68,6 @@ jobs:
           paths:
             - project/cypress
             - project/dist
-            - project/node_modules
             - project/scripts
             - project/src
             - project/test
@@ -108,6 +107,8 @@ jobs:
 
       - run: cd ~/api && npm run build
 
+      - run: cd ~/api && npm prune --production
+
       - persist_to_workspace:
           root: ..
           paths:
@@ -145,6 +146,9 @@ jobs:
       - attach_workspace:
           at: ..
 
+      - <<: *restore_cache
+      - run: npm ci --only=prod
+
       - restore_cache:
           keys:
             - cypress-cache-{{ checksum "package.json" }}
@@ -178,6 +182,9 @@ jobs:
 
       - attach_workspace:
           at: ..
+
+      - <<: *restore_cache
+      - run: npm ci --only=prod
 
       - run: ./scripts/setup_circleci_db.sh
 
