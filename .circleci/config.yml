@@ -1,41 +1,99 @@
 version: 2
+
+aliases:
+  restore_cache: &restore_cache
+    restore_cache:
+      name: Restore node_modules cache
+      keys:
+        - npm-cache-{{ checksum "package-lock.json" }}
+        - npm-cache-
+
+  persist_cache: &persist_cache
+    save_cache:
+      name: Save node modules cache
+      key: npm-cache-{{ checksum "package-lock.json" }}
+      paths:
+        - ~/.npm
+
+  test_env: &test_env
+    TZ: 'UTC'
+    NODE_ENV: 'circleci'
+    POSTGRES_USER: 'postgres'
+    POSTGRES_PASSWORD: ''
+    CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+    CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+
+  test_filters: &test_filters
+    filters:
+      branches:
+        ignore:
+          - test-server
+          - staging
+          - production
+
 jobs:
-  build:
+  lint:
+    docker:
+      - image: circleci/node:11.8.0
+    environment:
+      NODE_ENV: circleci
+    steps:
+      - checkout
+      - <<: *restore_cache
+      - run: npm ci --ignore-scripts
+      - <<: *persist_cache
+      - run: npm run lint
+  prettier:
+    docker:
+      - image: circleci/node:11.8.0
+    environment:
+      NODE_ENV: circleci
+    steps:
+      - checkout
+      - <<: *restore_cache
+      - run: npm ci --ignore-scripts
+      - <<: *persist_cache
+      - run: npm run prettier:check
+  test-bdd:
+    docker:
+      - image: circleci/node:11.8.0
+      - image: circleci/postgres:9.6.8-alpine-postgis-ram
+    environment:
+      - <<: *test_env
+    steps:
+      - checkout
+      - <<: *restore_cache
+      - run: npm ci
+      - run: npm run db:setup && npm run db:migrate
+      - <<: *persist_cache
+      - run: npm run test:bdd:dev
+  test-unit:
     docker:
       - image: circleci/node:11.8.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
     environment:
-      TZ: 'UTC'
-      NODE_ENV: 'circleci'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: ''
-      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
-      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      - <<: *test_env
     steps:
       - checkout
-      - setup_remote_docker
-      - restore_cache:
-          # Find a cache corresponding to this specific package-lock.json checksum
-          # when this file is changed, this key will fail
-          key: dependency-cache-{{ checksum "package.json" }}
-          # Find the most recently generated cache used from any branch
-          key: dependency-cache-
+      - <<: *restore_cache
       - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: npm ci
-      - run: npm run build
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
-
-      - run: npm run test
+      - run: npm run db:setup && npm run db:migrate
+      - <<: *persist_cache
+      - run: npm run test:unit
+      - run: npm run coverage
       - store_test_results:
           path: /tmp/circleci-test-results
 
-    branches:
-      ignore:
-        - test-server
-        - staging
-        - production
+workflows:
+  version: 2
+  main:
+    jobs:
+      - lint
+      - prettier
+      - test-bdd:
+          <<: *test_filters
+      - test-unit:
+          <<: *test_filters
