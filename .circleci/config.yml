@@ -64,18 +64,49 @@ jobs:
       - run: npm run build:next
 
       - persist_to_workspace:
-          root: .
+          root: ..
           paths:
-            - cypress
-            - dist
-            - node_modules
-            - scripts
-            - src
-            - test
-            - .babelrc
-            - cypress.json
-            - package.json
-            - package-lock.json
+            - project/cypress
+            - project/dist
+            - project/node_modules
+            - project/scripts
+            - project/src
+            - project/test
+            - project/.babelrc
+            - project/cypress.json
+            - project/package.json
+            - project/package-lock.json
+
+  build-api:
+    docker:
+      - image: circleci/node:11.8.0
+      - image: circleci/postgres:9.6.8-alpine-postgis-ram
+    environment:
+      NODE_ENV: circleci
+    steps:
+      - run: sudo apt -y update
+
+      # Used in setup_circleci_db.sh (dropdb ,psql and pg_restore)
+      - run: sudo apt -y install postgresql-client
+
+      - checkout
+
+      - run: ./scripts/setup_circleci.sh
+
+      - persist_to_workspace:
+          root: ..
+          paths:
+            - api/config
+            - api/dist
+            - api/migrations
+            - api/node_modules
+            - api/scripts
+            - api/server
+            - api/templates
+            - api/test
+            - api/.babelrc
+            - api/package.json
+            - api/package-lock.json
 
   e2e:
     docker:
@@ -87,6 +118,8 @@ jobs:
       NODE_ENV: circleci
     steps:
       - run: sudo apt -y update
+
+      # Used in setup_circleci_db.sh (dropdb ,psql and pg_restore)
       - run: sudo apt -y install postgresql-client
 
       # Cypress dependencies
@@ -94,7 +127,7 @@ jobs:
       - run: sudo apt -y install libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
 
       - attach_workspace:
-          at: .
+          at: ..
 
       - restore_cache:
           keys:
@@ -109,7 +142,7 @@ jobs:
             # This is the cache for the cypress binary
             - ../.cache
 
-      - run: ./scripts/setup_circleci.sh
+      - run: ./scripts/setup_circleci_db.sh
 
       - run: npm run test:e2e
 
@@ -123,6 +156,8 @@ workflows:
       - lint
       - jest
       - build
+      - build-api
       - e2e:
           requires:
             - build
+            - build-api
