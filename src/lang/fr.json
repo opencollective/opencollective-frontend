@@ -496,7 +496,7 @@
   "menu.team": "équipe",
   "menu.createPledge": "Faire une promesse de don",
   "collective.messages.StripeAccountConnected": "Compte Stripe connecté avec succès",
-  "newsletter.container.title": "Restez au courant de nos progrès et de nos news.",
+  "newsletter.container.title": "Tenez-vous au courant de nos progrès et de nos actualités.",
   "notFound": "pas trouvé",
   "notFound.search": "Chercher {term}",
   "order.created.tweet": "Je viens de contribuer {amount} à {collective}. Toi aussi, contribue!",
