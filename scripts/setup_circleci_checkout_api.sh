@@ -2,15 +2,7 @@
 # This script only runs on circleci, just before the e2e tests
 # first version cfr. https://discuss.circleci.com/t/add-ability-to-cache-apt-get-programs/598/6
 
-if [ "$NODE_ENV" = "circleci" ]; then
-  echo "Performing circleci e2e setup because NODE_ENV is '${NODE_ENV}'";
-else
-  echo "Skipping circleci e2e setup because NODE_ENV is '${NODE_ENV}'";
-  exit;
-fi
-
-mkdir -p ~/cache
-cd ~/cache
+cd ~
 
 API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/";
 if curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "200" > /dev/null
@@ -46,29 +38,8 @@ then
   curl  "${API_TARBALL_URL}${BRANCH}" -o $ARCHIVE
   echo "> Extracting $ARCHIVE"
   tar -xzf $ARCHIVE
-  if [ -d "opencollective-api" ]; then
-    rm -rf opencollective-api
+  if [ -d "api" ]; then
+    rm -rf api
   fi
-  mv "opencollective-api-${BRANCH//\//-}" opencollective-api
-  cd "opencollective-api"
-  echo "> Running npm install for api"
-  npm ci
-  echo "> Running build for api"
-  npm run build
-  cd ..
-fi
-
-cd "opencollective-api"
-echo "> Restoring opencollective_dvl database for e2e testing";
-export PGPORT=5432
-export PGHOST=localhost
-export PGUSER=ubuntu
-npm run db:setup
-./scripts/db_restore.sh -U ubuntu -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql
-./scripts/sequelize.sh db:migrate
-if [ $? -ne 0 ]; then
-  echo "Error with restoring opencollective_dvl, exiting"
-  exit 1;
-else
-  echo "✓ API is setup";
+  mv "opencollective-api-${BRANCH//\//-}" api
 fi
