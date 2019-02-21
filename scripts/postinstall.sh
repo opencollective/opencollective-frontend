@@ -19,8 +19,10 @@ fi
 # On circleci environment
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "- setup db user and run migration if any"
-  npm run db:setup
-  npm run db:migrate
+  if [ "$E2E_TEST" -ne "1" ]; then
+    npm run db:setup
+    npm run db:migrate
+  fi
 else
   if psql -lqt | cut -d \| -f 1 | grep -qw opencollective_dvl; then
     echo "✓ opencollective_dvl exists"
