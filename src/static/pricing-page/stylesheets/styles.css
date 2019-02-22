@@ -136,6 +136,18 @@
   color: #FFFFFF;
 }
 
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .PricePage__hero__title h2 {
+    font-size: 48px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .PricePage__hero__title h2 {
+    font-size: 45px;
+  }
+}
+
 @media (min-width: 0px) and (max-width: 768px) {
   .PricePage__hero__title h2 {
     font-size: 42px;
@@ -146,7 +158,7 @@
 
 @media (min-width: 0px) and (max-width: 576px) {
   .PricePage__hero__title h2 {
-    font-size: 28px;
+    font-size: 24px;
   }
 }
 
@@ -164,6 +176,13 @@
   text-align: center;
   letter-spacing: -0.4px;
   color: #FFFFFF;
+}
+
+@media (min-width: 0px) and (max-width: 576px) {
+  .PricePage__hero__title p {
+    font-size: 16px !important;
+    top: calc(50% - 64px/2 - 145px) !important;
+  }
 }
 
 @media (min-width: 0px) and (max-width: 768px) {
@@ -619,7 +638,7 @@
 .PricePage__table__res__content__item1 {
   position: relative;
   width: 40%;
-  height: 80px;
+  height: 90px;
   background: #F7F8FA;
   border-bottom: 1px solid rgba(20, 20, 20, 0.08);
   border-right: 1px solid rgba(20, 20, 20, 0.08);
@@ -646,7 +665,7 @@
 .PricePage__table__res__content__item2 {
   position: relative;
   width: 60%;
-  height: 80px;
+  height: 90px;
   background: white;
   border-bottom: 1px solid rgba(20, 20, 20, 0.08);
 }
@@ -671,9 +690,9 @@
   text-align: center;
   color: #4E5052;
   height: 50%;
-  -webkit-box-align: end;
-  -ms-flex-align: end;
-  align-items: flex-end;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 .PricePage__table__res__content__item2 p {
@@ -698,8 +717,15 @@
   font-size: 11px;
   text-align: center;
   color: #76777A;
-  height: 50%;
   padding: 0 10px 0 10px !important;
+}
+
+@media (min-width: 0px) and (max-width: 576px) {
+  .PricePage__table__res__content__item2 span {
+    position: relative;
+    font-size: 10px;
+    bottom: 10px;
+  }
 }
 
 .PricePage__create {
@@ -712,7 +738,7 @@
 
 @media (min-width: 0px) and (max-width: 768px) {
   .PricePage__create {
-    top: 1300px;
+    top: 1350px;
   }
 }
 
@@ -786,6 +812,12 @@
   }
 }
 
+@media (min-width: 0px) and (max-width: 576px) {
+  .PricePage__create__container__graphic {
+    top: 350px;
+  }
+}
+
 .PricePage__create__container__content {
   position: absolute;
   width: 416px;
@@ -836,6 +868,12 @@
   }
 }
 
+@media (min-width: 0px) and (max-width: 576px) {
+  .PricePage__create__container__content h1 {
+    font-size: 28px;
+  }
+}
+
 .PricePage__create__container__content p {
   font-family: 'Inter-Medium';
   font-style: normal;
@@ -862,6 +900,12 @@
   }
 }
 
+@media (min-width: 0px) and (max-width: 576px) {
+  .PricePage__create__container__content p {
+    font-size: 20px;
+  }
+}
+
 .PricePage__create__container__content button {
   background: #3385FF;
   border-radius: 100px;
@@ -875,6 +919,7 @@
   letter-spacing: -0.2px;
   color: #FFFFFF;
   width: 256px;
+  border: 0;
 }
 
 @media (min-width: 0px) and (max-width: 768px) {
@@ -935,6 +980,12 @@
   }
 }
 
+@media (min-width: 0px) and (max-width: 576px) {
+  .PricePage__faq {
+    top: 2060px;
+  }
+}
+
 .PricePage__faq h1 {
   font-family: 'Inter-Regular';
   font-style: normal;
@@ -975,12 +1026,6 @@
   font-size: 16px;
   color: #313233;
   text-decoration: none;
-}
-
-@media (min-width: 0px) and (max-width: 768px) {
-  .PricePage__faq__panel-group__heading a, .PricePage__faq__panel-group__heading a:active {
-    padding: 5px;
-  }
 }
 
 .PricePage__faq__panel-group__heading a span, .PricePage__faq__panel-group__heading a:active span {
