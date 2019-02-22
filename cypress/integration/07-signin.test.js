@@ -10,10 +10,25 @@ describe('signin', () => {
 
   it('shows an error when token gets rejected', () => {
     cy.visit('/signin?token=InvalidToken');
-    cy.contains('Sign In failed: Invalid token.');
+    cy.contains('Sign In failed: Token rejected.');
     cy.contains('You can ask for a new sign in link using the form below.');
     cy.contains('Sign in using your email address:');
     cy.get('input[name=email]').should('exist');
+  });
+
+  it('redirects if token is invalid but user is already logged in', () => {
+    // Sign in with test account
+    cy.visit('/signin?next=/testuseradmin');
+    cy.get('input[name=email]').type('testuser+admin@opencollective.com');
+    cy.get('button[type=submit]').click();
+    cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin', { timeout: 15000 });
+
+    // Try to signin with an invalid token
+    cy.visit('/signin?token=InvalidToken&next=/apex');
+
+    // Should be logged in with the old account
+    cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin');
+    cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
 
   it('trims the email when it has trailing spaces', () => {
