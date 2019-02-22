@@ -231,17 +231,11 @@ class OrderCreated extends React.Component {
                 <p>
                   <Button onClick={() => this.open(this.tweetUrl)}>
                     <TwitterLogo />
-                    <FormattedMessage
-                      id="collective.user.orderCreated.helpUsRaise.tweetUrl"
-                      defaultMessage="Share on Twitter"
-                    />
+                    <FormattedMessage id="shareOnTwitter" defaultMessage="Share on Twitter" />
                   </Button>
                   <Button onClick={() => this.open(this.fbUrl, 550, 700)}>
                     <FacebookLogo />
-                    <FormattedMessage
-                      id="collective.user.orderCreated.helpUsRaise.fbUrl"
-                      defaultMessage="Share on Facebook"
-                    />
+                    <FormattedMessage id="shareOnFacebook" defaultMessage="Share on Facebook" />
                   </Button>
                 </p>
               </div>

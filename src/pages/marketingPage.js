@@ -13,6 +13,7 @@ import { loadScriptAsync } from '../lib/utils';
 
 import sponsorPageHtml from '../static/sponsor-page/index.html';
 import howItWorksPageHtml from '../static/how-it-works-page/index.html';
+import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
 import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
 import holidayGiftCardConfirmationHtml from '../static/holiday-gift-card/confirmation.html';
 import giftCardPageHtml from '../static/gift-cards-page/index.html';
@@ -37,6 +38,7 @@ class MarketingPage extends React.Component {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     pageSlug: PropTypes.string.isRequired,
     confirmationPage: PropTypes.bool,
+    locale: PropTypes.string,
   };
 
   constructor(props) {
@@ -67,7 +69,7 @@ class MarketingPage extends React.Component {
   }
 
   render() {
-    const { pageSlug, confirmationPage } = this.props;
+    const { pageSlug, confirmationPage, locale } = this.props;
     const { LoggedInUser } = this.state;
 
     let html, style, className;
@@ -77,7 +79,11 @@ class MarketingPage extends React.Component {
       style = sponsorPageStyle;
       className = 'sponsorPage';
     } else if (pageSlug === 'how-it-works') {
-      html = howItWorksPageHtml;
+      if (locale === 'fr') {
+        html = howItWorksPageHtmlFR;
+      } else {
+        html = howItWorksPageHtml;
+      }
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
     } else if (pageSlug === 'gift-of-giving') {

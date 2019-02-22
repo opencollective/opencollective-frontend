@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedNumber } from 'react-intl';
+import { FormattedNumber, FormattedMessage, defineMessages } from 'react-intl';
 import { Facebook } from 'styled-icons/fa-brands/Facebook';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Linkedin } from 'styled-icons/fa-brands/Linkedin';
@@ -32,30 +32,6 @@ import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
 
 import withIntl from '../lib/withIntl';
-
-const carouselContent = [
-  {
-    image: '/static/images/home-slide-01.svg',
-    heading: 'Raise money online with recurring subscriptions.',
-    details: 'Connect with the Open Collective community and raise the funds required to sustain your community.',
-  },
-  {
-    image: '/static/images/home-slide-02.svg',
-    heading: 'All are welcome to join & contribute.',
-    details: 'Everyone can contribute to your open collective. All you need is for people to believe in your mission.',
-  },
-  {
-    image: '/static/images/home-slide-03.svg',
-    heading: 'Show how the money is spent.',
-    details:
-      'Every contribution helps you support your collective. Open Collective shows everyone how these financial contributions are earned and spent.',
-  },
-  {
-    image: '/static/images/home-slide-04.svg',
-    heading: 'A bottom - up group where anyone can become a core contributor.',
-    details: 'The mission is what persists and unites you with your community. Leaders can change over time.',
-  },
-];
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -148,7 +124,50 @@ class HomePage extends React.Component {
 
   static propTypes = {
     data: PropTypes.object.isRequired, // from withData
+    intl: PropTypes.object.isRequired, // from withIntl
   };
+
+  constructor(props) {
+    super(props);
+    this.carouselMessages = defineMessages({
+      raiseMoneyHeading: {
+        id: 'home.carousel.raiseMoneyHeading',
+        defaultMessage: 'Raise money online with recurring subscriptions.',
+      },
+      raiseMoneyDetails: {
+        id: 'home.carousel.raiseMoneyDetails',
+        defaultMessage:
+          'Connect with the Open Collective community and raise the funds required to sustain your community.',
+      },
+      contributeHeading: {
+        id: 'home.carousel.contributeHeading',
+        defaultMessage: 'All are welcome to join & contribute.',
+      },
+      contributeDetails: {
+        id: 'home.carousel.contributeDetails',
+        defaultMessage:
+          'Everyone can contribute to your open collective. All you need is for people to believe in your mission.',
+      },
+      transparencyHeading: {
+        id: 'home.carousel.transparencyHeading',
+        defaultMessage: 'Show how the money is spent.',
+      },
+      transparencyDetails: {
+        id: 'home.carousel.transparencyDetails',
+        defaultMessage:
+          'Every contribution helps you support your collective. Open Collective shows everyone how these financial contributions are earned and spent.',
+      },
+      missionHeading: {
+        id: 'home.carousel.missionHeading',
+        defaultMessage: 'A bottom - up group where anyone can become a core contributor.',
+      },
+      missionDetails: {
+        id: 'home.carousel.missionDetails',
+        defaultMessage:
+          'The mission is what persists and unites you with your community. Leaders can change over time.',
+      },
+    });
+  }
 
   state = {
     stats: {},
@@ -158,6 +177,33 @@ class HomePage extends React.Component {
     // separate request to not block showing LoggedInUser
     const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
     this.setState({ stats });
+  }
+
+  getCarouselContent() {
+    const { formatMessage } = this.props.intl;
+
+    return [
+      {
+        image: '/static/images/home-slide-01.svg',
+        heading: formatMessage(this.carouselMessages.raiseMoneyHeading),
+        details: formatMessage(this.carouselMessages.raiseMoneyDetails),
+      },
+      {
+        image: '/static/images/home-slide-02.svg',
+        heading: formatMessage(this.carouselMessages.contributeHeading),
+        details: formatMessage(this.carouselMessages.contributeDetails),
+      },
+      {
+        image: '/static/images/home-slide-03.svg',
+        heading: formatMessage(this.carouselMessages.transparencyHeading),
+        details: formatMessage(this.carouselMessages.transparencyDetails),
+      },
+      {
+        image: '/static/images/home-slide-04.svg',
+        heading: formatMessage(this.carouselMessages.missionHeading),
+        detaiils: formatMessage(this.carouselMessages.missionDetails),
+      },
+    ];
   }
 
   render() {
@@ -212,14 +258,22 @@ class HomePage extends React.Component {
                   textAlign="left"
                   mb={4}
                 >
-                  A new form of association, <br /> <strong>transparent by design.</strong>
+                  <FormattedMessage id="home.tagline1" defaultMessage="A new form of association" />,
+                  <br />
+                  <strong>
+                    <FormattedMessage id="home.tagline2" defaultMessage="transparent by design" />
+                  </strong>
+                  .
                 </H1>
 
                 <Container maxWidth={500}>
                   <P fontSize="LeadParagraph" lineHeight="LeadParagraph" my={3} color="black.700">
-                    The Internet generation needs organizations that reflect who we are; where anybody can contribute to
+                    <FormattedMessage
+                      id="home.presentation"
+                      defaultMessage="The Internet generation needs organizations that reflect who we are; where anybody can contribute to
                     a shared mission; where leaders can easily change; and where money flows in full transparency.
-                    Create an Open Collective for your community.
+                    Create an Open Collective for your community."
+                    />
                   </P>
                 </Container>
 
@@ -233,12 +287,12 @@ class HomePage extends React.Component {
                     textAlign="center"
                     width={1}
                   >
-                    Join the movement
+                    <FormattedMessage id="home.join" defaultMessage="Join the movement" />
                   </StyledLink>
 
                   <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
                     <StyledLink href="/how-it-works" mt={[3, null, 0]} ml={[0, null, 3]}>
-                      How it works &gt;
+                      <FormattedMessage id="home.howItWorks" defaultMessage="How it works" /> &gt;
                     </StyledLink>
                   </Link>
                 </Flex>
@@ -268,13 +322,17 @@ class HomePage extends React.Component {
 
           <Container maxWidth={1200} mx="auto" px={2}>
             <H3 as="h2" textAlign={['center', null, 'left']} pb={3}>
-              Active collectives
+              <FormattedMessage id="home.activeCollectives" defaultMessage="Active collectives" />
             </H3>
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
-                <H5 textAlign="left">Recently created</H5>
-                <StyledLink href="/discover">See all &gt;</StyledLink>
+                <H5 textAlign="left">
+                  <FormattedMessage id="home.recentlyCreated" defaultMessage="Recently created" />
+                </H5>
+                <StyledLink href="/discover">
+                  <FormattedMessage id="home.seeAll" defaultMessage="See all" /> &gt;
+                </StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {collectives.map(c => (
@@ -287,8 +345,12 @@ class HomePage extends React.Component {
 
             <Container py={3}>
               <Flex mb={3} justifyContent="space-between" px={[1, null, 0]}>
-                <H5 textAlign="left">Most active</H5>
-                <StyledLink href="/discover">See all &gt;</StyledLink>
+                <H5 textAlign="left">
+                  <FormattedMessage id="home.mostActive" defaultMessage="Most active" />
+                </H5>
+                <StyledLink href="/discover">
+                  <FormattedMessage id="home.seeAll" defaultMessage="See all" /> &gt;
+                </StyledLink>
               </Flex>
               <Container display="flex" flexWrap="wrap" justifyContent="space-between">
                 {topSpenders.map(c => (
@@ -310,7 +372,7 @@ class HomePage extends React.Component {
               mx="auto"
               textAlign="center"
             >
-              Discover more collectives
+              <FormattedMessage id="home.discoverMore" defaultMessage="Discover more collectives" />
             </StyledLink>
           </Container>
 
@@ -324,7 +386,10 @@ class HomePage extends React.Component {
                 fontSize={['H2', null, 'H1']}
                 lineHeight={['H2', null, 'H1']}
               >
-                Join the movement for a world with more open, transparent, and sustainable communities.
+                <FormattedMessage
+                  id="home.joinFor"
+                  defaultMessage="Join the movement for a world with more open, transparent, and sustainable communities."
+                />
               </H1>
               <P
                 color="black.700"
@@ -334,9 +399,12 @@ class HomePage extends React.Component {
                 px={3}
                 my={[3, null, 4]}
               >
-                There are many ways to participate: create an open collective, become a host, make a financial
+                <FormattedMessage
+                  id="home.participate"
+                  defaultMessage="There are many ways to participate: create an open collective, become a host, make a financial
                 contribution, attend an event or simply share the love by showing others how they can benefit from
-                operating as an open community. Here’s how:
+                operating as an open community. Here’s how:"
+                />
               </P>
             </Container>
 
@@ -350,15 +418,27 @@ class HomePage extends React.Component {
               alignItems="center"
             >
               <Container width={[1, null, 0.5]}>
-                <H2 {...sectionHeadingStyles}>Create an open collective</H2>
+                <H2 {...sectionHeadingStyles}>
+                  <FormattedMessage id="home.createCollective" defaultMessage="Create an open collective" />
+                </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
-                  A group of people with a shared mission that operates in full transparency 👀
+                  <FormattedMessage
+                    id="home.transparency"
+                    defaultMessage="A group of people with a shared mission that operates in full transparency"
+                  />{' '}
+                  👀
                 </H4>
 
                 <P {...sectionDetailStyles}>
-                  Create an open collective for your group and leverage the power of the community to live up to your
-                  mission. <a href="/discover">Learn more.</a>
+                  <FormattedMessage
+                    id="home.createFor"
+                    defaultMessage="Create an open collective for your group and leverage the power of the community to live up to your
+                  mission."
+                  />{' '}
+                  <a href="/discover">
+                    <FormattedMessage id="home.learnMore" defaultMessage="Learn more" />.
+                  </a>
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -370,14 +450,14 @@ class HomePage extends React.Component {
                       fontWeight="500"
                       textAlign="center"
                     >
-                      Create an open collective
+                      <FormattedMessage id="home.create" defaultMessage="Create an open collective" />
                     </StyledLink>
                   </Link>
                 </Flex>
               </Container>
 
               <Container width={[1, null, 0.5]}>
-                <Carousel content={carouselContent} />
+                <Carousel content={this.getCarouselContent()} />
               </Container>
             </Container>
 
@@ -385,22 +465,44 @@ class HomePage extends React.Component {
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container width={[1, null, 0.5]}>
-                <H2 {...sectionHeadingStyles}>Become a sponsor</H2>
+                <H2 {...sectionHeadingStyles}>
+                  <FormattedMessage id="home.sponsor" defaultMessage="Become a sponsor" />
+                </H2>
 
-                <H4 {...sectionSubHeadingStyles}>Great companies supporting great collectives with 💙</H4>
+                <H4 {...sectionSubHeadingStyles}>
+                  <FormattedMessage
+                    id="home.greatCompanies"
+                    defaultMessage="Great companies supporting great collectives with"
+                  />{' '}
+                  💙
+                </H4>
 
                 <P {...sectionDetailStyles}>
-                  Support collectives on behalf of your organization.{' '}
+                  <FormattedMessage
+                    id="home.orgSupport"
+                    defaultMessage="Support collectives on behalf of your organization."
+                  />{' '}
                   <strong>
-                    You&apos;ll get an invoice for every financial contribution your company makes as well as a monthly
-                    report.
+                    <FormattedMessage
+                      id="home.invoice"
+                      defaultMessage="You'll get an invoice for every financial contribution your company makes as well as a monthly
+                    report."
+                    />
                   </strong>
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
-                  If you’re looking to onboard and financially support an initiative through Open Collective,{' '}
-                  <a href="mailto:info@opencollective.com">let us know</a> and we’ll gladly set them up and get them
-                  going.
+                  <FormattedMessage
+                    id="home.onboard"
+                    defaultMessage="If you’re looking to onboard and financially support an initiative through Open Collective, {letUsKnowLink} and we’ll gladly set them up and get them going."
+                    values={{
+                      letUsKnowLink: (
+                        <a href="mailto:info@opencollective.com">
+                          <FormattedMessage id="home.letUsKnow" defaultMessage="let us know" />
+                        </a>
+                      ),
+                    }}
+                  />
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -412,7 +514,7 @@ class HomePage extends React.Component {
                       fontWeight="bold"
                       textAlign="center"
                     >
-                      Become a sponsor
+                      <FormattedMessage id="home.sponsor" defaultMessage="Become a sponsor" />
                     </StyledLink>
                   </Link>
                 </Flex>
@@ -436,14 +538,23 @@ class HomePage extends React.Component {
 
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container width={[1, null, 0.5]} mb={4}>
-                <H2 {...sectionHeadingStyles}>Become a backer</H2>
+                <H2 {...sectionHeadingStyles}>
+                  <FormattedMessage id="home.becomeABacker" defaultMessage="Become a backer" />
+                </H2>
 
-                <H4 {...sectionSubHeadingStyles}>For those who believe in giving back</H4>
+                <H4 {...sectionSubHeadingStyles}>
+                  <FormattedMessage id="home.givingBack" defaultMessage="For those who believe in giving back" />
+                </H4>
 
                 <P {...sectionDetailStyles}>
-                  Join Open Collective and discover the different initiatives that need your support. Embrace the
-                  mission that drives them and contribute to their group effort.{' '}
-                  <strong>Become part of the movement.</strong>
+                  <FormattedMessage
+                    id="home.joinAndDiscover"
+                    defaultMessage="Join Open Collective and discover the different initiatives that need your support. Embrace the
+                  mission that drives them and contribute to their group effort."
+                  />{' '}
+                  <strong>
+                    <FormattedMessage id="home.becomePart" defaultMessage="Become part of the movement." />
+                  </strong>
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -455,7 +566,7 @@ class HomePage extends React.Component {
                     fontWeight="bold"
                     textAlign="center"
                   >
-                    Become a backer
+                    <FormattedMessage id="home.becomeABacker" defaultMessage="Become a backer" />
                   </StyledLink>
                 </Flex>
               </Container>
@@ -496,23 +607,41 @@ class HomePage extends React.Component {
               mx="auto"
             >
               <Container width={[1, null, 0.5]}>
-                <H2 {...sectionHeadingStyles}>Contribute code 👩🏻‍💻👨🏿‍💻</H2>
+                <H2 {...sectionHeadingStyles}>
+                  <FormattedMessage id="home.contributeCode" defaultMessage="Contribute code" /> 👩🏻‍💻👨🏿‍💻
+                </H2>
 
-                <H4 {...sectionSubHeadingStyles}>Building Open Collective together to get further, faster 🚀</H4>
+                <H4 {...sectionSubHeadingStyles}>
+                  <FormattedMessage
+                    id="home.buildingTogether"
+                    defaultMessage="Building Open Collective together to get further, faster"
+                  />{' '}
+                  🚀
+                </H4>
 
                 <P {...sectionDetailStyles}>
-                  Are you a developer who believes in supporting open and welcoming communities? Open Collective is open
-                  source (MIT License) so anyone can contribute code or report issues publicly.
+                  <FormattedMessage
+                    id="home.devOpenSource"
+                    defaultMessage="Are you a developer who believes in supporting open and welcoming communities? Open Collective is open
+                  source (MIT License) so anyone can contribute code or report issues publicly."
+                  />
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
-                  Our goal is to provide all communities around the world the software that they need to operate as open
+                  <FormattedMessage
+                    id="home.goal"
+                    defaultMessage="Our goal is to provide all communities around the world the software that they need to operate as open
                   and transparent collectives. We want to enable them to thrive in the same way that WordPress enabled
-                  millions of blogs to exist.
+                  millions of blogs to exist."
+                  />
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
-                  Special thanks to all of you who already contributed in some way! 🙏
+                  <FormattedMessage
+                    id="home.specialThanks"
+                    defaultMessage="Special thanks to all of you who already contributed in some way!"
+                  />{' '}
+                  🙏
                 </P>
 
                 <StyledLink
@@ -522,7 +651,10 @@ class HomePage extends React.Component {
                   my={4}
                   href="https://github.com/opencollective"
                 >
-                  Check out our Github organization to find out more
+                  <FormattedMessage
+                    id="home.github"
+                    defaultMessage="Check out our Github organization to find out more"
+                  />
                 </StyledLink>
               </Container>
               <Container width={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
@@ -548,15 +680,25 @@ class HomePage extends React.Component {
                 <H2 {...sectionHeadingStyles}>Become a host</H2>
 
                 <H4 {...sectionSubHeadingStyles}>
-                  Help provide the umbrella legal entities open collectives need to raise funds ⚖️
+                  <FormattedMessage
+                    id="home.umbrella"
+                    defaultMessage="Help provide the umbrella legal entities open collectives need to raise funds"
+                  />{' '}
+                  ⚖️
                 </H4>
 
                 <P {...sectionDetailStyles}>
-                  <strong>Grow the movement</strong> by becoming a host of open collectives in your city or your
+                  <strong>
+                    <FormattedMessage id="home.hostDetails1" defaultMessage="Grow the movement" />
+                  </strong>{' '}
+                  <FormattedMessage
+                    id="home.hostDetails2"
+                    defaultMessage="by becoming a host of open collectives in your city or your
                   industry. Hosts are acting as fiscal sponsors. They collect the money on behalf of the collectives and
                   enable them to issue invoices. They are mutualising the legal and accounting overhead that come with
                   creating and maintaining a legal entity so that the open collectives that they host can focus on their
-                  mission.
+                  mission."
+                  />
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -568,7 +710,7 @@ class HomePage extends React.Component {
                       fontWeight="500"
                       textAlign="center"
                     >
-                      Become a host
+                      <FormattedMessage id="home.becomeHost" defaultMessage="Become a host" />
                     </StyledLink>
                   </Link>
                 </Flex>
@@ -585,7 +727,7 @@ class HomePage extends React.Component {
 
             <Container mt={6}>
               <P textAlign="center" fontSize={[20, null, 28]} mb={2}>
-                Today we are:
+                <FormattedMessage id="home.todayWeAre" defaultMessage="Today we are:" />
               </P>
               {totalCollectives && (
                 <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
@@ -594,22 +736,28 @@ class HomePage extends React.Component {
                       <FormattedNumber value={totalCollectives} />
                     </P>
                     <P>
-                      <a href="https://opencollective.com/discover">collectives</a>
+                      <a href="https://opencollective.com/discover">
+                        <FormattedMessage id="home.collectives" defaultMessage="collectives" />
+                      </a>
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
                       <FormattedNumber value={totalDonors} />
                     </P>
-                    <P>backers</P>
+                    <P>
+                      <FormattedMessage id="home.backers" defaultMessage="backers" />
+                    </P>
                   </Container>
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
                       <FormattedNumber value={totalChapters} />
                     </P>
                     <P>
-                      <Link route={'chapters'}>
-                        <a>chapters</a>
+                      <Link route="chapters" passHref>
+                        <a>
+                          <FormattedMessage id="home.chapters" defaultMessage="chapters" />
+                        </a>
                       </Link>
                     </P>
                   </Container>
@@ -617,7 +765,9 @@ class HomePage extends React.Component {
                     <P {...statsStyles}>
                       <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
-                    <P>raised</P>
+                    <P>
+                      <FormattedMessage id="home.moneyRaised" defaultMessage="raised" />
+                    </P>
                   </Container>
                 </Container>
               )}
@@ -625,7 +775,7 @@ class HomePage extends React.Component {
 
             <Container mt={5} px={3}>
               <H3 textAlign="center" fontSize={['H4', null, 'H2']} lineHeight={['H4', null, 'H2']} pb={4}>
-                Spread the word!
+                <FormattedMessage id="home.spread" defaultMessage="Spread the word!" />
               </H3>
 
               <Container maxWidth={600} mx="auto">
@@ -636,8 +786,11 @@ class HomePage extends React.Component {
                   color="black.700"
                   mb={4}
                 >
-                  Do you know people or organizations that will benefit from an open structure and a transparent
-                  operation? Let them know that Open Collective exists!
+                  <FormattedMessage
+                    id="home.speadDescription"
+                    defaultMessage="Do you know people or organizations that will benefit from an open structure and a transparent
+                  operation? Let them know that Open Collective exists!"
+                  />
                 </P>
               </Container>
 
@@ -648,7 +801,9 @@ class HomePage extends React.Component {
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Twitter size={18} color={colors.primary[500]} />
-                    <Span>Share on Twitter</Span>
+                    <Span>
+                      <FormattedMessage id="shareOnTwitter" defaultMessage="Share on Twitter" />
+                    </Span>
                   </Container>
                 </StyledLink>
 
@@ -658,7 +813,9 @@ class HomePage extends React.Component {
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Facebook size={18} color={colors.primary[500]} />
-                    <Span>Share on Facebook</Span>
+                    <Span>
+                      <FormattedMessage id="shareOnFacebook" defaultMessage="Share on Facebook" />
+                    </Span>
                   </Container>
                 </StyledLink>
 
@@ -668,7 +825,9 @@ class HomePage extends React.Component {
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Linkedin size={18} color={colors.primary[500]} />
-                    <Span>Share on LinkedIn</Span>
+                    <Span>
+                      <FormattedMessage id="shareOnLinkedIn" defaultMessage="Share on LinkedIn" />
+                    </Span>
                   </Container>
                 </StyledLink>
               </Flex>
@@ -694,7 +853,7 @@ class HomePage extends React.Component {
             >
               <Container maxWidth={550} px={[3, null, 0]}>
                 <P color="white.transparent.48" fontSize="LeadParagraph" mb={4}>
-                  Introducing
+                  <FormattedMessage id="home.intoducing" defaultMessage="Introducing" />
                 </P>
 
                 <Box mb={3}>
@@ -702,18 +861,24 @@ class HomePage extends React.Component {
                 </Box>
 
                 <H4 color="white.full" mb={4}>
-                  Discover the Open Source projects your organization is using that need financial support.
+                  <FormattedMessage
+                    id="home.discoverOpenSourceProjects"
+                    defaultMessage="Discover the Open Source projects your organization is using that need financial support."
+                  />
                 </H4>
 
                 <P color="white.full" fontSize="LeadParagraph" lineHeight="24px">
-                  BackYourStack is a community project initiated by Open Collective.
+                  <FormattedMessage
+                    id="home.backYourStack"
+                    defaultMessage="BackYourStack is a community project initiated by Open Collective."
+                  />
                   <StyledLink
                     href="https://backyourstack.com/contributing"
                     color="white.full"
                     px={2}
                     textDecoration="underline"
                   >
-                    Learn how to contribute here.
+                    <FormattedMessage id="home.contributeLearnHow" defaultMessage="Learn how to contribute here." />
                   </StyledLink>
                 </P>
 
@@ -730,7 +895,7 @@ class HomePage extends React.Component {
                   textAlign="center"
                   buttonSize="large"
                 >
-                  Go to Back Your Stack
+                  <FormattedMessage id="home.goToBackYourStack" defaultMessage="Go to Back Your Stack" />
                 </StyledLink>
               </Container>
 
