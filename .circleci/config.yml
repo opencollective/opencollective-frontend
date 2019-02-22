@@ -136,7 +136,7 @@ jobs:
     steps:
       - run: sudo apt -y update
 
-      # Used in setup_circleci_db.sh (dropdb ,psql and pg_restore)
+      # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
       - run: sudo apt -y install postgresql-client
 
       # Cypress dependencies
@@ -147,20 +147,18 @@ jobs:
           at: ..
 
       - <<: *restore_cache
-      - run: npm ci
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
 
       - restore_cache:
           keys:
-            - cypress-cache-{{ checksum "package.json" }}
-            - cypress-cache-
+            - cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
 
       - run: npx cypress install
 
       - save_cache:
-          key: cypress-cache-{{ checksum "package.json" }}
+          key: cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
           paths:
-            # This is the cache for the cypress binary
-            - ../.cache
+            - ../.cache/Cypress
 
       - run: ./scripts/setup_circleci_db.sh
 
@@ -174,6 +172,7 @@ jobs:
       - image: memcached
     environment:
       NODE_ENV: circleci
+      CYPRESS_INSTALL_BINARY: 0
     steps:
       - run: sudo apt -y update
 
