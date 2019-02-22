@@ -115,14 +115,29 @@ describe('Contribution Flow: Donate', () => {
 
   it('Forces params if given in URL', () => {
     cy.signup({ redirect: '/apex/donate/42/year', visitParams }).then(() => {
+      cy.clock(Date.parse('2042/05/25'));
       cy.contains('button', 'Next step').click();
 
-      // Amount must be disabled
-      cy.get('#totalAmount[disabled]').should('have.value', '42');
-      // Frequency must be disabled
-      cy.contains('#interval[disabled]', 'Yearly');
-      // Ensure all values are dispatched in state
-      cy.contains('.step-details', '$42.00 per year');
+      // Second step should be payment method select
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment'], disabled: 'summary' });
+      cy.wait(1000); // Wait for stripe to be loaded
+      cy.fillStripeInput();
+      cy.contains('Next step').click();
+
+      // Final step should be summary
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment', 'summary'] });
+      cy.contains('Contribution breakdown:');
+      cy.contains('Your contribution');
+      cy.contains('$42.00');
+      // Check FAQ
+      cy.contains('Tier details:');
+      cy.contains('You’ll contribute with the amount of $42.00 yearly. Your next charge will be on: May 1, 2043');
+      // Submit order
+      cy.contains('button', 'Make contribution').click();
+
+      // Check success page
+      cy.get('#page-order-success', { timeout: 20000 }).contains('$42.00 per year');
+      cy.contains("You're now a backer of APEX.");
     });
   });
 });

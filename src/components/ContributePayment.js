@@ -171,10 +171,10 @@ class ContributePayment extends React.Component {
   }
 
   generatePaymentsOptions() {
-    const { paymentMethods, collective } = this.props;
+    const { paymentMethods, collective, defaultValue } = this.props;
     const userPaymentMethods = uniqBy([...paymentMethods, ...get(collective, 'paymentMethods', [])], 'id');
 
-    return [
+    const paymentMethodsOptions = [
       ...userPaymentMethods.map(pm => ({
         key: `pm-${pm.id}`,
         title: getPaymentMethodName(pm),
@@ -184,6 +184,24 @@ class ContributePayment extends React.Component {
       })),
       ...this.staticPaymentMethodsOptions,
     ];
+
+    // Add default value to the list if it's a validated card
+    if (defaultValue && defaultValue.isNew && defaultValue.key !== 'newCreditCard') {
+      paymentMethodsOptions.unshift({
+        ...defaultValue,
+        title: (
+          <FormattedMessage
+            id="contribute.newCard"
+            defaultMessage="New: {name}"
+            values={{ name: getPaymentMethodName(defaultValue.paymentMethod) }}
+          />
+        ),
+        subtitle: getPaymentMethodMetadata(defaultValue.paymentMethod),
+        icon: getPaymentMethodIcon(defaultValue.paymentMethod, collective),
+      });
+    }
+
+    return paymentMethodsOptions;
   }
 
   render() {

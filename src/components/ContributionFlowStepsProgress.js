@@ -68,7 +68,7 @@ const ContributionFlowStepsProgress = ({
             details = 'Free';
           }
         } else if (step.name === 'payment') {
-          label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
+          label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment info" />;
           if (isFreeTier && get(stepDetails, 'totalAmount') === 0) {
             details = 'No payment required';
           } else {

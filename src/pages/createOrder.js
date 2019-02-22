@@ -8,6 +8,7 @@ import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
 import moment from 'moment';
+import uuid from 'uuid/v4';
 
 import { Router } from '../server/pages';
 
@@ -118,6 +119,7 @@ class CreateOrderPage extends React.Component {
     verb: PropTypes.string,
     step: PropTypes.string,
     redirect: PropTypes.string,
+    referral: PropTypes.string,
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
@@ -236,46 +238,83 @@ class CreateOrderPage extends React.Component {
     );
   };
 
-  async getPaymentMethodToSubmit() {
-    const { stepDetails, stepPayment } = this.state;
+  /** Validate step payment, loading data from stripe for new credit cards */
+  validateStepPayment = async () => {
+    const { stepPayment } = this.state;
 
-    // Always ignore payment method for free tiers
-    if (this.isFreeTier() && stepDetails.totalAmount === 0) {
-      return null;
+    if (this.isFreeTier()) {
+      // Always ignore payment method for free tiers
+      return true;
+    } else if (!stepPayment.isNew) {
+      // No need to validate existing payment methods
+      return true;
+    } else if (!stepPayment.data && get(stepPayment, 'paymentMethod.token')) {
+      // New credit card - if no data, stripe token has already been exchanged
+      return true;
+    } else {
+      // New credit card - load info from stripe
+      if (!this.state.stripe) {
+        this.setState({
+          error: 'There was a problem initializing the payment form. Please reload the page and try again',
+        });
+        return false;
+      }
+      const { token, error } = await this.state.stripe.createToken();
+      if (error) {
+        this.setState({ error: error.message });
+        return false;
+      }
+      this.setState(state => ({
+        ...state,
+        stepPayment: {
+          ...state.stepPayment,
+          data: null,
+          key: `newCreditCard-${uuid()}`,
+          paymentMethod: { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save },
+        },
+      }));
     }
 
-    // For existing payment methods, just pick the service, type and uuid
-    if (!stepPayment.isNew) {
-      return pick(stepPayment.paymentMethod, ['service', 'type', 'uuid']);
+    return true;
+  };
+
+  /** Validate step profile, create new org if necessary */
+  validateStepProfile = async () => {
+    if (!this.state.stepProfile || !this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
+      return false;
     }
 
-    // New credit card - if no data, stripe token has already been exchanged
-    if (!stepPayment.data && stepPayment.paymentMethod) {
-      return stepPayment.paymentMethod;
+    // Check if we're creating a new organization
+    if (!this.state.stepProfile.id) {
+      this.setState({ submitting: true });
+
+      try {
+        const { data: result } = await this.props.createCollective(this.state.stepProfile);
+        const createdOrg = result.createCollective;
+
+        await this.props.refetchLoggedInUser();
+        this.setState({ stepProfile: createdOrg, submitting: false });
+      } catch (error) {
+        this.setState({ error: error.message, submitting: false });
+        window.scrollTo(0, 0);
+        return false;
+      }
     }
 
-    // New credit card - load info from stripe
-    if (!this.state.stripe) {
-      throw new Error('There was a problem initializing the payment form. Please reload the page and try again');
-    }
-    const { token, error } = await this.state.stripe.createToken();
-    if (error) {
-      throw new Error(error.message);
-    }
-    return { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save };
-  }
+    return true;
+  };
 
   submitOrder = async (paymentMethodOverride = null) => {
     this.setState({ submitting: true, error: null });
-    const { stepDetails } = this.state;
+    const { stepDetails, stepPayment } = this.state;
 
-    // Load payment method info
-    let paymentMethod = null;
-    try {
-      paymentMethod = paymentMethodOverride || (await this.getPaymentMethodToSubmit());
-    } catch (e) {
-      this.setState({ submitting: false, error: e.message });
-      return false;
+    // Prepare payment method
+    let paymentMethod = paymentMethodOverride;
+    if (!paymentMethod && stepPayment) {
+      paymentMethod = stepPayment.paymentMethod;
+      if (!stepPayment.isNew) {
+        paymentMethod = pick(paymentMethod, ['service', 'type', 'uuid']);
+      }
     }
 
     // Load recaptcha token
@@ -359,9 +398,20 @@ class CreateOrderPage extends React.Component {
 
   /** Get the min authorized amount for order, in cents */
   getOrderMinAmount() {
-    const { amount, presets } = this.getTier() || {};
-    if (isNil(amount) && isNil(presets)) return 0;
-    return min(isNil(amount) ? presets : [...(presets || []), amount]);
+    const tier = this.getTier();
+
+    // When making a donation, min amount is $1
+    if (!tier) {
+      return 100;
+    }
+
+    // If the tier has not amount and no preset, it's a free tier
+    if (isNil(tier.amount) && isNil(tier.presets)) {
+      return 0;
+    }
+
+    // Return the minimum amongs presets and amount
+    return min(isNil(tier.amount) ? tier.presets : [...(tier.presets || []), tier.amount]);
   }
 
   /** Get default total amount, or undefined if we don't have any info on this */
@@ -397,31 +447,6 @@ class CreateOrderPage extends React.Component {
     return tier ? get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`) : null;
   }
 
-  validateStepProfile = async () => {
-    if (!this.state.stepProfile || !this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
-      return false;
-    }
-
-    // Check if we're creating a new organization
-    if (!this.state.stepProfile.id) {
-      this.setState({ submitting: true });
-
-      try {
-        const { data: result } = await this.props.createCollective(this.state.stepProfile);
-        const createdOrg = result.createCollective;
-
-        await this.props.refetchLoggedInUser();
-        this.setState({ stepProfile: createdOrg, submitting: false });
-      } catch (error) {
-        this.setState({ error: error.message, submitting: false });
-        window.scrollTo(0, 0);
-        return false;
-      }
-    }
-
-    return true;
-  };
-
   /** Returs the steps list */
   getSteps() {
     const isFixedPriceTier = this.isFixedPriceTier();
@@ -446,16 +471,16 @@ class CreateOrderPage extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!this.isFreeTier() || !isFixedPriceTier) {
+    if (!(this.isFreeTier() && isFixedPriceTier)) {
       steps.push({
         name: 'payment',
         isCompleted: Boolean(this.state.stepPayment),
-        validate: () => this.state.stepPayment,
+        validate: this.validateStepPayment,
       });
     }
 
     // Show the summary step only if the order has tax
-    if (this.getTax()) {
+    if (isFixedPriceTier) {
       steps.push({
         name: 'summary',
       });
@@ -509,7 +534,7 @@ class CreateOrderPage extends React.Component {
    * When using an order with fixed amount, this function returns the details to
    * show the user order amount as step details is skipped.
    */
-  renderTierDetails(tier, tax) {
+  renderTierDetails(tier) {
     const amount = get(this.state.stepDetails, 'totalAmount');
     const interval = get(this.state.stepDetails, 'interval');
 
@@ -545,7 +570,6 @@ class CreateOrderPage extends React.Component {
             </React.Fragment>
           )}
         </Container>
-        <ContributeDetailsFAQ hasInterval={Boolean(interval)} tax={tax} />
       </Container>
     );
   }
@@ -609,7 +633,6 @@ class CreateOrderPage extends React.Component {
           </Container>
           <ContributeDetailsFAQ
             hasInterval={Boolean(interval)}
-            hasVat={tax}
             mt={4}
             display={['none', null, 'block']}
             width={1 / 5}
@@ -681,7 +704,7 @@ class CreateOrderPage extends React.Component {
     return null;
   }
 
-  renderContent(step, goNext, goBack) {
+  renderContent(step, goNext, goBack, isValidating) {
     const { LoggedInUser } = this.props;
 
     if (!LoggedInUser) {
@@ -689,13 +712,13 @@ class CreateOrderPage extends React.Component {
     }
 
     const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';
-    const canNavigate = !this.state.submitting && !this.state.submitted;
+    const canGoPrev = !this.state.submitting && !this.state.submitted && !isValidating;
     return (
       <Flex flexDirection="column" alignItems="center" mx={3} width={0.95}>
         {this.renderStep(step)}
         <Flex mt={[4, null, 5]} justifyContent="center" flexWrap="wrap">
           {goBack && (
-            <PrevNextButton buttonStyle="standard" disabled={!canNavigate} onClick={goBack}>
+            <PrevNextButton buttonStyle="standard" disabled={!canGoPrev} onClick={goBack}>
               &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
             </PrevNextButton>
           )}
@@ -715,8 +738,8 @@ class CreateOrderPage extends React.Component {
             <PrevNextButton
               buttonStyle="primary"
               onClick={goNext}
-              disabled={!goNext || !canNavigate}
-              loading={this.state.submitting}
+              disabled={!goNext}
+              loading={this.state.submitting || this.state.submitted || isValidating}
             >
               {step.isLastStep ? (
                 <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
@@ -789,7 +812,7 @@ class CreateOrderPage extends React.Component {
           onInvalidStep={this.onInvalidStep}
           onComplete={this.submitOrder}
         >
-          {({ steps, currentStep, lastValidStep, lastVisitedStep, goNext, goBack, goToStep }) => (
+          {({ steps, currentStep, lastValidStep, lastVisitedStep, goNext, goBack, goToStep, isValidating }) => (
             <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
               {loadingLoggedInUser ||
                 (LoggedInUser && (
@@ -817,7 +840,7 @@ class CreateOrderPage extends React.Component {
               {isLoadingContent || currentStep.index > lastValidStep.index + 1 ? (
                 <Loading />
               ) : (
-                this.renderContent(currentStep, goNext, goBack)
+                this.renderContent(currentStep, goNext, goBack, isValidating)
               )}
             </Flex>
           )}

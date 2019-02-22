@@ -3,13 +3,16 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import Container from '../Container';
 import FAQ from './FAQ';
 
 /**
  * FAQ associated to the `ContributeDetails` component.
  */
 const ContributeDetailsFAQ = ({ tax, hasInterval, ...props }) =>
-  !tax && !hasInterval ? null : (
+  !tax && !hasInterval ? (
+    <Container {...props} />
+  ) : (
     <FAQ {...props}>
       {({ Container, Entry, Title, Content }) => (
         <Container>

@@ -42,6 +42,8 @@ export default class Steps extends React.Component {
   state = {
     /** A set of visited steps */
     visited: new Set([]),
+    /** True if an async `validate` is currently running */
+    isValidating: false,
   };
 
   componentDidMount() {
@@ -112,13 +114,32 @@ export default class Steps extends React.Component {
     return stepIdx === -1 ? null : this.buildStep(this.props.steps[stepIdx], stepIdx);
   }
 
+  validateCurrentStep = async () => {
+    const currentStep = this.getStepByName(this.props.currentStepName);
+    if (!currentStep) {
+      return false;
+    } else if (currentStep.isCompleted === false) {
+      return false;
+    } else if (currentStep.validate) {
+      this.setState({ isValidating: true });
+      const result = await currentStep.validate();
+      this.setState({ isValidating: false });
+      if (!result) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   // --- Callbacks passed to child component ---
 
   /** Go to the next step. Will be blocked if current step is not validated. */
-  goNext = () => {
+  goNext = async () => {
     const currentStep = this.getStepByName(this.props.currentStepName);
     if (currentStep.index === this.props.steps.length - 1) {
-      this.props.onComplete();
+      if (await this.validateCurrentStep()) {
+        return this.props.onComplete();
+      }
     } else {
       const nextStep = this.props.steps[currentStep.index + 1];
       this.goToStep(this.buildStep(nextStep, currentStep.index + 1));
@@ -143,15 +164,8 @@ export default class Steps extends React.Component {
    * if `opts.ignoreValidation` is true.
    */
   goToStep = async (step, opts = {}) => {
-    if (!opts.ignoreValidation) {
-      const currentStep = this.getStepByName(this.props.currentStepName);
-      if (!currentStep) {
-        return false;
-      } else if (currentStep.isCompleted === false) {
-        return false;
-      } else if (currentStep.validate && !(await currentStep.validate())) {
-        return false;
-      }
+    if (!opts.ignoreValidation && !(await this.validateCurrentStep())) {
+      return false;
     }
 
     this.props.onStepChange(step);
@@ -174,6 +188,7 @@ export default class Steps extends React.Component {
     return this.props.children({
       currentStep,
       lastValidStep,
+      isValidating: this.state.isValidating,
       lastVisitedStep: this.getLastVisitedStep(lastValidStep),
       steps: this.props.steps.map(this.buildStep),
       goNext: lastValidStep.index >= currentStep.index ? this.goNext : undefined,
