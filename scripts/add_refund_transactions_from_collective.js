@@ -15,7 +15,13 @@ import debug from 'debug';
 import models from '../server/models';
 import * as libPayments from '../server/lib/payments';
 
+// the user id of the one who's running this script, will be set on the field `CreatedByUserId`.
+const UPDATER_USER_ID = parseInt(process.env.UPDATER_USER_ID);
+if (!UPDATER_USER_ID) {
+  throw Error('You need to define a user id to run this script');
+}
 const fromCollectiveIds = process.env.FROM_COLLECTIVE_IDS ? process.env.FROM_COLLECTIVE_IDS.split(',').map(Number) : [];
+
 const debugRefund = debug('refundTransactions');
 
 async function refundTransaction(transaction) {
@@ -34,13 +40,15 @@ async function refundTransaction(transaction) {
     debugRefund('refunding transaction.', transaction);
     try {
       // try to do both stripe and database refunds
-      const refundTransactions = await paymentMethod.refundTransaction(transaction, { id: 18520 });
+      const refundTransactions = await paymentMethod.refundTransaction(transaction, { id: UPDATER_USER_ID });
       debugRefund(`Stripe refundTransactions: ${JSON.stringify(refundTransactions, null, 2)}`);
     } catch (error) {
       // Error means stripe has already refunded
       debugRefund(`STRIPE error meaning it was already refund...trying to refund only on our database:`);
       try {
-        const refundTransactions = await paymentMethod.refundTransactionOnlyInDatabase(transaction, { id: 18520 });
+        const refundTransactions = await paymentMethod.refundTransactionOnlyInDatabase(transaction, {
+          id: UPDATER_USER_ID,
+        });
         debugRefund(`Database ONLY refundTransactions: ${JSON.stringify(refundTransactions, null, 2)}`);
       } catch (error) {
         // throwing error on purpose to stop everything if something unexpected happens..
