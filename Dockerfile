@@ -37,6 +37,8 @@ ENV API_KEY $API_KEY
 
 RUN npm run build
 
+RUN npm prune --production
+
 EXPOSE ${PORT}
 
 CMD [ "npm", "run", "start" ]
