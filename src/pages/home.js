@@ -419,7 +419,7 @@ class HomePage extends React.Component {
             >
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.createCollective" defaultMessage="Create an open collective" />
+                  <FormattedMessage id="home.create" defaultMessage="Create an open collective" />
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
