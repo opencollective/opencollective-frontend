@@ -44,7 +44,14 @@ class SigninPage extends React.Component {
 
   async componentDidMount() {
     if (this.props.token) {
-      const user = await this.props.login(this.props.token);
+      let user = await this.props.login(this.props.token);
+
+      // If given token is invalid, try to login with the old one
+      if (!user) {
+        user = await this.props.login();
+      }
+
+      // If there's no user at this point, there's no chance we can login
       if (!user) {
         this.setState({ error: 'Token rejected' });
       }
