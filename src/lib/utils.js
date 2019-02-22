@@ -366,7 +366,7 @@ export const loadScriptAsync = (url, opts = {}) =>
 export const escapeInput = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const getBrowserWebsiteUrl = () => {
-  if (window && window.location) {
+  if (typeof window !== 'undefined' && window.location) {
     return `${window.location.protocol}//${window.location.host}`;
   }
 };

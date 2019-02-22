@@ -9,8 +9,7 @@ import { Github } from 'styled-icons/fa-brands/Github';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
-import { getBaseApiUrl } from '../lib/utils';
+import { getBaseApiUrl, getBrowserWebsiteUrl } from '../lib/utils';
 
 import { Router, Link } from '../server/pages';
 import { colors } from '../constants/theme';
@@ -23,8 +22,7 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import StyledLink from '../components/StyledLink';
 import StyledButton from '../components/StyledButton';
-
-const { WEBSITE_URL } = process.env;
+import { withUser } from '../components/UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
@@ -41,51 +39,50 @@ class ClaimCollectivePage extends React.Component {
     claimCollective: PropTypes.func.isRequired, // from addGraphQL/addClaimCollectiveMutation
     slug: PropTypes.string,
     token: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   state = {
     error: null,
-    loadingUserLogin: true,
     loadingGithub: false,
-    LoggedInUser: undefined,
+    githubLoaded: false,
     repo: null,
     memberships: [],
   };
 
   async componentDidMount() {
-    const { getLoggedInUser, token } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({
-      LoggedInUser,
-      loadingUserLogin: false,
-    });
+    this.loadDataFromGithub();
+  }
 
-    const isConnected =
-      token &&
-      LoggedInUser &&
-      LoggedInUser.collective &&
-      LoggedInUser.collective.connectedAccounts.some(({ service }) => service === 'github');
+  async componentDidUpdate() {
+    this.loadDataFromGithub();
+  }
 
-    if (isConnected) {
+  async loadDataFromGithub() {
+    const { LoggedInUser, token } = this.props;
+    const { loadingGithub, githubLoaded } = this.state;
+
+    if (token && LoggedInUser && !loadingGithub && !githubLoaded) {
       const githubHandle = this.githubHandle();
       this.setState({ loadingGithub: true });
       if (githubHandle.includes('/')) {
         fetch(`${getBaseApiUrl()}/github/repo?name=${githubHandle}&access_token=${token}`)
           .then(response => response.json())
           .then(repo => {
-            this.setState({ loadingGithub: false, repo });
+            this.setState({ loadingGithub: false, repo, githubLoaded: true });
           })
           .catch(() => {
-            this.setState({ loadingGithub: false });
+            this.setState({ loadingGithub: false, githubLoaded: true });
           });
       } else {
         fetch(`${getBaseApiUrl()}/github/orgMemberships?access_token=${token}`)
           .then(response => response.json())
           .then(memberships => {
-            this.setState({ loadingGithub: false, memberships });
+            this.setState({ loadingGithub: false, memberships, githubLoaded: true });
           })
           .catch(() => {
-            this.setState({ loadingGithub: false });
+            this.setState({ loadingGithub: false, githubLoaded: true });
           });
       }
     }
@@ -130,8 +127,8 @@ class ClaimCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug, token } = this.props;
-    const { error, LoggedInUser, loadingUserLogin, loadingGithub } = this.state;
+    const { data, slug, token, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { error, loadingGithub } = this.state;
 
     const { Collective, loading } = data;
 
@@ -143,10 +140,11 @@ class ClaimCollectivePage extends React.Component {
       return <ErrorPage loading={loading} data={data} message={error && error.message} />;
     }
 
-    const connectUrl = `/api/connected-accounts/github?redirect=${WEBSITE_URL}/${slug}/claim`;
+    const websiteUrl = getBrowserWebsiteUrl() || process.env.WEBSITE_URL;
+    const connectUrl = `/api/connected-accounts/github?redirect=${websiteUrl}/${slug}/claim`;
 
     let step, invalid;
-    if (loadingUserLogin) {
+    if (loadingLoggedInUser) {
       step = 'loading';
     } else if (loadingGithub) {
       step = 'analyzing';
@@ -161,7 +159,7 @@ class ClaimCollectivePage extends React.Component {
 
     return (
       <Fragment>
-        <Header title={`Claim ${slug}`} className={loadingUserLogin ? 'loading' : ''} LoggedInUser={LoggedInUser} />
+        <Header title={`Claim ${slug}`} className={loadingLoggedInUser ? 'loading' : ''} LoggedInUser={LoggedInUser} />
         <Body>
           <Container background="linear-gradient(180deg, #DBECFF, #FFFFFF)" py={4}>
             <Container display="flex" flexDirection="column" alignItems="center" mx="auto" maxWidth={1200} py={4}>
@@ -300,7 +298,7 @@ class ClaimCollectivePage extends React.Component {
                       mx="auto"
                       onClick={() => this.claim(data.Collective.id)}
                     >
-                      Activate open collective
+                      Activate Open Collective
                     </StyledButton>
                   </Fragment>
                 )}
@@ -353,4 +351,4 @@ const addGraphQL = compose(
 );
 
 export { ClaimCollectivePage as MockClaimCollectivePage };
-export default withData(withLoggedInUser(addGraphQL(withIntl(ClaimCollectivePage))));
+export default withData(withUser(addGraphQL(withIntl(ClaimCollectivePage))));
