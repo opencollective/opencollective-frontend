@@ -147,7 +147,7 @@ jobs:
           at: ..
 
       - <<: *restore_cache
-      - run: npm ci --only=prod
+      - run: npm ci
 
       - restore_cache:
           keys:
@@ -177,14 +177,14 @@ jobs:
     steps:
       - run: sudo apt -y update
 
-      # Used in setup_circleci_db.sh (dropdb ,psql and pg_restore)
+      # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
       - run: sudo apt -y install postgresql-client
 
       - attach_workspace:
           at: ..
 
       - <<: *restore_cache
-      - run: npm ci --only=prod
+      - run: npm ci
 
       - run: ./scripts/setup_circleci_db.sh
 

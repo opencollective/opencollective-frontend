@@ -3,7 +3,7 @@
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "> Starting api server"
   cd ~/api
-  PG_DATABASE=opencollective_dvl E2E_TEST=1 npm start &
+  PG_DATABASE=opencollective_dvl npm start &
   API_PID=$!
   cd -
   echo "> Starting frontend server"
@@ -13,7 +13,7 @@ fi
 
 echo ""
 echo "> Starting server jest tests"
-npx jest test/server/*
+jest test/server/*
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with jest tests, exiting"
