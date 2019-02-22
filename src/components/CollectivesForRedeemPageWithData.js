@@ -87,21 +87,13 @@ class CollectivesForRedeemPageWithData extends React.Component {
 
         <div className="Collectives cardsList">
           {collectives.map(collective => (
-            <CollectiveCardWithRedeem
-              key={collective.id}
-              collective={collective}
-              showRedeemPrompt={true}
-            />
+            <CollectiveCardWithRedeem key={collective.id} collective={collective} showRedeemPrompt={true} />
           ))}
         </div>
         <div className="loadMoreBtn">
           <Button onClick={this.fetchMore}>
-            {this.state.loading && (
-              <FormattedMessage id="loading" defaultMessage="loading" />
-            )}
-            {!this.state.loading && (
-              <FormattedMessage id="loadMore" defaultMessage="load more" />
-            )}
+            {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+            {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
           </Button>
         </div>
       </div>
@@ -175,14 +167,8 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) return previousResult;
           // Update the results object with new entries
-          const {
-            __typename,
-            total,
-            collectives,
-          } = previousResult.allCollectives;
-          const all = collectives.concat(
-            fetchMoreResult.allCollectives.collectives,
-          );
+          const { __typename, total, collectives } = previousResult.allCollectives;
+          const all = collectives.concat(fetchMoreResult.allCollectives.collectives);
           return Object.assign({}, previousResult, {
             allCollectives: { __typename, total, collectives: all },
           });

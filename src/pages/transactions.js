@@ -66,6 +66,7 @@ class TransactionsPage extends React.Component {
             href={`/${collective.slug}`}
             cta={cta}
             LoggedInUser={LoggedInUser}
+            key={collective.slug}
           />
 
           <div className="content">
@@ -84,6 +85,4 @@ class TransactionsPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsPage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsPage))));

@@ -63,16 +63,9 @@ const EventSponsorCard = ({ sponsor }) => (
       <div className="tier border-top border-gray px3 py2">
         <p className="name">{get(sponsor, 'tier.name')}</p>
         <p className="since">
-          <FormattedMessage
-            id="EventSponsorCard.since"
-            defaultMessage="since"
-          />
+          <FormattedMessage id="EventSponsorCard.since" defaultMessage="since" />
           &nbsp;
-          <FormattedDate
-            value={sponsor.createdAt}
-            month="long"
-            year="numeric"
-          />
+          <FormattedDate value={sponsor.createdAt} month="long" year="numeric" />
         </p>
       </div>
     </div>

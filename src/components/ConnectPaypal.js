@@ -41,9 +41,7 @@ class ConnectPaypal extends React.Component {
     if (!collective || !collective.paymentMethods) {
       return <div />;
     }
-    const paypalPaymentMethod = collective.paymentMethods.find(
-      pm => pm.service === 'paypal',
-    );
+    const paypalPaymentMethod = collective.paymentMethods.find(pm => pm.service === 'paypal');
 
     return (
       <div className="CollectivesContainer">
@@ -60,7 +58,6 @@ class ConnectPaypal extends React.Component {
               margin: 1rem 0.5rem 1rem 0;
             }
             .amount {
-              font-family: Rubik;
               font-size: 3.6rem;
               font-weight: 500;
               line-height: 1.11;
@@ -70,7 +67,6 @@ class ConnectPaypal extends React.Component {
 
             .description,
             label {
-              font-family: Rubik;
               font-size: 1.4rem;
               line-height: 1.5;
               text-align: right;
@@ -89,15 +85,9 @@ class ConnectPaypal extends React.Component {
           {paypalPaymentMethod && (
             <div style={{ textAlign: 'center' }}>
               <div className="balance">
-                <FormattedMessage
-                  id="host.dashboard.paypal.balance"
-                  defaultMessage="PayPal card balance:"
-                />
+                <FormattedMessage id="host.dashboard.paypal.balance" defaultMessage="PayPal card balance:" />
                 <div className="amount">
-                  <Currency
-                    value={paypalPaymentMethod.balance}
-                    currency={paypalPaymentMethod.currency}
-                  />
+                  <Currency value={paypalPaymentMethod.balance} currency={paypalPaymentMethod.currency} />
                 </div>
                 <div>
                   <SmallButton
@@ -114,9 +104,10 @@ class ConnectPaypal extends React.Component {
               <div className="description">
                 <FormattedMessage
                   id="collective.connectedAccounts.paypal.connected"
-                  defaultMessage="Paypal account connected on {createdAt, date, short}"
+                  defaultMessage="Paypal account ({paypalEmail}) connected on {createdAt, date, short}"
                   values={{
                     createdAt: new Date(paypalPaymentMethod.createdAt),
+                    paypalEmail: paypalPaymentMethod.name,
                   }}
                 />
               </div>

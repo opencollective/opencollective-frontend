@@ -2,28 +2,25 @@
 
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "> Starting api server"
-  cd ~/cache/opencollective-api
+  cd ~/api
   PG_DATABASE=opencollective_dvl npm start &
   API_PID=$!
   cd -
   echo "> Starting frontend server"
   npm start &
   FRONTEND_PID=$!
-fi
-echo ""
-echo "> Starting server jest tests"
-jest test/server/*
-RETURN_CODE=$?
-if [ $RETURN_CODE -ne 0 ]; then
-  echo "Error with jest tests, exiting"
-  exit 1;
+  # Record video and upload them if test fail on CI
+  CYPRESS_CONFIG="video=true,videoUploadOnPasses=true"
+  CYPRESS_RECORD="--record"
+else
+  # Never record video in dev
+  CYPRESS_CONFIG="video=false"
+  CYPRESS_RECORD=""
 fi
 
 echo ""
-echo "> Ensure cypress binary is installed (should normally be cached)"
-cypress install
 echo "> Running cypress tests"
-cypress run --record
+npx cypress run ${CYPRESS_RECORD} --config ${CYPRESS_CONFIG}
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"

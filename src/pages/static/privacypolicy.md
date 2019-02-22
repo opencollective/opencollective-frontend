@@ -1,8 +1,8 @@
 # Open Collective Privacy Policy
 
-**Last Updated: March 8th, 2017**
+**Last Updated: 7 January 2019**
 
-This Privacy Policy explains how information about you is collected, used and disclosed by Open Collective, Inc. ("Open Collective" or “we”).  This Privacy Policy applies to information we collect when you use our websites and online services (collectively, the “Services”) or when you otherwise interact with us. 
+This Privacy Policy explains how information about you is collected, used, and disclosed by Open Collective, Inc. ("Open Collective" or “we”).  This Privacy Policy applies to information we collect when you use our websites and online services (collectively, the “Services”) or when you otherwise interact with us. 
 
 We may change this Privacy Policy from time to time.  If we make changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification).  We encourage you to review the Privacy Policy whenever you access the Services or otherwise interact with us to stay informed about our information practices and the ways you can help protect your privacy.
 
@@ -77,6 +77,12 @@ You may update the profile information you provide by logging into your online a
 Most web browsers are set to accept cookies by default.  If you prefer, you can usually choose to set your browser to remove or reject browser cookies.  Please note that if you choose to remove or reject cookies, this could affect the availability and functionality of our Services.
 <h4>Promotional Communications</h4>
 You may opt out of receiving promotional or notification emails from Open Collective by following the instructions in those emails.  If you opt out, we may still send you non-promotional emails, such as those about your account or our ongoing business relations.</td>
+  </tr>
+  <tr>
+    <th valign="top">GDPR</th>
+    <td><h4>Compliance</h4>
+Open Collective is GDPR compliant. We are not in the business of selling data to any 3rd party. Our business model is to take a commission on the money raised by Collectives (like most other crowdfunding platforms). Companies that sponsors Collectives don't get access to private information. Only the admins of the Collective (core contributors) and of the organization that is legally hosting the Collectives (fiscal sponsor) get access to your email address. We don't store credit card information on our servers (we only store a token if you have decided to save it to your profile). We don’t store any passwords. Since our entire code base is open source, anyone can easily audit it.
+    </td> 
   </tr>
   <tr>
     <th valign="top">Contact Us</th>

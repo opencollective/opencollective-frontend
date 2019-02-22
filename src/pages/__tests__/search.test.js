@@ -4,6 +4,7 @@ import { shallow } from 'enzyme';
 import 'jest-styled-components';
 
 import Router from 'next/router';
+import { withMockRouterContext } from '../../../test/mocks/withMockRouter';
 
 import { MockSearchPage } from '../search';
 
@@ -12,6 +13,8 @@ describe('Search Page', () => {
     data: {},
     getLoggedInUser: () => Promise.resolve({}),
   };
+
+  const MockRouter = withMockRouterContext({});
 
   it('renders loading grid SVG', () => {
     const loadingProps = {
@@ -36,9 +39,7 @@ describe('Search Page', () => {
       term: 'test',
     };
 
-    const tree = renderer
-      .create(<MockSearchPage {...emptyResultsProps} />)
-      .toJSON();
+    const tree = renderer.create(<MockSearchPage {...emptyResultsProps} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -51,12 +52,9 @@ describe('Search Page', () => {
         },
       },
       term: 'test',
-      usePledges: true,
     };
 
-    const tree = renderer
-      .create(<MockSearchPage {...emptyResultsProps} />)
-      .toJSON();
+    const tree = renderer.create(<MockSearchPage {...emptyResultsProps} />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 
@@ -92,7 +90,13 @@ describe('Search Page', () => {
       term: 'Test',
     };
 
-    const tree = renderer.create(<MockSearchPage {...resultsProps} />).toJSON();
+    const tree = renderer
+      .create(
+        <MockRouter>
+          <MockSearchPage {...resultsProps} />
+        </MockRouter>,
+      )
+      .toJSON();
     expect(tree).toMatchSnapshot();
   });
 

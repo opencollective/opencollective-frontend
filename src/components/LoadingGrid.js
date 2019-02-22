@@ -2,13 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const LoadingGrid = ({ color, size }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 105 105"
-    xmlns="http://www.w3.org/2000/svg"
-    fill={color}
-  >
+  <svg width={size} height={size} viewBox="0 0 105 105" xmlns="http://www.w3.org/2000/svg" fill={color}>
     <circle cx="12.5" cy="12.5" r="12.5">
       <animate
         attributeName="fill-opacity"
@@ -108,7 +102,7 @@ LoadingGrid.propTypes = {
 };
 
 LoadingGrid.defaultProps = {
-  color: '#46B0ED',
+  color: '#3385FF',
   size: 100,
 };
 

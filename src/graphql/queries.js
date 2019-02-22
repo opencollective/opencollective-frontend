@@ -17,6 +17,15 @@ export const transactionFields = `
   paymentProcessorFeeInHostCurrency
   paymentMethod {
     service
+    type
+    name
+    data
+  }
+  collective {
+    id
+    slug
+    type
+    name
   }
   fromCollective {
     id
@@ -25,8 +34,13 @@ export const transactionFields = `
     path
     image
   }
+  usingVirtualCardFromCollective {
+    slug
+    name
+  }
   host {
     id
+    slug
     name
     currency
     hostFeePercent
@@ -74,14 +88,16 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
-        paymentMethods(limit: 5) {
+        paymentMethods(limit: 10, hasBalanceAboveZero: true) {
           id
           uuid
           currency
-          type
-          service
           name
+          service
+          type
           data
+          balance
+          expiryDate
         }
         connectedAccounts {
           service
@@ -102,7 +118,7 @@ export const getLoggedInUserQuery = gql`
             id
             balance
           }
-          paymentMethods(limit: 5) {
+          paymentMethods(limit: 10, hasBalanceAboveZero: true) {
             id
             uuid
             currency
@@ -129,6 +145,7 @@ const getTiersQuery = gql`
       backgroundImage
       twitterHandle
       description
+      countryISO
       currency
       settings
       tiers {
@@ -179,13 +196,16 @@ const getCollectiveToEditQuery = gql`
       description
       longDescription
       tags
+      countryISO
       twitterHandle
+      githubHandle
       website
       currency
       settings
       createdAt
       isActive
       isHost
+      hostFeePercent
       expensePolicy
       stats {
         id
@@ -261,12 +281,17 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      paymentMethods(service: "stripe") {
+      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"], hasBalanceAboveZero: true) {
         id
         uuid
         name
         data
         monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
         orders(hasActiveSubscription: true) {
           id
         }
@@ -300,7 +325,9 @@ const getCollectiveQuery = gql`
       description
       longDescription
       twitterHandle
+      githubHandle
       website
+      countryISO
       currency
       settings
       createdAt
@@ -347,9 +374,10 @@ const getCollectiveQuery = gql`
         stats {
           id
           totalOrders
+          totalActiveDistinctOrders
           availableQuantity
         }
-        orders(limit: 30) {
+        orders(limit: 30, isActive: true) {
           fromCollective {
             id
             slug
@@ -381,6 +409,8 @@ const getCollectiveQuery = gql`
           slug
           type
           image
+          backgroundImage
+          company
         }
       }
       ... on User {
@@ -403,6 +433,9 @@ const getCollectiveQuery = gql`
             description
             longDescription
             backgroundImage
+            parentCollective {
+              slug
+            }
           }
         }
       }
@@ -426,12 +459,25 @@ const getCollectiveQuery = gql`
             description
             longDescription
             backgroundImage
+            parentCollective {
+              slug
+            }
           }
         }
       }
       pledges: orders(status: PENDING) {
+        currency
+        id
+        interval
+        publicMessage
         status
         totalAmount
+        fromCollective {
+          name
+          image
+          slug
+          type
+        }
       }
     }
   }
@@ -455,6 +501,7 @@ const getEventCollectiveQuery = gql`
       startsAt
       endsAt
       timezone
+      countryISO
       currency
       settings
       location {
@@ -473,6 +520,10 @@ const getEventCollectiveQuery = gql`
         presets
         currency
         maxQuantity
+        stats {
+          id
+          availableQuantity
+        }
       }
       parentCollective {
         id
@@ -596,20 +647,6 @@ const getCollectiveCoverQuery = gql`
   }
 `;
 
-export const getOcCardBalanceQuery = gql`
-  query checkOcPaymentMethod($token: String!) {
-    ocPaymentMethod(token: $token) {
-      id
-      name
-      currency
-      balance
-      uuid
-      service
-      type
-    }
-  }
-`;
-
 export const getSubscriptionsQuery = gql`
   query Collective($slug: String) {
     Collective(slug: $slug) {
@@ -642,6 +679,7 @@ export const getSubscriptionsQuery = gql`
         createdAt
         isSubscriptionActive
         isPastDue
+        status
         collective {
           id
           name
@@ -663,19 +701,25 @@ export const getSubscriptionsQuery = gql`
         paymentMethod {
           id
           uuid
-          data
+          currency
           name
           service
           type
+          data
+          balance
+          expiryDate
         }
       }
       paymentMethods {
         id
         uuid
+        currency
+        name
         service
         type
         data
-        name
+        balance
+        expiryDate
       }
       ... on User {
         memberOf(limit: 60) {
@@ -703,6 +747,44 @@ export const getSubscriptionsQuery = gql`
           }
           collective {
             id
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** A query to get the virtual cards created by a collective. Must be authenticated. */
+export const getCollectiveVirtualCards = gql`
+  query CollectiveVirtualCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int) {
+    Collective(id: $CollectiveId) {
+      createdVirtualCards(isConfirmed: $isConfirmed, limit: $limit, offset: $offset) {
+        offset
+        limit
+        total
+        paymentMethods {
+          id
+          uuid
+          currency
+          name
+          service
+          type
+          data
+          initialBalance
+          monthlyLimitPerMember
+          balance
+          expiryDate
+          isConfirmed
+          data
+          createdAt
+          expiryDate
+          description
+          collective {
+            id
+            slug
+            image
+            type
+            name
           }
         }
       }
@@ -767,8 +849,35 @@ export const getCollectiveApplicationsQuery = gql`
   }
 `;
 
+/**
+ * A query to get a collective source payment methods. This will not return
+ * virtual cards, as a virtual card cannot be used as a source payment method
+ * for another payment method.
+ */
+export const getCollectiveSourcePaymentMethodsQuery = gql`
+  query Collective($id: Int) {
+    Collective(id: $id) {
+      id
+      paymentMethods(types: ["creditcard", "prepaid"], hasBalanceAboveZero: true) {
+        id
+        uuid
+        name
+        data
+        monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
+      }
+    }
+  }
+`;
+
 export const addCollectiveData = graphql(getCollectiveQuery);
-export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
+export const addCollectiveCoverData = (component, options) => {
+  return graphql(getCollectiveCoverQuery, options)(component);
+};
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);

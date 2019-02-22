@@ -6,7 +6,7 @@ export default {
   green: '#75CC1F',
   blueHover: '#4DA6FF',
   blueActive: '#297ACC',
-  blue: '#46B0ED',
+  blue: '#3385FF',
   bgBlue: 'rgba(0,173,255,1)',
   black: '#484B4C',
   white: '#FFFFFF',

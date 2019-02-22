@@ -23,7 +23,7 @@
                         <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
                         <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
                     </g>
-                    <use id="Combined-Shape" stroke="#46B0ED" mask="url(#mask-4)" stroke-width="2" fill="#FFFFFF" opacity="0.429999977" xlink:href="#path-3"></use>
+                    <use id="Combined-Shape" stroke="#3385FF" mask="url(#mask-4)" stroke-width="2" fill="#FFFFFF" opacity="0.429999977" xlink:href="#path-3"></use>
                     <g id="::-quantity" transform="translate(0.000000, 111.000000)"></g>
                 </g>
             </g>

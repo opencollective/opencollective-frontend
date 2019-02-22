@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedNumber,
-  FormattedDate,
-} from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -14,18 +9,22 @@ import Avatar from '../../../components/Avatar';
 import { capitalize, formatCurrency } from '../../../lib/utils';
 import Link from '../../../components/Link';
 import SmallButton from '../../../components/SmallButton';
+import Moment from '../../../components/Moment';
 
+import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
+import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import colors from '../../../constants/colors';
 
 class Expense extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     expense: PropTypes.object,
-    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
@@ -73,7 +72,7 @@ class Expense extends React.Component {
 
   toggleDetails() {
     this.setState({
-      mode: this.state.mode === 'details' ? 'list' : 'details',
+      mode: this.state.mode === 'details' ? 'summary' : 'details',
     });
   }
 
@@ -89,8 +88,9 @@ class Expense extends React.Component {
     this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
   }
 
-  handleChange(expense) {
-    this.setState({ modified: true, expense });
+  handleChange(obj) {
+    const newState = { ...this.state, modified: true, ...obj };
+    this.setState(newState);
   }
 
   async save() {
@@ -103,51 +103,45 @@ class Expense extends React.Component {
   }
 
   render() {
-    const {
-      intl,
-      collective,
-      expense,
-      includeHostedCollectives,
-      LoggedInUser,
-      editable,
-      view,
-    } = this.props;
+    const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
+
+    if (!expense.fromCollective) {
+      console.error('No FromCollective for expense', expense);
+      return <div />;
+    }
 
     const title = expense.description;
     const status = expense.status.toLowerCase();
 
+    const view = this.props.view || 'summary';
     let { mode } = this.state;
     if (editable && LoggedInUser && !mode) {
-      if (
-        expense.status === 'PENDING' &&
-        LoggedInUser.canApproveExpense(expense)
-      ) {
-        mode = 'details';
-      }
-      if (
-        expense.status === 'APPROVED' &&
-        LoggedInUser.canPayExpense(expense)
-      ) {
-        mode = 'details';
+      switch (expense.status) {
+        case 'PENDING':
+          mode = LoggedInUser.canApproveExpense(expense) && 'details';
+          break;
+        case 'APPROVED':
+          mode = LoggedInUser.canPayExpense(expense) && 'details';
+          break;
       }
     }
     mode = mode || view;
+
+    const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
 
     const canReject =
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
         (expense.status === 'APPROVED' &&
-          (Date.now() - new Date(expense.updatedAt).getTime() <
-            60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
+          (Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
             LoggedInUser.canEditCollective(collective.host))));
 
     const canApprove =
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
-        (expense.status === 'REJECTED' &&
-          Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
+        (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
     return (
       <div className={`expense ${status} ${this.state.mode}View`}>
@@ -174,11 +168,11 @@ class Expense extends React.Component {
             }
             .fromCollective {
               float: left;
-              margin-right: 1rem;
+              margin-right: 1.6rem;
             }
             .body {
               overflow: hidden;
-              font-size: 1.5rem;
+              font-size: 1.4rem;
               width: 100%;
             }
             .description {
@@ -202,10 +196,8 @@ class Expense extends React.Component {
               color: #919599;
             }
             .amount {
-              width: 10rem;
               margin-left: 0.5rem;
               text-align: right;
-              font-family: montserratlight, arial;
               font-size: 1.5rem;
               font-weight: 300;
             }
@@ -232,7 +224,9 @@ class Expense extends React.Component {
               margin-right: 1rem;
               float: left;
             }
-
+            .expenseActions {
+              display: flex;
+            }
             .expenseActions :global(> div) {
               margin-right: 0.5rem;
             }
@@ -271,64 +265,46 @@ class Expense extends React.Component {
             }
           `}
         </style>
+
         <div className="fromCollective">
-          <a
-            href={`/${expense.fromCollective.slug}`}
+          <Link
+            route="collective"
+            params={{ slug: expense.fromCollective.slug }}
             title={expense.fromCollective.name}
+            passHref
           >
             <Avatar
               src={expense.fromCollective.image}
+              type={expense.fromCollective.type}
+              name={expense.fromCollective.name}
               key={expense.fromCollective.id}
               radius={40}
+              className="noFrame"
             />
-          </a>
+          </Link>
         </div>
         <div className="body">
           <div className="header">
             <div className="amount pullRight">
-              <FormattedNumber
-                value={expense.amount / 100}
-                currency={expense.currency}
-                {...this.currencyStyle}
-              />
+              <AmountCurrency amount={-expense.amount} currency={expense.currency} />
             </div>
             <div className="description">
-              <Link
-                route={`/${collective.slug}/expenses/${expense.id}`}
-                title={capitalize(title)}
-              >
+              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
                 {capitalize(title)}
-                {view !== 'compact' && (
-                  <span className="ExpenseId">#{expense.id}</span>
-                )}
+                {view !== 'compact' && <span className="ExpenseId">#{expense.id}</span>}
               </Link>
             </div>
             <div className="meta">
-              <span className="incurredAt">
-                <FormattedDate
-                  value={expense.incurredAt}
-                  day="numeric"
-                  month="numeric"
-                />
-              </span>{' '}
-              |&nbsp;
-              {includeHostedCollectives && (
+              <Moment relative={true} value={expense.incurredAt} />
+              {' | '}
+              {includeHostedCollectives && expense.collective && (
                 <span className="collective">
-                  <Link route={`/${expense.collective.slug}`}>
-                    {expense.collective.slug}
-                  </Link>{' '}
-                  (balance:{' '}
-                  {formatCurrency(
-                    expense.collective.stats.balance,
-                    expense.collective.currency,
-                  )}
-                  ) |{' '}
+                  <Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance:{' '}
+                  {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
                 </span>
               )}
-              <span className="status">
-                {intl.formatMessage(this.messages[status])}
-              </span>{' '}
-              |
+              <span className="status">{intl.formatMessage(this.messages[status])}</span>
+              {' | '}
               <span className="metaItem">
                 <Link
                   route="expenses"
@@ -342,37 +318,22 @@ class Expense extends React.Component {
                   {capitalize(expense.category)}
                 </Link>
               </span>
-              {editable &&
-                LoggedInUser &&
-                LoggedInUser.canEditExpense(expense) && (
-                  <span>
-                    {' '}
-                    |{' '}
-                    <a className="toggleEditExpense" onClick={this.toggleEdit}>
-                      {intl.formatMessage(
-                        this.messages[
-                          `${mode === 'edit' ? 'cancelEdit' : 'edit'}`
-                        ],
-                      )}
-                    </a>
-                  </span>
-                )}
-              {mode !== 'edit' &&
-                view === 'list' && (
-                  <span>
-                    {' '}
-                    |{' '}
-                    <a className="toggleDetails" onClick={this.toggleDetails}>
-                      {intl.formatMessage(
-                        this.messages[
-                          `${
-                            mode === 'details' ? 'closeDetails' : 'viewDetails'
-                          }`
-                        ],
-                      )}
-                    </a>
-                  </span>
-                )}
+              {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
+                <span>
+                  {' | '}
+                  <a className="toggleEditExpense" onClick={this.toggleEdit}>
+                    {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                  </a>
+                </span>
+              )}
+              {mode !== 'edit' && view === 'summary' && (
+                <span>
+                  {' | '}
+                  <a className="toggleDetails" onClick={this.toggleDetails}>
+                    {intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}
+                  </a>
+                </span>
+              )}
             </div>
           </div>
 
@@ -380,44 +341,48 @@ class Expense extends React.Component {
             LoggedInUser={LoggedInUser}
             expense={expense}
             collective={collective}
-            onChange={this.handleChange}
+            onChange={expense => this.handleChange({ expense })}
             mode={mode}
           />
 
           {editable && (
             <div className="actions">
-              {mode === 'edit' &&
-                this.state.modified && (
-                  <div>
-                    <div className="leftColumn" />
-                    <div className="rightColumn">
-                      <SmallButton className="primary save" onClick={this.save}>
-                        <FormattedMessage
-                          id="expense.save"
-                          defaultMessage="save"
-                        />
-                      </SmallButton>
-                    </div>
+              {mode === 'edit' && this.state.modified && (
+                <div>
+                  <div className="leftColumn" />
+                  <div className="rightColumn">
+                    <SmallButton className="primary save" onClick={this.save}>
+                      <FormattedMessage id="expense.save" defaultMessage="save" />
+                    </SmallButton>
                   </div>
-                )}
-              {mode !== 'edit' &&
-                LoggedInUser &&
-                LoggedInUser.canApproveExpense(expense) && (
+                </div>
+              )}
+              {mode !== 'edit' && (canPay || canApprove || canReject) && (
+                <div className="manageExpense">
+                  {canPay && expense.payoutMethod === 'other' && (
+                    <EditPayExpenseFeesForm
+                      canEditPlatformFee={LoggedInUser.isRoot()}
+                      currency={collective.currency}
+                      onChange={fees => this.handleChange({ fees })}
+                    />
+                  )}
                   <div className="expenseActions">
-                    {expense.status === 'APPROVED' &&
-                      LoggedInUser.canPayExpense(expense) && (
-                        <PayExpenseBtn
-                          expense={expense}
-                          collective={collective}
-                          disabled={!this.props.allowPayAction}
-                          lock={this.props.lockPayAction}
-                          unlock={this.props.unlockPayAction}
-                        />
-                      )}
+                    {canPay && (
+                      <PayExpenseBtn
+                        expense={expense}
+                        collective={collective}
+                        host={host}
+                        {...this.state.fees}
+                        disabled={!this.props.allowPayAction}
+                        lock={this.props.lockPayAction}
+                        unlock={this.props.unlockPayAction}
+                      />
+                    )}
                     {canApprove && <ApproveExpenseBtn id={expense.id} />}
                     {canReject && <RejectExpenseBtn id={expense.id} />}
                   </div>
-                )}
+                </div>
+              )}
             </div>
           )}
         </div>

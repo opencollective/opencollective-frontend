@@ -11,6 +11,7 @@ import ErrorPage from './ErrorPage';
 import SignInForm from './SignInForm';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages } from 'react-intl';
+import { Router } from '../server/pages';
 
 class CreateCollective extends React.Component {
   static propTypes = {
@@ -35,8 +36,7 @@ class CreateCollective extends React.Component {
       },
       'collective.create.description': {
         id: 'collective.create.description',
-        defaultMessage:
-          'The place for your community to collect money and share your finance in full transparency.',
+        defaultMessage: 'The place for your community to collect money and share your finance in full transparency.',
       },
     });
 
@@ -44,12 +44,8 @@ class CreateCollective extends React.Component {
       type: 'COLLECTIVE',
       settings: {
         apply: {
-          title: this.props.intl.formatMessage(
-            this.messages['collective.create.title'],
-          ),
-          description: this.props.intl.formatMessage(
-            this.messages['collective.create.description'],
-          ),
+          title: this.props.intl.formatMessage(this.messages['collective.create.title']),
+          description: this.props.intl.formatMessage(this.messages['collective.create.description']),
           categories: [
             'association',
             'coop',
@@ -79,10 +75,7 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    if (
-      !CollectiveInputType.tos ||
-      (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos)
-    ) {
+    if (!CollectiveInputType.tos || (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos)) {
       this.setState({
         result: { error: 'Please accept the terms of service' },
       });
@@ -92,12 +85,17 @@ class CreateCollective extends React.Component {
     CollectiveInputType.type = 'COLLECTIVE';
     CollectiveInputType.HostCollectiveId = this.host.id;
     if (CollectiveInputType.tags) {
-      CollectiveInputType.tags = CollectiveInputType.tags
-        .split(',')
-        .map(t => t.trim());
+      // Meetup returns an array of tags, while the regular input stores a string
+      if (typeof CollectiveInputType.tags === 'string') {
+        CollectiveInputType.tags.split(',');
+      }
+
+      CollectiveInputType.tags =
+        Array.isArray(CollectiveInputType.tags) && CollectiveInputType.tags.length > 0
+          ? CollectiveInputType.tags.map(t => t.trim())
+          : null;
     }
-    CollectiveInputType.tags =
-      [...(CollectiveInputType.tags || []), ...(this.host.tags || [])] || [];
+    CollectiveInputType.tags = [...(CollectiveInputType.tags || []), ...(this.host.tags || [])] || [];
     if (CollectiveInputType.category) {
       CollectiveInputType.tags.push(CollectiveInputType.category);
     }
@@ -111,29 +109,30 @@ class CreateCollective extends React.Component {
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
-      let successUrl;
-      if (CollectiveInputType.HostCollectiveId) {
-        successUrl = `${window.location.protocol}//${window.location.host}/${
-          collective.slug
-        }?status=collectiveCreated&CollectiveId=${
-          collective.id
-        }&collectiveSlug=${collective.slug}`;
-      } else {
-        successUrl = `${window.location.protocol}//${window.location.host}/${
-          collective.slug
-        }/edit#host`;
-      }
+      const successParams = {
+        slug: collective.slug,
+      };
       this.setState({
         status: 'idle',
         result: { success: 'Collective created successfully' },
       });
-      window.location.replace(successUrl);
+
+      if (CollectiveInputType.HostCollectiveId) {
+        successParams.status = 'collectiveCreated';
+        successParams.CollectiveId = collective.id;
+        successParams.collectiveSlug = collective.slug;
+        Router.pushRoute('collective', {
+          slug: collective.slug,
+          status: 'collectiveCreated',
+          CollectiveId: collective.id,
+          CollectiveSlug: collective.slug,
+        });
+      } else {
+        Router.pushRoute('editCollective', { slug: collective.slug, section: 'host' });
+      }
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err));
-      const errorMsg =
-        err.graphQLErrors && err.graphQLErrors[0]
-          ? err.graphQLErrors[0].message
-          : err.message;
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
@@ -206,35 +205,33 @@ class CreateCollective extends React.Component {
               </div>
             )}
 
-            {canApply &&
-              !LoggedInUser && (
-                <div className="signin">
-                  <h2>
-                    <FormattedMessage
-                      id="collectives.create.signin"
-                      defaultMessage="Sign in or create an Open Collective account"
-                    />
-                  </h2>
-                  <SignInForm next={this.next} />
-                </div>
-              )}
-
-            {canApply &&
-              LoggedInUser && (
-                <div>
-                  <CreateCollectiveForm
-                    host={this.host}
-                    collective={this.state.collective}
-                    onSubmit={this.createCollective}
-                    onChange={this.resetError}
+            {canApply && !LoggedInUser && (
+              <div className="signin">
+                <h2>
+                  <FormattedMessage
+                    id="collectives.create.signin"
+                    defaultMessage="Sign in or create an Open Collective account"
                   />
+                </h2>
+                <SignInForm next={this.next} />
+              </div>
+            )}
 
-                  <div className="result">
-                    <div className="success">{this.state.result.success}</div>
-                    <div className="error">{this.state.result.error}</div>
-                  </div>
+            {canApply && LoggedInUser && (
+              <div>
+                <CreateCollectiveForm
+                  host={this.host}
+                  collective={this.state.collective}
+                  onSubmit={this.createCollective}
+                  onChange={this.resetError}
+                />
+
+                <div className="result">
+                  <div className="success">{this.state.result.success}</div>
+                  <div className="error">{this.state.result.error}</div>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         </Body>
 

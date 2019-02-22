@@ -7,7 +7,7 @@ import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Link from './Link';
 import SmallButton from './SmallButton';
-import { get, pick } from 'lodash';
+import { pick } from 'lodash';
 import InputField from './InputField';
 
 class Comment extends React.Component {
@@ -68,21 +68,16 @@ class Comment extends React.Component {
   }
 
   async save() {
-    const comment = pick(this.state.comment, ['id', 'markdown', 'html']);
+    const comment = pick(this.state.comment, ['id', 'html']);
     await this.props.editComment(comment);
     this.setState({ modified: false, mode: 'details' });
   }
 
   render() {
-    const { intl, collective, LoggedInUser, editable } = this.props;
+    const { intl, LoggedInUser, editable } = this.props;
 
     const { comment } = this.state;
     if (!comment) return <div />;
-    const editor =
-      get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||
-      get(collective, 'settings.editor') === 'markdown'
-        ? 'markdown'
-        : 'html';
 
     return (
       <div className={`comment ${this.state.mode}View`}>
@@ -139,12 +134,6 @@ class Comment extends React.Component {
             .commentActions :global(> div) {
               margin-right: 0.5rem;
             }
-
-            @media (max-width: 600px) {
-              .comment {
-                max-height: 23rem;
-              }
-            }
           `}
         </style>
         <style jsx global>
@@ -158,60 +147,49 @@ class Comment extends React.Component {
           `}
         </style>
         <div className="fromCollective">
-          <a
-            href={`/${comment.fromCollective.slug}`}
+          <Link
+            route="collective"
+            params={{ slug: comment.fromCollective.slug }}
             title={comment.fromCollective.name}
+            passHref
           >
             <Avatar
               src={comment.fromCollective.image}
+              type={comment.fromCollective.type}
+              name={comment.fromCollective.name}
               key={comment.fromCollective.id}
               radius={40}
             />
-          </a>
+          </Link>
         </div>
         <div className="body">
           <div className="header">
             <div className="meta">
               <span className="createdAt">
-                <FormattedDate
-                  value={comment.createdAt}
-                  day="numeric"
-                  month="numeric"
-                />
+                <FormattedDate value={comment.createdAt} day="numeric" month="numeric" />
               </span>{' '}
               |&nbsp;
               <span className="metaItem">
-                <Link route={`/${comment.fromCollective.slug}`}>
-                  {comment.fromCollective.name}
-                </Link>
+                <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
               </span>
-              {editable &&
-                LoggedInUser &&
-                LoggedInUser.canEditComment(comment) && (
-                  <span>
-                    {' '}
-                    |{' '}
-                    <a className="toggleEditComment" onClick={this.toggleEdit}>
-                      {intl.formatMessage(
-                        this.messages[
-                          `${
-                            this.state.mode === 'edit' ? 'cancelEdit' : 'edit'
-                          }`
-                        ],
-                      )}
-                    </a>
-                  </span>
-                )}
+              {editable && LoggedInUser && LoggedInUser.canEditComment(comment) && (
+                <span>
+                  {' '}
+                  |{' '}
+                  <a className="toggleEditComment" onClick={this.toggleEdit}>
+                    {intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                  </a>
+                </span>
+              )}
             </div>
             <div className="description">
-              {this.state.mode !== 'edit' && (
-                <div dangerouslySetInnerHTML={{ __html: comment.html }} />
-              )}
+              {this.state.mode !== 'edit' && <div dangerouslySetInnerHTML={{ __html: comment.html }} />}
               {this.state.mode === 'edit' && (
                 <InputField
-                  type={editor}
-                  defaultValue={comment[editor]}
-                  onChange={value => this.handleChange(editor, value)}
+                  name={`comment-${comment.id}`}
+                  type="html"
+                  defaultValue={comment.html}
+                  onChange={value => this.handleChange('html', value)}
                 />
               )}
             </div>
@@ -221,11 +199,7 @@ class Comment extends React.Component {
             <div className="actions">
               {this.state.mode === 'edit' && (
                 <div>
-                  <SmallButton
-                    className="primary save"
-                    onClick={this.save}
-                    disabled={!this.state.modified}
-                  >
+                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}>
                     <FormattedMessage id="save" defaultMessage="save" />
                   </SmallButton>
                 </div>

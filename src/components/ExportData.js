@@ -18,9 +18,7 @@ class ExportData extends React.Component {
 
   render() {
     const { collective } = this.props;
-    const widgetCode = `<script src="https://opencollective.com/${
-      collective.slug
-    }/banner.js"></script>`;
+    const widgetCode = `<script src="https://opencollective.com/${collective.slug}/banner.js"></script>`;
 
     return (
       <div className="ExportData">
@@ -56,10 +54,7 @@ class ExportData extends React.Component {
         <ExportImages collective={collective} />
 
         <h1>
-          <FormattedMessage
-            id="export.csv.title"
-            defaultMessage="Export in CSV"
-          />
+          <FormattedMessage id="export.csv.title" defaultMessage="Export in CSV" />
         </h1>
         <p>
           <FormattedMessage
@@ -69,18 +64,12 @@ class ExportData extends React.Component {
         </p>
         <div className="actions">
           <Button onClick={async () => await exportMembers(collective.slug)}>
-            <FormattedMessage
-              id="export.all"
-              defaultMessage="Export all members in CSV"
-            />
+            <FormattedMessage id="export.all" defaultMessage="Export all members in CSV" />
           </Button>
         </div>
 
         <h1>
-          <FormattedMessage
-            id="export.json.title"
-            defaultMessage="Export in JSON"
-          />
+          <FormattedMessage id="export.json.title" defaultMessage="Export in JSON" />
         </h1>
         <p>
           <FormattedMessage
@@ -119,20 +108,14 @@ class ExportData extends React.Component {
         </ul>
 
         <h2>
-          <FormattedMessage
-            id="export.json.parameters.title"
-            defaultMessage="Parameters"
-          />
+          <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
         </h2>
         <table>
           <tbody>
             <tr>
               <td className="param">limit</td>
               <td>
-                <FormattedMessage
-                  id="export.json.parameters.limit"
-                  defaultMessage="number of members to return"
-                />
+                <FormattedMessage id="export.json.parameters.limit" defaultMessage="number of members to return" />
               </td>
             </tr>
             <tr>
@@ -159,13 +142,7 @@ class ExportData extends React.Component {
           <div>
             e.g.
             <br />
-            <a
-              href={`/${
-                collective.slug
-              }/members/all.json?limit=10&offset=0&TierId=${
-                collective.tiers[0].id
-              }`}
-            >
+            <a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>
               https://opencollective.com/
               {collective.slug}
               /members/all.json?limit=10&offset=0&TierId=

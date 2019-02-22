@@ -8,6 +8,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
+import LoginBtn from './LoginBtn';
 
 class CommentsWithData extends React.Component {
   static propTypes = {
@@ -37,13 +38,32 @@ class CommentsWithData extends React.Component {
     try {
       res = await this.props.createComment(CommentInputType);
     } catch (e) {
-      console.error(
-        '>>> error while trying to create the comment',
-        CommentInputType,
-        e,
-      );
+      console.error('>>> error while trying to create the comment', CommentInputType, e);
     }
     return res;
+  }
+
+  renderUserAction(LoggedInUser, expense, notice) {
+    if (!LoggedInUser)
+      return (
+        <div>
+          <hr />
+          <LoginBtn>
+            <FormattedMessage id="comment.login" defaultMessage="Login to comment" />
+          </LoginBtn>
+        </div>
+      );
+    else if (!LoggedInUser.canCreateCommentOnExpense(expense))
+      return (
+        <div>
+          <hr />
+          <FormattedMessage
+            id="comment.badPermissions"
+            defaultMessage="You don't have permission to comment on this expense."
+          />
+        </div>
+      );
+    return <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} notice={notice} />;
   }
 
   render() {
@@ -60,17 +80,11 @@ class CommentsWithData extends React.Component {
       notice = (
         <FormattedMessage
           id="comment.post.to.author"
-          defaultMessage={
-            'Note: Your comment will be public and we will notify the person who submitted the expense'
-          }
+          defaultMessage={'Note: Your comment will be public and we will notify the person who submitted the expense'}
         />
       );
     }
-    if (
-      LoggedInUser &&
-      LoggedInUser.id === get(expense, 'user.id') &&
-      expense.status === 'APPROVED'
-    ) {
+    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status === 'APPROVED') {
       notice = (
         <FormattedMessage
           id="comment.post.to.host"
@@ -80,17 +94,11 @@ class CommentsWithData extends React.Component {
         />
       );
     }
-    if (
-      LoggedInUser &&
-      LoggedInUser.id === get(expense, 'user.id') &&
-      expense.status !== 'APPROVED'
-    ) {
+    if (LoggedInUser && LoggedInUser.id === get(expense, 'user.id') && expense.status !== 'APPROVED') {
       notice = (
         <FormattedMessage
           id="comment.post.to.collective"
-          defaultMessage={
-            'Note: Your comment will be public and we will notify the administrators of this collective'
-          }
+          defaultMessage={'Note: Your comment will be public and we will notify the administrators of this collective'}
         />
       );
     }
@@ -106,14 +114,7 @@ class CommentsWithData extends React.Component {
           LoggedInUser={LoggedInUser}
         />
 
-        {LoggedInUser &&
-          LoggedInUser.canCreateCommentOnExpense(expense) && (
-            <CommentForm
-              onSubmit={this.createComment}
-              LoggedInUser={LoggedInUser}
-              notice={notice}
-            />
-          )}
+        {this.renderUserAction(LoggedInUser, expense, notice)}
       </div>
     );
   }
@@ -181,10 +182,7 @@ export const addCommentsData = graphql(getCommentsQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allComments: [
-              ...previousResult.allComments,
-              ...fetchMoreResult.allComments,
-            ],
+            allComments: [...previousResult.allComments, ...fetchMoreResult.allComments],
           });
         },
       });

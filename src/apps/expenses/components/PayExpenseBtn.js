@@ -6,16 +6,19 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
-import { getCurrencySymbol, isValidEmail } from '../../../lib/utils';
+import { isValidEmail } from '../../../lib/utils';
 
-import InputField from '../../../components/InputField';
 import SmallButton from '../../../components/SmallButton';
 
 class PayExpenseBtn extends React.Component {
   static propTypes = {
     expense: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
+    host: PropTypes.object,
     disabled: PropTypes.bool,
+    paymentProcessorFeeInCollectiveCurrency: PropTypes.number,
+    hostFeeInCollectiveCurrency: PropTypes.number,
+    platformFeeInCollectiveCurrency: PropTypes.number,
     lock: PropTypes.func,
     unlock: PropTypes.func,
   };
@@ -24,7 +27,7 @@ class PayExpenseBtn extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      paymentProcessorFeeInHostCurrency: 0,
+      paymentProcessorFeeInCollectiveCurrency: 0,
     };
     this.onClick = this.onClick.bind(this);
     this.messages = defineMessages({
@@ -45,7 +48,9 @@ class PayExpenseBtn extends React.Component {
     try {
       await this.props.payExpense(
         expense.id,
-        this.state.paymentProcessorFeeInHostCurrency,
+        this.props.paymentProcessorFeeInCollectiveCurrency,
+        this.props.hostFeeInCollectiveCurrency,
+        this.props.platformFeeInCollectiveCurrency,
       );
       this.setState({ loading: false });
       unlock();
@@ -58,26 +63,27 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { collective, expense, intl } = this.props;
+    const { collective, expense, intl, host } = this.props;
     let disabled = this.state.loading,
+      selectedPayoutMethod = expense.payoutMethod,
       title = '',
       error = this.state.error;
-    if (
-      expense.payoutMethod === 'paypal' &&
-      !isValidEmail(get(expense, 'user.paypalEmail')) &&
-      !isValidEmail(get(expense, 'user.email'))
-    ) {
-      disabled = true;
-      title = intl.formatMessage(this.messages['paypal.missing']);
+
+    if (expense.payoutMethod === 'paypal') {
+      if (!isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
+        disabled = true;
+        title = intl.formatMessage(this.messages['paypal.missing']);
+      } else {
+        const paypalPaymentMethod =
+          get(host, 'paymentMethods') && host.paymentMethods.find(pm => pm.service === 'paypal');
+        if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
+          selectedPayoutMethod = 'other';
+        }
+      }
     }
     if (get(collective, 'stats.balance') < expense.amount) {
       disabled = true;
-      error = (
-        <FormattedMessage
-          id="expense.pay.error.insufficientBalance"
-          defaultMessage="Insufficient balance"
-        />
-      );
+      error = <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
     }
     return (
       <div className="PayExpenseBtn">
@@ -118,39 +124,11 @@ class PayExpenseBtn extends React.Component {
             }
           `}
         </style>
-        {expense.payoutMethod === 'other' && (
-          <div className="processorFee">
-            <label htmlFor="processorFee">
-              <FormattedMessage
-                id="expense.paymentProcessorFeeInHostCurrency"
-                defaultMessage="payment processor fee"
-              />
-            </label>
-            <InputField
-              defaultValue={0}
-              id="paymentProcessorFeeInHostCurrency"
-              name="paymentProcessorFeeInHostCurrency"
-              onChange={fee =>
-                this.setState({ paymentProcessorFeeInHostCurrency: fee })
-              }
-              pre={getCurrencySymbol(expense.currency)}
-              type="currency"
-            />
-          </div>
-        )}
-        <SmallButton
-          className="pay"
-          onClick={this.onClick}
-          disabled={this.props.disabled || disabled}
-          title={title}
-        >
-          {expense.payoutMethod === 'other' && (
-            <FormattedMessage
-              id="expense.pay.manual.btn"
-              defaultMessage="record as paid"
-            />
+        <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
+          {selectedPayoutMethod === 'other' && (
+            <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />
           )}
-          {expense.payoutMethod !== 'other' && (
+          {selectedPayoutMethod !== 'other' && (
             <FormattedMessage
               id="expense.pay.btn"
               defaultMessage="pay with {paymentMethod}"
@@ -165,8 +143,18 @@ class PayExpenseBtn extends React.Component {
 }
 
 const payExpenseQuery = gql`
-  mutation payExpense($id: Int!, $fee: Int!) {
-    payExpense(id: $id, fee: $fee) {
+  mutation payExpense(
+    $id: Int!
+    $paymentProcessorFeeInCollectiveCurrency: Int
+    $hostFeeInCollectiveCurrency: Int
+    $platformFeeInCollectiveCurrency: Int
+  ) {
+    payExpense(
+      id: $id
+      paymentProcessorFeeInCollectiveCurrency: $paymentProcessorFeeInCollectiveCurrency
+      hostFeeInCollectiveCurrency: $hostFeeInCollectiveCurrency
+      platformFeeInCollectiveCurrency: $platformFeeInCollectiveCurrency
+    ) {
       id
       status
       collective {
@@ -182,8 +170,20 @@ const payExpenseQuery = gql`
 
 const addMutation = graphql(payExpenseQuery, {
   props: ({ mutate }) => ({
-    payExpense: async (id, fee) => {
-      return await mutate({ variables: { id, fee } });
+    payExpense: async (
+      id,
+      paymentProcessorFeeInCollectiveCurrency,
+      hostFeeInCollectiveCurrency,
+      platformFeeInCollectiveCurrency,
+    ) => {
+      return await mutate({
+        variables: {
+          id,
+          paymentProcessorFeeInCollectiveCurrency,
+          hostFeeInCollectiveCurrency,
+          platformFeeInCollectiveCurrency,
+        },
+      });
     },
   }),
 });

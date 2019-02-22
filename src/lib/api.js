@@ -1,9 +1,10 @@
 import fetch from 'cross-fetch';
-import { isValidEmail } from './utils';
+import { isValidEmail, getBrowserWebsiteUrl } from './utils';
+
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
 
-const queryString = params => {
+export const queryString = params => {
   return Object.keys(params)
     .map(k => `${k}=${encodeURIComponent(params[k])}`)
     .join('&');
@@ -59,20 +60,15 @@ export function connectAccount(CollectiveId, service, options = {}) {
     ...options,
   };
 
-  return fetch(
-    `/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`,
-    {
-      method: 'get',
-      headers: addAuthTokenToHeader(),
-    },
-  ).then(checkResponseStatus);
+  return fetch(`/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
+    method: 'get',
+    headers: addAuthTokenToHeader(),
+  }).then(checkResponseStatus);
 }
 
 export async function getAccountClientToken(CollectiveId, service) {
   const params = { CollectiveId };
-  const url = `/api/connected-accounts/${service}/clientToken?${queryString(
-    params,
-  )}`;
+  const url = `/api/connected-accounts/${service}/clientToken?${queryString(params)}`;
   return checkResponseStatus(
     await fetch(url, {
       method: 'get',
@@ -111,6 +107,7 @@ export function addFunds(CollectiveId, order) {
 }
 
 export function signin(user, redirect) {
+  const websiteUrl = getBrowserWebsiteUrl() || process.env.WEBSITE_URL;
   return fetch('/api/users/signin', {
     method: 'POST',
     headers: {
@@ -118,7 +115,7 @@ export function signin(user, redirect) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ user, redirect }),
+    body: JSON.stringify({ user, redirect, websiteUrl }),
   }).then(checkResponseStatus);
 }
 
@@ -134,16 +131,33 @@ export async function refreshToken(currentToken) {
   }
 }
 
+/**
+ * Fetch the given file from `path`. Must be a local path, otherwise
+ * `options.allowExternal` must be explicitely set. You should be **extremely**
+ * careful when using this as an attacker abusing from this option could
+ * be able to fetch arbitrary files to our servers.
+ *
+ * @param options {Object}
+ *  - format {string} Format of the file to get (currently supports csv and blob)
+ *  - allowExtenal {string} An external URL from which get is allowed to fetch
+ */
 export function get(path, options = {}) {
-  if (path.substr(0, 1) !== '/')
+  const { allowExternal, format } = options;
+  const isAbsolute = path.substr(0, 1) === '/';
+  if (!isAbsolute && (!allowExternal || !path.startsWith(allowExternal))) {
     throw new Error('Can only get resources with a relative path');
+  }
 
   return fetch(path, {
     method: 'get',
     headers: addAuthTokenToHeader(),
   }).then(response => {
-    if (options.format === 'csv') return response.text();
-    if (options.format === 'blob') return response.blob();
+    if (format === 'csv') return response.text();
+    if (format === 'blob') return response.blob();
     return checkResponseStatus(response);
   });
+}
+
+export function getGithubRepos(token) {
+  return fetch(`/api/github-repositories?access_token=${token}`).then(checkResponseStatus);
 }

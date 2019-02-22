@@ -136,50 +136,40 @@ class MembersWithData extends React.Component {
           `}
         </style>
 
-        {!role &&
-          !tier && (
-            <div className="filter">
-              <ButtonGroup className="filterBtnGroup">
-                <Button
-                  className="filterBtn"
-                  bsStyle={!this.state.role ? 'primary' : 'default'}
-                  onClick={() => this.refetch()}
-                >
-                  <FormattedMessage id="members.all" defaultMessage="all" />
-                </Button>
-                <Button
-                  className="filterBtn"
-                  bsStyle={this.state.role === 'ADMIN' ? 'primary' : 'default'}
-                  onClick={() => this.refetch('ADMIN')}
-                >
-                  <FormattedMessage
-                    id="members.admin"
-                    defaultMessage="administrators"
-                  />
-                </Button>
-                <Button
-                  className="filterBtn"
-                  bsStyle={this.state.role === 'MEMBER' ? 'primary' : 'default'}
-                  onClick={() => this.refetch('MEMBER')}
-                >
-                  <FormattedMessage
-                    id="members.members"
-                    defaultMessage="members"
-                  />
-                </Button>
-                <Button
-                  className="filterBtn"
-                  bsStyle={this.state.role === 'BACKER' ? 'primary' : 'default'}
-                  onClick={() => this.refetch('BACKER')}
-                >
-                  <FormattedMessage
-                    id="members.paid"
-                    defaultMessage="backers"
-                  />
-                </Button>
-              </ButtonGroup>
-            </div>
-          )}
+        {!role && !tier && (
+          <div className="filter">
+            <ButtonGroup className="filterBtnGroup">
+              <Button
+                className="filterBtn"
+                bsStyle={!this.state.role ? 'primary' : 'default'}
+                onClick={() => this.refetch()}
+              >
+                <FormattedMessage id="members.all" defaultMessage="all" />
+              </Button>
+              <Button
+                className="filterBtn"
+                bsStyle={this.state.role === 'ADMIN' ? 'primary' : 'default'}
+                onClick={() => this.refetch('ADMIN')}
+              >
+                <FormattedMessage id="members.admin" defaultMessage="administrators" />
+              </Button>
+              <Button
+                className="filterBtn"
+                bsStyle={this.state.role === 'MEMBER' ? 'primary' : 'default'}
+                onClick={() => this.refetch('MEMBER')}
+              >
+                <FormattedMessage id="members.members" defaultMessage="members" />
+              </Button>
+              <Button
+                className="filterBtn"
+                bsStyle={this.state.role === 'BACKER' ? 'primary' : 'default'}
+                onClick={() => this.refetch('BACKER')}
+              >
+                <FormattedMessage id="members.paid" defaultMessage="backers" />
+              </Button>
+            </ButtonGroup>
+          </div>
+        )}
 
         <div className="Members cardsList">
           {members.map(member => (
@@ -193,19 +183,14 @@ class MembersWithData extends React.Component {
             />
           ))}
         </div>
-        {members.length % 10 === 0 &&
-          members.length >= limit && (
-            <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && (
-                  <FormattedMessage id="loading" defaultMessage="loading" />
-                )}
-                {!this.state.loading && (
-                  <FormattedMessage id="loadMore" defaultMessage="load more" />
-                )}
-              </Button>
-            </div>
-          )}
+        {members.length % 10 === 0 && members.length >= limit && (
+          <div className="loadMoreBtn">
+            <Button bsStyle="default" onClick={this.fetchMore}>
+              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
@@ -286,10 +271,7 @@ export const addMembersData = graphql(getMembersQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allMembers: [
-              ...previousResult.allMembers,
-              ...fetchMoreResult.allMembers,
-            ],
+            allMembers: [...previousResult.allMembers, ...fetchMoreResult.allMembers],
           });
         },
       });

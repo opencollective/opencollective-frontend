@@ -66,23 +66,14 @@ class RequestBitcoin extends React.Component {
         <div className="QRCode">
           <QRCode value={uri} />
           <SmallButton className="default" bsStyle="default" href={uri}>
-            <FormattedMessage
-              id="paymentMethod.bitcoin.openApp"
-              defaultMessage="open in app"
-            />
+            <FormattedMessage id="paymentMethod.bitcoin.openApp" defaultMessage="open in app" />
           </SmallButton>
         </div>
         <div className="details">
-          <FormattedMessage
-            id="paymentMethod.bitcoin.send"
-            defaultMessage="Please send"
-          />
+          <FormattedMessage id="paymentMethod.bitcoin.send" defaultMessage="Please send" />
           <div className="btcAmount">{btcAmount} BTC</div>
           <div className="btcAddress">
-            <FormattedMessage
-              id="paymentMethod.bitcoin.toAddress"
-              defaultMessage="to this BTC address: "
-            />
+            <FormattedMessage id="paymentMethod.bitcoin.toAddress" defaultMessage="to this BTC address: " />
             {btcAddress}
             <div className="instructions">
               <FormattedMessage

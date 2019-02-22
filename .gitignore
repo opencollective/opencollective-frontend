@@ -8,4 +8,9 @@ yarn.lock
 .vscode/*
 build
 cypress/screenshots
+cypress/videos
+dist
 *.swp
+styleguide/index.html
+styleguide/build/
+.vimrc

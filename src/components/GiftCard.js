@@ -6,7 +6,7 @@ import Container from './Container';
 import { Span } from './Text';
 import Currency from './Currency';
 import Link from './Link';
-import { Flex, Box } from 'grid-styled';
+import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { width, height, fontSize } from 'styled-system';
@@ -66,48 +66,31 @@ class GiftCard extends React.Component {
   }
 
   render() {
-    const { amount, currency, name, emitter } = this.props;
+    const { amount, currency, collective, emitter } = this.props;
 
     return (
       <ShadowCard width={['300px', '400px']} height={['168px', '224px']}>
-        <Container
-          position="absolute"
-          left={['12px', '24px']}
-          top={['12px', '24px']}
-        >
+        <Container position="absolute" left={['12px', '24px']} top={['12px', '24px']}>
           <Title fontSize={['18px', '24px']}>
             <FormattedMessage
               id="giftcard.user.name"
               defaultMessage="Hello again, {name}!"
-              values={{ name }}
+              values={{ name: collective.name }}
             />
           </Title>
           <Text fontSize={['12px', '14px']}>
             <FormattedMessage
               id="giftcard.user.text"
-              defaultMessage="You can now support open collectives with this amount, courtesy of {emitter}."
+              defaultMessage="You can now support open collectives with this gift card, courtesy of {emitter}."
               values={{
-                emitter: (
-                  <WhiteLink route={`/${emitter.slug}`}>
-                    {emitter.name}
-                  </WhiteLink>
-                ),
+                emitter: <WhiteLink route={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
               }}
             />
           </Text>
         </Container>
-        <Container
-          position="absolute"
-          right={['12px', '24px']}
-          bottom={['12px', '24px']}
-        >
+        <Container position="absolute" right={['12px', '24px']} bottom={['12px', '24px']}>
           <Flex alignItems="top" className="AmountCurrency">
-            <Span
-              fontWeight="bold"
-              fontSize="4rem"
-              lineHeight="4rem"
-              color="#313233"
-            >
+            <Span fontWeight="bold" fontSize="4rem" lineHeight="4rem" color="#313233">
               <Currency value={amount} currency={currency} precision={0} />
             </Span>
             <Box ml={1}>

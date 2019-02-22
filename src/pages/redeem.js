@@ -2,13 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
+import sanitizeHtml from 'sanitize-html';
 import { graphql } from 'react-apollo';
 import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
-import { Flex, Box } from 'grid-styled';
+import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
-import sanitizeHtml from 'sanitize-html';
 
+import { Router } from '../server/pages';
+
+import { withUser } from '../components/UserProvider';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -17,11 +20,11 @@ import RedeemForm from '../components/RedeemForm';
 import RedeemSuccess from '../components/RedeemSuccess';
 import { P, H1, H5 } from '../components/Text';
 
+import { getLoggedInUserQuery } from '../graphql/queries';
 import { isValidEmail } from '../lib/utils';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 const Error = styled(P)`
   color: red;
@@ -94,9 +97,10 @@ class RedeemPage extends React.Component {
   }
 
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     intl: PropTypes.object.isRequired, // from withIntl
     claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
+    LoggedInUser: PropTypes.object, // from withUser
     code: PropTypes.string,
     name: PropTypes.string,
     email: PropTypes.string,
@@ -111,7 +115,7 @@ class RedeemPage extends React.Component {
       loading: false,
       view: 'form', // form or success
       form: { code, email, name },
-      LoggedInUser: null,
+      LoggedInUser: undefined,
     };
     this.messages = defineMessages({
       'error.email.invalid': {
@@ -120,24 +124,29 @@ class RedeemPage extends React.Component {
       },
       'error.code.invalid': {
         id: 'error.code.invalid',
-        defaultMessage: 'Invalid gift card code',
+        defaultMessage: 'Invalid Gift Card code',
       },
     });
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
   }
 
   async claimPaymentMethod() {
     this.setState({ loading: true });
     const { code, email, name } = this.state.form;
-    const user = { email, name };
     try {
-      const res = await this.props.claimPaymentMethod(code, user);
+      let res;
+      if (this.props.LoggedInUser) {
+        res = await this.props.claimPaymentMethod(code);
+
+        // Refresh LoggedInUser
+        this.props.refetchLoggedInUser();
+        Router.pushRoute('redeemed', { code });
+        return;
+      } else {
+        res = await this.props.claimPaymentMethod(code, { email, name });
+      }
       console.log('>>> res graphql: ', JSON.stringify(res, null, '  '));
+      // TODO: need to know from API if an account was created or not
+      // TODO: or refuse to create an account automatically and ask to sign in
       this.setState({ loading: false, view: 'success' });
     } catch (e) {
       const error = e.graphQLErrors && e.graphQLErrors[0].message;
@@ -153,7 +162,7 @@ class RedeemPage extends React.Component {
 
   handleSubmit() {
     const { intl } = this.props;
-    if (!isValidEmail(this.state.form.email)) {
+    if (!this.props.LoggedInUser && !isValidEmail(this.state.form.email)) {
       return this.setState({
         error: intl.formatMessage(this.messages['error.email.invalid']),
       });
@@ -167,37 +176,29 @@ class RedeemPage extends React.Component {
   }
 
   render() {
-    const { code, email, name } = this.props;
+    const { code, email, name, LoggedInUser } = this.props;
 
     return (
       <div className="RedeemedPage">
         <Header
-          title="Redeem gift card"
+          title="Redeem Gift Card"
           description="Use your gift card to support open source projects that you are contributing to."
-          LoggedInUser={this.state.LoggedInUser}
+          LoggedInUser={LoggedInUser}
         />
         <Body>
           <Flex alignItems="center" flexDirection="column">
-            <Hero
-              minHeight={['500px', null, '700px']}
-              backgroundSize={['auto 300px', 'auto 380px']}
-            >
+            <Hero minHeight={['500px', null, '700px']} backgroundSize={['auto 300px', 'auto 380px']}>
               <Flex alignItems="center" flexDirection="column">
                 <Box mt={5}>
-                  <Title fontSize={['3rem', null, '4rem']}>
-                    Redeem Gift Card
-                  </Title>
+                  <Title fontSize={['3rem', null, '4rem']}>Redeem Gift Card</Title>
                 </Box>
 
                 <Box mt={2}>
-                  <Subtitle
-                    fontSize={['1.5rem', null, '2rem']}
-                    maxWidth={['90%', '640px']}
-                  >
+                  <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
                     <Box>
                       <FormattedMessage
                         id="redeem.subtitle.line1"
-                        defaultMessage="Open Collective helps communities - like open source projects, meetups, etc - raise money and operate transparently."
+                        defaultMessage="Open Collective helps communities - like open source projects, meetups and social movements - raise funds spend them transparently."
                       />
                     </Box>
                   </Subtitle>
@@ -205,41 +206,27 @@ class RedeemPage extends React.Component {
 
                 <Box mt={[4, 5]}>
                   <Flex justifyContent="center" flexDirection="column">
-                    <Container
-                      background="white"
-                      borderRadius="16px"
-                      width="400px"
-                    >
+                    <Container background="white" borderRadius="16px" width="400px">
                       <ShadowBox py="24px" px="32px">
                         {this.state.view === 'form' && (
                           <RedeemForm
                             code={code}
                             name={name}
                             email={email}
+                            LoggedInUser={LoggedInUser}
                             onChange={this.handleChange}
                           />
                         )}
-                        {this.state.view === 'success' && (
-                          <RedeemSuccess email={email} />
-                        )}
+                        {this.state.view === 'success' && <RedeemSuccess email={email} />}
                       </ShadowBox>
                     </Container>
                     {this.state.view === 'form' && (
                       <Box my={3} align="center">
-                        <BlueButton
-                          onClick={this.handleSubmit}
-                          disabled={this.state.loading}
-                        >
+                        <BlueButton onClick={this.handleSubmit} disabled={this.state.loading}>
                           {this.state.loading ? (
-                            <FormattedMessage
-                              id="form.processing"
-                              defaultMessage="processing"
-                            />
+                            <FormattedMessage id="form.processing" defaultMessage="processing" />
                           ) : (
-                            <FormattedMessage
-                              id="redeem.form.redeem.btn"
-                              defaultMessage="redeem"
-                            />
+                            <FormattedMessage id="redeem.form.redeem.btn" defaultMessage="redeem" />
                           )}
                         </BlueButton>
                         {this.state.error && <Error>{this.state.error}</Error>}
@@ -269,9 +256,15 @@ const redeemMutation = gql`
 const addMutation = graphql(redeemMutation, {
   props: ({ mutate }) => ({
     claimPaymentMethod: async (code, user) => {
-      return await mutate({ variables: { code, user } });
+      // Claim payment method and refresh LoggedInUser Apollo cache so
+      // `client.query` will deliver new data for next call
+      return await mutate({
+        variables: { code, user },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
+      });
     },
   }),
 });
 
-export default withData(withIntl(withLoggedInUser(addMutation(RedeemPage))));
+export default withData(withIntl(withUser(addMutation(RedeemPage))));

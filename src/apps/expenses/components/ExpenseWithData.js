@@ -14,7 +14,7 @@ class ExpenseWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
-    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     LoggedInUser: PropTypes.object,
@@ -28,15 +28,7 @@ class ExpenseWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      view,
-      allowPayAction,
-      lockPayAction,
-      unlockPayAction,
-    } = this.props;
+    const { data, LoggedInUser, collective, view, allowPayAction, lockPayAction, unlockPayAction } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -55,6 +47,11 @@ class ExpenseWithData extends React.Component {
 
     return (
       <div className="ExpenseWithData">
+        <style jsx>{`
+          .comments {
+            margin-top: 3rem;
+          }
+        `}</style>
         <Expense
           key={expense.id}
           collective={collective}
@@ -68,11 +65,9 @@ class ExpenseWithData extends React.Component {
         />
 
         {view === 'details' && (
-          <CommentsWithData
-            expense={expense}
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-          />
+          <div className="comments">
+            <CommentsWithData expense={expense} collective={collective} LoggedInUser={LoggedInUser} />
+          </div>
         )}
       </div>
     );

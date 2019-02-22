@@ -19,7 +19,7 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
-    return { slug: collectiveSlug, ExpenseId };
+    return { slug: collectiveSlug, ExpenseId: parseInt(ExpenseId) };
   }
 
   static propTypes = {
@@ -58,17 +58,10 @@ class ExpensePage extends React.Component {
               display: flex;
             }
 
-            .col.side {
-              width: 100%;
-              min-width: 20rem;
-              max-width: 25%;
-              margin-left: 5rem;
-            }
-
             .col.large {
               width: 100%;
               min-width: 30rem;
-              max-width: 75%;
+              max-width: 800px;
             }
 
             @media (max-width: 600px) {
@@ -97,6 +90,7 @@ class ExpensePage extends React.Component {
 
         <Body>
           <CollectiveCover
+            key={collective.slug}
             collective={collective}
             cta={{
               href: `/${collective.slug}#contribute`,
@@ -110,10 +104,7 @@ class ExpensePage extends React.Component {
               <div className="col large">
                 <div className="viewAllExpenses">
                   <Link route={`/${collective.slug}/expenses`}>
-                    <FormattedMessage
-                      id="expenses.viewAll"
-                      defaultMessage="View All Expenses"
-                    />
+                    <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                   </Link>
                 </div>
 
@@ -123,16 +114,10 @@ class ExpensePage extends React.Component {
                   view="details"
                   LoggedInUser={this.state.LoggedInUser}
                   allowPayAction={!this.state.isPayActionLocked}
-                  lockPayAction={() =>
-                    this.setState({ isPayActionLocked: true })
-                  }
-                  unlockPayAction={() =>
-                    this.setState({ isPayActionLocked: false })
-                  }
+                  lockPayAction={() => this.setState({ isPayActionLocked: true })}
+                  unlockPayAction={() => this.setState({ isPayActionLocked: false })}
                 />
               </div>
-
-              <div className="col side" />
             </div>
           </div>
         </Body>
@@ -143,6 +128,4 @@ class ExpensePage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(ExpensePage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensePage))));

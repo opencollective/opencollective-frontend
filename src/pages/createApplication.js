@@ -111,20 +111,12 @@ class Apps extends React.Component {
 
           {LoggedInUser && (
             <div className="apps">
-              <form
-                method="post"
-                onSubmit={this.handleSubmit}
-                ref={this.createForm}
-              >
+              <form method="post" onSubmit={this.handleSubmit} ref={this.createForm}>
                 {type === 'apiKey' && (
                   <Fragment>
                     <h3>Create an API Key</h3>
                     <div className="separator actions">
-                      <Button
-                        bsStyle="primary"
-                        type="submit"
-                        onClick={this.handleSubmit}
-                      >
+                      <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>
                         Create API Key
                       </Button>
                     </div>
@@ -153,12 +145,8 @@ class Apps extends React.Component {
                           className="horizontal"
                           type="text"
                           name="description"
-                          label={intl.formatMessage(
-                            this.messages['app.description'],
-                          )}
-                          onChange={value =>
-                            this.handleChange('description', value)
-                          }
+                          label={intl.formatMessage(this.messages['app.description'])}
+                          onChange={value => this.handleChange('description', value)}
                         />
                       </Col>
                     </Row>
@@ -169,22 +157,14 @@ class Apps extends React.Component {
                           className="horizontal"
                           type="text"
                           name="callbackUrl"
-                          label={intl.formatMessage(
-                            this.messages['app.callbackUrl'],
-                          )}
-                          onChange={value =>
-                            this.handleChange('callbackUrl', value)
-                          }
+                          label={intl.formatMessage(this.messages['app.callbackUrl'])}
+                          onChange={value => this.handleChange('callbackUrl', value)}
                         />
                       </Col>
                     </Row>
 
                     <div className="actions">
-                      <Button
-                        bsStyle="primary"
-                        type="submit"
-                        onClick={this.handleSubmit}
-                      >
+                      <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>
                         Create Application
                       </Button>
                     </div>
@@ -219,6 +199,4 @@ export const addCreateApplicationMutation = graphql(createApplicationMutation, {
   }),
 });
 
-export default withData(
-  withIntl(withLoggedInUser(addCreateApplicationMutation(Apps))),
-);
+export default withData(withIntl(withLoggedInUser(addCreateApplicationMutation(Apps))));

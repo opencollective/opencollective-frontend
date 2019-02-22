@@ -6,6 +6,7 @@ class InputFieldPresets extends React.Component {
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.number),
     pre: PropTypes.string,
+    options: PropTypes.object,
     onChange: PropTypes.func,
   };
 
@@ -38,6 +39,7 @@ class InputFieldPresets extends React.Component {
         type="currency"
         defaultValue={defaultValue}
         value={this.state.values[index]}
+        options={this.props.options}
         pre={this.props.pre}
         onChange={val => this.handleChange(index, val)}
       />

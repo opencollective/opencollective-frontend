@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages } from 'react-intl';
+
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -7,10 +9,9 @@ import SignInForm from './SignInForm';
 import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveCover from './CollectiveCover';
 import { defaultBackgroundImage } from '../constants/collectives';
-import { getStripeToken } from '../lib/stripe';
-import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
+import Loading from './Loading';
 
 class EditCollective extends React.Component {
   static propTypes = {
@@ -18,6 +19,7 @@ class EditCollective extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     editCollective: PropTypes.func.isRequired,
     deleteCollective: PropTypes.func.isRequired,
+    loggedInEditDataLoaded: PropTypes.bool.isRequired,
   };
 
   constructor(props) {
@@ -39,21 +41,15 @@ class EditCollective extends React.Component {
   }
 
   async validate(CollectiveInputType) {
-    const { intl } = this.props;
     const tiers = this.cleanTiers(CollectiveInputType.tiers);
     if (tiers) {
       CollectiveInputType.tiers = tiers;
     }
 
     if (typeof CollectiveInputType.tags === 'string') {
-      CollectiveInputType.tags = CollectiveInputType.tags
-        .split(',')
-        .map(t => t.trim());
+      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
     }
-    if (
-      CollectiveInputType.backgroundImage ===
-      defaultBackgroundImage[CollectiveInputType.type]
-    ) {
+    if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
       delete CollectiveInputType.backgroundImage;
     }
 
@@ -70,51 +66,7 @@ class EditCollective extends React.Component {
     delete CollectiveInputType.sendInvoiceByEmail;
     delete CollectiveInputType.tos;
 
-    if (!CollectiveInputType.paymentMethods) return CollectiveInputType;
-
-    let newPaymentMethod, index;
-    CollectiveInputType.paymentMethods.forEach((pm, i) => {
-      if (pm.id) return;
-      newPaymentMethod = pm;
-      index = i;
-      return;
-    });
-
-    if (!newPaymentMethod) return CollectiveInputType;
-
-    const card = newPaymentMethod.card;
-    let res;
-    try {
-      res = await getStripeToken('cc', card);
-      const last4 = res.card.last4;
-      const paymentMethod = {
-        name: last4,
-        token: res.token,
-        monthlyLimitPerMember: newPaymentMethod.monthlyLimitPerMember,
-        currency: CollectiveInputType.currency,
-        data: {
-          last4,
-          fullName: res.card.full_name,
-          expMonth: res.card.exp_month,
-          expYear: res.card.exp_year,
-          brand: res.card.brand,
-          country: res.card.country,
-          funding: res.card.funding,
-          zip: res.card.address_zip,
-        },
-      };
-      CollectiveInputType.paymentMethods[index] = paymentMethod;
-      return CollectiveInputType;
-    } catch (e) {
-      this.setState({
-        result: {
-          error: `${intl.formatMessage(
-            this.messages['creditcard.error'],
-          )}: ${e}`,
-        },
-      });
-      return false;
-    }
+    return CollectiveInputType;
   }
 
   cleanTiers(tiers) {
@@ -161,10 +113,7 @@ class EditCollective extends React.Component {
       }, 3000);
     } catch (err) {
       console.error('>>> editCollective error:', JSON.stringify(err));
-      const errorMsg =
-        err.graphQLErrors && err.graphQLErrors[0]
-          ? err.graphQLErrors[0].message
-          : err.message;
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: null, result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
@@ -184,10 +133,7 @@ class EditCollective extends React.Component {
         Router.pushRoute(collectiveRoute);
       } catch (err) {
         console.error('>>> deleteCollective error: ', JSON.stringify(err));
-        const errorMsg =
-          err.graphQLErrors && err.graphQLErrors[0]
-            ? err.graphQLErrors[0].message
-            : err.message;
+        const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
         this.setState({ result: { error: errorMsg } });
         throw new Error(errorMsg);
       }
@@ -195,13 +141,12 @@ class EditCollective extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
 
     if (!collective || !collective.slug) return <div />;
 
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
-    const canEditCollective =
-      LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="EditCollective">
@@ -229,16 +174,11 @@ class EditCollective extends React.Component {
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
           className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
+          LoggedInUser={LoggedInUser}
         />
 
         <Body>
-          <CollectiveCover
-            href={`/${collective.slug}`}
-            collective={collective}
-            title={title}
-            className="small"
-          />
+          <CollectiveCover href={`/${collective.slug}`} collective={collective} title={title} className="small" />
 
           <div className="content">
             {!canEditCollective && (
@@ -251,7 +191,8 @@ class EditCollective extends React.Component {
                 <SignInForm next={`/${collective.slug}/edit`} />
               </div>
             )}
-            {canEditCollective && (
+            {canEditCollective && !loggedInEditDataLoaded && <Loading />}
+            {canEditCollective && loggedInEditDataLoaded && (
               <div>
                 <EditCollectiveForm
                   collective={collective}
@@ -260,9 +201,7 @@ class EditCollective extends React.Component {
                   status={this.state.status}
                 />
                 <div className="actions">
-                  {collective.type === 'EVENT' && (
-                    <a onClick={this.deleteCollective}>delete event</a>
-                  )}
+                  {collective.type === 'EVENT' && <a onClick={this.deleteCollective}>delete event</a>}
                   <div className="result">
                     <div className="success">{this.state.result.success}</div>
                     <div className="error">{this.state.result.error}</div>

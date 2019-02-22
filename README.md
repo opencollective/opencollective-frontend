@@ -37,8 +37,8 @@ npm install
 
 This project requires an access to the Open Collective API. You have two options:
 
-- `cp .env-staging .env` to connect to the Open Collective staging API
-- `cp .env-local .env` to connect to the API running locally
+- `cp .env.staging .env` to connect to the Open Collective staging API
+- `cp .env.local .env` to connect to the API running locally
 
 If you decide to pick the local strategy, make sure you install and run the [opencollective-api](https://github.com/opencollective/opencollective-api) project.
 
@@ -54,6 +54,37 @@ Code style? Commit convention? Please check our [Contributing guidelines](CONTRI
 
 TL;DR: we use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/), we do like great commit messages and clean Git history.
 
+## Styleguide
+
+We use [React-Styleguidist](https://react-styleguidist.js.org/) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://jxnblk.com/styled-system/).
+
+### Start
+
+```
+npm run styleguide:dev
+```
+
+### Create a new component:
+
+Only components with a matching example markdown file in the `styleguide/examples/` directory will appear in the styleguide. After creating a new component in the `src/components/` directory (i.e. `src/components/NewComponent.js`), make an example markdown file to go with it (i.e. `styleguide/examples/NewComponent.md`).
+
+If you are creating a styled-component, you will need to annotate the export statement for React-Styleguidist to recognize it:
+
+```es6
+/** @component */
+export default NewComponent;
+```
+
+Check out the [React-Styleguidist docs](https://react-styleguidist.js.org/docs/documenting.html) for more details about documenting components with [JSDoc](http://usejsdoc.org/) annotations and writing interactive code examples.
+
+### Deploy
+
+If you have access the Open Collective `now` team account:
+
+```
+npm run styleguide:deploy
+```
+
 ## Tests
 
 You can run the tests using `npm test` or more specifically:
@@ -63,6 +94,7 @@ You can run the tests using `npm test` or more specifically:
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
 To update the Jest snapshots, run `npm run test:update`
+To update the graphql schema for eslint, run `npm run graphql:get-schema:dev`
 
 ## Localization
 
@@ -78,9 +110,26 @@ fs.writeFileSync(`${LANG_DIR}ja.json`, JSON.stringify(translatedMessages('ja'), 
 
 To deploy to staging or production, you need to be a core member of the Open Collective team.
 
+### (Optional) Configure Slack token
+
+Setting a Slack token will post a message on `#engineering` with the changes you're
+about to deploy. It is not required, but you can activate it like this:
+
+1. Go to https://api.slack.com/custom-integrations/legacy-tokens
+2. Generate a token for the OpenCollective workspace
+3. Add this token to your `.env` file:
+
+```bash
+OC_SLACK_USER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
 ### Staging (heroku)
 
-```
+```bash
+# Before first deployment, configure staging remote
+git remote add staging https://git.heroku.com/oc-staging-frontend.git
+
+# Then deploy master with
 npm run deploy:staging
 ```
 
@@ -88,8 +137,18 @@ URL: https://staging.opencollective.com/
 
 ### Production (heroku)
 
-```
+```bash
+# Before first deployment, configure production remote
+git remote add production https://git.heroku.com/oc-prod-frontend.git
+
+# Then deploy master with
 npm run deploy:production
 ```
 
 URL: https://opencollective.com/
+
+## Discussion
+
+If you have any questions, ping us on Slack
+(https://slack.opencollective.org) or on Twitter
+([@opencollect](https://twitter.com/opencollect)).

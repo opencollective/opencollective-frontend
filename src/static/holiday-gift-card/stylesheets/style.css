@@ -1,0 +1,547 @@
+/**
+ * Holiday Gift Card
+ * all styles namespaced under the `.mkt-page-holiday-gift-card` parent classname
+ */
+
+.mkt-page-holiday-gift-card {
+    color: #4E5052;
+    font-size: 14px;
+}
+
+.mkt-page-holiday-gift-card * {
+    margin: 0;
+    padding: 0;
+    font-weight: 400;
+    text-align: inherit;
+}
+
+.mkt-page-holiday-gift-card img {
+    max-width: 100%;
+}
+
+.mkt-page-holiday-gift-card section {
+    overflow: initial;
+    padding-bottom: 60px;
+}
+
+@media (min-width: 52em) {
+    .mkt-page-holiday-gift-card section {
+        padding-bottom: 160px;
+    }
+}
+
+.mkt-page-holiday-gift-card svg {
+    fill: currentColor;
+}
+
+.mkt-page-holiday-gift-card .wrapper {
+    max-width: 1232px;
+    margin: 0 auto;
+    padding-left: 1.6rem;
+    padding-right: 1.6rem;
+}
+
+.mkt-page-holiday-gift-card .white100 {
+    color: #FFF;
+}
+
+.mkt-page-holiday-gift-card .primary200 {
+    color: #B8DEFF;
+}
+
+.mkt-page-holiday-gift-card .primary500 {
+    color: #1F87FF;
+}
+
+.mkt-page-holiday-gift-card .red500 {
+    color: #FF0044;
+}
+
+.mkt-page-holiday-gift-card .neutralsolid600 {
+    color: #76777A;
+}
+
+.mkt-page-holiday-gift-card .neutralsolid800 {
+    color: #313233;
+}
+
+.mkt-page-holiday-gift-card h1,
+.mkt-page-holiday-gift-card h2,
+.mkt-page-holiday-gift-card h3 {
+    color: #313233;
+}
+
+.mkt-page-holiday-gift-card .h300 {
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.mkt-page-holiday-gift-card .h500 {
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: -0.2px;
+}
+
+.mkt-page-holiday-gift-card .h700 {
+    font-size: 52px;
+    line-height: 56px;
+    letter-spacing: -0.4px;
+}
+
+.mkt-page-holiday-gift-card .paragraph {
+    font-size: 14px;
+    line-height: 24px;
+}
+
+.mkt-page-holiday-gift-card .caption {
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.mkt-page-holiday-gift-card .tiny {
+    font-size: 10px;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+}
+
+@media (min-width: 52em) {
+    .mkt-page-holiday-gift-card .h300 {
+        font-size: 24px;
+        line-height: 32px;
+        letter-spacing: -0.4px;
+    }
+    .mkt-page-holiday-gift-card .h500 {
+        font-size: 40px;
+        line-height: 48px;
+    }
+    .mkt-page-holiday-gift-card .h700 {
+        font-size: 64px;
+        line-height: 72px;
+        letter-spacing: -1.6px;
+    }
+}
+
+.mkt-page-holiday-gift-card .-font-thin {
+    font-weight: 100;
+}
+
+.mkt-page-holiday-gift-card .-font-extra-light,
+.mkt-page-holiday-gift-card .-font-ultra-light {
+    font-weight: 200;
+}
+
+.mkt-page-holiday-gift-card .-font-light {
+    font-weight: 300;
+}
+
+.mkt-page-holiday-gift-card .-font-normal,
+.mkt-page-holiday-gift-card .-font-book,
+.mkt-page-holiday-gift-card .-font-regular {
+    font-weight: 400;
+}
+
+.mkt-page-holiday-gift-card .-font-medium {
+    font-weight: 500;
+}
+
+.mkt-page-holiday-gift-card .-font-semi-bold,
+.mkt-page-holiday-gift-card .-font-demi-bold {
+    font-weight: 600;
+}
+
+.mkt-page-holiday-gift-card .-font-bold {
+    font-weight: 700;
+}
+
+.mkt-page-holiday-gift-card .-font-extra-bold,
+.mkt-page-holiday-gift-card .-font-ultra-bold {
+    font-weight: 800;
+}
+
+.mkt-page-holiday-gift-card .-font-black,
+.mkt-page-holiday-gift-card .-font-heavy {
+    font-weight: 900;
+}
+
+.mkt-page-holiday-gift-card .p1 {
+    padding: 8px;
+}
+
+.mkt-page-holiday-gift-card .px1 {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.mkt-page-holiday-gift-card .pb1 {
+    padding-bottom: 8px;
+}
+
+.mkt-page-holiday-gift-card .pb2 {
+    padding-bottom: 16px;
+}
+
+.mkt-page-holiday-gift-card .pb3 {
+    padding-bottom: 24px;
+}
+
+.mkt-page-holiday-gift-card .pb4 {
+    padding-bottom: 32px;
+}
+
+@media (min-width: 40em) {
+    .mkt-page-holiday-gift-card .sm-pr1 {
+        padding-right: 8px;
+    }
+    .mkt-page-holiday-gift-card .sm-pl1 {
+        padding-left: 8px;
+    }
+}
+
+.mkt-page-holiday-gift-card .flex {
+    display: flex;
+}
+
+.mkt-page-holiday-gift-card .flex-column {
+    flex-direction: column;
+}
+
+.mkt-page-holiday-gift-card .flex-wrap {
+    flex-wrap: wrap;
+}
+
+.mkt-page-holiday-gift-card .items-center {
+    align-items: center;
+}
+
+.mkt-page-holiday-gift-card .justify-center {
+    justify-content: center;
+}
+
+.mkt-page-holiday-gift-card .justify-end {
+    justify-content: flex-end;
+}
+
+.mkt-page-holiday-gift-card .row-reverse {
+    flex-direction: row-reverse;
+}
+
+.mkt-page-holiday-gift-card .shrink-0 {
+    flex-shrink: 0;
+}
+
+.mkt-page-holiday-gift-card .col-3 {
+    width: 25%;
+}
+
+.mkt-page-holiday-gift-card .col-6 {
+    width: 50%;
+}
+
+@media (min-width: 40em) {
+    .mkt-page-holiday-gift-card .sm-flex {
+        display: flex;
+        background: rgba(255, 0, 0, 0);
+    }
+    .mkt-page-holiday-gift-card .sm-col-3 {
+        width: 25%;
+    }
+    .mkt-page-holiday-gift-card .sm-col-4 {
+        width: 33%;
+    }
+    .mkt-page-holiday-gift-card .sm-col-5 {
+        width: 41%;
+    }
+    .mkt-page-holiday-gift-card .sm-col-6 {
+        width: 50%;
+    }
+    .mkt-page-holiday-gift-card .sm-col-7 {
+        width: 58%;
+    }
+}
+
+@media (min-width: 52em) {
+    .mkt-page-holiday-gift-card .md-flex {
+        display: flex;
+        background: rgba(0, 255, 0, 0);
+    }
+    .mkt-page-holiday-gift-card .md-col-1 {
+        width: 8%;
+    }
+    .mkt-page-holiday-gift-card .md-col-2 {
+        width: 16%;
+    }
+    .mkt-page-holiday-gift-card .md-col-3 {
+        width: 25%;
+    }
+    .mkt-page-holiday-gift-card .md-col-4 {
+        width: 33%;
+    }
+    .mkt-page-holiday-gift-card .md-col-5 {
+        width: 41%;
+    }
+    .mkt-page-holiday-gift-card .md-col-6 {
+        width: 50%;
+    }
+    .mkt-page-holiday-gift-card .md-col-7 {
+        width: 58%;
+    }
+}
+
+@media (min-width: 64em) {
+    .mkt-page-holiday-gift-card .lg-flex {
+        display: flex;
+        background: rgba(0, 0, 255, 0);
+    }
+    .mkt-page-holiday-gift-card .lg-col-6 {
+        width: 50%;
+    }
+}
+
+.mkt-page-holiday-gift-card .btn {
+    font-size: inherit;
+    line-height: calc(4em - 2px);
+    min-width: 256px;
+    border: 1px solid;
+    font-weight: 600;
+    border-radius: 32px;
+    text-align: center;
+}
+
+.mkt-page-holiday-gift-card .btn.-primary {
+    color: #FFF;
+    background-color: #1F87FF;
+    border-color: #1F87FF;
+}
+
+.mkt-page-holiday-gift-card .btn.-primary:hover {
+    background-color: #0061E0;
+    border-color: #0061E0;
+}
+
+.mkt-page-holiday-gift-card .btn.-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px #82FAA2;
+    border-color: #82FAA2;
+}
+
+.mkt-page-holiday-gift-card .btn.-primary:active {
+    box-shadow: none;
+    background-color: #0041A3;
+    border-color: #0041A3;
+}
+
+.mkt-page-holiday-gift-card .btn.-primary[disabled] {
+    color: #B8DEFF;
+    background-color: #F0F8FF;
+    border-color: #F0F8FF;
+}
+
+.mkt-page-holiday-gift-card .btn.-white {
+    color: #1F87FF;
+    background-color: #FFF;
+    border-color: #FFF;
+}
+
+.mkt-page-holiday-gift-card .btn.-white:hover,
+.mkt-page-holiday-gift-card .btn.-white:focus {
+    color: #0061E0;
+    background-color: #F0F8FF;
+    border-color: #F0F8FF;
+}
+
+.mkt-page-holiday-gift-card .btn.-white:active {
+    box-shadow: none;
+    color: #0061E0;
+    background-color: #E0F1FF;
+    border-color: #E0F1FF;
+}
+
+.mkt-page-holiday-gift-card .btn.-ghost {
+    color: #FFF;
+    border-color: rgba(255, 255, 255, 0.48);
+}
+
+.mkt-page-holiday-gift-card .btn.-ghost:hover,
+.mkt-page-holiday-gift-card .btn.-ghost:focus {
+    border-color: white;
+}
+
+.mkt-page-holiday-gift-card .btn.-ghost:active {
+    box-shadow: none;
+    color: #0061E0;
+    background-color: #E0F1FF;
+    border-color: #E0F1FF;
+}
+
+.mkt-page-holiday-gift-card .btn.-large {
+    font-size: 14px;
+    line-height: 46px;
+}
+
+.mkt-page-holiday-gift-card .text-input {
+    display: flex;
+    font-size: 14px;
+    height: 40px;
+    overflow: hidden;
+    border: 1px solid #DCDEE0;
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+.mkt-page-holiday-gift-card .text-input > input {
+    width: 100%;
+    padding: 0 8px;
+    border: none;
+}
+
+.mkt-page-holiday-gift-card .text-input > input:focus {
+    outline: none;
+}
+
+.mkt-page-holiday-gift-card .text-input > .field-element {
+    display: flex;
+    align-items: center;
+    color: #C4C7CC;
+    background-color: #F7F8FA;
+    padding: 0 16px;
+}
+
+.mkt-page-holiday-gift-card .text-input > .field-icon {
+    display: flex;
+    align-items: center;
+    margin: 0 16px;
+}
+
+.mkt-page-holiday-gift-card .text-input:hover {
+    border-color: #99C9FF;
+}
+
+.mkt-page-holiday-gift-card .text-input:focus-within {
+    border-color: #3385FF;
+}
+
+.mkt-page-holiday-gift-card .text-input:focus-within .field-element {
+    color: #99CFFF;
+    background-color: #E0F1FF;
+}
+
+.mkt-page-holiday-gift-card .text-input.-success {
+    border-color: #82FAA2;
+}
+
+.mkt-page-holiday-gift-card .text-input.-success .field-element {
+    color: #82FAA2;
+    background-color: #EBFFF0;
+}
+
+.mkt-page-holiday-gift-card .text-input.-success .field-icon {
+    color: #00CC36;
+}
+
+.mkt-page-holiday-gift-card .text-input.-error {
+    border-color: #FF0044;
+}
+
+.mkt-page-holiday-gift-card .text-input.-error .field-element {
+    color: #FF99B4;
+    background-color: #FFF0F0;
+}
+
+.mkt-page-holiday-gift-card .text-input.-error .field-icon {
+    color: #FF0044;
+}
+
+.mkt-page-holiday-gift-card section.hero {
+    padding: 80px 0;
+    background-color: #E0F1FF;
+    background-image: linear-gradient(rgba(224, 241, 255, 0), #FFF 50%), url("../images/snowflakes-background.svg");
+    background-position: top center;
+}
+
+.mkt-page-holiday-gift-card section.hero > .wrapper {
+    max-width: 1120px;
+}
+
+.mkt-page-holiday-gift-card h2.primary500 {
+    text-shadow: 6px 6px 0 #FFF;
+}
+
+@media (min-width: 52em) {
+    .mkt-page-holiday-gift-card .form-col {
+        padding-top: 45px;
+        padding-left: 80px;
+    }
+}
+
+.mkt-page-holiday-gift-card .form-wrapper .gift-card-wrapper {
+    max-width: 288px;
+    margin: 0 auto 38px;
+}
+
+.mkt-page-holiday-gift-card .form-wrapper .gift-card {
+    overflow: hidden;
+    border-radius: 8px;
+    background: linear-gradient(154.26deg, #145ECC 0%, #66A3FF 100%);
+    box-shadow: 0px 16px 32px rgba(24, 25, 26, 0.16);
+}
+
+.mkt-page-holiday-gift-card .form-wrapper .gift-card-text {
+    padding: 22px 24px 11px;
+}
+
+.mkt-page-holiday-gift-card .form-wrapper .gift-card-svg {
+    display: block;
+}
+
+@media (min-width: 52em) {
+    .mkt-page-holiday-gift-card .form-wrapper {
+        position: relative;
+        padding: 40px 32px;
+        border: 1px solid rgba(20, 20, 20, 0.08);
+        border-radius: 8px;
+        background-color: #FFF;
+        box-shadow: 0px 1px 4px rgba(26, 27, 31, 0.16);
+    }
+    .mkt-page-holiday-gift-card .form-wrapper .gift-card-wrapper {
+        margin: -86px auto 38px;
+    }
+}
+
+@media (min-width: 52em) {
+    .mkt-page-holiday-gift-card {
+        font-size: 16px;
+    }
+}
+
+.mkt-page-holiday-gift-card details summary {
+    outline: none;
+}
+
+.mkt-page-holiday-gift-card details summary::-webkit-details-marker {
+    display: none;
+}
+
+.mkt-page-holiday-gift-card details summary > svg {
+    color: #9D9FA3;
+    margin-left: 20px;
+}
+
+.mkt-page-holiday-gift-card details .closed-icon {
+    opacity: 1;
+}
+
+.mkt-page-holiday-gift-card details .open-icon {
+    opacity: 0;
+}
+
+.mkt-page-holiday-gift-card details[open] .closed-icon {
+    opacity: 0;
+}
+
+.mkt-page-holiday-gift-card details[open] .open-icon {
+    opacity: 1;
+}
+
+.mkt-page-holiday-gift-card .w100 {
+    width: 100%;
+}

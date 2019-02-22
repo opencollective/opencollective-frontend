@@ -30,25 +30,19 @@ class TopBackersCoverWithData extends React.Component {
     };
   }
 
+  renderMemberTitle(memberObj) {
+    const member = memberObj.member;
+    const amount = formatCurrency(memberObj.stats.totalDonations, this.props.collective.currency, { precision: 0 });
+
+    const title = member.name;
+    const subtitle = member.description ? `\n${member.description}\n` : '';
+    const financialContributionTxt = `Financial contribution: ${amount}`;
+    return `${title}${subtitle}\n${financialContributionTxt}`;
+  }
+
   renderOrganization(member, index) {
     const org = member.member;
-    const percentage = Math.round(
-      (member.stats.totalDonations /
-        this.props.collective.stats.totalAmountReceived) *
-        100,
-    );
-    let title = `${org.name}`;
-    if (org.description) {
-      title += `
-${org.description}
-`;
-    }
-    title += `
-Financial contribution: ${percentage}% (${formatCurrency(
-      member.stats.totalDonations,
-      this.props.collective.currency,
-      { precision: 0 },
-    )})`;
+
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
       <div key={`topBacker-${index}`} className={className}>
@@ -57,7 +51,7 @@ Financial contribution: ${percentage}% (${formatCurrency(
             {`
               .org {
                 border-radius: 16px;
-                background: rgba(255, 255, 255, 0.5);
+                background: rgba(0, 0, 0, 0.5);
                 padding: 5px;
                 display: flex;
                 align-items: center;
@@ -69,8 +63,8 @@ Financial contribution: ${percentage}% (${formatCurrency(
               }
             `}
           </style>
-          <Link route={`/${org.slug}`} title={title}>
-            <Logo src={org.image} height={36} />
+          <Link route="collective" params={{ slug: org.slug }} title={this.renderMemberTitle(member)} passHref>
+            <Logo src={org.image} type={org.type} website={org.website} height={36} />
           </Link>
         </div>
       </div>
@@ -80,38 +74,26 @@ Financial contribution: ${percentage}% (${formatCurrency(
   renderUser(member, index) {
     const user = member.member;
 
-    const percentage = Math.round(
-      (member.stats.totalDonations /
-        this.props.collective.stats.totalAmountReceived) *
-        100,
-    );
-    let title = `${user.name}`;
-    if (user.description) {
-      title += `
-${user.description}
-`;
-    }
-    title += `
-Financial contribution: ${percentage}% (${formatCurrency(
-      member.stats.totalDonations,
-      this.props.collective.currency,
-      { precision: 0 },
-    )})`;
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
-        <Link route={`/${user.slug}`} title={title}>
-          <Avatar src={user.image} radius={48} className="noFrame" />
+        <Link route="collective" params={{ slug: user.slug }} title={this.renderMemberTitle(member)} passHref>
+          <Avatar
+            src={user.image}
+            name={user.name}
+            type={user.type}
+            radius={48}
+            size={[30, null, 48]}
+            className="noFrame"
+          />
         </Link>
       </div>
     );
   }
 
   renderMember(member, index) {
-    if (member.member.type === 'ORGANIZATION')
-      return this.renderOrganization(member, index);
-    if (member.member.type === 'COLLECTIVE')
-      return this.renderOrganization(member, index);
+    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member, index);
+    if (member.member.type === 'COLLECTIVE') return this.renderOrganization(member, index);
     if (member.member.type === 'USER') return this.renderUser(member, index);
   }
 
@@ -130,8 +112,7 @@ Financial contribution: ${percentage}% (${formatCurrency(
     if (members.length === 0) {
       return <div />;
     }
-    const additionalBackers =
-      get(collective, 'stats.backers.all') - members.length;
+    const additionalBackers = get(collective, 'stats.backers.all') - members.length;
 
     return (
       <div className="TopBackersCover" ref={node => (this.node = node)}>
@@ -154,7 +135,6 @@ Financial contribution: ${percentage}% (${formatCurrency(
               height: 48px;
               line-height: 48px;
               color: #ffffff;
-              font-family: Rubik;
               font-size: 12px;
               font-weight: 500;
               text-align: center;
@@ -210,20 +190,8 @@ Financial contribution: ${percentage}% (${formatCurrency(
 }
 
 const getTopBackersQuery = gql`
-  query getTopBackersQuery(
-    $CollectiveId: Int!
-    $TierId: Int
-    $role: String
-    $limit: Int
-    $orderBy: String
-  ) {
-    allMembers(
-      CollectiveId: $CollectiveId
-      TierId: $TierId
-      role: $role
-      limit: $limit
-      orderBy: $orderBy
-    ) {
+  query getTopBackersQuery($CollectiveId: Int!, $TierId: Int, $role: String, $limit: Int, $orderBy: String) {
+    allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, limit: $limit, orderBy: $orderBy) {
       id
       role
       createdAt

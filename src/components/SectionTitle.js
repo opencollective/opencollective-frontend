@@ -27,8 +27,7 @@ class SectionTitle extends React.Component {
       },
       'updates.subtitle': {
         id: 'section.updates.subtitle',
-        defaultMessage:
-          'Stay up to dates with our latest activities and progress.',
+        defaultMessage: 'Stay up to dates with our latest activities and progress.',
       },
       'events.title': { id: 'section.events.title', defaultMessage: 'Events' },
       'events.subtitle': {
@@ -38,8 +37,7 @@ class SectionTitle extends React.Component {
       'team.title': { id: 'section.team.title', defaultMessage: 'Team' },
       'team.subtitle': {
         id: 'section.team.subtitle',
-        defaultMessage:
-          'Meet the awesome people that are bringing the community together! 🙌',
+        defaultMessage: 'Meet the awesome people that are bringing the community together! 🙌',
       },
       'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
       'budget.subtitle': {
@@ -89,8 +87,7 @@ class SectionTitle extends React.Component {
       },
       'organizationDetails.subtitle': {
         id: 'tier.order.organizationDetails.description',
-        defaultMessage:
-          'Create an organization. You can edit it later to add other members.',
+        defaultMessage: 'Create an organization. You can edit it later to add other members.',
       },
       'paymentDetails.title': {
         id: 'tier.order.paymentDetails',
@@ -104,14 +101,10 @@ class SectionTitle extends React.Component {
 
     const title =
       this.props.title ||
-      (this.messages[`${section}.title`]
-        ? intl.formatMessage(this.messages[`${section}.title`])
-        : section);
+      (this.messages[`${section}.title`] ? intl.formatMessage(this.messages[`${section}.title`]) : section);
     const subtitle =
       this.props.subtitle ||
-      (this.messages[`${section}.subtitle`]
-        ? intl.formatMessage(this.messages[`${section}.subtitle`], values)
-        : '');
+      (this.messages[`${section}.subtitle`] ? intl.formatMessage(this.messages[`${section}.subtitle`], values) : '');
 
     return (
       <div className="SectionTitle">
@@ -120,56 +113,36 @@ class SectionTitle extends React.Component {
             .SectionTitle {
               margin-top: 4rem;
               overflow: hidden;
-              border-left: 4px solid #3399ff;
-              padding-left: 2.8rem;
-              margin-bottom: 5rem;
-            }
-            .title {
-              display: flex;
-              align-items: baseline;
+              text-align: center;
+              margin-bottom: 7.2rem;
             }
             .SectionTitle .title :global(.action) {
               font-size: 1.4rem;
             }
             h1 {
-              color: #18191a;
-              font-family: Rubik;
-              font-size: 32px;
-              font-weight: 500;
-              line-height: 38px;
               margin: 0;
-              text-align: left;
-              text-align: left;
-              margin-right: 0.5rem;
+              text-align: center;
             }
             .subtitle {
               margin-top: 0.8rem;
-              color: #666f80;
-              font-family: Rubik;
-              font-size: 16px;
+              color: #4e5052;
+              font-size: 1.6rem;
               line-height: 19px;
-              text-align: left;
+              text-align: center;
             }
             .content {
               padding: 0.8rem 0;
-            }
-            @media (max-width: 420px) {
-              .SectionTitle {
-                padding-left: 1.5rem;
-              }
             }
           `}
         </style>
 
         <div className="content">
-          <div className="title">
-            <h1>{title}</h1>
-            {action && (
-              <Link route={action.href} className="action" scroll={false}>
-                {action.label}
-              </Link>
-            )}
-          </div>
+          <h1>{title}</h1>
+          {action && (
+            <Link route={action.href} className="action" scroll={false}>
+              {action.label}
+            </Link>
+          )}
           {subtitle && <div className="subtitle">{subtitle}</div>}
         </div>
       </div>

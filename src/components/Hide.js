@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Box } from 'grid-styled';
+import { Box } from '@rebass/grid';
 import { bottom, height, left, position, right, top } from 'styled-system';
 import PropTypes from 'prop-types';
 

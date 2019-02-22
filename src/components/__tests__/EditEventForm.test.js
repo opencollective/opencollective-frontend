@@ -40,8 +40,6 @@ describe('EditEventForm component', () => {
         .text(),
     ).toEqual('Name');
     expect(component.find('input[name="slug"]').exists()).toBeTrue;
-    expect(component.find('input[name="slug"]').prop('value')).toEqual(
-      event.slug.replace(/.*\//, ''),
-    );
+    expect(component.find('input[name="slug"]').prop('value')).toEqual(event.slug.replace(/.*\//, ''));
   });
 });

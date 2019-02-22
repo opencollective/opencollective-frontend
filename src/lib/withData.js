@@ -4,7 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import { ApolloProvider, getDataFromTree } from 'react-apollo';
+import { getDataFromTree } from 'react-apollo';
 
 import initClient from './initClient';
 
@@ -15,9 +15,20 @@ function getComponentDisplayName(Component) {
 
 export default ComposedComponent => {
   return class WithData extends React.Component {
+    static defaultProps = {
+      serverState: {
+        apollo: {},
+      },
+    };
+
     static async getInitialProps(ctx) {
       // Initial serverState with apollo (empty)
-      let serverState = {};
+      let serverState = {
+        apollo: {
+          data: {},
+        },
+      };
+      const { Component, router } = ctx;
 
       const options = {
         headers: ctx.req ? ctx.req.headers : {},
@@ -31,7 +42,7 @@ export default ComposedComponent => {
 
       // Run all GraphQL queries in the component tree
       // and extract the resulting data
-      const apollo = initClient(undefined, options);
+      const apollo = initClient(undefined);
       try {
         // create the url prop which is passed to every page
         const url = {
@@ -42,7 +53,14 @@ export default ComposedComponent => {
 
         // Run all GraphQL queries
         await getDataFromTree(
-          <ComposedComponent ctx={ctx} url={url} {...composedInitialProps} />,
+          <ComposedComponent
+            ctx={ctx}
+            url={url}
+            client={apollo}
+            Component={Component}
+            router={router}
+            {...composedInitialProps}
+          />,
           {
             router: {
               asPath: ctx.asPath,
@@ -58,7 +76,6 @@ export default ComposedComponent => {
         // http://dev.apollodata.com/react/api-queries.html#graphql-query-data-error
         if (process.env.DEBUG) console.error('>>> apollo error: ', error);
       }
-
       if (!process.browser) {
         // getDataFromTree does not call componentWillUnmount
         // head side effect therefore need to be cleared manually
@@ -79,29 +96,29 @@ export default ComposedComponent => {
       };
     }
 
-    static displayName = `WithData(${getComponentDisplayName(
-      ComposedComponent,
-    )})`;
+    static displayName = `WithData(${getComponentDisplayName(ComposedComponent)})`;
 
     static propTypes = {
       serverState: PropTypes.object.isRequired,
       options: PropTypes.object,
     };
 
+    static defaultProps = {
+      serverState: {
+        apollo: {
+          data: {},
+        },
+      },
+    };
+
     constructor(props) {
       super(props);
-      this.apollo = initClient(
-        this.props.serverState.apollo.data,
-        this.props.options,
-      );
+      const { serverState } = this.props;
+      this.apollo = initClient(serverState.apollo.data);
     }
 
     render() {
-      return (
-        <ApolloProvider client={this.apollo}>
-          <ComposedComponent {...this.props} client={this.apollo} />
-        </ApolloProvider>
-      );
+      return <ComposedComponent {...this.props} client={this.apollo} />;
     }
   };
 };

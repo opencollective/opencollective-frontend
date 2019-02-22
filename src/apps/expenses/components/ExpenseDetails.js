@@ -6,13 +6,10 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
-import {
-  capitalize,
-  getCurrencySymbol,
-  imagePreview,
-} from '../../../lib/utils';
+import { capitalize, getCurrencySymbol, imagePreview } from '../../../lib/utils';
 import InputField from '../../../components/InputField';
 import categories from '../../../constants/categories';
+import TransactionDetails from './TransactionDetails';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -33,12 +30,10 @@ class ExpenseDetails extends React.Component {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
-
     this.messages = defineMessages({
       paypal: {
         id: 'expense.payoutMethod.paypal',
-        defaultMessage:
-          'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})',
+        defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})',
       },
       // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
       other: {
@@ -75,26 +70,18 @@ class ExpenseDetails extends React.Component {
     const { LoggedInUser, data, intl } = this.props;
     const expense = (data && data.Expense) || this.props.expense;
     const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
-    const isAuthor =
-      LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
-    const canEditAmount =
-      expense.status !== 'PAID' || expense.payoutMethod !== 'paypal';
+    const isAuthor = LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
+    const canEditAmount = expense.status !== 'PAID' || expense.payoutMethod !== 'paypal';
     const editMode = canEditExpense && this.props.mode === 'edit';
-    const previewAttachmentImage = expense.attachment
-      ? imagePreview(expense.attachment)
-      : '/static/images/receipt.svg';
-    const payoutMethod =
-      this.state.expense.payoutMethod || expense.payoutMethod;
-    const paypalEmail =
-      get(expense, 'user.paypalEmail') || get(expense, 'user.email');
+    const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
+    const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
+    const paypalEmail = get(expense, 'user.paypalEmail') || get(expense, 'user.email');
     const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], {
       paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
     });
-    const categoriesOptions = categories(expense.collective.slug).map(
-      category => {
-        return { [category]: category };
-      },
-    );
+    const categoriesOptions = categories(expense.collective.slug).map(category => {
+      return { [category]: category };
+    });
 
     return (
       <div className={`ExpenseDetails ${this.props.mode}`}>
@@ -143,7 +130,6 @@ class ExpenseDetails extends React.Component {
               text-transform: uppercase;
               color: #aaaeb3;
               font-weight: 300;
-              font-family: lato, montserratlight, arial;
               white-space: nowrap;
             }
             .netAmountInCollectiveCurrency {
@@ -183,7 +169,7 @@ class ExpenseDetails extends React.Component {
               margin: 0;
             }
 
-            .col.privateMessage {
+            .col.large {
               width: 100%;
             }
           `}
@@ -197,27 +183,21 @@ class ExpenseDetails extends React.Component {
                 options={{ accept: 'image/jpeg, image/png, application/pdf' }}
                 name="attachment"
                 className="attachmentField"
-                onChange={attachment =>
-                  this.handleChange('attachment', attachment)
-                }
-                defaultValue={
-                  expense.attachment || '/static/images/receipt.svg'
-                }
+                onChange={attachment => this.handleChange('attachment', attachment)}
+                defaultValue={expense.attachment || '/static/images/receipt.svg'}
               />
             )}
-            {!editMode &&
-              expense.attachment && (
-                <a
-                  href={expense.attachment}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Open receipt in a new window"
-                >
-                  <img src={previewAttachmentImage} />
-                </a>
-              )}
-            {!editMode &&
-              !expense.attachment && <img src={previewAttachmentImage} />}
+            {!editMode && expense.attachment && (
+              <a
+                href={expense.attachment}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open receipt in a new window"
+              >
+                <img src={previewAttachmentImage} />
+              </a>
+            )}
+            {!editMode && !expense.attachment && <img src={previewAttachmentImage} />}
           </div>
         </div>
 
@@ -226,10 +206,7 @@ class ExpenseDetails extends React.Component {
             <div className="row">
               <div className="col large">
                 <label>
-                  <FormattedMessage
-                    id="expense.description"
-                    defaultMessage="description"
-                  />
+                  <FormattedMessage id="expense.description" defaultMessage="description" />
                 </label>
                 <div className="description">
                   <span className="description">
@@ -238,9 +215,7 @@ class ExpenseDetails extends React.Component {
                       name="description"
                       defaultValue={expense.description}
                       className="descriptionField"
-                      onChange={description =>
-                        this.handleChange('description', description)
-                      }
+                      onChange={description => this.handleChange('description', description)}
                     />
                   </span>
                 </div>
@@ -251,10 +226,7 @@ class ExpenseDetails extends React.Component {
           {editMode && (
             <div className="col">
               <label>
-                <FormattedMessage
-                  id="expense.category"
-                  defaultMessage="category"
-                />
+                <FormattedMessage id="expense.category" defaultMessage="category" />
               </label>
               <div className="category">
                 <span className="category">
@@ -264,9 +236,7 @@ class ExpenseDetails extends React.Component {
                     options={categoriesOptions}
                     defaultValue={expense.category}
                     className="categoryField"
-                    onChange={category =>
-                      this.handleChange('category', category)
-                    }
+                    onChange={category => this.handleChange('category', category)}
                   />
                 </span>
               </div>
@@ -279,23 +249,18 @@ class ExpenseDetails extends React.Component {
             </label>
             <div className="amountDetails">
               <span className="amount">
-                {editMode &&
-                  canEditAmount && (
-                    <InputField
-                      name="amount"
-                      defaultValue={expense.amount}
-                      pre={getCurrencySymbol(expense.currency)}
-                      type="currency"
-                      className="amountField"
-                      onChange={amount => this.handleChange('amount', amount)}
-                    />
-                  )}
-                {!(editMode && canEditAmount) && (
-                  <FormattedNumber
-                    value={expense.amount / 100}
-                    currency={expense.currency}
-                    {...this.currencyStyle}
+                {editMode && canEditAmount && (
+                  <InputField
+                    name="amount"
+                    defaultValue={expense.amount}
+                    pre={getCurrencySymbol(expense.currency)}
+                    type="currency"
+                    className="amountField"
+                    onChange={amount => this.handleChange('amount', amount)}
                   />
+                )}
+                {!(editMode && canEditAmount) && (
+                  <FormattedNumber value={expense.amount / 100} currency={expense.currency} {...this.currencyStyle} />
                 )}
               </span>
             </div>
@@ -303,16 +268,12 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label>
-              <FormattedMessage
-                id="expense.payoutMethod"
-                defaultMessage="payout method"
-              />
+              <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
             </label>
             {!editMode &&
               capitalize(
                 intl.formatMessage(this.messages[expense.payoutMethod], {
-                  paypalEmail:
-                    paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
+                  paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
                 }),
               )}
             {editMode && (
@@ -321,35 +282,35 @@ class ExpenseDetails extends React.Component {
                 type="select"
                 options={payoutMethods}
                 defaultValue={expense.payoutMethod}
-                onChange={payoutMethod =>
-                  this.handleChange('payoutMethod', payoutMethod)
-                }
+                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
               />
             )}
           </div>
 
-          {(expense.privateMessage ||
-            ((isAuthor || canEditExpense) && payoutMethod === 'other')) && (
-            <div className="col privateMessage">
+          {(expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) && (
+            <div className="col large privateMessage">
               <label>
-                <FormattedMessage
-                  id="expense.privateMessage"
-                  defaultMessage="private note"
-                />
+                <FormattedMessage id="expense.privateMessage" defaultMessage="private note" />
               </label>
               {(!editMode || !isAuthor) && capitalize(expense.privateMessage)}
-              {editMode &&
-                (isAuthor || canEditExpense) && (
-                  <InputField
-                    type="textarea"
-                    name="privateMessage"
-                    onChange={privateMessage =>
-                      this.handleChange('privateMessage', privateMessage)
-                    }
-                    defaultValue={expense.privateMessage}
-                  />
-                )}
+              {editMode && (isAuthor || canEditExpense) && (
+                <InputField
+                  type="textarea"
+                  name="privateMessage"
+                  onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
+                  defaultValue={expense.privateMessage}
+                />
+              )}
             </div>
+          )}
+
+          {expense.transaction && (
+            <TransactionDetails
+              className="col large"
+              {...expense.transaction}
+              collective={expense.collective}
+              host={expense.collective.host}
+            />
           )}
         </div>
       </div>
@@ -373,6 +334,8 @@ const getExpenseQuery = gql`
       collective {
         id
         slug
+        name
+        type
         host {
           id
           slug
@@ -380,6 +343,18 @@ const getExpenseQuery = gql`
       }
       fromCollective {
         id
+      }
+      transaction {
+        id
+        type
+        amount
+        currency
+        hostCurrency
+        hostCurrencyFxRate
+        netAmountInCollectiveCurrency
+        platformFeeInHostCurrency
+        paymentProcessorFeeInHostCurrency
+        hostFeeInHostCurrency
       }
       user {
         id
@@ -395,9 +370,7 @@ const getExpenseQuery = gql`
 
 export const addGetExpense = component => {
   const accessToken =
-    typeof window !== 'undefined' &&
-    window.localStorage &&
-    window.localStorage.getItem('accessToken');
+    typeof window !== 'undefined' && window.localStorage && window.localStorage.getItem('accessToken');
 
   // if we don't have an accessToken, there is no need to get the details of a expense
   // as we won't have access to any more information than the allExpenses query

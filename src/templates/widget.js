@@ -82,9 +82,7 @@
     this.loading.appendChild(this.logo);
     this.iframe = document.createElement('iframe');
     this.iframe.id = this.id;
-    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${
-      this.id
-    }&style=${style}`;
+    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}&style=${style}`;
     this.iframe.width = width;
     this.iframe.height = height;
     this.iframe.frameBorder = 0;
@@ -126,9 +124,7 @@
 
   const init = () => {
     initStylesheet();
-    const scriptsNodesArray = [].slice.call(
-      document.querySelectorAll('script'),
-    );
+    const scriptsNodesArray = [].slice.call(document.querySelectorAll('script'));
     const regex = new RegExp('{{host}}'.replace(/^https?:\/\//, ''), 'i');
     scriptsNodesArray.map(s => {
       const src = s.getAttribute('src');
@@ -136,9 +132,7 @@
         if (src && src.match(regex) && src.match(new RegExp(`${widget}.js`))) {
           const tokens = src.match(new RegExp(`/([^/]+)/${widget}.js`));
           const collectiveSlug = tokens[1];
-          return window.OC.widgets[widget].push(
-            new OpenCollectiveWidget(widget, collectiveSlug, s),
-          );
+          return window.OC.widgets[widget].push(new OpenCollectiveWidget(widget, collectiveSlug, s));
         }
       });
     });

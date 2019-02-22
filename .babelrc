@@ -7,16 +7,11 @@
     }]
   ],
   "plugins": [
-    "@babel/plugin-proposal-function-bind",
     "lodash",
     ["react-intl", {
-      "messagesDir": "./build/messages/"
+      "messagesDir": "./dist/messages/"
     }],
-    ["styled-components", {
-      "ssr": true,
-      "displayName": true,
-      "preprocess": false
-    }]
+    "styled-components"
   ],
   "env": {
     "development" : {

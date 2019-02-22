@@ -1,87 +1,128 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { Flex } from '@rebass/grid';
+
+import { Router } from '../server/pages';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import ErrorPage from '../components/ErrorPage';
-import SignInForm from '../components/SignInForm';
 
-import * as api from '../lib/api';
-import { isValidUrl } from '../lib/utils';
+import { isValidRelativeUrl } from '../lib/utils';
 
 import withIntl from '../lib/withIntl';
+import { withUser } from '../components/UserProvider';
+import Loading from '../components/Loading';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
-  static getInitialProps({ query: { token, next } }) {
-    next = isValidUrl(next) && next.substr(0, 1) === '/' ? next : null;
-    return { token, next };
+  static getInitialProps({ query: { token, next, form } }) {
+    // Decode next URL if URI encoded
+    if (next && next.startsWith('%2F')) {
+      next = decodeURIComponent(next);
+    }
+
+    next = next && isValidRelativeUrl(next) ? next : null;
+    return { token, next, form: form || 'signin' };
   }
 
   static propTypes = {
+    form: PropTypes.oneOf(['signin', 'create-account']).isRequired,
     token: PropTypes.string,
     next: PropTypes.string,
+    login: PropTypes.func,
+    errorLoggedInUser: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-    // Record the login error
-    this.state = { error: null };
-  }
+  static routes = { signin: '/signin', join: '/create-account' };
+
+  state = { error: null, success: null };
 
   async componentDidMount() {
     if (this.props.token) {
-      const { error, token } = await api.refreshToken(this.props.token);
-      if (error) {
-        this.setState({ error });
-        console.log(error);
-      } else {
-        window.localStorage.setItem('accessToken', token);
-        window.location.replace(this.props.next || '/');
+      const user = await this.props.login(this.props.token);
+      if (!user) {
+        this.setState({ error: 'Token rejected' });
+      }
+    } else {
+      this.props.login();
+    }
+  }
+  async componentDidUpdate(oldProps) {
+    const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
+    if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
+      // --- User logged in ---
+      this.setState({ success: true });
+      // Avoid redirect loop: replace '/signin' redirects by '/'
+      const { next } = this.props;
+      const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
+      await Router.replaceRoute(redirect || '/');
+      window.scroll(0, 0);
+    } else if (this.props.token && oldProps.token !== this.props.token) {
+      // --- There's a new token in town ---
+      const user = await this.props.login(this.props.token);
+      if (!user) {
+        this.setState({ error: 'Token rejected' });
       }
     }
   }
 
-  render() {
-    if (this.props.token && !this.state.error) {
-      return <ErrorPage loading />;
+  renderContent() {
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
+
+    if ((loadingLoggedInUser || this.state.success) && token) {
+      return <Loading />;
+    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
+      return (
+        <MessageBox type="warning" withIcon>
+          <FormattedMessage
+            id="createAccount.alreadyLoggedIn"
+            defaultMessage="It seems like you're already signed in as '{email}'. If you want to create a new account, please log out first."
+            values={{ email: LoggedInUser.email }}
+          />
+        </MessageBox>
+      );
     }
+
+    const error = errorLoggedInUser || this.state.error;
+    return (
+      <React.Fragment>
+        {error && (
+          <MessageBox type="error" withIcon mb={4}>
+            <strong>
+              <FormattedMessage
+                id="login.failed"
+                defaultMessage="Sign In failed: {message}."
+                values={{ message: error }}
+              />
+            </strong>
+            <br />
+            <FormattedMessage
+              id="login.askAnother"
+              defaultMessage="You can ask for a new sign in link using the form below."
+            />
+          </MessageBox>
+        )}
+        <SignInOrJoinFree redirect={next || '/'} form={form} routes={SigninPage.routes} />
+      </React.Fragment>
+    );
+  }
+
+  render() {
     return (
       <div className="LoginPage">
         <Header
-          title="Sign Up"
+          title="Login"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
         />
-        <style jsx>
-          {`
-            .signin {
-              max-width: 70rem;
-              margin: 15rem auto;
-              text-align: center;
-            }
-            h2 {
-              font-size: 2rem;
-              padding: 2rem;
-            }
-          `}
-        </style>
         <Body>
-          <div className="signin">
-            {this.state.error && (
-              <h1>
-                Authentication Failed. Please try to generate a new token.
-              </h1>
-            )}
-
-            <h2>
-              <FormattedMessage
-                id="loginform.title"
-                defaultMessage="Sign in or Create an Account"
-              />
-            </h2>
-            <SignInForm next={this.props.next} />
-          </div>
+          <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>
+            {this.renderContent()}
+          </Flex>
         </Body>
         <Footer />
       </div>
@@ -89,4 +130,4 @@ class SigninPage extends React.Component {
   }
 }
 
-export default withIntl(SigninPage);
+export default withIntl(withUser(SigninPage));

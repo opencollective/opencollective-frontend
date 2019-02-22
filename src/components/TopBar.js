@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Bars as MenuIcon } from 'styled-icons/fa-solid/Bars';
 import SearchIcon from './SearchIcon';
-import MenuIcon from './icons/MenuIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import SearchForm from './SearchForm';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -9,10 +9,11 @@ import withIntl from '../lib/withIntl';
 import { Link } from '../server/pages';
 
 import Hide from './Hide';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../constants/animations';
+import { withUser } from './UserProvider';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
@@ -40,7 +41,7 @@ const NavLink = styled.a`
 class TopBar extends React.Component {
   static propTypes = {
     className: PropTypes.string,
-    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
   };
 
@@ -60,20 +61,20 @@ class TopBar extends React.Component {
   }
 
   render() {
-    const { className, LoggedInUser, showSearch } = this.props;
-    const shouldAnimate =
-      Array.isArray(className) && className.includes('loading');
+    const { className, loadingLoggedInUser, showSearch } = this.props;
+    const shouldAnimate = (Array.isArray(className) && className.includes('loading')) || loadingLoggedInUser;
 
     return (
       <Flex
-        mx={3}
-        my={2}
+        px={3}
+        py={showSearch ? 2 : 3}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-around"
+        css={{ minHeight: 68 }}
       >
         <Link route="home" passHref>
-          <Flex is="a" alignItems="center">
+          <Flex as="a" alignItems="center">
             <Logo width="24" height="24" animate={shouldAnimate} />
             <Hide xs>
               <Box mx={2}>
@@ -97,7 +98,7 @@ class TopBar extends React.Component {
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="/search">
-                <Flex is="a">
+                <Flex as="a">
                   <SearchIcon fill="#aaaaaa" size={24} />
                 </Flex>
               </Link>
@@ -107,38 +108,35 @@ class TopBar extends React.Component {
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="#footer">
-                <Flex is="a">
-                  <MenuIcon fill="#aaaaaa" size={24} />
+                <Flex as="a">
+                  <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
               </Link>
             </Box>
           </Hide>
 
           <Hide xs>
-            <NavList
-              is="ul"
-              p={0}
-              m={0}
-              justifyContent="space-around"
-              css="margin: 0;"
-            >
-              <Box is="li" px={3}>
-                <NavLink href="/discover">
-                  <FormattedMessage
-                    id="menu.discover"
-                    defaultMessage="Discover"
-                  />
+            <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+              <Box as="li" px={3}>
+                <Link route="discover" passHref>
+                  <NavLink>
+                    <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+                  </NavLink>
+                </Link>
+              </Box>
+              <Box as="li" px={3}>
+                <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                  <NavLink>
+                    <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                  </NavLink>
+                </Link>
+              </Box>
+              <Box as="li" px={3}>
+                <NavLink href="https://docs.opencollective.com">
+                  <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
                 </NavLink>
               </Box>
-              <Box is="li" px={3}>
-                <NavLink href="/learn-more">
-                  <FormattedMessage
-                    id="menu.howItWorks"
-                    defaultMessage="How it Works"
-                  />
-                </NavLink>
-              </Box>
-              <Box is="li" px={3}>
+              <Box as="li" px={3}>
                 <NavLink href="https://medium.com/open-collective">
                   <FormattedMessage id="menu.blog" defaultMessage="Blog" />
                 </NavLink>
@@ -146,11 +144,11 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
 
-          <TopBarProfileMenu LoggedInUser={LoggedInUser} />
+          <TopBarProfileMenu />
         </Flex>
       </Flex>
     );
   }
 }
 
-export default withIntl(TopBar);
+export default withIntl(withUser(TopBar));

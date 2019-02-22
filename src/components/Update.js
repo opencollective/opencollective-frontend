@@ -2,17 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { capitalize, formatDate } from '../lib/utils';
-import { graphql } from 'react-apollo';
+import { formatDate } from '../lib/utils';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
-import { Link } from '../server/pages';
+import { Router, Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
-import { get } from 'lodash';
 
 class Update extends React.Component {
   static propTypes = {
@@ -36,6 +36,7 @@ class Update extends React.Component {
     this.save = this.save.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    this.deleteUpdate = this.deleteUpdate.bind(this);
     this.messages = defineMessages({
       pending: { id: 'update.pending', defaultMessage: 'pending' },
       paid: { id: 'update.paid', defaultMessage: 'paid' },
@@ -62,6 +63,17 @@ class Update extends React.Component {
     this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
   }
 
+  async deleteUpdate() {
+    if (!confirm('😱 Are you really sure you want to delete this update?')) return;
+
+    try {
+      await this.props.deleteUpdate(this.props.update.id);
+      Router.pushRoute('collective', { slug: this.props.collective.slug });
+    } catch (err) {
+      console.error('>>> deleteUpdate error: ', JSON.stringify(err));
+    }
+  }
+
   handleChange(update) {
     this.setState({ modified: true, update });
   }
@@ -79,12 +91,8 @@ class Update extends React.Component {
 
     const { mode } = this.state;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
-    const canPublishUpdate =
-      LoggedInUser &&
-      LoggedInUser.canEditCollective(collective) &&
-      !update.publishedAt;
-    const editable =
-      !this.props.compact && this.props.editable && canEditUpdate;
+    const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
+    const editable = !this.props.compact && this.props.editable && canEditUpdate;
     return (
       <div className={`Update ${this.state.mode}View`}>
         <style jsx>
@@ -107,7 +115,6 @@ class Update extends React.Component {
 
             .title {
               color: #18191a;
-              font-family: Rubik;
               font-size: 20px;
               font-weight: 500;
               line-height: 28px;
@@ -156,12 +163,11 @@ class Update extends React.Component {
           `}
         </style>
         <div className="fromCollective">
-          <a
-            href={`/${update.fromCollective.slug}`}
-            title={update.fromCollective.name}
-          >
+          <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
             <Avatar
               src={update.fromCollective.image}
+              type={update.fromCollective.type}
+              name={update.fromCollective.name}
               key={update.fromCollective.id}
               radius={40}
             />
@@ -171,14 +177,12 @@ class Update extends React.Component {
           {mode === 'summary' && (
             <div className="title">
               <Link route={`/${collective.slug}/updates/${update.slug}`}>
-                <a>{capitalize(update.title)}</a>
+                <a>{update.title}</a>
               </Link>
             </div>
           )}
 
-          {mode === 'details' && (
-            <div className="title">{capitalize(update.title)}</div>
-          )}
+          {mode === 'details' && <div className="title">{update.title}</div>}
 
           <div className="meta">
             <div className="author">
@@ -212,61 +216,49 @@ class Update extends React.Component {
               </div>
             )}
             {editable && (
-              <div>
-                <a className="toggleEditUpdate" onClick={this.toggleEdit}>
-                  {intl.formatMessage(
-                    this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`],
-                  )}
-                </a>
-              </div>
+              <React.Fragment>
+                <div>
+                  <a className="toggleEditUpdate" onClick={this.toggleEdit}>
+                    {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                  </a>
+                </div>
+                <div>
+                  <a className="deleteUpdateUpdate" onClick={this.deleteUpdate}>
+                    <FormattedMessage id="update.delete" defaultMessage="delete" />
+                  </a>
+                </div>
+              </React.Fragment>
             )}
           </div>
 
-          {mode === 'summary' && (
-            <div
-              className="summary"
-              dangerouslySetInnerHTML={{ __html: update.summary }}
-            />
-          )}
+          {mode === 'summary' && <div className="summary" dangerouslySetInnerHTML={{ __html: update.summary }} />}
 
-          {mode === 'details' &&
-            !this.props.compact && (
-              <div>
-                {update.html && (
-                  <div dangerouslySetInnerHTML={{ __html: update.html }} />
-                )}
-                {!update.html && <UpdateTextWithData id={update.id} />}
-                {update.publishedAt && (
-                  <Link
-                    route={`/${collective.slug}/updates`}
-                    className="viewLatestUpdates"
-                  >
-                    {intl.formatMessage(this.messages['viewLatestUpdates'])}
-                  </Link>
-                )}
-              </div>
-            )}
+          {mode === 'details' && !this.props.compact && (
+            <div>
+              {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
+              {!update.html && <UpdateTextWithData id={update.id} />}
+              {update.publishedAt && (
+                <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
+                  {intl.formatMessage(this.messages['viewLatestUpdates'])}
+                </Link>
+              )}
+            </div>
+          )}
 
           {mode === 'edit' && (
             <div className="edit">
-              <EditUpdateForm
-                collective={collective}
-                update={update}
-                onSubmit={this.save}
-              />
+              <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
             </div>
           )}
 
           {mode !== 'summary' && (
             <div className="actions">
-              {mode === 'edit' &&
-                this.state.modified && (
-                  <SmallButton className="primary save" onClick={this.save}>
-                    <FormattedMessage id="save" defaultMessage="save" />
-                  </SmallButton>
-                )}
-              {mode === 'details' &&
-                canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
+              {mode === 'edit' && this.state.modified && (
+                <SmallButton className="primary save" onClick={this.save}>
+                  <FormattedMessage id="save" defaultMessage="save" />
+                </SmallButton>
+              )}
+              {mode === 'details' && canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
             </div>
           )}
         </div>
@@ -287,7 +279,15 @@ const editUpdateQuery = gql`
   }
 `;
 
-const addMutation = graphql(editUpdateQuery, {
+const deleteUpdateQuery = gql`
+  mutation deleteUpdate($id: Int!) {
+    deleteUpdate(id: $id) {
+      id
+    }
+  }
+`;
+
+const editUpdateMutation = graphql(editUpdateQuery, {
   props: ({ mutate }) => ({
     editUpdate: async update => {
       return await mutate({ variables: { update } });
@@ -295,4 +295,17 @@ const addMutation = graphql(editUpdateQuery, {
   }),
 });
 
-export default withIntl(addMutation(Update));
+const deleteUpdateMutation = graphql(deleteUpdateQuery, {
+  props: ({ mutate }) => ({
+    deleteUpdate: async updateID => {
+      return await mutate({ variables: { id: updateID } });
+    },
+  }),
+});
+
+const addUpdateMutations = compose(
+  editUpdateMutation,
+  deleteUpdateMutation,
+);
+
+export default withIntl(addUpdateMutations(Update));

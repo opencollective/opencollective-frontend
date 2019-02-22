@@ -5,27 +5,26 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import withIntl from '../../../lib/withIntl';
-import {
-  getTransactionsQuery,
-  transactionFields,
-} from '../../../graphql/queries';
+import { getTransactionsQuery, transactionFields } from '../../../graphql/queries';
 
 import SmallButton from '../../../components/SmallButton';
 
 class RefundTransactionBtn extends React.Component {
   static propTypes = {
-    transaction: PropTypes.object.isRequired,
-    collective: PropTypes.object.isRequired,
+    id: PropTypes.number.isRequired,
+    isRefund: PropTypes.bool,
+    CollectiveId: PropTypes.number.isRequired,
   };
 
   constructor(props) {
     super(props);
+    this.setShowingState = this.setShowingState.bind(this);
 
-    const canRefund = !props.transaction.refundTransaction;
+    const canRefund = !props.isRefund;
     this.state = {
       showing: {
         canRefund,
-        refunded: !canRefund,
+        refunded: props.isRefund,
         confirmRefund: false,
         refunding: false,
       },
@@ -60,7 +59,7 @@ class RefundTransactionBtn extends React.Component {
   async onClickRefund() {
     this.setShowingState({ refunding: true });
     try {
-      await this.props.refundTransaction(this.props.transaction.id);
+      await this.props.refundTransaction(this.props.id);
     } finally {
       this.setShowingState({ refunded: true });
     }
@@ -109,12 +108,9 @@ class RefundTransactionBtn extends React.Component {
                 className="refund"
                 bsStyle="danger"
                 bsSize="xsmall"
-                onClick={() => ::this.setShowingState({ confirmRefund: true })}
+                onClick={() => this.setShowingState({ confirmRefund: true })}
               >
-                <FormattedMessage
-                  id="transaction.refund.btn"
-                  defaultMessage="refund"
-                />
+                <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
               </SmallButton>
             </div>
           </div>
@@ -124,27 +120,16 @@ class RefundTransactionBtn extends React.Component {
           <div className="confirmation">
             <strong>Do you really want to refund this transaction?</strong>
             <div className="confirmation-buttons">
-              <SmallButton
-                className="refund"
-                bsStyle="danger"
-                bsSize="xsmall"
-                onClick={::this.onClickRefund}
-              >
-                <FormattedMessage
-                  id="transaction.refund.yes.btn"
-                  defaultMessage="Yes, refund!"
-                />
+              <SmallButton className="refund" bsStyle="danger" bsSize="xsmall" onClick={() => this.onClickRefund()}>
+                <FormattedMessage id="transaction.refund.yes.btn" defaultMessage="Yes, refund!" />
               </SmallButton>
               <SmallButton
                 className="no"
                 bsStyle="primary"
                 bsSize="xsmall"
-                onClick={() => ::this.setShowingState({ canRefund: true })}
+                onClick={() => this.setShowingState({ canRefund: true })}
               >
-                <FormattedMessage
-                  id="transaction.refund.no.btn"
-                  defaultMessage="no"
-                />
+                <FormattedMessage id="transaction.refund.no.btn" defaultMessage="no" />
               </SmallButton>
             </div>
           </div>
@@ -177,7 +162,7 @@ const addMutation = graphql(refundTransactionQuery, {
         variables: { id },
         update: (proxy, { data: { refundTransaction } }) => {
           const variables = {
-            CollectiveId: ownProps.collective.id,
+            CollectiveId: ownProps.CollectiveId,
             limit: 20,
             offset: 0,
           };

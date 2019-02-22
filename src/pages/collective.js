@@ -4,17 +4,18 @@ import PropTypes from 'prop-types';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
+import PledgedCollective from '../components/PledgedCollective';
 
 import { addCollectiveData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { ssrNotFoundError } from '../lib/nextjs_utils';
+import { withUser } from '../components/UserProvider';
 
 class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query }) {
-    if (res && req && req.locale == 'en') {
-      res.setHeader('Cache-Control', 's-maxage=300');
+    if (res && req && (req.language || req.locale === 'en')) {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
 
     return { slug: query && query.slug, query };
@@ -24,7 +25,6 @@ class CollectivePage extends React.Component {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveData
     query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
   constructor(props) {
@@ -33,11 +33,13 @@ class CollectivePage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
+    const { LoggedInUser, query, data = {} } = this.props;
     window.OC = window.OC || {};
     window.OC.LoggedInUser = LoggedInUser;
+
+    if (query.refetch && data.refetch) {
+      data.refetch();
+    }
   }
 
   shouldComponentUpdate(nextProps) {
@@ -51,34 +53,33 @@ class CollectivePage extends React.Component {
   }
 
   render() {
-    const { data, query } = this.props;
-    const { LoggedInUser } = this.state;
+    const { data, query, LoggedInUser } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data.loading && !data.Collective) {
+      ssrNotFoundError(data);
+    }
 
     const collective = data.Collective;
+    const props = {
+      collective,
+      LoggedInUser,
+      query,
+    };
 
-    return (
-      <div>
-        {collective.type === 'COLLECTIVE' && (
-          <Collective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            query={query}
-          />
-        )}
-        {['USER', 'ORGANIZATION'].includes(collective.type) && (
-          <UserCollective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            query={query}
-          />
-        )}
-      </div>
-    );
+    if (collective && collective.pledges.length > 0 && !collective.isActive) {
+      return <PledgedCollective {...props} />;
+    }
+
+    if (collective && collective.type === 'COLLECTIVE') {
+      return <Collective {...props} />;
+    }
+
+    if (collective && ['USER', 'ORGANIZATION'].includes(collective.type)) {
+      return <UserCollective {...props} />;
+    }
+
+    return <ErrorPage LoggedInUser={LoggedInUser} data={data} />;
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveData(CollectivePage))),
-);
+export default withIntl(withUser(addCollectiveData(CollectivePage)));

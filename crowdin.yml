@@ -1,0 +1,10 @@
+files:
+  - source: /src/lang/en.json
+    translation: /src/lang/%two_letters_code%.json
+  - source: /src/static/**/*.html
+    ignore:
+      - '*.test.html'
+      - '*.fr.html'
+      - '*.es.html'
+      - '*.ja.html'
+    translation: /%original_path%/%file_name%.%two_letters_code%.html

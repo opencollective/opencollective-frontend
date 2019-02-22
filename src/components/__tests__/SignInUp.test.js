@@ -8,12 +8,7 @@ const onSubmit = value => {
 
 describe('Interested', () => {
   const component = shallowWithIntl(
-    <SignInUp
-      emailOnly={true}
-      label="Remind me"
-      showLabels={false}
-      onSubmit={onSubmit}
-    />,
+    <SignInUp emailOnly={true} label="Remind me" showLabels={false} onSubmit={onSubmit} />,
   ).dive();
 
   it('only shows the email field', () => {
@@ -27,9 +22,7 @@ describe('Interested', () => {
 });
 
 describe('Register for free', () => {
-  const component = shallowWithIntl(
-    <SignInUp requireCreditCard={false} onSubmit={onSubmit} />,
-  ).dive();
+  const component = shallowWithIntl(<SignInUp requireCreditCard={false} onSubmit={onSubmit} />).dive();
 
   it('only shows the email field', () => {
     expect(component.find('input').hostNodes().length).toEqual(5); // [ 'email', 'firstname', 'lastname', 'description', 'twitter' ]
@@ -37,9 +30,7 @@ describe('Register for free', () => {
 });
 
 describe('Register with credit card', () => {
-  const component = shallowWithIntl(
-    <SignInUp requireCreditCard={true} label="sign up" onSubmit={onSubmit} />,
-  ).dive();
+  const component = shallowWithIntl(<SignInUp requireCreditCard={true} label="sign up" onSubmit={onSubmit} />).dive();
 
   it('renders the credit card form', () => {
     expect(component.find('.CreditCardForm').exists()).toBeTrue;

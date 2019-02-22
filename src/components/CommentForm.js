@@ -1,18 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get, pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
 import Link from './Link';
-import { get, pick } from 'lodash';
 
+/**
+ * Component to render for for **new** comments. Comment Edit form is created
+ * with an `InputField` (see `opencollective-frontend/src/components/Comment.js`).
+ */
 class CommentForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    notice: PropTypes.oneOf(PropTypes.string, PropTypes.node),
+    notice: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     onChange: PropTypes.func,
     onSubmit: PropTypes.func,
   };
@@ -38,9 +42,7 @@ class CommentForm extends React.Component {
   }
 
   async onSubmit() {
-    const res = await this.props.onSubmit(
-      pick(this.state.comment, ['html', 'markdown']),
-    );
+    const res = await this.props.onSubmit(pick(this.state.comment, ['html']));
     const comment = res.data && res.data.createComment;
     if (comment) {
       const newEmptyComment = { id: comment.id++ };
@@ -58,7 +60,7 @@ class CommentForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective, notice } = this.props;
+    const { LoggedInUser, notice } = this.props;
     if (!LoggedInUser) return <div />;
 
     const comment = {
@@ -70,11 +72,6 @@ class CommentForm extends React.Component {
         image: LoggedInUser.image,
       },
     };
-    const editor =
-      get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||
-      get(collective, 'settings.editor') === 'markdown'
-        ? 'markdown'
-        : 'html';
 
     return (
       <div className={'CommentForm'}>
@@ -103,7 +100,6 @@ class CommentForm extends React.Component {
             }
             .notice {
               color: #525866;
-              font-family: Rubik;
               font-size: 12px;
               margin-left: 1rem;
             }
@@ -111,41 +107,39 @@ class CommentForm extends React.Component {
         </style>
 
         <div className="fromCollective">
-          <a
-            href={`/${comment.fromCollective.slug}`}
+          <Link
+            route="collective"
+            params={{ slug: comment.fromCollective.slug }}
             title={comment.fromCollective.name}
+            passHref
           >
             <Avatar
               src={comment.fromCollective.image}
+              type={comment.fromCollective.type}
+              name={comment.fromCollective.name}
               key={comment.fromCollective.id}
               radius={40}
             />
-          </a>
+          </Link>
         </div>
         <div className="body">
           <div className="header">
             <div className="meta">
               <span className="createdAt">
-                <FormattedDate
-                  value={comment.createdAt}
-                  day="numeric"
-                  month="numeric"
-                />
+                <FormattedDate value={comment.createdAt} day="numeric" month="numeric" />
               </span>{' '}
               |&nbsp;
               <span className="metaItem">
-                <Link route={`/${comment.fromCollective.slug}`}>
-                  {comment.fromCollective.name}
-                </Link>
+                <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
               </span>
             </div>
             <div className="description">
               <div className="comment">
                 <InputField
-                  key={`comment-${this.state.comment.id}`}
-                  type={editor}
-                  defaultValue={this.state.comment[editor]}
-                  onChange={value => this.handleChange(editor, value)}
+                  name="comment-new"
+                  type="html"
+                  value={get(this.state, 'comment.html', '')}
+                  onChange={value => this.handleChange('html', value)}
                   className="small"
                 />
               </div>

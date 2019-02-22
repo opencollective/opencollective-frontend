@@ -17,17 +17,11 @@ class Membership extends React.Component {
     const { collective } = membership;
 
     if (!collective) {
-      console.error(
-        '>>> no collective attached to this membership:',
-        membership,
-      );
+      console.error('>>> no collective attached to this membership:', membership);
       return <div />;
     }
 
-    const name =
-      (collective.name && collective.name.match(/^null/)
-        ? null
-        : collective.name) || collective.slug;
+    const name = (collective.name && collective.name.match(/^null/) ? null : collective.name) || collective.slug;
 
     if (!name) return <div />;
 
@@ -43,11 +37,7 @@ class Membership extends React.Component {
         </style>
 
         <div className="Membership">
-          <CollectiveCard
-            membership={membership}
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-          />
+          <CollectiveCard membership={membership} collective={collective} LoggedInUser={LoggedInUser} />
         </div>
       </React.Fragment>
     );

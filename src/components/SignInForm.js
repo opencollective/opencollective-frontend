@@ -7,6 +7,9 @@ import { isValidEmail } from '../lib/utils';
 import withIntl from '../lib/withIntl';
 import * as api from '../lib/api';
 
+/**
+ * @deprecated Since 2019/01/25 - Use `SignIn` component instead.
+ */
 class LoginForm extends React.Component {
   static propTypes = {
     signin: PropTypes.bool,
@@ -67,8 +70,7 @@ class LoginForm extends React.Component {
       },
       'description.description': {
         id: 'user.description.description',
-        defaultMessage:
-          'Present yourself in 60 characters or less, if you can!',
+        defaultMessage: 'Present yourself in 60 characters or less, if you can!',
       },
       'newsletterOptIn.description': {
         id: 'user.newsletterOptIn.description',
@@ -113,9 +115,7 @@ class LoginForm extends React.Component {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
       if (this.messages[`${field.name}.description`]) {
-        field.description = intl.formatMessage(
-          this.messages[`${field.name}.description`],
-        );
+        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
       }
       return field;
     });
@@ -164,9 +164,7 @@ class LoginForm extends React.Component {
           })
           .catch(e => {
             if (e.message === 'ECONNREFUSED') {
-              this.error(
-                intl.formatMessage(this.messages['api.error.unreachable']),
-              );
+              this.error(intl.formatMessage(this.messages['api.error.unreachable']));
             }
           });
       }
@@ -187,8 +185,7 @@ class LoginForm extends React.Component {
   }
 
   signin() {
-    this.state.user.email =
-      this.state.user.email && this.state.user.email.trim();
+    this.state.user.email = this.state.user.email && this.state.user.email.trim();
     if (!isValidEmail(this.state.user.email)) {
       return;
     }
@@ -207,8 +204,7 @@ class LoginForm extends React.Component {
   }
 
   signup() {
-    this.state.user.email =
-      this.state.user.email && this.state.user.email.trim();
+    this.state.user.email = this.state.user.email && this.state.user.email.trim();
 
     if (!isValidEmail(this.state.user.email)) {
       return;
@@ -254,7 +250,7 @@ class LoginForm extends React.Component {
       name: 'email',
       button: (
         <Button disabled={true}>
-          <FormattedMessage id="login.button" defaultMessage="login" />
+          <FormattedMessage id="login.button" defaultMessage="Sign In" />
         </Button>
       ),
       required: true,
@@ -270,47 +266,36 @@ class LoginForm extends React.Component {
           <FormattedMessage id="loading" defaultMessage="loading" />
         </Button>
       );
-      inputEmail.description = (
-        <FormattedMessage
-          id="signin.loading.description"
-          defaultMessage="Please wait..."
-        />
-      );
+      inputEmail.description = <FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." />;
     } else if (!this.state.signup) {
       if (this.state.isNewUser === true) {
         inputEmail.button = (
-          <Button
-            className="signup"
-            onClick={() => this.setState({ signup: true })}
-          >
-            <FormattedMessage
-              id="signin.createAccount"
-              defaultMessage="Sign Up"
-            />
+          <Button className="signup" onClick={() => this.setState({ signup: true })}>
+            <FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" />
           </Button>
         );
         inputEmail.description = (
           <FormattedMessage
             id="signin.createAccount.description"
-            defaultMessage="There is no user with this email address. Click on &quot;Sign Up&quot; to create a new Open Collective Account."
+            defaultMessage='There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.'
           />
         );
       } else if (this.state.isNewUser === false) {
         inputEmail.button = (
           <Button className="login" onClick={() => this.signin()}>
-            <FormattedMessage id="login.button" defaultMessage="login" />
+            <FormattedMessage id="login.button" defaultMessage="Sign In" />
           </Button>
         );
         inputEmail.description = (
           <FormattedMessage
             id="signin.login.description"
-            defaultMessage="Welcome back! Click on &quot;Login&quot; (or hit Enter) and we will send you a link to login by email."
+            defaultMessage='Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.'
           />
         );
         if (this.state.loginSent) {
           inputEmail.button = (
             <Button disabled={true}>
-              <FormattedMessage id="login.button" defaultMessage="login" />
+              <FormattedMessage id="login.button" defaultMessage="Sign In" />
             </Button>
           );
           inputEmail.description = (
@@ -386,10 +371,7 @@ class LoginForm extends React.Component {
           {signupSuccessful && (
             <div className="signupSuccessful">
               <h2>
-                <FormattedMessage
-                  id="signin.signup.success.title"
-                  defaultMessage="✓ Account created with success"
-                />
+                <FormattedMessage id="signin.signup.success.title" defaultMessage="✓ Account created with success" />
               </h2>
               <p>
                 <FormattedMessage
@@ -407,47 +389,33 @@ class LoginForm extends React.Component {
                     <InputField className="horizontal" {...inputEmail} />
                   </Col>
                 </Row>
-                {this.state.isNewUser &&
-                  this.state.signup && (
-                    <div>
-                      {this.fields.map(field => (
-                        <Row key={`${field.name}.input`}>
-                          <Col sm={12}>
-                            <InputField
-                              className="horizontal"
-                              {...field}
-                              defaultValue={this.state.user[field.name]}
-                              onChange={value =>
-                                this.handleChange('user', field.name, value)
-                              }
-                            />
-                          </Col>
-                        </Row>
-                      ))}
-                      <Row>
-                        <Col sm={8} smOffset={2}>
-                          <Button
-                            className="signup"
-                            bsStyle="primary"
-                            onClick={() => this.signup()}
-                          >
-                            <FormattedMessage
-                              id="signin.createAccount"
-                              defaultMessage="Sign Up"
-                            />
-                          </Button>
+                {this.state.isNewUser && this.state.signup && (
+                  <div>
+                    {this.fields.map(field => (
+                      <Row key={`${field.name}.input`}>
+                        <Col sm={12}>
+                          <InputField
+                            className="horizontal"
+                            {...field}
+                            defaultValue={this.state.user[field.name]}
+                            onChange={value => this.handleChange('user', field.name, value)}
+                          />
                         </Col>
                       </Row>
-                    </div>
-                  )}
+                    ))}
+                    <Row>
+                      <Col sm={8} smOffset={2}>
+                        <Button className="signup" bsStyle="primary" onClick={() => this.signup()}>
+                          <FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" />
+                        </Button>
+                      </Col>
+                    </Row>
+                  </div>
+                )}
               </div>
               <div className="result">
-                {this.state.result.success && (
-                  <div className="success">{this.state.result.success}</div>
-                )}
-                {this.state.result.error && (
-                  <div className="error">{this.state.result.error}</div>
-                )}
+                {this.state.result.success && <div className="success">{this.state.result.success}</div>}
+                {this.state.result.error && <div className="error">{this.state.result.error}</div>}
               </div>
             </Form>
           )}

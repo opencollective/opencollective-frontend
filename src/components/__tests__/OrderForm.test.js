@@ -192,61 +192,13 @@ describe('OrderForm component', () => {
         }
       }
       expect(component.find('.creditcardSelector').exists()).toBeTrue;
-      expect(component.find('.creditcardSelector').html()).toContain(
-        LoggedInUser.paymentMethods[0].identifier,
-      );
+      expect(component.find('.creditcardSelector').html()).toContain(LoggedInUser.paymentMethods[0].identifier);
       setTimeout(() => {
         component.find('.submit button').simulate('click');
         setTimeout(() => {
           console.log('>>> result: ', component.find('.result').html());
         }, 500);
       }, 2000);
-    });
-  });
-
-  describe('gift card', () => {
-    it('gives invalid error', done => {
-      component = mountComponent({ collective, order }, () =>
-        Promise.resolve({ data: null }),
-      );
-
-      component.find('.gift-card-expander').simulate('click');
-      fillValue(component, 'ocCard', 'BB-FTC1900');
-
-      component.find('.ocCardApply.btn').simulate('click');
-
-      setTimeout(() => {
-        expect(component.find('.inputField.ocCard').html()).toContain(
-          'Invalid code',
-        );
-        done();
-      }, 1000);
-    });
-
-    it('gives correct amount on success', done => {
-      component = mountComponent({ collective, order }, () =>
-        Promise.resolve({
-          data: {
-            ocPaymentMethod: {
-              balance: 5000,
-              valid: true,
-              currency: 'USD',
-            },
-          },
-        }),
-      );
-
-      component.find('.gift-card-expander').simulate('click');
-      fillValue(component, 'ocCard', 'BB-FTC1900');
-
-      component.find('.ocCardApply.btn').simulate('click');
-
-      setTimeout(() => {
-        expect(component.find('.inputField.ocCard').html()).toContain(
-          'Valid code. Amount available: $50.00',
-        );
-        done();
-      }, 1000);
     });
   });
 });

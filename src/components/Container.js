@@ -8,15 +8,18 @@ import {
   backgroundPosition,
   backgroundRepeat,
   backgroundSize,
-  bgColor,
   borders,
+  borderColor,
   borderRadius,
   bottom,
   boxShadow,
+  color,
   display,
   flex,
   flexDirection,
   flexWrap,
+  fontSize,
+  fontWeight,
   height,
   justifyContent,
   left,
@@ -30,16 +33,23 @@ import {
   size,
   space,
   style,
+  textAlign,
   top,
   width,
   zIndex,
 } from 'styled-system';
+import { cursor } from './Text';
 
 export const overflow = style({ prop: 'overflow' });
 
 export const pointerEvents = style({ prop: 'pointerEvents' });
 
+export const float = style({ prop: 'float' });
+export const clear = style({ prop: 'clear' });
+
 const Container = styled(tag)`
+  box-sizing: border-box;
+
   ${alignItems}
   ${alignSelf}
   ${background}
@@ -47,15 +57,21 @@ const Container = styled(tag)`
   ${backgroundPosition}
   ${backgroundRepeat}
   ${backgroundSize}
-  ${bgColor}
   ${borders}
+  ${borderColor}
   ${borderRadius}
   ${bottom}
   ${boxShadow}
+  ${clear}
+  ${color}
+  ${cursor}
   ${display}
   ${flex}
   ${flexDirection}
   ${flexWrap}
+  ${fontWeight}
+  ${float}
+  ${fontSize}
   ${height}
   ${justifyContent}
   ${left}
@@ -71,8 +87,22 @@ const Container = styled(tag)`
   ${size}
   ${space}
   ${top}
+  ${textAlign}
   ${width}
   ${zIndex}
+  ${props =>
+    props.clearfix &&
+    `
+      ::after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+    `}
 `;
+
+Container.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('float', 'clear', 'clearfix'),
+};
 
 export default Container;

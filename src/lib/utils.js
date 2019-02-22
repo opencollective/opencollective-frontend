@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import getSymbolFromCurrency from 'currency-symbol-map';
 
 import loadScript from 'load-script';
 
@@ -25,9 +26,7 @@ export function trimObject(obj) {
  */
 export const days = (d1, d2 = new Date()) => {
   const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  return Math.round(
-    Math.abs((new Date(d1).getTime() - new Date(d2).getTime()) / oneDay),
-  );
+  return Math.round(Math.abs((new Date(d1).getTime() - new Date(d2).getTime()) / oneDay));
 };
 
 export function filterCollection(array, cond, inverse) {
@@ -46,13 +45,27 @@ export function filterCollection(array, cond, inverse) {
   return array.filter(r => (inverse ? !test(r, cond) : test(r, cond)));
 }
 
+/** @deprecated since 28/01/2018 - this doesn't work for path with a `_` in it */
 export const isValidUrl = url => {
   if (typeof url !== 'string') return false;
   return Boolean(
-    url.match(
-      /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/,
-    ),
+    url.match(/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/),
   );
+};
+
+/**
+ * Validate a relative path.
+ * > isValidRelativeUrl('a/b/c/d/e/f/g')
+ * true
+ * > isValidRelativeUrl('about.html')
+ * true
+ * > isValidRelativeUrl('//')
+ * false
+ * > isValidRelativeUrl('https://google.com')
+ * false
+ */
+export const isValidRelativeUrl = url => {
+  return Boolean(url.match(/^[^/]*\/[^/].*$|^\/[^/].*$/));
 };
 
 export const isValidEmail = email => {
@@ -62,21 +75,35 @@ export const isValidEmail = email => {
   );
 };
 
+function getCurrencySymbolFallback(currency) {
+  return Number(0)
+    .toLocaleString('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })
+    .replace(/(^0\s?)|(\s?0$)/, '');
+}
+
 export function getCurrencySymbol(currency) {
-  const r = Number(0).toLocaleString(currency, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-  return r.replace(/0$/, '');
+  return getSymbolFromCurrency(currency) || getCurrencySymbolFallback(currency);
 }
 
 /** Retrieve variables set in the environment */
-export const getEnvVar = v =>
-  process.browser
-    ? get(window, ['__NEXT_DATA__', 'env', v])
-    : get(process, ['env', v]);
+export const getEnvVar = v => (process.browser ? get(window, ['__NEXT_DATA__', 'env', v]) : get(process, ['env', v]));
+
+export function parseToBoolean(value) {
+  let lowerValue = value;
+  // check whether it's string
+  if (lowerValue && (typeof lowerValue === 'string' || lowerValue instanceof String)) {
+    lowerValue = lowerValue.trim().toLowerCase();
+  }
+  if (['on', 'enabled', '1', 'true', 'yes', 1].includes(lowerValue)) {
+    return true;
+  }
+  return false;
+}
 
 export const getBaseImagesUrl = () => getEnvVar('IMAGES_URL');
 
@@ -93,16 +120,11 @@ export function resizeImage(imageUrl, { width, height, query, baseUrl }) {
     if (height) queryurl += `&height=${height}`;
   }
 
-  return `${getBaseImagesUrl() ||
-    baseUrl ||
-    ''}/proxy/images?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+  return `${getBaseImagesUrl() || baseUrl || ''}/proxy/images?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function isValidImageUrl(src) {
-  return (
-    src &&
-    (src.substr(0, 1) === '/' || src.substr(0, 4).toLowerCase() === 'http')
-  );
+  return src && (src.substr(0, 1) === '/' || src.substr(0, 4).toLowerCase() === 'http');
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
@@ -197,10 +219,7 @@ export function getDomain(url = '') {
 
 export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
   const d = new Date(date);
-  const locale =
-    typeof window !== 'undefined'
-      ? window.navigator.language
-      : options.locale || 'en-US';
+  const locale = typeof window !== 'undefined' ? window.navigator.language : options.locale || 'en-US';
   return d.toLocaleDateString(locale, options);
 }
 
@@ -250,13 +269,10 @@ export const getGraphqlUrl = () => {
 };
 
 export const translateApiUrl = url => {
-  const withoutParams =
-    getBaseApiUrl({ internal: true }) + url.replace('/api/', '/');
+  const withoutParams = getBaseApiUrl({ internal: true }) + url.replace('/api/', '/');
   const hasParams = `${url}`.match(/\?/);
   if (process.env.API_KEY) {
-    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${
-      process.env.API_KEY
-    }`;
+    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
   } else {
     return withoutParams;
   }
@@ -334,9 +350,9 @@ export const abbreviateNumber = (number, precision = 0) => {
   return round(scaled) + SI_PREFIXES[tier];
 };
 
-export const loadScriptAsync = url =>
+export const loadScriptAsync = (url, opts = {}) =>
   new Promise((resolve, reject) => {
-    loadScript(url, (err, script) => {
+    loadScript(url, opts, (err, script) => {
       if (err) {
         reject(err);
       } else {
@@ -344,3 +360,13 @@ export const loadScriptAsync = url =>
       }
     });
   });
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Using_special_characters
+// From section about escapting user input
+export const escapeInput = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+export const getBrowserWebsiteUrl = () => {
+  if (typeof window !== 'undefined' && window.location) {
+    return `${window.location.protocol}//${window.location.host}`;
+  }
+};

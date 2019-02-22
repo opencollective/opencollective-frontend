@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from 'grid-styled';
+import { Box, Flex } from '@rebass/grid';
 import { fontSize } from 'styled-system';
 import styled from 'styled-components';
 
@@ -15,6 +15,7 @@ const SearchInputContainer = styled(Flex)`
 
 const SearchInput = styled(Box)`
   && {
+    appearance: none;
     background-color: transparent;
     border: none;
     font-size: 1.2rem;
@@ -34,18 +35,14 @@ const SearchButton = styled(Flex)`
 const handleSubmit = event => {
   const searchInput = event.target.elements.q;
   Router.pushRoute('search', { q: searchInput.value });
-  return false;
+  event.preventDefault();
 };
 
 const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
   <form action="/search" method="GET" onSubmit={onSubmit}>
-    <SearchInputContainer
-      alignItems="center"
-      justifyContent="space-between"
-      p={1}
-    >
+    <SearchInputContainer alignItems="center" justifyContent="space-between" p={1}>
       <SearchInput
-        is="input"
+        as="input"
         type="search"
         name="q"
         placeholder="Search Open Collective"
@@ -54,7 +51,7 @@ const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
         width={1}
         fontSize={fontSize}
       />
-      <SearchButton is="button" mr={1} p={1}>
+      <SearchButton as="button" mr={1} p={1}>
         <SearchIcon size={16} fill="#aaaaaa" />
       </SearchButton>
     </SearchInputContainer>

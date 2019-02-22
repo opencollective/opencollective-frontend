@@ -10,6 +10,8 @@ import Transaction from './Transaction';
 import TransactionsExportPopoverAndButton from './TransactionsExportPopoverAndButton';
 import DownloadInvoicesPopOver from './DownloadInvoicesPopOver';
 
+import { Box } from '@rebass/grid';
+
 class Transactions extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -43,13 +45,7 @@ class Transactions extends React.Component {
   }
 
   render() {
-    const {
-      collective,
-      transactions,
-      LoggedInUser,
-      showCSVlink,
-      filters,
-    } = this.props;
+    const { collective, transactions, LoggedInUser, showCSVlink, filters } = this.props;
 
     if (!transactions) {
       return <div />;
@@ -61,6 +57,7 @@ class Transactions extends React.Component {
           {`
             .Transactions {
               min-width: 30rem;
+              max-width: 1080px;
               width: 100%;
             }
             :global(.loadMoreBtn) {
@@ -86,6 +83,9 @@ class Transactions extends React.Component {
             .itemsList {
               position: relative;
             }
+            .itemsList :global(.transaction) {
+              border-bottom: 1px solid #e8e9eb;
+            }
             .loading {
               color: ${colors.darkgray};
               position: absolute;
@@ -107,20 +107,16 @@ class Transactions extends React.Component {
           `}
         </style>
 
-        {showCSVlink &&
-          transactions.length > 0 && (
-            <div>
-              <TransactionsExportPopoverAndButton collective={collective} />
-              {(collective.type === 'ORGANIZATION' ||
-                collective.type === 'USER') &&
-                LoggedInUser &&
-                LoggedInUser.canEditCollective(collective) && (
-                  <DownloadInvoicesPopOver
-                    fromCollectiveSlug={collective.slug}
-                  />
-                )}
-            </div>
-          )}
+        {showCSVlink && transactions.length > 0 && (
+          <div>
+            <TransactionsExportPopoverAndButton collective={collective} />
+            {(collective.type === 'ORGANIZATION' || collective.type === 'USER') &&
+              LoggedInUser &&
+              LoggedInUser.canEditCollective(collective) && (
+                <DownloadInvoicesPopOver fromCollectiveSlug={collective.slug} />
+              )}
+          </div>
+        )}
 
         {filters && (
           <div className="filter">
@@ -139,10 +135,7 @@ class Transactions extends React.Component {
                 bsStyle={this.state.type === 'CREDIT' ? 'primary' : 'default'}
                 onClick={() => this.refetch('CREDIT')}
               >
-                <FormattedMessage
-                  id="transactions.credits"
-                  defaultMessage="credits"
-                />
+                <FormattedMessage id="transactions.credits" defaultMessage="credits" />
               </Button>
               <Button
                 className="filterBtn debit"
@@ -150,10 +143,7 @@ class Transactions extends React.Component {
                 bsStyle={this.state.type === 'DEBIT' ? 'primary' : 'default'}
                 onClick={() => this.refetch('DEBIT')}
               >
-                <FormattedMessage
-                  id="transactions.debits"
-                  defaultMessage="debits"
-                />
+                <FormattedMessage id="transactions.debits" defaultMessage="debits" />
               </Button>
             </ButtonGroup>
           </div>
@@ -166,37 +156,31 @@ class Transactions extends React.Component {
             </div>
           )}
           {transactions.map(transaction => (
-            <Transaction
-              key={transaction.id}
-              collective={collective}
-              transaction={transaction}
-              LoggedInUser={LoggedInUser}
-            />
+            <Box className="transaction" key={transaction.id} my={3}>
+              <Transaction
+                collective={collective}
+                {...transaction}
+                isRefund={Boolean(transaction.refundTransaction)}
+                canRefund={LoggedInUser && LoggedInUser.isRoot()}
+                canDownloadInvoice={
+                  LoggedInUser && (LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot())
+                }
+              />
+            </Box>
           ))}
           {transactions.length === 0 && (
             <div className="empty">
-              <FormattedMessage
-                id="transactions.empty"
-                defaultMessage="No transactions"
-              />
+              <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
             </div>
           )}
-          {transactions.length >= 10 &&
-            transactions.length % 10 === 0 && (
-              <div className="loadMoreBtn">
-                <Button bsStyle="default" onClick={this.fetchMore}>
-                  {this.state.fetchingMore && (
-                    <FormattedMessage id="loading" defaultMessage="loading" />
-                  )}
-                  {!this.state.fetchingMore && (
-                    <FormattedMessage
-                      id="loadMore"
-                      defaultMessage="load more"
-                    />
-                  )}
-                </Button>
-              </div>
-            )}
+          {transactions.length >= 10 && transactions.length % 10 === 0 && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.fetchingMore && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.fetchingMore && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

@@ -26,8 +26,7 @@ class CollectiveCardWithRedeem extends React.Component {
     const coverStyle = { ...get(collective, 'settings.style.hero.cover') };
     const backgroundImage = imagePreview(
       collective.backgroundImage,
-      collective.type === 'COLLECTIVE' &&
-        defaultBackgroundImage[collective.type],
+      collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type],
       { width: 400 },
     );
     if (!coverStyle.backgroundImage && backgroundImage) {
@@ -38,8 +37,7 @@ class CollectiveCardWithRedeem extends React.Component {
 
     const description =
       (collective.description && firstSentence(collective.description, 64)) ||
-      (collective.longDescription &&
-        firstSentence(collective.longDescription, 64));
+      (collective.longDescription && firstSentence(collective.longDescription, 64));
 
     return (
       <div className={`CollectiveCard ${collective.type}`}>
@@ -109,7 +107,6 @@ class CollectiveCardWithRedeem extends React.Component {
               min-height: 20px;
               font-size: 14px;
               margin: 5px;
-              font-family: lato;
               font-weight: 300;
               text-align: center;
               color: #303233;
@@ -117,7 +114,6 @@ class CollectiveCardWithRedeem extends React.Component {
             }
 
             .description {
-              font-family: lato;
               font-weight: normal;
               text-align: center;
               color: #787d80;
@@ -154,7 +150,6 @@ class CollectiveCardWithRedeem extends React.Component {
             }
 
             .value {
-              font-family: Lato;
               font-weight: normal;
               text-align: center;
               color: #303233;
@@ -163,7 +158,6 @@ class CollectiveCardWithRedeem extends React.Component {
             }
 
             .label {
-              font-family: Lato;
               font-size: 9px;
               text-align: center;
               font-weight: 300;
@@ -173,7 +167,6 @@ class CollectiveCardWithRedeem extends React.Component {
 
             .redeem {
               min-height: 18px;
-              font-family: Lato;
               font-size: 12px;
               font-weight: 500;
               line-height: 1.5;
@@ -186,7 +179,7 @@ class CollectiveCardWithRedeem extends React.Component {
         </style>
 
         <Link
-          route={'donate'}
+          route="orderCollective"
           params={{
             collectiveSlug: this.props.collective.slug,
             verb: 'donate',
@@ -198,10 +191,7 @@ class CollectiveCardWithRedeem extends React.Component {
           <div>
             <div className="head">
               <div className="background" style={coverStyle} />
-              <div
-                className="image"
-                style={{ backgroundImage: `url(${logo})` }}
-              />
+              <div className="image" style={{ backgroundImage: `url(${logo})` }} />
             </div>
             <div className="body">
               <div className="name">{collective.name}</div>
@@ -211,9 +201,7 @@ class CollectiveCardWithRedeem extends React.Component {
               {collective.stats && (
                 <div className="stats">
                   <div className="backers">
-                    <div className="value">
-                      {collective.stats.backers.users}
-                    </div>
+                    <div className="value">{collective.stats.backers.users}</div>
                     <div className="label">
                       <FormattedMessage
                         id="collective.stats.backers.users"
@@ -222,9 +210,7 @@ class CollectiveCardWithRedeem extends React.Component {
                     </div>
                   </div>
                   <div className="organizations">
-                    <div className="value">
-                      {collective.stats.backers.organizations}
-                    </div>
+                    <div className="value">{collective.stats.backers.organizations}</div>
                     <div className="label">
                       <FormattedMessage
                         id="collective.stats.backers.organizations"

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 
 import CreateCollective from '../components/CreateCollective';
 import ErrorPage from '../components/ErrorPage';
@@ -19,7 +18,7 @@ class CreateCollectivePage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveCoverData
-    data: PropTypes.object.isRequired, // from withData
+    data: PropTypes.object, // from withData
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
   };
 
@@ -35,25 +34,22 @@ class CreateCollectivePage extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data = {} } = this.props;
 
-    const bypassErrorPage = get(data, 'error.message', '').includes(
-      'Please provide a slug or an id',
-    );
-
-    if ((this.state.loading || !data.Collective) && !bypassErrorPage) {
+    if (this.state.loading || data.error) {
       return <ErrorPage loading={this.state.loading} data={data} />;
     }
 
-    return (
-      <CreateCollective
-        host={data.Collective}
-        LoggedInUser={this.state.LoggedInUser}
-      />
-    );
+    return <CreateCollective host={data.Collective} LoggedInUser={this.state.LoggedInUser} />;
   }
 }
 
 export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(CreateCollectivePage))),
+  withIntl(
+    withLoggedInUser(
+      addCollectiveCoverData(CreateCollectivePage, {
+        skip: props => !props.slug,
+      }),
+    ),
+  ),
 );

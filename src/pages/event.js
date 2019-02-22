@@ -14,8 +14,8 @@ class EventPage extends React.Component {
   static getInitialProps({ req, res, query }) {
     const { parentCollectiveSlug, eventSlug } = query;
 
-    if (res && req && req.locale == 'en') {
-      res.setHeader('Cache-Control', 's-maxage=300');
+    if (res && req && (req.language || req.locale === 'en')) {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
 
     const scripts = { googleMaps: true }; // Used in <Event> -> <Location> -> <Map>
@@ -36,9 +36,17 @@ class EventPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, data } = this.props;
+    const event = data.Collective;
+
     const LoggedInUser = await getLoggedInUser();
     this.setState({ LoggedInUser });
+
+    if (LoggedInUser && LoggedInUser.canEditEvent(event)) {
+      // We refetch the data to get the email addresses of the participants
+      // We need to bypass the cache otherwise it won't update the list of participants with the email addresses
+      data.refetch({ options: { fetchPolicy: 'network-only' } });
+    }
   }
 
   render() {
@@ -49,12 +57,6 @@ class EventPage extends React.Component {
 
     const event = data.Collective;
 
-    if (LoggedInUser && LoggedInUser.canEditEvent(event)) {
-      // We refetch the data to get the email addresses of the participants
-      // We need to bypass the cache otherwise it won't update the list of participants with the email addresses
-      data.refetch({ options: { fetchPolicy: 'network-only' } });
-    }
-
     return (
       <div>
         <Event event={event} LoggedInUser={LoggedInUser} />
@@ -63,6 +65,4 @@ class EventPage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addEventCollectiveData(EventPage))),
-);
+export default withData(withIntl(withLoggedInUser(addEventCollectiveData(EventPage))));

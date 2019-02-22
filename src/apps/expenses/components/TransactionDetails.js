@@ -1,17 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../../../lib/utils';
+import { capitalize } from '../../../lib/utils';
 import withIntl from '../../../lib/withIntl';
 import { get } from 'lodash';
 
 import RefundTransactionBtn from './RefundTransactionBtn';
 
+import Link from '../../../components/Link';
+import InvoiceDownloadLink from './InvoiceDownloadLink';
+
 class TransactionDetails extends React.Component {
   static propTypes = {
-    collective: PropTypes.object,
-    transaction: PropTypes.object,
-    LoggedInUser: PropTypes.object,
+    collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      hostFeePercent: PropTypes.number,
+    }),
+    id: PropTypes.number.isRequired,
+    amount: PropTypes.number.isRequired,
+    canDownloadInvoice: PropTypes.bool,
+    canRefund: PropTypes.bool,
+    className: PropTypes.string,
+    currency: PropTypes.string.isRequired,
+    uuid: PropTypes.string,
+    netAmountInCollectiveCurrency: PropTypes.number,
+    platformFeeInHostCurrency: PropTypes.number,
+    paymentProcessorFeeInHostCurrency: PropTypes.number,
+    hostCurrency: PropTypes.string,
+    hostCurrencyFxRate: PropTypes.number,
+    paymentMethod: PropTypes.shape({
+      service: PropTypes.string.isRequired,
+    }),
+    host: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
+    type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
+    isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
     intl: PropTypes.object.isRequired,
     mode: PropTypes.string, // open or closed
   };
@@ -21,15 +48,15 @@ class TransactionDetails extends React.Component {
     this.messages = defineMessages({
       hostFeeInHostCurrency: {
         id: 'transaction.hostFeeInHostCurrency',
-        defaultMessage: '{hostFeePercent} host fee',
+        defaultMessage: '{percentage} host fee',
       },
       platformFeeInHostCurrency: {
         id: 'transaction.platformFeeInHostCurrency',
-        defaultMessage: '5% Open Collective fee',
+        defaultMessage: '{percentage} Open Collective fee',
       },
       paymentProcessorFeeInHostCurrency: {
         id: 'transaction.paymentProcessorFeeInHostCurrency',
-        defaultMessage: 'payment processor fee',
+        defaultMessage: '{percentage} payment processor fee',
       },
     });
     this.currencyStyle = {
@@ -40,63 +67,119 @@ class TransactionDetails extends React.Component {
     };
   }
 
-  render() {
-    const { intl, collective, LoggedInUser, transaction } = this.props;
-    const type = transaction.type.toLowerCase();
-    const hostFeePercent =
-      transaction.host && `${transaction.host.hostFeePercent}%`;
+  paymentMethodName = pm => {
+    if (pm.type === 'virtualcard') {
+      return pm.name.replace('card from', 'Gift Card from');
+    } else if (pm.type === 'creditcard') {
+      return <FormattedMessage id="creditcard.label" defaultMessage="Credit Card" />;
+    } else {
+      return capitalize(pm.service);
+    }
+  };
+
+  /**
+   * Amount details:
+   * /airbnb/transactions DEBITS AirBnB gives $1,000 to Webpack
+   * $1,000 - $50 (host fees) - $50 (Open Collective fees) - $30 (Payment Processor Fees) = $870 (net amount for Webpack)
+   * /webpack/transactions CREDITS AirBnB gives $1,000 to Webpack
+   * $1,000 - $50 (host fees) - $50 (Open Collective fees) - $30 (Payment Processor Fees) = $870 (net amount for Webpack)
+   * /webpack/transactions DEBIT Tobiaz receives $1,000 from Webpack
+   * -$1,000 - $30 (Payment Processor Fees) = -$1,030 (net amount for Webpack)
+   */
+  formatAmountDetails() {
+    const {
+      intl,
+      type,
+      netAmountInCollectiveCurrency,
+      amount,
+      collective,
+      currency,
+      hostCurrency,
+      hostCurrencyFxRate,
+    } = this.props;
+
+    const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type) ? -netAmountInCollectiveCurrency : amount;
+    let totalAmount = initialAmount;
     const amountDetails = [
-      intl.formatNumber(transaction.amount / 100, {
-        currency: transaction.currency,
+      intl.formatNumber(initialAmount / 100, {
+        currency: currency,
         ...this.currencyStyle,
       }),
     ];
-    if (
-      transaction.hostCurrencyFxRate &&
-      transaction.hostCurrencyFxRate !== 1
-    ) {
-      const amountInHostCurrency =
-        transaction.amount * transaction.hostCurrencyFxRate;
+    if (hostCurrencyFxRate && hostCurrencyFxRate !== 1) {
+      const amountInHostCurrency = amount * hostCurrencyFxRate;
+      totalAmount = amount;
       amountDetails.push(
         ` (${intl.formatNumber(amountInHostCurrency / 100, {
-          currency: transaction.hostCurrency,
+          currency: hostCurrency,
           ...this.currencyStyle,
         })})`,
       );
     }
     const addFees = feesArray => {
       feesArray.forEach(feeName => {
-        if (transaction[feeName]) {
+        if (this.props[feeName]) {
+          const percentage =
+            this.props[feeName] > 0 ? this.props[feeName] / totalAmount : -(this.props[feeName] / totalAmount);
           amountDetails.push(
-            `${intl.formatNumber(transaction[feeName] / 100, {
-              currency: transaction.hostCurrency,
+            `${intl.formatNumber(this.props[feeName] / 100, {
+              currency: hostCurrency,
               ...this.currencyStyle,
             })} (${intl.formatMessage(this.messages[feeName], {
-              hostFeePercent,
+              percentage: `${(percentage * 100).toFixed(2)}%`,
             })})`,
           );
         }
       });
     };
 
-    addFees([
-      'hostFeeInHostCurrency',
-      'platformFeeInHostCurrency',
-      'paymentProcessorFeeInHostCurrency',
-    ]);
+    addFees(['hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
-    const amountDetailsStr =
-      amountDetails.length > 1 ? amountDetails.join(' ') : null;
+    let amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : '';
+
+    if (['ORGANIZATION', 'USER'].includes(collective.type) && type === 'CREDIT') {
+      amountDetailsStr = amountDetailsStr.replace(/-/g, '+');
+    }
+
+    return amountDetailsStr;
+  }
+
+  render() {
+    const {
+      canDownloadInvoice,
+      canRefund,
+      collective,
+      fromCollective,
+      id,
+      type,
+      host,
+      currency,
+      hostCurrency,
+      hostCurrencyFxRate,
+      amount,
+      netAmountInCollectiveCurrency,
+      paymentMethod,
+      isRefund,
+      uuid,
+    } = this.props;
+
+    const amountDetailsStr = this.formatAmountDetails();
+    let finalAmount = netAmountInCollectiveCurrency,
+      recipient = collective;
+    if (['ORGANIZATION', 'USER'].includes(collective.type)) {
+      finalAmount = -amount;
+      recipient = fromCollective;
+    }
 
     return (
-      <div className={`TransactionDetails ${this.props.mode}`}>
+      <div className={`TransactionDetails ${this.props.mode} ${this.props.className}`}>
         <style jsx>
           {`
             .TransactionDetails {
               font-size: 1.2rem;
               overflow: hidden;
               transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-              max-height: 19rem;
+              max-height: 21rem;
             }
             .TransactionDetails.closed {
               max-height: 0;
@@ -122,7 +205,6 @@ class TransactionDetails extends React.Component {
               text-transform: uppercase;
               color: #aaaeb3;
               font-weight: 300;
-              font-family: lato, montserratlight, arial;
               white-space: nowrap;
             }
             .netAmountInCollectiveCurrency {
@@ -140,123 +222,77 @@ class TransactionDetails extends React.Component {
           `}
         </style>
 
-        {type === 'debit' && (
-          <div className="frame">
-            {transaction.attachment && (
-              <a
-                href={transaction.attachment}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Open receipt in a new window"
-              >
-                <img src={imagePreview(transaction.attachment)} />
-              </a>
-            )}
-            {!transaction.attachment && (
-              <img src={'/static/images/receipt.svg'} />
-            )}
-          </div>
-        )}
-        {get(transaction, 'host.name') && (
+        {get(host, 'name') && (
           <div className="col">
             <label>
               <FormattedMessage id="transaction.host" defaultMessage="host" />
             </label>
-            {transaction.host.name} ({transaction.hostCurrency})
+            <Link route={`/${host.slug}`}>{host.name}</Link> ({hostCurrency})
           </div>
         )}
-        <div className="col">
-          <label>
-            <FormattedMessage
-              id="transaction.paymentMethod"
-              defaultMessage="payment method"
-            />
-          </label>
-          {transaction.paymentMethod &&
-            capitalize(transaction.paymentMethod.service)}
-        </div>
-        {transaction.hostCurrencyFxRate &&
-          transaction.hostCurrencyFxRate !== 1 && (
-            <div className="col">
-              <label>
-                <FormattedMessage
-                  id="transaction.fxrate"
-                  defaultMessage="fx rate"
-                />
-              </label>
-              {transaction.hostCurrencyFxRate}
+        {paymentMethod && (
+          <div className="col">
+            <label>
+              <FormattedMessage id="transaction.paymentMethod" defaultMessage="payment method" />
+            </label>
+            {paymentMethod && this.paymentMethodName(paymentMethod)}
+          </div>
+        )}
+        {hostCurrencyFxRate && hostCurrencyFxRate !== 1 && (
+          <div className="col">
+            <label>
+              <FormattedMessage id="transaction.fxrate" defaultMessage="fx rate" />
+            </label>
+            {hostCurrencyFxRate}
+          </div>
+        )}
+
+        {type === 'DEBIT' && canDownloadInvoice && !isRefund && uuid && (
+          <div className="col invoice">
+            <label>
+              <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
+            </label>
+            <div>
+              <InvoiceDownloadLink type="transaction" transactionUuid={uuid} viewLoading={() => 'Loading...'}>
+                <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+              </InvoiceDownloadLink>
             </div>
-          )}
+          </div>
+        )}
+
         <div className="col">
           <label>
-            <FormattedMessage
-              id="transaction.amountDetails"
-              defaultMessage="amount details"
-            />
+            <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
           </label>
           <div className="amountDetails">
             {amountDetailsStr && (
               <span>
                 <span>{amountDetailsStr}</span>
-                <span className="netAmountInCollectiveCurrency">
-                  &nbsp;=&nbsp;
-                </span>
+                <span className="netAmountInCollectiveCurrency">&nbsp;=&nbsp;</span>
               </span>
             )}
             <span className="netAmountInCollectiveCurrency">
-              <FormattedNumber
-                value={transaction.netAmountInCollectiveCurrency / 100}
-                currency={transaction.currency}
-                {...this.currencyStyle}
-              />
+              <FormattedNumber value={finalAmount / 100} currency={currency} {...this.currencyStyle} />
             </span>
             &nbsp;
             <span className="netAmountInCollectiveCurrencyDescription">
               (
               <FormattedMessage
                 id="transaction.netAmountInCollectiveCurrency.description"
-                defaultMessage="net amount added to your collective's balance"
+                defaultMessage="net amount for {collective}"
+                values={{ collective: recipient.name }}
               />
               )
             </span>
           </div>
         </div>
-        {type === 'debit' &&
-          LoggedInUser &&
-          (LoggedInUser.canEditCollective(collective) ||
-            LoggedInUser.isRoot()) &&
-          !transaction.refundTransaction && (
-            <div className="col invoice">
-              <label>
-                <FormattedMessage
-                  id="transaction.invoice"
-                  defaultMessage="invoice"
-                />
-              </label>
-              <div>
-                <a
-                  href={`/${collective.slug}/transactions/${
-                    transaction.uuid
-                  }/invoice.pdf`}
-                >
-                  <FormattedMessage
-                    id="transaction.downloadPDF"
-                    defaultMessage="Download (pdf)"
-                  />
-                </a>
-              </div>
+
+        <div className="actions">
+          {canRefund && (
+            <div className="transactionActions">
+              <RefundTransactionBtn id={id} isRefund={isRefund} CollectiveId={collective.id} />
             </div>
           )}
-        <div className="actions">
-          {LoggedInUser &&
-            LoggedInUser.isRoot() && (
-              <div className="transactionActions">
-                <RefundTransactionBtn
-                  transaction={transaction}
-                  collective={collective}
-                />
-              </div>
-            )}
         </div>
       </div>
     );

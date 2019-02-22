@@ -9,12 +9,8 @@ export async function list(req, res, next) {
     logger.debug('>>> events.list fetching: %s', req.params.collectiveSlug);
     allEvents = await fetchEvents(req.params.collectiveSlug);
     allEvents = allEvents.map(e => {
-      e.url = `https://opencollective.com/${req.params.collectiveSlug}/events/${
-        e.slug
-      }`;
-      e.info = `https://opencollective.com/${
-        req.params.collectiveSlug
-      }/events/${e.slug}.json`;
+      e.url = `https://opencollective.com/${req.params.collectiveSlug}/events/${e.slug}`;
+      e.info = `https://opencollective.com/${req.params.collectiveSlug}/events/${e.slug}.json`;
       return e;
     });
     logger.debug('>>> events.list allEvents: %j', allEvents);
@@ -35,12 +31,8 @@ export async function info(req, res, next) {
   try {
     logger.debug('>>> events.info fetching: %s', req.params.eventSlug);
     event = await fetchEvent(req.params.eventSlug);
-    event.url = `https://opencollective.com/${
-      req.params.collectiveSlug
-    }/events/${event.slug}`;
-    event.attendees = `https://opencollective.com/${
-      req.params.collectiveSlug
-    }/events/${event.slug}/attendees.json`;
+    event.url = `https://opencollective.com/${req.params.collectiveSlug}/events/${event.slug}`;
+    event.attendees = `https://opencollective.com/${req.params.collectiveSlug}/events/${event.slug}/attendees.json`;
     logger.debug('>>> events.info event: %j', event);
     res.send(event);
   } catch (e) {

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, isEqual } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { defaultImage, defaultBackgroundImage } from '../constants/collectives';
 
 import { imagePreview } from '../lib/utils';
 
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 import Container from './Container';
 import { P, Span } from './Text';
 import { Link } from '../server/pages';
@@ -14,23 +15,12 @@ import StyledLink from './StyledLink';
 import Currency from './Currency';
 
 const hasGoals = (settings = {}) =>
-  get(settings, 'goals', []).length > 0 &&
-  !isEqual(get(settings, 'goals', [])[0], {});
+  get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
 
 const getGoalPercentage = ({ type, amount }, { balance, yearlyBudget }) =>
   type === 'balance' ? balance / amount : yearlyBudget / amount;
 
-const CollectiveStatsCard = ({
-  backgroundImage,
-  description,
-  image,
-  name,
-  settings,
-  slug,
-  stats,
-  currency,
-  type,
-}) => (
+const CollectiveStatsCard = ({ backgroundImage, description, image, name, settings, slug, stats, currency, type }) => (
   <Container
     bg="white"
     borderRadius="8px"
@@ -99,14 +89,7 @@ const CollectiveStatsCard = ({
       {description}
     </P>
 
-    <Container
-      bg="#E8E9EB"
-      height={4}
-      borderRadius={2}
-      mx={3}
-      position="relative"
-      mt={3}
-    >
+    <Container bg="#E8E9EB" height={4} borderRadius={2} mx={3} position="relative" mt={3}>
       {hasGoals(settings) && (
         <Container
           bg="#3385FF"
@@ -123,57 +106,43 @@ const CollectiveStatsCard = ({
 
     {!hasGoals(settings) && (
       <P fontSize="1rem" textAlign="center" color="#9399A3" mt={2} mb={5}>
-        No budget goals yet.
+        <FormattedMessage id="collectiveStats.noBudget" defaultMessage="No budget goals yet." />
       </P>
     )}
 
     {hasGoals(settings) && [
       <P key="progress" textAlign="center" fontSize="1.2rem" my={2}>
-        <Span fontWeight="bold">
-          {Math.round(getGoalPercentage(settings.goals[0], stats) * 100)}%
-        </Span>{' '}
-        progress to:
+        <Span fontWeight="bold">{Math.round(getGoalPercentage(settings.goals[0], stats) * 100)}%</Span>{' '}
+        <FormattedMessage id="collectiveStats.progressTo" defaultMessage="progress to:" />
       </P>,
       <P key="goal" textAlign="center" fontSize="1.2rem" px={2} color="#3385FF">
         {settings.goals[0].title}
       </P>,
     ]}
-
     <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
       {get(stats, 'backers.all', 0) || get(stats, 'backers.all', 0) ? (
         [
-          <Flex
-            width={0.5}
-            alignItems="center"
-            flexDirection="column"
-            key="backers"
-          >
+          <Flex width={0.5} alignItems="center" flexDirection="column" key="backers">
             <P fontSize="1.2rem" fontWeight="bold">
               {get(stats, 'backers.all', 0)}
             </P>
-            <P fontSize="1.2rem">backers</P>
-          </Flex>,
-          <Flex
-            width={0.5}
-            alignItems="center"
-            flexDirection="column"
-            key="monthly spending"
-          >
-            <P fontSize="1.2rem" fontWeight="bold">
-              <Currency
-                value={get(stats, 'monthlySpending', 0)}
-                currency={currency}
-                precision={0}
-                abbreviate
-              />
+            <P fontSize="1.2rem">
+              <FormattedMessage id="home.backers" defaultMessage="backers" />
             </P>
-            <P fontSize="1.2rem">monthly spending</P>
+          </Flex>,
+          <Flex width={0.5} alignItems="center" flexDirection="column" key="monthly spending">
+            <P fontSize="1.2rem" fontWeight="bold">
+              <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
+            </P>
+            <P fontSize="1.2rem">
+              <FormattedMessage id="collectiveStats.monthlySpending" defaultMessage="monthly spending" />
+            </P>
           </Flex>,
         ]
       ) : (
         <Link route={`/${slug}#contribute`} passHref>
           <StyledLink fontSize="1.2rem" width="100%" textAlign="center">
-            Be the first to contribute!
+            <FormattedMessage id="collectiveStats.beFirstContribute" defaultMessage="Be the first to contribute!" />
           </StyledLink>
         </Link>
       )}

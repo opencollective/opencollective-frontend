@@ -54,72 +54,40 @@ class ExpensesStatsWithData extends React.Component {
         </style>
 
         <h1>
-          <FormattedMessage
-            id="collective.stats.balance.title"
-            defaultMessage="Available balance"
-          />
+          <FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance" />
         </h1>
-        <Currency
-          value={Collective.stats.balance}
-          currency={Collective.currency}
-          precision={2}
-        />
+        <Currency value={Collective.stats.balance} currency={Collective.currency} precision={2} />
         <h1>
-          <FormattedMessage
-            id="expenses.stats.distribution.title"
-            defaultMessage="Distribution"
-          />
+          <FormattedMessage id="expenses.stats.distribution.title" defaultMessage="Distribution" />
         </h1>
         <div className="section categories">
           <h2>
-            <FormattedMessage
-              id="expenses.stats.byCategory.title"
-              defaultMessage="By category"
-            />
+            <FormattedMessage id="expenses.stats.byCategory.title" defaultMessage="By category" />
           </h2>
           <ol>
             {topExpenses.byCategory.map(category => (
               <li key={category.category}>
-                <Link
-                  route={`/${slug}/expenses/categories/${category.category}`}
-                  scroll={false}
-                >
+                <Link route={`/${slug}/expenses/categories/${category.category}`} scroll={false}>
                   {category.category}
                 </Link>{' '}
                 (
-                <Currency
-                  value={category.totalExpenses}
-                  currency={Collective.currency}
-                />
-                )
+                <Currency value={category.totalExpenses} currency={Collective.currency} />)
               </li>
             ))}
           </ol>
         </div>
         <div className="section recipients">
           <h2>
-            <FormattedMessage
-              id="expenses.stats.byRecipient.title"
-              defaultMessage="By recipient"
-            />
+            <FormattedMessage id="expenses.stats.byRecipient.title" defaultMessage="By recipient" />
           </h2>
           <ol>
             {topExpenses.byCollective.map(recipientCollective => (
               <li key={recipientCollective.slug}>
-                <Link
-                  route={`/${slug}/expenses/recipients/${
-                    recipientCollective.slug
-                  }`}
-                  scroll={false}
-                >
+                <Link route={`/${slug}/expenses/recipients/${recipientCollective.slug}`} scroll={false}>
                   {recipientCollective.name}
                 </Link>{' '}
                 (
-                <Currency
-                  value={-recipientCollective.totalExpenses}
-                  currency={Collective.currency}
-                />
-                )
+                <Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
               </li>
             ))}
           </ol>

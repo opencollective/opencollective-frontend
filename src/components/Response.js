@@ -65,12 +65,10 @@ class Response extends React.Component {
               }
 
               .name {
-                font-family: 'montserratlight';
                 font-size: 1.7rem;
               }
 
               .description {
-                font-family: 'lato';
                 font-size: 1.4rem;
               }
 
@@ -84,14 +82,7 @@ class Response extends React.Component {
             `}
           </style>
           <div className="Response">
-            {status === 'INTERESTED' && (
-              <object
-                title={title}
-                type="image/svg+xml"
-                data={star}
-                className="star"
-              />
-            )}
+            {status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" />}
             <img src={image} />
             <div className="bubble">
               <div className="name">{name}</div>

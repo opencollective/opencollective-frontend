@@ -57,8 +57,7 @@ class EditTwitterAccount extends React.Component {
       },
       'tenBackers.toggle.description': {
         id: 'connectedAccounts.twitter.tenBackers.toggle.description',
-        defaultMessage:
-          'Whenever one of the collectives that you are hosting reaches 10 backers',
+        defaultMessage: 'Whenever one of the collectives that you are hosting reaches 10 backers',
       },
       'tenBackers.tweet': {
         id: 'connectedAccounts.twitter.tenBackers.tweet',
@@ -71,13 +70,11 @@ class EditTwitterAccount extends React.Component {
       },
       'oneHundredBackers.toggle.description': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.description',
-        defaultMessage:
-          'Whenever one of the collectives that you are hosting reaches 100 backers',
+        defaultMessage: 'Whenever one of the collectives that you are hosting reaches 100 backers',
       },
       'oneHundredBackers.tweet': {
         id: 'connectedAccounts.twitter.oneHundredBackers.tweet',
-        defaultMessage:
-          '🎉 {collective} just reached 100 backers!! 🙌  Support them too!',
+        defaultMessage: '🎉 {collective} just reached 100 backers!! 🙌  Support them too!',
       },
       'oneThousandBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.label',
@@ -85,13 +82,11 @@ class EditTwitterAccount extends React.Component {
       },
       'oneThousandBackers.toggle.description': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.description',
-        defaultMessage:
-          'Whenever one of the collectives that you are hosting reaches 1,000 backers',
+        defaultMessage: 'Whenever one of the collectives that you are hosting reaches 1,000 backers',
       },
       'oneThousandBackers.tweet': {
         id: 'connectedAccounts.twitter.oneThousandBackers.tweet',
-        defaultMessage:
-          '🎉 {collective} just reached 1,000 backers!! 🙌  Support them too!',
+        defaultMessage: '🎉 {collective} just reached 1,000 backers!! 🙌  Support them too!',
       },
     });
 
@@ -101,19 +96,15 @@ class EditTwitterAccount extends React.Component {
     }
 
     if (props.collective.isHost) {
-      this.notificationTypes = [
-        'tenBackers',
-        'oneHundredBackers',
-        'oneThousandBackers',
-      ];
+      this.notificationTypes = ['tenBackers', 'oneHundredBackers', 'oneThousandBackers'];
     }
 
     this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
-    this.state.connectedAccount.settings =
-      this.state.connectedAccount.settings || {};
+    this.state.connectedAccount.settings = this.state.connectedAccount.settings || {};
     this.notificationTypes.forEach(notificationType => {
-      this.state.connectedAccount.settings[notificationType] = this.state
-        .connectedAccount.settings[notificationType] || { active: false };
+      this.state.connectedAccount.settings[notificationType] = this.state.connectedAccount.settings[
+        notificationType
+      ] || { active: false };
       if (this.messages[`${notificationType}.tweet`]) {
         this.state.connectedAccount.settings[notificationType].tweet =
           this.state.connectedAccount.settings[notificationType].tweet ||
@@ -123,10 +114,7 @@ class EditTwitterAccount extends React.Component {
   }
 
   async onClick() {
-    const connectedAccount = pick(this.state.connectedAccount, [
-      'id',
-      'settings',
-    ]);
+    const connectedAccount = pick(this.state.connectedAccount, ['id', 'settings']);
     await this.props.editConnectedAccount(connectedAccount);
     this.setState({ isModified: false });
   }
@@ -163,18 +151,12 @@ class EditTwitterAccount extends React.Component {
               name={`${notificationType}.active`}
               className="horizontal"
               defaultValue={connectedAccount.settings[notificationType].active}
-              label={intl.formatMessage(
-                this.messages[`${notificationType}.toggle.label`],
-              )}
+              label={intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
               description={
                 this.messages[`${notificationType}.toggle.description`] &&
-                intl.formatMessage(
-                  this.messages[`${notificationType}.toggle.description`],
-                )
+                intl.formatMessage(this.messages[`${notificationType}.toggle.description`])
               }
-              onChange={activateNewBacker =>
-                this.handleChange(notificationType, 'active', activateNewBacker)
-              }
+              onChange={activateNewBacker => this.handleChange(notificationType, 'active', activateNewBacker)}
             />
             {this.messages[`${notificationType}.tweet`] && (
               <InputField
@@ -187,9 +169,7 @@ class EditTwitterAccount extends React.Component {
                   connectedAccount.settings[notificationType].tweet ||
                   intl.formatMessage(this.messages[`${notificationType}.tweet`])
                 }
-                onChange={tweet =>
-                  this.handleChange(notificationType, 'tweet', tweet)
-                }
+                onChange={tweet => this.handleChange(notificationType, 'tweet', tweet)}
               />
             )}
           </Col>
@@ -204,10 +184,7 @@ class EditTwitterAccount extends React.Component {
         <Form horizontal>
           <details>
             <summary>
-              <FormattedMessage
-                id="connectedAccounts.twitter.settings"
-                defaultMessage="Settings"
-              />
+              <FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" />
             </summary>
             {this.notificationTypes.map(this.renderNotification)}
           </details>
@@ -215,11 +192,7 @@ class EditTwitterAccount extends React.Component {
             <Col sm={3} />
             <Col sm={9}>
               {this.state.isModified && (
-                <SmallButton
-                  className="default"
-                  bsStyle="primary"
-                  onClick={this.onClick}
-                >
+                <SmallButton className="default" bsStyle="primary" onClick={this.onClick}>
                   <FormattedMessage id="save" defaultMessage="save" />
                 </SmallButton>
               )}

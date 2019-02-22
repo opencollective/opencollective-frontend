@@ -35,13 +35,7 @@ class UpdatesWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      compact,
-      includeHostedCollectives,
-    } = this.props;
+    const { data, LoggedInUser, collective, compact, includeHostedCollectives } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -54,12 +48,7 @@ class UpdatesWithData extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/updates/new`,
-        label: (
-          <FormattedMessage
-            id="sections.update.new"
-            defaultMessage="Create an Update"
-          />
-        ),
+        label: <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />,
       };
     }
 
@@ -97,12 +86,7 @@ class UpdatesWithData extends React.Component {
 }
 
 const getUpdatesQuery = gql`
-  query Updates(
-    $CollectiveId: Int!
-    $limit: Int
-    $offset: Int
-    $includeHostedCollectives: Boolean
-  ) {
+  query Updates($CollectiveId: Int!, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
     allUpdates(
       CollectiveId: $CollectiveId
       limit: $limit
@@ -163,10 +147,7 @@ export const addUpdatesData = graphql(getUpdatesQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allUpdates: [
-              ...previousResult.allUpdates,
-              ...fetchMoreResult.allUpdates,
-            ],
+            allUpdates: [...previousResult.allUpdates, ...fetchMoreResult.allUpdates],
           });
         },
       });

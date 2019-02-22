@@ -31,9 +31,13 @@ class Event extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  static getDerivedStateFromProps(props) {
+    return { event: props.event };
+  }
+
   constructor(props) {
     super(props);
-    this.event = this.props.event; // pre-loaded by SSR
+
     this.setInterested = this.setInterested.bind(this);
     this.removeInterested = this.removeInterested.bind(this);
     this.updateOrder = this.updateOrder.bind(this);
@@ -45,7 +49,6 @@ class Event extends React.Component {
       order: { tier: {} },
       tierInfo: {},
       api: { status: 'idle' },
-      event: this.props.event,
     };
 
     this.messages = defineMessages({
@@ -67,30 +70,15 @@ class Event extends React.Component {
         defaultMessage: 'Edit tickets',
       },
     });
-
-    this.isEventOver =
-      new Date(this.event.endsAt).getTime() < new Date().getTime();
-  }
-
-  componentDidMount() {
-    window.oc = { event: this.state.event }; // for easy debugging
   }
 
   async removeInterested() {
     const { LoggedInUser } = this.props;
-    const memberCollectiveId =
-      this.state.interestedUserCollectiveId ||
-      (LoggedInUser && LoggedInUser.CollectiveId);
-    const res = await this.props.removeMember(
-      { id: memberCollectiveId },
-      { id: this.state.event.id },
-      'FOLLOWER',
-    );
+    const memberCollectiveId = this.state.interestedUserCollectiveId || (LoggedInUser && LoggedInUser.CollectiveId);
+    const res = await this.props.removeMember({ id: memberCollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
     const memberRemoved = res.data.removeMember;
     const event = { ...this.state.event };
-    event.members = event.members.filter(
-      member => member.id !== memberRemoved.id,
-    );
+    event.members = event.members.filter(member => member.id !== memberRemoved.id);
     this.setState({ showInterestedForm: false, event });
   }
 
@@ -99,23 +87,15 @@ class Event extends React.Component {
    * Otherwise, we show the form to enter an email address
    */
   async setInterested(member) {
-    member =
-      member ||
-      (this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId });
+    member = member || (this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId });
     if (member) {
-      const parts =
-        member.email &&
-        member.email.substr(0, member.email.indexOf('@')).split('.');
+      const parts = member.email && member.email.substr(0, member.email.indexOf('@')).split('.');
       if (parts && parts.length > 1) {
         member.firstName = capitalize(parts[0] || '');
         member.lastName = capitalize(parts[1] || '');
       }
       try {
-        const res = await this.props.createMember(
-          member,
-          { id: this.state.event.id },
-          'FOLLOWER',
-        );
+        const res = await this.props.createMember(member, { id: this.state.event.id }, 'FOLLOWER');
         const memberCreated = res.data.createMember;
         const interestedUserCollectiveId = memberCreated.member.id;
         const event = { ...this.state.event };
@@ -132,9 +112,7 @@ class Event extends React.Component {
         if (e && e.graphQLErrors) {
           message = ` (error: ${e.graphQLErrors[0].message})`;
         }
-        this.error(
-          `An error occured 😳. We couldn't register you as interested. Please try again in a few.${message}`,
-        );
+        this.error(`An error occured 😳. We couldn't register you as interested. Please try again in a few.${message}`);
       }
       return;
     } else {
@@ -193,6 +171,8 @@ class Event extends React.Component {
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = { sponsors: [] };
 
+    const isEventOver = new Date(event.endsAt).getTime() < new Date().getTime();
+
     const guests = {};
     guests.interested = [];
     filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
@@ -223,8 +203,7 @@ class Event extends React.Component {
     });
 
     const allGuests = union(guests.interested, guests.confirmed).sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
     responses.guests = uniqBy(allGuests, r => r.user && r.user.id);
     responses.going = filterCollection(responses.guests, { status: 'YES' });
@@ -234,41 +213,24 @@ class Event extends React.Component {
 
     let notification = {};
     // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
-    if (
-      this.isEventOver &&
-      get(this.props.event, 'stats.balance') > 0 &&
-      canEditEvent
-    ) {
+    if (isEventOver && get(this.props.event, 'stats.balance') > 0 && canEditEvent) {
       notification = {
-        title: intl.formatMessage(
-          this.messages['event.over.sendMoneyToParent.title'],
-        ),
-        description: intl.formatMessage(
-          this.messages['event.over.sendMoneyToParent.description'],
-          { collective: event.parentCollective.name },
-        ),
+        title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
+        description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], {
+          collective: event.parentCollective.name,
+        }),
         actions: [
-          <Button
-            key="submitExpenseBtn"
-            className="submitExpense gray"
-            href={`${event.path}/expenses/new`}
-          >
-            <FormattedMessage
-              id="menu.submitExpense"
-              defaultMessage="Submit Expense"
-            />
+          <Button key="submitExpenseBtn" className="submitExpense gray" href={`${event.path}/expenses/new`}>
+            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </Button>,
           <SendMoneyToCollectiveBtn
             key="SendMoneyToCollectiveBtn"
             fromCollective={event}
             toCollective={event.parentCollective}
             LoggedInUser={LoggedInUser}
-            description={intl.formatMessage(
-              this.messages[
-                'event.over.sendMoneyToParent.transaction.description'
-              ],
-              { event: event.name },
-            )}
+            description={intl.formatMessage(this.messages['event.over.sendMoneyToParent.transaction.description'], {
+              event: event.name,
+            })}
             amount={event.stats.balance}
             currency={event.currency}
           />,
@@ -277,9 +239,7 @@ class Event extends React.Component {
     }
 
     const backgroundImage =
-      event.backgroundImage ||
-      get(event, 'parentCollective.backgroundImage') ||
-      defaultBackgroundImage;
+      event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
 
     return (
       <div>
@@ -340,22 +300,16 @@ class Event extends React.Component {
                 LoggedInUser={LoggedInUser}
                 cta={{ label: 'tickets', href: '#tickets' }}
                 style={
-                  get(event, 'settings.style.hero.cover') ||
-                  get(event.parentCollective, 'settings.style.hero.cover')
+                  get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')
                 }
               />
 
-              {this.state.showInterestedForm && (
-                <InterestedForm onSubmit={this.setInterested} />
-              )}
+              {this.state.showInterestedForm && <InterestedForm onSubmit={this.setInterested} />}
 
               <div>
                 <div className="content">
                   <div className="eventDescription">
-                    <Markdown
-                      source={event.longDescription || event.description}
-                      escapeHtml={false}
-                    />
+                    <Markdown source={event.longDescription || event.description} escapeHtml={false} />
                   </div>
 
                   <section id="tickets">
@@ -364,9 +318,7 @@ class Event extends React.Component {
                       action={
                         LoggedInUser && LoggedInUser.canEditCollective(event)
                           ? {
-                              label: intl.formatMessage(
-                                this.messages['event.tickets.edit'],
-                              ),
+                              label: intl.formatMessage(this.messages['event.tickets.edit']),
                               href: `${event.path}/edit#tiers`,
                             }
                           : null
@@ -387,24 +339,16 @@ class Event extends React.Component {
                   </section>
                 </div>
 
-                {get(event, 'location.name') && (
-                  <Location location={event.location} />
-                )}
+                {get(event, 'location.name') && <Location location={event.location} />}
 
                 {responses.sponsors.length > 0 && (
                   <section id="sponsors">
                     <h1>
-                      <FormattedMessage
-                        id="event.sponsors.title"
-                        defaultMessage="Sponsors"
-                      />
+                      <FormattedMessage id="event.sponsors.title" defaultMessage="Sponsors" />
                     </h1>
                     <Sponsors
                       sponsors={responses.sponsors.map(r => {
-                        const sponsorCollective = Object.assign(
-                          {},
-                          r.fromCollective,
-                        );
+                        const sponsorCollective = Object.assign({}, r.fromCollective);
                         sponsorCollective.tier = r.tier;
                         sponsorCollective.createdAt = new Date(r.createdAt);
                         return sponsorCollective;
@@ -436,20 +380,12 @@ class Event extends React.Component {
                       <div className="adminActions" id="adminActions">
                         <ul>
                           <li>
-                            <a
-                              href={`/${event.parentCollective.slug}/events/${
-                                event.slug
-                              }/nametags.pdf`}
-                            >
+                            <a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>
                               Print name tags
                             </a>
                           </li>
                           <li>
-                            <a
-                              href={`mailto:${event.slug}@${
-                                event.parentCollective.slug
-                              }.opencollective.com`}
-                            >
+                            <a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>
                               Send email
                             </a>
                           </li>
@@ -463,11 +399,7 @@ class Event extends React.Component {
                   </section>
                 )}
 
-                <ExpensesSection
-                  collective={event}
-                  LoggedInUser={LoggedInUser}
-                  limit={10}
-                />
+                <ExpensesSection collective={event} LoggedInUser={LoggedInUser} limit={10} />
               </div>
             </div>
           </Body>

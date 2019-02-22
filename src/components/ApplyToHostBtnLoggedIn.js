@@ -39,10 +39,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
     if (data.loading) {
       return (
         <Button className="blue" disabled>
-          <FormattedMessage
-            id="host.apply.create.btn"
-            defaultMessage="Apply to create a collective"
-          />
+          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
         </Button>
       );
     }
@@ -55,15 +52,11 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       <div className="ApplyToHostBtnLoggedIn">
         {!this.inactiveCollective && (
           <Button className="blue" href={`/${host.slug}/apply`}>
-            <FormattedMessage
-              id="host.apply.create.btn"
-              defaultMessage="Apply to create a collective"
-            />
+            <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
           </Button>
         )}
         {this.inactiveCollective &&
-          (!this.inactiveCollective.host ||
-            get(this.inactiveCollective, 'host.id') !== host.id) && (
+          (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) && (
             <Button onClick={this.onClick} className="blue">
               <FormattedMessage
                 id="host.apply.btn"
@@ -77,11 +70,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
             id="host.apply.pending"
             defaultMessage="Application pending for {collective}"
             values={{
-              collective: (
-                <Link route={`/${this.inactiveCollective.slug}`}>
-                  {this.inactiveCollective.name}
-                </Link>
-              ),
+              collective: <Link route={`/${this.inactiveCollective.slug}`}>{this.inactiveCollective.name}</Link>,
             }}
           />
         )}

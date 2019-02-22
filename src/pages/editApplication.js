@@ -14,10 +14,7 @@ import InputField from '../components/InputField';
 import ErrorPage from '../components/ErrorPage';
 
 import { getCollectiveApplicationsQuery } from '../graphql/queries';
-import {
-  updateApplicationMutation,
-  deleteApplicationMutation,
-} from '../graphql/mutations';
+import { updateApplicationMutation, deleteApplicationMutation } from '../graphql/mutations';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -50,12 +47,7 @@ class EditApplication extends React.Component {
 
     const application = applications.find(a => a.id == applicationId);
 
-    this.state.form = pick(application, [
-      'type',
-      'name',
-      'description',
-      'callbackUrl',
-    ]);
+    this.state.form = pick(application, ['type', 'name', 'description', 'callbackUrl']);
 
     this.messages = defineMessages({
       'app.name': { id: 'app.name', defaultMessage: 'name' },
@@ -88,10 +80,7 @@ class EditApplication extends React.Component {
     const { collectiveSlug, applicationId } = this.props;
 
     const application = this.state.form;
-    const result = await this.props.updateApplication(
-      applicationId,
-      application,
-    );
+    const result = await this.props.updateApplication(applicationId, application);
     if (result) {
       Router.pushRoute('applications', { collectiveSlug });
     }
@@ -140,20 +129,12 @@ class EditApplication extends React.Component {
 
           {LoggedInUser && (
             <div className="apps">
-              <form
-                method="post"
-                onSubmit={this.handleSubmit}
-                ref={this.createForm}
-              >
+              <form method="post" onSubmit={this.handleSubmit} ref={this.createForm}>
                 {this.state.form.type === 'API_KEY' && (
                   <Fragment>
                     <h3>Edit an API Key</h3>
                     <div className="separator">
-                      <Button
-                        bsStyle="danger"
-                        type="submit"
-                        onClick={this.handleDelete}
-                      >
+                      <Button bsStyle="danger" type="submit" onClick={this.handleDelete}>
                         Delete API Key
                       </Button>
                     </div>
@@ -181,14 +162,10 @@ class EditApplication extends React.Component {
                           className="horizontal"
                           type="text"
                           name="description"
-                          label={intl.formatMessage(
-                            this.messages['app.description'],
-                          )}
+                          label={intl.formatMessage(this.messages['app.description'])}
                           defaultValue={this.state.form.description}
                           value={this.state.form.description}
-                          onChange={value =>
-                            this.handleChange('description', value)
-                          }
+                          onChange={value => this.handleChange('description', value)}
                         />
                       </Col>
                     </Row>
@@ -198,32 +175,20 @@ class EditApplication extends React.Component {
                           className="horizontal"
                           type="text"
                           name="callbackUrl"
-                          label={intl.formatMessage(
-                            this.messages['app.callbackUrl'],
-                          )}
+                          label={intl.formatMessage(this.messages['app.callbackUrl'])}
                           defaultValue={this.state.form.callbackUrl}
                           value={this.state.form.callbackUrl}
-                          onChange={value =>
-                            this.handleChange('callbackUrl', value)
-                          }
+                          onChange={value => this.handleChange('callbackUrl', value)}
                         />
                       </Col>
                     </Row>
                     <div className="actions">
-                      <Button
-                        bsStyle="primary"
-                        type="submit"
-                        onClick={this.handleSubmit}
-                      >
+                      <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>
                         Update Application
                       </Button>
 
                       <div className="separator">
-                        <Button
-                          bsStyle="danger"
-                          type="submit"
-                          onClick={this.handleDelete}
-                        >
+                        <Button bsStyle="danger" type="submit" onClick={this.handleDelete}>
                           Delete Application
                         </Button>
                       </div>

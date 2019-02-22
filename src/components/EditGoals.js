@@ -121,11 +121,7 @@ class EditGoals extends React.Component {
     return (
       <div className={`goal ${goal.slug}`} key={`goal-${index}-${goal.key}`}>
         <div className="goalActions">
-          <a
-            className="removeGoal"
-            href="#"
-            onClick={() => this.removeGoal(index)}
-          >
+          <a className="removeGoal" href="#" onClick={() => this.removeGoal(index)}>
             {intl.formatMessage(this.messages['goal.remove'])}
           </a>
         </div>
@@ -184,11 +180,7 @@ class EditGoals extends React.Component {
           {this.state.goals.map(this.renderGoal)}
         </div>
         <div className="editGoalsActions">
-          <Button
-            className="addGoal"
-            bsStyle="primary"
-            onClick={() => this.addGoal()}
-          >
+          <Button className="addGoal" bsStyle="primary" onClick={() => this.addGoal()}>
             {intl.formatMessage(this.messages['goal.add'])}
           </Button>
         </div>

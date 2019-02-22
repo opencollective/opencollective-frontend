@@ -39,37 +39,74 @@ class EventsIframe extends React.Component {
       <div>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Lato:400,700,900"
-          />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} events`}</title>
         </Head>
 
         <style jsx global>
           {`
             @font-face {
-              font-family: 'montserratlight';
-              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
-              src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix')
-                  format('embedded-opentype'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.woff2')
-                  format('woff2'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.woff')
-                  format('woff'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.ttf')
-                  format('truetype'),
-                url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight')
-                  format('svg');
-              font-weight: normal;
+              font-family: 'Inter UI';
               font-style: normal;
+              font-weight: 400;
+              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
             }
+
             @font-face {
-              font-family: 'lato';
-              src: url('/static/fonts/montserrat/lato-regular.ttf')
-                format('truetype');
-              font-weight: normal;
+              font-family: 'Inter UI';
+              font-style: italic;
+              font-weight: 400;
+              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter UI';
               font-style: normal;
+              font-weight: 500;
+              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter UI';
+              font-style: italic;
+              font-weight: 500;
+              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter UI';
+              font-style: normal;
+              font-weight: 700;
+              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter UI';
+              font-style: italic;
+              font-weight: 700;
+              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter UI';
+              font-style: normal;
+              font-weight: 900;
+              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter UI';
+              font-style: italic;
+              font-weight: 900;
+              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2') format('woff2'),
+                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
             }
 
             body {
@@ -77,7 +114,7 @@ class EventsIframe extends React.Component {
               height: 100%;
               padding: 0;
               margin: 0;
-              font-family: Lato, Helvetica, sans-serif;
+              font-family: 'Inter UI', sans-serif;
               font-weight: 300;
               font-size: 1rem;
               line-height: 1.5;
@@ -145,10 +182,7 @@ class EventsIframe extends React.Component {
             }
           `}
         </style>
-        <EventsWithData
-          collectiveSlug={collectiveSlug}
-          onChange={this.onChange}
-        />
+        <EventsWithData collectiveSlug={collectiveSlug} onChange={this.onChange} />
       </div>
     );
   }

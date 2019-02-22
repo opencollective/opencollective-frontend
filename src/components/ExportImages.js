@@ -31,12 +31,10 @@ class ExportImages extends React.Component {
         images: [
           {
             name: 'badge',
-            url: `https://opencollective.com/${collective.slug}/tiers/${
-              tier.slug
-            }/badge.svg?label=${tier.name}&color=brightgreen`,
-            code: `<img src="https://opencollective.com/${
-              collective.slug
-            }/tiers/${tier.slug}/badge.svg?label=${
+            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${
+              tier.name
+            }&color=brightgreen`,
+            code: `<img src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${
               tier.name
             }&color=brightgreen" />`,
             options: [
@@ -55,12 +53,10 @@ class ExportImages extends React.Component {
           },
           {
             name: 'members',
-            url: `https://opencollective.com/${collective.slug}/tiers/${
+            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
+            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${
               tier.slug
-            }.svg?avatarHeight=36`,
-            code: `<object type="image/svg+xml" data="https://opencollective.com/${
-              collective.slug
-            }/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
+            }.svg?avatarHeight=36&width=600"></object>`,
             options: [
               {
                 name: 'width',
@@ -80,14 +76,13 @@ class ExportImages extends React.Component {
                 description: 'max height of each avatar / logo',
               },
               {
-                name: 'showBtn',
+                name: 'button',
                 description: 'show "become a backer/sponsor" button',
                 defaultValue: 'true',
               },
               {
                 name: 'format',
-                description:
-                  'format of the image (replace .svg with .png or .jpg)',
+                description: 'format of the image (replace .svg with .png or .jpg)',
               },
             ],
           },
@@ -135,17 +130,12 @@ class ExportImages extends React.Component {
         </style>
 
         <h1>
-          <FormattedMessage
-            id="export.images.title"
-            defaultMessage="Export images"
-          />
+          <FormattedMessage id="export.images.title" defaultMessage="Export images" />
         </h1>
-        <p>
-          You can export images of each tier with the logo/avatar of the
-          contributors.
-        </p>
+        <p>You can export images of each tier with the logo/avatar of the contributors.</p>
         <div>
           <InputField
+            name="tiers"
             type="select"
             options={tierOptions}
             onChange={tierIndex => this.setState({ tierIndex })}
@@ -154,7 +144,7 @@ class ExportImages extends React.Component {
         {tier && (
           <div>
             {tier.images.map(image => (
-              <div>
+              <div key={image.name}>
                 <label>{image.name}</label>
                 <div
                   dangerouslySetInnerHTML={{
@@ -177,7 +167,7 @@ class ExportImages extends React.Component {
                         <th>default value</th>
                       </tr>
                       {image.options.map(option => (
-                        <tr>
+                        <tr key={option.name}>
                           <th valign="top">{option.name}</th>
                           <td valign="top">{option.description}</td>
                           <td valign="top">{option.defaultValue}</td>

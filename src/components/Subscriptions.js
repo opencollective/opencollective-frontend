@@ -23,10 +23,13 @@ class Subscriptions extends React.Component {
         id: 'subscription.cancelled.label',
         defaultMessage: 'Cancelled Subscriptions',
       },
+      'subscription.pending.label': {
+        id: 'subscription.pending.label',
+        defaultMessage: 'Pending Subscriptions',
+      },
       'subscription.login.message': {
         id: 'subscription.login.message',
-        defaultMessage:
-          'Are these your subscriptions? Login above to edit them',
+        defaultMessage: 'Are these your subscriptions? Login above to edit them',
       },
     });
   }
@@ -45,24 +48,17 @@ class Subscriptions extends React.Component {
   }
 
   render() {
-    const {
-      intl,
-      subscriptions,
-      LoggedInUser,
-      collective,
-      loading,
-    } = this.props;
+    const { intl, subscriptions, LoggedInUser, collective, loading } = this.props;
 
     if (!subscriptions || loading) {
       return <div />;
     }
 
-    const activeSubs = subscriptions
-      .filter(s => s.isSubscriptionActive)
-      .sort(this.sortBycreatedAt);
+    const activeSubs = subscriptions.filter(s => s.isSubscriptionActive).sort(this.sortBycreatedAt);
     const canceledSubs = subscriptions
-      .filter(s => !s.isSubscriptionActive)
+      .filter(s => !s.isSubscriptionActive && s.status !== 'PENDING')
       .sort(this.sortBycreatedAt);
+    const pendingSubs = subscriptions.filter(({ status }) => status === 'PENDING').sort(this.sortBycreatedAt);
 
     let userString = `${collective.name || collective.slug} isn't`;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
@@ -91,7 +87,8 @@ class Subscriptions extends React.Component {
               width: 33%;
             }
             .active,
-            .canceled {
+            .canceled,
+            .pending {
               display: flex;
               flex-wrap: wrap;
               flex-direction: row;
@@ -106,7 +103,6 @@ class Subscriptions extends React.Component {
               font-size: 20px;
               font-weight: 700;
               line-height: 1.08;
-              letter-spacing: -0.5px;
               border-bottom: 1px solid ${colors.gray};
               line-height: 0.1rem;
               color: ${colors.black};
@@ -151,35 +147,43 @@ class Subscriptions extends React.Component {
         </div>
         {activeSubs.length === 0 && (
           <div className="subscriptions-noactive">
-            <img
-              className="subscriptions-noactive-image"
-              src="/static/images/no-subscription-placeholder.svg"
-            />
-            <div className="subscriptions-noactive-text">
-              {' '}
-              Looks like {userString} contributing right now.
-            </div>
+            <img className="subscriptions-noactive-image" src="/static/images/no-subscription-placeholder.svg" />
+            <div className="subscriptions-noactive-text"> Looks like {userString} contributing right now.</div>
             <div className="subscriptions-noactive-link">
               <a href="/discover">Discover more collectives</a>
             </div>
           </div>
         )}
-        {activeSubs.length > 1 &&
-          !LoggedInUser && (
-            <div className="subscriptions-login-message">
-              {intl.formatMessage(this.messages['subscription.login.message'])}
-            </div>
-          )}
+        {activeSubs.length > 1 && !LoggedInUser && (
+          <div className="subscriptions-login-message">
+            {intl.formatMessage(this.messages['subscription.login.message'])}
+          </div>
+        )}
         {canceledSubs.length > 0 && (
           <div className="subscriptions-cancelled-label">
             {' '}
-            <span>
-              {intl.formatMessage(this.messages['subscription.canceled.label'])}{' '}
-            </span>
+            <span>{intl.formatMessage(this.messages['subscription.canceled.label'])} </span>
           </div>
         )}
         <div className="canceled">
           {canceledSubs.map(subscription => (
+            <SubscriptionCard
+              subscription={subscription}
+              key={`canceled-${subscription.id}`}
+              LoggedInUser={LoggedInUser}
+              paymentMethods={collective.paymentMethods}
+              slug={collective.slug}
+            />
+          ))}
+        </div>
+        {pendingSubs.length > 0 && (
+          <div className="subscriptions-cancelled-label">
+            {' '}
+            <span>{intl.formatMessage(this.messages['subscription.pending.label'])} </span>
+          </div>
+        )}
+        <div className="pending">
+          {pendingSubs.map(subscription => (
             <SubscriptionCard
               subscription={subscription}
               key={`canceled-${subscription.id}`}

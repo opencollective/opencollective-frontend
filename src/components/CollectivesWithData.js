@@ -107,19 +107,14 @@ class CollectivesWithData extends React.Component {
             <CollectiveCard key={collective.id} collective={collective} />
           ))}
         </div>
-        {collectives.length % 10 === 0 &&
-          collectives.length >= limit && (
-            <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && (
-                  <FormattedMessage id="loading" defaultMessage="loading" />
-                )}
-                {!this.state.loading && (
-                  <FormattedMessage id="loadMore" defaultMessage="load more" />
-                )}
-              </Button>
-            </div>
-          )}
+        {collectives.length % 10 === 0 && collectives.length >= limit && (
+          <div className="loadMoreBtn">
+            <Button bsStyle="default" onClick={this.fetchMore}>
+              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
@@ -205,14 +200,8 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) return previousResult;
           // Update the results object with new entries
-          const {
-            __typename,
-            total,
-            collectives,
-          } = previousResult.allCollectives;
-          const all = collectives.concat(
-            fetchMoreResult.allCollectives.collectives,
-          );
+          const { __typename, total, collectives } = previousResult.allCollectives;
+          const all = collectives.concat(fetchMoreResult.allCollectives.collectives);
           return Object.assign({}, previousResult, {
             allCollectives: { __typename, total, collectives: all },
           });

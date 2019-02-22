@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
-import router from '../server/pages';
+import { Router } from '../server/pages';
 import HashLink from 'react-scrollchor';
 
 const star = '/static/images/icons/star.svg';
@@ -28,12 +28,14 @@ class Button extends React.Component {
     this.onClick = this.onClick.bind(this);
   }
 
-  onClick(e) {
+  async onClick(e) {
     const { type, href, onClick, disabled } = this.props;
     if (type === 'submit') return;
     e.preventDefault();
     if (href && href.substr(0, 1) !== '#') {
-      return router.Router.pushRoute(href);
+      await Router.pushRoute(href);
+      window.scrollTo(0, 0);
+      document.body.focus();
     }
     if (!onClick) return;
     return !disabled && onClick && onClick();
@@ -52,7 +54,6 @@ class Button extends React.Component {
           {`
             .Button {
               --webkit-appearance: none;
-              font-family: Rubik;
               font-size: 1.4rem;
               font-weight: 500;
               height: 3.6rem;
@@ -153,7 +154,7 @@ class Button extends React.Component {
               width: 100%;
               border-radius: 0;
               height: 100%;
-              border-color: #46b0ed;
+              border-color: #3385ff;
               text-transform: uppercase;
               font-weight: bold;
               font-size: 1.7rem;

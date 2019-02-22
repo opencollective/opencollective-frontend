@@ -36,8 +36,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       },
     } = this.props;
     if (!paymentMethods || paymentMethods.length === 0) {
-      const error =
-        "We couldn't find a payment method to make this transaction";
+      const error = "We couldn't find a payment method to make this transaction";
       console.error(error);
       this.setState({ error });
       return;
@@ -72,17 +71,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
             }
           `}
         </style>
-        <SmallButton
-          className="approve"
-          bsStyle="success"
-          onClick={this.onClick}
-        >
-          {this.state.loading && (
-            <FormattedMessage
-              id="form.processing"
-              defaultMessage="processing"
-            />
-          )}
+        <SmallButton className="approve" bsStyle="success" onClick={this.onClick}>
+          {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
           {!this.state.loading && (
             <FormattedMessage
               id="SendMoneyToCollective.btn"

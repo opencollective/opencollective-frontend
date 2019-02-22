@@ -9,11 +9,12 @@ import Expense from './Expense';
 class Expenses extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     expenses: PropTypes.array,
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
-    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid)
     LoggedInUser: PropTypes.object,
@@ -46,15 +47,7 @@ class Expenses extends React.Component {
   }
 
   render() {
-    const {
-      collective,
-      expenses,
-      LoggedInUser,
-      editable,
-      view,
-      includeHostedCollectives,
-      filters,
-    } = this.props;
+    const { collective, host, expenses, LoggedInUser, editable, view, includeHostedCollectives, filters } = this.props;
 
     if (!expenses) {
       return <div />;
@@ -93,6 +86,9 @@ class Expenses extends React.Component {
             .itemsList {
               position: relative;
             }
+            .itemsList .item {
+              border-bottom: 1px solid #e8e9eb;
+            }
             .loading {
               color: ${colors.darkgray};
               position: absolute;
@@ -128,28 +124,18 @@ class Expenses extends React.Component {
               <Button
                 className="filterBtn pending"
                 bsSize="small"
-                bsStyle={
-                  this.state.status === 'PENDING' ? 'primary' : 'default'
-                }
+                bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PENDING')}
               >
-                <FormattedMessage
-                  id="expenses.pending"
-                  defaultMessage="pending"
-                />
+                <FormattedMessage id="expenses.pending" defaultMessage="pending" />
               </Button>
               <Button
                 className="filterBtn approved"
                 bsSize="small"
-                bsStyle={
-                  this.state.status === 'APPROVED' ? 'primary' : 'default'
-                }
+                bsStyle={this.state.status === 'APPROVED' ? 'primary' : 'default'}
                 onClick={() => this.refetch('APPROVED')}
               >
-                <FormattedMessage
-                  id="expenses.approved"
-                  defaultMessage="approved"
-                />
+                <FormattedMessage id="expenses.approved" defaultMessage="approved" />
               </Button>
               <Button
                 className="filterBtn paid"
@@ -170,43 +156,34 @@ class Expenses extends React.Component {
             </div>
           )}
           {expenses.map(expense => (
-            <Expense
-              key={expense.id}
-              collective={expense.collective || collective}
-              expense={expense}
-              editable={editable}
-              view={view}
-              includeHostedCollectives={includeHostedCollectives}
-              LoggedInUser={LoggedInUser}
-              allowPayAction={!this.state.isPayActionLocked}
-              lockPayAction={this.setPayActionLock.bind(this, true)}
-              unlockPayAction={this.setPayActionLock.bind(this, false)}
-            />
+            <div className="item" key={expense.id}>
+              <Expense
+                collective={expense.collective || collective}
+                host={host}
+                expense={expense}
+                editable={editable}
+                view={view}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={LoggedInUser}
+                allowPayAction={!this.state.isPayActionLocked}
+                lockPayAction={this.setPayActionLock.bind(this, true)}
+                unlockPayAction={this.setPayActionLock.bind(this, false)}
+              />
+            </div>
           ))}
           {expenses.length === 0 && (
             <div className="empty">
-              <FormattedMessage
-                id="expenses.empty"
-                defaultMessage="No expenses"
-              />
+              <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
             </div>
           )}
-          {expenses.length >= 10 &&
-            expenses.length % 10 === 0 && (
-              <div className="loadMoreBtn">
-                <Button bsStyle="default" onClick={this.fetchMore}>
-                  {this.state.loading && (
-                    <FormattedMessage id="loading" defaultMessage="loading" />
-                  )}
-                  {!this.state.loading && (
-                    <FormattedMessage
-                      id="loadMore"
-                      defaultMessage="load more"
-                    />
-                  )}
-                </Button>
-              </div>
-            )}
+          {expenses.length >= 10 && expenses.length % 10 === 0 && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

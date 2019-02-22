@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
+import uuidv4 from 'uuid/v4';
 
 import InputField from './InputField';
 import InputFieldPresets from './InputFieldPresets';
@@ -27,9 +28,7 @@ class EditTiers extends React.Component {
     this.removeTier = this.removeTier.bind(this);
     this.editTier = this.editTier.bind(this);
     this.onChange = props.onChange.bind(this);
-    this.defaultType =
-      this.props.defaultType ||
-      (this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER');
+    this.defaultType = this.props.defaultType || (this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER');
 
     this.messages = defineMessages({
       TIER: { id: 'tier.type.tier', defaultMessage: 'generic tier' },
@@ -121,8 +120,7 @@ class EditTiers extends React.Component {
       'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'Expiration' },
       'endsAt.description': {
         id: 'tier.endsAt.description',
-        defaultMessage:
-          'Date and time until when this tier should be available',
+        defaultMessage: 'Date and time until when this tier should be available',
       },
       'maxQuantity.label': {
         id: 'tier.maxQuantity.label',
@@ -146,16 +144,7 @@ class EditTiers extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(
-          props.types || [
-            'TIER',
-            'TICKET',
-            'MEMBERSHIP',
-            'SERVICE',
-            'PRODUCT',
-            'DONATION',
-          ],
-        ),
+        options: getOptions(props.types || ['TIER', 'TICKET', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']),
         label: intl.formatMessage(this.messages['type.label']),
       },
       {
@@ -185,6 +174,7 @@ class EditTiers extends React.Component {
         name: 'presets',
         pre: getCurrencySymbol(props.currency),
         type: 'component',
+        options: { step: 1 },
         component: InputFieldPresets,
         label: intl.formatMessage(this.messages['presets.label']),
         when: tier => tier._amountType === 'flexible',
@@ -201,18 +191,13 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['onetime', 'month', 'year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: tier =>
-          !tier ||
-          ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].indexOf(tier.type) !==
-            -1,
+        when: tier => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].indexOf(tier.type) !== -1,
       },
       {
         name: 'maxQuantity',
         type: 'number',
         label: intl.formatMessage(this.messages['maxQuantity.label']),
-        description: intl.formatMessage(
-          this.messages['maxQuantity.description'],
-        ),
+        description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: tier => ['TICKET', 'PRODUCT', 'TIER'].indexOf(tier.type) !== -1,
       },
     ];
@@ -234,7 +219,7 @@ class EditTiers extends React.Component {
 
   addTier(tier) {
     const tiers = this.state.tiers;
-    tiers.push(tier || {});
+    tiers.push({ ...(tier || {}), __uuid: uuidv4() });
     this.setState({ tiers });
   }
 
@@ -248,6 +233,7 @@ class EditTiers extends React.Component {
 
   renderTier(tier, index) {
     const { intl } = this.props;
+    const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
 
     const defaultValues = {
       ...tier,
@@ -256,13 +242,9 @@ class EditTiers extends React.Component {
     };
 
     return (
-      <div className={`tier ${tier.slug}`} key={`tier-${index}`}>
+      <div className={`tier ${tier.slug}`} key={key}>
         <div className="tierActions">
-          <a
-            className="removeTier"
-            href="#"
-            onClick={() => this.removeTier(index)}
-          >
+          <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>
             {intl.formatMessage(this.messages[`${this.defaultType}.remove`])}
           </a>
         </div>
@@ -320,11 +302,7 @@ class EditTiers extends React.Component {
           {this.state.tiers.map(this.renderTier)}
         </div>
         <div className="editTiersActions">
-          <Button
-            className="addTier"
-            bsStyle="primary"
-            onClick={() => this.addTier({})}
-          >
+          <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
             {intl.formatMessage(this.messages[`${defaultType}.add`])}
           </Button>
         </div>

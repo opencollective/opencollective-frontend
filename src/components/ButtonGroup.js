@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { borders, borderRadius } from 'styled-system';
-import { Flex } from 'grid-styled';
+import { Flex } from '@rebass/grid';
 
 const computeBorderRadius = ({ index, itemCount }) => {
   if (index === 0) {
@@ -35,6 +35,7 @@ const ButtonGroup = ({ onChange = () => {}, values = [], value }) => (
         isLast={index === values.length - 1}
         onClick={() => onChange(v)}
         selected={v === value}
+        type="button"
       >
         {v}
       </Button>

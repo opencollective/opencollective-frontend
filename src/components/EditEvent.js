@@ -7,10 +7,7 @@ import EditEventForm from './EditEventForm';
 import CollectiveCover from './CollectiveCover';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
-import {
-  addEditCollectiveMutation,
-  addDeleteCollectiveMutation,
-} from '../graphql/mutations';
+import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
 import { Router } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
 
@@ -33,17 +30,12 @@ class EditEvent extends React.Component {
       EventInputType.ParentCollectiveId = this.props.event.parentCollective.id;
       const res = await this.props.editCollective(EventInputType);
       const event = res.data.editCollective;
-      const eventRoute = `/${this.props.event.parentCollective.slug}/events/${
-        event.slug
-      }`;
+      const eventRoute = `/${this.props.event.parentCollective.slug}/events/${event.slug}`;
       Router.pushRoute(eventRoute);
       this.setState({ result: { success: 'Event edited successfully' } });
     } catch (err) {
       console.error('>>> editEvent error: ', JSON.stringify(err));
-      const errorMsg =
-        err.graphQLErrors && err.graphQLErrors[0]
-          ? err.graphQLErrors[0].message
-          : err.message;
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
     }
@@ -62,10 +54,7 @@ class EditEvent extends React.Component {
         Router.pushRoute(collectiveRoute);
       } catch (err) {
         console.error('>>> deleteEvent error: ', JSON.stringify(err));
-        const errorMsg =
-          err.graphQLErrors && err.graphQLErrors[0]
-            ? err.graphQLErrors[0].message
-            : err.message;
+        const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
         this.setState({ result: { error: errorMsg } });
         throw new Error(errorMsg);
       }
@@ -115,12 +104,7 @@ class EditEvent extends React.Component {
           <CollectiveCover
             collective={parentCollective}
             className="small"
-            title={
-              <FormattedMessage
-                id="menu.edit.event"
-                defaultMessage="edit event"
-              />
-            }
+            title={<FormattedMessage id="menu.edit.event" defaultMessage="edit event" />}
             style={get(parentCollective, 'settings.style.hero.cover')}
           />
 
@@ -130,16 +114,10 @@ class EditEvent extends React.Component {
                 <p>
                   You need to be logged in as the creator of this event
                   <br />
-                  or as a core contributor of the {
-                    event.parentCollective.name
-                  }{' '}
-                  collective.
+                  or as a core contributor of the {event.parentCollective.name} collective.
                 </p>
                 <p>
-                  <Button
-                    bsStyle="primary"
-                    href={`/signin?next=/${event.slug}/edit`}
-                  >
+                  <Button bsStyle="primary" href={`/signin?next=/${event.slug}/edit`}>
                     Login
                   </Button>
                 </p>
@@ -147,11 +125,7 @@ class EditEvent extends React.Component {
             )}
             {canEditEvent && (
               <div>
-                <EditEventForm
-                  event={event}
-                  onSubmit={this.editEvent}
-                  loading={this.state.status === 'loading'}
-                />
+                <EditEventForm event={event} onSubmit={this.editEvent} loading={this.state.status === 'loading'} />
                 <div className="actions">
                   (<a onClick={this.deleteEvent}>delete event</a>)
                   <div className="result">
@@ -169,6 +143,4 @@ class EditEvent extends React.Component {
   }
 }
 
-export default addEditCollectiveMutation(
-  addDeleteCollectiveMutation(EditEvent),
-);
+export default addEditCollectiveMutation(addDeleteCollectiveMutation(EditEvent));

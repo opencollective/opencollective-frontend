@@ -1,16 +1,3 @@
-const WEBSITE_URL =
-  process.env.WEBSITE_URL ||
-  'http://localhost:3000' ||
-  'https://staging.opencollective.com';
-
-const signin = redirect => {
-  cy.visit(`${WEBSITE_URL}/signin?next=${redirect}`);
-  cy.get('.email.inputField input').type('testuser+admin@opencollective.com');
-  cy.wait(400);
-  cy.get('.email.inputField input').type('{enter}');
-  cy.wait(700);
-};
-
 const addTier = tier => {
   cy.get('.addTier').click();
 
@@ -24,20 +11,21 @@ const addTier = tier => {
 
   fields.map(field => {
     const action = field.type === 'select' ? 'select' : 'type';
-    const value =
-      action === 'type' ? `{selectall}${tier[field.name]}` : tier[field.name];
-    cy.get(`.EditTiers .tier:last .${field.name}.inputField ${field.type}`)[
-      action
-    ](value);
+    const value = action === 'type' ? `{selectall}${tier[field.name]}` : tier[field.name];
+    cy.get(`.EditTiers .tier:last .${field.name}.inputField ${field.type}`)[action](value);
   });
 };
 
 describe('edit collective', () => {
+  beforeEach(() => {
+    cy.login({ redirect: '/testcollective/edit' });
+  });
+
   it('edit info', () => {
-    signin('/testcollective/edit');
     cy.get('.name.inputField input').type(' edited');
     cy.get('.description.inputField input').type(' edited');
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
+    cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
     cy.get('.website.inputField input').type('{selectall}opencollective.com');
     cy.get('.longDescription.inputField textarea').type(
       '{selectall}Testing *markdown* [link to google](https://google.com).',
@@ -48,40 +36,22 @@ describe('edit collective', () => {
     cy.wait(500);
     cy.get('.CollectivePage .cover h1').contains('edited');
     cy.get('.cover .twitterHandle').contains('@opencollect');
+    cy.get('.cover .githubHandle').contains('AwesomeHandle');
     cy.get('.cover .website').contains('opencollective.com');
-    cy.get('.CollectivePage .longDescription').contains(
-      'Testing markdown link to google',
-    );
+    cy.get('.CollectivePage .longDescription').contains('Testing markdown link to google');
     cy.get('.CollectivePage .longDescription a').contains('link to google');
   });
 
   it('edit tiers', () => {
-    signin('/testcollective/edit');
     cy.get('.MenuItem.tiers').click();
-    cy.get('.EditTiers .tier:first .name.inputField input').type(
-      '{selectall}Backer edited',
-    );
-    cy.get('.EditTiers .tier:first .description.inputField textarea').type(
-      '{selectall}New description for backers',
-    );
-    cy.get('.EditTiers .tier:first .amount.inputField input').type(
-      '{selectall}5',
-    );
-    cy.get('.EditTiers .tier:first ._amountType.inputField select').select(
-      'flexible',
-    );
-    cy.get('.EditTiers .tier:first .currency1.inputField input').type(
-      '{selectall}5',
-    );
-    cy.get('.EditTiers .tier:first .currency2.inputField input').type(
-      '{selectall}10',
-    );
-    cy.get('.EditTiers .tier:first .currency3.inputField input').type(
-      '{selectall}20',
-    );
-    cy.get('.EditTiers .tier:first .currency0.inputField input').type(
-      '{selectall}{backspace}',
-    );
+    cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
+    cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
+    cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
+    cy.get('.EditTiers .tier:first ._amountType.inputField select').select('flexible');
+    cy.get('.EditTiers .tier:first .currency1.inputField input').type('{selectall}5');
+    cy.get('.EditTiers .tier:first .currency2.inputField input').type('{selectall}10');
+    cy.get('.EditTiers .tier:first .currency3.inputField input').type('{selectall}20');
+    cy.get('.EditTiers .tier:first .currency0.inputField input').type('{selectall}{backspace}');
     addTier({
       name: 'Donor (one time donation)',
       type: 'DONATION',
@@ -130,10 +100,13 @@ describe('edit collective', () => {
       .first()
       .find('a.action')
       .click();
-    cy.get('.OrderForm', { timeout: 20000 });
-    cy.get('.tier .selectPreset label').contains('Select monthly amount');
-    cy.get('.tier .presetBtn', { timeout: 5000 }).should('have.length', 3);
-    cy.visit(`${WEBSITE_URL}/testcollective/edit#tiers`);
+
+    // Ensure the new tiers are properly displayed on order form
+    cy.contains('button', 'Next step', { timeout: 20000 }).click();
+    cy.get('#interval').contains('Monthly');
+    cy.get('#totalAmount > button').should('have.length', 3);
+
+    cy.visit('/testcollective/edit/tiers');
     cy.get('.EditTiers .tier')
       .first()
       .find('._amountType select')

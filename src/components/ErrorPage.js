@@ -15,6 +15,9 @@ class ErrorPage extends React.Component {
     loading: PropTypes.bool,
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
     intl: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
+    /** Define if error should be logged to console. Default: true */
+    log: PropTypes.bool,
   };
 
   constructor(props) {
@@ -23,7 +26,7 @@ class ErrorPage extends React.Component {
     this.messages = defineMessages({
       loading: { id: 'page.loading', defaultMessage: 'Loading' },
       'loading.description': {
-        id: 'page.loading.description',
+        id: 'pleasewait',
         defaultMessage: 'Please wait...',
       },
       'collective.is.not.host': {
@@ -36,8 +39,7 @@ class ErrorPage extends React.Component {
       },
       networkError: {
         id: 'page.error.networkError',
-        defaultMessage:
-          'The Open Collective Server is momentarily unreachable 🙀',
+        defaultMessage: 'The Open Collective Server is momentarily unreachable 🙀',
       },
       'networkError.description': {
         id: 'page.error.networkError.description',
@@ -49,9 +51,9 @@ class ErrorPage extends React.Component {
   }
 
   getErrorComponent() {
-    const { message, data, loading } = this.props;
+    const { message, data, loading, log = true } = this.props;
 
-    if (get(data, 'error')) {
+    if (log && get(data, 'error')) {
       if (data.error.message !== 'Test error') {
         // That might not be the right place to log the error. Remove?
         console.error(data.error);
@@ -99,9 +101,7 @@ class ErrorPage extends React.Component {
         <h1>{intl.formatMessage(this.messages[this.message])}</h1>
         {this.component}
         {this.messages[`${this.message}.description`] && (
-          <p>
-            {intl.formatMessage(this.messages[`${this.message}.description`])}
-          </p>
+          <p>{intl.formatMessage(this.messages[`${this.message}.description`])}</p>
         )}
         {this.message === 'graphQLError' && <p>{message}</p>}
       </div>
@@ -109,11 +109,13 @@ class ErrorPage extends React.Component {
   }
 
   render() {
+    const { LoggedInUser } = this.props;
+
     const component = this.getErrorComponent();
 
     return (
       <div className="ErrorPage">
-        <Header />
+        <Header LoggedInUser={LoggedInUser} />
         <Body>
           <div className="content">{component}</div>
         </Body>

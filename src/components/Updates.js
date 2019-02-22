@@ -34,13 +34,7 @@ class Updates extends React.Component {
   }
 
   render() {
-    const {
-      collective,
-      updates,
-      LoggedInUser,
-      editable,
-      includeHostedCollectives,
-    } = this.props;
+    const { collective, updates, LoggedInUser, editable, includeHostedCollectives } = this.props;
 
     if (!updates) {
       return <div />;
@@ -107,28 +101,17 @@ class Updates extends React.Component {
           ))}
           {updates.length === 0 && (
             <div className="empty">
-              <FormattedMessage
-                id="updates.empty"
-                defaultMessage="No updates"
-              />
+              <FormattedMessage id="updates.empty" defaultMessage="No updates" />
             </div>
           )}
-          {updates.length >= 10 &&
-            updates.length % 10 === 0 && (
-              <div className="loadMoreBtn">
-                <Button bsStyle="default" onClick={this.fetchMore}>
-                  {this.state.loading && (
-                    <FormattedMessage id="loading" defaultMessage="loading" />
-                  )}
-                  {!this.state.loading && (
-                    <FormattedMessage
-                      id="loadMore"
-                      defaultMessage="load more"
-                    />
-                  )}
-                </Button>
-              </div>
-            )}
+          {updates.length >= 10 && updates.length % 10 === 0 && (
+            <div className="loadMoreBtn">
+              <Button bsStyle="default" onClick={this.fetchMore}>
+                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

@@ -2,20 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { get } from 'lodash';
-import {
-  Col,
-  HelpBlock,
-  FormGroup,
-  InputGroup,
-  FormControl,
-  ControlLabel,
-  Checkbox,
-} from 'react-bootstrap';
-import Switch from '@material-ui/core/Switch';
+import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
+import InputSwitch from './InputSwitch';
+import InputTypeCountry from './InputTypeCountry';
 
 import { capitalize } from '../lib/utils';
 
@@ -23,18 +16,10 @@ import { capitalize } from '../lib/utils';
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 let HTMLEditor, MarkdownEditor, InputTypeTags, DateTime;
 if (process.env.DYNAMIC_IMPORT) {
-  HTMLEditor = dynamic(() =>
-    import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'),
-  );
-  MarkdownEditor = dynamic(() =>
-    import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'),
-  );
-  InputTypeTags = dynamic(() =>
-    import(/* webpackChunkName: 'InputTypeTags' */ './InputTypeTags'),
-  );
-  DateTime = dynamic(() =>
-    import(/* webpackChunkName: 'DateTime' */ './DateTime'),
-  );
+  HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
+  MarkdownEditor = dynamic(() => import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'));
+  InputTypeTags = dynamic(() => import(/* webpackChunkName: 'InputTypeTags' */ './InputTypeTags'));
+  DateTime = dynamic(() => import(/* webpackChunkName: 'DateTime' */ './DateTime'));
 } else {
   HTMLEditor = require('./HTMLEditor').default;
   MarkdownEditor = require('./MarkdownEditor').default;
@@ -42,17 +27,7 @@ if (process.env.DYNAMIC_IMPORT) {
   DateTime = require('./DateTime').default;
 }
 
-function FieldGroup({
-  controlId,
-  label,
-  help,
-  pre,
-  post,
-  after,
-  button,
-  className,
-  ...props
-}) {
+function FieldGroup({ controlId, label, help, pre, post, after, button, className, ...props }) {
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
 
@@ -63,11 +38,7 @@ function FieldGroup({
 
   if (className && className.match(/horizontal/)) {
     return (
-      <FormGroup
-        controlId={controlId}
-        validationState={validationState}
-        className={className}
-      >
+      <FormGroup controlId={controlId} validationState={validationState} className={className}>
         <Col componentClass={ControlLabel} sm={2}>
           {label}
         </Col>
@@ -86,32 +57,20 @@ function FieldGroup({
     );
   } else {
     return (
-      <FormGroup
-        controlId={controlId}
-        validationState={validationState}
-        className={className}
-      >
+      <FormGroup controlId={controlId} validationState={validationState} className={className}>
         {label && <ControlLabel>{label}</ControlLabel>}
         {(pre || button) && (
           <InputGroup>
             {pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-            <FormControl
-              {...inputProps}
-              ref={inputRef => inputRef && props.focus && inputRef.focus()}
-            />
+            <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
             {post && <InputGroup.Addon>{post}</InputGroup.Addon>}
             {validationState && <FormControl.Feedback />}
             {button && <InputGroup.Button>{button}</InputGroup.Button>}
           </InputGroup>
         )}
-        {!pre &&
-          !post &&
-          !button && (
-            <FormControl
-              {...inputProps}
-              ref={inputRef => inputRef && props.focus && inputRef.focus()}
-            />
-          )}
+        {!pre && !post && !button && (
+          <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+        )}
         {help && <HelpBlock>{help}</HelpBlock>}
       </FormGroup>
     );
@@ -121,22 +80,16 @@ function FieldGroup({
 class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.object,
-    ]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
     defaultValue: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
       PropTypes.object,
       PropTypes.bool,
+      PropTypes.array,
     ]),
     validate: PropTypes.func,
-    options: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.object),
-      PropTypes.object,
-    ]),
+    options: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
     context: PropTypes.object,
     placeholder: PropTypes.string,
     pre: PropTypes.string,
@@ -176,10 +129,33 @@ class InputField extends React.Component {
     return true;
   }
 
-  handleChange(value) {
-    if (this.props.type === 'number') {
-      value = parseInt(value) || null;
+  roundCurrencyValue(value) {
+    if (value === null) {
+      return null;
+    } else if (get(this.props.options, 'step') === 1) {
+      // Value must be an increment of 1, truncate the two last digits
+      return Math.trunc(value / 100) * 100;
     }
+    return value;
+  }
+
+  getCountryISOCode(value) {
+    if (value === null || typeof value !== 'string') return null;
+    // Example "Nigeria - NG" to "NG"
+    value = value.split('-')[1];
+    return value.trim();
+  }
+
+  handleChange(value) {
+    const { type } = this.props;
+    if (type === 'number') {
+      value = parseInt(value) || null;
+    } else if (type === 'currency') {
+      value = this.roundCurrencyValue(value);
+    } else if (type === 'country') {
+      value = this.getCountryISOCode(value);
+    }
+
     if (this.validate(value)) {
       this.setState({ validationState: null });
     } else {
@@ -204,21 +180,14 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <InputTypeCreditCard
-                    options={field.options}
-                    onChange={this.handleChange}
-                    style={this.props.style}
-                  />
+                  <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style} />
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
                 <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                <InputTypeCreditCard
-                  onChange={this.handleChange}
-                  style={this.props.style}
-                />
+                <InputTypeCreditCard onChange={this.handleChange} style={this.props.style} />
               </div>
             )}
           </FormGroup>
@@ -245,7 +214,7 @@ class InputField extends React.Component {
             help={field.description}
             after={after}
             maxLength={field.maxLength}
-            value={this.state.value || this.props.defaultValue}
+            value={this.state.value || this.props.defaultValue || ''}
             onChange={event => this.handleChange(event.target.value)}
           />
         );
@@ -267,13 +236,9 @@ class InputField extends React.Component {
             )}
             {!horizontal && (
               <div>
-                {field.label && (
-                  <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>
-                )}
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
                 <InputTypeTags {...field} />
-                {field.description && (
-                  <HelpBlock>{field.description}</HelpBlock>
-                )}
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}
           </FormGroup>
@@ -299,11 +264,7 @@ class InputField extends React.Component {
                     date={this.state.value || field.defaultValue}
                     timezone={context.timezone || 'utc'}
                     isValidDate={field.validate}
-                    onChange={date =>
-                      date.toISOString
-                        ? this.handleChange(date.toISOString())
-                        : false
-                    }
+                    onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
                     closeOnSelect={closeOnSelect}
                   />
                 </Col>
@@ -311,25 +272,17 @@ class InputField extends React.Component {
             )}
             {!horizontal && (
               <div>
-                {field.label && (
-                  <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>
-                )}
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
                 <DateTime
                   name={field.name}
                   timeFormat={field.timeFormat || timeFormat}
                   date={this.state.value || field.defaultValue}
                   timezone={context.timezone || 'utc'}
                   isValidDate={field.validate}
-                  onChange={date =>
-                    date.toISOString
-                      ? this.handleChange(date.toISOString())
-                      : false
-                  }
+                  onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
                   closeOnSelect={closeOnSelect}
                 />
-                {field.description && (
-                  <HelpBlock>{field.description}</HelpBlock>
-                )}
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}
           </FormGroup>
@@ -346,27 +299,15 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <field.component
-                    onChange={this.handleChange}
-                    {...field}
-                    {...field.options}
-                  />
+                  <field.component onChange={this.handleChange} {...field} {...field.options} />
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
-                {field.label && (
-                  <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>
-                )}
-                <field.component
-                  onChange={this.handleChange}
-                  {...field}
-                  {...field.options}
-                />
-                {field.description && (
-                  <HelpBlock>{field.description}</HelpBlock>
-                )}
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+                <field.component onChange={this.handleChange} {...field} {...field.options} />
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}
           </FormGroup>
@@ -376,9 +317,7 @@ class InputField extends React.Component {
       case 'location':
         this.input = (
           <FormGroup>
-            {field.label && (
-              <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>
-            )}
+            {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
             <InputTypeLocation
               value={this.state.value || field.defaultValue}
               onChange={event => this.handleChange(event)}
@@ -386,6 +325,30 @@ class InputField extends React.Component {
               options={field.options}
             />
             {field.description && <HelpBlock>{field.description}</HelpBlock>}
+          </FormGroup>
+        );
+        break;
+
+      case 'country':
+        this.input = (
+          <FormGroup>
+            {horizontal && (
+              <div>
+                <Col componentClass={ControlLabel} sm={2}>
+                  {capitalize(field.label)}
+                </Col>
+                <Col sm={10}>
+                  <InputTypeCountry {...field} onChange={value => this.handleChange(value)} />
+                </Col>
+              </div>
+            )}
+            {!horizontal && (
+              <div>
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+                <InputTypeCountry {...field} onChange={value => this.handleChange(value)} />
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
+              </div>
+            )}
           </FormGroup>
         );
         break;
@@ -406,17 +369,13 @@ class InputField extends React.Component {
                     placeholder={field.placeholder}
                     options={field.options}
                   />
-                  {field.description && (
-                    <HelpBlock>{field.description}</HelpBlock>
-                  )}
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
-                {field.label && (
-                  <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>
-                )}
+                {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
                 <InputTypeDropzone
                   defaultValue={field.defaultValue}
                   name={field.name}
@@ -424,9 +383,7 @@ class InputField extends React.Component {
                   placeholder={field.placeholder}
                   options={field.options}
                 />
-                {field.description && (
-                  <HelpBlock>{field.description}</HelpBlock>
-                )}
+                {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}
           </FormGroup>
@@ -439,16 +396,13 @@ class InputField extends React.Component {
         this.input = (
           <FieldGroup
             onChange={event => {
-              return this.handleChange(
-                event.target.value.length === 0
-                  ? null
-                  : Math.round(event.target.value * 100),
-              );
+              return this.handleChange(event.target.value.length === 0 ? null : Math.round(event.target.value * 100));
             }}
             type="number"
             pre={field.pre}
             post={field.post}
             name={field.name}
+            disabled={field.disabled}
             step={get(field, 'options.step') || '0.01'}
             min={(field.min || 0) / 100}
             label={field.label && `${capitalize(field.label)}`}
@@ -463,14 +417,9 @@ class InputField extends React.Component {
 
       case 'select': {
         const firstOptionValue =
-          field.options[0].value !== undefined
-            ? field.options[0].value
-            : Object.keys(field.options[0])[0];
+          field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
         if (field.options.length <= 1) {
-          console.warn(
-            '>>> InputField: options.length needs to be > 1',
-            field.options,
-          );
+          console.warn('>>> InputField: options.length needs to be > 1', field.options);
           return null;
         }
         this.input = (
@@ -490,10 +439,7 @@ class InputField extends React.Component {
           >
             {field.options &&
               field.options.map(option => {
-                const value =
-                  option.value !== undefined
-                    ? option.value
-                    : Object.keys(option)[0];
+                const value = option.value !== undefined ? option.value : Object.keys(option)[0];
                 const label = option.label || option[value];
                 return (
                   <option key={value} value={value}>
@@ -531,9 +477,7 @@ class InputField extends React.Component {
             )}
             {!horizontal && (
               <div>
-                {field.label && (
-                  <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                )}
+                {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
                 <Checkbox
                   defaultChecked={field.defaultValue}
                   onChange={event => this.handleChange(event.target.checked)}
@@ -550,34 +494,34 @@ class InputField extends React.Component {
         this.input = (
           <FormGroup controlId={field.name} help={field.description}>
             {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
+              <React.Fragment>
+                {field.label && (
+                  <Col componentClass={ControlLabel} sm={2}>
+                    {capitalize(field.label)}
+                  </Col>
+                )}
                 <Col sm={10}>
-                  <Switch
+                  <InputSwitch
+                    name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
                   />
-                  {field.description && (
-                    <HelpBlock>{field.description}</HelpBlock>
-                  )}
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Col>
-              </div>
+              </React.Fragment>
             )}
             {!horizontal && (
-              <div>
-                <ControlLabel>{capitalize(field.label)}</ControlLabel>
+              <React.Fragment>
+                {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
                 <div className="switch">
-                  <Switch
+                  <InputSwitch
+                    name={field.name}
                     defaultChecked={field.defaultValue}
                     onChange={event => this.handleChange(event.target.checked)}
                   />
-                  {field.description && (
-                    <HelpBlock>{field.description}</HelpBlock>
-                  )}
+                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </div>
-              </div>
+              </React.Fragment>
             )}
           </FormGroup>
         );
@@ -586,10 +530,9 @@ class InputField extends React.Component {
       case 'html':
         this.input = (
           <div>
-            {field.label && (
-              <ControlLabel>{capitalize(field.label)}</ControlLabel>
-            )}
+            {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
             <HTMLEditor
+              value={this.props.value}
               defaultValue={field.defaultValue}
               onChange={this.handleChange}
               className={field.className}
@@ -601,13 +544,8 @@ class InputField extends React.Component {
       case 'markdown':
         this.input = (
           <div>
-            {field.label && (
-              <ControlLabel>{capitalize(field.label)}</ControlLabel>
-            )}
-            <MarkdownEditor
-              defaultValue={field.defaultValue}
-              onChange={this.handleChange}
-            />
+            {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
+            <MarkdownEditor defaultValue={field.defaultValue} onChange={this.handleChange} />
           </div>
         );
         break;
@@ -637,10 +575,7 @@ class InputField extends React.Component {
     }
 
     return (
-      <div
-        className={`inputField ${this.props.className} ${this.props.name}`}
-        key={`input-${this.props.name}`}
-      >
+      <div className={`inputField ${this.props.className} ${this.props.name}`} key={`input-${this.props.name}`}>
         <style jsx global>
           {`
             span.input-group {
@@ -653,13 +588,16 @@ class InputField extends React.Component {
             .inputField textarea {
               font-size: 1.6rem;
             }
+            .horizontal .form-group label {
+              margin-top: 5px;
+            }
             .form-horizontal .form-group label {
               padding-top: 3px;
             }
             .inputField .checkbox label {
               width: auto;
             }
-            .inputField .right input[type='number'] {
+            .inputField input[type='number'] {
               text-align: right;
             }
             .inputField .currency input[type='number'] {
@@ -668,14 +606,6 @@ class InputField extends React.Component {
             .inputField .switch {
               display: flex;
               align-items: center;
-            }
-            .inputField .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5 {
-              color: #46b0ed;
-            }
-            .inputField
-              .MuiSwitch-colorSecondary-7.MuiSwitch-checked-5
-              + .MuiSwitch-bar-9 {
-              background-color: #46b0ed;
             }
           `}
         </style>

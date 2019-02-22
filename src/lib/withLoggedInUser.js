@@ -9,8 +9,12 @@ import LoggedInUser from '../classes/LoggedInUser';
 import { getLoggedInUserQuery } from '../graphql/queries';
 
 const maybeRefreshAccessToken = async currentToken => {
-  const { exp } = jwt.decode(currentToken);
-  const shouldUpdate = moment(exp * 1000)
+  const decodeResult = jwt.decode(currentToken);
+  if (!decodeResult) {
+    return;
+  }
+
+  const shouldUpdate = moment(decodeResult.exp * 1000)
     .subtract(1, 'month')
     .isBefore(new Date());
   if (shouldUpdate) {
@@ -44,29 +48,48 @@ export default WrappedComponent => {
         }
       });
 
-    getLoggedInUser = async () => {
+    /**
+     * If `token` is passed in `options`, function it will throw if
+     * that token is invalid and it won't try to load user from the local cache
+     * but instead force refetch it from the server.
+     */
+    getLoggedInUser = async (options = {}) => {
+      const { ignoreLocalStorage = false, token = null } = options;
+
       // only Client Side for now
       if (!process.browser || !window) {
         return null;
       }
 
-      // If no localStorage token, reset LoggedInUser
-      const token = window.localStorage.getItem('accessToken');
-      if (!token) {
-        storage.set('LoggedInUser', null);
-        return null;
-      }
+      if (token) {
+        // Ensure token is valid
+        const decodeResult = jwt.decode(token);
+        if (!decodeResult || !decodeResult.exp) {
+          throw new Error('Invalid token');
+        }
+        storage.set('accessToken', token);
+        await maybeRefreshAccessToken(token);
+      } else {
+        // If no localStorage token, reset LoggedInUser
+        const localStorageToken = window.localStorage.getItem('accessToken');
+        if (!localStorageToken) {
+          if (storage.get('LoggedInUser')) {
+            storage.set('LoggedInUser', null);
+          }
+          return null;
+        }
 
-      // refresh Access Token in the background if needed
-      maybeRefreshAccessToken(token);
+        // refresh Access Token in the background if needed
+        maybeRefreshAccessToken(localStorageToken);
 
-      // From cache
-      const cache = storage.get('LoggedInUser');
-      if (cache) {
-        // This is asynchronous and will take care of updating the cache
-        this.getLoggedInUserFromServer();
-        // Return from cache immediately
-        return new LoggedInUser(cache);
+        // From cache
+        const cache = storage.get('LoggedInUser');
+        if (!ignoreLocalStorage && cache) {
+          // This is asynchronous and will take care of updating the cache
+          this.getLoggedInUserFromServer();
+          // Return from cache immediately
+          return new LoggedInUser(cache);
+        }
       }
 
       // Synchronously
@@ -74,12 +97,7 @@ export default WrappedComponent => {
     };
 
     render() {
-      return (
-        <WrappedComponent
-          getLoggedInUser={this.getLoggedInUser}
-          {...this.props}
-        />
-      );
+      return <WrappedComponent getLoggedInUser={this.getLoggedInUser} {...this.props} />;
     }
   };
 };

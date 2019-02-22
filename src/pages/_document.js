@@ -2,7 +2,8 @@ import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
-import './global-styles';
+import { pick } from 'lodash';
+import GlobalStyles from './global-styles';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -15,9 +16,7 @@ export default class IntlDocument extends Document {
     } = context;
 
     const sheet = new ServerStyleSheet();
-    const page = renderPage(App => props =>
-      sheet.collectStyles(<App {...props} />),
-    );
+    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />));
     const styleTags = sheet.getStyleElement();
     const styles = flush();
 
@@ -33,14 +32,16 @@ export default class IntlDocument extends Document {
 
   constructor(props) {
     super(props);
-    props.__NEXT_DATA__.env = {
-      IMAGES_URL: process.env.IMAGES_URL || 'https://images.opencollective.com',
-      PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
-      STRIPE_KEY: process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
-      GOOGLE_MAPS_API_KEY:
-        process.env.GOOGLE_MAPS_API_KEY ||
-        'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
-    };
+    // We pick the environment variables that we want to access from the client
+    // They can later be read with getEnvVar()
+    // Please, NEVER SECRETS!
+    props.__NEXT_DATA__.env = pick(process.env, [
+      'IMAGES_URL',
+      'PAYPAL_ENVIRONMENT',
+      'STRIPE_KEY',
+      'GOOGLE_MAPS_API_KEY',
+      'RECAPTCHA_SITE_KEY',
+    ]);
   }
 
   render() {
@@ -48,6 +49,7 @@ export default class IntlDocument extends Document {
       <html>
         <Head>{this.props.styleTags}</Head>
         <body>
+          <GlobalStyles />
           <Main />
           <script
             dangerouslySetInnerHTML={{

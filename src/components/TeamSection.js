@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
 import SectionTitle from './SectionTitle';
-import Member from './Member';
+import { Flex } from '@rebass/grid';
+import MemberCard from './MemberCard';
 
 class TeamSection extends React.Component {
   static propTypes = {
@@ -11,30 +13,18 @@ class TeamSection extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { collective, LoggedInUser } = this.props;
 
     let action;
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
-        href: `/${collective.slug}/edit#members`,
-        label: (
-          <FormattedMessage
-            id="sections.team.edit"
-            defaultMessage="Edit team members"
-          />
-        ),
+        href: `/${collective.slug}/edit/members`,
+        label: <FormattedMessage id="sections.team.edit" defaultMessage="Edit team members" />,
       };
     }
 
-    const members = collective.members.filter(
-      m => m.role === 'ADMIN' || m.role === 'MEMBER',
-    );
-
+    const members = collective.members.filter(m => m.role === 'ADMIN' || m.role === 'MEMBER');
     return (
       <section id="team">
         <style jsx>
@@ -46,16 +36,11 @@ class TeamSection extends React.Component {
           `}
         </style>
         <SectionTitle section="team" action={action} />
-        <div className="Members cardsList">
-          {members.map(member => (
-            <Member
-              key={member.id}
-              member={member}
-              collective={collective}
-              LoggedInUser={LoggedInUser}
-            />
+        <Flex justifyContent="space-evenly" flexWrap="wrap">
+          {members.map(({ id, role, createdAt, member }) => (
+            <MemberCard key={id} role={role} createdAt={createdAt} collective={member} m={3} />
           ))}
-        </div>
+        </Flex>
       </section>
     );
   }

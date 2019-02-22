@@ -10,8 +10,9 @@ import Expenses from './Expenses';
 class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     limit: PropTypes.number,
-    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "list" for list view, "details" for details view
+    view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
@@ -24,14 +25,7 @@ class ExpensesWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      view,
-      includeHostedCollectives,
-      filters,
-    } = this.props;
+    const { data, LoggedInUser, collective, host, view, includeHostedCollectives, filters } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -44,6 +38,7 @@ class ExpensesWithData extends React.Component {
       <div className="ExpensesWithData">
         <Expenses
           collective={collective}
+          host={host}
           expenses={expenses}
           refetch={data.refetch}
           editable={view !== 'compact'}
@@ -156,10 +151,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
           }
           return Object.assign({}, previousResult, {
             // Append the new posts results to the old one
-            allExpenses: [
-              ...previousResult.allExpenses,
-              ...fetchMoreResult.allExpenses,
-            ],
+            allExpenses: [...previousResult.allExpenses, ...fetchMoreResult.allExpenses],
           });
         },
       });

@@ -131,11 +131,7 @@ class EditMembers extends React.Component {
     return (
       <div className="member" key={`member-${index}-${member.id}`}>
         <div className="memberActions">
-          <a
-            className="removeMember"
-            href="#"
-            onClick={() => this.removeMember(index)}
-          >
+          <a className="removeMember" href="#" onClick={() => this.removeMember(index)}>
             {intl.formatMessage(this.messages['members.remove'])}
           </a>
         </div>
@@ -149,11 +145,7 @@ class EditMembers extends React.Component {
                   name={field.name}
                   label={field.label}
                   type={field.type}
-                  disabled={
-                    typeof field.disabled === 'function'
-                      ? field.disabled(member)
-                      : field.disabled
-                  }
+                  disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
                   defaultValue={get(member, field.name) || field.defaultValue}
                   options={field.options}
                   pre={field.pre}

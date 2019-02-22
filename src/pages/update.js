@@ -69,6 +69,7 @@ class UpdatePage extends React.Component {
         <Body>
           <CollectiveCover
             collective={collective}
+            key={collective.slug}
             cta={{
               href: '#contribute',
               label: intl.formatMessage(this.messages['collective.contribute']),
@@ -92,6 +93,4 @@ class UpdatePage extends React.Component {
   }
 }
 
-export default withData(
-  withIntl(withLoggedInUser(addCollectiveCoverData(UpdatePage))),
-);
+export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatePage))));

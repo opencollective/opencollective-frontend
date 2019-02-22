@@ -8,6 +8,7 @@ import SignInForm from '../components/SignInForm';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import { FormattedMessage } from 'react-intl';
 
 class CreateHostPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
@@ -40,7 +41,12 @@ class CreateHostPage extends React.Component {
         {LoggedInUser && <CreateHostForm LoggedInUser={LoggedInUser} />}
         {!LoggedInUser && (
           <div className="login">
-            <p>You need to be logged in to conitnue.</p>
+            <p>
+              <FormattedMessage
+                id="authorization.loginRequired"
+                defaultMessage="You need to be logged in to continue."
+              />
+            </p>
             <SignInForm next={`/${this.props.slug}/edit`} />
           </div>
         )}

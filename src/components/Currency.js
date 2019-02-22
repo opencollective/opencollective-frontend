@@ -5,13 +5,7 @@ import { abbreviateNumber } from '../lib/utils';
 
 import { Span } from './Text';
 
-const Currency = ({
-  abbreviate = false,
-  currency,
-  precision = 0,
-  value,
-  ...styles
-}) => (
+const Currency = ({ abbreviate = false, currency, precision = 0, value, ...styles }) => (
   <FormattedNumber
     value={value / 100}
     currency={currency}
@@ -22,12 +16,14 @@ const Currency = ({
   >
     {formattedNumber =>
       abbreviate ? (
-        <Span {...styles}>
+        <Span {...styles} whiteSpace="nowrap">
           {formattedNumber.slice(0, 1)}
           {abbreviateNumber(value / 100, precision)}
         </Span>
       ) : (
-        <Span {...styles}>{formattedNumber}</Span>
+        <Span {...styles} whiteSpace="nowrap">
+          {formattedNumber}
+        </Span>
       )
     }
   </FormattedNumber>
