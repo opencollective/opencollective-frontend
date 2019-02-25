@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { get } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import uuidv4 from 'uuid/v4';
 
 import InputField from './InputField';
 import InputFieldPresets from './InputFieldPresets';
-import { getCurrencySymbol } from '../lib/utils';
+import { getCurrencySymbol, capitalize } from '../lib/utils';
+import { Box, Flex } from '@rebass/grid';
+import { Span } from './Text';
+import MessageBox from './MessageBox';
 
 class EditTiers extends React.Component {
   static propTypes = {
@@ -17,6 +20,7 @@ class EditTiers extends React.Component {
     currency: PropTypes.string.isRequired,
     defaultType: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    intl: PropTypes.object,
   };
 
   constructor(props) {
@@ -231,8 +235,22 @@ class EditTiers extends React.Component {
     this.onChange({ tiers });
   }
 
+  renderLabel(field, hasTax) {
+    if (['presets', 'amount'].includes(field.name) && hasTax) {
+      return (
+        <Flex flexDirection="column">
+          <Span>{capitalize(field.label)}</Span>
+          <Span fontSize="Tiny" color="black.400">
+            (without tax)
+          </Span>
+        </Flex>
+      );
+    }
+    return field.label;
+  }
+
   renderTier(tier, index) {
-    const { intl } = this.props;
+    const { intl, collective } = this.props;
     const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
 
     const defaultValues = {
@@ -241,6 +259,7 @@ class EditTiers extends React.Component {
       _amountType: tier._amountType || (tier.presets ? 'flexible' : 'fixed'),
     };
 
+    const tax = get(collective, `host.settings.tiersTaxes.${tier.type}`);
     return (
       <div className={`tier ${tier.slug}`} key={key}>
         <div className="tierActions">
@@ -252,20 +271,35 @@ class EditTiers extends React.Component {
           {this.fields.map(
             field =>
               (!field.when || field.when(defaultValues)) && (
-                <InputField
-                  className="horizontal"
-                  key={field.name}
-                  name={field.name}
-                  label={field.label}
-                  component={field.component}
-                  description={field.description}
-                  type={field.type}
-                  defaultValue={defaultValues[field.name] || field.defaultValue}
-                  options={field.options}
-                  pre={field.pre}
-                  placeholder={field.placeholder}
-                  onChange={value => this.editTier(index, field.name, value)}
-                />
+                <Box key={field.name}>
+                  <InputField
+                    className="horizontal"
+                    name={field.name}
+                    label={this.renderLabel(field, Boolean(tax))}
+                    component={field.component}
+                    description={field.description}
+                    type={field.type}
+                    defaultValue={defaultValues[field.name] || field.defaultValue}
+                    options={field.options}
+                    pre={field.pre}
+                    placeholder={field.placeholder}
+                    onChange={value => this.editTier(index, field.name, value)}
+                  />
+                  {field.name === 'type' && tax && (
+                    <Flex mb={4}>
+                      <Box width={0.166} px={15} />
+                      <MessageBox type="info" withIcon css={{ flexGrow: 1 }}>
+                        <strong>
+                          {tax.name || <FormattedMessage id="tax.vat" defaultMessage="Value-added tax (VAT)" />}
+                          {': '}
+                          {tax.percentage}%
+                        </strong>
+                        <br />
+                        <Span>{tax.description}</Span>
+                      </MessageBox>
+                    </Flex>
+                  )}
+                </Box>
               ),
           )}
         </Form>

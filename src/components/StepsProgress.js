@@ -83,7 +83,7 @@ const SeparatorLine = styled(Box)`
 
 const getBubbleContent = (idx, checked, loading) => {
   if (loading) {
-    return <StyledSpinner color={checked ? 'white.full' : 'primary.700'} size={14} />;
+    return <StyledSpinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
   } else if (checked) {
     return <Check color="white" size={14} />;
   }
@@ -95,9 +95,12 @@ const getBubbleContent = (idx, checked, loading) => {
   );
 };
 
+/**
+ * Shows numeroted steps circles that can be clicked.
+ */
 const StepsProgress = ({
   steps,
-  disabledSteps,
+  disabledStepNames,
   children,
   focus,
   loadingStep,
@@ -105,19 +108,21 @@ const StepsProgress = ({
   allCompleted,
   stepWidth,
 }) => {
-  const focusIdx = focus ? steps.indexOf(focus) : -1;
+  const focusIdx = focus ? steps.findIndex(step => step.name === focus.name) : -1;
+
   return (
     <Flex className="steps-progress">
       {steps.map((step, idx) => {
+        const stepName = step.name;
         const checked = idx < focusIdx || allCompleted;
         const focused = idx === focusIdx;
-        const disabled = disabledSteps.includes(step);
-        const loading = step === loadingStep;
+        const disabled = disabledStepNames.includes(stepName);
+        const loading = loadingStep && stepName === loadingStep.name;
 
         return (
           <Flex
-            key={step}
-            className={classNames(`step-${step}`, { disabled })}
+            key={stepName}
+            className={classNames(`step-${stepName}`, { disabled })}
             flexDirection="column"
             alignItems="center"
             css={{ flexGrow: 1, flexBasis: stepWidth }}
@@ -142,17 +147,21 @@ const StepsProgress = ({
   );
 };
 
+const stepType = PropTypes.shape({
+  name: PropTypes.string.isRequired,
+});
+
 StepsProgress.propTypes = {
   /** The list of steps. Each step **must** be unique */
-  steps: PropTypes.arrayOf(PropTypes.string).isRequired,
+  steps: PropTypes.arrayOf(stepType).isRequired,
   /** A list of steps that will be disabled (unclickable). Steps must exist in `steps` */
-  disabledSteps: PropTypes.arrayOf(PropTypes.string),
+  disabledStepNames: PropTypes.arrayOf(PropTypes.string),
   /** A renderer func. Gets passed an object like `{step, checked, focused}` */
   children: PropTypes.func,
   /** The curently focused step, or null if none focused yet */
-  focus: PropTypes.string,
+  focus: stepType,
   /** Step will show a loading spinner */
-  loadingStep: PropTypes.string,
+  loadingStep: stepType,
   /** Called when a step is clicked */
   onStepSelect: PropTypes.func,
   /** If true, all steps will be marked as completed */
@@ -164,7 +173,7 @@ StepsProgress.propTypes = {
 StepsProgress.defaultProps = {
   focused: null,
   loadingStep: null,
-  disabledSteps: [],
+  disabledStepNames: [],
   stepWidth: '100%',
 };
 

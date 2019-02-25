@@ -57,12 +57,12 @@ describe('Contribution Flow: Donate', () => {
 
       // Ensure we display errors
       cy.fillStripeInput(null, { creditCardNumber: 123 });
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
       cy.contains('Your card number is incomplete.');
 
       // Submit with valid credit card
       cy.fillStripeInput();
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$1,337.00 per year');
@@ -82,7 +82,7 @@ describe('Contribution Flow: Donate', () => {
       cy.get('#PaymentMethod label:first input[type=radio][name=PaymentMethod]').should('be.checked');
 
       // Submit a new order with existing card
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
       cy.get('#page-order-success', { timeout: 20000 }).contains('Woot woot!');
     });
   });
@@ -105,7 +105,7 @@ describe('Contribution Flow: Donate', () => {
       cy.contains('button:not([disabled])', 'Next step').click();
       cy.wait(2000);
       cy.fillStripeInput();
-      cy.contains('button', 'Submit').click();
+      cy.contains('button', 'Make contribution').click();
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$20.00');
@@ -115,14 +115,29 @@ describe('Contribution Flow: Donate', () => {
 
   it('Forces params if given in URL', () => {
     cy.signup({ redirect: '/apex/donate/42/year', visitParams }).then(() => {
+      cy.clock(Date.parse('2042/05/25'));
       cy.contains('button', 'Next step').click();
 
-      // Amount must be disabled
-      cy.get('#totalAmount[disabled]').should('have.value', '42');
-      // Frequency must be disabled
-      cy.contains('#interval[disabled]', 'Yearly');
-      // Ensure all values are dispatched in state
-      cy.contains('.step-details', '$42.00 per year');
+      // Second step should be payment method select
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment'], disabled: 'summary' });
+      cy.wait(1000); // Wait for stripe to be loaded
+      cy.fillStripeInput();
+      cy.contains('Next step').click();
+
+      // Final step should be summary
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment', 'summary'] });
+      cy.contains('Contribution breakdown:');
+      cy.contains('Your contribution');
+      cy.contains('$42.00');
+      // Check FAQ
+      cy.contains('Tier details:');
+      cy.contains('You’ll contribute with the amount of $42.00 yearly. Your next charge will be on: May 1, 2043');
+      // Submit order
+      cy.contains('button', 'Make contribution').click();
+
+      // Check success page
+      cy.get('#page-order-success', { timeout: 20000 }).contains('$42.00 per year');
+      cy.contains("You're now a backer of APEX.");
     });
   });
 });

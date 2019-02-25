@@ -769,7 +769,7 @@
   "contribute.payment.label": "Choisissez un moyen de paiement :",
   "contribute.step.contributeAs": "Profil",
   "contribute.step.details": "Détails",
-  "contribute.step.payment": "Paiement",
+  "contribute.step.payment": "Moyen de paiement",
   "contribute.contributorType": "Contribuer pour '{name}'",
   "tier.order.donation.title": "Contribution",
   "tier.order.membership.title": "Deviens un membre",
