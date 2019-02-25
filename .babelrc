@@ -1,20 +1,29 @@
 {
   "presets": [
-    ["next/babel", {
-      "preset-env": {
-        "modules": "auto"
+    [
+      "next/babel",
+      {
+        "preset-env": {
+          "modules": "auto"
+        },
+        "transform-runtime": {
+          "useESModules": false
+        }
       }
-    }]
+    ]
   ],
   "plugins": [
     "lodash",
-    ["react-intl", {
-      "messagesDir": "./dist/messages/"
-    }],
+    [
+      "react-intl",
+      {
+        "messagesDir": "./dist/messages/"
+      }
+    ],
     "styled-components"
   ],
   "env": {
-    "development" : {
+    "development": {
       "compact": false
     }
   }
