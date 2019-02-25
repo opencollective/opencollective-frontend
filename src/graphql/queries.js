@@ -88,6 +88,7 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
+        countryISO
         paymentMethods(limit: 10, hasBalanceAboveZero: true) {
           id
           uuid

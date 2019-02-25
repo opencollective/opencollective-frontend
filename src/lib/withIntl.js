@@ -51,11 +51,11 @@ export default Page => {
     }
 
     render() {
-      const { messages, now, ...props } = this.props;
+      const { messages, now, locale, ...props } = this.props;
 
       const intlProps = {};
-      if (this.props.locale) {
-        intlProps.locale = this.props.locale;
+      if (locale) {
+        intlProps.locale = locale;
       }
       if (messages) {
         intlProps.messages = messages;

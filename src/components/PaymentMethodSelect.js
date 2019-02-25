@@ -5,17 +5,12 @@ import StyledSelect from './StyledSelect';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 import withIntl from '../lib/withIntl';
 
-const paymentMethodsToOptions = paymentMethods => {
-  return paymentMethods.reduce((options, pm) => {
-    return { ...options, [pm.id]: pm };
-  }, {});
-};
-
 const PaymentMethodSelect = ({ intl, paymentMethods, defaultPaymentMethod, ...props }) => {
   return (
     <StyledSelect
       name="paymentMethod"
-      options={paymentMethodsToOptions(paymentMethods)}
+      options={paymentMethods}
+      keyGetter="id"
       defaultValue={defaultPaymentMethod}
       {...props}
     >

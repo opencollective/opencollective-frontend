@@ -10,6 +10,7 @@ import { formatCurrency, capitalize } from '../lib/utils';
 import StyledHr from './StyledHr';
 import getPaymentMethodFees from '../lib/fees';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
+import InputTypeCountry from './InputTypeCountry';
 
 const AmountLine = styled(Flex)``;
 AmountLine.defaultProps = {
@@ -107,6 +108,7 @@ const ContributionBreakdown = ({
   hostFeePercent,
   paymentMethod,
   showFees,
+  countryISO,
 }) => {
   const { name: taxName, percentage: taxPercent } = tax || {};
   const taxAmount = calculateTaxAmount(amount, tax);
@@ -132,9 +134,19 @@ const ContributionBreakdown = ({
         <React.Fragment>
           <StyledHr my={3} />
           <AmountLine>
-            <Label fontWeight="bold">
-              {taxName} (+{taxPercent}%)
-            </Label>
+            <Flex alignItems="center">
+              <Span fontSize="Paragraph" fontWeight="bold" mr={1}>
+                {taxName}{' '}
+              </Span>
+              <InputTypeCountry
+                mode="underlined"
+                defaultValue={countryISO}
+                labelBuilder={({ code, name }) => {
+                  return `${name} (+${tax.countries && !tax.countries.includes(code) ? 0 : taxPercent}%)`;
+                }}
+                onChange={console.log}
+              />
+            </Flex>
             <Span fontSize="LeadParagraph">+ {formatCurrency(taxAmount, currency)}</Span>
           </AmountLine>
           <StyledHr my={3} />
@@ -161,12 +173,16 @@ ContributionBreakdown.propTypes = {
   platformFeePercent: PropTypes.number,
   /** Host fees, as an integer percentage */
   hostFeePercent: PropTypes.number,
+  /** Country ISO of the contributing profile. Used to see what taxes applies */
+  countryISO: PropTypes.string,
   /** Tax as defined in host settings */
   tax: PropTypes.shape({
     /** Tax value, as an integer percentage */
     percentage: PropTypes.number,
     /** Tax name, only required if a tax is applied */
     name: PropTypes.string,
+    /** A list of countries where the tax applies. If not set, tax will apply on all countries. */
+    countries: PropTypes.arrayOf(PropTypes.string),
   }),
   /** Payment method, used to generate label and payment fee */
   paymentMethod: PropTypes.shape({

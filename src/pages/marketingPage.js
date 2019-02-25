@@ -38,7 +38,7 @@ class MarketingPage extends React.Component {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     pageSlug: PropTypes.string.isRequired,
     confirmationPage: PropTypes.bool,
-    locale: PropTypes.string,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -69,7 +69,7 @@ class MarketingPage extends React.Component {
   }
 
   render() {
-    const { pageSlug, confirmationPage, locale } = this.props;
+    const { pageSlug, confirmationPage, intl } = this.props;
     const { LoggedInUser } = this.state;
 
     let html, style, className;
@@ -79,7 +79,7 @@ class MarketingPage extends React.Component {
       style = sponsorPageStyle;
       className = 'sponsorPage';
     } else if (pageSlug === 'how-it-works') {
-      if (locale === 'fr') {
+      if (intl.locale === 'fr') {
         html = howItWorksPageHtmlFR;
       } else {
         html = howItWorksPageHtml;

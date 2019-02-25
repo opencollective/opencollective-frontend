@@ -691,6 +691,7 @@ class CreateOrderPage extends React.Component {
               amount={get(stepDetails, 'totalAmount')}
               currency={this.getCurrency()}
               hostFeePercent={get(data, 'Collective.hostFeePercent')}
+              countryISO={get(LoggedInUser, 'collective.countryISO')}
               paymentMethod={get(stepPayment, 'paymentMethod')}
               tax={tax}
               showFees={false}
