@@ -49,14 +49,19 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
         } catch (e) {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;
           debug(msg, 'json:', json, 'error:', e);
-          throw new Error(msg);
+          if (!process.env.NODE_ENV || ['test', 'development'].includes(process.env.NODE_ENV)) {
+            console.log('>>> development environment -> returning 1.1 instead of throwing the error');
+            return resolve(1.1);
+          } else {
+            reject(e);
+          }
         }
       })
       .catch(e => {
-        console.error('Unable to fetch fxrate', e.message);
+        debug('Unable to fetch fxrate', e.message);
         // for testing in airplane mode
         if (!process.env.NODE_ENV || ['test', 'development'].includes(process.env.NODE_ENV)) {
-          console.log('>>> development environment -> returning 1.1 instead of throwing the error', e);
+          console.log('>>> development environment -> returning 1.1 instead of throwing the error');
           return resolve(1.1);
         } else {
           reject(e);

@@ -170,6 +170,216 @@ data['collective.update.published'] = {
     },
   },
 };
+data['report.platform'] = {
+  year: 2019,
+  month: 'January',
+  hosts: [
+    {
+      host: 'opensourcecollective',
+      currency: 'USD',
+      HostCollectiveId: 11004,
+      backers: 2978,
+      activeCollectives: 370,
+      totalRevenue: 56302723,
+      hostFees: 2766001,
+      platformFeesPaypal: 13060,
+      platformFeesStripe: 655646,
+      platformFeesManual: 2103163,
+      platformFeesDue: 2116223,
+      platformFees: 2771869,
+      hostCurrency: 'USD',
+      collectives: 1171,
+    },
+    {
+      host: 'foundation',
+      currency: 'USD',
+      HostCollectiveId: 11049,
+      backers: 54,
+      activeCollectives: 16,
+      totalRevenue: 826084,
+      hostFees: 39252,
+      platformFeesPaypal: 0,
+      platformFeesStripe: 24380,
+      platformFeesManual: 14947,
+      platformFeesDue: 14947,
+      platformFees: 39327,
+      hostCurrency: 'USD',
+      collectives: 55,
+    },
+    {
+      host: 'faly',
+      currency: 'CHF',
+      HostCollectiveId: 8860,
+      backers: 1,
+      activeCollectives: 1,
+      totalRevenue: 500,
+      hostFees: 24,
+      platformFeesPaypal: 0,
+      platformFeesStripe: 24,
+      platformFeesManual: 0,
+      platformFeesDue: 0,
+      platformFees: 24,
+      hostCurrency: 'CHF',
+      collectives: 1,
+    },
+    {
+      host: 'tfavre',
+      currency: 'EUR',
+      HostCollectiveId: 8657,
+      backers: 1,
+      activeCollectives: 1,
+      totalRevenue: 500,
+      hostFees: 0,
+      platformFeesPaypal: 0,
+      platformFeesStripe: 25,
+      platformFeesManual: 0,
+      platformFeesDue: 0,
+      platformFees: 25,
+      hostCurrency: 'EUR',
+      collectives: 1,
+    },
+    {
+      host: 'ubie-user',
+      currency: 'EUR',
+      HostCollectiveId: 8643,
+      backers: 7,
+      activeCollectives: 1,
+      totalRevenue: 3500,
+      hostFees: 0,
+      platformFeesPaypal: 0,
+      platformFeesStripe: 175,
+      platformFeesManual: 0,
+      platformFeesDue: 0,
+      platformFees: 175,
+      hostCurrency: 'EUR',
+      collectives: 1,
+    },
+  ],
+  stats: {
+    thisMonth: {
+      backers: {
+        total: 11202,
+        repeat: 3028,
+        new: 688,
+        inactive: 7486,
+      },
+      platformFees: {
+        currency: 'USD',
+        amount: 5846108,
+      },
+      platformFeesByCurrency: [
+        {
+          currency: 'USD',
+          amount: 5774252,
+        },
+        {
+          currency: 'EUR',
+          amount: 46510,
+        },
+        {
+          currency: 'MXN',
+          amount: 12000,
+        },
+        {
+          currency: 'GBP',
+          amount: 4930,
+        },
+        {
+          currency: 'CAD',
+          amount: 1884,
+        },
+      ],
+      hosts: {
+        active: 60,
+        new: 22,
+        total: 182,
+      },
+    },
+    previousMonth: {
+      backers: {
+        total: 10514,
+        repeat: 3060,
+        new: 646,
+        inactive: 6808,
+      },
+      platformFees: {
+        currency: 'USD',
+        amount: 1775496,
+      },
+      platformFeesByCurrency: [
+        {
+          currency: 'USD',
+          amount: 1694428,
+        },
+        {
+          currency: 'EUR',
+          amount: 53168,
+        },
+        {
+          currency: 'MXN',
+          amount: 15000,
+        },
+        {
+          currency: 'GBP',
+          amount: 5530,
+        },
+        {
+          currency: 'AUD',
+          amount: 0,
+        },
+        {
+          currency: 'CAD',
+          amount: 0,
+        },
+      ],
+      hosts: {
+        active: 55,
+        new: 12,
+        total: 160,
+      },
+    },
+    delta: {
+      platformFees: {
+        currency: 'USD',
+        amount: 4070612,
+      },
+      platformFeesByCurrency: [
+        {
+          currency: 'USD',
+          amount: 4079824,
+        },
+        {
+          currency: 'EUR',
+          amount: -6658,
+        },
+        {
+          currency: 'MXN',
+          amount: -3000,
+        },
+        {
+          currency: 'GBP',
+          amount: -600,
+        },
+        {
+          currency: 'CAD',
+          amount: 1884,
+        },
+        {},
+      ],
+      backers: {
+        total: 688,
+        repeat: -32,
+        new: 42,
+        inactive: 678,
+      },
+      hosts: {
+        active: 5,
+        new: 10,
+        total: 22,
+      },
+    },
+  },
+};
 data['user.monthlyreport'] = {
   recipient: { firstName: 'Xavier' },
   month: 'march',
