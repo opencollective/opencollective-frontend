@@ -26,30 +26,19 @@ const summary = {
   hosts: [],
 };
 
-const deltaAmount = (a, b) => {
-  const r = {};
-  for (const attr in a) {
-    r[attr] = a[attr] - b[attr];
-  }
-  return r;
-};
-
 async function HostReport(year, month, hostId) {
-  const startTime = new Date();
-  let previousStartDate, startDate, endDate;
+  let startDate, endDate;
 
   const d = new Date();
   d.setFullYear(year);
   let yearlyReport = false;
   if (typeof month === 'number') {
     d.setMonth(month);
-    previousStartDate = new Date(d.getFullYear(), d.getMonth() - 1, 1);
     startDate = new Date(d.getFullYear(), d.getMonth(), 1);
     endDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
   } else {
     // yearly report
     yearlyReport = true;
-    previousStartDate = new Date(d.getFullYear() - 1, 0, 1);
     startDate = new Date(d.getFullYear(), 0, 1);
     endDate = new Date(d.getFullYear() + 1, 0, 1);
   }
@@ -60,10 +49,6 @@ async function HostReport(year, month, hostId) {
 
   const dateRange = {
     createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
-  };
-
-  const previousDateRange = {
-    createdAt: { [Op.gte]: previousStartDate, [Op.lt]: startDate },
   };
 
   const emailTemplate = yearlyReport ? 'host.yearlyreport' : 'host.monthlyreport';

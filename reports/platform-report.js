@@ -1,33 +1,11 @@
-import _ from 'lodash';
 import moment from 'moment';
-import Promise from 'bluebird';
 import debugLib from 'debug';
 import models, { sequelize, Op } from '../server/models';
 import emailLib from '../server/lib/email';
-import config from 'config';
-import { getBackersStats, sumTransactions } from '../server/lib/hostlib';
+import { getBackersStats } from '../server/lib/hostlib';
 import { reduceArrayToCurrency } from '../server/lib/currency';
 
 const debug = debugLib('hostreport');
-
-const summary = {
-  totalHosts: 0,
-  totalActiveHosts: 0,
-  totalCollectives: 0,
-  totalActiveCollectives: 0,
-  numberTransactions: 0,
-  numberDonations: 0,
-  numberPaidExpenses: 0,
-  hosts: [],
-};
-
-const deltaAmount = (a, b) => {
-  const r = {};
-  for (const attr in a) {
-    r[attr] = a[attr] - b[attr];
-  }
-  return r;
-};
 
 const query = (query, values) => {
   return sequelize.query(query, {
@@ -101,21 +79,7 @@ async function PlatformReport(year, month) {
     endDate = new Date(d.getFullYear() + 1, 0, 1);
   }
 
-  const endDateIncluded = moment(endDate)
-    .subtract(1, 'days')
-    .toDate();
-
-  const dateRange = {
-    createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
-  };
-
-  const previousDateRange = {
-    createdAt: { [Op.gte]: previousStartDate, [Op.lt]: startDate },
-  };
-
-  const emailTemplate = yearlyReport ? 'host.yearlyreport' : 'host.monthlyreport';
   const reportName = yearlyReport ? `${year} Yearly Platform Report` : `${year}/${month + 1} Monthly Platform Report`;
-  const dateFormat = yearlyReport ? 'YYYY' : 'YYYYMM';
   console.log('startDate', startDate, 'endDate', endDate);
 
   year = year || startDate.getFullYear();
@@ -136,13 +100,6 @@ async function PlatformReport(year, month) {
 
   const getPlatformStats = async () => {
     console.log('>>> Computing platform stats');
-
-    const where = {};
-    const now = new Date();
-    const catchError = e => {
-      console.error('>>> host-report.js: unable to perform the sum of transactions', e);
-      return 0;
-    };
 
     const hosts = await query(
       `
@@ -228,9 +185,13 @@ async function PlatformReport(year, month) {
       },
     };
     console.log('>>> stats', JSON.stringify(data.stats, null, '  '));
-    await sendEmail(['xdamman@opencollective.com'], data);
-    console.log('>>> all done');
-    process.exit(0);
+    const platformAdmins = await models.Member.findAll({ where: { CollectiveId: 1, role: 'ADMIN' } });
+    const adminUsers = await models.User.findAll({
+      attributes: ['email'],
+      where: { CollectiveId: { [Op.in]: platformAdmins.map(m => m.MemberCollectiveId) } },
+    });
+    await sendEmail(adminUsers.map(u => u.email), data);
+    return data;
   };
 
   const sendEmail = (recipients, data, attachments) => {
@@ -245,13 +206,11 @@ async function PlatformReport(year, month) {
 
   console.log(`Preparing the ${reportName}`);
 
-  const platformStats = await getPlatformStats();
+  await getPlatformStats();
 
   const timeLapsed = Math.round((new Date() - startTime) / 1000); // in seconds
   console.log(`Total run time: ${timeLapsed}s`);
-  if (!platformStats) return;
 
-  emailLib.send('host.report.summary', 'info@opencollective.com', summary);
   console.log('>>> All done. Exiting.');
   process.exit(0);
 }
