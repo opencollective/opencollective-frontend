@@ -21,6 +21,7 @@ const getPlatformRevenue = async (startDate, endDate) => {
   FROM "Transactions" t
   WHERE t."deletedAt" IS NULL
     AND t."OrderId" IS NOT NULL
+    AND t.type = 'CREDIT'
     AND t."createdAt" >= :startDate AND t."createdAt" < :endDate
   GROUP BY t."currency"
   ORDER BY "amount" DESC
