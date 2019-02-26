@@ -10,21 +10,59 @@
 /* MAIN CSS */
 
 @font-face {
-  font-family: 'Inter-Bold';
-  src: url("../fonts/Inter-Bold/Inter-Bold.eot") format("embedded-opentype"), url("../fonts/Inter-Bold/Inter-Bold.woff") format("woff"), url("../fonts/Inter-Bold/Inter-Bold.ttf") format("truetype"), url("../fonts/Inter-Bold/Inter-Bold.svg#Inter-Bold") format("svg");
+  font-family: 'Inter UI';
   font-style: normal;
+  font-weight: 400;
+  src: url("../../fonts/inter-ui/Inter-UI-Regular.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-Regular.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Inter-Medium';
-  src: url("../fonts/Inter-Medium/Inter-Medium.eot") format("embedded-opentype"), url("../fonts/Inter-Medium/Inter-Medium.woff") format("woff"), url("../fonts/Inter-Medium/Inter-Medium.ttf") format("truetype"), url("../fonts/Inter-Medium/Inter-Medium.svg#Inter-Medium") format("svg");
-  font-style: normal;
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 400;
+  src: url("../../fonts/inter-ui/Inter-UI-Italic.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-Italic.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Inter-Regular';
-  src: url("../fonts/Inter-Regular/Inter-Regular.eot") format("embedded-opentype"), url("../fonts/Inter-Regular/Inter-Regular.woff") format("woff"), url("../fonts/Inter-Regular/Inter-Regular.ttf") format("truetype"), url("../fonts/Inter-Regular/Inter-Regular.svg#Inter-Regular") format("svg");
+  font-family: 'Inter UI';
   font-style: normal;
+  font-weight: 500;
+  src: url("../../fonts/inter-ui/Inter-UI-Medium.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-Medium.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 500;
+  src: url("../../fonts/inter-ui/Inter-UI-MediumItalic.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-MediumItalic.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: normal;
+  font-weight: 700;
+  src: url("../../fonts/inter-ui/Inter-UI-Bold.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 700;
+  src: url("../../fonts/inter-ui/Inter-UI-BoldItalic.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-BoldItalic.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: normal;
+  font-weight: 900;
+  src: url("../../fonts/inter-ui/Inter-UI-Black.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-Black.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 900;
+  src: url("../../fonts/inter-ui/Inter-UI-BlackItalic.woff2") format("woff2"), url("../../fonts/inter-ui/Inter-UI-BlackItalic.woff") format("woff");
 }
 
 .PricePage {
@@ -39,11 +77,11 @@
 }
 
 .PricePage p, .PricePage span {
-  font-family: 'Inter-Medium';
+  font-family: 'Inter UI';
 }
 
 .PricePage h1, .PricePage h2, .PricePage h3, .PricePage h4, .PricePage h5 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
 }
 
 .PricePage__hero {
@@ -168,7 +206,7 @@
   height: 64px;
   left: calc(50% - 539px/2 + 0.5px);
   top: calc(50% - 64px/2 - 124px);
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 600;
   line-height: 32px;
@@ -199,7 +237,7 @@
   height: 24px;
   left: calc(50% - 327px/2 + 0.5px);
   top: calc(50% - 24px/2 - 56px);
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: normal;
   line-height: 24px;
@@ -273,7 +311,7 @@
 }
 
 .PricePage__table__heading-1__text h3 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 800;
   line-height: 32px;
@@ -290,7 +328,7 @@
 }
 
 .PricePage__table__heading-1__text p {
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
@@ -335,7 +373,7 @@
 }
 
 .PricePage__table__heading-2__text h4 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 24px;
@@ -382,7 +420,7 @@
 }
 
 .PricePage__table__item-1__text h4 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 18px;
@@ -393,7 +431,7 @@
 }
 
 .PricePage__table__item-1__text h3 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 18px;
@@ -404,7 +442,7 @@
 }
 
 .PricePage__table__item-1__text p {
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: normal;
   line-height: 16px;
@@ -443,7 +481,7 @@
 }
 
 .PricePage__table__item-2__text h5 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 18px;
@@ -454,7 +492,7 @@
 }
 
 .PricePage__table__item-2__text p {
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: normal;
   line-height: 16px;
@@ -513,7 +551,7 @@
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 600;
   line-height: 24px;
@@ -586,7 +624,7 @@
   height: 16px;
   left: 50%;
   top: 50%;
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -622,7 +660,7 @@
   height: 16px;
   left: 50%;
   top: 50%;
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -654,7 +692,7 @@
   top: 50%;
   left: 50%;
   width: 60%;
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -682,7 +720,7 @@
 }
 
 .PricePage__table__res__content__item2 h3 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -696,7 +734,7 @@
 }
 
 .PricePage__table__res__content__item2 p {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -710,7 +748,7 @@
 }
 
 .PricePage__table__res__content__item2 span {
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: normal;
   line-height: 16px;
@@ -847,7 +885,7 @@
 }
 
 .PricePage__create__container__content h1 {
-  font-family: 'Inter-Bold';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 800;
   line-height: 48px;
@@ -910,7 +948,7 @@
   background: #3385FF;
   border-radius: 100px;
   height: 56px;
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 500;
   line-height: 56px;
@@ -936,7 +974,7 @@
 
 .PricePage__create__container__content a {
   margin-left: 40px;
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: normal;
   line-height: 24px;
@@ -987,7 +1025,7 @@
 }
 
 .PricePage__faq h1 {
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 600;
   line-height: 40px;
@@ -1019,7 +1057,7 @@
 .PricePage__faq__panel-group__heading a, .PricePage__faq__panel-group__heading a:active {
   display: block;
   padding: 15px;
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
@@ -1044,7 +1082,7 @@
 }
 
 .PricePage__faq__panel-group__body {
-  font-family: 'Inter-Regular';
+  font-family: 'Inter UI';
   font-style: normal;
   font-weight: normal;
   line-height: 24px;
