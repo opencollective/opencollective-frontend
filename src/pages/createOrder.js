@@ -69,43 +69,27 @@ PaypalButtonContainer.defaultProps = {
  * to payment.
  */
 class CreateOrderPage extends React.Component {
-  static getInitialProps({
-    query: {
-      collectiveSlug,
-      eventSlug,
-      tierId,
-      tierSlug,
-      amount,
-      quantity,
-      interval,
-      description,
-      verb,
-      step,
-      redeem,
-      redirect,
-      referral,
-    },
-  }) {
+  static getInitialProps({ query }) {
     // Whitelist interval
-    if (['monthly', 'yearly'].includes(interval)) {
-      interval = interval.replace('ly', '');
-    } else if (!['month', 'year'].includes(interval)) {
-      interval = null;
+    if (['monthly', 'yearly'].includes(query.interval)) {
+      query.interval = query.interval.replace('ly', '');
+    } else if (!['month', 'year'].includes(query.interval)) {
+      query.interval = null;
     }
 
     return {
-      slug: eventSlug || collectiveSlug,
-      amount: parseInt(amount) || null,
-      step: step || 'contributeAs',
-      tierId,
-      tierSlug,
-      quantity,
-      description,
-      interval,
-      verb,
-      redeem,
-      redirect,
-      referral,
+      slug: query.eventSlug || query.collectiveSlug,
+      amount: parseInt(query.amount) || null,
+      step: query.step || 'contributeAs',
+      tierId: query.tierId,
+      tierSlug: query.tierSlug,
+      quantity: query.quantity,
+      description: query.description,
+      interval: query.interval,
+      verb: query.verb,
+      redeem: query.redeem,
+      redirect: query.redirect,
+      referral: query.referral,
     };
   }
 
@@ -143,6 +127,7 @@ class CreateOrderPage extends React.Component {
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
       stepDetails: null,
       stepPayment: null,
+      stepSummary: null,
       error: null,
       stripe: null,
     };
@@ -380,6 +365,15 @@ class CreateOrderPage extends React.Component {
             .filter(m => m.role === 'ADMIN' && m.collective.id !== data.Collective.id && m.collective.type !== 'EVENT')
             .map(({ collective }) => collective),
         ];
+  }
+
+  /** Guess the country, from the more pricise method (settings) to the less */
+  getContributingProfileCountry() {
+    return (
+      get(this.state.stepSummary, 'countryISO') ||
+      get(this.state.stepProfile, 'countryISO') ||
+      get(this.props.LoggedInUser, 'collective.countryISO')
+    );
   }
 
   /** Return the currently selected tier, or a falsy value if none selected */
@@ -691,9 +685,10 @@ class CreateOrderPage extends React.Component {
               amount={get(stepDetails, 'totalAmount')}
               currency={this.getCurrency()}
               hostFeePercent={get(data, 'Collective.hostFeePercent')}
-              countryISO={get(LoggedInUser, 'collective.countryISO')}
               paymentMethod={get(stepPayment, 'paymentMethod')}
               tax={tax}
+              countryISO={this.getContributingProfileCountry()}
+              onCountryChange={({ code }) => this.setState({ stepSummary: { countryISO: code } })}
               showFees={false}
             />
           </Container>
@@ -866,10 +861,12 @@ const addData = graphql(gql`
       currency
       hostFeePercent
       tags
+      countryISO
       host {
         id
         name
         settings
+        countryISO
       }
       parentCollective {
         image
