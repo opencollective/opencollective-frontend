@@ -1,4 +1,4 @@
-import url from 'url';
+import url from 'universal-url';
 import path from 'path';
 import { template } from 'lodash';
 import fs from 'fs';
