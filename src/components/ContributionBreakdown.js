@@ -128,11 +128,19 @@ const isTaxedCountry = (tax, countryISO) => {
   return !countryISO || !tax.countries || tax.countries.includes(countryISO);
 };
 
-const initialState = { countryISO: null, number: null, isReady: false, amount: 0 };
+const getInitialState = (collectiveTaxInfo, tax) => {
+  const base = {
+    countryISO: null,
+    number: null,
+    isReady: Boolean(tax && collectiveTaxInfo && collectiveTaxInfo.countryISO),
+    amount: 0,
+  };
+  return { ...base, ...collectiveTaxInfo };
+};
 
 /** Add missing fields to taxInfo and calculate tax amount */
 const prepareTaxInfo = (baseAmount, tax, collectiveTaxInfo) => {
-  const taxInfo = { ...initialState, ...collectiveTaxInfo };
+  const taxInfo = getInitialState(collectiveTaxInfo, tax);
   const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
   const isTaxApplicable = tax && isTaxedCountry(tax, taxInfo.countryISO) && !hasConfirmedTaxID;
   const amount = isTaxApplicable ? calculateTaxAmount(baseAmount, tax) : 0;

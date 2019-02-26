@@ -418,8 +418,8 @@ class CreateOrderPage extends React.Component {
   /** Get total amount based on stepDetails with taxes applied */
   getTotalAmount() {
     const totalAmount = get(this.state, 'stepDetails.totalAmount', 0);
-    const tax = this.getTax();
-    return tax ? Math.trunc(totalAmount * (1 + tax.percentage / 100)) : totalAmount;
+    const taxAmount = get(this.state, 'stepSummary.amount', 0);
+    return totalAmount + taxAmount;
   }
 
   /** Teturn true if current order doesn't need any payment */
@@ -433,12 +433,6 @@ class CreateOrderPage extends React.Component {
     const forceInterval = Boolean(tier) || Boolean(this.props.interval);
     const forceAmount = !get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.amount);
     return forceInterval && forceAmount;
-  }
-
-  /** Returns the tax linked to the current tier, or null if none */
-  getTax() {
-    const tier = this.getTier();
-    return tier ? get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`) : null;
   }
 
   /** Returs the steps list */
@@ -477,6 +471,7 @@ class CreateOrderPage extends React.Component {
     if (isFixedPriceTier) {
       steps.push({
         name: 'summary',
+        isCompleted: this.state.stepSummary && this.state.stepSummary.isReady,
       });
     }
 
@@ -531,6 +526,8 @@ class CreateOrderPage extends React.Component {
   renderTierDetails(tier) {
     const amount = get(this.state.stepDetails, 'totalAmount');
     const interval = get(this.state.stepDetails, 'interval');
+    const taxAmount = get(this.state.stepSummary, 'amount', 0);
+    const tax = get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`);
 
     return (
       <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
@@ -540,10 +537,18 @@ class CreateOrderPage extends React.Component {
           </P>
           <FormattedMessage
             id="contribute.tierDetails"
-            defaultMessage="You’ll contribute with the amount of {amount} {interval, select, month {monthly} year {yearly} other {}}."
+            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
             values={{
               amount: (
-                <strong>{formatCurrency(amount, get(tier, 'currency', this.props.data.Collective.currency))}</strong>
+                <strong>
+                  {formatCurrency(amount, get(tier, 'currency', this.props.data.Collective.currency))}
+                  {taxAmount > 0 && (
+                    /** Use non-breaking spaces to ensure amount and tax stay on the same line */
+                    <span>
+                      &nbsp;+&nbsp;{tax.name}&nbsp;({tax.percentage}%)
+                    </span>
+                  )}
+                </strong>
               ),
               interval: get(tier, 'interval') || this.props.interval,
             }}
@@ -573,7 +578,6 @@ class CreateOrderPage extends React.Component {
     const { stepDetails, stepPayment } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
-    const tax = this.getTax();
     const interval = get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval;
 
     if (step.name === 'contributeAs') {
@@ -665,7 +669,7 @@ class CreateOrderPage extends React.Component {
               margins="0 auto"
             />
           </Flex>
-          {this.isFixedPriceTier() ? this.renderTierDetails(tier, tax) : <Box width={[0, null, null, 1 / 5]} />}
+          {this.isFixedPriceTier() ? this.renderTierDetails(tier) : <Box width={[0, null, null, 1 / 5]} />}
         </Flex>
       );
     } else if (step.name === 'summary') {
@@ -686,13 +690,13 @@ class CreateOrderPage extends React.Component {
               currency={this.getCurrency()}
               hostFeePercent={get(data, 'Collective.hostFeePercent')}
               paymentMethod={get(stepPayment, 'paymentMethod')}
-              tax={tax}
-              countryISO={this.getContributingProfileCountry()}
-              onCountryChange={({ code }) => this.setState({ stepSummary: { countryISO: code } })}
+              collectiveTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
+              onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
+              tax={tier ? get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`) : null}
             />
           </Container>
-          {this.renderTierDetails(tier, tax)}
+          {this.renderTierDetails(tier)}
         </Flex>
       );
     }

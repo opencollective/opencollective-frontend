@@ -89,10 +89,11 @@ export default class Steps extends React.Component {
     const firstInvalidStepIdx = steps.findIndex(step => !step.isCompleted);
     let lastValidStepIdx = firstInvalidStepIdx - 1;
 
-    if (firstInvalidStepIdx === -1 || firstInvalidStepIdx === steps.length - 1) {
+    if (firstInvalidStepIdx === -1) {
+      // No invalid step, last step is valid
       lastValidStepIdx = steps.length - 1;
     } else if (firstInvalidStepIdx === 0) {
-      lastValidStepIdx = 0;
+      return { name: '__INIT__', index: -1, isLastStep: false, isVisited: true };
     }
 
     return this.buildStep(steps[lastValidStepIdx], lastValidStepIdx);
@@ -191,7 +192,7 @@ export default class Steps extends React.Component {
       isValidating: this.state.isValidating,
       lastVisitedStep: this.getLastVisitedStep(lastValidStep),
       steps: this.props.steps.map(this.buildStep),
-      goNext: lastValidStep.index >= currentStep.index ? this.goNext : undefined,
+      goNext: lastValidStep && lastValidStep.index >= currentStep.index ? this.goNext : undefined,
       goBack: currentStep.index > 0 ? this.goBack : undefined,
       goToStep: this.goToStep,
     });
