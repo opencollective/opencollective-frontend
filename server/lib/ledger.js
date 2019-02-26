@@ -1,9 +1,10 @@
-import { get, groupBy } from 'lodash';
 import amqp from 'amqplib';
 import debugLib from 'debug';
 import axios from 'axios';
-import queryString from 'query-string';
 import { ledger, ledgerQueue } from 'config';
+import { get, groupBy } from 'lodash';
+import { URLSearchParams } from 'url';
+
 import models from '../models';
 
 const debug = debugLib('ledgerLib');
@@ -32,7 +33,8 @@ export async function fetchLedgerTransactions(args) {
     includeHostedCollectivesTransactions: args.includeHostedCollectivesTransactions,
   };
   ledgerQuery.where = JSON.stringify(ledgerQuery.where);
-  return axios.get(`${ledger.transactionUrl}?${queryString.stringify(ledgerQuery)}`);
+  const params = new URLSearchParams(ledgerQuery);
+  return axios.get(`${ledger.transactionUrl}?${params.toString()}`);
 }
 /**
  * Fetches transactions from the ledger service and return them

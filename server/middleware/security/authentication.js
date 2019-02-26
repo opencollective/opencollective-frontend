@@ -1,14 +1,15 @@
-import { get, contains } from 'lodash';
+import debug from 'debug';
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import request from 'request-promise';
-import qs from 'querystring';
-import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controllers/connectedAccounts';
+import { get, contains, omitBy, isNil } from 'lodash';
+import { URLSearchParams } from 'url';
+
 import models from '../../models';
 import errors from '../../lib/errors';
-import debug from 'debug';
 import paymentProviders from '../../paymentProviders';
+import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controllers/connectedAccounts';
 
 const { User } = models;
 
@@ -215,37 +216,35 @@ export const authenticateServiceCallback = (req, res, next) => {
 
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
-  passport.authenticate(service, opts, (err, accessToken, data) => {
+  passport.authenticate(service, opts, async (err, accessToken, data) => {
     if (err) {
       return next(err);
     }
     if (!accessToken) {
       return res.redirect(config.host.website);
     }
-    if (service === 'github') {
-      request({
-        uri: 'https://api.github.com/user/emails',
-        qs: { access_token: accessToken },
-        headers: { 'User-Agent': 'OpenCollective' },
-        json: true,
-      })
-        .then(json => json.map(entry => entry.email))
-        .then(emails => createOrUpdateConnectedAccount(req, res, next, accessToken, data, emails))
-        .catch(next);
-    } else {
-      createOrUpdateConnectedAccount(req, res, next, accessToken, data);
+    let emails;
+    if (service === 'github' && !req.remoteUser) {
+      emails = await getGithubEmails(accessToken);
     }
+    createOrUpdateConnectedAccount(req, res, next, accessToken, data, emails).catch(next);
   })(req, res, next);
 };
 
 function getOAuthCallbackUrl(req) {
   const { utm_source, CollectiveId, access_token, redirect } = req.query;
-  const params = qs.stringify({
-    utm_source,
-    CollectiveId,
-    access_token,
-    redirect,
-  });
   const { service } = req.params;
-  return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
+
+  const params = new URLSearchParams(omitBy({ access_token, redirect, CollectiveId, utm_source }, isNil));
+
+  return `${config.host.website}/api/connected-accounts/${service}/callback?${params.toString()}`;
+}
+
+function getGithubEmails(accessToken) {
+  return request({
+    uri: 'https://api.github.com/user/emails',
+    qs: { access_token: accessToken },
+    headers: { 'User-Agent': 'OpenCollective' },
+    json: true,
+  }).then(json => json.map(entry => entry.email));
 }

@@ -1,5 +1,5 @@
 import { pick } from 'lodash';
-import queryString from 'query-string';
+import { URLSearchParams } from 'url';
 
 import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
 import emailLib from '../../../lib/email';
@@ -101,9 +101,9 @@ export async function claimPaymentMethod(args, remoteUser) {
   const amount = initialBalance || monthlyLimitPerMember;
   const emitter = await models.Collective.findByPk(paymentMethod.sourcePaymentMethod.CollectiveId);
 
-  const qs = queryString.stringify({
+  const qs = new URLSearchParams({
     code: paymentMethod.uuid.substring(0, 8),
-  });
+  }).toString();
 
   // If the User is already authenticated it doesn't need this email
   // It will be redirected to the /redeemed page

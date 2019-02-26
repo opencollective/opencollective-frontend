@@ -36,9 +36,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
           expect(err).not.to.exist;
           const baseUrl = 'https://github.com/login/oauth/authorize';
           const redirectUri = encodeURIComponent(
-            `${
-              config.host.website
-            }/api/connected-accounts/github/callback?utm_source=mm&CollectiveId=&access_token=&redirect=`,
+            `${config.host.website}/api/connected-accounts/github/callback?utm_source=mm`,
           );
           const scope = encodeURIComponent('user:email,public_repo,read:org');
           const location = `^${baseUrl}\\?response_type=code&redirect_uri=${redirectUri}&scope=${scope}&client_id=${clientId}$`;
@@ -79,7 +77,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
           expect(res.headers.location).to.be.equal(
             `https://github.com/login/oauth/authorize?response_type=code&redirect_uri=${encodeURIComponent(
               `${config.host.website}/api/connected-accounts/github/callback`,
-            )}%3Futm_source%3D%26CollectiveId%3D%26access_token%3D%26redirect%3D&client_id=${clientId}`,
+            )}%3F&client_id=${clientId}`,
           );
           done();
         });

@@ -1,7 +1,7 @@
 import config from 'config';
 import jwt from 'jsonwebtoken';
-import qs from 'querystring';
 import axios from 'axios';
+import { URLSearchParams } from 'url';
 
 import models from '../../models';
 import errors from '../../lib/errors';
@@ -64,14 +64,14 @@ export default {
         },
       );
 
-      const params = qs.stringify({
+      const params = new URLSearchParams({
         response_type: 'code',
         scope: 'read_write',
         client_id: config.stripe.clientId,
         redirect_uri: config.stripe.redirectUri,
         state,
       });
-      return Promise.resolve(`${AUTHORIZE_URI}?${params}`);
+      return Promise.resolve(`${AUTHORIZE_URI}?${params.toString()}`);
     },
 
     // callback called by Stripe after the user approves the connection
