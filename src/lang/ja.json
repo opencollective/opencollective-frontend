@@ -8,7 +8,7 @@
   "expense.error.amountMissing": "Amount must be greater than 0",
   "expense.error.privateMessageMissing": "Please provide instructions on how you'd like to be reimbursed as a private note",
   "expense.error.paypalEmailMissing": "Please provide your PayPal email address (or change the payout method)",
-  "expense.error.attachmentMissing": "Missing attachment",
+  "expense.error.attachmentMissing": "添付されていません",
   "collective.expensePolicy.label": "Expense policy",
   "collective.expensePolicy.description": "Submitting an expense can be daunting if the people in your community don't know what can or cannot be expensed. Help them by defining a simple expense policy.",
   "expense.expensePolicy.add": "add an expense policy",
