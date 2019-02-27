@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { defineMessages } from 'react-intl';
 import { Elements, IbanElement, injectStripe } from 'react-stripe-elements';
 import { Flex } from '@rebass/grid';
 import { debounce } from 'lodash';
@@ -8,6 +9,7 @@ import { debounce } from 'lodash';
 import { Span } from './Text';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
+import withIntl from '../lib/withIntl';
 
 const StyledIbanElement = styled(IbanElement)`
   background: #fff;
@@ -35,6 +37,9 @@ class NewSEPAAccountFormWithoutStripe extends React.Component {
     onChange: PropTypes.func,
     onReady: PropTypes.func,
     stripe: PropTypes.object,
+    intl: {
+      formatMessage: PropTypes.func,
+    },
   };
 
   static defaultProps = {
@@ -43,6 +48,16 @@ class NewSEPAAccountFormWithoutStripe extends React.Component {
 
   constructor(props) {
     super(props);
+    this.messages = defineMessages({
+      saveIban: {
+        id: 'contribute.sepa.saveIban',
+        defaultMessage: 'Save this IBAN to my account',
+      },
+      accountHolderNamePlaceholder: {
+        id: 'contribute.sepa.accountHolderNamePlaceholder',
+        defaultMessage: 'Account holder name',
+      },
+    });
     this.onChange = this.onChange.bind(this);
     this.state = {
       bankName: undefined,
@@ -91,14 +106,19 @@ class NewSEPAAccountFormWithoutStripe extends React.Component {
   }
 
   render() {
-    const { onChange, error, hasSaveCheckBox } = this.props;
+    const { onChange, error, hasSaveCheckBox, intl } = this.props;
 
     return (
       <Flex flexDirection="column">
+        {/*
+          Make sure these inputs are wrapped in <label> elements otherwise
+          the Stripe Element will hijack focus everytime it loses it.
+          ref: https://github.com/stripe/react-stripe-elements/issues/23
+        */}
         <Flex mb={2} as="label">
           <StyledInput
             name="accountHolderName"
-            placeholder="Account holder name"
+            placeholder={intl.formatMessage(this.messages.accountHolderNamePlaceholder)}
             width="100%"
             fontWeight="normal"
             onChange={this.onChange}
@@ -119,7 +139,12 @@ class NewSEPAAccountFormWithoutStripe extends React.Component {
         )}
         {hasSaveCheckBox && (
           <Flex mt={3} alignItems="center">
-            <StyledCheckbox defaultChecked name="save" label="Save this IBAN to my account" onChange={onChange} />
+            <StyledCheckbox
+              defaultChecked
+              name="save"
+              label={intl.formatMessage(this.messages.saveIban)}
+              onChange={onChange}
+            />
           </Flex>
         )}
       </Flex>
@@ -135,4 +160,4 @@ const NewSEPAAccountForm = props => (
   </Elements>
 );
 
-export default NewSEPAAccountForm;
+export default withIntl(NewSEPAAccountForm);

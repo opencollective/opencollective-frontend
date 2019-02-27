@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { debounce, get, pick, isNil, min } from 'lodash';
@@ -120,6 +120,13 @@ class CreateOrderPage extends React.Component {
     this.recaptcha = null;
     this.recaptchaToken = null;
     this.activeFormRef = React.createRef();
+    this.messages = this.messages = defineMessages({
+      sepaMandate: {
+        id: 'contribute.sepa.mandate',
+        defaultMessage:
+          'By providing your IBAN and confirming this payment, you are authorizing {collectiveName} (through {collectiveHostName}) and Stripe, our payment service provider, to send instructions to your bank to debit your account and your bank to debit your account in accordance with those instructions. You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.',
+      },
+    });
     this.state = {
       loading: false,
       submitting: false,
@@ -246,7 +253,8 @@ class CreateOrderPage extends React.Component {
         });
         return false;
       }
-      const { token, error } = await this.state.stripe.createToken();
+      const tokenOptions = get(stepPayment, 'data.tokenOptions');
+      const { token, error } = await this.state.stripe.createToken(tokenOptions);
       if (error) {
         this.setState({ error: error.message });
         return false;
@@ -327,6 +335,12 @@ class CreateOrderPage extends React.Component {
       tier: tier ? pick(tier, ['id', 'amount']) : undefined,
       description: decodeURIComponent(this.props.description || ''),
     };
+
+    if (paymentMethod.type === 'sepa') {
+      order.data = {
+        sepaMandate: this.getSEPAMandate(),
+      };
+    }
 
     try {
       const res = await this.props.createOrder(order);
@@ -518,6 +532,13 @@ class CreateOrderPage extends React.Component {
     };
   }
 
+  getSEPAMandate() {
+    return this.props.intl.formatMessage(this.messages.sepaMandate, {
+      collectiveName: get(this.props.data, 'Collective.name'),
+      collectiveHostName: get(this.props.data, 'Collective.host.name'),
+    });
+  }
+
   // Debounce state update functions that may be called successively
   updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
   updateDetails = debounce(stepDetails => this.setState({ stepDetails }), 100, { leading: true, maxWait: 500 });
@@ -669,12 +690,18 @@ class CreateOrderPage extends React.Component {
               onChange={stepPayment => this.setState({ stepPayment })}
               paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
               collective={this.state.stepProfile}
+              currency={this.getCurrency()}
               defaultValue={stepPayment}
-              onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+              onStripeFormReady={({ stripe }) => this.setState({ stripe })}
               withPaypal={this.hasPaypal()}
               manual={this.getManualPaymentMethod()}
               margins="0 auto"
             />
+            {get(stepPayment, 'paymentMethod.type') === 'sepa' && (
+              <MessageBox type="info" mt={3} withIcon>
+                {this.getSEPAMandate()}
+              </MessageBox>
+            )}
           </Flex>
           {this.isFixedPriceTier() ? this.renderTierDetails(tier) : <Box width={[0, null, null, 1 / 5]} />}
         </Flex>

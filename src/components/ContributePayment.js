@@ -8,6 +8,7 @@ import { uniqBy, get } from 'lodash';
 
 import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck';
 import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt';
+import { AccountBalance } from 'styled-icons/material/AccountBalance';
 
 import { withStripeLoader } from './StripeProvider';
 import Container from './Container';
@@ -24,6 +25,7 @@ import PayPal from './icons/PayPal';
 import CreditCardInactive from './icons/CreditCardInactive';
 import Avatar from './Avatar';
 import NewCreditCardForm from './NewCreditCardForm';
+import NewSEPAAccountForm from './NewSEPAAccountForm';
 
 const PaymentEntryContainer = styled(Container)`
   display: flex;
@@ -49,6 +51,8 @@ const getPaymentMethodIcon = (pm, collective) => {
     return <Avatar src={image} type={type} size="3.6rem" name={name} />;
   } else if (pm.type === 'manual') {
     return <ExchangeAlt size="1.5em" color="#c9ced4" />;
+  } else if (pm.type === 'sepa') {
+    return <AccountBalance height={24} width={26} color="#0061E0" />;
   }
 };
 
@@ -105,11 +109,20 @@ class ContributePayment extends React.Component {
       });
     }
 
+    if (props.currency === 'EUR') {
+      this.staticPaymentMethodsOptions.push({
+        key: 'newSEPAAccount',
+        title: <FormattedMessage id="contribute.newsepaaccount" defaultMessage="New SEPA Direct Debit account" />,
+        icon: <AccountBalance height={24} width={26} color="#c9ced4" />,
+        paymentMethod: { type: 'sepa', service: 'stripe' },
+      });
+    }
+
     const paymentMethodsOptions = this.generatePaymentsOptions();
     this.state = {
       paymentMethodsOptions: paymentMethodsOptions,
       selectedOption: props.defaultValue || paymentMethodsOptions[0],
-      newCreditCardInfo: null,
+      newStripePaymentInfo: null,
       save: true,
       errors: {},
     };
@@ -125,18 +138,18 @@ class ContributePayment extends React.Component {
     }
   }
 
-  dispatchChangeEvent(selectedOption, newCreditCardInfo, save) {
+  dispatchChangeEvent(selectedOption, newStripePaymentInfo, save) {
     if (this.props.onChange) {
-      const isNew = selectedOption.key === 'newCreditCard';
+      const isNew = selectedOption.key === 'newCreditCard' || selectedOption.key === 'newSEPAAccount';
       this.props.onChange({
         paymentMethod: selectedOption.paymentMethod,
-        data: newCreditCardInfo,
+        data: newStripePaymentInfo,
         title: selectedOption.title,
         subtitle: selectedOption.subtitle,
         isNew,
         save,
         key: selectedOption.key,
-        error: isNew && get(newCreditCardInfo, 'error'),
+        error: isNew && get(newStripePaymentInfo, 'error'),
       });
     }
   }
@@ -147,12 +160,11 @@ class ContributePayment extends React.Component {
       const errors = state.errors;
       let selectedOption = state.selectedOption;
       let save = state.save;
-      let newCreditCardInfo = state.newCreditCardInfo;
-
+      let newStripePaymentInfo = state.newStripePaymentInfo;
       if (name === 'PaymentMethod') {
         selectedOption = value;
-      } else if (name === 'newCreditCardInfo') {
-        newCreditCardInfo = value;
+      } else if (name === 'newCreditCardInfo' || name === 'newSEPAAccountInfo') {
+        newStripePaymentInfo = value;
         if (value.error) {
           errors['newCreditCardInfo'] = value.error.message;
         } else {
@@ -163,7 +175,7 @@ class ContributePayment extends React.Component {
       }
 
       if (this.props.onChange) {
-        this.dispatchChangeEvent(selectedOption, newCreditCardInfo, save);
+        this.dispatchChangeEvent(selectedOption, newStripePaymentInfo, save);
       }
 
       return { ...state, selectedOption, save, errors };
@@ -248,7 +260,17 @@ class ContributePayment extends React.Component {
                     name="newCreditCardInfo"
                     error={errors.newCreditCardInfo}
                     onChange={this.onChange}
-                    onReady={this.props.onNewCardFormReady}
+                    onReady={this.props.onStripeFormReady}
+                  />
+                </Box>
+              )}
+              {key === 'newSEPAAccount' && checked && (
+                <Box my={3}>
+                  <NewSEPAAccountForm
+                    name="newSEPAAccountInfo"
+                    error={errors.newSEPAAccountInfo}
+                    onChange={this.onChange}
+                    onReady={this.props.onStripeFormReady}
                   />
                 </Box>
               )}
@@ -285,15 +307,18 @@ ContributePayment.propTypes = {
   /** Default value */
   defaultValue: PropTypes.object,
   /** Called with an object like {stripe} when new card form is mounted */
-  onNewCardFormReady: PropTypes.func,
+  onStripeFormReady: PropTypes.func,
   /** From withStripeLoader */
   loadStripe: PropTypes.func.isRequired,
+  /** The currency being used in the transaction */
+  currency: PropTypes.string,
 };
 
 ContributePayment.defaultProps = {
   withPaypal: false,
   paymentMethods: [],
   collective: null,
+  currency: '',
 };
 
 export default withIntl(withStripeLoader(ContributePayment));
