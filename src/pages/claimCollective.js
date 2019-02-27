@@ -119,6 +119,10 @@ class ClaimCollectivePage extends React.Component {
   isAdmin() {
     const githubHandle = this.githubHandle();
 
+    if (!githubHandle) {
+      return false;
+    }
+
     if (githubHandle.includes('/')) {
       // A repository GitHub Handle (most common)
       return get(this.state.repo, 'permissions.admin');
