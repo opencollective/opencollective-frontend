@@ -44,6 +44,7 @@
   "expenses.all": "全て",
   "expenses.pending": "保留中",
   "expenses.approved": "承認済み",
+  "expenses.ready": "ready to pay",
   "expenses.paid": "支払い済み",
   "expenses.empty": "経費申請がありません",
   "loadMore": "もっと見る",

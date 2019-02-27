@@ -44,6 +44,7 @@
   "expenses.all": "all",
   "expenses.pending": "pending",
   "expenses.approved": "aprobados",
+  "expenses.ready": "ready to pay",
   "expenses.paid": "paid",
   "expenses.empty": "No expenses",
   "loadMore": "cargar más",

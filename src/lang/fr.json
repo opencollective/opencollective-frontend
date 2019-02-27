@@ -44,6 +44,7 @@
   "expenses.all": "tout",
   "expenses.pending": "en attente",
   "expenses.approved": "approuvé",
+  "expenses.ready": "ready to pay",
   "expenses.paid": "payé",
   "expenses.empty": "Pas de dépenses",
   "loadMore": "voir plus",
