@@ -82,6 +82,8 @@ export const getPaymentMethodName = ({ name, data, type }) => {
   } else if (type === 'creditcard') {
     const brand = data && data.brand && formatCreditCardBrand(data.brand);
     return `${brand || type} **** ${name}`;
+  } else if (type === 'sepa') {
+    return `${data.bankName} (${data.country}) **** ${name}`;
   } else {
     return name;
   }
