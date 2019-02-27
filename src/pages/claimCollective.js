@@ -66,8 +66,9 @@ class ClaimCollectivePage extends React.Component {
     const { LoggedInUser, token } = this.props;
     const { loadingGithub, githubLoaded } = this.state;
 
-    if (token && LoggedInUser && !loadingGithub && !githubLoaded) {
-      const githubHandle = this.githubHandle();
+    const githubHandle = this.githubHandle();
+
+    if (token && LoggedInUser && !loadingGithub && !githubLoaded && githubHandle) {
       this.setState({ loadingGithub: true });
       if (githubHandle.includes('/')) {
         fetch(`${getBaseApiUrl()}/github/repo?name=${githubHandle}&access_token=${token}`)
