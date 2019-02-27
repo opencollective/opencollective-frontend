@@ -56,22 +56,41 @@ const getStripeToken = (type = 'cc', data) => {
 /**
  * Convert a stripe token as returned by `createToken` into a PaymentMethod object.
  */
-export const stripeTokenToPaymentMethod = ({ id, card }) => {
-  return {
-    name: card.last4,
-    token: id,
-    service: 'stripe',
-    type: 'creditcard',
-    data: {
-      fullName: card.full_name,
-      expMonth: card.exp_month,
-      expYear: card.exp_year,
-      brand: card.brand,
-      country: card.country,
-      funding: card.funding,
-      zip: card.address_zip,
-    },
-  };
+export const stripeTokenToPaymentMethod = ({ id, bank_account, card }) => {
+  if (card) {
+    return {
+      name: card.last4,
+      token: id,
+      service: 'stripe',
+      type: 'creditcard',
+      data: {
+        fullName: card.full_name,
+        expMonth: card.exp_month,
+        expYear: card.exp_year,
+        brand: card.brand,
+        country: card.country,
+        funding: card.funding,
+        zip: card.address_zip,
+      },
+    };
+  } else if (bank_account) {
+    return {
+      name: bank_account.last4,
+      token: id,
+      service: 'stripe',
+      type: 'sepa',
+      data: {
+        accountHolderName: bank_account.account_holder_name,
+        bankName: bank_account.bank_name,
+        country: bank_account.country,
+        currency: bank_account.currency,
+        last4: bank_account.last4,
+        routingNumber: bank_account.routing_number,
+      },
+    };
+  } else {
+    throw new Error("Token is missing 'card' or 'bank_account' property.");
+  }
 };
 
 const isValidCard = card => {
