@@ -260,6 +260,7 @@ const ContributionBreakdown = ({
                           px={2}
                           py={1}
                           autoFocus
+                          maxWidth={180}
                           onChange={e => {
                             setFormState({ isEnabled: true, error: false });
                             dispatchChange({ number: e.target.value, isReady: false });

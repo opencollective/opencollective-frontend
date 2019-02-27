@@ -16,6 +16,7 @@ import {
   textAlign,
   themeGet,
   width,
+  lineHeight,
 } from 'styled-system';
 import tag from 'clean-tag';
 import { overflow } from './Container';
@@ -48,6 +49,7 @@ const StyledInput = styled(tag.input)`
   ${flex}
   ${fontSize}
   ${fontWeight}
+  ${lineHeight}
   ${maxWidth}
   ${minWidth}
   ${overflow}
@@ -117,6 +119,7 @@ StyledInput.defaultProps = {
   borderRadius: '4px',
   px: 3,
   py: 2,
+  lineHeight: '1em',
 };
 
 export const TextInput = styled(StyledInput)``;
