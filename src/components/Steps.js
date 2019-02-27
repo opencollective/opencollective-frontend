@@ -34,8 +34,8 @@ export default class Steps extends React.Component {
   };
 
   static defaultProps = {
-    onInvalidStep: ({ lastValidStep, goToStep }) => {
-      return goToStep(lastValidStep, { ignoreValidation: true });
+    onInvalidStep: ({ lastValidStep, firstStep, goToStep }) => {
+      return goToStep(lastValidStep || firstStep, { ignoreValidation: true });
     },
   };
 
@@ -49,26 +49,33 @@ export default class Steps extends React.Component {
   componentDidMount() {
     const currentStep = this.getStepByName(this.props.currentStepName);
     const lastValidStep = this.getLastCompletedStep();
-    if (!currentStep || currentStep.index > lastValidStep.index + 1) {
-      this.props.onInvalidStep({ step: currentStep, lastValidStep, goToStep: this.goToStep });
+    const maxIdx = lastValidStep ? lastValidStep.index + 1 : 0;
+    if (!currentStep || currentStep.index > maxIdx) {
+      this.onInvalidStep(currentStep, lastValidStep);
     } else {
       this.props.steps.slice(0, currentStep.index + 1).map(this.markStepAsVisited);
     }
   }
 
   componentDidUpdate(oldProps) {
-    const { currentStepName, onInvalidStep } = this.props;
+    const { currentStepName } = this.props;
 
     if (oldProps.currentStepName !== currentStepName) {
       const currentStep = this.getStepByName(currentStepName);
       const lastValidStep = this.getLastCompletedStep();
-      if (!currentStep || currentStep.index > lastValidStep.index + 1) {
-        onInvalidStep({ step: currentStep, lastValidStep, goToStep: this.goToStep });
+      const maxIdx = lastValidStep ? lastValidStep.index + 1 : 0;
+      if (!currentStep || currentStep.index > maxIdx) {
+        this.onInvalidStep(currentStep, lastValidStep);
       } else {
         this.props.steps.slice(0, currentStep.index + 1).map(this.markStepAsVisited);
       }
     }
   }
+
+  onInvalidStep = (step, lastValidStep) => {
+    const firstStep = this.getStepByIndex(0);
+    return this.props.onInvalidStep({ step, lastValidStep, firstStep, goToStep: this.goToStep });
+  };
 
   markStepAsVisited = step => {
     this.setState(state => ({ ...state, visited: state.visited.add(step.name) }));
@@ -93,7 +100,7 @@ export default class Steps extends React.Component {
       // No invalid step, last step is valid
       lastValidStepIdx = steps.length - 1;
     } else if (firstInvalidStepIdx === 0) {
-      return { name: '__INIT__', index: -1, isLastStep: false, isVisited: true };
+      return null;
     }
 
     return this.buildStep(steps[lastValidStepIdx], lastValidStepIdx);
@@ -110,9 +117,12 @@ export default class Steps extends React.Component {
     return this.buildStep(this.props.steps[returnedStepIdx], returnedStepIdx);
   }
 
-  getStepByName(stepName) {
-    const stepIdx = this.props.steps.findIndex(s => s.name === stepName);
+  getStepByIndex(stepIdx) {
     return stepIdx === -1 ? null : this.buildStep(this.props.steps[stepIdx], stepIdx);
+  }
+
+  getStepByName(stepName) {
+    return this.getStepByIndex(this.props.steps.findIndex(s => s.name === stepName));
   }
 
   validateCurrentStep = async () => {
@@ -195,6 +205,7 @@ export default class Steps extends React.Component {
       goNext: lastValidStep && lastValidStep.index >= currentStep.index ? this.goNext : undefined,
       goBack: currentStep.index > 0 ? this.goBack : undefined,
       goToStep: this.goToStep,
+      isValidStep: lastValidStep ? lastValidStep.index + 1 >= currentStep.index : currentStep.index === 0,
     });
   }
 }
