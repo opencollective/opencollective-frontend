@@ -226,8 +226,10 @@ class CreateOrderPage extends React.Component {
   /** Validate step payment, loading data from stripe for new credit cards */
   validateStepPayment = async () => {
     const { stepPayment } = this.state;
+    const isFixedPriceTier = this.isFixedPriceTier();
+    const isFreeTier = this.isFreeTier();
 
-    if (this.isFreeTier()) {
+    if (isFreeTier && isFixedPriceTier) {
       // Always ignore payment method for free tiers
       return true;
     } else if (!stepPayment.isNew) {
@@ -438,6 +440,7 @@ class CreateOrderPage extends React.Component {
   /** Returs the steps list */
   getSteps() {
     const isFixedPriceTier = this.isFixedPriceTier();
+    const isFreeTier = this.isFreeTier();
 
     const steps = [
       {
@@ -451,7 +454,7 @@ class CreateOrderPage extends React.Component {
     if (!isFixedPriceTier) {
       steps.push({
         name: 'details',
-        isCompleted: Boolean(this.state.stepDetails),
+        isCompleted: Boolean(this.state.stepDetails && this.state.stepDetails.totalAmount > 0),
         validate: () => {
           return this.state.stepDetails && this.activeFormRef.current && this.activeFormRef.current.reportValidity();
         },
@@ -459,10 +462,10 @@ class CreateOrderPage extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!(this.isFreeTier() && isFixedPriceTier)) {
+    if (!(isFreeTier && isFixedPriceTier)) {
       steps.push({
         name: 'payment',
-        isCompleted: Boolean(this.state.stepPayment),
+        isCompleted: Boolean(isFreeTier || this.state.stepPayment),
         validate: this.validateStepPayment,
       });
     }
