@@ -93,6 +93,7 @@ class MarketingPage extends React.Component {
       } else {
         html = howItWorksPageHtml;
       }
+      style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
     } else if (pageSlug === 'gift-of-giving') {
       html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
