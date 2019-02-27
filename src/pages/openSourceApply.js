@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
+import { URLSearchParams } from 'universal-url';
 
 import Page from '../components/Page';
 import Loading from '../components/Loading';
@@ -20,7 +21,7 @@ import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
 import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
-import { getBrowserWebsiteUrl } from '../lib/utils';
+import { getWebsiteUrl } from '../lib/utils';
 
 const MIN_REPO_STARS = 100;
 
@@ -142,8 +143,17 @@ class OpenSourceApplyPage extends Component {
     }
   }
 
+  getGithubConnectUrl() {
+    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/opensource/apply` });
+
+    if (typeof window !== 'undefined' && window.localStorage.accessToken) {
+      urlParams.set('access_token', window.localStorage.accessToken);
+    }
+
+    return `/api/connected-accounts/github?${urlParams.toString()}`;
+  }
+
   renderConnectGithubButton() {
-    const connectUrl = `/api/connected-accounts/github?redirect=${getBrowserWebsiteUrl()}/opensource/apply`;
     return (
       <StyledCard minWidth={400} maxWidth={500} border="none" minHeight={350} p={4} textAlign="center">
         <H3 mb={2}>
@@ -160,7 +170,7 @@ class OpenSourceApplyPage extends Component {
           buttonSize="large"
           buttonStyle="primary"
           onClick={() => {
-            window.location.replace(connectUrl);
+            window.location.replace(this.getGithubConnectUrl());
           }}
           loading={this.state.loadingRepos}
           disabled={this.state.loadingRepos}

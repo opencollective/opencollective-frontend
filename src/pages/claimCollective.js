@@ -1,4 +1,3 @@
-import url from 'universal-url';
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
@@ -7,10 +6,11 @@ import fetch from 'node-fetch';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 import { Github } from 'styled-icons/fa-brands/Github';
+import { URLSearchParams } from 'universal-url';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import { getBaseApiUrl, getBrowserWebsiteUrl } from '../lib/utils';
+import { getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 
 import { Router, Link } from '../server/pages';
 import { colors } from '../constants/theme';
@@ -119,6 +119,10 @@ class ClaimCollectivePage extends React.Component {
   isAdmin() {
     const githubHandle = this.githubHandle();
 
+    if (!githubHandle) {
+      return false;
+    }
+
     if (githubHandle.includes('/')) {
       // A repository GitHub Handle (most common)
       return get(this.state.repo, 'permissions.admin');
@@ -132,15 +136,13 @@ class ClaimCollectivePage extends React.Component {
   getGithubConnectUrl() {
     const { slug } = this.props;
 
-    const websiteUrl = getBrowserWebsiteUrl() || process.env.WEBSITE_URL;
+    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/${slug}/claim` });
 
-    const searchParams = new url.URLSearchParams();
-    searchParams.set('redirect', `${websiteUrl}/${slug}/claim`);
     if (typeof window !== 'undefined' && window.localStorage.accessToken) {
-      searchParams.set('access_token', window.localStorage.accessToken);
+      urlParams.set('access_token', window.localStorage.accessToken);
     }
 
-    return `/api/connected-accounts/github?${searchParams.toString()}`;
+    return `/api/connected-accounts/github?${urlParams.toString()}`;
   }
 
   render() {
