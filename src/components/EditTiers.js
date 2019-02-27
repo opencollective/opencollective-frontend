@@ -259,7 +259,7 @@ class EditTiers extends React.Component {
       _amountType: tier._amountType || (tier.presets ? 'flexible' : 'fixed'),
     };
 
-    const tax = get(collective, `host.settings.tiersTaxes.${tier.type}`);
+    const tax = get(collective, `host.taxes.${tier.type}`);
     return (
       <div className={`tier ${tier.slug}`} key={key}>
         <div className="tierActions">

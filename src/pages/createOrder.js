@@ -315,6 +315,9 @@ class CreateOrderPage extends React.Component {
       paymentMethod,
       recaptchaToken,
       totalAmount: this.getTotalAmount(),
+      taxAmount: get(this.state, 'stepSummary.amount', 0),
+      countryISO: get(this.state, 'stepSummary.countryISO'),
+      taxIDNumber: get(this.state, 'stepSummary.number'),
       quantity: this.props.quantity || 1,
       currency: this.getCurrency(),
       interval: stepDetails.interval,
@@ -417,7 +420,7 @@ class CreateOrderPage extends React.Component {
     return get(this.state.stepDetails, 'totalAmount') || get(tier, 'amount') || amountFromUrl;
   }
 
-  /** Get total amount based on stepDetails with taxes applied */
+  /** Get total amount based on stepDetails with taxes from step summary applied */
   getTotalAmount() {
     const totalAmount = get(this.state, 'stepDetails.totalAmount', 0);
     const taxAmount = get(this.state, 'stepSummary.amount', 0);
@@ -439,8 +442,10 @@ class CreateOrderPage extends React.Component {
 
   /** Returs the steps list */
   getSteps() {
+    const tier = this.getTier();
     const isFixedPriceTier = this.isFixedPriceTier();
     const isFreeTier = this.isFreeTier();
+    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
 
     const steps = [
       {
@@ -471,7 +476,7 @@ class CreateOrderPage extends React.Component {
     }
 
     // Show the summary step only if the order has tax
-    if (isFixedPriceTier) {
+    if (tax) {
       steps.push({
         name: 'summary',
         isCompleted: this.state.stepSummary && this.state.stepSummary.isReady,
@@ -530,7 +535,7 @@ class CreateOrderPage extends React.Component {
     const amount = get(this.state.stepDetails, 'totalAmount');
     const interval = get(this.state.stepDetails, 'interval');
     const taxAmount = get(this.state.stepSummary, 'amount', 0);
-    const tax = get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`);
+    const tax = get(this.props.data.Collective, `host.taxes.${tier.type}`);
 
     return (
       <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
@@ -540,7 +545,7 @@ class CreateOrderPage extends React.Component {
           </P>
           <FormattedMessage
             id="contribute.tierDetails"
-            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
+            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month {monthly.} year {yearly.} other {.}}"
             values={{
               amount: (
                 <strong>
@@ -551,6 +556,7 @@ class CreateOrderPage extends React.Component {
                       &nbsp;+&nbsp;{tax.name}&nbsp;({tax.percentage}%)
                     </span>
                   )}
+                  {interval ? ' ' : ''}
                 </strong>
               ),
               interval: get(tier, 'interval') || this.props.interval,
@@ -558,7 +564,7 @@ class CreateOrderPage extends React.Component {
           />
           {interval && (
             <React.Fragment>
-              {' '}
+              <br />
               <FormattedMessage
                 id="contribute.tierDetailsFrequency"
                 defaultMessage="Your next charge will be on:"
@@ -632,13 +638,11 @@ class CreateOrderPage extends React.Component {
               minAmount={this.getOrderMinAmount()}
             />
           </Container>
-          <ContributeDetailsFAQ
-            hasInterval={Boolean(interval)}
-            mt={4}
-            display={['none', null, 'block']}
-            width={1 / 5}
-            minWidth="335px"
-          />
+          {interval ? (
+            <ContributeDetailsFAQ hasInterval mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          ) : (
+            <Box width={[0, null, null, 1 / 5]} />
+          )}
         </Flex>
       );
     } else if (step.name === 'payment') {
@@ -696,7 +700,7 @@ class CreateOrderPage extends React.Component {
               collectiveTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
               onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
-              tax={tier ? get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`) : null}
+              tax={tier ? get(this.props.data.Collective, `host.taxes.${tier.type}`) : null}
             />
           </Container>
           {this.renderTierDetails(tier)}
@@ -815,7 +819,7 @@ class CreateOrderPage extends React.Component {
           onInvalidStep={this.onInvalidStep}
           onComplete={this.submitOrder}
         >
-          {({ steps, currentStep, lastValidStep, lastVisitedStep, goNext, goBack, goToStep, isValidating }) => (
+          {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
             <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
               {loadingLoggedInUser ||
                 (LoggedInUser && (
@@ -840,7 +844,7 @@ class CreateOrderPage extends React.Component {
                   {this.state.error.replace('GraphQL error: ', '')}
                 </MessageBox>
               )}
-              {isLoadingContent || currentStep.index > lastValidStep.index + 1 ? (
+              {isLoadingContent || !isValidStep ? (
                 <Loading />
               ) : (
                 this.renderContent(currentStep, goNext, goBack, isValidating)
@@ -873,6 +877,7 @@ const addData = graphql(gql`
         id
         name
         settings
+        taxes
         countryISO
       }
       parentCollective {

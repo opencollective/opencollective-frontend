@@ -38,7 +38,7 @@ const calculateTaxAmount = (amount, tax) => {
     return 0;
   }
 
-  return amount * (tax.percentage / 100);
+  return Math.round(amount * (tax.percentage / 100));
 };
 
 const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMethod, currency }) => {
@@ -132,7 +132,7 @@ const getInitialState = (collectiveTaxInfo, tax) => {
   const base = {
     countryISO: null,
     number: null,
-    isReady: Boolean(tax && collectiveTaxInfo && collectiveTaxInfo.countryISO),
+    isReady: Boolean(tax ? collectiveTaxInfo && collectiveTaxInfo.countryISO : true),
     amount: 0,
   };
   return { ...base, ...collectiveTaxInfo };
