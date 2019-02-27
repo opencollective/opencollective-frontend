@@ -1,16 +1,171 @@
-Subject: {{title}}
+Subject: {{month}} {{year}} Platform Report
 
 {{> header}}
 
 <style>
   h2 {
     margin-top: 2rem;
-    text-align: left;
+    text-align: center;
+  }
+
+  table h3 {
+    font-weight: 300;
+    margin-bottom: 0;
+  }
+
+  table.small {
+    font-size: 11px;
+  }
+
+  .bignumber {
+    font-size: 48px;
+  }
+
+  .delta {
+    color: #444;
+    font-size: 12px;
+  }
+
+  .delta.big {
+    font-size: 18px;
   }
 </style>
 
+<div
+  style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  {{{currency stats.thisMonth.platformFees.amount currency=stats.thisMonth.platformFees.currency}}}
+  ({{{currency stats.delta.platformFees.amount currency=stats.delta.platformFees.currency  sign=true}}}) /
+  {{stats.thisMonth.hosts.new}} new hosts ({{stats.thisMonth.hosts.active}} active, {{stats.thisMonth.hosts.total}}
+  total) /
+  {{stats.thisMonth.backers.new}} new backers ({{stats.thisMonth.backers.repeat}} repeat,
+  {{stats.thisMonth.backers.total}} total)
+
+</div>
 <div class="htmlReport">
-  {{{html}}}
+  <center>
+    <h2>Total platform fees in {{month}} {{year}}</h2>
+    <div class="bignumber">
+      {{{currency stats.thisMonth.platformFees.amount currency=stats.thisMonth.platformFees.currency}}}</div>
+    <div class="big delta">
+      ({{{currency stats.delta.platformFees.amount currency=stats.delta.platformFees.currency  sign=true}}})</div>
+    <br />
+    <br />
+    by currency:
+    <br />
+    <br />
+    <table>
+      <tr>
+        {{#each stats.thisMonth.platformFeesByCurrency}}
+        {{#if amount}}
+        <td width="60px" align="center">
+          <div>{{{currency amount currency=currency}}}</div>
+        </td>
+        {{/if}}
+        {{/each}}
+      </tr>
+      <tr>
+        {{#each stats.delta.platformFeesByCurrency}}
+        {{#if amount}}
+        <td width="60px" align="center">
+          <div class="delta">{{{currency amount currency=currency sign=true}}}</div>
+        </td>
+        {{/if}}
+        {{/each}}
+      </tr>
+    </table>
+    <br />
+    <br />
+    <table width="100%">
+      <tr>
+        <td align="center" width="33%">
+          <h3>Active hosts</h3>
+          <div class="bignumber">{{stats.thisMonth.hosts.active}}</div>
+          <div class="big delta">{{{sign stats.delta.hosts.active}}}{{stats.delta.hosts.active}}</div>
+        </td>
+        <td align="center" width="33%">
+          <h3>New backers</h3>
+          <div class="bignumber">{{stats.thisMonth.backers.new}}</div>
+          <div class="big delta">{{{sign stats.delta.backers.new}}}{{stats.delta.backers.new}}</div>
+        </td>
+        <td align="center" width="33%">
+          <h3>Repeat backers</h3>
+          <div class="bignumber">{{stats.thisMonth.backers.repeat}}</div>
+          <div class="big delta">{{{sign stats.delta.backers.repeat}}}{{stats.delta.backers.repeat}}</div>
+        </td>
+      </tr>
+    </table>
+    <h2>Hosts with unpaid platform fees</h2>
+    {{#each hosts}}
+    {{#if platformFeesDue}}
+    <h3><a href="https://opencollective.com/{{host}}">{{host}}</a></h3>
+    <table>
+      <tr>
+        <th colspan=2>Revenue:</th>
+        <td></td>
+        <td align="right">{{{currency totalRevenue currency=currency}}}</td>
+      </tr>
+      <tr>
+        <th colspan=2>Host fees:</th>
+        <td></td>
+        <td align="right">{{{currency hostFees currency=currency}}}</td>
+      </tr>
+      <tr>
+        <th colspan=2>Platform fees:</th>
+        <td></td>
+        <td align="right">{{{currency platformFees currency=currency}}}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Stripe (already paid automatically):</td>
+        <td></td>
+        <td align="right">{{{currency platformFeesStripe currency=currency}}}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Manually added funds:</td>
+        <td></td>
+        <td align="right">{{{currency platformFeesManual currency=currency}}}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>PayPal:</td>
+        <td></td>
+        <td align="right">{{{currency platformFeesPaypal currency=currency}}}</td>
+      </tr>
+      <tr>
+        <th colspan=2>Fees still due:</th>
+        <td></td>
+        <td align="right">{{{currency platformFeesDue currency=currency}}}</td>
+      </tr>
+    </table>
+    {{/if}}
+    {{/each}}
+
+
+    <h2>All hosts</h2>
+    <table class="small">
+      <tr>
+        <th>host</th>
+        <th>collectives (active)</th>
+        <th>backers</th>
+        <th>total revenue</th>
+        <th>host fees</th>
+        <th>platform fees</th>
+      </tr>
+      {{#each hosts}}
+      <tr>
+        <td><a href="https://opencollective.com/{{host}}">{{host}}</a></td>
+        <td align="right">{{collectives}} ({{activeCollectives}})</td>
+        <td align="right">{{backers}}</td>
+        <td align="right">{{{currency totalRevenue currency=currency}}}</td>
+        <td align="right">{{{currency hostFees currency=currency}}}</td>
+        <td align="right">{{{currency platformFees currency=currency}}}</td>
+      </tr>
+      {{/each}}
+
+    </table>
+  </center>
+
 </div>
 
 {{> footer}}
