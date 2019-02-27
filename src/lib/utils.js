@@ -365,8 +365,10 @@ export const loadScriptAsync = (url, opts = {}) =>
 // From section about escapting user input
 export const escapeInput = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-export const getBrowserWebsiteUrl = () => {
+export const getWebsiteUrl = () => {
   if (typeof window !== 'undefined' && window.location) {
     return `${window.location.protocol}//${window.location.host}`;
+  } else {
+    return process.env.WEBSITE_URL;
   }
 };
