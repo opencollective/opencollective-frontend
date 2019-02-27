@@ -8,6 +8,7 @@ import { Span } from './Text';
 import StyledCheckbox from './StyledCheckbox';
 
 const StyledCardElement = styled(CardElement)`
+  background: #fff;
   min-width: 200px;
   max-width: 450px;
   max-height: 55px;
