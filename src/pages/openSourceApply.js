@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { URLSearchParams } from 'universal-url';
@@ -38,6 +38,13 @@ class OpenSourceApplyPage extends Component {
     LoggedInUser: PropTypes.object,
     createCollectiveFromGithub: PropTypes.func,
   };
+
+  constructor(props) {
+    super(props);
+    this.messages = defineMessages({
+      guidelines: { id: 'openSourceApply.guidelines', defaultMessage: 'guidelines' },
+    });
+  }
 
   state = {
     result: {},
@@ -154,6 +161,7 @@ class OpenSourceApplyPage extends Component {
   }
 
   renderConnectGithubButton() {
+    const { intl } = this.props;
     return (
       <StyledCard minWidth={400} maxWidth={500} border="none" minHeight={350} p={4} textAlign="center">
         <H3 mb={2}>
@@ -161,9 +169,32 @@ class OpenSourceApplyPage extends Component {
         </H3>
         <P mb={4}>
           <FormattedMessage
-            id="openSourceApply.description"
-            defaultMessage="By clicking below you are applying to be hosted by the Open Source Collective 501c6 You need a GitHub account and a repository with over 100 stars. If you run into trouble, file an issue in our GitHub Issues section."
+            id="openSourceApply.description.p1"
+            defaultMessage="When you do an open source project the last thing you want to worry about is creating a legal entity, keeping track of accounting and other tax reports, just because a company wants to support you financially but needs an invoice for that."
           />
+        </P>
+        <P mb={4}>
+          <FormattedMessage
+            id="openSourceApply.description.p2"
+            defaultMessage="That's why we have created an umbrella non profit (the {osclink}) that can host your open source community. You just need to have at least 100 stars on Github, operate in full transparency and respect our {communityguidelineslink}."
+            values={{
+              osclink: <a href="https://opencollective.com/opensourcecollective">Open Source Collective 501c6</a>,
+              communityguidelineslink: (
+                <a href="https://github.com/opencollective/opencollective/blob/master/COMMUNITY-GUIDELINES.MD">
+                  {intl.formatMessage(this.messages['guidelines'])}
+                </a>
+              ),
+            }}
+          />
+        </P>
+        <P mb={4}>
+          <FormattedMessage
+            id="openSourceApply.description.p3"
+            defaultMessage="50% of the commission (so 5% out of the 10%) goes to finance this non profit and pay for legal and accounting and other expenses that can be mutualized for the benefit of the open source community at large."
+          />
+        </P>
+        <P mb={4}>
+          <FormattedMessage id="openSourceApply.description.p4" defaultMessage="Join us!" />
         </P>
         <StyledButton
           textAlign="center"
