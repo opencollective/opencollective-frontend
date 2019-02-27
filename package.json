@@ -65,7 +65,7 @@
     "rc-table": "6.4.3",
     "react": "16.8.3",
     "react-add-to-calendar": "0.1.5",
-    "react-apollo": "2.5.0",
+    "react-apollo": "2.5.1",
     "react-bootstrap": "0.32.4",
     "react-datetime": "2.16.3",
     "react-dom": "16.8.3",
