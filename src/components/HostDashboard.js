@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { Flex } from '@rebass/grid';
 
 import ExpensesWithData from '../apps/expenses/components/ExpensesWithData';
 import OrdersWithData from '../apps/expenses/components/OrdersWithData';
@@ -19,6 +20,8 @@ import CollectivePicker from '../components/CollectivePickerWithData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
 import { FormattedMessage } from 'react-intl';
+import MessageBox from './MessageBox';
+import Page from './Page';
 
 class HostDashboard extends React.Component {
   static propTypes = {
@@ -39,8 +42,21 @@ class HostDashboard extends React.Component {
   render() {
     const { LoggedInUser, data } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
-    if (!data.Collective.isHost) return <ErrorPage message="collective.is.not.host" />;
+    if (!data.Collective) {
+      return <ErrorPage data={data} />;
+    }
+
+    if (!data.Collective.isHost) {
+      return (
+        <Page>
+          <Flex px={2} py={6} justifyContent="center">
+            <MessageBox type="error" withIcon>
+              <FormattedMessage id="page.error.collective.is.not.host" defaultMessage="This page is only for hosts" />
+            </MessageBox>
+          </Flex>
+        </Page>
+      );
+    }
 
     const host = data.Collective;
     const selectedCollective = this.state.selectedCollective || host;
