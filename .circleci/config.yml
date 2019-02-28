@@ -156,6 +156,7 @@ jobs:
             - api/migrations
             - api/node_modules # We persist node_modules, no need to install later on
             - api/scripts/db_restore.sh
+            - api/scripts/db_setup.js
             - api/scripts/sequelize.sh
             - api/server # We should refactor so we don't need it in scripts
             - api/test/dbdumps/opencollective_dvl.pgsql # We need the DB dump for e2e
