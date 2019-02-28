@@ -40,6 +40,7 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       hostFeeInHostCurrency: { type: GraphQLInt },
       platformFeeInHostCurrency: { type: GraphQLInt },
       paymentProcessorFeeInHostCurrency: { type: GraphQLInt },
+      taxAmount: { type: GraphQLInt },
       createdByUser: { type: UserType },
       host: { type: CollectiveInterfaceType },
       paymentMethod: { type: PaymentMethodType },
@@ -142,6 +143,10 @@ const TransactionFields = () => {
       resolve(transaction) {
         return transaction.paymentProcessorFeeInHostCurrency;
       },
+    },
+    taxAmount: {
+      type: GraphQLInt,
+      description: 'The amount paid in tax (for example VAT) for this transaction',
     },
     netAmountInCollectiveCurrency: {
       type: GraphQLInt,

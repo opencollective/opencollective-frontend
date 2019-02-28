@@ -1067,6 +1067,10 @@ export const OrderType = new GraphQLObjectType({
           return order.totalAmount;
         },
       },
+      taxAmount: {
+        type: GraphQLInt,
+        description: 'The amount paid in tax (for example VAT) for this order',
+      },
       interval: {
         description: "frequency of the subscription if any (could be either null, 'month' or 'year')",
         type: GraphQLString,

@@ -182,6 +182,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     amountInHostCurrency: totalAmountInPaymentMethodCurrency,
     hostFeeInHostCurrency,
     platformFeeInHostCurrency,
+    taxAmount: order.taxAmount,
     paymentProcessorFeeInHostCurrency: 0,
     description: order.description,
   };

@@ -124,6 +124,7 @@ export default {
             hostFeeInHostCurrency,
             platformFeeInHostCurrency: fees.applicationFee,
             paymentProcessorFeeInHostCurrency: fees.stripeFee,
+            taxAmount: order.taxAmount,
             description: order.description,
             data: { charge, balanceTransaction },
           };

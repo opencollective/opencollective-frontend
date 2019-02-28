@@ -241,7 +241,10 @@ export const OrderInputType = new GraphQLInputObjectType({
   description: 'Input type for OrderType',
   fields: () => ({
     id: { type: GraphQLInt },
-    quantity: { type: GraphQLInt },
+    quantity: {
+      type: GraphQLInt,
+      defaultValue: 1,
+    },
     totalAmount: { type: GraphQLInt },
     hostFeePercent: { type: GraphQLInt },
     platformFeePercent: { type: GraphQLInt },
@@ -264,6 +267,20 @@ export const OrderInputType = new GraphQLInputObjectType({
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType },
     recaptchaToken: { type: GraphQLString },
+    // For taxes
+    taxAmount: {
+      type: GraphQLInt,
+      description: 'The amount of taxes that were included in totalAmount',
+      defaultValue: 0,
+    },
+    countryISO: {
+      type: GraphQLString,
+      description: 'User country, to know which tax applies',
+    },
+    taxIDNumber: {
+      type: GraphQLString,
+      description: 'User tax ID number',
+    },
   }),
 });
 

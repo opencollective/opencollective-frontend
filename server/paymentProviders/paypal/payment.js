@@ -113,6 +113,7 @@ export async function createTransaction(order, paymentInfo) {
     hostFeeInHostCurrency,
     platformFeeInHostCurrency,
     paymentProcessorFeeInHostCurrency: paypalFee,
+    taxAmount: order.taxAmount,
     description: order.description,
     data: paymentInfo,
   };

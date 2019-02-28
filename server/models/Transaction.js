@@ -137,6 +137,7 @@ export default (Sequelize, DataTypes) => {
       platformFeeInHostCurrency: DataTypes.INTEGER,
       hostFeeInHostCurrency: DataTypes.INTEGER,
       paymentProcessorFeeInHostCurrency: DataTypes.INTEGER,
+      taxAmount: { type: DataTypes.INTEGER },
       netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective (after fees) or removed from the collective (including fees)
 
       data: DataTypes.JSON,

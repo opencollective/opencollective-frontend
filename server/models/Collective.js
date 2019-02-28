@@ -244,6 +244,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.JSON,
       },
 
+      taxes: {
+        type: DataTypes.JSON,
+      },
+
       data: {
         type: DataTypes.JSON,
         allowNull: true,

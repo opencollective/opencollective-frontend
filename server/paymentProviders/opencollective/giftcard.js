@@ -66,6 +66,7 @@ export async function processOrder(order) {
       hostFeeInHostCurrency: 0,
       platformFeeInHostCurrency: 0, // we don't charge a fee until the money is used by User
       paymentProcessorFeeInHostCurrency: 0,
+      taxAmount: order.taxAmount,
       description: order.paymentMethod.name,
       HostCollectiveId,
     },

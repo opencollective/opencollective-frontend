@@ -123,6 +123,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
   try {
     // ---- Set defaults ----
     order.quantity = order.quantity || 1;
+    order.taxAmount = order.taxAmount || 0;
 
     if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !remoteUser) {
       throw new Error('You need to be logged in to be able to use a payment method on file');
@@ -322,21 +323,58 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       throw new Error(`Invalid currency. Expected ${currency}.`);
     }
 
+    // ---- Taxes (VAT) ----
+    let taxPercent = 0;
+
+    // Load tax info from DB
+    if (tier && order.collective.HostCollectiveId) {
+      const hostCollective = await loaders.collective.findById.load(order.collective.HostCollectiveId);
+      const tax = get(hostCollective, `taxes.${tier.type}`);
+
+      // Adapt tax based on country / tax ID number
+      if (tax && tax.percentage > 0) {
+        if (!order.countryISO) {
+          throw Error('This order has a tax attached, you must set a country');
+        }
+
+        const isTaxedCountry = !tax.countries || tax.countries.includes(order.countryISO);
+        if (isTaxedCountry && !order.taxIDNumber) {
+          taxPercent = tax.percentage;
+        }
+      }
+    }
+
+    // Ensure tax amount is not out-of-bound
+    if (order.taxAmount < 0) {
+      throw Error('Tax amount cannot be negative');
+    } else if (taxPercent === 0 && order.taxAmount !== 0) {
+      throw Error(
+        `This order should not have any tax attached. Received tax amount ${formatCurrency(order.taxAmount, currency)}`,
+      );
+    }
+
     // ---- Checks on totalAmount ----
     if (order.totalAmount < 0) {
       throw new Error('Total amount cannot be a negative value');
     }
 
     // Don't allow custom values if using a tier with fixed amount
-    if (tier && tier.amount && !tier.presets && tier.amount * order.quantity !== order.totalAmount) {
+    if (tier && tier.amount && !tier.presets) {
+      // Manually force the totalAmount if it has no been passed
       if (isNil(order.totalAmount)) {
-        // Manually force the totalAmount if it has no been passed
         order.totalAmount = order.quantity * tier.amount;
-      } else {
+      }
+
+      const netAmountForCollective = order.totalAmount - order.taxAmount;
+      const expectedAmountForCollective = order.quantity * tier.amount;
+      const expectedTaxAmount = Math.round((expectedAmountForCollective * taxPercent) / 100);
+
+      if (netAmountForCollective !== expectedAmountForCollective || order.taxAmount !== expectedTaxAmount) {
         const prettyTotalAmount = formatCurrency(order.totalAmount, currency);
-        const prettyExpectedAmount = formatCurrency(tier.amount * order.quantity, currency);
+        const prettyExpectedAmount = formatCurrency(expectedAmountForCollective, currency);
+        const taxInfo = expectedTaxAmount ? ` + ${formatCurrency(expectedTaxAmount, currency)} tax` : '';
         throw new Error(
-          `This tier uses a fixed amount. Order total must be ${prettyExpectedAmount}. You set: ${prettyTotalAmount}`,
+          `This tier uses a fixed amount. Order total must be ${prettyExpectedAmount}${taxInfo}. You set: ${prettyTotalAmount}`,
         );
       }
     }
@@ -344,14 +382,15 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     // If using a tier, amount can never be less than the minimum amount
     if (tier && tier.presets) {
       const minValue = min(isNil(tier.amount) ? tier.presets : [...tier.presets, tier.amount]);
-      if (order.totalAmount < order.quantity * minValue) {
-        const prettyMinTotal = formatCurrency(order.quantity * minValue, currency);
+      const minAmount = minValue * order.quantity;
+      const minTotalAmount = taxPercent ? Math.round(minAmount * (1 + taxPercent / 100)) : minAmount;
+      if ((order.totalAmount || 0) < minTotalAmount) {
+        const prettyMinTotal = formatCurrency(minTotalAmount, currency);
         throw new Error(`The amount you set is below minimum tier value, it should be at least ${prettyMinTotal}`);
       }
     }
 
     const tierNameInfo = tier && tier.name ? ` (${tier.name})` : '';
-
     let defaultDescription;
     if (order.interval) {
       defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
@@ -370,6 +409,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       quantity: order.quantity,
       totalAmount: order.totalAmount,
       currency,
+      taxAmount: order.taxAmount,
       interval: order.interval,
       description: order.description || defaultDescription,
       publicMessage: order.publicMessage,
@@ -379,6 +419,8 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       data: {
         reqIp,
         recaptchaResponse,
+        countryISO: order.countryISO || fromCollective.collectiveId,
+        taxIDNumber: order.taxIDNumber,
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };

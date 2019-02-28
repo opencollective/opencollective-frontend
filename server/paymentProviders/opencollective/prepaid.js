@@ -99,6 +99,7 @@ async function processOrder(order) {
       hostFeeInHostCurrency,
       platformFeeInHostCurrency,
       paymentProcessorFeeInHostCurrency: 0,
+      taxAmount: order.taxAmount,
       description: order.description,
     },
   });
