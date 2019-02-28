@@ -2,7 +2,6 @@
  * Dependencies.
  */
 import _ from 'lodash';
-import cheerio from 'cheerio';
 import app from '../server/index';
 import config from 'config';
 import { expect } from 'chai';
@@ -12,7 +11,6 @@ import * as utils from '../test/utils';
 import userlib from '../server/lib/userlib';
 import sinon from 'sinon';
 import Bluebird from 'bluebird';
-import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import models from '../server/models';
 import mock from './mocks/clearbit';
@@ -229,122 +227,6 @@ describe('users.routes.test.js', () => {
           paypalEmail: 'abc',
         })
         .expect(400));
-  });
-
-  /**
-   * Send a new link to the user to login
-   */
-  describe('#sendNewTokenByEmail', () => {
-    let user;
-
-    beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
-
-    it('fails if there is no email', done => {
-      request(app)
-        .post('/users/new_login_token')
-        .send({
-          api_key: application.api_key,
-        })
-        .expect(400, {
-          error: {
-            code: 400,
-            fields: {
-              email: 'Required field email missing',
-            },
-            message: 'Missing required fields',
-            type: 'missing_required',
-          },
-        })
-        .end(done);
-    });
-
-    it('fails silently if the user does not exist', done => {
-      const email = 'idonotexist@void.null';
-
-      request(app)
-        .post('/users/new_login_token')
-        .send({
-          email,
-          api_key: application.api_key,
-        })
-        .expect(200)
-        .end(done);
-    });
-
-    it('sends an email to the user with the new token', () =>
-      request(app)
-        .post('/users/new_login_token')
-        .send({
-          email: user.email,
-          api_key: application.api_key,
-        })
-        .expect(200)
-        .then(() => {
-          const options = nm.sendMail.lastCall.args[0];
-          const $ = cheerio.load(options.html);
-          const href = $('a').attr('href');
-          expect(href).to.contain(`${config.host.website}/signin/`);
-          expect(options.to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
-        }));
-  });
-
-  /**
-   * Send a new link to the user for the subscription page
-   */
-
-  describe('#refreshTokenByEmail', () => {
-    let user;
-
-    beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
-
-    it('fails if there is no auth', () =>
-      request(app)
-        .post(`/users/refresh_login_token?api_key=${application.api_key}`)
-        .expect(401));
-
-    it('fails if the user does not exist', done => {
-      const fakeUser = { id: 12312312 };
-      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.jwtSecret, {
-        expiresIn: 100,
-        subject: fakeUser.id,
-        issuer: config.host.api,
-        audience: application.id,
-      });
-
-      request(app)
-        .post(`/users/refresh_login_token?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${expiredToken}`)
-        .expect(401, {
-          error: {
-            code: 401,
-            message: 'Invalid payload',
-            type: 'unauthorized',
-          },
-        })
-        .end(done);
-    });
-
-    it('sends an email with the new valid token', () => {
-      const expiredToken = jwt.sign({ user }, config.keys.opencollective.jwtSecret, {
-        expiresIn: -1,
-        subject: user.id,
-        issuer: config.host.api,
-        audience: application.id,
-      });
-
-      return request(app)
-        .post(`/users/refresh_login_token?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${expiredToken}`)
-        .expect(200)
-        .toPromise()
-        .then(() => {
-          const options = nm.sendMail.lastCall.args[0];
-          const $ = cheerio.load(options.html);
-          const href = $('a').attr('href');
-          expect(href).to.contain(`${config.host.website}/signin/`);
-          expect(options.to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
-        });
-    });
   });
 
   /**
