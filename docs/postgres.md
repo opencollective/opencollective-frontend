@@ -18,6 +18,24 @@ Get the app from [Postgres.app](http://postgresapp.com/). Install it.
 
 Then to enable the CLI tools, follow the steps from: https://postgresapp.com/documentation/cli-tools.html
 
+### Using Docker
+
+If you don't want to run a local instance of Postgres in your computer, you can run one in Docker.
+Keep in mind that you still need to have the local client tools like `psql`, `dropdb`, `createuser` still locally available.
+
+Create and run the container:
+
+```
+docker run -p 5432:5432 -d --name opencollective-postgres mdillon/postgis:9.6
+```
+
+Set the necessary environment variables:
+
+```
+export PGHOST=localhost
+export PGUSER=postgres
+```
+
 ## Setup
 
 #### Development
