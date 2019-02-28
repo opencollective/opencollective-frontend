@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Feb 27 2019 15:24:51 GMT+0100 (GMT+01:00)
+# timestamp: Fri Mar 01 2019 18:23:51 GMT+0100 (GMT+01:00)
 
 """Application model"""
 type Application {
@@ -608,7 +608,7 @@ type Expense implements Transaction {
   paymentProcessorFeeInHostCurrency: Int
 
   """The amount paid in tax (for example VAT) for this transaction"""
-  taxAmount: Int!
+  taxAmount: Int
 
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
@@ -811,6 +811,17 @@ type Mutation {
   removeMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
   createOrder(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
+
+  """
+  Update the non-sensitive information of an order, like the public message
+  """
+  updateOrderInfo(
+    """ID of the order to update"""
+    id: Int!
+
+    """Public message to motivate others to contribute"""
+    publicMessage: String
+  ): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!): UpdateType
@@ -946,7 +957,7 @@ type Order implements Transaction {
   paymentProcessorFeeInHostCurrency: Int
 
   """The amount paid in tax (for example VAT) for this transaction"""
-  taxAmount: Int!
+  taxAmount: Int
 
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
