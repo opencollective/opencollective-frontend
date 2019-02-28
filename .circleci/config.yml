@@ -104,7 +104,6 @@ jobs:
       # - run: npm prune --production
 
       # We persist only the build folder
-      # This will likely break at first but this is what we want
       - run: mkdir ../frontend
       - run: cp -R dist ../frontend/
       - run: cp package*.json ../frontend/
@@ -156,9 +155,10 @@ jobs:
             - api/dist
             - api/migrations
             - api/node_modules # We persist node_modules, no need to install later on
-            - api/scripts
-            - api/server # We should move env.js or refactor so we don't need server/env.js
-            - api/test/dbdumps # We need the DB dumps
+            - api/scripts/db_restore.sh
+            - api/scripts/sequelize.sh
+            - api/server/env.js # We should refactor so we don't need it in scripts
+            - api/test/dbdumps/opencollective_dvl.pgsql # We need the DB dump for e2e
             - api/templates
             - api/.babelrc
             - api/package.json
