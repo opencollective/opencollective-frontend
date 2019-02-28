@@ -28,7 +28,7 @@ be created between the two Collectives to reflect the transfer.
 
 #### Use case example (Order)
 
-Given a transaction that represents moving $50 USD from User to
+Given a transaction that represents moving \$50 USD from User to
 Collective with 5% of platform fee, 10% of host fee and 2.9%+30c of
 payment processor fee and the Host account receiving it is in MXN and
 the exchange rate is 1 USD to 18.43 MXN.
@@ -37,13 +37,13 @@ the exchange rate is 1 USD to 18.43 MXN.
 
 Collective Ledger (CREDIT)
 
-* **amount**: Store the value in the received currency (USD)
-* **amountInHostCurrency**: Store the amount converted to the Host
+- **amount**: Store the value in the received currency (USD)
+- **amountInHostCurrency**: Store the amount converted to the Host
   currency (MXN)
-* **netAmountInCollectiveCurrency**: Store the amount in the
+- **netAmountInCollectiveCurrency**: Store the amount in the
   Collective currency (which could be different from the Host & the
   User).
-* **hostCurrencyFxRate**: Store the rate between the **amount** and
+- **hostCurrencyFxRate**: Store the rate between the **amount** and
   **amountInHostCurrency**.
 
 ##### How it should look like after this change
@@ -53,22 +53,23 @@ following changes are necessary:
 
 The following fields will be renamed
 
- * **amountInHostCurrency** replaced by **amount**
- * **hostCurrency** replaced by **currency**
- * **hostCurrencyFxRate** deleted
+- **amountInHostCurrency** replaced by **amount**
+- **hostCurrency** replaced by **currency**
+- **hostCurrencyFxRate** deleted
 
- * **fromAmount** store the amount in the original currency
- * **fromCurrency** store the original currency
- * **fromCurrencyRate** store the rate between **fromAmount** and **amount**
+- **fromAmount** store the amount in the original currency
+- **fromCurrency** store the original currency
+- **fromCurrencyRate** store the rate between **fromAmount** and **amount**
 
 And the following fields are going to be deleted:
- * **netAmountInCollectiveCurrency**
+
+- **netAmountInCollectiveCurrency**
 
 Here's how a transaction of a user donating 921.50 MXN to a host in
 USD with the rate of ~0.05.
 
 |             from |               to |   hostId |   type | amount | currency | fromAmount | fromCurrency | fromCurrencyRate |
-|-----------------:|-----------------:|---------:|-------:|-------:|---------:|-----------:|-------------:|-----------------:|
+| ---------------: | ---------------: | -------: | -----: | -----: | -------: | ---------: | -----------: | ---------------: |
 |             User |       Collective | USD-HOST |  DEBIT |  -5000 |      USD |     -92150 |          MXN |          0.05426 |
 |       Collective |             User | USD-HOST | CREDIT |  +5000 |      USD |     +92150 |          MXN |          0.05426 |
 |       Collective |             Host | USD-HOST |  DEBIT |   -500 |      USD |            |              |                  |
@@ -78,14 +79,14 @@ USD with the rate of ~0.05.
 |       Collective | Payment Provider | USD-HOST |  DEBIT |   -175 |      USD |            |              |                  |
 | Payment Provider |       Collective | USD-HOST | CREDIT |   +175 |      USD |            |              |                  |
 
-
 The following expression is always true for all the rows:
 
 ```javascript
-amount == fromAmount * fromCurrencyRate
+amount == fromAmount * fromCurrencyRate;
 ```
 
 A helper will be added to the `libledger` to retrieving the value in the original currency:
+
 ```javascript
 > const rows = await libledger.rows('d3e36baa-69a2-4f6e-ac44-f93981e51c97');
 > libledger.formattedBalanceFromCurrency(userCollective.id, rows);
@@ -97,14 +98,16 @@ A helper will be added to the `libledger` to retrieving the value in the origina
 ### Where currency conversion happens
 
 Stripe's policy on multi-currency
- * If there is a bank account for that currency, no conversion occurs
- * If there are multiple bank accounts available for a given currency,
-   Stripe uses the one set as =default_for_currency=
- * If there is not a bank account for that currency, we automatically
-   convert those funds to your default currency
+
+- If there is a bank account for that currency, no conversion occurs
+- If there are multiple bank accounts available for a given currency,
+  Stripe uses the one set as =default_for_currency=
+- If there is not a bank account for that currency, we automatically
+  convert those funds to your default currency
 
 PayPal's Policy on multi-currency
- * ??
+
+- ??
 
 ### Multi Wallets
 
@@ -113,8 +116,9 @@ PayPal's Policy on multi-currency
 #### Donation to the `USD` wallet in `USD`
 
 ##### Transaction
+
 |             from |               to |   hostId |   type | amount | currency | fromAmount | fromCurrency | fromCurrencyRate |
-|-----------------:|-----------------:|---------:|-------:|-------:|---------:|-----------:|-------------:|-----------------:|
+| ---------------: | ---------------: | -------: | -----: | -----: | -------: | ---------: | -----------: | ---------------: |
 |             User |       Collective | USD-HOST |  DEBIT |  -5000 |      USD |            |              |                  |
 |       Collective |             User | USD-HOST | CREDIT |  +5000 |      USD |            |              |                  |
 |       Collective |             Host | USD-HOST |  DEBIT |   -500 |      USD |            |              |                  |
@@ -125,8 +129,9 @@ PayPal's Policy on multi-currency
 | Payment Provider |       Collective | USD-HOST | CREDIT |   +175 |      USD |            |              |                  |
 
 ##### Balance
+
 |      User | Collective |     Host | Platform | Payment Provider |
-|----------:|-----------:|---------:|---------:|-----------------:|
+| --------: | ---------: | -------: | -------: | ---------------: |
 | -5000 USD |  +4075 USD | +500 USD | +250 USD |         +175 USD |
 
 #### Donation to the `USD` wallet in `MXN`
@@ -137,8 +142,9 @@ be filled in with the meta data about the original amount of `MXN`
 used to buy that amount of `USD`.
 
 ##### Transaction
+
 |             from |               to |   hostId |   type | amount | currency | fromAmount | fromCurrency | fromCurrencyRate |
-|-----------------:|-----------------:|---------:|-------:|-------:|---------:|-----------:|-------------:|-----------------:|
+| ---------------: | ---------------: | -------: | -----: | -----: | -------: | ---------: | -----------: | ---------------: |
 |             User |       Collective | USD-HOST |  DEBIT |  -5000 |      USD |     -92150 |          MXN |          0.05426 |
 |       Collective |             User | USD-HOST | CREDIT |  +5000 |      USD |     +92150 |          MXN |          0.05426 |
 |       Collective |             Host | USD-HOST |  DEBIT |   -500 |      USD |            |              |                  |
@@ -149,13 +155,15 @@ used to buy that amount of `USD`.
 | Payment Provider |       Collective | USD-HOST | CREDIT |   +175 |      USD |            |              |                  |
 
 ##### Balance
+
 |                 User |           Collective |     Host | Platform | Payment Provider |
-|---------------------:|---------------------:|---------:|---------:|-----------------:|
+| -------------------: | -------------------: | -------: | -------: | ---------------: |
 | -5000 USD/-92150 MXN | +4075 USD/+92150 MXN | +500 USD | +250 USD |         +175 USD |
 
 #### Donation to the `MXN` wallet in `MXN` but fees in `USD`
+
 |             from |               to |   hostId |   type | amount | currency | fromAmount | fromCurrency | fromCurrencyRate |
-|-----------------:|-----------------:|---------:|-------:|-------:|---------:|-----------:|-------------:|-----------------:|
+| ---------------: | ---------------: | -------: | -----: | -----: | -------: | ---------: | -----------: | ---------------: |
 |             User |       Collective | MXN-HOST |  DEBIT | -92150 |      MXN |            |              |                  |
 |       Collective |             User | MXN-HOST | CREDIT | +92150 |      MXN |            |              |                  |
 |       Collective |             Host | MXN-HOST |  DEBIT |  -9215 |      MXN |       -500 |          USD |            18.43 |
@@ -166,6 +174,7 @@ used to buy that amount of `USD`.
 | Payment Provider |       Collective | MXN-HOST | CREDIT |  +2702 |      MXN |       +175 |          USD |            18.43 |
 
 ##### Balance
+
 |       User |           Collective |     Host | Platform | Payment Provider |
-|-----------:|---------------------:|---------:|---------:|-----------------:|
+| ---------: | -------------------: | -------: | -------: | ---------------: |
 | -92150 MXN | +4075 USD/+92150 MXN | +500 USD | +250 USD |         +175 USD |

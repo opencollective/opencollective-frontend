@@ -160,7 +160,7 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
-    "prettier": "prettier \"**/*.js\" --ignore-path .eslintignore",
+    "prettier": "prettier \"**/*.@(js|json|md)\" --ignore-path .eslintignore",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
     "pretest": "npm run lint:quiet && npm run prettier:check",
@@ -219,7 +219,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,json}": [
+    "*.{js,json,md}": [
       "prettier --write",
       "git add"
     ]

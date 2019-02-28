@@ -10,9 +10,9 @@ manage the transactions.
 
 1. Increase accuracy of the ledger
    1. Store Fees on the User & Collective ledgers [rfc-002]
-      1. [X] Orders
-      2. [X] Expenses
-      3. [X] Neither
+      1. [x] Orders
+      2. [x] Expenses
+      3. [x] Neither
    2. Double Entry Ledger [rfc-003]
       1. [ ] Create collective type "Payment Provider"
       2. [ ] Create separate transactions for fees
