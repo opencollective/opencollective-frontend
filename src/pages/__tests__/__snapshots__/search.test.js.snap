@@ -5733,6 +5733,7 @@ Array [
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12 {
@@ -5749,6 +5750,7 @@ Array [
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12 {
@@ -5765,6 +5767,7 @@ Array [
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12 {
@@ -5781,6 +5784,7 @@ Array [
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12:disabled {

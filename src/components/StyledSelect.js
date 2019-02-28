@@ -1,27 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Downshift from 'downshift';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { CaretDown } from 'styled-icons/fa-solid/CaretDown';
 import { themeGet } from 'styled-system';
 import { Box } from '@rebass/grid';
+import tag from 'clean-tag';
 
 import { getInputBorderColor } from '../lib/styled_components_utils';
 import Container from './Container';
-
-const matches = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-
-const getBgColor = ({ highlightedIndex, index, item, selectedItem }) => {
-  if (highlightedIndex === index) {
-    return 'black.100';
-  }
-
-  if (matches(item, selectedItem)) {
-    return 'primary.500';
-  }
-
-  return 'white.full';
-};
 
 /**
  * Returns a function that will return a unique key from iteratee. As we rely on
@@ -36,7 +23,7 @@ export const getKeyExtractor = (options, keyGetter) => {
   } else if (typeof keyGetter === 'string') {
     return item => item[keyGetter].toString();
   } else if (Array.isArray(options)) {
-    return item => (typeof item === 'object' ? JSON.stringify(item) : item.toString());
+    return item => item.toString();
   } else {
     return (_item, key) => key.toString();
   }
@@ -67,7 +54,7 @@ export const getItems = (options, keyGetter) => {
 
 const SelectContainer = styled(Container)`
   cursor: pointer;
-  ${props => props.disabled && 'cursor: not-allowed;'};
+  outline: none;
   &:hover,
   &:focus {
     border-color: ${themeGet('colors.primary.300')};
@@ -76,20 +63,67 @@ const SelectContainer = styled(Container)`
       color: ${themeGet('colors.primary.300')};
     }
   }
+
+  ${props => props.disabled && 'cursor: not-allowed;'};
+
+  ${props =>
+    props.mode === 'select'
+      ? css`
+          border-width: 1px;
+          border-style: solid;
+          padding: 8px 12px;
+        `
+      : css`
+          border-bottom-width: 1px;
+          border-bottom-style: dashed;
+          padding: 0 4px;
+          height: 1em;
+          min-width: 8em;
+        `}
 `;
+
+SelectContainer.defaultProps = {
+  blacklist: SelectContainer.defaultProps.blacklist.concat('mode'),
+};
 
 const SelectPopupContainer = styled(Container)`
   position: absolute;
   z-index: 10;
   background: white;
+  box-shadow: 0px 4px 14px rgba(20, 20, 20, 0.16);
 `;
 
-const ListItem = styled(Container)`
+const StyledListItem = styled(tag.li)`
   list-style: none;
   cursor: pointer;
+  padding: 8px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  color: #313233;
   /* We need !important here cause "Body.js" CSS is overriding this :( */
   margin: 0.2em !important;
+
+  ${props => {
+    if (props.isHighlighted) {
+      return css`
+        background: #f2f3f5;
+      `;
+    } else if (props.isSelected) {
+      return css`
+        background: #3385ff;
+        color: white;
+      `;
+    } else {
+      return css`
+        background: white;
+      `;
+    }
+  }}
 `;
+
+StyledListItem.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('isHighlighted', 'isSelected'),
+};
 
 const Icon = styled(CaretDown)`
   color: ${themeGet('colors.black.400')};
@@ -102,6 +136,26 @@ const Icon = styled(CaretDown)`
   ${props => props.success && `color: ${themeGet('colors.green.300')(props)}`};
   ${props => props.disabled && `color: ${themeGet('colors.black.300')(props)}`};
 `;
+
+const DefaultItemsListRenderer = ({
+  StyledListItem,
+  items,
+  selectedItem,
+  highlightedIndex,
+  getItemProps,
+  children,
+}) => {
+  return items.map((item, index) => (
+    <StyledListItem
+      key={item.key}
+      isSelected={selectedItem && selectedItem.key === item.key}
+      isHighlighted={highlightedIndex === index}
+      {...getItemProps({ index, item })}
+    >
+      {children(item)}
+    </StyledListItem>
+  ));
+};
 
 export default class StyledSelect extends React.Component {
   static propTypes = {
@@ -123,34 +177,39 @@ export default class StyledSelect extends React.Component {
       PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),
       PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),
     ]).isRequired,
+    /** Function to get the key from individual options */
+    keyGetter: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
     /** show success state */
     success: PropTypes.bool,
+    /** Switch between display modes */
+    mode: PropTypes.oneOf(['select', 'underlined']),
+    /** A custom list renderer. Usefull for windowing or progressive loading */
+    ItemsListRenderer: PropTypes.func,
   };
 
   static defaultProps = {
     children: ({ value }) => value,
+    ItemsListRenderer: DefaultItemsListRenderer,
+    mode: 'select',
   };
 
   constructor(props) {
     super(props);
-    this.state = { items: getItems(props.options) };
+    this.state = { items: getItems(props.options, props.keyGetter) };
   }
 
   componentDidUpdate(oldProps) {
     if (oldProps.options !== this.props.options) {
-      this.setState({ items: getItems(this.props.options) });
+      this.setState({ items: getItems(this.props.options, this.props.keyGetter) });
     }
   }
 
   render() {
-    const { children, error, defaultValue, disabled, id, name, onChange, success } = this.props;
+    const { ItemsListRenderer, error, defaultValue, disabled, id, name, onChange, success, mode } = this.props;
+    const initialSelectedItem = defaultValue ? getItems([defaultValue], this.props.keyGetter)[0] : null;
 
     return (
-      <Downshift
-        onChange={onChange}
-        initialSelectedItem={defaultValue ? getItems([defaultValue])[0] : null}
-        itemToString={item => (item ? item.toString() : null)}
-      >
+      <Downshift onChange={onChange} initialSelectedItem={initialSelectedItem} itemToString={item => item && item.key}>
         {({ getInputProps, getItemProps, getMenuProps, highlightedIndex, isOpen, selectedItem, toggleMenu }) => (
           <div>
             <SelectContainer
@@ -158,12 +217,10 @@ export default class StyledSelect extends React.Component {
               display="flex"
               alignItems="center"
               bg={disabled ? 'black.50' : 'white.full'}
-              border="1px solid"
               borderColor={getInputBorderColor(error, success)}
               borderRadius="4px"
               fontSize="Paragraph"
-              py={2}
-              px="1em"
+              mode={mode}
               {...getInputProps({
                 disabled,
                 id,
@@ -173,15 +230,15 @@ export default class StyledSelect extends React.Component {
               })}
             >
               <Box flex="1 1 auto" mr={1}>
-                {selectedItem && children(selectedItem)}
+                {selectedItem && this.props.children(selectedItem)}
               </Box>
-              <Icon size="1.2em" disabled={disabled} error={error} success={success} />
+              {mode === 'select' && <Icon size="1.2em" disabled={disabled} error={error} success={success} />}
             </SelectContainer>
             {isOpen && (
               <SelectPopupContainer
                 as="ul"
                 p={1}
-                mt={2}
+                mt={1}
                 border="1px solid"
                 borderColor="black.300"
                 borderRadius="4px"
@@ -190,25 +247,15 @@ export default class StyledSelect extends React.Component {
                 fontSize="Paragraph"
                 {...getMenuProps()}
               >
-                {this.state.items.map((item, index) => (
-                  // eslint-disable-next-line react/jsx-key
-                  <ListItem
-                    className={`select-${item.key}`}
-                    {...getItemProps({
-                      key: item.key,
-                      index,
-                      item,
-                      as: 'li',
-                      bg: getBgColor({ highlightedIndex, index, item, selectedItem }),
-                      borderRadius: '4px',
-                      color: matches(item, selectedItem) && highlightedIndex !== index ? 'white.full' : 'black.800',
-                      mb: 1,
-                      p: 2,
-                    })}
-                  >
-                    {children(item)}
-                  </ListItem>
-                ))}
+                <ItemsListRenderer
+                  StyledListItem={StyledListItem}
+                  items={this.state.items}
+                  selectedItem={selectedItem}
+                  highlightedIndex={highlightedIndex}
+                  getItemProps={getItemProps}
+                >
+                  {this.props.children}
+                </ItemsListRenderer>
               </SelectPopupContainer>
             )}
           </div>
