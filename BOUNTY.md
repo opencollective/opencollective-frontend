@@ -10,9 +10,9 @@ The Open Collective engineering team is small and we're always looking for new c
 
 Our Bounty model is simple:
 
-- $100: simple or unknown complexity
-- $300: medium complexity
-- $1,000: high complexity
+- \$100: simple or unknown complexity
+- \$300: medium complexity
+- \$1,000: high complexity
 
 We want to attract quality contributions. The issue will only be considered complete and approved for payment if the Pull Request is merged by an Open Collective Core Contributor.
 
@@ -35,12 +35,11 @@ We want to attract quality contributions. The issue will only be considered comp
    - If you can issue an invoice, submit it as expense to [Open Collective Engineering](https://opencollective.com/engineering)
    - If you can't issue an invoice, ask to be rewarded with an Open Collective Gift Card
 
-*See [more info about getting paid](https://docs.opencollective.com/help/expenses) through Open Collective*
-   
+_See [more info about getting paid](https://docs.opencollective.com/help/expenses) through Open Collective_
 
 ### Workflow for Core Contributors
 
-1. Tag issues with the "bounty" label and amount (e.g. "$100")
+1. Tag issues with the "bounty" label and amount (e.g. "\$100")
 
 1. Add a comment with a basic explanation of the Bounty process and link to BOUNTY.md
 
