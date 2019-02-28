@@ -771,7 +771,7 @@
   "expenses.sendAnotherExpense": "Soumettre une autre dépense",
   "authorization.loginRequired": "Veuillez vous authentifier pour pouvoir continuer.",
   "contribute.tierDetailsTitle": "Tier details:",
-  "contribute.tierDetails": "You’ll contribute with the amount of {amount} {interval, select, month {monthly} year {yearly} other {}}.",
+  "contribute.tierDetails": "You’ll contribute with the amount of {amount}{interval, select, month {monthly.} year {yearly.} other {.}}",
   "contribute.tierDetailsFrequency": "Your next charge will be on:",
   "contribute.profile.label": "Contribuer en tant que:",
   "contribute.details.label": "Détails de votre contribution:",
