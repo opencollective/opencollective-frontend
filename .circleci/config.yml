@@ -1,19 +1,61 @@
 version: 2
 
 aliases:
-  restore_cache: &restore_cache
+  restore_npm_cache: &restore_npm_cache
     restore_cache:
       name: Restore npm cache
       keys:
         - npm-cache-{{ checksum "package.json" }}
         - npm-cache-
 
-  persist_cache: &persist_cache
+  persist_npm_cache: &persist_npm_cache
     save_cache:
-      name: Save npm cache
+      name: Persist npm cache
       key: npm-cache-{{ checksum "package.json" }}
       paths:
         - ../.npm
+
+  e2e_steps: &e2e_steps
+    steps:
+      - run: sudo apt -y update
+
+      # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
+      - run: sudo apt -y install postgresql-client
+
+      # Cypress dependencies
+      # See: https://github.com/cypress-io/cypress-docker-images/blob/master/base/ubuntu16/Dockerfile
+      - run: sudo apt -y install libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
+
+      - attach_workspace:
+          at: ..
+
+      - checkout
+
+      - <<: *restore_npm_cache
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+
+      # # We run npm ci in case node_modules are not persisted
+      # # When it is persisted we don't need it
+      # - run: cd ~/api && npm ci --only-prod
+
+      # We run npm ci in case node_modules are not persisted
+      # When it is persisted we don't need it
+      - run: cd ~/frontend && npm ci --only=prod
+
+      # Cypress installation with cache
+      - restore_cache:
+          keys:
+            - cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
+      - run: npx cypress install
+      - save_cache:
+          key: cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
+          paths:
+            - ../.cache/Cypress
+
+      # Loading the opencollective_dvl dump database
+      - run: ./scripts/setup_circleci_db.sh
+
+      - run: npm run test:e2e
 
 jobs:
   lint:
@@ -21,14 +63,11 @@ jobs:
       - image: circleci/node:11.8.0
     environment:
       NODE_ENV: circleci
-      CYPRESS_INSTALL_BINARY: 0
-
     steps:
       - checkout
-      - <<: *restore_cache
-      - run: npm ci
-      - <<: *persist_cache
-
+      - <<: *restore_npm_cache
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+      - <<: *persist_npm_cache
       - run: npm run lint
       - run: npm run prettier:check
 
@@ -37,13 +76,11 @@ jobs:
       - image: circleci/node:11.8.0
     environment:
       NODE_ENV: circleci
-      CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
-      - <<: *restore_cache
-      - run: npm ci
-      - <<: *persist_cache
-
+      - <<: *restore_npm_cache
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+      - <<: *persist_npm_cache
       - run: npm run test:jest
 
   build:
@@ -51,30 +88,30 @@ jobs:
       - image: circleci/node:11.8.0
     environment:
       NODE_ENV: circleci
-      CYPRESS_INSTALL_BINARY: 0
     steps:
       - checkout
-      - <<: *restore_cache
-      - run: npm ci
-      - <<: *persist_cache
+      - <<: *restore_npm_cache
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+      - <<: *persist_npm_cache
 
       - run: npm run build:clean
       - run: npm run build:updates
       - run: npm run build:server
       - run: npm run build:next
 
+      # # We prune to save space in node_modules persistence
+      # # If we don't persist node_modules, we don't need it
+      # - run: npm prune --production
+
+      # We persist only the build folder
+      - run: mkdir ../frontend
+      - run: cp -R dist ../frontend/
+      - run: cp package*.json ../frontend/
+
       - persist_to_workspace:
           root: ..
           paths:
-            - project/cypress
-            - project/dist
-            - project/scripts
-            - project/src
-            - project/test
-            - project/.babelrc
-            - project/cypress.json
-            - project/package.json
-            - project/package-lock.json
+            - frontend
 
   build-api:
     docker:
@@ -95,18 +132,20 @@ jobs:
 
       - restore_cache:
           keys:
-            - npm-api-cache-{{ checksum "package.json" }}
+            - npm-api-cache-{{ checksum "~/api/package.json" }}
             - npm-api-cache-
 
       - run: cd ~/api && npm ci
 
       - save_cache:
-          key: npm-api-cache-{{ checksum "package.json" }}
+          key: npm-api-cache-{{ checksum "~/api/package.json" }}
           paths:
             - ../.npm
 
       - run: cd ~/api && npm run build
 
+      # We prune to save space in node_modules persistence
+      # If we don't persist node_modules, we don't need it
       - run: cd ~/api && npm prune --production
 
       - persist_to_workspace:
@@ -115,16 +154,18 @@ jobs:
             - api/config
             - api/dist
             - api/migrations
-            - api/node_modules
-            - api/scripts
-            - api/server
+            - api/node_modules # We persist node_modules, no need to install later on
+            - api/scripts/db_restore.sh
+            - api/scripts/db_setup.js
+            - api/scripts/sequelize.sh
+            - api/server # We should refactor so we don't need it in scripts
+            - api/test/dbdumps/opencollective_dvl.pgsql # We need the DB dump for e2e
             - api/templates
-            - api/test
             - api/.babelrc
             - api/package.json
             - api/package-lock.json
 
-  test-e2e:
+  test-e2e-0:
     docker:
       - image: circleci/node:11.8.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
@@ -132,37 +173,36 @@ jobs:
       - image: memcached
     environment:
       NODE_ENV: circleci
+      # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
-    steps:
-      - run: sudo apt -y update
+      CYPRESS_TEST_FILES: 0*.js
+    <<: *e2e_steps
 
-      # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
-      - run: sudo apt -y install postgresql-client
+  test-e2e-1:
+    docker:
+      - image: circleci/node:11.8.0
+      - image: circleci/postgres:9.6.8-alpine-postgis-ram
+      - image: circleci/redis
+      - image: memcached
+    environment:
+      NODE_ENV: circleci
+      # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
+      E2E_TEST: 1
+      CYPRESS_TEST_FILES: 1*.js
+    <<: *e2e_steps
 
-      # Cypress dependencies
-      # See: https://github.com/cypress-io/cypress-docker-images/blob/master/base/ubuntu16/Dockerfile
-      - run: sudo apt -y install libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
-
-      - attach_workspace:
-          at: ..
-
-      - <<: *restore_cache
-      - run: CYPRESS_INSTALL_BINARY=0 npm ci
-
-      - restore_cache:
-          keys:
-            - cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
-
-      - run: npx cypress install
-
-      - save_cache:
-          key: cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
-          paths:
-            - ../.cache/Cypress
-
-      - run: ./scripts/setup_circleci_db.sh
-
-      - run: npm run test:e2e
+  test-e2e-2:
+    docker:
+      - image: circleci/node:11.8.0
+      - image: circleci/postgres:9.6.8-alpine-postgis-ram
+      - image: circleci/redis
+      - image: memcached
+    environment:
+      NODE_ENV: circleci
+      # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
+      E2E_TEST: 1
+      CYPRESS_TEST_FILES: 2*.js
+    <<: *e2e_steps
 
   test-server:
     docker:
@@ -172,7 +212,6 @@ jobs:
       - image: memcached
     environment:
       NODE_ENV: circleci
-      CYPRESS_INSTALL_BINARY: 0
     steps:
       - run: sudo apt -y update
 
@@ -182,9 +221,20 @@ jobs:
       - attach_workspace:
           at: ..
 
-      - <<: *restore_cache
-      - run: npm ci
+      - checkout
 
+      - <<: *restore_npm_cache
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+
+      # # We run npm ci in case node_modules are not persisted
+      # # When it is persisted we don't need it
+      # - run: cd ~/api && npm ci --only-prod
+
+      # We run npm ci in case node_modules are not persisted
+      # When it is persisted we don't need it
+      - run: cd ~/frontend && npm ci --only=prod
+
+      # Loading the opencollective_dvl dump database
       - run: ./scripts/setup_circleci_db.sh
 
       - run: npm run test:server
@@ -197,11 +247,19 @@ workflows:
       - jest
       - build
       - build-api
-      - test-e2e:
+      - test-server:
           requires:
             - build
             - build-api
-      - test-server:
+      - test-e2e-0:
+          requires:
+            - build
+            - build-api
+      - test-e2e-1:
+          requires:
+            - build
+            - build-api
+      - test-e2e-2:
           requires:
             - build
             - build-api
