@@ -16,6 +16,7 @@ import {
   textAlign,
   themeGet,
   width,
+  lineHeight,
 } from 'styled-system';
 import tag from 'clean-tag';
 import { overflow } from './Container';
@@ -48,6 +49,7 @@ const StyledInput = styled(tag.input)`
   ${flex}
   ${fontSize}
   ${fontWeight}
+  ${lineHeight}
   ${maxWidth}
   ${minWidth}
   ${overflow}
@@ -58,6 +60,7 @@ const StyledInput = styled(tag.input)`
   border-color: ${getBorderColor};
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
+  outline: none;
 
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
@@ -116,6 +119,7 @@ StyledInput.defaultProps = {
   borderRadius: '4px',
   px: 3,
   py: 2,
+  lineHeight: '1em',
 };
 
 export const TextInput = styled(StyledInput)``;

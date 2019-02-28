@@ -34,14 +34,14 @@ describe('Contribution Flow: Donate', () => {
 
       // Change frequency - monthly
       cy.get('#interval').click();
-      cy.get('.select-month').click();
+      cy.contains('li', 'Monthly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per month');
       cy.contains('Next charge: Jun 1, 2042');
 
       // Change frequency - yearly
       cy.get('#interval').click();
-      cy.get('.select-year').click();
+      cy.contains('li', 'Yearly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per year');
       cy.contains('Next charge: May 1, 2043');
@@ -119,19 +119,16 @@ describe('Contribution Flow: Donate', () => {
       cy.contains('button', 'Next step').click();
 
       // Second step should be payment method select
-      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment'], disabled: 'summary' });
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment'] });
       cy.wait(1000); // Wait for stripe to be loaded
       cy.fillStripeInput();
       cy.contains('Next step').click();
 
-      // Final step should be summary
-      cy.checkStepsProgress({ enabled: ['contributeAs', 'payment', 'summary'] });
-      cy.contains('Contribution breakdown:');
-      cy.contains('Your contribution');
-      cy.contains('$42.00');
-      // Check FAQ
+      // Should display the tier details
       cy.contains('Tier details:');
-      cy.contains('You’ll contribute with the amount of $42.00 yearly. Your next charge will be on: May 1, 2043');
+      cy.contains('You’ll contribute with the amount of $42.00 yearly.');
+      cy.contains('Your next charge will be on: May 1, 2043');
+
       // Submit order
       cy.contains('button', 'Make contribution').click();
 

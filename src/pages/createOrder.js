@@ -69,43 +69,27 @@ PaypalButtonContainer.defaultProps = {
  * to payment.
  */
 class CreateOrderPage extends React.Component {
-  static getInitialProps({
-    query: {
-      collectiveSlug,
-      eventSlug,
-      tierId,
-      tierSlug,
-      amount,
-      quantity,
-      interval,
-      description,
-      verb,
-      step,
-      redeem,
-      redirect,
-      referral,
-    },
-  }) {
+  static getInitialProps({ query }) {
     // Whitelist interval
-    if (['monthly', 'yearly'].includes(interval)) {
-      interval = interval.replace('ly', '');
-    } else if (!['month', 'year'].includes(interval)) {
-      interval = null;
+    if (['monthly', 'yearly'].includes(query.interval)) {
+      query.interval = query.interval.replace('ly', '');
+    } else if (!['month', 'year'].includes(query.interval)) {
+      query.interval = null;
     }
 
     return {
-      slug: eventSlug || collectiveSlug,
-      amount: parseInt(amount) || null,
-      step: step || 'contributeAs',
-      tierId,
-      tierSlug,
-      quantity,
-      description,
-      interval,
-      verb,
-      redeem,
-      redirect,
-      referral,
+      slug: query.eventSlug || query.collectiveSlug,
+      amount: parseInt(query.amount) || null,
+      step: query.step || 'contributeAs',
+      tierId: query.tierId,
+      tierSlug: query.tierSlug,
+      quantity: query.quantity,
+      description: query.description,
+      interval: query.interval,
+      verb: query.verb,
+      redeem: query.redeem,
+      redirect: query.redirect,
+      referral: query.referral,
     };
   }
 
@@ -143,6 +127,7 @@ class CreateOrderPage extends React.Component {
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
       stepDetails: null,
       stepPayment: null,
+      stepSummary: null,
       error: null,
       stripe: null,
     };
@@ -241,8 +226,10 @@ class CreateOrderPage extends React.Component {
   /** Validate step payment, loading data from stripe for new credit cards */
   validateStepPayment = async () => {
     const { stepPayment } = this.state;
+    const isFixedPriceTier = this.isFixedPriceTier();
+    const isFreeTier = this.isFreeTier();
 
-    if (this.isFreeTier()) {
+    if (isFreeTier && isFixedPriceTier) {
       // Always ignore payment method for free tiers
       return true;
     } else if (!stepPayment.isNew) {
@@ -328,6 +315,9 @@ class CreateOrderPage extends React.Component {
       paymentMethod,
       recaptchaToken,
       totalAmount: this.getTotalAmount(),
+      taxAmount: get(this.state, 'stepSummary.amount', 0),
+      countryISO: get(this.state, 'stepSummary.countryISO'),
+      taxIDNumber: get(this.state, 'stepSummary.number'),
       quantity: this.props.quantity || 1,
       currency: this.getCurrency(),
       interval: stepDetails.interval,
@@ -382,6 +372,15 @@ class CreateOrderPage extends React.Component {
         ];
   }
 
+  /** Guess the country, from the more pricise method (settings) to the less */
+  getContributingProfileCountry() {
+    return (
+      get(this.state.stepSummary, 'countryISO') ||
+      get(this.state.stepProfile, 'countryISO') ||
+      get(this.props.LoggedInUser, 'collective.countryISO')
+    );
+  }
+
   /** Return the currently selected tier, or a falsy value if none selected */
   getTier() {
     const { data, tierId } = this.props;
@@ -421,11 +420,11 @@ class CreateOrderPage extends React.Component {
     return get(this.state.stepDetails, 'totalAmount') || get(tier, 'amount') || amountFromUrl;
   }
 
-  /** Get total amount based on stepDetails with taxes applied */
+  /** Get total amount based on stepDetails with taxes from step summary applied */
   getTotalAmount() {
     const totalAmount = get(this.state, 'stepDetails.totalAmount', 0);
-    const tax = this.getTax();
-    return tax ? Math.trunc(totalAmount * (1 + tax.percentage / 100)) : totalAmount;
+    const taxAmount = get(this.state, 'stepSummary.amount', 0);
+    return totalAmount + taxAmount;
   }
 
   /** Teturn true if current order doesn't need any payment */
@@ -441,15 +440,12 @@ class CreateOrderPage extends React.Component {
     return forceInterval && forceAmount;
   }
 
-  /** Returns the tax linked to the current tier, or null if none */
-  getTax() {
-    const tier = this.getTier();
-    return tier ? get(this.props.data.Collective, `host.settings.tiersTaxes.${tier.type}`) : null;
-  }
-
   /** Returs the steps list */
   getSteps() {
+    const tier = this.getTier();
     const isFixedPriceTier = this.isFixedPriceTier();
+    const isFreeTier = this.isFreeTier();
+    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
 
     const steps = [
       {
@@ -463,7 +459,7 @@ class CreateOrderPage extends React.Component {
     if (!isFixedPriceTier) {
       steps.push({
         name: 'details',
-        isCompleted: Boolean(this.state.stepDetails),
+        isCompleted: Boolean(this.state.stepDetails && this.state.stepDetails.totalAmount > 0),
         validate: () => {
           return this.state.stepDetails && this.activeFormRef.current && this.activeFormRef.current.reportValidity();
         },
@@ -471,18 +467,19 @@ class CreateOrderPage extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!(this.isFreeTier() && isFixedPriceTier)) {
+    if (!(isFreeTier && isFixedPriceTier)) {
       steps.push({
         name: 'payment',
-        isCompleted: Boolean(this.state.stepPayment),
+        isCompleted: Boolean(isFreeTier || this.state.stepPayment),
         validate: this.validateStepPayment,
       });
     }
 
     // Show the summary step only if the order has tax
-    if (isFixedPriceTier) {
+    if (tax) {
       steps.push({
         name: 'summary',
+        isCompleted: this.state.stepSummary && this.state.stepSummary.isReady,
       });
     }
 
@@ -537,6 +534,8 @@ class CreateOrderPage extends React.Component {
   renderTierDetails(tier) {
     const amount = get(this.state.stepDetails, 'totalAmount');
     const interval = get(this.state.stepDetails, 'interval');
+    const taxAmount = get(this.state.stepSummary, 'amount', 0);
+    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
 
     return (
       <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
@@ -546,17 +545,26 @@ class CreateOrderPage extends React.Component {
           </P>
           <FormattedMessage
             id="contribute.tierDetails"
-            defaultMessage="You’ll contribute with the amount of {amount} {interval, select, month {monthly} year {yearly} other {}}."
+            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month {monthly.} year {yearly.} other {.}}"
             values={{
               amount: (
-                <strong>{formatCurrency(amount, get(tier, 'currency', this.props.data.Collective.currency))}</strong>
+                <strong>
+                  {formatCurrency(amount, get(tier, 'currency', this.props.data.Collective.currency))}
+                  {taxAmount > 0 && (
+                    /** Use non-breaking spaces to ensure amount and tax stay on the same line */
+                    <span>
+                      &nbsp;+&nbsp;{tax.name}&nbsp;({tax.percentage}%)
+                    </span>
+                  )}
+                  {interval ? ' ' : ''}
+                </strong>
               ),
               interval: get(tier, 'interval') || this.props.interval,
             }}
           />
           {interval && (
             <React.Fragment>
-              {' '}
+              <br />
               <FormattedMessage
                 id="contribute.tierDetailsFrequency"
                 defaultMessage="Your next charge will be on:"
@@ -579,7 +587,6 @@ class CreateOrderPage extends React.Component {
     const { stepDetails, stepPayment } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
-    const tax = this.getTax();
     const interval = get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval;
 
     if (step.name === 'contributeAs') {
@@ -631,13 +638,11 @@ class CreateOrderPage extends React.Component {
               minAmount={this.getOrderMinAmount()}
             />
           </Container>
-          <ContributeDetailsFAQ
-            hasInterval={Boolean(interval)}
-            mt={4}
-            display={['none', null, 'block']}
-            width={1 / 5}
-            minWidth="335px"
-          />
+          {interval ? (
+            <ContributeDetailsFAQ hasInterval mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          ) : (
+            <Box width={[0, null, null, 1 / 5]} />
+          )}
         </Flex>
       );
     } else if (step.name === 'payment') {
@@ -671,7 +676,7 @@ class CreateOrderPage extends React.Component {
               margins="0 auto"
             />
           </Flex>
-          {this.isFixedPriceTier() ? this.renderTierDetails(tier, tax) : <Box width={[0, null, null, 1 / 5]} />}
+          {this.isFixedPriceTier() ? this.renderTierDetails(tier) : <Box width={[0, null, null, 1 / 5]} />}
         </Flex>
       );
     } else if (step.name === 'summary') {
@@ -692,11 +697,13 @@ class CreateOrderPage extends React.Component {
               currency={this.getCurrency()}
               hostFeePercent={get(data, 'Collective.hostFeePercent')}
               paymentMethod={get(stepPayment, 'paymentMethod')}
-              tax={tax}
+              collectiveTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
+              onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
+              tax={tier ? get(this.props.data.Collective, `host.taxes.${tier.type}`) : null}
             />
           </Container>
-          {this.renderTierDetails(tier, tax)}
+          {this.renderTierDetails(tier)}
         </Flex>
       );
     }
@@ -812,7 +819,7 @@ class CreateOrderPage extends React.Component {
           onInvalidStep={this.onInvalidStep}
           onComplete={this.submitOrder}
         >
-          {({ steps, currentStep, lastValidStep, lastVisitedStep, goNext, goBack, goToStep, isValidating }) => (
+          {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
             <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
               {loadingLoggedInUser ||
                 (LoggedInUser && (
@@ -837,7 +844,7 @@ class CreateOrderPage extends React.Component {
                   {this.state.error.replace('GraphQL error: ', '')}
                 </MessageBox>
               )}
-              {isLoadingContent || currentStep.index > lastValidStep.index + 1 ? (
+              {isLoadingContent || !isValidStep ? (
                 <Loading />
               ) : (
                 this.renderContent(currentStep, goNext, goBack, isValidating)
@@ -865,10 +872,13 @@ const addData = graphql(gql`
       currency
       hostFeePercent
       tags
+      countryISO
       host {
         id
         name
         settings
+        taxes
+        countryISO
       }
       parentCollective {
         image
