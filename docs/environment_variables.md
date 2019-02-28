@@ -9,7 +9,6 @@
 | PG_HOST                 | .database.options.host                 | Postgres database host                        |
 | PG_MAX_CONNECTIONS      | .database.options.pool.max             | Postgres number of max connections to be open |
 | API_KEY                 | .keys.opencollective.apiKey            | The API KEY                                   |
-| SESSION_SECRET          | .keys.opencollective.sessionSecret     | The session secre                             |
 | JWT_SECRET              | .keys.opencollective.jwtSecret         | JWT secret                                    |
 | STRIPE_CLIENT_ID        | .stripe.client_id                      | Stripe Client id                              |
 | STRIPE_KEY              | .stripe.key                            | Stripe key                                    |

@@ -26,7 +26,6 @@
   "keys": {
     "opencollective": {
       "apiKey": "API_KEY",
-      "sessionSecret": "SESSION_SECRET",
       "jwtSecret": "JWT_SECRET",
       "hashidSalt": "HASHID_SALT"
     }
