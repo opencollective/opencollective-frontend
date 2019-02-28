@@ -1,19 +1,20 @@
 # FAQ for hosts
 
 ### What is a host?
+
 The host is the organization or individual that acts as the fiscal sponsor of one or many Collectives. It receives the funds in the name of the Collective and reimburses the expenses that have been approved by its members.
 
 The host is responsible to do the accounting and to comply with all the tax regulations that apply in its jurisdiction. The Open Collective platforms makes this process easier by providing monthly and yearly reports with all the income and expenses (with their attachment) of the collectives hosted by the host.
 
 The host can define a commission for offering that service to the collective. Hosts on Open Collective charge anything from 0 to 30% depending on what services (branding, fiscal sponsorship, workshops, support, etc) they provide to the Collectives that they host.
 
-A host is basically the financial and legal entity behind the scene that makes it possible for Collectives to receive and pay out money without having to every worry about all the overhead of creating and maintaining a legal entity. By sharing a host, Collectives are effectively mutualizing the cost and overhead of having a legal entity. 
+A host is basically the financial and legal entity behind the scene that makes it possible for Collectives to receive and pay out money without having to every worry about all the overhead of creating and maintaining a legal entity. By sharing a host, Collectives are effectively mutualizing the cost and overhead of having a legal entity.
 
 There are diverse examples of Open Collective hosts:
 
-* [The Open Source Collective](https://opencollective.com/opensource) - host to open source software projects
-* [Women Who Code](https://opencollective.com/wwcode) - host for WWCode Meetup groups
-* [Brussels Together](https://opencollective.com/brusselstogether) - host for citizen projects in Brussels, Belgium
+- [The Open Source Collective](https://opencollective.com/opensource) - host to open source software projects
+- [Women Who Code](https://opencollective.com/wwcode) - host for WWCode Meetup groups
+- [Brussels Together](https://opencollective.com/brusselstogether) - host for citizen projects in Brussels, Belgium
 
 Read more on [Why Becoming an Open Collective Host](becoming-an-open-collective-host).
 
@@ -33,10 +34,10 @@ Right now, we only support PayPal and "manual" as payout methods. Manual means t
 
 ### How to pay out expenses with PayPal?
 
-From your host dashboard (`https://opencollective.com/:host/dashboard`), you can connect your PayPal account  and authorize it to spend for up to $2,000 USD (or equivalent).
+From your host dashboard (`https://opencollective.com/:host/dashboard`), you can connect your PayPal account and authorize it to spend for up to \$2,000 USD (or equivalent).
 Note: make sure that you are connecting a PayPal account that is connected to the same bank account than your Stripe Account.
 
-Then with just one click you can pay out an expense that has been approved. When you run out of your PayPal pre-authorized allowance, you can simply reconnect your PayPal account and you are good to spend another $2,000 USD equivalent.
+Then with just one click you can pay out an expense that has been approved. When you run out of your PayPal pre-authorized allowance, you can simply reconnect your PayPal account and you are good to spend another \$2,000 USD equivalent.
 
 ### What if a collective wants to receive money via bank transfer instead of credit card? (or any other unsupported payment method)
 
