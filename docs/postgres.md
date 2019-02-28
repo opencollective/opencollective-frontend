@@ -9,8 +9,9 @@ You need to have Postgres 9.x with the Postgis extension.
 Last time we checked, the simplest way to get this running was using [Postgres.app](http://postgresapp.com/).
 
 Using brew was not an option:
- - `brew install postgresql postgis` would end up with Postgres 10.x
- - `brew install postgresql@9.x` would end up with Postgres 9.x without possibility to install Postgis
+
+- `brew install postgresql postgis` would end up with Postgres 10.x
+- `brew install postgresql@9.x` would end up with Postgres 9.x without possibility to install Postgis
 
 ## Setting Up The database
 

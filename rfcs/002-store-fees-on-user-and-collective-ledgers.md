@@ -13,10 +13,10 @@ negative numbers.
 
 The change was applied to all the types of fees:
 
- * Host Fees (`Transaction.hostFeeInHostCurrency` field)
- * Platform Fees (`Transactions.platformFeeInHostCurrency` field)
- * Payment Processor Fees
-   (`Transactions.paymentProcessorFeeInHostCurrency` field)
+- Host Fees (`Transaction.hostFeeInHostCurrency` field)
+- Platform Fees (`Transactions.platformFeeInHostCurrency` field)
+- Payment Processor Fees
+  (`Transactions.paymentProcessorFeeInHostCurrency` field)
 
 ## Verification
 
@@ -40,12 +40,13 @@ amountPlusFees = (
 
 ## Use case example
 
-Given a transaction that represents moving $50 dollars from User to
+Given a transaction that represents moving \$50 dollars from User to
 Collective
 
 ### How it was stored
+
 |            | User Ledger | Collective Ledger |
-|------------|------------:|------------------:|
+| ---------- | ----------: | ----------------: |
 | Type       |       DEBIT |            CREDIT |
 | Amount     |       -4075 |              5000 |
 | Host Fee   |           0 |               500 |
@@ -56,7 +57,7 @@ Collective
 ### How it is stored now
 
 |            | User Ledger | Collective Ledger |
-|------------|------------:|------------------:|
+| ---------- | ----------: | ----------------: |
 | Type       |       DEBIT |            CREDIT |
 | Amount     |       -4075 |              5000 |
 | Host Fee   |        -500 |              -500 |

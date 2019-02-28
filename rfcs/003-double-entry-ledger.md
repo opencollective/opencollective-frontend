@@ -18,8 +18,8 @@ store the transactions. It will also decrease duplicated code (likely
 reducing bugs) because it will provide a library that implements all
 the basic operations related to the ledger.
 
-*Fig 1.0 - Payment Flow*
-![Payment Flow](./imgs/payment-flow.svg "Payment Flow")
+_Fig 1.0 - Payment Flow_
+![Payment Flow](./imgs/payment-flow.svg 'Payment Flow')
 
 ## Goals
 
@@ -47,14 +47,14 @@ have a ledger as well.
 
 #### Use case example (Order)
 
-Given a transaction that represents moving $50 dollars from User to
+Given a transaction that represents moving \$50 dollars from User to
 Collective with 5% of platform fee, 10% of host fee and 2.9%+30c of
 payment processor fee.
 
 ##### How it is currently stored
 
 |            |  User | Collective |
-|------------|------:|-----------:|
+| ---------- | ----: | ---------: |
 | Type       | DEBIT |     CREDIT |
 | Amount     | -4075 |       5000 |
 | Host Fee   |  -500 |       -500 |
@@ -65,7 +65,7 @@ payment processor fee.
 ##### How it should look like after this change
 
 |      User | Collective |     Host | Platform | Payment Provider |
-|----------:|-----------:|---------:|---------:|-----------------:|
+| --------: | ---------: | -------: | -------: | ---------------: |
 | -5000 USD |  +5000 USD |          |          |                  |
 |           |   -500 USD | +500 USD |          |                  |
 |           |   -250 USD |          | +250 USD |                  |
@@ -73,13 +73,13 @@ payment processor fee.
 
 #### Use case example (Expense)
 
-Given a transaction that represents moving $50 dollars from Collective
+Given a transaction that represents moving \$50 dollars from Collective
 to User with 2.9%+30c of payment processor fee.
 
 ##### How it is currently stored
 
 |            | Collective |   User |
-|------------|-----------:|-------:|
+| ---------- | ---------: | -----: |
 | Type       |      DEBIT | CREDIT |
 | Amount     |      -5000 |   5000 |
 | PP Fee     |       -175 |   -175 |
@@ -88,7 +88,7 @@ to User with 2.9%+30c of payment processor fee.
 ##### How it should look like after this change
 
 | Collective |      User | Payment Provider |
-|-----------:|----------:|-----------------:|
+| ---------: | --------: | ---------------: |
 |  -5000 USD | +5000 USD |                  |
 |   -175 USD |           |         +175 USD |
 
@@ -104,7 +104,7 @@ The example shown in the section "Create separate transactions for
 fees" would be represented in the database by the following rows:
 
 |             from |               to |   type |   hostId | currency | amount |
-|-----------------:|-----------------:|-------:|---------:|---------:|-------:|
+| ---------------: | ---------------: | -----: | -------: | -------: | -----: |
 |             User |       Collective |  DEBIT | USD-HOST |      USD |  -5000 |
 |       Collective |             User | CREDIT | USD-HOST |      USD |  +5000 |
 |       Collective |             Host |  DEBIT | USD-HOST |      USD |   -500 |
