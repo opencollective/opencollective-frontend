@@ -26,8 +26,6 @@ export async function list(req, res, next) {
   if (req.headers.authorization) {
     res.setHeader('cache-control', 'no-cache'); // don't cache at CDN level as the result contains private information
     headers.authorization = req.headers.authorization;
-  } else {
-    res.setHeader('cache-control', 'max-age=6000');
   }
 
   const client = new GraphQLClient(getGraphqlUrl(), { headers });
