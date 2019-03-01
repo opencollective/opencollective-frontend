@@ -44,6 +44,22 @@ class Transactions extends React.Component {
     });
   }
 
+  canDownloadInvoice(transaction) {
+    const { LoggedInUser, collective } = this.props;
+
+    // User must be logged in as collective admin or root
+    if (!LoggedInUser || (!LoggedInUser.canEditCollective(collective) && !LoggedInUser.isRoot())) {
+      return false;
+    }
+
+    // Transactions invoices for gift cards are only available to emitter collectives
+    if (transaction.usingVirtualCardFromCollective) {
+      return transaction.usingVirtualCardFromCollective.id === collective.id;
+    }
+
+    return true;
+  }
+
   render() {
     const { collective, transactions, LoggedInUser, showCSVlink, filters } = this.props;
 
@@ -162,9 +178,7 @@ class Transactions extends React.Component {
                 {...transaction}
                 isRefund={Boolean(transaction.refundTransaction)}
                 canRefund={LoggedInUser && LoggedInUser.isRoot()}
-                canDownloadInvoice={
-                  LoggedInUser && (LoggedInUser.canEditCollective(collective) || LoggedInUser.isRoot())
-                }
+                canDownloadInvoice={this.canDownloadInvoice(transaction)}
               />
             </Box>
           ))}
