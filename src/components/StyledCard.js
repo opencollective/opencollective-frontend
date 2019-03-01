@@ -16,7 +16,7 @@ import {
   minWidth,
 } from 'styled-system';
 import { Box } from '@rebass/grid';
-import { overflow } from './Container';
+import { overflow } from '../lib/styled_system_custom';
 
 /**
  * A simple styled-component to contain content in a card UI using styled-system.

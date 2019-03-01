@@ -19,7 +19,7 @@ import {
   lineHeight,
 } from 'styled-system';
 import tag from 'clean-tag';
-import { overflow } from './Container';
+import { overflow } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
 
 const getBorderColor = ({ error, success }) => {
@@ -113,7 +113,7 @@ StyledInput.propTypes = {
 };
 
 StyledInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare', 'error'),
   border: '1px solid',
   borderColor: 'black.300',
   borderRadius: '4px',
@@ -125,12 +125,7 @@ StyledInput.defaultProps = {
 export const TextInput = styled(StyledInput)``;
 
 TextInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
-  border: '1px solid #cccccc',
-  borderRadius: '4px',
-  fontSize: '14px',
-  px: 3,
-  py: 2,
+  ...StyledInput.defaultProps,
   type: 'text',
 };
 

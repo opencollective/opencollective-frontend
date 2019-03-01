@@ -9,22 +9,11 @@ import {
   lineHeight,
   letterSpacing,
   space,
-  style,
   textAlign,
 } from 'styled-system';
 import tag from 'clean-tag';
 
-export const textTransform = style({
-  prop: 'textTransform',
-});
-
-export const whiteSpace = style({
-  prop: 'whiteSpace',
-});
-
-export const cursor = style({
-  prop: 'cursor',
-});
+import { textTransform, whiteSpace, cursor } from '../lib/styled_system_custom';
 
 export const P = styled(tag.p)`
   ${color}
@@ -43,7 +32,7 @@ export const P = styled(tag.p)`
 `;
 
 P.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat(['textTransform', 'whiteSpace']),
+  blacklist: tag.defaultProps.blacklist.concat(['textTransform', 'whiteSpace', 'cursor']),
   fontSize: 'Paragraph',
   letterSpacing: '-0.2px',
   lineHeight: 'Paragraph',
