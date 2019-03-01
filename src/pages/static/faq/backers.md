@@ -23,11 +23,13 @@ Some of the 501c3 hosts on Open Collective include the [Open Collective Foundati
 ### Why do you have monthly payments from backers/sponsors as the default?
 
 A collective is an organization of people working together towards a common goal. Sometimes these goals take a few months or a few years to achieve. By supporting a collective with a recurring monthly amount, you help the collective plan out its future.
-          
+
 ### <a name="charge-date-notice"></a>Why do you charge recurring monthly subscriptions on 1st of every month?
+
 It helps our collectives manage their monthly budget. Instead of getting donations randomly throughout the month, they can start with a minimum budget for that month. Any new donations improve the budget.
 
 We're working on a way to charge a single payment spread out across monthly contributions, to reduce payment processor transaction fees.
-          
+
 ### How can I cancel my monthly donation?
+
 We are sorry to see you go! Go to your subscriptions page (https://opencollective.com/:profile/subscriptions) (replace `:profile` with the url of your profile).

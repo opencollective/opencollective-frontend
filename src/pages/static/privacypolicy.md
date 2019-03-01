@@ -2,9 +2,9 @@
 
 **Last Updated: 7 January 2019**
 
-This Privacy Policy explains how information about you is collected, used, and disclosed by Open Collective, Inc. ("Open Collective" or “we”).  This Privacy Policy applies to information we collect when you use our websites and online services (collectively, the “Services”) or when you otherwise interact with us. 
+This Privacy Policy explains how information about you is collected, used, and disclosed by Open Collective, Inc. ("Open Collective" or “we”). This Privacy Policy applies to information we collect when you use our websites and online services (collectively, the “Services”) or when you otherwise interact with us.
 
-We may change this Privacy Policy from time to time.  If we make changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification).  We encourage you to review the Privacy Policy whenever you access the Services or otherwise interact with us to stay informed about our information practices and the ways you can help protect your privacy.
+We may change this Privacy Policy from time to time. If we make changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification). We encourage you to review the Privacy Policy whenever you access the Services or otherwise interact with us to stay informed about our information practices and the ways you can help protect your privacy.
 
 <table>
   <tr>

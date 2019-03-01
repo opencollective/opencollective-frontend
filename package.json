@@ -127,7 +127,7 @@
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
     "cypress:open": "TZ=UTC cypress open",
-    "prettier": "prettier \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
+    "prettier": "prettier \"*.@(js|md)\" \"cypress/**/*.@(js|md)\" \"src/**/*.@(js|md)\" \"test/**/*.@(js|md)\"",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
@@ -205,7 +205,7 @@
     }
   },
   "lint-staged": {
-    "*.js": [
+    "*.{js,md}": [
       "prettier --write",
       "git add"
     ]
