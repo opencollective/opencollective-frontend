@@ -835,23 +835,27 @@
   font-size: 40px;
   letter-spacing: -0.2px;
   color: #313233;
+  text-align: left;
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .PricePage__create__container__content h1 {
     font-size: 34px;
+    text-align: center;
   }
 }
 
 @media (min-width: 0px) and (max-width: 768px) {
   .PricePage__create__container__content h1 {
     font-size: 34px;
+    text-align: center;
   }
 }
 
 @media (min-width: 0px) and (max-width: 576px) {
   .PricePage__create__container__content h1 {
     font-size: 28px;
+    text-align: center;
   }
 }
 
@@ -887,7 +891,7 @@
   }
 }
 
-.PricePage__create__container__content button {
+.PricePage__create__container__content button, .PricePage__create__container__content a.button {
   background: #3385FF;
   border-radius: 100px;
   height: 56px;
@@ -901,21 +905,24 @@
   color: #FFFFFF;
   width: 256px;
   border: 0;
+  display: block;
+  margin-left: 0;
+  float: left;
 }
 
 @media (min-width: 0px) and (max-width: 768px) {
-  .PricePage__create__container__content button {
+  .PricePage__create__container__content button, .PricePage__create__container__content a.button {
     width: 100%;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
-  .PricePage__create__container__content button {
+  .PricePage__create__container__content button, .PricePage__create__container__content a.button {
     width: 196px;
   }
 }
 
-.PricePage__create__container__content a {
+.PricePage__create__container__content a.learn-more {
   margin-left: 40px;
   font-family: 'Inter UI';
   font-style: normal;
@@ -923,10 +930,12 @@
   line-height: 24px;
   font-size: 16px;
   color: #0061E0;
+  float: left;
+  margin-top: 15px;
 }
 
 @media (min-width: 0px) and (max-width: 768px) {
-  .PricePage__create__container__content a {
+  .PricePage__create__container__content a.learn-more {
     position: relative;
     margin: 0;
     width: 100%;
