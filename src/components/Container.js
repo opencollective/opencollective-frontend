@@ -32,20 +32,12 @@ import {
   right,
   size,
   space,
-  style,
   textAlign,
   top,
   width,
   zIndex,
 } from 'styled-system';
-import { cursor } from './Text';
-
-export const overflow = style({ prop: 'overflow' });
-
-export const pointerEvents = style({ prop: 'pointerEvents' });
-
-export const float = style({ prop: 'float' });
-export const clear = style({ prop: 'clear' });
+import { cursor, clear, float, overflow, pointerEvents } from '../lib/styled_system_custom';
 
 const Container = styled(tag)`
   box-sizing: border-box;

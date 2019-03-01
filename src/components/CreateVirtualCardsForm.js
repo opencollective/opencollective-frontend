@@ -85,13 +85,17 @@ const FieldLabelDetails = styled.span`
   font-weight: 400;
 `;
 
-const RedeemLinksTextarea = styled.textarea`
-  max-width: 450px;
-  height: 175px;
-  resize: vertical;
+const RedeemLinksTextarea = styled(StyledInput)`
   width: 95%;
+  max-width: 450px;
+  min-height: 175px;
+  padding: 8px;
+  border-radius: 8px;
+  resize: vertical;
   overflow-wrap: normal;
 `;
+
+RedeemLinksTextarea.defaultProps = { as: 'textarea' };
 
 class CreateVirtualCardsForm extends Component {
   static propTypes = {

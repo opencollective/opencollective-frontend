@@ -1,6 +1,25 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { alignSelf } from 'styled-system';
+import { alignSelf, height, width } from 'styled-system';
+import tag from 'clean-tag';
+
+import { cursor } from '../../lib/styled_system_custom';
+
+const StyledSVG = styled(tag.svg)`
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+
+  ${alignSelf};
+  ${height};
+  ${width};
+  ${cursor};
+`;
+
+StyledSVG.defaultProps = {
+  blacklist: tag.defaultProps.blacklist.concat('cursor'),
+};
 
 /**
  * A simple wrapper to export custom icons as styled icons. It mostly mimics the
@@ -9,19 +28,21 @@ import { alignSelf } from 'styled-system';
  * As soon as it is released, we should transition to styled-icons component
  * to ensure consistency with third-party imported icons.
  */
-const CustomIcon = ({ size, ...props }) => <svg height={size} width={size} {...props} />;
+const CustomStyledIcon = ({ size, ...props }) => {
+  return <StyledSVG height={size} width={size} {...props} />;
+};
 
-CustomIcon.defaultProps = {
+CustomStyledIcon.defaultProps = {
   focusable: 'false',
   'aria-hidden': 'true',
   role: 'img',
+  xmlns: 'http://www.w3.org/2000/svg',
 };
 
-const CustomStyledIcon = styled(CustomIcon)`
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-  ${alignSelf};
-`;
+CustomStyledIcon.propTypes = {
+  /** Size of the icon */
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  cursor: PropTypes.string,
+};
 
 export default CustomStyledIcon;

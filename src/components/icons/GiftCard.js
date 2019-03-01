@@ -5,14 +5,7 @@ import CustomStyledIcon from './CustomStyledIcon';
 const GiftCard = props => {
   const gradientID = `gradient-${props.color.replace('#', '')}`;
   return (
-    <CustomStyledIcon
-      width={props.size || '26'}
-      height={props.size || '18'}
-      viewBox="0 0 26 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
+    <CustomStyledIcon width={props.size || 26} height={props.size || 18} viewBox="0 0 26 18" fill="none" {...props}>
       <rect width="26" height="18" rx="3" fill="#0061E0" />
       <rect x="0.5" y="0.5" width="25" height="17" rx="1.5" fill="white" stroke="#DCDEE0" />
       <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="26" height="18">

@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet, space, minWidth, maxWidth, boxShadow, borderColor, style } from 'styled-system';
+import { themeGet, space, minWidth, maxWidth, boxShadow, borderColor } from 'styled-system';
 import tag from 'clean-tag';
-
-const borderStyle = style({ prop: 'borderStyle' });
+import { borderStyle } from '../lib/styled_system_custom';
 
 const StyledHr = styled(tag.hr)`
   border: 0;
@@ -16,6 +15,7 @@ const StyledHr = styled(tag.hr)`
   ${maxWidth}
   ${boxShadow}
   ${borderColor}
+
   ${borderStyle}
 `;
 

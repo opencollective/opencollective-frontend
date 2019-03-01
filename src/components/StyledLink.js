@@ -12,18 +12,13 @@ import {
   fontWeight,
   maxWidth,
   space,
-  style,
   textAlign,
   width,
   themeGet,
 } from 'styled-system';
 import tag from 'clean-tag';
-import { whiteSpace } from './Text';
+import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
-
-const textDecoration = style({
-  prop: 'textDecoration',
-});
 
 /**
  * styled-component anchor tag using styled-system
