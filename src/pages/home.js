@@ -201,7 +201,7 @@ class HomePage extends React.Component {
       {
         image: '/static/images/home-slide-04.svg',
         heading: formatMessage(this.carouselMessages.missionHeading),
-        detaiils: formatMessage(this.carouselMessages.missionDetails),
+        details: formatMessage(this.carouselMessages.missionDetails),
       },
     ];
   }
