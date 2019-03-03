@@ -96,7 +96,7 @@
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.3",
     "sanitize-html": "1.20.0",
-    "sequelize": "4.42.1",
+    "sequelize": "4.43.0",
     "sequelize-cli": "4.0.0",
     "sequelize-temporal": "1.0.6",
     "showdown": "1.9.0",
