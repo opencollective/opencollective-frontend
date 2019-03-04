@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import tag from 'clean-tag';
 import {
-  bgColor,
+  backgroundColor,
   border,
   borderRadius,
   color,
@@ -50,7 +50,7 @@ const StyledButtonContent = styled(tag.button)`
       }
     `}
 
-  ${bgColor}
+  ${backgroundColor}
   ${border}
   ${borderRadius}
   ${color}
