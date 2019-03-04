@@ -1,4 +1,3 @@
-const { createConfig, babel } = require('webpack-blocks');
 const path = require('path');
 const fileExistsCaseInsensitive = require('react-styleguidist/scripts/utils/findFileCaseInsensitive');
 
@@ -66,5 +65,17 @@ module.exports = {
   },
   title: 'Open Collective Frontend Style Guide',
   usageMode: 'expand',
-  webpackConfig: createConfig([babel()]),
+  webpackConfig: {
+    resolve: { extensions: ['.js', '.json'] },
+    stats: { children: false, chunks: false, modules: false, reasons: false },
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          use: [{ loader: 'babel-loader', options: { cacheDirectory: true } }],
+        },
+      ],
+    },
+  },
 };
