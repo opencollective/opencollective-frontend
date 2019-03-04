@@ -309,6 +309,19 @@ Array [
             >
               <a
                 className="c12"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                <span>
+                  Pricing
+                </span>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
+                className="c12"
                 href="https://docs.opencollective.com"
               >
                 <span>
@@ -1046,6 +1059,17 @@ Array [
                 onClick={[Function]}
               >
                 Join Free
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
               </a>
             </li>
             <li
@@ -1585,6 +1609,19 @@ Array [
             >
               <a
                 className="c12"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                <span>
+                  Pricing
+                </span>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
+                className="c12"
                 href="https://docs.opencollective.com"
               >
                 <span>
@@ -2322,6 +2359,17 @@ Array [
                 onClick={[Function]}
               >
                 Join Free
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
               </a>
             </li>
             <li
@@ -3376,6 +3424,19 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c18"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                <span>
+                  Pricing
+                </span>
+              </a>
+            </li>
+            <li
+              className="c17"
+            >
+              <a
+                className="c18"
                 href="https://docs.opencollective.com"
               >
                 <span>
@@ -3743,6 +3804,17 @@ exports[`Search Page renders error message 1`] = `
                 onClick={[Function]}
               >
                 Join Free
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
               </a>
             </li>
             <li
@@ -4274,6 +4346,19 @@ Array [
               >
                 <span>
                   How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
+                className="c12"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                <span>
+                  Pricing
                 </span>
               </a>
             </li>
@@ -5121,6 +5206,17 @@ Array [
             >
               <a
                 className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -5645,6 +5741,19 @@ Array [
               >
                 <span>
                   How it Works
+                </span>
+              </a>
+            </li>
+            <li
+              className="c11"
+            >
+              <a
+                className="c12"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                <span>
+                  Pricing
                 </span>
               </a>
             </li>
@@ -6641,6 +6750,17 @@ Array [
                 onClick={[Function]}
               >
                 Join Free
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
               </a>
             </li>
             <li
