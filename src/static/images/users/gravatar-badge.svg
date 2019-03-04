@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="160px" height="160px" viewBox="0 0 160 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.2 (12043) - http://www.bohemiancoding.com/sketch -->
+    <title>gravatar</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="gravatar" sketch:type="MSArtboardGroup" transform="translate(-46.000000, -64.000000)" fill="#444444">
+            <path d="M114.686292,68.6862915 C117.581722,65.790861 121.581722,64 126,64 C170.18278,64 206,99.81722 206,144 C206,188.18278 170.18278,224 126,224 C81.81722,224 46,188.18278 46,144 C46,122.032047 54.9193592,101.444734 70,86 C76.7543824,80.3361716 86.8835728,80.5075233 93,87 C99.1671894,93.2138859 98.9958377,103.343076 93,109 C83.3350302,118.482842 78,130.796948 78,144 C78,170.509668 99.490332,192 126,192 C152.509668,192 174,170.509668 174,144 C174,123.100499 160.643078,105.320674 142,98.7312913 L142,136 C142,144.836874 134.836556,152 126,152 C117.163444,152 110,144.836874 110,136 L110,80 C110,75.581563 111.790861,71.581563 114.686292,68.6861723 L114.686292,68.6862915 Z" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

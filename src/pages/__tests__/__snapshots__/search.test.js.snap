@@ -2811,7 +2811,7 @@ exports[`Search Page renders error message 1`] = `
   -moz-letter-spacing: -1.2px;
   -ms-letter-spacing: -1.2px;
   letter-spacing: -1.2px;
-  margin: 0px;
+  margin: 0;
 }
 
 .c19 {
@@ -2834,10 +2834,10 @@ exports[`Search Page renders error message 1`] = `
 }
 
 .c25 {
-  margin-left: 8px;
-  margin-right: 8px;
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 .c25[disabled] {
@@ -3066,10 +3066,10 @@ exports[`Search Page renders error message 1`] = `
   border: none;
   cursor: pointer;
   outline: 0;
-  margin-left: 8px;
-  margin-right: 8px;
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 @media screen and (min-width:52em) {
