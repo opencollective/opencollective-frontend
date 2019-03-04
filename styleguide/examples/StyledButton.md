@@ -76,6 +76,14 @@ initialState = { buttonSize: 'medium' };
 </React.Fragment>;
 ```
 
+### Advanced customization
+
+```js
+<StyledButton buttonStyle="primary" backgroundColor="green.700">
+  A green button
+</StyledButton>
+```
+
 ### Button is not clickable when loading
 
 ```js
