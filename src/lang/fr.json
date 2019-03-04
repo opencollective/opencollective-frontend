@@ -445,7 +445,7 @@
   "pleasewait": "Veuillez patienter...",
   "page.error.collective.is.not.host": "Cette page est uniquement pour les hôtes de collectifs",
   "page.error.graphQLError": "Erreur",
-  "page.error.networkError": "Open Collective n'est momentanément pas joignable 🙀",
+  "page.error.networkError": "The Open Collective Server is momentarily unreachable",
   "page.error.networkError.description": "Pas de panique! Un de nos ingénieurs est probablement déjà occupé de régler ce problème 👩🏻‍💻👨🏿‍💻. Merci de bien vouloir réessayer plus tard. Merci pour votre patience 🙏 ",
   "page.error.unknown": "Erreur inconnue",
   "event.over.sendMoneyToParent.title": "L'événement est terminé et il reste de l'argent qui n'a pas été dépensé",
