@@ -114,6 +114,9 @@ const editCollectiveQuery = gql`
       backgroundImage
       description
       longDescription
+      location {
+        address
+      }
       website
       twitterHandle
       githubHandle

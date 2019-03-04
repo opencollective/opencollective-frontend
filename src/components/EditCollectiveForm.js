@@ -196,6 +196,10 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.country.label',
         defaultMessage: 'Country',
       },
+      'address.label': {
+        id: 'collective.address.label',
+        defaultMessage: 'Address',
+      },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -249,7 +253,14 @@ class EditCollectiveForm extends React.Component {
 
   handleChange(fieldname, value) {
     const collective = {};
-    collective[fieldname] = value;
+    // GrarphQL schema has address emebed within location
+    // mutation expects { location: { address: '' } }
+    if (fieldname === 'address') {
+      collective['location'] = value;
+    } else {
+      collective[fieldname] = value;
+    }
+
     this.setState({
       modified: true,
       collective: Object.assign({}, this.state.collective, collective),
@@ -325,12 +336,17 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           placeholder: '',
         },
+        {
+          name: 'address',
+          placeholder: '',
+          maxLength: 255,
+        },
         // {
         //   name: 'location',
         //   placeholder: 'Search cities',
         //   type: 'location',
         //   options: {
-        //     types: ['cities']
+        //     types: ['cities']location
         //   }
         // },
         {
