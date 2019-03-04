@@ -184,7 +184,7 @@ class OrderForm extends React.Component {
         defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.',
       },
       'description.label': {
-        id: 'user.description.label',
+        id: 'user.shortBio.label',
         defaultMessage: 'Short bio',
       },
       'description.description': {

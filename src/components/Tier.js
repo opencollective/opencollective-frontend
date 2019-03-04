@@ -51,8 +51,8 @@ class Tier extends React.Component {
         id: 'tier.interval.onetime',
         defaultMessage: 'one time',
       },
-      'interval.month': { id: 'tier.interval.month', defaultMessage: 'month' },
-      'interval.year': { id: 'tier.interval.year', defaultMessage: 'year' },
+      'interval.month': { id: 'tier.interval.month', defaultMessage: 'monthly' },
+      'interval.year': { id: 'tier.interval.year', defaultMessage: 'yearly' },
     });
 
     this.defaultDescription = (

@@ -121,7 +121,7 @@ class EditTiers extends React.Component {
         id: 'tier.startsAt.label',
         defaultMessage: 'start date and time',
       },
-      'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'Expiration' },
+      'endsAt.label': { id: 'tier.expiration.label', defaultMessage: 'Expiration' },
       'endsAt.description': {
         id: 'tier.endsAt.description',
         defaultMessage: 'Date and time until when this tier should be available',
