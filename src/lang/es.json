@@ -330,7 +330,7 @@
   "virtualCards.returnToEdit": "Go back to gift cards list",
   "collective.edit.backToProfile": "o vuelve a la página de {type}",
   "collective.connectedAccounts.reconnect.button": "Reconnect",
-  "create.collective.connectedAccounts.stripe.description": "Connect a Stripe account to create collectives and start accepting donations.",
+  "collective.create.connectedAccounts.stripe.description": "Connect a Stripe account to create collectives and start accepting donations.",
   "collective.connectedAccounts.stripe.connected": "Stripe ha sido conectado el {createdAt, date, short}",
   "collective.connectedAccounts.twitter.button": "Conectar Twitter",
   "collective.connectedAccounts.twitter.description": "Conectar una cuenta de Twitter para agradecer automáticamente a los nuevos backers",

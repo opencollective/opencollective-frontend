@@ -330,7 +330,7 @@
   "virtualCards.returnToEdit": "Retour à la liste des cartes cadeaux",
   "collective.edit.backToProfile": "ou retourner à la page précédente",
   "collective.connectedAccounts.reconnect.button": "Reconnecter",
-  "create.collective.connectedAccounts.stripe.description": "Connect a Stripe account to create collectives and start accepting donations.",
+  "collective.create.connectedAccounts.stripe.description": "Connect a Stripe account to create collectives and start accepting donations.",
   "collective.connectedAccounts.stripe.connected": "Compte Stripe account connecté le {createdAt, date, short}",
   "collective.connectedAccounts.twitter.button": "Connecter Twitter",
   "collective.connectedAccounts.twitter.description": "Connecter un compte Twitter pour envoyer automatiquement un tweet de remerciement aux nouveaux supporters",
