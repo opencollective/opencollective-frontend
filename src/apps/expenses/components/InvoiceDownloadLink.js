@@ -4,6 +4,8 @@ import * as api from '../../../lib/api';
 import { saveAs } from 'file-saver';
 
 import { collectiveInvoiceURL, invoiceServiceURL, transactionInvoiceURL } from '../../../lib/url_helpers';
+import { Span } from '../../../components/Text';
+import { FormattedMessage } from 'react-intl';
 
 export default class InvoiceDownloadLink extends Component {
   static propTypes = {
@@ -23,7 +25,7 @@ export default class InvoiceDownloadLink extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { isLoading: false };
+    this.state = { isLoading: false, error: false };
   }
 
   getInvoiceUrl() {
@@ -43,15 +45,22 @@ export default class InvoiceDownloadLink extends Component {
     const getParams = { format: 'blob', allowExternal: invoiceServiceURL };
 
     this.setState({ isLoading: true });
-    const file = await api.get(invoiceUrl, getParams);
-    this.setState({ isLoading: false });
-
-    return saveAs(file, this.getFilename());
+    try {
+      const file = await api.get(invoiceUrl, getParams);
+      this.setState({ isLoading: false });
+      return saveAs(file, this.getFilename());
+    } catch (e) {
+      this.setState({ error: e.message, isLoading: false });
+    }
   }
 
   render() {
-    const { isLoading } = this.state;
-    return (
+    const { isLoading, error } = this.state;
+    return error ? (
+      <Span color="red.700">
+        <FormattedMessage id="errorMsg" defaultMessage="Error: {error}" values={{ error }} />
+      </Span>
+    ) : (
       <a onClick={() => !isLoading && this.download()}>
         {!isLoading && this.props.children}
         {isLoading && this.props.viewLoading()}

@@ -35,6 +35,7 @@ export const transactionFields = `
     image
   }
   usingVirtualCardFromCollective {
+    id
     slug
     name
   }
