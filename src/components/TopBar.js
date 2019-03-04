@@ -132,6 +132,13 @@ class TopBar extends React.Component {
                 </Link>
               </Box>
               <Box as="li" px={3}>
+                <Link route="marketing" params={{ pageSlug: 'pricing' }} passHref>
+                  <NavLink>
+                    <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
+                  </NavLink>
+                </Link>
+              </Box>
+              <Box as="li" px={3}>
                 <NavLink href="https://docs.opencollective.com">
                   <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
                 </NavLink>
