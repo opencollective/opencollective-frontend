@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { compose, withHandlers, withState } from 'recompose';
 import { pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
@@ -32,49 +31,6 @@ const Tab = ({ active, children, setActive }) => (
   </Container>
 );
 
-const enhance = compose(
-  withState('state', 'setState', ({ errors }) => ({ errors, tab: 'personal' })),
-  withHandlers({
-    getFieldError: ({ state, errors }) => name => (errors && errors[name]) || state.errors[name],
-    onChange: ({ setState, onEmailChange }) => ({ target }) => {
-      // Email state is not local so any changes should be handled seprately
-      if (target.name === 'email') {
-        onEmailChange(target.value);
-        setState(state => ({
-          ...state,
-          errors: { ...state.errors, [target.name]: null },
-        }));
-      } else {
-        setState(state => ({
-          ...state,
-          [target.name]: target.value,
-          errors: { ...state.errors, [target.name]: null },
-        }));
-      }
-    },
-    onInvalid: ({ setState }) => event => {
-      event.persist();
-      event.preventDefault();
-      setState(state => ({
-        ...state,
-        errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
-      }));
-    },
-  }),
-  // follows composition of onChange && onInvalid to access them from props
-  withHandlers({
-    getFieldProps: ({ state, onChange, onInvalid }) => name => ({
-      defaultValue: state[name] || '',
-      fontSize: 'Paragraph',
-      lineHeight: 'Paragraph',
-      onChange,
-      onInvalid,
-      type: 'text',
-      width: 1,
-    }),
-  }),
-);
-
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
     <Link route={onSecondaryAction} passHref>
@@ -89,33 +45,75 @@ const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   );
 };
 
-/**
- * Component for handling the creation of profiles, either personal or organizational
- */
-const CreateProfile = enhance(
-  ({
-    getFieldError,
-    getFieldProps,
-    onPersonalSubmit,
-    onOrgSubmit,
-    onSecondaryAction,
+const useForm = ({ onEmailChange, errors }) => {
+  const [state, setState] = useState({ errors });
+
+  return {
+    getFieldProps: name => ({
+      defaultValue: state[name] || '',
+      fontSize: 'Paragraph',
+      lineHeight: 'Paragraph',
+      type: 'text',
+      width: 1,
+      onChange: ({ target }) => {
+        // Email state is not local so any changes should be handled seprately
+        if (target.name === 'email') {
+          onEmailChange(target.value);
+          setState({
+            ...state,
+            errors: { ...state.errors, [target.name]: null },
+          });
+        } else {
+          setState({
+            ...state,
+            [target.name]: target.value,
+            errors: { ...state.errors, [target.name]: null },
+          });
+        }
+      },
+      onInvalid: event => {
+        event.persist();
+        event.preventDefault();
+        setState({
+          ...state,
+          errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
+        });
+      },
+    }),
+    getFieldError: name => {
+      if (state.errors && state.errors[name]) {
+        return state.errors[name];
+      }
+    },
     state,
-    setState,
-    submitting,
-    email,
-    ...props
-  }) => (
+  };
+};
+
+const CreateProfile = ({
+  email,
+  submitting,
+  errors,
+  onEmailChange,
+  onPersonalSubmit,
+  onOrgSubmit,
+  onSecondaryAction,
+  ...props
+}) => {
+  const [tab, setTab] = useState('personal');
+  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors });
+
+  return (
     <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
-        <Tab active={state.tab === 'personal'} setActive={() => setState({ ...state, tab: 'personal' })}>
+        <Tab active={tab === 'personal'} setActive={() => setTab('personal')}>
           <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
         </Tab>
-        <Tab active={state.tab === 'organization'} setActive={() => setState({ ...state, tab: 'organization' })}>
+        <Tab active={tab === 'organization'} setActive={() => setTab('organization')}>
           <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
         </Tab>
       </Flex>
 
-      {state.tab === 'personal' && (
+      {tab === 'personal' && (
         <Box
           as="form"
           p={4}
@@ -166,7 +164,7 @@ const CreateProfile = enhance(
         </Box>
       )}
 
-      {state.tab === 'organization' && (
+      {tab === 'organization' && (
         <Box
           as="form"
           p={4}
@@ -263,8 +261,8 @@ const CreateProfile = enhance(
         </SecondaryAction>
       </Container>
     </StyledCard>
-  ),
-);
+  );
+};
 
 CreateProfile.propTypes = {
   /** a map of errors to the matching field name, i.e. `{ email: 'Invalid email' }` will display that message until the email field */

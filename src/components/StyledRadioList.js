@@ -1,61 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { withState } from 'recompose';
 import { find } from 'lodash';
 
 import { Box } from '@rebass/grid';
 import { getItems, getKeyExtractor } from './StyledSelect';
 import Container from './Container';
 
-const enhance = withState('selected', 'setSelected', ({ defaultValue }) => defaultValue);
-
 /**
  * Component for controlling a list of radio inputs
  */
-const StyledRadioList = enhance(
-  ({ children, defaultValue, id, name, onChange, options, selected, setSelected, keyGetter }) => {
-    const keyExtractor = getKeyExtractor(options, keyGetter);
-    const items = getItems(options, keyExtractor);
-    const defaultValueStr = defaultValue !== undefined && defaultValue.toString();
+const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, ...props }) => {
+  const [selected, setSelected] = useState(props.defaultValue);
+  const keyExtractor = getKeyExtractor(options, keyGetter);
+  const items = getItems(options, keyExtractor);
+  const defaultValueStr = props.defaultValue !== undefined && props.defaultValue.toString();
 
-    return (
-      <Container
-        as="fieldset"
-        border="none"
-        m={0}
-        p={0}
-        onChange={event => {
-          event.stopPropagation();
-          const target = event.target;
-          const selectedItem = find(items, item => item.key === target.value);
-          onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
-          setSelected(target.value);
-        }}
-        id={id}
-      >
-        {items.map(({ value, key }, index) => (
-          <Container as="label" htmlFor={id && key + id} key={key} width={1} m={0}>
-            {children({
-              checked: selected && key === selected,
-              index,
-              key,
-              value,
-              radio: (
-                <input
-                  type="radio"
-                  name={name}
-                  id={id && key + id}
-                  value={key}
-                  defaultChecked={defaultValue !== undefined && defaultValueStr === key}
-                />
-              ),
-            })}
-          </Container>
-        ))}
-      </Container>
-    );
-  },
-);
+  return (
+    <Container
+      as="fieldset"
+      border="none"
+      m={0}
+      p={0}
+      onChange={event => {
+        event.stopPropagation();
+        const target = event.target;
+        const selectedItem = find(items, item => item.key === target.value);
+        onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
+        setSelected(target.value);
+      }}
+      id={id}
+    >
+      {items.map(({ value, key }, index) => (
+        <Container as="label" htmlFor={id && key + id} key={key} width={1} m={0}>
+          {children({
+            checked: selected && key === selected,
+            index,
+            key,
+            value,
+            radio: (
+              <input
+                type="radio"
+                name={name}
+                id={id && key + id}
+                value={key}
+                defaultChecked={props.defaultValue !== undefined && defaultValueStr === key}
+              />
+            ),
+          })}
+        </Container>
+      ))}
+    </Container>
+  );
+};
 
 StyledRadioList.propTypes = {
   /**
