@@ -109,10 +109,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -426,10 +426,10 @@ Array [
   font-size: Paragraph;
   font-weight: bold;
   max-width: 220px;
-  padding-left: 32px;
-  padding-right: 32px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
   text-align: center;
 }
 
@@ -654,7 +654,7 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
@@ -668,7 +668,7 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
   text-align: center;
 }
@@ -682,7 +682,7 @@ Array [
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -1385,10 +1385,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -1702,10 +1702,10 @@ Array [
   font-size: Paragraph;
   font-weight: bold;
   max-width: 220px;
-  padding-left: 32px;
-  padding-right: 32px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
   text-align: center;
 }
 
@@ -1930,7 +1930,7 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
@@ -1944,7 +1944,7 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
   text-align: center;
 }
@@ -1958,7 +1958,7 @@ Array [
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -2784,7 +2784,7 @@ exports[`Search Page renders error message 1`] = `
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
@@ -2798,7 +2798,7 @@ exports[`Search Page renders error message 1`] = `
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
   text-align: center;
 }
@@ -2820,10 +2820,10 @@ exports[`Search Page renders error message 1`] = `
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c19[disabled] {
@@ -2856,7 +2856,7 @@ exports[`Search Page renders error message 1`] = `
 .c27 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -4033,10 +4033,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -4673,7 +4673,7 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
@@ -4687,7 +4687,7 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
   text-align: center;
 }
@@ -4701,7 +4701,7 @@ Array [
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -5404,10 +5404,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -5761,7 +5761,7 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
 }
 
 .c15 {
@@ -5769,10 +5769,10 @@ Array [
   font-size: Paragraph;
   font-weight: bold;
   max-width: 220px;
-  padding-left: 32px;
-  padding-right: 32px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
   text-align: center;
 }
 
@@ -5819,13 +5819,15 @@ Array [
   border: 1px solid;
   border-color: black.300;
   border-radius: 4px;
+  border-color: black.300;
+  border-radius: 4px;
   line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
@@ -5837,13 +5839,15 @@ Array [
   border: 1px solid;
   border-color: black.300;
   border-radius: 4px;
+  border-color: black.300;
+  border-radius: 4px;
   line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
@@ -5855,13 +5859,15 @@ Array [
   border: 1px solid;
   border-color: black.300;
   border-radius: 4px;
+  border-color: black.300;
+  border-radius: 4px;
   line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
@@ -5873,13 +5879,15 @@ Array [
   border: 1px solid;
   border-color: black.300;
   border-radius: 4px;
+  border-color: black.300;
+  border-radius: 4px;
   line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
@@ -6192,7 +6200,7 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
@@ -6206,7 +6214,7 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
   text-align: center;
 }
@@ -6220,7 +6228,7 @@ Array [
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
