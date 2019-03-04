@@ -13,8 +13,9 @@ import {
   updateSubscription,
   refundTransaction,
   addFundsToOrg,
-  updateOrder,
+  completePledge,
   markOrderAsPaid,
+  updateOrderInfo,
 } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
@@ -299,6 +300,7 @@ const mutations = {
     },
   },
   updateOrder: {
+    // TODO: Should be renamed to completePledge.
     type: OrderType,
     args: {
       order: {
@@ -306,7 +308,24 @@ const mutations = {
       },
     },
     resolve(_, args, req) {
-      return updateOrder(req.remoteUser, args.order);
+      return completePledge(req.remoteUser, args.order);
+    },
+  },
+  updateOrderInfo: {
+    type: OrderType,
+    description: 'Update the non-sensitive information of an order, like the public message',
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the order to update',
+      },
+      publicMessage: {
+        type: GraphQLString,
+        description: 'Public message to motivate others to contribute',
+      },
+    },
+    resolve: async (_, args, req) => {
+      return updateOrderInfo(req, args);
     },
   },
   createUpdate: {
