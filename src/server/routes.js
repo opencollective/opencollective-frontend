@@ -29,6 +29,9 @@ export default (server, app) => {
     next();
   });
 
+  // Support older assets from website
+  server.use('/public/images', express.static(path.join(__dirname, '../static/images')));
+
   server.get('/static/*', maxAge(7200));
 
   server.get('/favicon.*', maxAge(300000), (req, res) => {
