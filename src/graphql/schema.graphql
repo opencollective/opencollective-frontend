@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Tue Feb 12 2019 11:11:53 GMT+0100 (GMT+01:00)
+# timestamp: Wed Feb 27 2019 15:24:51 GMT+0100 (GMT+01:00)
 
 """Application model"""
 type Application {
@@ -72,6 +72,7 @@ type Collective implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
+  taxes: JSON
   data: JSON
   slug: String
   path: String
@@ -232,6 +233,7 @@ interface CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
+  taxes: JSON
   data: JSON
   slug: String
   path: String
@@ -503,6 +505,7 @@ type Event implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
+  taxes: JSON
   data: JSON
   slug: String
   path: String
@@ -603,6 +606,9 @@ type Expense implements Transaction {
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
   paymentProcessorFeeInHostCurrency: Int
+
+  """The amount paid in tax (for example VAT) for this transaction"""
+  taxAmount: Int!
 
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
@@ -939,6 +945,9 @@ type Order implements Transaction {
   """
   paymentProcessorFeeInHostCurrency: Int
 
+  """The amount paid in tax (for example VAT) for this transaction"""
+  taxAmount: Int!
+
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
@@ -986,7 +995,7 @@ enum OrderDirection {
 """Input type for OrderType"""
 input OrderInputType {
   id: Int
-  quantity: Int
+  quantity: Int = 1
   totalAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
@@ -1009,6 +1018,15 @@ input OrderInputType {
   collective: CollectiveAttributesInputType!
   tier: TierInputType
   recaptchaToken: String
+
+  """The amount of taxes that were included in totalAmount"""
+  taxAmount: Int = 0
+
+  """User country, to know which tax applies"""
+  countryISO: String
+
+  """User tax ID number"""
+  taxIDNumber: String
 }
 
 """Possible statuses for an Order"""
@@ -1032,6 +1050,9 @@ type OrderType {
 
   """total amount for this order (doesn't include recurring transactions)"""
   totalAmount: Int
+
+  """The amount paid in tax (for example VAT) for this order"""
+  taxAmount: Int
 
   """
   frequency of the subscription if any (could be either null, 'month' or 'year')
@@ -1125,6 +1146,7 @@ type Organization implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
+  taxes: JSON
   data: JSON
   slug: String
   path: String
@@ -1587,6 +1609,7 @@ interface Transaction {
   hostFeeInHostCurrency: Int
   platformFeeInHostCurrency: Int
   paymentProcessorFeeInHostCurrency: Int
+  taxAmount: Int
   createdByUser: UserDetails
   host: CollectiveInterface
   paymentMethod: PaymentMethodType
@@ -1718,6 +1741,7 @@ type User implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
+  taxes: JSON
   data: JSON
   slug: String
   path: String

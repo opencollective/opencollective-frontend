@@ -7,8 +7,15 @@ if [ "$NODE_ENV" = "circleci" ]; then
   API_PID=$!
   cd -
   echo "> Starting frontend server"
-  npm start &
-  FRONTEND_PID=$!
+  if [ -d "/home/circleci/frontend" ]; then
+    cd ~/frontend
+    npm start &
+    FRONTEND_PID=$!
+    cd -
+  else
+    npm start &
+    FRONTEND_PID=$!
+  fi
 fi
 
 echo ""

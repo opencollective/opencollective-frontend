@@ -12,6 +12,7 @@ import withLoggedInUser from '../lib/withLoggedInUser';
 import { loadScriptAsync } from '../lib/utils';
 
 import sponsorPageHtml from '../static/sponsor-page/index.html';
+import pricingPageHtml from '../static/pricing-page/index.html';
 import howItWorksPageHtml from '../static/how-it-works-page/index.html';
 import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
 import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
@@ -22,6 +23,8 @@ import giftCardPageConfirmationHtml from '../static/gift-cards-page/confirmation
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
+import pricingPageScript from '!file-loader?publicPath=/_next/static/javascripts/&outputPath=static/javascripts/&name=[name]-[hash].[ext]!../static/pricing-page/javascripts/scripts.js'; // eslint-disable-line
+import pricingPageStyle from '!css-loader!../static/pricing-page/stylesheets/styles.css'; // eslint-disable-line
 import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
 import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
@@ -38,7 +41,7 @@ class MarketingPage extends React.Component {
     getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
     pageSlug: PropTypes.string.isRequired,
     confirmationPage: PropTypes.bool,
-    locale: PropTypes.string,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -65,11 +68,13 @@ class MarketingPage extends React.Component {
       loadScriptAsync(sponsorPageScript);
     } else if (this.props.pageSlug === 'how-it-works') {
       loadScriptAsync(howItWorksPageScript);
+    } else if (this.props.pageSlug === 'pricing') {
+      loadScriptAsync(pricingPageScript);
     }
   }
 
   render() {
-    const { pageSlug, confirmationPage, locale } = this.props;
+    const { pageSlug, confirmationPage, intl } = this.props;
     const { LoggedInUser } = this.state;
 
     let html, style, className;
@@ -78,8 +83,12 @@ class MarketingPage extends React.Component {
       html = sponsorPageHtml;
       style = sponsorPageStyle;
       className = 'sponsorPage';
+    } else if (pageSlug === 'pricing') {
+      html = pricingPageHtml;
+      style = pricingPageStyle;
+      className = null;
     } else if (pageSlug === 'how-it-works') {
-      if (locale === 'fr') {
+      if (intl.locale === 'fr') {
         html = howItWorksPageHtmlFR;
       } else {
         html = howItWorksPageHtml;

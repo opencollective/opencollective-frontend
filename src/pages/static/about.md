@@ -32,8 +32,8 @@ Support: support@opencollective.com
 - [From the Internet of Information to the Internet of Actions](https://medium.com/open-collective/from-the-internet-of-information-to-the-internet-of-action-17d799f8a773), Xavier Damman
 - [The New Citizen](https://medium.com/open-collective/the-new-citizen-731d15aa901b), Xavier Damman
 
-
 ## Talks
+
 Subscribe to our [Talks Playlist on YouTube](https://www.youtube.com/playlist?list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw)
 
 - [Collaborating with Money](https://www.youtube.com/watch?v=kZleX383-VQ), Alanna Irving, New Frontiers, New Zealand November 2018
@@ -42,7 +42,7 @@ Subscribe to our [Talks Playlist on YouTube](https://www.youtube.com/playlist?li
 - [Cities as Open Collectives](https://www.youtube.com/watch?v=S74uMkmNdh0&index=1&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw) - Pia Mancini, OuiShare Fest, Paris 2017
 - [Reducing the Friction for Citizens to Create Associations and Sustain Them](https://www.youtube.com/watch?v=uBj5nS0s9uQ&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw&index=7) - Xavier Damman, iMAL, Brussels November 2017
 - [A new Way of Sustaining Open Source
-](https://www.youtube.com/watch?v=szE_00HC5h4&index=2&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw) - Pia Mancini, Zeit, Berlin September 2017
+  ](https://www.youtube.com/watch?v=szE_00HC5h4&index=2&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw) - Pia Mancini, Zeit, Berlin September 2017
 - [How to Fund Communities and Movements Transparently](https://www.youtube.com/watch?v=KtRYjfiYHKc&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw&index=6&t=0s) - Xavier Damman, OuiShare Fest, Paris, 2016
 - [A New Form of Association to Build a New World, Together](https://www.youtube.com/watch?v=YNmG8-Yj7C4&index=5&list=PLXg2bdeeuFip6JoPoYgdm3AQ53lfEOjnw) - Xavier Damman, OSFEST, Barcelona 2016
 

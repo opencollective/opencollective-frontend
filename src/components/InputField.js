@@ -139,21 +139,12 @@ class InputField extends React.Component {
     return value;
   }
 
-  getCountryISOCode(value) {
-    if (value === null || typeof value !== 'string') return null;
-    // Example "Nigeria - NG" to "NG"
-    value = value.split('-')[1];
-    return value.trim();
-  }
-
   handleChange(value) {
     const { type } = this.props;
     if (type === 'number') {
       value = parseInt(value) || null;
     } else if (type === 'currency') {
       value = this.roundCurrencyValue(value);
-    } else if (type === 'country') {
-      value = this.getCountryISOCode(value);
     }
 
     if (this.validate(value)) {
@@ -338,14 +329,14 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <InputTypeCountry {...field} onChange={value => this.handleChange(value)} />
+                  <InputTypeCountry {...field} onChange={({ code }) => this.handleChange(code)} />
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
                 {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeCountry {...field} onChange={value => this.handleChange(value)} />
+                <InputTypeCountry {...field} onChange={({ code }) => this.handleChange(code)} />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}
@@ -405,7 +396,7 @@ class InputField extends React.Component {
             disabled={field.disabled}
             step={get(field, 'options.step') || '0.01'}
             min={(field.min || 0) / 100}
-            label={field.label && `${capitalize(field.label)}`}
+            label={typeof field.label === 'string' ? `${capitalize(field.label)}` : field.label}
             help={field.description}
             placeholder={field.placeholder}
             className={`currency ${field.className}`}

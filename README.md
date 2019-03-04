@@ -89,12 +89,14 @@ npm run styleguide:deploy
 
 You can run the tests using `npm test` or more specifically:
 
-- `npm run test:src` for pages and components
+- `npm run test:jest` for pages and components
 - `npm run test:server` for api
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
-To update the Jest snapshots, run `npm run test:update`
-To update the graphql schema for eslint, run `npm run graphql:get-schema:dev`
+To update:
+
+- Jest snapshots: run `npm run test:update`
+- GraphQL schema for eslint: run `npm run graphql:get-schema:dev`
 
 ## Localization
 

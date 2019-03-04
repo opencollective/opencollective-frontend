@@ -3,14 +3,7 @@ import CustomStyledIcon from './CustomStyledIcon';
 
 const PayPal = props => {
   return (
-    <CustomStyledIcon
-      width="21"
-      height="24"
-      viewBox="0 0 21 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
+    <CustomStyledIcon width={21} height={24} viewBox="0 0 21 24" fill="none" {...props}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

@@ -7,6 +7,8 @@ import { debounce, get, pick, isNil, min } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
+import moment from 'moment';
+import uuid from 'uuid/v4';
 
 import { Router } from '../server/pages';
 
@@ -31,27 +33,27 @@ import ContributePayment from '../components/ContributePayment';
 import ContributeDetails from '../components/ContributeDetails';
 import Loading from '../components/Loading';
 import StyledButton from '../components/StyledButton';
-import StepsProgress from '../components/StepsProgress';
 import PayWithPaypalButton from '../components/PayWithPaypalButton';
 import ContributeDetailsFAQ from '../components/faqs/ContributeDetailsFAQ';
 import Container from '../components/Container';
 import { fadeIn } from '../components/StyledKeyframes';
 import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-
-const STEPS = ['contributeAs', 'details', 'payment'];
-
-// Styles for the steps label rendered in StepsProgress
-const StepLabel = styled(Span)`
-  text-transform: uppercase;
-`;
-StepLabel.defaultProps = { color: 'black.400', fontSize: 'Tiny', mt: 1 };
+import ContributionBreakdown from '../components/ContributionBreakdown';
+import Steps from '../components/Steps';
+import ContributionFlowStepsProgress from '../components/ContributionFlowStepsProgress';
 
 // Styles for the previous, next and submit buttons
 const PrevNextButton = styled(StyledButton)`
   animation: ${fadeIn} 0.3s;
 `;
-PrevNextButton.defaultProps = { buttonSize: 'large', fontWeight: 'bold', m: 2, minWidth: '255px' };
+
+PrevNextButton.defaultProps = {
+  buttonSize: 'large',
+  fontWeight: 'bold',
+  minWidth: '255px',
+  m: 2,
+};
 
 // Styles for Paypal button
 const PaypalButtonContainer = styled(Box)`
@@ -67,43 +69,27 @@ PaypalButtonContainer.defaultProps = {
  * to payment.
  */
 class CreateOrderPage extends React.Component {
-  static getInitialProps({
-    query: {
-      collectiveSlug,
-      eventSlug,
-      tierId,
-      tierSlug,
-      amount,
-      quantity,
-      interval,
-      description,
-      verb,
-      step,
-      redeem,
-      redirect,
-      referral,
-    },
-  }) {
+  static getInitialProps({ query }) {
     // Whitelist interval
-    if (['monthly', 'yearly'].includes(interval)) {
-      interval = interval.replace('ly', '');
-    } else if (!['month', 'year'].includes(interval)) {
-      interval = null;
+    if (['monthly', 'yearly'].includes(query.interval)) {
+      query.interval = query.interval.replace('ly', '');
+    } else if (!['month', 'year'].includes(query.interval)) {
+      query.interval = null;
     }
 
     return {
-      slug: eventSlug || collectiveSlug,
-      amount: parseInt(amount) || null,
-      tierId,
-      tierSlug,
-      quantity,
-      description,
-      interval,
-      verb,
-      step,
-      redeem,
-      redirect,
-      referral,
+      slug: query.eventSlug || query.collectiveSlug,
+      amount: parseInt(query.amount) || null,
+      step: query.step || 'contributeAs',
+      tierId: query.tierId,
+      tierSlug: query.tierSlug,
+      quantity: query.quantity,
+      description: query.description,
+      interval: query.interval,
+      verb: query.verb,
+      redeem: query.redeem,
+      redirect: query.redirect,
+      referral: query.referral,
     };
   }
 
@@ -111,16 +97,20 @@ class CreateOrderPage extends React.Component {
     slug: PropTypes.string, // for addData
     tierSlug: PropTypes.string,
     quantity: PropTypes.number,
-    totalAmount: PropTypes.number,
+    amount: PropTypes.number,
+    interval: PropTypes.string,
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
     redirect: PropTypes.string,
+    referral: PropTypes.string,
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from withIntl
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
+    LoggedInUser: PropTypes.object, // from withUser
+    loadingLoggedInUser: PropTypes.bool, // from withUser
   };
 
   static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";
@@ -137,17 +127,14 @@ class CreateOrderPage extends React.Component {
       stepProfile: this.getLoggedInUserDefaultContibuteProfile(),
       stepDetails: null,
       stepPayment: null,
+      stepSummary: null,
       error: null,
       stripe: null,
     };
   }
 
   async componentDidMount() {
-    // Redirect to previous step if data is missing
-    if (!this.isCurrentStepValid()) {
-      const maxStepIdx = this.getMaxStepIdx();
-      this.changeStep(maxStepIdx === 0 ? 'contributeAs' : STEPS[maxStepIdx - 1]);
-    }
+    this.loadInitialData();
 
     // Load payment providers scripts in the background
     this.props.loadStripe();
@@ -168,21 +155,58 @@ class CreateOrderPage extends React.Component {
       this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
     }
 
-    // Redirect to previous step if data is missing
-    if (!this.isCurrentStepValid()) {
-      const maxStepIdx = this.getMaxStepIdx();
-      this.changeStep(maxStepIdx === 0 ? 'contributeAs' : STEPS[maxStepIdx - 1]);
-    }
-
     // Collective was loaded
-    if (!prevProps.data.Collective && this.props.data.Collective && this.hasPaypal()) {
-      getPaypal();
+    if (prevProps.data.Collective !== this.props.data.Collective) {
+      this.loadInitialData();
+      if (this.hasPaypal()) {
+        getPaypal();
+      }
     }
   }
 
   componentWillUnmount() {
     unloadRecaptcha();
   }
+
+  loadInitialData() {
+    const tier = this.getTier();
+    this.setState(state => ({
+      ...state,
+      stepProfile: state.stepProfile || this.getLoggedInUserDefaultContibuteProfile(),
+      stepDetails: get(state.stepDetails, 'totalAmount')
+        ? state.stepDetails
+        : {
+            totalAmount: this.getDefaultTotalAmount(),
+            interval: get(state.stepDetails, 'interval') || get(tier, 'interval') || this.props.interval,
+          },
+    }));
+  }
+
+  /** Steps component callback  */
+  onStepChange = async step => {
+    this.pushStepRoute(step.name);
+  };
+
+  /** Navigate to another step, ensuring all route params are preserved */
+  pushStepRoute = async (stepName, routeParams = {}) => {
+    const { tierId, slug } = this.props;
+    const route = tierId ? 'orderCollectiveTierNew' : 'orderCollectiveNew';
+    const params = {
+      collectiveSlug: slug,
+      step: stepName === 'contributeAs' ? undefined : stepName,
+      ...pick(this.props, ['verb', 'tierId', 'tierSlug', 'amount', 'interval', 'description', 'redirect']),
+      ...routeParams,
+    };
+
+    // Reset errors if any
+    if (this.state.error) {
+      this.setState({ error: null });
+    }
+
+    // Navigate to the new route
+    await Router.pushRoute(stepName === 'success' ? `${route}Success` : route, params);
+    window.scrollTo(0, 0);
+  };
 
   fetchRecaptchaToken = () => {
     if (this.recaptchaToken) {
@@ -199,35 +223,88 @@ class CreateOrderPage extends React.Component {
     );
   };
 
-  async getPaymentMethodToSubmit() {
-    const { stepDetails, stepPayment } = this.state;
+  /** Validate step payment, loading data from stripe for new credit cards */
+  validateStepPayment = async () => {
+    const { stepPayment } = this.state;
+    const isFixedPriceTier = this.isFixedPriceTier();
+    const isFreeTier = this.isFreeTier();
 
-    if (this.isFreeTier() && stepDetails.totalAmount === 0) {
-      return null;
+    if (isFreeTier && isFixedPriceTier) {
+      // Always ignore payment method for free tiers
+      return true;
+    } else if (!stepPayment.isNew) {
+      // No need to validate existing payment methods
+      return true;
+    } else if (!stepPayment.data && get(stepPayment, 'paymentMethod.token')) {
+      // New credit card - if no data, stripe token has already been exchanged
+      return true;
+    } else {
+      // New credit card - load info from stripe
+      if (!this.state.stripe) {
+        this.setState({
+          error: 'There was a problem initializing the payment form. Please reload the page and try again',
+        });
+        return false;
+      }
+      const { token, error } = await this.state.stripe.createToken();
+      if (error) {
+        this.setState({ error: error.message });
+        return false;
+      }
+      this.setState(state => ({
+        ...state,
+        stepPayment: {
+          ...state.stepPayment,
+          data: null,
+          key: `newCreditCard-${uuid()}`,
+          paymentMethod: { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save },
+        },
+      }));
     }
 
-    if (!stepPayment.isNew) {
-      return pick(stepPayment.paymentMethod, ['type', 'uuid']);
-    } else if (!this.state.stripe) {
-      throw new Error('There was a problem initializing the payment form. Please reload the page and try again');
-    }
-    const { token, error } = await this.state.stripe.createToken();
-    if (error) {
-      throw new Error(error.message);
-    }
-    return { ...stripeTokenToPaymentMethod(token), save: this.state.stepPayment.save };
-  }
+    return true;
+  };
 
-  async submitOrder(paymentMethodOverride = null) {
-    this.setState({ submitting: true, error: null });
-    const { stepDetails } = this.state;
-    let paymentMethod = null;
-    try {
-      paymentMethod = paymentMethodOverride || (await this.getPaymentMethodToSubmit());
-    } catch (e) {
-      this.setState({ submitting: false, error: e.message });
+  /** Validate step profile, create new org if necessary */
+  validateStepProfile = async () => {
+    if (!this.state.stepProfile || !this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
       return false;
     }
+
+    // Check if we're creating a new organization
+    if (!this.state.stepProfile.id) {
+      this.setState({ submitting: true });
+
+      try {
+        const { data: result } = await this.props.createCollective(this.state.stepProfile);
+        const createdOrg = result.createCollective;
+
+        await this.props.refetchLoggedInUser();
+        this.setState({ stepProfile: createdOrg, submitting: false });
+      } catch (error) {
+        this.setState({ error: error.message, submitting: false });
+        window.scrollTo(0, 0);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  submitOrder = async (paymentMethodOverride = null) => {
+    this.setState({ submitting: true, error: null });
+    const { stepDetails, stepPayment } = this.state;
+
+    // Prepare payment method
+    let paymentMethod = paymentMethodOverride;
+    if (!paymentMethod && stepPayment) {
+      paymentMethod = stepPayment.paymentMethod;
+      if (!stepPayment.isNew) {
+        paymentMethod = pick(paymentMethod, ['service', 'type', 'uuid']);
+      }
+    }
+
+    // Load recaptcha token
     const recaptchaToken = await this.fetchRecaptchaToken();
     if (!recaptchaToken) {
       this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
@@ -235,16 +312,19 @@ class CreateOrderPage extends React.Component {
 
     const tier = this.getTier();
     const order = {
+      paymentMethod,
+      recaptchaToken,
+      totalAmount: this.getTotalAmount(),
+      taxAmount: get(this.state, 'stepSummary.amount', 0),
+      countryISO: get(this.state, 'stepSummary.countryISO'),
+      taxIDNumber: get(this.state, 'stepSummary.number'),
       quantity: this.props.quantity || 1,
-      totalAmount: stepDetails.totalAmount,
       currency: this.getCurrency(),
       interval: stepDetails.interval,
-      paymentMethod,
       referral: this.props.referral,
       fromCollective: pick(this.state.stepProfile, ['id', 'type', 'name']),
       collective: pick(this.props.data.Collective, ['id']),
-      tier: tier ? pick(this.getTier(), ['id', 'amount']) : undefined,
-      recaptchaToken,
+      tier: tier ? pick(tier, ['id', 'amount']) : undefined,
       description: decodeURIComponent(this.props.description || ''),
     };
 
@@ -253,17 +333,17 @@ class CreateOrderPage extends React.Component {
       const orderCreated = res.data.createOrder;
       this.setState({ submitting: false, submitted: true, error: null });
       if (this.props.redirect && isURL(this.props.redirect)) {
-        const transactionId = get(orderCreated, 'transactions[0].uuid', null);
+        const transactionId = get(orderCreated, 'transactions[0].id', null);
         const status = orderCreated.status;
         const redirectTo = `${this.props.redirect}?transactionid=${transactionId}&status=${status}`;
         window.location.href = redirectTo;
       } else {
-        this.changeStep('success', { OrderId: orderCreated.id });
+        this.pushStepRoute('success', { OrderId: orderCreated.id });
       }
     } catch (e) {
       this.setState({ submitting: false, error: e.message });
     }
-  }
+  };
 
   getLoggedInUserDefaultContibuteProfile() {
     if (get(this.state, 'stepProfile')) {
@@ -292,6 +372,15 @@ class CreateOrderPage extends React.Component {
         ];
   }
 
+  /** Guess the country, from the more pricise method (settings) to the less */
+  getContributingProfileCountry() {
+    return (
+      get(this.state.stepSummary, 'countryISO') ||
+      get(this.state.stepProfile, 'countryISO') ||
+      get(this.props.LoggedInUser, 'collective.countryISO')
+    );
+  }
+
   /** Return the currently selected tier, or a falsy value if none selected */
   getTier() {
     const { data, tierId } = this.props;
@@ -308,9 +397,20 @@ class CreateOrderPage extends React.Component {
 
   /** Get the min authorized amount for order, in cents */
   getOrderMinAmount() {
-    const { amount, presets } = this.getTier() || {};
-    if (isNil(amount) && isNil(presets)) return 0;
-    return min(isNil(amount) ? presets : [...(presets || []), amount]);
+    const tier = this.getTier();
+
+    // When making a donation, min amount is $1
+    if (!tier) {
+      return 100;
+    }
+
+    // If the tier has not amount and no preset, it's a free tier
+    if (isNil(tier.amount) && isNil(tier.presets)) {
+      return 0;
+    }
+
+    // Return the minimum amongs presets and amount
+    return min(isNil(tier.amount) ? tier.presets : [...(tier.presets || []), tier.amount]);
   }
 
   /** Get default total amount, or undefined if we don't have any info on this */
@@ -320,28 +420,70 @@ class CreateOrderPage extends React.Component {
     return get(this.state.stepDetails, 'totalAmount') || get(tier, 'amount') || amountFromUrl;
   }
 
+  /** Get total amount based on stepDetails with taxes from step summary applied */
+  getTotalAmount() {
+    const totalAmount = get(this.state, 'stepDetails.totalAmount', 0);
+    const taxAmount = get(this.state, 'stepSummary.amount', 0);
+    return totalAmount + taxAmount;
+  }
+
   /** Teturn true if current order doesn't need any payment */
   isFreeTier() {
     return this.getOrderMinAmount() === 0;
   }
 
-  /** Return the index of the last step user can switch to */
-  getMaxStepIdx() {
-    // Validate step details
-    if (!this.state.stepDetails || isNil(this.state.stepDetails.totalAmount)) return 1;
-    if (this.state.stepDetails.totalAmount === 0 && !this.isFreeTier()) return 1;
-
-    // Validate step payment
-    if (this.state.stepDetails.totalAmount === 0 && this.isFreeTier()) return 3;
-    if (!this.state.stepPayment || this.state.stepPayment.error) return 2;
-    return STEPS.length;
+  /** Returns true if the price and interval of the current tier cannot be changed */
+  isFixedPriceTier() {
+    const tier = this.getTier();
+    const forceInterval = Boolean(tier) || Boolean(this.props.interval);
+    const forceAmount = !get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.amount);
+    return forceInterval && forceAmount;
   }
 
-  /** Return true if we're not missing data from previous steps */
-  isCurrentStepValid() {
-    const stepIdx = STEPS.indexOf(this.props.step);
-    const maxStepIdx = this.getMaxStepIdx();
-    return stepIdx === -1 || stepIdx <= maxStepIdx || maxStepIdx >= STEPS.length;
+  /** Returs the steps list */
+  getSteps() {
+    const tier = this.getTier();
+    const isFixedPriceTier = this.isFixedPriceTier();
+    const isFreeTier = this.isFreeTier();
+    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
+
+    const steps = [
+      {
+        name: 'contributeAs',
+        isCompleted: Boolean(this.state.stepProfile),
+        validate: this.validateStepProfile,
+      },
+    ];
+
+    // If amount and interval are forced by a tier or by params, skip StepDetails
+    if (!isFixedPriceTier) {
+      steps.push({
+        name: 'details',
+        isCompleted: Boolean(this.state.stepDetails && this.state.stepDetails.totalAmount > 0),
+        validate: () => {
+          return this.state.stepDetails && this.activeFormRef.current && this.activeFormRef.current.reportValidity();
+        },
+      });
+    }
+
+    // Hide step payment if using a free tier with fixed price
+    if (!(isFreeTier && isFixedPriceTier)) {
+      steps.push({
+        name: 'payment',
+        isCompleted: Boolean(isFreeTier || this.state.stepPayment),
+        validate: this.validateStepPayment,
+      });
+    }
+
+    // Show the summary step only if the order has tax
+    if (tax) {
+      steps.push({
+        name: 'summary',
+        isCompleted: this.state.stepSummary && this.state.stepSummary.isReady,
+      });
+    }
+
+    return steps;
   }
 
   /** Get currency from the current tier, or fallback on collective currency */
@@ -376,72 +518,6 @@ class CreateOrderPage extends React.Component {
     };
   }
 
-  getContributorTypeName() {
-    const tier = this.getTier();
-    if (tier) {
-      return tier.name;
-    } else if (this.props.verb === 'pay') {
-      return <FormattedMessage id="member.title" defaultMessage="member" />;
-    } else {
-      return <FormattedMessage id="backer.title" defaultMessage="backer" />;
-    }
-  }
-
-  renderPrevStepButton(step) {
-    const prevStepIdx = STEPS.indexOf(step) - 1;
-    if (prevStepIdx < 0) {
-      return null;
-    }
-
-    return (
-      <PrevNextButton
-        onClick={() => this.changeStep(STEPS[prevStepIdx])}
-        buttonStyle="standard"
-        disabled={this.state.submitting || this.state.submitted}
-      >
-        &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
-      </PrevNextButton>
-    );
-  }
-
-  renderNextStepButton(step) {
-    const stepIdx = STEPS.indexOf(step);
-    if (stepIdx === -1) {
-      return null;
-    }
-
-    const isLast = stepIdx + 1 >= STEPS.length;
-    const canGoNext = stepIdx + 1 <= this.getMaxStepIdx();
-    const isPaypal = canGoNext && isLast && get(this.state, 'stepPayment.paymentMethod.type') === 'paypal';
-    return isPaypal ? (
-      <PaypalButtonContainer>
-        <PayWithPaypalButton
-          totalAmount={get(this.state, 'stepDetails.totalAmount')}
-          currency={this.getCurrency()}
-          style={{ size: 'responsive', height: 55 }}
-          onClick={() => this.setState({ submitting: true })}
-          onAuthorize={pm => this.submitOrder(pm)}
-          onCancel={() => this.setState({ submitting: false })}
-          onError={e => this.setState({ submitting: false, error: `PayPal error: ${e.message}` })}
-        />
-      </PaypalButtonContainer>
-    ) : (
-      <PrevNextButton
-        buttonStyle="primary"
-        onClick={() => (isLast ? this.submitOrder() : this.changeStep(STEPS[stepIdx + 1]))}
-        disabled={this.state.submitting || !canGoNext || this.state.submitted}
-        loading={this.state.submitting}
-      >
-        {isLast ? (
-          <FormattedMessage id="contribute.submit" defaultMessage="Submit" />
-        ) : (
-          <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
-        )}{' '}
-        &rarr;
-      </PrevNextButton>
-    );
-  }
-
   // Debounce state update functions that may be called successively
   updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
   updateDetails = debounce(stepDetails => this.setState({ stepDetails }), 100, { leading: true, maxWait: 500 });
@@ -451,13 +527,69 @@ class CreateOrderPage extends React.Component {
     return get(this.props.data, 'Collective.host.id') === 11004 && !get(this.state, 'stepDetails.interval');
   }
 
+  /**
+   * When using an order with fixed amount, this function returns the details to
+   * show the user order amount as step details is skipped.
+   */
+  renderTierDetails(tier) {
+    const amount = get(this.state.stepDetails, 'totalAmount');
+    const interval = get(this.state.stepDetails, 'interval');
+    const taxAmount = get(this.state.stepSummary, 'amount', 0);
+    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
+
+    return (
+      <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
+        <Container fontSize="Paragraph" mb={3}>
+          <P fontSize="LeadParagraph" fontWeight="bold" mb={2}>
+            <FormattedMessage id="contribute.tierDetailsTitle" defaultMessage="Tier details:" />
+          </P>
+          <FormattedMessage
+            id="contribute.tierDetails"
+            defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month {monthly.} year {yearly.} other {.}}"
+            values={{
+              amount: (
+                <strong>
+                  {formatCurrency(amount, get(tier, 'currency', this.props.data.Collective.currency))}
+                  {taxAmount > 0 && (
+                    /** Use non-breaking spaces to ensure amount and tax stay on the same line */
+                    <span>
+                      &nbsp;+&nbsp;{tax.name}&nbsp;({tax.percentage}%)
+                    </span>
+                  )}
+                  {interval ? ' ' : ''}
+                </strong>
+              ),
+              interval: get(tier, 'interval') || this.props.interval,
+            }}
+          />
+          {interval && (
+            <React.Fragment>
+              <br />
+              <FormattedMessage
+                id="contribute.tierDetailsFrequency"
+                defaultMessage="Your next charge will be on:"
+              />{' '}
+              <Span color="primary.500">
+                {moment()
+                  .add(1, interval)
+                  .date(1)
+                  .format('MMM D, YYYY')}
+              </Span>
+            </React.Fragment>
+          )}
+        </Container>
+      </Container>
+    );
+  }
+
   renderStep(step) {
-    const { LoggedInUser } = this.props;
-    const { stepDetails } = this.state;
+    const { LoggedInUser, data } = this.props;
+    const { stepDetails, stepPayment } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.getTier();
+    const interval = get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval;
 
-    if (step === 'contributeAs') {
+    if (step.name === 'contributeAs') {
       return (
         <StyledInputField
           htmlFor="contributeAs"
@@ -480,7 +612,7 @@ class CreateOrderPage extends React.Component {
           )}
         </StyledInputField>
       );
-    } else if (step === 'details') {
+    } else if (step.name === 'details') {
       return (
         <Flex justifyContent="center" width={1}>
           <Box width={[0, null, null, 1 / 5]} />
@@ -499,17 +631,21 @@ class CreateOrderPage extends React.Component {
               amountOptions={this.props.amount ? null : this.getAmountsPresets()}
               currency={this.getCurrency()}
               onChange={this.updateDetails}
-              defaultInterval={get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval}
+              defaultInterval={interval}
               defaultAmount={this.getDefaultTotalAmount()}
               disabledInterval={Boolean(tier) || Boolean(this.props.interval)}
               disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.amount)}
               minAmount={this.getOrderMinAmount()}
             />
           </Container>
-          <ContributeDetailsFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          {interval ? (
+            <ContributeDetailsFAQ hasInterval mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          ) : (
+            <Box width={[0, null, null, 1 / 5]} />
+          )}
         </Flex>
       );
-    } else if (step === 'payment') {
+    } else if (step.name === 'payment') {
       return get(stepDetails, 'totalAmount') === 0 ? (
         <MessageBox type="success" withIcon>
           <FormattedMessage
@@ -518,20 +654,56 @@ class CreateOrderPage extends React.Component {
           />
         </MessageBox>
       ) : (
-        <Flex flexDirection="column" width={1} css={{ maxWidth: 480 }}>
-          <H5 textAlign="left" mb={3}>
-            <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
-          </H5>
-          <ContributePayment
-            onChange={stepPayment => this.setState({ stepPayment })}
-            paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
-            collective={this.state.stepProfile}
-            defaultValue={this.state.stepPayment}
-            onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
-            withPaypal={this.hasPaypal()}
-            manual={this.getManualPaymentMethod()}
-            margins="0 auto"
-          />
+        <Flex
+          flexDirection={['column', null, 'row']}
+          alignItems={['center', null, 'flex-start']}
+          justifyContent="center"
+          width={1}
+        >
+          <Box width={[0, null, null, 1 / 5]} />
+          <Flex flexDirection="column" width={[1, null, 3 / 5]} mx={[1, 3, 5]} css={{ maxWidth: 480 }}>
+            <H5 textAlign="left" mb={3}>
+              <FormattedMessage id="contribute.payment.label" defaultMessage="Choose a payment method:" />
+            </H5>
+            <ContributePayment
+              onChange={stepPayment => this.setState({ stepPayment })}
+              paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
+              collective={this.state.stepProfile}
+              defaultValue={stepPayment}
+              onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
+              withPaypal={this.hasPaypal()}
+              manual={this.getManualPaymentMethod()}
+              margins="0 auto"
+            />
+          </Flex>
+          {this.isFixedPriceTier() ? this.renderTierDetails(tier) : <Box width={[0, null, null, 1 / 5]} />}
+        </Flex>
+      );
+    } else if (step.name === 'summary') {
+      return (
+        <Flex
+          flexDirection={['column', null, 'row']}
+          alignItems={['center', null, 'flex-start']}
+          justifyContent="center"
+          width={1}
+        >
+          <Container width={[0, null, null, 1 / 5]} />
+          <Container width={[1, null, 3 / 5]} mx={[1, 3, 5]} maxWidth={480}>
+            <H5 textAlign="left" mb={3}>
+              <FormattedMessage id="contribute.summary.breakdown" defaultMessage="Contribution breakdown:" />
+            </H5>
+            <ContributionBreakdown
+              amount={get(stepDetails, 'totalAmount')}
+              currency={this.getCurrency()}
+              hostFeePercent={get(data, 'Collective.hostFeePercent')}
+              paymentMethod={get(stepPayment, 'paymentMethod')}
+              collectiveTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
+              onChange={stepSummary => this.setState({ stepSummary })}
+              showFees={false}
+              tax={tier ? get(this.props.data.Collective, `host.taxes.${tier.type}`) : null}
+            />
+          </Container>
+          {this.renderTierDetails(tier)}
         </Flex>
       );
     }
@@ -539,137 +711,51 @@ class CreateOrderPage extends React.Component {
     return null;
   }
 
-  changeStep = async (step, options) => {
-    const { createCollective, slug, refetchLoggedInUser, step: currentStep } = this.props;
-    const { stepProfile } = this.state;
-    const routeSuffix = step === 'success' ? 'Success' : '';
-
-    const params = {
-      ...options,
-      collectiveSlug: slug,
-      step: ['contributeAs', 'success'].includes(step) ? undefined : step,
-    };
-
-    if (this.state.error) {
-      this.setState({ error: null });
-    }
-
-    // Validate step if it has a form
-    if (!currentStep || currentStep === 'details' || currentStep === 'contributeAs') {
-      if (!this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
-        return false;
-      }
-    }
-
-    // Check if we're creating a new organization
-    if (!currentStep && stepProfile && stepProfile.name && !stepProfile.id) {
-      this.setState({ submitting: true });
-
-      try {
-        const { data: result } = await createCollective(stepProfile);
-        const createdOrg = result.createCollective;
-
-        await refetchLoggedInUser();
-        this.setState({ stepProfile: createdOrg, submitting: false });
-      } catch (error) {
-        this.setState({ error: error.message, submitting: false });
-        window.scrollTo(0, 0);
-        return false;
-      }
-    }
-
-    let route;
-    if (this.props.tierId) {
-      route = `orderCollectiveTierNew${routeSuffix}`;
-    } else {
-      route = `orderCollectiveNew${routeSuffix}`;
-    }
-
-    await Router.pushRoute(route, {
-      ...params,
-      ...pick(this.props, ['verb', 'tierId', 'tierSlug', 'amount', 'interval', 'description', 'redirect']),
-    });
-    window.scrollTo(0, 0);
-  };
-
-  renderContributeDetailsSummary(amount, currency, interval) {
-    const formattedAmount = formatCurrency(amount, currency);
-    return !interval ? (
-      formattedAmount
-    ) : (
-      <Span>
-        {formattedAmount}{' '}
-        <FormattedMessage
-          id="tier.interval"
-          defaultMessage="per {interval, select, month {month} year {year} other {}}"
-          values={{ interval: interval }}
-        />
-      </Span>
-    );
-  }
-
-  renderStepsProgress(currentStep) {
-    const { stepProfile, stepDetails, stepPayment, submitted } = this.state;
-    const loading = this.props.loadingLoggedInUser || this.state.loading || this.state.submitting;
-    return (
-      <StepsProgress
-        steps={STEPS}
-        focus={currentStep}
-        allCompleted={submitted}
-        onStepSelect={!loading && !submitted ? this.changeStep : undefined}
-        loadingStep={loading ? currentStep : undefined}
-        disabledSteps={STEPS.slice(this.getMaxStepIdx(), STEPS.length)}
-      >
-        {({ step }) => {
-          let label = null;
-          let details = null;
-          if (step === 'contributeAs') {
-            label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage="Contribute as" />;
-            details = get(stepProfile, 'name', null);
-          } else if (step === 'details') {
-            label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
-            if (stepDetails && stepDetails.totalAmount) {
-              const currency = this.getCurrency();
-              details = this.renderContributeDetailsSummary(stepDetails.totalAmount, currency, stepDetails.interval);
-            } else if (stepDetails && stepDetails.totalAmount === 0 && this.isFreeTier()) {
-              details = 'Free';
-            }
-          } else if (step === 'payment') {
-            label = <FormattedMessage id="contribute.step.payment" defaultMessage="Payment" />;
-            if (this.isFreeTier() && get(stepDetails, 'totalAmount') === 0) {
-              details = 'No payment required';
-            } else {
-              details = get(stepPayment, 'title', null);
-            }
-          }
-
-          return (
-            <Flex flexDirection="column" alignItems="center">
-              <StepLabel>{label}</StepLabel>
-              <Span fontSize="Caption" textAlign="center">
-                {details}
-              </Span>
-            </Flex>
-          );
-        }}
-      </StepsProgress>
-    );
-  }
-
-  renderContent() {
+  renderContent(step, goNext, goBack, isValidating) {
     const { LoggedInUser } = this.props;
 
     if (!LoggedInUser) {
       return <SignInOrJoinFree redirect={Router.asPath} />;
     }
 
-    const step = this.props.step || 'contributeAs';
+    const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';
+    const canGoPrev = !this.state.submitting && !this.state.submitted && !isValidating;
     return (
       <Flex flexDirection="column" alignItems="center" mx={3} width={0.95}>
         {this.renderStep(step)}
         <Flex mt={[4, null, 5]} justifyContent="center" flexWrap="wrap">
-          {this.renderPrevStepButton(step)}
-          {this.renderNextStepButton(step)}
+          {goBack && (
+            <PrevNextButton buttonStyle="standard" disabled={!canGoPrev} onClick={goBack}>
+              &larr; <FormattedMessage id="contribute.prevStep" defaultMessage="Previous step" />
+            </PrevNextButton>
+          )}
+          {isPaypal && step.isLastStep ? (
+            <PaypalButtonContainer>
+              <PayWithPaypalButton
+                totalAmount={this.getTotalAmount()}
+                currency={this.getCurrency()}
+                style={{ size: 'responsive', height: 55 }}
+                onClick={() => this.setState({ submitting: true })}
+                onAuthorize={pm => this.submitOrder(pm)}
+                onCancel={() => this.setState({ submitting: false })}
+                onError={e => this.setState({ submitting: false, error: `PayPal error: ${e.message}` })}
+              />
+            </PaypalButtonContainer>
+          ) : (
+            <PrevNextButton
+              buttonStyle="primary"
+              onClick={goNext}
+              disabled={!goNext}
+              loading={this.state.submitting || this.state.submitted || isValidating}
+            >
+              {step.isLastStep ? (
+                <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
+              ) : (
+                <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />
+              )}{' '}
+              &rarr;
+            </PrevNextButton>
+          )}
         </Flex>
       </Flex>
     );
@@ -684,7 +770,7 @@ class CreateOrderPage extends React.Component {
 
     const collective = data.Collective;
     const logo = collective.image || get(collective.parentCollective, 'image');
-    const isLoadingContent = loadingLoggedInUser || data.loading || !this.isCurrentStepValid();
+    const isLoadingContent = loadingLoggedInUser || data.loading;
     const tier = this.getTier();
 
     return (
@@ -726,20 +812,46 @@ class CreateOrderPage extends React.Component {
             </P>
           )}
         </Flex>
-        <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
-          {loadingLoggedInUser ||
-            (LoggedInUser && (
-              <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
-                {this.renderStepsProgress(this.props.step || 'contributeAs')}
-              </Box>
-            ))}
-          {this.state.error && (
-            <MessageBox type="error" mb={3} mx={2} withIcon>
-              {this.state.error.replace('GraphQL error: ', '')}
-            </MessageBox>
+        <Steps
+          steps={this.getSteps()}
+          currentStepName={this.props.step}
+          onStepChange={this.onStepChange}
+          onInvalidStep={this.onInvalidStep}
+          onComplete={this.submitOrder}
+        >
+          {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
+            <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
+              {loadingLoggedInUser ||
+                (LoggedInUser && (
+                  <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+                    <ContributionFlowStepsProgress
+                      steps={steps}
+                      currentStep={currentStep}
+                      lastVisitedStep={lastVisitedStep}
+                      goToStep={goToStep}
+                      stepProfile={this.state.stepProfile}
+                      stepDetails={this.state.stepDetails}
+                      stepPayment={this.state.stepPayment}
+                      submitted={this.state.submitted}
+                      loading={this.props.loadingLoggedInUser || this.state.loading || this.state.submitting}
+                      currency={this.getCurrency()}
+                      isFreeTier={this.isFreeTier()}
+                    />
+                  </Box>
+                ))}
+              {this.state.error && (
+                <MessageBox type="error" mb={3} mx={2} withIcon>
+                  {this.state.error.replace('GraphQL error: ', '')}
+                </MessageBox>
+              )}
+              {isLoadingContent || !isValidStep ? (
+                <Loading />
+              ) : (
+                this.renderContent(currentStep, goNext, goBack, isValidating)
+              )}
+            </Flex>
           )}
-          {isLoadingContent ? <Loading /> : this.renderContent()}
-        </Flex>
+        </Steps>
       </Page>
     );
   }
@@ -758,11 +870,15 @@ const addData = graphql(gql`
       image
       backgroundImage
       currency
+      hostFeePercent
       tags
+      countryISO
       host {
         id
         name
         settings
+        taxes
+        countryISO
       }
       parentCollective {
         image
@@ -788,9 +904,8 @@ const createOrderQuery = gql`
     createOrder(order: $order) {
       id
       status
-      transactions(type: "CREDIT") {
+      transactions {
         id
-        uuid
       }
     }
   }

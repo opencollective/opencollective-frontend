@@ -33,6 +33,7 @@ pages
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
+  .add('collectiveTaxes', '/:collectiveSlug/taxes')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
   .add(
@@ -76,12 +77,12 @@ pages.add(
 pages
   .add(
     'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute|order)/success', 'orderSuccess')
@@ -121,11 +122,7 @@ pages
 // Marketing Pages
 // ---------------
 
-pages.add(
-  'marketing',
-  '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|gift-cards-next)',
-  'marketingPage',
-);
+pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|pricing)', 'marketingPage');
 
 // Collective
 // ----------

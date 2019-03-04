@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import colors from '../../../constants/colors';
+import { get } from 'lodash';
 
 import Expense from './Expense';
 
@@ -24,7 +25,7 @@ class Expenses extends React.Component {
     super(props);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
-    this.state = { loading: false, isPayActionLocked: false };
+    this.state = { loading: false, isPayActionLocked: {} };
   }
 
   fetchMore(e) {
@@ -37,6 +38,7 @@ class Expenses extends React.Component {
 
   refetch(status) {
     this.setState({ status, loading: true });
+    if (status === 'READY') status = 'APPROVED';
     this.props.refetch({ status }).then(() => {
       this.setState({ loading: false });
     });
@@ -138,6 +140,14 @@ class Expenses extends React.Component {
                 <FormattedMessage id="expenses.approved" defaultMessage="approved" />
               </Button>
               <Button
+                className="filterBtn ready"
+                bsSize="small"
+                bsStyle={this.state.status === 'READY' ? 'primary' : 'default'}
+                onClick={() => this.refetch('READY')}
+              >
+                <FormattedMessage id="expenses.ready" defaultMessage="ready to pay" />
+              </Button>
+              <Button
                 className="filterBtn paid"
                 bsSize="small"
                 bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'}
@@ -155,22 +165,28 @@ class Expenses extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           )}
-          {expenses.map(expense => (
-            <div className="item" key={expense.id}>
-              <Expense
-                collective={expense.collective || collective}
-                host={host}
-                expense={expense}
-                editable={editable}
-                view={view}
-                includeHostedCollectives={includeHostedCollectives}
-                LoggedInUser={LoggedInUser}
-                allowPayAction={!this.state.isPayActionLocked}
-                lockPayAction={this.setPayActionLock.bind(this, true)}
-                unlockPayAction={this.setPayActionLock.bind(this, false)}
-              />
-            </div>
-          ))}
+          {expenses.map(
+            expense =>
+              (this.state.status !== 'READY' ||
+                get(expense.collective || collective, 'stats.balance') > expense.amount) && (
+                <div className="item" key={expense.id}>
+                  <Expense
+                    collective={expense.collective || collective}
+                    host={host}
+                    expense={expense}
+                    editable={editable}
+                    view={view}
+                    includeHostedCollectives={includeHostedCollectives}
+                    LoggedInUser={LoggedInUser}
+                    allowPayAction={!this.state.isPayActionLocked[(expense.collective || collective).id]}
+                    lockPayAction={this.setPayActionLock.bind(this, { [(expense.collective || collective).id]: true })}
+                    unlockPayAction={this.setPayActionLock.bind(this, {
+                      [(expense.collective || collective).id]: false,
+                    })}
+                  />
+                </div>
+              ),
+          )}
           {expenses.length === 0 && (
             <div className="empty">
               <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />

@@ -16,9 +16,10 @@ import {
   textAlign,
   themeGet,
   width,
+  lineHeight,
 } from 'styled-system';
 import tag from 'clean-tag';
-import { overflow } from './Container';
+import { overflow } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
 
 const getBorderColor = ({ error, success }) => {
@@ -48,6 +49,7 @@ const StyledInput = styled(tag.input)`
   ${flex}
   ${fontSize}
   ${fontWeight}
+  ${lineHeight}
   ${maxWidth}
   ${minWidth}
   ${overflow}
@@ -58,6 +60,7 @@ const StyledInput = styled(tag.input)`
   border-color: ${getBorderColor};
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
+  outline: none;
 
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
@@ -110,23 +113,19 @@ StyledInput.propTypes = {
 };
 
 StyledInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
+  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare', 'error'),
   border: '1px solid',
   borderColor: 'black.300',
   borderRadius: '4px',
   px: 3,
   py: 2,
+  lineHeight: '1em',
 };
 
 export const TextInput = styled(StyledInput)``;
 
 TextInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
-  border: '1px solid #cccccc',
-  borderRadius: '4px',
-  fontSize: '14px',
-  px: 3,
-  py: 2,
+  ...StyledInput.defaultProps,
   type: 'text',
 };
 

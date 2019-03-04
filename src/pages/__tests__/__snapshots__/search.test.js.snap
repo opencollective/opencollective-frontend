@@ -89,6 +89,12 @@ Array [
   overflow: hidden;
 }
 
+.c15 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c3 {
   box-sizing: border-box;
 }
@@ -103,10 +109,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -117,9 +123,6 @@ Array [
 }
 
 .c14 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
   -webkit-animation: iVXCSc 1s linear infinite;
   animation: iVXCSc 1s linear infinite;
 }
@@ -336,7 +339,7 @@ Array [
             onClick={[Function]}
           >
             <svg
-              className="c14"
+              className="c14 c15"
               fill="currentColor"
               focusable="false"
               height="1em"
@@ -412,14 +415,10 @@ Array [
   justify-content: center;
 }
 
-.c0 {
-  box-sizing: border-box;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  width: 100%;
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 .c8 {
@@ -427,10 +426,10 @@ Array [
   font-size: Paragraph;
   font-weight: bold;
   max-width: 220px;
-  padding-left: 32px;
-  padding-right: 32px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
   text-align: center;
 }
 
@@ -441,10 +440,14 @@ Array [
   text-decoration: none;
 }
 
-.c5 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
+.c0 {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
 }
 
 .c3.c3.c3 {
@@ -568,7 +571,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c10 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -609,7 +612,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c9 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -631,6 +634,18 @@ Array [
   justify-content: center;
 }
 
+.c7 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c8 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c4 {
   color: #6E747A;
   font-size: 1.4rem;
@@ -639,13 +654,13 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
 }
 
-.c14 {
+.c11 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -653,15 +668,21 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
+  text-align: center;
+}
+
+.c13 {
+  list-style: none;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -705,42 +726,6 @@ Array [
   width: 100%;
 }
 
-.c16 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.c9 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c7 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c10 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c8 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c11 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
 .c6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -766,7 +751,7 @@ Array [
   opacity: 1;
 }
 
-.c17 {
+.c14 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -775,14 +760,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c14[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c12 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -803,7 +788,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c10 {
     width: 25%;
   }
 }
@@ -835,7 +820,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c9 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -849,7 +834,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c11 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c13 {
     text-align: left;
   }
 }
@@ -865,12 +856,6 @@ Array [
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c16 {
-    text-align: left;
   }
 }
 
@@ -928,7 +913,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c8"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -948,7 +933,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c9"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -968,7 +953,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -988,7 +973,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c8"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1003,7 +988,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c9"
         order={
           Array [
             "3",
@@ -1013,7 +998,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -1023,18 +1008,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -1042,10 +1027,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -1053,10 +1038,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -1064,10 +1049,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1077,7 +1062,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -1087,18 +1072,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create"
                 onClick={[Function]}
               >
@@ -1106,10 +1091,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -1117,10 +1102,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1128,10 +1113,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -1139,10 +1124,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -1152,7 +1137,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -1162,18 +1147,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1181,40 +1166,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="mailto:support@opencollective.com"
               >
                 Email Support
@@ -1223,7 +1208,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -1233,18 +1218,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/about"
                 onClick={[Function]}
               >
@@ -1252,20 +1237,20 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1273,10 +1258,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1380,6 +1365,12 @@ Array [
   overflow: hidden;
 }
 
+.c15 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c3 {
   box-sizing: border-box;
 }
@@ -1394,10 +1385,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -1408,9 +1399,6 @@ Array [
 }
 
 .c14 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
   -webkit-animation: iVXCSc 1s linear infinite;
   animation: iVXCSc 1s linear infinite;
 }
@@ -1627,7 +1615,7 @@ Array [
             onClick={[Function]}
           >
             <svg
-              className="c14"
+              className="c14 c15"
               fill="currentColor"
               focusable="false"
               height="1em"
@@ -1703,14 +1691,10 @@ Array [
   justify-content: center;
 }
 
-.c0 {
-  box-sizing: border-box;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  width: 100%;
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 .c8 {
@@ -1718,10 +1702,10 @@ Array [
   font-size: Paragraph;
   font-weight: bold;
   max-width: 220px;
-  padding-left: 32px;
-  padding-right: 32px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
   text-align: center;
 }
 
@@ -1732,10 +1716,14 @@ Array [
   text-decoration: none;
 }
 
-.c5 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
+.c0 {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: 100%;
 }
 
 .c3.c3.c3 {
@@ -1859,7 +1847,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c10 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -1900,7 +1888,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c9 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -1922,6 +1910,18 @@ Array [
   justify-content: center;
 }
 
+.c7 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c8 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c4 {
   color: #6E747A;
   font-size: 1.4rem;
@@ -1930,13 +1930,13 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
 }
 
-.c14 {
+.c11 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -1944,15 +1944,21 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
+  text-align: center;
+}
+
+.c13 {
+  list-style: none;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -1996,42 +2002,6 @@ Array [
   width: 100%;
 }
 
-.c16 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.c9 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c7 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c10 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c8 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c11 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
 .c6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -2057,7 +2027,7 @@ Array [
   opacity: 1;
 }
 
-.c17 {
+.c14 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -2066,14 +2036,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c14[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c12 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -2094,7 +2064,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c10 {
     width: 25%;
   }
 }
@@ -2126,7 +2096,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c9 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -2140,7 +2110,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c11 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c13 {
     text-align: left;
   }
 }
@@ -2156,12 +2132,6 @@ Array [
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c16 {
-    text-align: left;
   }
 }
 
@@ -2219,7 +2189,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c8"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2239,7 +2209,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c9"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2259,7 +2229,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2279,7 +2249,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c8"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2294,7 +2264,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c9"
         order={
           Array [
             "3",
@@ -2304,7 +2274,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -2314,18 +2284,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -2333,10 +2303,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -2344,10 +2314,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -2355,10 +2325,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2368,7 +2338,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -2378,18 +2348,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create"
                 onClick={[Function]}
               >
@@ -2397,10 +2367,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -2408,10 +2378,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2419,10 +2389,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -2430,10 +2400,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -2443,7 +2413,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -2453,18 +2423,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2472,40 +2442,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="mailto:support@opencollective.com"
               >
                 Email Support
@@ -2514,7 +2484,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -2524,18 +2494,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/about"
                 onClick={[Function]}
               >
@@ -2543,20 +2513,20 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2564,10 +2534,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -2601,7 +2571,7 @@ exports[`Search Page renders error message 1`] = `
   padding-right: 16px;
 }
 
-.c34 {
+.c35 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -2646,7 +2616,7 @@ exports[`Search Page renders error message 1`] = `
   display: flex;
 }
 
-.c22 {
+.c28 {
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
@@ -2669,7 +2639,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: space-between;
 }
 
-.c24 {
+.c30 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2681,7 +2651,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c33 {
+.c34 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -2742,13 +2712,71 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
+.c22 {
+  box-sizing: border-box;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 32px;
+  padding-bottom: 32px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c24 {
+  box-sizing: border-box;
+  margin-top: 64px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
 .c15 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c25 {
+.c21 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.c3 {
+  box-sizing: border-box;
+}
+
+.c12 {
+  box-sizing: border-box;
+}
+
+.c6 {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.c31 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -2756,13 +2784,13 @@ exports[`Search Page renders error message 1`] = `
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
 }
 
-.c35 {
+.c36 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -2770,22 +2798,72 @@ exports[`Search Page renders error message 1`] = `
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
   text-align: center;
 }
 
-.c21 {
+.c23 {
+  font-size: 30px;
+  font-weight: bold;
+  line-height: H1;
+  -webkit-letter-spacing: -1.2px;
+  -moz-letter-spacing: -1.2px;
+  -ms-letter-spacing: -1.2px;
+  letter-spacing: -1.2px;
+  margin: 0px;
+}
+
+.c19 {
+  border: 1px solid #D5DAE0;
+  border-radius: 20px;
+  color: #3385FF;
+  display: inline-block;
+  font-size: 1.4rem;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.c19[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.c25 {
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.c25[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.c38 {
+  list-style: none;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.c27 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
   width: 100%;
 }
 
-.c23 {
+.c29 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2799,7 +2877,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c26 {
+.c32 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -2822,48 +2900,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c3 {
-  box-sizing: border-box;
-}
-
-.c12 {
-  box-sizing: border-box;
-}
-
-.c6 {
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.c19 {
-  border: 1px solid #D5DAE0;
-  border-radius: 20px;
-  color: #3385FF;
-  display: inline-block;
-  font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
-.c19[disabled] {
-  pointer-events: none;
-  cursor: default;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-.c37 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
 .c20 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
   -webkit-animation: iVXCSc 1s linear infinite;
   animation: iVXCSc 1s linear infinite;
 }
@@ -2961,37 +2998,7 @@ exports[`Search Page renders error message 1`] = `
   font-size: 1.4rem;
 }
 
-.c30 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c28 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c31 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c29 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c32 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.c27 {
+.c33 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3011,12 +3018,12 @@ exports[`Search Page renders error message 1`] = `
   width: 48px;
 }
 
-.c27:hover,
-.c27:focus {
+.c33:hover,
+.c33:focus {
   opacity: 1;
 }
 
-.c38 {
+.c39 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -3025,14 +3032,14 @@ exports[`Search Page renders error message 1`] = `
   padding: 0;
 }
 
-.c38[disabled] {
+.c39[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c36 {
+.c37 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -3052,14 +3059,27 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
+.c26 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  outline: 0;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
 @media screen and (min-width:52em) {
-  .c34 {
+  .c35 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c22 {
+  .c28 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -3067,7 +3087,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c22 {
+  .c28 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -3076,7 +3096,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c24 {
+  .c30 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -3085,36 +3105,17 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c33 {
+  .c34 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
   }
 }
 
-@media screen and (min-width:52em) {
-  .c25 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c35 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c23 {
-    width: 33.33333333333333%;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c26 {
-    -webkit-order: 3;
-    -ms-flex-order: 3;
-    order: 3;
+@media screen and (min-width:40em) {
+  .c22 {
+    padding-top: 128px;
+    padding-bottom: 128px;
   }
 }
 
@@ -3149,8 +3150,34 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c31 {
     text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c36 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c38 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c29 {
+    width: 33.33333333333333%;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c32 {
+    -webkit-order: 3;
+    -ms-flex-order: 3;
+    order: 3;
   }
 }
 
@@ -3368,7 +3395,7 @@ exports[`Search Page renders error message 1`] = `
             onClick={[Function]}
           >
             <svg
-              className="c20"
+              className="c20 c21"
               fill="currentColor"
               focusable="false"
               height="1em"
@@ -3395,28 +3422,103 @@ exports[`Search Page renders error message 1`] = `
       className="content"
     >
       <div
-        className="jsx-1072026091"
+        className="c22"
       >
         <h1
-          className="jsx-1072026091"
+          className="-Clean-h1 c23"
         >
-          Unknown error
+          <span>
+            Ooops, an unexpected error seems to have occurred
+          </span>
+            🤕
         </h1>
+        <div
+          className="c24"
+        >
+          <a
+            className="c25"
+            href="mailto:support@opencollective.com"
+          >
+            <svg
+              aria-hidden="true"
+              className="c21"
+              fill="currentColor"
+              focusable="false"
+              height="1em"
+              viewBox="0 0 24 24"
+              width="1em"
+            >
+              <path
+                d="M20 10h-.005c-.149-4.312-3.568-7.871-7.75-7.996A7.937 7.937 0 0 0 6.43 4.258 7.931 7.931 0 0 0 4 10c-1.103 0-2 .897-2 2v4c0 1.103.897 2 2 2h1a1 1 0 0 0 1-1v-7c0-1.637.647-3.166 1.822-4.307a5.97 5.97 0 0 1 4.362-1.69C15.392 4.099 18 6.921 18 10.293V18c0 1.103-.897 2-2 2h-2a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h5c2.206 0 4-1.794 4-4 1.103 0 2-.897 2-2v-4c0-1.103-.897-2-2-2z"
+              />
+            </svg>
+             
+            <span>
+              Contact support
+            </span>
+          </a>
+          <a
+            className="c25"
+            href="https://github.com/opencollective/opencollective/issues/new?title=Unexpected%20error%20when%20___________&body=%0A%23%20Describe%20the%20bug%0A*A%20clear%20and%20concise%20description%20of%20what%20the%20bug%20is.*%0A%0A%23%20To%20Reproduce%0ASteps%20to%20reproduce%20the%20behavior%3A%0A1.%20Go%20to%20'...'%0A2.%20Click%20on%20'....'%0A3.%20Scroll%20down%20to%20'....'%0A4.%20See%20error%0A%0A%23%20Screenshots%0A*If%20applicable%2C%20add%20screenshots%20to%20help%20explain%20your%20problem.*%0A%0A%23%20Device%0A-%20OS%3A%20%0A-%20Browser%3A%20%604.0%60%0A%0A%23%20Context%0A%0A%3Awarning%3A%20PLEASE%20REMOVE%20ANY%20PERSONAL%20INFORMATION%20BELOW%20%3Awarning%3A%0A%0A**URL**%3A%20http%3A%2F%2Flocalhost%2F%0A%0A**Stacktrace**%3A%0A%60%60%60%0A%0A%60%60%60%0A%20%20%20%20"
+          >
+            <svg
+              aria-hidden="true"
+              className="c15"
+              fill="currentColor"
+              focusable="false"
+              height="1em"
+              viewBox="0 0 496 512"
+              width="1em"
+            >
+              <path
+                d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+                fill="currentColor"
+              />
+            </svg>
+             
+            <span>
+              Add an issue on Github
+            </span>
+          </a>
+          <button
+            className="c26"
+            onClick={[Function]}
+          >
+            <svg
+              aria-hidden="true"
+              className="c15"
+              fill="currentColor"
+              focusable="false"
+              height="0.8em"
+              viewBox="0 0 512 512"
+              width="0.8em"
+            >
+              <path
+                d="M500.333 0h-47.411c-6.853 0-12.314 5.729-11.986 12.574l3.966 82.759C399.416 41.899 331.672 8 256.001 8 119.34 8 7.899 119.526 8 256.187 8.101 393.068 119.096 504 256 504c63.926 0 122.202-24.187 166.178-63.908 5.113-4.618 5.354-12.561.482-17.433l-33.971-33.971c-4.466-4.466-11.64-4.717-16.38-.543C341.308 415.448 300.606 432 256 432c-97.267 0-176-78.716-176-176 0-97.267 78.716-176 176-176 60.892 0 114.506 30.858 146.099 77.8l-101.525-4.865c-6.845-.328-12.574 5.133-12.574 11.986v47.411c0 6.627 5.373 12 12 12h200.333c6.627 0 12-5.373 12-12V12c0-6.627-5.373-12-12-12z"
+                fill="currentColor"
+              />
+            </svg>
+             
+            <span>
+              Reload the page
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   </main>
   <div
-    className="c21"
+    className="c27"
     id="footer"
   >
     <div
-      className="c22"
+      className="c28"
     >
       <div
-        className="c23"
+        className="c29"
       >
         <div
-          className="c24"
+          className="c30"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -3425,21 +3527,21 @@ exports[`Search Page renders error message 1`] = `
           />
         </div>
         <p
-          className="c25"
+          className="c31"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c26"
+        className="c32"
       >
         <a
-          className="c27"
+          className="c33"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c28"
+            className="c15"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -3454,12 +3556,12 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c27"
+          className="c33"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c29"
+            className="c15"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -3474,12 +3576,12 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c27"
+          className="c33"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c30"
+            className="c15"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -3494,12 +3596,12 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c27"
+          className="c33"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c31"
+            className="c15"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -3514,12 +3616,12 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c27"
+          className="c33"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c32"
+            className="c21"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -3534,7 +3636,7 @@ exports[`Search Page renders error message 1`] = `
         </a>
       </div>
       <nav
-        className="c33"
+        className="c34"
         order={
           Array [
             "3",
@@ -3544,7 +3646,7 @@ exports[`Search Page renders error message 1`] = `
         }
       >
         <div
-          className="c34"
+          className="c35"
           width={
             Array [
               0.5,
@@ -3554,18 +3656,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c35"
+            className="c36"
           >
             PLATFORM
           </p>
           <ul
-            className="c36"
+            className="c37"
           >
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -3573,10 +3675,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -3584,10 +3686,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -3595,10 +3697,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3608,7 +3710,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c34"
+          className="c35"
           width={
             Array [
               0.5,
@@ -3618,18 +3720,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c35"
+            className="c36"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c36"
+            className="c37"
           >
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/create"
                 onClick={[Function]}
               >
@@ -3637,10 +3739,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -3648,10 +3750,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -3659,10 +3761,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -3670,10 +3772,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -3683,7 +3785,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c34"
+          className="c35"
           width={
             Array [
               0.5,
@@ -3693,18 +3795,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c35"
+            className="c36"
           >
             COMMUNITY
           </p>
           <ul
-            className="c36"
+            className="c37"
           >
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -3712,40 +3814,40 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="mailto:support@opencollective.com"
               >
                 Email Support
@@ -3754,7 +3856,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c34"
+          className="c35"
           width={
             Array [
               0.5,
@@ -3764,18 +3866,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c35"
+            className="c36"
           >
             COMPANY
           </p>
           <ul
-            className="c36"
+            className="c37"
           >
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/about"
                 onClick={[Function]}
               >
@@ -3783,20 +3885,20 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -3804,10 +3906,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c37"
+              className="c38"
             >
               <a
-                className="c38"
+                className="c39"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -3911,6 +4013,12 @@ Array [
   overflow: hidden;
 }
 
+.c15 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c3 {
   box-sizing: border-box;
 }
@@ -3925,10 +4033,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -3939,9 +4047,6 @@ Array [
 }
 
 .c14 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
   -webkit-animation: iVXCSc 1s linear infinite;
   animation: iVXCSc 1s linear infinite;
 }
@@ -4158,7 +4263,7 @@ Array [
             onClick={[Function]}
           >
             <svg
-              className="c14"
+              className="c14 c15"
               fill="currentColor"
               focusable="false"
               height="1em"
@@ -4227,6 +4332,12 @@ Array [
   justify-content: center;
 }
 
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c0 {
   box-sizing: border-box;
   max-width: 1200px;
@@ -4235,12 +4346,6 @@ Array [
   padding-left: 16px;
   padding-right: 16px;
   width: 100%;
-}
-
-.c5 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
 }
 
 .c3.c3.c3 {
@@ -4485,7 +4590,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c10 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -4526,7 +4631,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c9 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -4548,6 +4653,18 @@ Array [
   justify-content: center;
 }
 
+.c7 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c8 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c4 {
   color: #6E747A;
   font-size: 1.4rem;
@@ -4556,13 +4673,13 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
 }
 
-.c14 {
+.c11 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -4570,15 +4687,21 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
+  text-align: center;
+}
+
+.c13 {
+  list-style: none;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -4622,42 +4745,6 @@ Array [
   width: 100%;
 }
 
-.c16 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.c9 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c7 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c10 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c8 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c11 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
 .c6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -4683,7 +4770,7 @@ Array [
   opacity: 1;
 }
 
-.c17 {
+.c14 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -4692,14 +4779,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c14[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c12 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -4720,7 +4807,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c10 {
     width: 25%;
   }
 }
@@ -4752,7 +4839,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c9 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -4766,7 +4853,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c11 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c13 {
     text-align: left;
   }
 }
@@ -4782,12 +4875,6 @@ Array [
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c16 {
-    text-align: left;
   }
 }
 
@@ -4845,7 +4932,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c8"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -4865,7 +4952,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c9"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -4885,7 +4972,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -4905,7 +4992,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c8"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -4920,7 +5007,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c9"
         order={
           Array [
             "3",
@@ -4930,7 +5017,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -4940,18 +5027,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -4959,10 +5046,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -4970,10 +5057,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -4981,10 +5068,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -4994,7 +5081,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -5004,18 +5091,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create"
                 onClick={[Function]}
               >
@@ -5023,10 +5110,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -5034,10 +5121,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -5045,10 +5132,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -5056,10 +5143,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -5069,7 +5156,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -5079,18 +5166,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -5098,40 +5185,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="mailto:support@opencollective.com"
               >
                 Email Support
@@ -5140,7 +5227,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -5150,18 +5237,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/about"
                 onClick={[Function]}
               >
@@ -5169,20 +5256,20 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -5190,10 +5277,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -5297,6 +5384,12 @@ Array [
   overflow: hidden;
 }
 
+.c15 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c3 {
   box-sizing: border-box;
 }
@@ -5311,10 +5404,10 @@ Array [
   color: #3385FF;
   display: inline-block;
   font-size: 1.4rem;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .c13[disabled] {
@@ -5325,9 +5418,6 @@ Array [
 }
 
 .c14 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
   -webkit-animation: iVXCSc 1s linear infinite;
   animation: iVXCSc 1s linear infinite;
 }
@@ -5544,7 +5634,7 @@ Array [
             onClick={[Function]}
           >
             <svg
-              className="c14"
+              className="c14 c15"
               fill="currentColor"
               focusable="false"
               height="1em"
@@ -5658,6 +5748,12 @@ Array [
   align-items: center;
 }
 
+.c5 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c11 {
   font-size: inherit;
   line-height: inherit;
@@ -5665,7 +5761,33 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
+}
+
+.c15 {
+  display: block;
+  font-size: Paragraph;
+  font-weight: bold;
+  max-width: 220px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
+  text-align: center;
+}
+
+.c15[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.c13[disabled] {
+  pointer-events: none;
+  cursor: default;
+  -webkit-text-decoration: none;
+  text-decoration: none;
 }
 
 .c0 {
@@ -5693,104 +5815,88 @@ Array [
   margin-bottom: 16px;
 }
 
-.c15 {
-  display: block;
-  font-size: Paragraph;
-  font-weight: bold;
-  max-width: 220px;
-  padding-left: 32px;
-  padding-right: 32px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  text-align: center;
-}
-
-.c15[disabled] {
-  pointer-events: none;
-  cursor: default;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-.c13[disabled] {
-  pointer-events: none;
-  cursor: default;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
 .c12 {
-  border: 1px solid #cccccc;
+  border: 1px solid;
+  border-color: black.300;
   border-radius: 4px;
-  font-size: 14px;
+  border-color: black.300;
+  border-radius: 4px;
+  line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12 {
-  border: 1px solid #cccccc;
+  border: 1px solid;
+  border-color: black.300;
   border-radius: 4px;
-  font-size: 14px;
+  border-color: black.300;
+  border-radius: 4px;
+  line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12 {
-  border: 1px solid #cccccc;
+  border: 1px solid;
+  border-color: black.300;
   border-radius: 4px;
-  font-size: 14px;
+  border-color: black.300;
+  border-radius: 4px;
+  line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12 {
-  border: 1px solid #cccccc;
+  border: 1px solid;
+  border-color: black.300;
   border-radius: 4px;
-  font-size: 14px;
+  border-color: black.300;
+  border-radius: 4px;
+  line-height: 1em;
   margin-left: 4px;
   margin-right: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
   width: 30px;
   border-style: solid;
   box-sizing: border-box;
+  outline: none;
 }
 
 .c12:disabled {
   cursor: not-allowed;
-}
-
-.c5 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
 }
 
 .c3.c3.c3 {
@@ -6011,7 +6117,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c10 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -6052,7 +6158,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c9 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -6074,6 +6180,18 @@ Array [
   justify-content: center;
 }
 
+.c7 {
+  display: inline-block;
+  vertical-align: -.125em;
+  overflow: hidden;
+}
+
+.c8 {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
 .c4 {
   color: #6E747A;
   font-size: 1.4rem;
@@ -6082,13 +6200,13 @@ Array [
   -moz-letter-spacing: -0.2px;
   -ms-letter-spacing: -0.2px;
   letter-spacing: -0.2px;
-  margin: 0px;
+  margin: 0;
   padding-top: 8px;
   padding-bottom: 8px;
   text-align: center;
 }
 
-.c14 {
+.c11 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -6096,15 +6214,21 @@ Array [
   -moz-letter-spacing: 1px;
   -ms-letter-spacing: 1px;
   letter-spacing: 1px;
-  margin: 0px;
+  margin: 0;
   padding-bottom: 16px;
+  text-align: center;
+}
+
+.c13 {
+  list-style: none;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 .c0 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
-  bottom: 0px;
+  bottom: 0;
   background-color: white;
   min-height: 7.5rem;
   padding: 1rem;
@@ -6148,42 +6272,6 @@ Array [
   width: 100%;
 }
 
-.c16 {
-  list-style: none;
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.c9 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c7 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c10 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c8 {
-  display: inline-block;
-  vertical-align: -.125em;
-  overflow: hidden;
-}
-
-.c11 {
-  display: inline-block;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
 .c6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -6209,7 +6297,7 @@ Array [
   opacity: 1;
 }
 
-.c17 {
+.c14 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -6218,14 +6306,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c14[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c12 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -6246,7 +6334,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c10 {
     width: 25%;
   }
 }
@@ -6278,7 +6366,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c9 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -6292,7 +6380,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c11 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c13 {
     text-align: left;
   }
 }
@@ -6308,12 +6402,6 @@ Array [
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c16 {
-    text-align: left;
   }
 }
 
@@ -6371,7 +6459,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c8"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -6391,7 +6479,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c9"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -6411,7 +6499,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c7"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -6431,7 +6519,7 @@ Array [
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c8"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -6446,7 +6534,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c9"
         order={
           Array [
             "3",
@@ -6456,7 +6544,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -6466,18 +6554,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -6485,10 +6573,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -6496,10 +6584,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -6507,10 +6595,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -6520,7 +6608,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -6530,18 +6618,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/create"
                 onClick={[Function]}
               >
@@ -6549,10 +6637,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -6560,10 +6648,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -6571,10 +6659,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -6582,10 +6670,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -6595,7 +6683,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -6605,18 +6693,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -6624,40 +6712,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="mailto:support@opencollective.com"
               >
                 Email Support
@@ -6666,7 +6754,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c10"
           width={
             Array [
               0.5,
@@ -6676,18 +6764,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c11"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c12"
           >
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/about"
                 onClick={[Function]}
               >
@@ -6695,20 +6783,20 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -6716,10 +6804,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c13"
             >
               <a
-                className="c17"
+                className="c14"
                 href="/privacypolicy"
                 onClick={[Function]}
               >

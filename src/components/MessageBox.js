@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as styledSystem from 'styled-system';
+import tag from 'clean-tag';
 import { Box } from '@rebass/grid';
 
 import { InfoCircle } from 'styled-icons/fa-solid/InfoCircle';
@@ -52,6 +53,8 @@ const MessageBox = ({ withIcon, children, ...props }) => {
 };
 
 MessageBox.propTypes = {
+  /** @ignore */
+  blacklist: PropTypes.arrayOf(PropTypes.string),
   /** Type of the message */
   type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
   /** Weither icon should be hidden. Icons are only set for info, success, warning and error messages. */
@@ -65,6 +68,7 @@ MessageBox.propTypes = {
 MessageBox.defaultProps = {
   type: 'white',
   withIcon: false,
+  blacklist: tag.defaultProps.blacklist.concat('type'),
 };
 
 export default MessageBox;

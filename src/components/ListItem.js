@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-import { space, style, textAlign, width } from 'styled-system';
-
-export const listStyle = style({ prop: 'listStyle' });
+import { space, textAlign, width } from 'styled-system';
+import { listStyle } from '../lib/styled_system_custom';
 
 const ListItem = styled.li`
   list-style: none;

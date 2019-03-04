@@ -35,6 +35,7 @@ export const transactionFields = `
     image
   }
   usingVirtualCardFromCollective {
+    id
     slug
     name
   }
@@ -88,6 +89,7 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
+        countryISO
         paymentMethods(limit: 10, hasBalanceAboveZero: true) {
           id
           uuid
@@ -179,6 +181,7 @@ const getCollectiveToEditQuery = gql`
         image
         backgroundImage
         settings
+        taxes
         description
         website
         twitterHandle

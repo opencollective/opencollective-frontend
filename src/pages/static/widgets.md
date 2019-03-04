@@ -9,6 +9,7 @@
 Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack for https://opencollective.com/webpack).
 The verb can either be "donate" or "contribute".
 Example:
+
 <center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script><script src="https://opencollective.com/webpack/contribute/button.js" color="blue"></script></center>
 
 If you want to add a donate button to a blog post, you can load an image version of the logo and then link to the donate page of your collective.
@@ -22,7 +23,6 @@ Result:
 <center><a href="https://opencollective.com/webpack/donate" target="_blank"><img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" width=300 /></a></center>
 
 On Medium, just download the image then upload it to your post (make sure the image file ends with "@2x" to make it retina size). To link it, select the image then press CMD+K (or CTRL+K on Windows). A pop up menu will show up where you can enter the URL to link the image to (see [Medium support page](https://help.medium.com/hc/en-us/articles/115004808847-Image-links)). Here is an example: https://medium.com/open-collective/open-collective-donate-button-e7e6d5965b2c
-
 
 ### Show backers and sponsors
 
@@ -39,9 +39,9 @@ You can also add a style object (react style), e.g.
 Note: make sure that your style object is parsable with `JSON.stringify`.
 
 #### Examples:
+
 - http://apex.run/#links
 - https://www.spinacms.com/
-
 
 #### How to customize it?
 
@@ -52,7 +52,6 @@ You can target them with CSS to customize them:
       color: black;
     }
 
-
 ### Show next events
 
     <script src="https://opencollective.com/:collectiveSlug/events.js" width="500"></script>
@@ -60,7 +59,6 @@ You can target them with CSS to customize them:
 Example:
 
 <script src="https://opencollective.com/brusselstogether/events.js" width="500"></script>
-
 
 ## For backers and sponsors
 
@@ -74,7 +72,6 @@ Leave it empty or remove it to show all the collectives that you are a member of
 E.g. http://polycode.co.uk
 
 ![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
-
 
 ## Feedback
 
