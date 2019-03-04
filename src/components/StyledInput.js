@@ -16,6 +16,7 @@ import {
   textAlign,
   themeGet,
   width,
+  height,
   lineHeight,
 } from 'styled-system';
 import tag from 'clean-tag';
@@ -56,6 +57,7 @@ const StyledInput = styled(tag.input)`
   ${space}
   ${textAlign}
   ${width}
+  ${height}
 
   border-color: ${getBorderColor};
   border-style: ${props => (props.bare ? 'none' : 'solid')};

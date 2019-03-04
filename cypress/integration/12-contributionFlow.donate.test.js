@@ -66,7 +66,7 @@ describe('Contribution Flow: Donate', () => {
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$1,337.00 per year');
-      cy.contains(`${user.firstName} ${user.lastName} is now a backer of APEX.`);
+      cy.contains(`${user.firstName} ${user.lastName} is now a backer of APEX!`);
 
       // ---- Let's go back ---
       cy.go('back');
@@ -109,7 +109,7 @@ describe('Contribution Flow: Donate', () => {
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$20.00');
-      cy.contains('Evil Corp is now a backer of APEX.');
+      cy.contains('Evil Corp is now a backer of APEX!');
     });
   });
 
@@ -134,7 +134,7 @@ describe('Contribution Flow: Donate', () => {
 
       // Check success page
       cy.get('#page-order-success', { timeout: 20000 }).contains('$42.00 per year');
-      cy.contains("You're now a backer of APEX.");
+      cy.contains("You're now a backer of APEX!");
     });
   });
 });
