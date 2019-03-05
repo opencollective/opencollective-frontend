@@ -131,9 +131,10 @@ ${truncate(stackTrace, { length: 6000 })}
   }
 
   unknownError() {
+    const message = get(this.props, 'data.error.message');
     const stackTrace = get(this.props, 'data.error.stack');
     const expandError = process.env.NODE_ENV !== 'production';
-    const fontSize = process.env.NODE_ENV === 'circleci' ? 22 : 13;
+    const fontSize = ['circleci', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
 
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
@@ -152,13 +153,27 @@ ${truncate(stackTrace, { length: 6000 })}
             <Redo size="0.8em" /> <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
           </StyledButton>
         </Flex>
-        {stackTrace && (
+        {(stackTrace || message) && (
           <Container mt={5} maxWidth={1200}>
             <details open={expandError}>
               <summary style={{ textAlign: 'center', marginBottom: 12 }}>
                 <FormattedMessage id="error.details" defaultMessage="Error details" />
               </summary>
-              <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{stackTrace}</pre>
+              <Container p={3}>
+                {message && (
+                  <React.Fragment>
+                    <strong>Message</strong>
+                    <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{message}</pre>
+                    <br />
+                  </React.Fragment>
+                )}
+                {stackTrace && (
+                  <React.Fragment>
+                    <strong>Trace</strong>
+                    <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{stackTrace}</pre>
+                  </React.Fragment>
+                )}
+              </Container>
             </details>
           </Container>
         )}

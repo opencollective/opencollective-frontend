@@ -2571,7 +2571,7 @@ exports[`Search Page renders error message 1`] = `
   padding-right: 16px;
 }
 
-.c35 {
+.c37 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -2616,7 +2616,7 @@ exports[`Search Page renders error message 1`] = `
   display: flex;
 }
 
-.c28 {
+.c30 {
   box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
@@ -2639,7 +2639,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: space-between;
 }
 
-.c30 {
+.c32 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2651,7 +2651,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c34 {
+.c36 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -2776,7 +2776,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c31 {
+.c33 {
   color: #6E747A;
   font-size: 1.4rem;
   line-height: Paragraph;
@@ -2790,7 +2790,7 @@ exports[`Search Page renders error message 1`] = `
   text-align: center;
 }
 
-.c36 {
+.c38 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -2847,13 +2847,13 @@ exports[`Search Page renders error message 1`] = `
   text-decoration: none;
 }
 
-.c38 {
+.c40 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
 }
 
-.c27 {
+.c29 {
   box-sizing: border-box;
   border-top: 1px solid #aaaaaa;
   bottom: 0;
@@ -2863,7 +2863,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c29 {
+.c31 {
   box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2877,7 +2877,7 @@ exports[`Search Page renders error message 1`] = `
   width: 100%;
 }
 
-.c32 {
+.c34 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -2898,6 +2898,17 @@ exports[`Search Page renders error message 1`] = `
   margin-top: 16px;
   margin-bottom: 16px;
   width: 100%;
+}
+
+.c27 {
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin-top: 64px;
+}
+
+.c28 {
+  box-sizing: border-box;
+  padding: 16px;
 }
 
 .c20 {
@@ -2998,7 +3009,7 @@ exports[`Search Page renders error message 1`] = `
   font-size: 1.4rem;
 }
 
-.c33 {
+.c35 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3018,12 +3029,12 @@ exports[`Search Page renders error message 1`] = `
   width: 48px;
 }
 
-.c33:hover,
-.c33:focus {
+.c35:hover,
+.c35:focus {
   opacity: 1;
 }
 
-.c39 {
+.c41 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -3032,14 +3043,14 @@ exports[`Search Page renders error message 1`] = `
   padding: 0;
 }
 
-.c39[disabled] {
+.c41[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c37 {
+.c39 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -3073,13 +3084,13 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c35 {
+  .c37 {
     width: 25%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c28 {
+  .c30 {
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
@@ -3087,7 +3098,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c28 {
+  .c30 {
     -webkit-align-items: flex-start;
     -webkit-box-align: flex-start;
     -ms-flex-align: flex-start;
@@ -3096,7 +3107,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c30 {
+  .c32 {
     -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
@@ -3105,7 +3116,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c34 {
+  .c36 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -3150,13 +3161,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c31 {
-    text-align: left;
-  }
-}
-
-@media screen and (min-width:52em) {
-  .c36 {
+  .c33 {
     text-align: left;
   }
 }
@@ -3168,13 +3173,19 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c29 {
+  .c40 {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c31 {
     width: 33.33333333333333%;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c32 {
+  .c34 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -3504,21 +3515,59 @@ exports[`Search Page renders error message 1`] = `
             </span>
           </button>
         </div>
+        <div
+          className="c27"
+        >
+          <details
+            open={true}
+          >
+            <summary
+              style={
+                Object {
+                  "marginBottom": 12,
+                  "textAlign": "center",
+                }
+              }
+            >
+              <span>
+                Error details
+              </span>
+            </summary>
+            <div
+              className="c28"
+            >
+              <strong>
+                Message
+              </strong>
+              <pre
+                style={
+                  Object {
+                    "fontSize": 22,
+                    "whiteSpace": "pre-wrap",
+                  }
+                }
+              >
+                Test error
+              </pre>
+              <br />
+            </div>
+          </details>
+        </div>
       </div>
     </div>
   </main>
   <div
-    className="c27"
+    className="c29"
     id="footer"
   >
     <div
-      className="c28"
+      className="c30"
     >
       <div
-        className="c29"
+        className="c31"
       >
         <div
-          className="c30"
+          className="c32"
         >
           <object
             data="/static/images/opencollectivelogo-footer.svg"
@@ -3527,16 +3576,16 @@ exports[`Search Page renders error message 1`] = `
           />
         </div>
         <p
-          className="c31"
+          className="c33"
         >
           An organization for your community, transparent by design.
         </p>
       </div>
       <div
-        className="c32"
+        className="c34"
       >
         <a
-          className="c33"
+          className="c35"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -3556,7 +3605,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c35"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -3576,7 +3625,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c35"
           href="https://github.com/opencollective"
         >
           <svg
@@ -3596,7 +3645,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c35"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -3616,7 +3665,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c33"
+          className="c35"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -3636,7 +3685,7 @@ exports[`Search Page renders error message 1`] = `
         </a>
       </div>
       <nav
-        className="c34"
+        className="c36"
         order={
           Array [
             "3",
@@ -3646,7 +3695,7 @@ exports[`Search Page renders error message 1`] = `
         }
       >
         <div
-          className="c35"
+          className="c37"
           width={
             Array [
               0.5,
@@ -3656,18 +3705,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c36"
+            className="c38"
           >
             PLATFORM
           </p>
           <ul
-            className="c37"
+            className="c39"
           >
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -3675,10 +3724,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -3686,10 +3735,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -3697,10 +3746,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -3710,7 +3759,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c35"
+          className="c37"
           width={
             Array [
               0.5,
@@ -3720,18 +3769,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c36"
+            className="c38"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c37"
+            className="c39"
           >
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/create"
                 onClick={[Function]}
               >
@@ -3739,10 +3788,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -3750,10 +3799,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -3761,10 +3810,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -3772,10 +3821,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -3785,7 +3834,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c35"
+          className="c37"
           width={
             Array [
               0.5,
@@ -3795,18 +3844,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c36"
+            className="c38"
           >
             COMMUNITY
           </p>
           <ul
-            className="c37"
+            className="c39"
           >
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -3814,40 +3863,40 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="mailto:support@opencollective.com"
               >
                 Email Support
@@ -3856,7 +3905,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c35"
+          className="c37"
           width={
             Array [
               0.5,
@@ -3866,18 +3915,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c36"
+            className="c38"
           >
             COMPANY
           </p>
           <ul
-            className="c37"
+            className="c39"
           >
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/about"
                 onClick={[Function]}
               >
@@ -3885,20 +3934,20 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -3906,10 +3955,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c38"
+              className="c40"
             >
               <a
-                className="c39"
+                className="c41"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
