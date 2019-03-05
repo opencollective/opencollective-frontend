@@ -132,6 +132,28 @@ export default function(Sequelize, DataTypes) {
       },
     }).then(us => us.map(us => us.UserId));
   };
+  /**
+   * Check if notification with `notificationType`, `CollectiveId` and `UserId` is active.
+   * @param {*} notificationType
+   * @param {*} CollectiveId
+   * @param {*} UserId
+   */
+  Notification.isActive = (notificationType, CollectiveId, UserId) => {
+    debug('isActive', notificationType, CollectiveId, UserId);
+    return models.Notification.findOne({
+      where: {
+        CollectiveId,
+        type: notificationType,
+        UserId,
+      },
+    }).then(notification => {
+      if (notification && notification.active) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  };
 
   return Notification;
 }
@@ -171,7 +193,7 @@ Types:
       data: collective, user (caller), target (the updated user), collectiveuser (updated values)
       2* Userid: the updated user + the caller
   - collective.user.deleted
-      data: collective, user (caller), target (the deleted user)
+      data: collective, user (caller), target (the  deleted user)
       2* Userid: the deleted user + the caller
 
   - activities.COLLECTIVE_TRANSACTION_CREATED
