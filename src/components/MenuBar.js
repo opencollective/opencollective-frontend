@@ -89,9 +89,9 @@ class MenuBar extends React.Component {
 
     this.messages = defineMessages({
       admin: { id: 'menu.admin', defaultMessage: 'admin' },
-      backer: { id: 'menu.backer', defaultMessage: 'backing' },
-      attendee: { id: 'menu.attendee', defaultMessage: 'attending' },
-      fundraiser: { id: 'menu.fundraiser', defaultMessage: 'fundraising' },
+      backer: { id: 'menu.backing', defaultMessage: 'backing' },
+      attendee: { id: 'menu.attending', defaultMessage: 'attending' },
+      fundraiser: { id: 'menu.fundraising', defaultMessage: 'fundraising' },
       parenting: { id: 'menu.parenting', defaultMessage: 'member collectives' },
       about: { id: 'menu.about', defaultMessage: 'about' },
       events: { id: 'menu.events', defaultMessage: 'events' },

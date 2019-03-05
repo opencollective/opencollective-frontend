@@ -445,7 +445,7 @@ class CreatePledgePage extends React.Component {
 
                   <P color="black.600">
                     <FormattedMessage
-                      id="pledge.stats"
+                      id="create.pledge.stats"
                       values={{
                         both: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE && pledgeStats.USER ? 1 : 0,
                         orgCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE,

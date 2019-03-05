@@ -30,8 +30,8 @@ class EditConnectedAccount extends React.Component {
         defaultMessage: 'Connect Stripe',
       },
       'collective.connectedAccounts.stripe.description': {
-        id: 'collective.connectedAccounts.stripe.description',
-        defaultMessage: 'Connect a Stripe account to create collectives and start accepting donations on their behalf.',
+        id: 'collective.create.connectedAccounts.stripe.description',
+        defaultMessage: 'Connect a Stripe account to create collectives and start accepting donations.',
       },
       'collective.connectedAccounts.stripe.connected': {
         id: 'collective.connectedAccounts.stripe.connected',

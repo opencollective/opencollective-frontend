@@ -115,7 +115,7 @@ class CreateOrderLegacyPage extends React.Component {
       'payment.title': { id: 'tier.name.payment', defaultMessage: 'payment' },
       'order.success': {
         id: 'tier.order.success',
-        defaultMessage: 'Order processed successfully',
+        defaultMessage: '🎉 Your order has been processed successfully',
       },
       'order.successRedirect': {
         id: 'tier.order.successRedirect',
