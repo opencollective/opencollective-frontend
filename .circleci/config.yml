@@ -204,41 +204,6 @@ jobs:
       CYPRESS_TEST_FILES: 2*.js
     <<: *e2e_steps
 
-  test-server:
-    docker:
-      - image: circleci/node:11.8.0
-      - image: circleci/postgres:9.6.8-alpine-postgis-ram
-      - image: circleci/redis
-      - image: memcached
-    environment:
-      NODE_ENV: circleci
-    steps:
-      - run: sudo apt -y update
-
-      # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
-      - run: sudo apt -y install postgresql-client
-
-      - attach_workspace:
-          at: ..
-
-      - checkout
-
-      - <<: *restore_npm_cache
-      - run: CYPRESS_INSTALL_BINARY=0 npm ci
-
-      # # We run npm ci in case node_modules are not persisted
-      # # When it is persisted we don't need it
-      # - run: cd ~/api && npm ci --only-prod
-
-      # We run npm ci in case node_modules are not persisted
-      # When it is persisted we don't need it
-      - run: cd ~/frontend && npm ci --only=prod
-
-      # Loading the opencollective_dvl dump database
-      - run: ./scripts/setup_circleci_db.sh
-
-      - run: npm run test:server
-
 workflows:
   version: 2
   lint-build-test:
@@ -247,10 +212,6 @@ workflows:
       - jest
       - build
       - build-api
-      - test-server:
-          requires:
-            - build
-            - build-api
       - test-e2e-0:
           requires:
             - build
