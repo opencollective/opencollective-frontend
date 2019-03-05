@@ -223,6 +223,7 @@ const getNotificationLabel = (template, recipients) => {
     onboarding: 'onboarding emails',
     'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports',
+    thankyou: 'thank you for your donation',
   };
 
   return notificationTypeLabels[template];
