@@ -1055,10 +1055,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/create-account"
+                href="/pricing"
                 onClick={[Function]}
               >
-                Join Free
+                Pricing
               </a>
             </li>
             <li
@@ -1066,10 +1066,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/pricing"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Pricing
+                Join Free
               </a>
             </li>
             <li
@@ -2355,10 +2355,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/create-account"
+                href="/pricing"
                 onClick={[Function]}
               >
-                Join Free
+                Pricing
               </a>
             </li>
             <li
@@ -2366,10 +2366,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/pricing"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Pricing
+                Join Free
               </a>
             </li>
             <li
@@ -3800,10 +3800,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c41"
-                href="/create-account"
+                href="/pricing"
                 onClick={[Function]}
               >
-                Join Free
+                Pricing
               </a>
             </li>
             <li
@@ -3811,10 +3811,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c41"
-                href="/pricing"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Pricing
+                Join Free
               </a>
             </li>
             <li
@@ -5195,10 +5195,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/create-account"
+                href="/pricing"
                 onClick={[Function]}
               >
-                Join Free
+                Pricing
               </a>
             </li>
             <li
@@ -5206,10 +5206,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/pricing"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Pricing
+                Join Free
               </a>
             </li>
             <li
@@ -6746,10 +6746,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/create-account"
+                href="/pricing"
                 onClick={[Function]}
               >
-                Join Free
+                Pricing
               </a>
             </li>
             <li
@@ -6757,10 +6757,10 @@ Array [
             >
               <a
                 className="c14"
-                href="/pricing"
+                href="/create-account"
                 onClick={[Function]}
               >
-                Pricing
+                Join Free
               </a>
             </li>
             <li

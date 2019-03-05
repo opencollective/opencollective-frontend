@@ -45,8 +45,8 @@ const navigation = {
   PLATFORM: {
     Discover: '/discover',
     'How it Works': '/how-it-works',
-    'Join Free': '/create-account',
     Pricing: '/pricing',
+    'Join Free': '/create-account',
     Login: '/signin',
   },
   'JOIN THE MOVEMENT': {
