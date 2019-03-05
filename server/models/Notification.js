@@ -147,10 +147,10 @@ export default function(Sequelize, DataTypes) {
         UserId,
       },
     }).then(notification => {
-      if (notification && notification.active) {
-        return true;
+      if (notification) {
+        return notification.active;
       } else {
-        return false;
+        return true;
       }
     });
   };
