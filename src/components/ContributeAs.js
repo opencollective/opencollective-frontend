@@ -31,31 +31,31 @@ const ContributeAsEntryContainer = styled(Container)`
   }
 `;
 
-const useForm = ({ onChange }) => {
+const useForm = ({ onProfileChange }) => {
   const [state, setState] = useState({ errors: {} });
   return {
     getFieldError: name => state.errors[name],
     onChange: selected => {
       if (selected.key === 'new-org') {
         if (state.name && state.website) {
-          return onChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
+          return onProfileChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
         } else {
-          return onChange(null);
+          return onProfileChange(null);
         }
       }
 
       if (selected.key === 'anonymous') {
-        return onChange({ name: 'anonymous' });
+        return onProfileChange({ name: 'anonymous' });
       }
 
-      return onChange(selected.value);
+      return onProfileChange(selected.value);
     },
     onFieldChange: event => {
       event.stopPropagation();
 
       const { target } = event;
       if (!target.validity.valid) {
-        onChange(null);
+        onProfileChange(null);
         setState({ ...state, [target.name]: undefined });
         return;
       }
@@ -68,7 +68,7 @@ const useForm = ({ onChange }) => {
         ...newState,
         errors: { ...state.errors, [target.name]: null },
       });
-      onChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
+      onProfileChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
     },
     onSearch: ({ target }) => {
       setState(state => ({
@@ -119,8 +119,8 @@ const useForm = ({ onChange }) => {
 /**
  * Search is displayed if 5 or more profiles are passed in.
  */
-const ContributeAs = ({ onChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
-  const { getFieldError, getFieldProps, onFieldChange, onSearch, state } = useForm({ onChange });
+const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
+  const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ onProfileChange });
   if (state.search) {
     const test = new RegExp(escapeInput(state.search), 'i');
     profiles = profiles.filter(profile => profile.name.match(test));
@@ -272,7 +272,7 @@ ContributeAs.propTypes = {
    * if 'A new organization' is selected, the latest data from that form is returned <br />
    * else the data passed to `profiles` or `personal` is returned
    */
-  onChange: PropTypes.func,
+  onProfileChange: PropTypes.func,
   defaultSelectedProfile: PropTypes.shape({
     id: PropTypes.number,
   }),
@@ -295,7 +295,7 @@ ContributeAs.propTypes = {
 };
 
 ContributeAs.defaultProps = {
-  onChange: () => {}, // noop
+  onProfileChange: () => {}, // noop
 };
 
 export default ContributeAs;
