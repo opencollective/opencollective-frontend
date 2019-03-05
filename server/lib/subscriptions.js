@@ -277,30 +277,24 @@ export async function sendThankYouEmail(order, transaction) {
   const relatedCollectives = await order.collective.getRelatedCollectives(3, 0);
   const recommendedCollectives = await getRecommendedCollectives(order.collective, 3);
   const user = order.createdByUser;
-  const notificationIsActive = await models.Notification.isActive('thankyou', order.collective.id, user.id);
-
-  // check if the user email notification is active before sending thankyou email.
-  if (notificationIsActive) {
-    return emailLib.send(
-      'thankyou',
-      user.email,
-      {
-        order: order.info,
-        transaction: transaction.info,
-        user: user.info,
-        firstPayment: false,
-        collective: order.collective.info,
-        fromCollective: order.fromCollective.minimal,
-        relatedCollectives,
-        recommendedCollectives,
-        config: { host: config.host },
-        interval: order.Subscription.interval,
-        subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
-      },
-      {
-        from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
-      },
-    );
-  }
-  return;
+  return emailLib.send(
+    'thankyou',
+    user.email,
+    {
+      order: order.info,
+      transaction: transaction.info,
+      user: user.info,
+      firstPayment: false,
+      collective: order.collective.info,
+      fromCollective: order.fromCollective.minimal,
+      relatedCollectives,
+      recommendedCollectives,
+      config: { host: config.host },
+      interval: order.Subscription.interval,
+      subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
+    },
+    {
+      from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
+    },
+  );
 }

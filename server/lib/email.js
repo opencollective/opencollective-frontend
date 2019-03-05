@@ -9,6 +9,7 @@ import path from 'path';
 import he from 'he';
 import { isArray, pick, get, merge, includes } from 'lodash';
 
+import models from '../models';
 import logger from './logger';
 import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
@@ -313,11 +314,19 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
 /*
  * Given a template, recipient and data, generates email and sends it.
  */
-const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
+const generateEmailFromTemplateAndSend = async (template, recipient, data, options = {}) => {
   if (!recipient) {
     logger.info(`Email with template '${template}' not sent. No recipient.`);
     return;
   }
+
+  const notificationIsActive = await models.Notification.isActive(template, data.collective.id, data.user.id);
+
+  if (!notificationIsActive) {
+    logger.info(`Email with template '${template}' not sent. Recipient email notification not active.`);
+    return;
+  }
+
   return generateEmailFromTemplate(template, recipient, data, options).then(renderedTemplate => {
     const attributes = getTemplateAttributes(renderedTemplate.html);
     options.text = renderedTemplate.text;
