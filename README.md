@@ -35,12 +35,12 @@ npm install
 
 ### Environment variables
 
-This project requires an access to the Open Collective API. You have two options:
+This project requires an access to the Open Collective API. By default, it will try to connect to the Open Colllective staging API.
 
-- `cp .env.staging .env` to connect to the Open Collective staging API
-- `cp .env.local .env` to connect to the API running locally
+If you want to connect to the Open Collective API running locally:
 
-If you decide to pick the local strategy, make sure you install and run the [opencollective-api](https://github.com/opencollective/opencollective-api) project.
+- clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)
+- in this project, create an `.env` file (if necessary), then copy the data from the `[.env.local](.env.local)` file
 
 ### Start
 
