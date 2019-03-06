@@ -169,7 +169,7 @@
     "raf": "^3.4.1",
     "raw-loader": "^1.0.0",
     "react-styleguidist": "^8.0.6",
-    "react-test-renderer": "^16.8.3",
+    "react-test-renderer": "^16.8.4",
     "sinon": "^7.2.4",
     "url-loader": "^1.1.2",
     "webpack-bundle-analyzer": "^3.0.4"
