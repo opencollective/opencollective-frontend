@@ -57,7 +57,7 @@ describe('Contribution Flow: Order', () => {
     cy.clock(Date.parse('2042/05/25'));
 
     const visitParams = { onBeforeLoad: mockRecaptcha };
-    // Login and rediect to the order page
+    // Login and redirect to the order page
     cy.login({ redirect: '/apex/contribute/tier/470-sponsors', visitParams });
 
     // Select 'Test Collective' organization profile
