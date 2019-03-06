@@ -52,4 +52,28 @@ describe('Contribution Flow: Order', () => {
       cy.contains(`${user.firstName} ${user.lastName} is now a member of APEX's 'Sponsors' tier!`);
     });
   });
+
+  it('Can order with an existing orgnanization', () => {
+    cy.clock(Date.parse('2042/05/25'));
+
+    const visitParams = { onBeforeLoad: mockRecaptcha };
+    // Login and rediect to the order page
+    cy.login({ redirect: '/apex/contribute/tier/470-sponsors', visitParams });
+
+    // Select 'Test Collective' organization profile
+    cy.get('[type="radio"][value="10880"]').check();
+    cy.contains('Next step').click();
+
+    cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
+    cy.get('#interval[disabled]').should('exist');
+    cy.contains('Next charge: Jun 1, 2042');
+    cy.contains('Next step').click();
+    cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
+    cy.get('input[type=checkbox][name=save]').should('be.checked');
+    cy.wait(1000); // Wait for stripe to be loaded
+    cy.fillStripeInput();
+    cy.contains('button', 'Make contribution').click();
+    cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
+    cy.contains("Test Collective is now a member of APEX's 'Sponsors' tier!");
+  });
 });
