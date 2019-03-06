@@ -320,11 +320,17 @@ const generateEmailFromTemplateAndSend = async (template, recipient, data, optio
     return;
   }
 
-  const notificationIsActive = await models.Notification.isActive(template, data.collective.id, data.user.id);
+  // Unit test like collective.model.test.js don't care about sending
+  // the email only making sure the function was called
+  // hence data.collective or data.user are usually an empty object
+  // we skip the notification active check in this case.
+  if (process.env.NODE_ENV === 'production' && data.collective && data.user) {
+    const notificationIsActive = await models.Notification.isActive(template, data.collective.id, data.user.id);
 
-  if (!notificationIsActive) {
-    logger.info(`Email with template '${template}' not sent. Recipient email notification not active.`);
-    return;
+    if (!notificationIsActive) {
+      logger.info(`Email with template '${template}' not sent. Recipient email notification not active.`);
+      return;
+    }
   }
 
   return generateEmailFromTemplate(template, recipient, data, options).then(renderedTemplate => {
