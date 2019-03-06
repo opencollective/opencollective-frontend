@@ -21,7 +21,7 @@
     "apollo-link": "1.2.9",
     "apollo-link-context": "1.0.15",
     "apollo-link-error": "1.1.8",
-    "apollo-link-http": "1.5.11",
+    "apollo-link-http": "1.5.12",
     "bluebird": "3.5.3",
     "bootstrap": "3.4.1",
     "classnames": "2.2.6",
