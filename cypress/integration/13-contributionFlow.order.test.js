@@ -58,22 +58,23 @@ describe('Contribution Flow: Order', () => {
 
     const visitParams = { onBeforeLoad: mockRecaptcha };
     // Login and redirect to the order page
-    cy.login({ redirect: '/apex/contribute/tier/470-sponsors', visitParams });
+    cy.login({ redirect: '/apex/contribute/tier/470-sponsors', visitParams }).then(() => {
+      // Select 'Test Collective' organization profile
+      cy.get('[type="radio"][value="10880"]').check();
+      cy.tick(1000);
+      cy.get('input[type=radio][name=contributeAs][value=10880]').should('be.checked');
 
-    // Select 'Test Collective' organization profile
-    cy.get('[type="radio"][value="10880"]').check();
-    cy.contains('Next step').click();
+      cy.contains('Next step').click();
 
-    cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
-    cy.get('#interval[disabled]').should('exist');
-    cy.contains('Next charge: Jun 1, 2042');
-    cy.contains('Next step').click();
-    cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
-    cy.get('input[type=checkbox][name=save]').should('be.checked');
-    cy.wait(1000); // Wait for stripe to be loaded
-    cy.fillStripeInput();
-    cy.contains('button', 'Make contribution').click();
-    cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
-    cy.contains("Test Collective is now a member of APEX's 'Sponsors' tier!");
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
+      cy.get('#interval[disabled]').should('exist');
+      cy.contains('Next charge: Jun 1, 2042');
+      cy.contains('Next step').click();
+      cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
+
+      cy.contains('button', 'Make contribution').click();
+      cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
+      cy.contains("Test Collective is now a member of APEX's 'Sponsors' tier!");
+    });
   });
 });
