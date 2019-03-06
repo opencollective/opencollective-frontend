@@ -73,7 +73,7 @@ describe('Contribution Flow: Order', () => {
       cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
 
       cy.contains('button', 'Make contribution').click();
-      cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
+      cy.get('#page-order-success', { timeout: 30000 }).contains('$100.00 per month');
       cy.contains("Test Collective is now a member of APEX's 'Sponsors' tier!");
     });
   });
