@@ -141,8 +141,9 @@ const run = async () => {
     if (org) {
       queue
         .add(() => getOrgData(org).then(data => updateCollectiveGithubData(collective, data)))
-        .catch(() => {
+        .catch(e => {
           logger.error(`Error while fetching org data for collective '${collective.slug}'`);
+          logger.debug(e);
         });
     } else {
       const split = repo.split('/');
@@ -156,8 +157,9 @@ const run = async () => {
       };
       queue
         .add(() => getRepoData(options).then(data => updateCollectiveGithubData(collective, data)))
-        .catch(() => {
+        .catch(e => {
           logger.error(`Error while fetching ${options.owner}/${options.repo} for collective '${collective.slug}'`);
+          logger.debug(e);
         });
     }
   }
