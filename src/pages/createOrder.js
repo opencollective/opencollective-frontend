@@ -603,7 +603,7 @@ class CreateOrderPage extends React.Component {
             <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
               <ContributeAs
                 {...fieldProps}
-                onChange={this.updateProfile}
+                onProfileChange={this.updateProfile}
                 profiles={profiles}
                 personal={personal}
                 defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}

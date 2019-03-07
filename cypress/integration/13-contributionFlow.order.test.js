@@ -52,4 +52,48 @@ describe('Contribution Flow: Order', () => {
       cy.contains(`${user.firstName} ${user.lastName} is now a member of APEX's 'Sponsors' tier!`);
     });
   });
+
+  it('Can order with an existing orgnanization', () => {
+    cy.clock(Date.parse('2042/05/25'));
+    let collectiveSlug = null;
+    const visitParams = { onBeforeLoad: mockRecaptcha };
+
+    cy.login().then(() => {
+      // Create a new organization
+      cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
+        collectiveSlug = collective.slug;
+        // Add a paymentMethod to the organization profile
+        cy.addCreditCardToCollective({ collectiveSlug });
+
+        cy.visit('/apex/contribute/tier/470-sponsors', visitParams);
+        // Check the newly created organization
+        cy.get(`[type="radio"][name=contributeAs][value=${collective.id}]`).check();
+        cy.tick(1000);
+        cy.get(`input[type=radio][name=contributeAs][value=${collective.id}]`).should('be.checked');
+
+        cy.contains('Next step').click();
+
+        cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
+        cy.get('#interval[disabled]').should('exist');
+        cy.contains('Next charge: Jun 1, 2042');
+        cy.contains('Next step').click();
+        cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
+
+        cy.get('#PaymentMethod').then($paymentMethod => {
+          // Checks if the organization already has a payment method configured
+          if ($paymentMethod.text().includes('VISA **** 4242')) {
+            cy.contains('button', 'Make contribution').click();
+          } else {
+            cy.get('input[type=checkbox][name=save]').should('be.checked');
+            cy.wait(1000); // Wait for stripe to be loaded
+            cy.fillStripeInput();
+            cy.contains('button', 'Make contribution').click();
+          }
+          cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
+          // TestOrg is the name of the created organization.
+          cy.contains("TestOrg is now a member of APEX's 'Sponsors' tier!");
+        });
+      });
+    });
+  });
 });

@@ -10,14 +10,14 @@ import { randomEmail } from './faker';
  *    - email: User email
  */
 Cypress.Commands.add('login', (params = {}) => {
-  const { email = defaultTestUserEmail, redirect = null } = params;
+  const { email = defaultTestUserEmail, redirect = null, visitParams } = params;
   const user = { email, newsletterOptIn: false };
 
   return signinRequest(user, redirect).then(({ body: { redirect } }) => {
     // Test users are allowed to signin directly with E2E, thus a signin URL
     // is directly returned by the API. See signin function in
     // opencollective-api/server/controllers/users.js for more info
-    return cy.visit(redirect).then(() => user);
+    return cy.visit(redirect, visitParams).then(() => user);
   });
 });
 
