@@ -72,9 +72,19 @@ describe('Contribution Flow: Order', () => {
       cy.contains('Next step').click();
       cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
 
-      cy.contains('button', 'Make contribution').click();
-      cy.get('#page-order-success', { timeout: 30000 }).contains('$100.00 per month');
-      cy.contains("Test Collective is now a member of APEX's 'Sponsors' tier!");
+      cy.get('#PaymentMethod').then($paymentMethod => {
+        // Checks if the organization already has a payment method configured
+        if ($paymentMethod.text().includes('VISA **** 4242')) {
+          cy.contains('button', 'Make contribution').click();
+        } else {
+          cy.get('input[type=checkbox][name=save]').should('be.checked');
+          cy.wait(1000); // Wait for stripe to be loaded
+          cy.fillStripeInput();
+          cy.contains('button', 'Make contribution').click();
+        }
+        cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
+        cy.contains("Test Collective is now a member of APEX's 'Sponsors' tier!");
+      });
     });
   });
 });
