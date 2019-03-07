@@ -565,10 +565,17 @@ class CreateOrderPage extends React.Component {
           {interval && (
             <React.Fragment>
               <br />
-              <FormattedMessage
-                id="contribute.tierDetailsFrequency"
-                defaultMessage="Your next charge will be on:"
-              />{' '}
+              <br />
+              <strong>
+                <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />
+              </strong>{' '}
+              <Span color="primary.500">
+                <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
+              </Span>
+              <br />
+              <strong>
+                <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />
+              </strong>{' '}
               <Span color="primary.500">
                 {moment()
                   .add(1, interval)
