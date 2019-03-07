@@ -317,11 +317,7 @@ const isNotificationActive = async (template, data) => {
     logger.info('Skips active email notification checks for unit test');
     return true;
   } else {
-    const notificationIsActive = await models.Notification.isActive(template, data.collective.id, data.user.id);
-    if (!notificationIsActive) {
-      return false;
-    }
-    return true;
+    return models.Notification.isActive(template, data.collective.id, data.user.id);
   }
 };
 
