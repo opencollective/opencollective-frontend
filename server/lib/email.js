@@ -311,6 +311,20 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   return Promise.resolve(renderedTemplate);
 };
 
+const isNotificationActive = async (template, data) => {
+  // Skip active email notification check for unit test
+  if (config.env === 'test' || config.env === 'circleci') {
+    logger.info('Skips active email notification checks for unit test');
+    return true;
+  } else {
+    const notificationIsActive = await models.Notification.isActive(template, data.collective.id, data.user.id);
+    if (!notificationIsActive) {
+      return false;
+    }
+    return true;
+  }
+};
+
 /*
  * Given a template, recipient and data, generates email and sends it.
  */
@@ -320,15 +334,10 @@ const generateEmailFromTemplateAndSend = async (template, recipient, data, optio
     return;
   }
 
-  // Skip active email notification check for unit test
-  if (config.env === 'test' || config.env === 'circleci') {
-    logger.info('Skips active email notification checks for unit test');
-  } else {
-    const notificationIsActive = await models.Notification.isActive(template, data.collective.id, data.user.id);
-    if (!notificationIsActive) {
-      logger.info(`Email with template '${template}' not sent. Recipient email notification not active.`);
-      return;
-    }
+  const notificationIsActive = await isNotificationActive(template, data);
+  if (!notificationIsActive) {
+    logger.info(`Email with template '${template}' not sent. Recipient email notification is not active.`);
+    return;
   }
 
   return generateEmailFromTemplate(template, recipient, data, options).then(renderedTemplate => {
