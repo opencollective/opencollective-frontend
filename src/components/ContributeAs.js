@@ -158,7 +158,7 @@ const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProf
         {...fieldProps}
         options={options}
         keyGetter="id"
-        defaultValue={defaultSelectedProfile.id}
+        defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}
         onChange={onChange}
       >
         {({ key, value, radio, checked, index }) => (
@@ -267,17 +267,18 @@ ContributeAs.displayName = 'ContributeAs';
 
 ContributeAs.propTypes = {
   /**
-   * emits latest selected profile <br />
-   * if enhance( enhance( enhance( enhance( anoymous is selected, only `{name: 'anonymous'}` is returned <br />
-   * if 'A new organization' is selected, the latest data from that form is returned <br />
-   * else the data passed to `profiles` or `personal` is returned
+   * emits latest selected profile
+   *
+   *  - if anoymous is selected, only `{name: 'anonymous'}` is returned
+   *  - if 'A new organization' is selected, the latest data from that form is returned
+   *  - else the data passed to `profiles` or `personal` is returned
    */
   onProfileChange: PropTypes.func,
   defaultSelectedProfile: PropTypes.shape({
     id: PropTypes.number,
   }),
   personal: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.number.isRequired,
     email: PropTypes.string,
     image: PropTypes.string,
     name: PropTypes.string,
@@ -285,7 +286,7 @@ ContributeAs.propTypes = {
   }),
   profiles: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.number.isRequired,
       email: PropTypes.string,
       image: PropTypes.string,
       name: PropTypes.string,
