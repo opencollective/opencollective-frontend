@@ -172,6 +172,10 @@ class ExpenseDetails extends React.Component {
             .col.large {
               width: 100%;
             }
+
+            .privateMessage {
+              white-space: pre-line;
+            }
           `}
         </style>
 
