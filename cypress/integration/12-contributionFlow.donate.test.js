@@ -127,7 +127,8 @@ describe('Contribution Flow: Donate', () => {
       // Should display the tier details
       cy.contains('Tier details:');
       cy.contains('You’ll contribute with the amount of $42.00 yearly.');
-      cy.contains('Your next charge will be on: May 1, 2043');
+      cy.contains('First charge: Today');
+      cy.contains('Next charge: May 1, 2043');
 
       // Submit order
       cy.contains('button', 'Make contribution').click();
