@@ -356,6 +356,7 @@ export default function(Sequelize, DataTypes) {
 
       archivedAt: {
         type: DataTypes.DATE,
+        allowNull: true,
       },
     },
     {
