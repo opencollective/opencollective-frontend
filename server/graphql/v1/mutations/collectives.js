@@ -2,7 +2,7 @@ import debug from 'debug';
 import slugify from 'limax';
 import { get, omit } from 'lodash';
 
-import models from '../../../models';
+import models, { Op } from '../../../models';
 import * as errors from '../../errors';
 import emailLib from '../../../lib/email';
 import * as github from '../../../lib/github';
@@ -10,6 +10,7 @@ import { defaultHostCollective } from '../../../lib/utils';
 
 import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
+import status from '../../../constants/order_status';
 import { types } from '../../../constants/collectives';
 
 const debugClaim = debug('claim');
@@ -630,4 +631,40 @@ export async function claimCollective(_, args, req) {
   await collective.save();
 
   return collective;
+}
+
+export async function archiveCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to archive a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(collective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as a core contributor.',
+    });
+  }
+
+  collective.getTiers().then(tiers => {
+    tiers.destory();
+  });
+  // Cancle all active subscription
+  const orders = await collective.getIncomingOrders({
+    where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
+    include: [{ model: models.Subscription }, { model: models.Collective, as: 'collective' }],
+  });
+
+  orders.map(async order => {
+    await Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]);
+  });
+
+  return collective.update({ isActive: true, archiveAt: Date.now() });
 }
