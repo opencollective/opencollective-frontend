@@ -76,7 +76,7 @@ class PledgedCollective extends React.Component {
           <Container display="flex" justifyContent="center" position="relative" top={-30}>
             <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
               <StyledLink buttonStyle="primary" buttonSize="large">
-                Make a pledge
+                <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
               </StyledLink>
             </Link>
           </Container>
@@ -90,21 +90,29 @@ class PledgedCollective extends React.Component {
                   orgCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE,
                   userCount: pledgeStats.USER,
                   totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
+                  currency: collective.currency,
+                  amount: (
+                    <Currency
+                      fontWeight="bold"
+                      value={pledgeStats.total}
+                      currency={collective.currency}
+                      precision={0}
+                    />
+                  ),
                 }}
-                defaultMessage={
-                  '{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }}'
-                }
-              />{' '}
-              already pledged a total of{' '}
-              <Currency fontWeight="bold" value={pledgeStats.total} currency={collective.currency} precision={0} />{' '}
-              {collective.currency}.
+                defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
+              />
             </H3>
 
             <P color="black.600" fontSize="Caption" my={4}>
-              A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
-              Open Collective, just like <strong>{collective.name}</strong>. This will incentivize them to create a
+              <FormattedMessage
+                id="pledge.definition"
+                defaultMessage="A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
+              Open Collective, just like {collective}. This will incentivize them to create a
               collective for their activities and offer you much more visibility on how your money is spent to advance
-              their cause. Once they create it, you will receive an email to ask you to fulfill your pledge.
+              their cause. Once they create it, you will receive an email to ask you to fulfill your pledge."
+                values={{ collective: <strong>{collective.name}</strong> }}
+              />
             </P>
           </Container>
 
@@ -137,18 +145,25 @@ class PledgedCollective extends React.Component {
             >
               <Box width={[1, null, 0.65]}>
                 <H5 textAlign="left" fontWeight="normal" mb={1}>
-                  Do you own <strong>{collective.name}</strong>?
+                  <FormattedMessage
+                    id="pledge.ownerQuestion"
+                    defaultMessage="Do you own {collective}?"
+                    values={{ collective: <strong>{collective.name}</strong> }}
+                  />
                 </H5>
                 <P fontSize="Caption" color="black.500">
-                  You can claim this collective! You will be able to start raising funds and manage your expenses
+                  <FormattedMessage
+                    id="pledge.ownerDetails"
+                    defaultMessage="You can claim this collective! You will be able to start raising funds and manage your expenses
                   transparently. We will contact the organizations and individuals who made commitment for them to
-                  fulfill their pledge.
+                  fulfill their pledge."
+                  />
                 </P>
               </Box>
               <Flex width={[1, null, 0.35]} justifyContent="center" mt={[4, null, 0]}>
                 <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
                   <StyledLink textAlign="center" width={1} buttonSize="medium" buttonStyle="standard">
-                    Claim this collective
+                    <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
                   </StyledLink>
                 </Link>
               </Flex>
