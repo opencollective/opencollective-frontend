@@ -657,14 +657,15 @@ export async function archiveCollective(_, args, req) {
     tiers.destory();
   });
   // Cancle all active subscription
-  const orders = await collective.getIncomingOrders({
+  let orders = await collective.getIncomingOrders({
     where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
     include: [{ model: models.Subscription }, { model: models.Collective, as: 'collective' }],
   });
 
-  orders.map(async order => {
-    await Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]);
+  orders = orders.map(async order => {
+    return await Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]);
   });
 
-  return collective.update({ isActive: true, archiveAt: Date.now() });
+  await Promise.all(orders);
+  return collective.update({ isActive: false, archiveAt: Date.now() });
 }
