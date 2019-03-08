@@ -353,6 +353,10 @@ export default function(Sequelize, DataTypes) {
       monthlySpending: {
         type: new DataTypes.VIRTUAL(DataTypes.INTEGER),
       },
+
+      archivedAt: {
+        type: DataTypes.DATE,
+      },
     },
     {
       paranoid: true,
