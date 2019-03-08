@@ -80,6 +80,12 @@ class UserProvider extends React.Component {
       });
       return LoggedInUser;
     } catch (error) {
+      // If token from localStorage is invalid or expired, delete it
+      if (!token && ['Invalid token', 'Expired token'].includes(error.message)) {
+        this.logout();
+      }
+
+      // Store the error
       this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
     }
   };

@@ -11,16 +11,25 @@ import { getLoggedInUserQuery } from '../graphql/queries';
 const maybeRefreshAccessToken = async currentToken => {
   const decodeResult = jwt.decode(currentToken);
   if (!decodeResult) {
-    return;
+    return null;
   }
 
+  // Update token if it expires in less than a month
   const shouldUpdate = moment(decodeResult.exp * 1000)
     .subtract(1, 'month')
     .isBefore(new Date());
+
   if (shouldUpdate) {
-    const { token } = await api.refreshToken(currentToken);
-    window.localStorage.setItem('accessToken', token);
+    const { token, error } = await api.refreshToken(currentToken);
+    if (error) {
+      return null;
+    } else if (token) {
+      window.localStorage.setItem('accessToken', token);
+      return token;
+    }
   }
+
+  return currentToken;
 };
 
 export default WrappedComponent => {
@@ -67,8 +76,13 @@ export default WrappedComponent => {
         if (!decodeResult || !decodeResult.exp) {
           throw new Error('Invalid token');
         }
-        storage.set('accessToken', token);
-        await maybeRefreshAccessToken(token);
+
+        const newToken = await maybeRefreshAccessToken(token);
+        if (!newToken) {
+          throw Error('Invalid token');
+        } else if (window.localStorage.getItem('accessToken') !== newToken) {
+          window.localStorage.setItem('accessToken', newToken);
+        }
       } else {
         // If no localStorage token, reset LoggedInUser
         const localStorageToken = window.localStorage.getItem('accessToken');
