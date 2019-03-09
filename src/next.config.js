@@ -8,6 +8,13 @@ const nextConfig = {
     // Make sure entries are not getting disposed.
     maxInactiveAge: 1000 * 60 * 60,
   },
+  env: {
+    API_KEY: null,
+    API_URL: 'https://api.opencollective.com',
+    INVOICES_URL: 'https://invoices.opencollective.com',
+    DYNAMIC_IMPORT: true,
+    WEBSITE_URL: 'https://opencollective.com',
+  },
   webpack: config => {
     config.plugins.push(
       // Ignore __tests__
@@ -16,13 +23,6 @@ const nextConfig = {
       new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
-      new webpack.EnvironmentPlugin({
-        API_KEY: null,
-        API_URL: 'https://api.opencollective.com',
-        INVOICES_URL: 'https://invoices.opencollective.com',
-        DYNAMIC_IMPORT: true,
-        WEBSITE_URL: 'https://opencollective.com',
-      }),
     );
 
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
