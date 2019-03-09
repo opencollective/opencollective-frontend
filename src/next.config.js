@@ -1,7 +1,7 @@
-/*  eslint-disable-next-line import/no-unresolved */
-import webpack from 'webpack';
-import withCSS from '@zeit/next-css';
-import { get } from 'lodash';
+/*  eslint-disable-next-line require/no-unresolved */
+const webpack = require('webpack');
+const { get } = require('lodash');
+const withCSS = require('@zeit/next-css');
 
 const nextConfig = {
   onDemandEntries: {
