@@ -1,4 +1,4 @@
-/*  eslint-disable-next-line require/no-unresolved */
+/*  eslint-disable-next-line node/no-extraneous-require */
 const webpack = require('webpack');
 const { get } = require('lodash');
 const withCSS = require('@zeit/next-css');
