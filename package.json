@@ -52,7 +52,7 @@
     "markdown-loader": "5.0.0",
     "moment": "2.24.0",
     "moment-timezone": "0.5.23",
-    "next": "8.0.3",
+    "next": "^8.0.4-canary.9",
     "next-routes": "1.4.2",
     "node-fetch": "2.3.0",
     "nodemailer": "5.1.1",
