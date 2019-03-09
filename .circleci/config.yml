@@ -97,8 +97,8 @@ jobs:
 
       - run: npm run build:clean
       - run: npm run build:updates
-      - run: npm run build:server
       - run: npm run build:next
+      - run: npm run build:server
 
       # # We prune to save space in node_modules persistence
       # # If we don't persist node_modules, we don't need it
