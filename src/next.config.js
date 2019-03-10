@@ -1,5 +1,5 @@
 /*  eslint-disable-next-line node/no-extraneous-require */
-const { IgnorePlugin, ContextReplacementPlugin } = require('webpack');
+// const { IgnorePlugin, ContextReplacementPlugin } = require('webpack');
 const { get } = require('lodash');
 const withCSS = require('@zeit/next-css');
 
@@ -16,12 +16,12 @@ const nextConfig = {
     WEBSITE_URL: 'https://opencollective.com',
   },
   webpack: config => {
-    config.plugins.push(
-      // Ignore __tests__
-      new IgnorePlugin(/\/__tests__\//),
-      // Only include our supported locales
-      new ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
-    );
+    // config.plugins.push(
+    //   Ignore __tests__
+    //   new IgnorePlugin(/\/__tests__\//),
+    //   Only include our supported locales
+    //   new ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
+    // );
 
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
       // eslint-disable-next-line node/no-unpublished-require
@@ -80,6 +80,12 @@ const nextConfig = {
             outputPath: 'static/img/',
             name: '[name]-[hash].[ext]',
           },
+        },
+      },
+      {
+        test: /\/__tests__\//,
+        use: {
+          loader: 'null-loader',
         },
       },
     );
