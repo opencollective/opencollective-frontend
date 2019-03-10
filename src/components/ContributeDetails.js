@@ -88,7 +88,7 @@ const ContributeDetails = ({
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
   return (
-    <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap" {...props}>
+    <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap">
       <Flex mb={3}>
         {hasOptions && (
           <StyledInputField
