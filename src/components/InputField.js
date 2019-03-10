@@ -9,6 +9,7 @@ import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
+import ArchiveCollective from './ArchiveCollective';
 
 import { capitalize } from '../lib/utils';
 
@@ -545,7 +546,9 @@ class InputField extends React.Component {
           </div>
         );
         break;
-
+      case 'archiveCollective':
+        this.input = <ArchiveCollective collective={context} />;
+        break;
       default: {
         const addressDefaultValue = field.name === 'address' ? context['location'][field.name] : '';
         this.input = (
@@ -603,6 +606,11 @@ class InputField extends React.Component {
             .inputField .switch {
               display: flex;
               align-items: center;
+            }
+            .archiveField {
+              width: 100%;
+              display: flex;
+              padding-top: 20px;
             }
           `}
         </style>
