@@ -90,9 +90,9 @@ jobs:
       NODE_ENV: circleci
     steps:
       - checkout
-      - <<: *restore_npm_cache
+      # - <<: *restore_npm_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
-      - <<: *persist_npm_cache
+      # - <<: *persist_npm_cache
 
       - run: npm run build:clean
       - run: npm run build:updates
