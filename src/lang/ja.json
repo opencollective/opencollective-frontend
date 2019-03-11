@@ -781,7 +781,7 @@
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Approving expense",
   "actions.rejectExpense.processing": "Rejecting expense",
-  "actions.done": "done",
+  "actions.done": "Done",
   "error.label": "Error",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organization} other {organizations}} are supporting {collective}",
   "widget.becomeSponsor": "Become a sponsor",
