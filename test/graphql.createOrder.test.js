@@ -184,7 +184,7 @@ describe('createOrder', () => {
 
   it('creates a pending order if the collective is active and the payment method type is manual', async () => {
     const host = await models.Collective.create({
-      slug: 'host',
+      slug: 'host-collective',
       name: 'Open Collective 501c3',
       currency: 'USD',
       settings: {
@@ -567,7 +567,7 @@ describe('createOrder', () => {
     const transactions = await models.Transaction.findAll({
       where: { OrderId: orderCreated.id },
     });
-    expect(fromCollective.website).to.equal('http://newco.com'); // api should prepend http://
+    expect(fromCollective.website).to.equal('https://newco.com'); // api should prepend https://
     expect(transactions.length).to.equal(2);
     expect(transactions[0].type).to.equal('DEBIT');
     expect(transactions[0].FromCollectiveId).to.equal(collective.id);
@@ -744,7 +744,7 @@ describe('createOrder', () => {
       // First clean the database
       await utils.resetTestDB();
       // Given a host collective and its admin
-      ({ hostAdmin, hostCollective } = await store.newHost('Host', 'USD', 10));
+      ({ hostAdmin, hostCollective } = await store.newHost('host-collective', 'USD', 10));
       // And the above collective's host has a stripe account
       await store.stripeConnectedAccount(hostCollective.id);
       // And given two collectives in that host
