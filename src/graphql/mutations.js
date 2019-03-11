@@ -189,6 +189,14 @@ const deleteCollectiveQuery = gql`
   }
 `;
 
+const archiveCollectiveQuery = gql`
+  mutation archiveCollective($id: Int!) {
+    archiveCollective(id: $id) {
+      id
+    }
+  }
+`;
+
 export const createApplicationMutation = gql`
   mutation createApplication($application: ApplicationInput!) {
     createApplication(application: $application) {
@@ -427,6 +435,14 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
 export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
   props: ({ mutate }) => ({
     deleteCollective: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+export const addArchiveCollectiveMutation = graphql(archiveCollectiveQuery, {
+  props: ({ mutate }) => ({
+    archiveCollective: async id => {
       return await mutate({ variables: { id } });
     },
   }),
