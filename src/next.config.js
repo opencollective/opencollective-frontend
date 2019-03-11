@@ -15,13 +15,13 @@ const nextConfig = {
     DYNAMIC_IMPORT: true,
     WEBSITE_URL: 'https://opencollective.com',
   },
-  webpack: config => {
-    // config.plugins.push(
-    //   Ignore __tests__
-    //   new IgnorePlugin(/\/__tests__\//),
-    //   Only include our supported locales
-    //   new ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
-    // );
+  webpack: (config, { webpack }) => {
+    config.plugins.push(
+      // Ignore __tests__
+      new webpack.IgnorePlugin(/\/__tests__\//),
+      // Only include our supported locales
+      new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|fr|es|ja/),
+    );
 
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
       // eslint-disable-next-line node/no-unpublished-require
@@ -80,12 +80,6 @@ const nextConfig = {
             outputPath: 'static/img/',
             name: '[name]-[hash].[ext]',
           },
-        },
-      },
-      {
-        test: /\/__tests__\//,
-        use: {
-          loader: 'null-loader',
         },
       },
     );
