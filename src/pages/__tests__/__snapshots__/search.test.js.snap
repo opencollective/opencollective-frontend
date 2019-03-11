@@ -14,12 +14,6 @@ Array [
   margin-right: 16px;
 }
 
-.c11 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
 .c0 {
   box-sizing: border-box;
   padding-left: 16px;
@@ -148,6 +142,17 @@ Array [
   list-style: none;
   min-width: 20rem;
   text-align: right;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c11 {
+  box-sizing: border-box;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
 }
 
 .c12 {
@@ -176,6 +181,20 @@ Array [
 @media screen and (min-width:64em) {
   .c6 {
     display: none;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
@@ -1290,12 +1309,6 @@ Array [
   margin-right: 16px;
 }
 
-.c11 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
 .c0 {
   box-sizing: border-box;
   padding-left: 16px;
@@ -1424,6 +1437,17 @@ Array [
   list-style: none;
   min-width: 20rem;
   text-align: right;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c11 {
+  box-sizing: border-box;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
 }
 
 .c12 {
@@ -1452,6 +1476,20 @@ Array [
 @media screen and (min-width:64em) {
   .c6 {
     display: none;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
@@ -2565,12 +2603,6 @@ exports[`Search Page renders error message 1`] = `
   margin-right: 16px;
 }
 
-.c17 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
 .c37 {
   box-sizing: border-box;
   margin-bottom: 16px;
@@ -3002,6 +3034,17 @@ exports[`Search Page renders error message 1`] = `
   list-style: none;
   min-width: 20rem;
   text-align: right;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c17 {
+  box-sizing: border-box;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
 }
 
 .c18 {
@@ -3189,6 +3232,20 @@ exports[`Search Page renders error message 1`] = `
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c17 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c17 {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
@@ -3987,12 +4044,6 @@ Array [
   margin-right: 16px;
 }
 
-.c11 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
 .c0 {
   box-sizing: border-box;
   padding-left: 16px;
@@ -4121,6 +4172,17 @@ Array [
   list-style: none;
   min-width: 20rem;
   text-align: right;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c11 {
+  box-sizing: border-box;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
 }
 
 .c12 {
@@ -4149,6 +4211,20 @@ Array [
 @media screen and (min-width:64em) {
   .c6 {
     display: none;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
@@ -5358,12 +5434,6 @@ Array [
   margin-right: 16px;
 }
 
-.c11 {
-  box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
 .c0 {
   box-sizing: border-box;
   padding-left: 16px;
@@ -5492,6 +5562,17 @@ Array [
   list-style: none;
   min-width: 20rem;
   text-align: right;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c11 {
+  box-sizing: border-box;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
 }
 
 .c12 {
@@ -5520,6 +5601,20 @@ Array [
 @media screen and (min-width:64em) {
   .c6 {
     display: none;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
