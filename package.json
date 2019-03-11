@@ -106,7 +106,7 @@
     "build": "npm run build:clean && npm run build:updates && npm run build:next && npm run build:server",
     "build:clean": "rm -rf dist src/.next",
     "build:updates": "npm --prefix node_modules/cloudflare-ip run update-list",
-    "build:next": "next build dist",
+    "build:next": "next build src",
     "build:server": "babel --copy-files ./src --out-dir ./dist --ignore src/templates/widget.js,src/**/__tests__/*,src/.next/*,src/pages/**,src/components/**",
     "test": "npm run test:jest && npm run test:e2e",
     "test:jest": "TZ=UTC jest src/*",

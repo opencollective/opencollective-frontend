@@ -1,5 +1,4 @@
 /*  eslint-disable-next-line node/no-extraneous-require */
-// const { IgnorePlugin, ContextReplacementPlugin } = require('webpack');
 const { get } = require('lodash');
 const withCSS = require('@zeit/next-css');
 
