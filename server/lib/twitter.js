@@ -122,6 +122,8 @@ const compileTweet = (template, data, message) => {
     'en-US': {
       tenBackers: `🎉 {collective} just reached 10 backers! Thank you {topBackersTwitterHandles} 🙌
 Support them too!`,
+      fiftyBackers: `🎉 {collective} just reached 50 backers!! 🙌
+Support them too!`,
       oneHundred: `🎉 {collective} just reached 100 backers!! 🙌
 Support them too!`,
       oneThousandBackers: `🎉 {collective} just reached 1,0000 backers!!! 🙌
