@@ -361,12 +361,6 @@ export default (Sequelize, DataTypes) => {
     return result;
   };
 
-  User.prototype.isRoot = function() {
-    const result = this.hasRole([roles.ADMIN], 1);
-    debug('isRoot ?', result);
-    return result;
-  };
-
   User.prototype.getPersonalDetails = function(remoteUser) {
     if (!remoteUser) return Promise.resolve(this.public);
     return this.populateRoles()
