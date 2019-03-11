@@ -13,6 +13,7 @@ import { formatCurrency } from '../../server/lib/utils';
 import showdown from 'showdown';
 import { reduceArrayToCurrency } from '../../server/lib/currency';
 import fetch from 'isomorphic-fetch';
+import { pluralize } from '../../server/lib/utils';
 
 const markdownConverter = new showdown.Converter();
 
@@ -49,7 +50,7 @@ const createdLastWeek = getTimeFrame('createdAt', lastWeek);
 const updatedLastWeek = getTimeFrame('updatedAt', lastWeek);
 const createdSameWeekPreviousMonth = getTimeFrame('createdAt', sameDatesLastMonth);
 const updatedSameWeekPreviousMonth = getTimeFrame('updatedAt', sameDatesLastMonth);
-
+const sinceISOString = lastWeek[0].toISOString();
 const title = 'Weekly Platform Report';
 const subtitle = `Week ${lastWeek[0].week()} from ${lastWeek[0].format('YYYY-MM-DD')} till ${lastWeek[1].format(
   'YYYY-MM-DD',
@@ -131,6 +132,31 @@ const distinct = {
   plain: false,
   distinct: true,
 };
+
+function printIssues(issues, limit = 10) {
+  const resArray = [];
+  for (let i = 0; i < Math.min(limit, issues.length); i++) {
+    const issue = issues[i];
+    const labels = issue.labels.map(label => label.name);
+    const labelsStr = labels.length > 0 ? ` #${labels.join(' #')}` : '';
+    resArray.push(`- ${moment(issue.updated_at).format('DD/MM')} [${issue.title}](${issue.url})${labelsStr}<br>
+Created ${moment(issue.created_at).fromNow()} by [${issue.user.login}](${issue.user.html_url}) | ${
+      issue.assignee ? `assigned to ${issue.assignee.login}` : 'not assigned'
+    }${issue.comments > 0 ? ` | ${issue.comments} ${pluralize('comment', issue.comments)}` : ''}`);
+  }
+  return resArray.join('\n\n');
+}
+
+function getLatestIssues(state = 'open') {
+  const url = `https://api.github.com/repos/opencollective/opencollective/issues?state=${state}&per_page=50&since=${sinceISOString}`;
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  }).then(response => response.json());
+}
 
 export default function run() {
   return Promise.props({
@@ -264,6 +290,9 @@ export default function run() {
     priorNewCollectivesCount: Collective.count(
       merge({}, { where: { type: 'COLLECTIVE' } }, createdSameWeekPreviousMonth),
     ),
+
+    openIssues: getLatestIssues('open'),
+    closedIssues: getLatestIssues('closed'),
   })
     .then(async results => {
       results.revenueInUSD = -(await reduceArrayToCurrency(
@@ -295,7 +324,7 @@ export default function run() {
         title,
         html,
       };
-      return emailLib.send('report.platform', 'team@opencollective.com', data);
+      return emailLib.send('report.platform.weekly', 'team@opencollective.com', data);
     })
     .then(() => {
       console.log('Weekly reporting done!');
@@ -392,6 +421,8 @@ function reportString({
   priorPaidExpenseCount,
   rejectedExpenseAmount,
   rejectedExpenseCount,
+  openIssues,
+  closedIssues,
 }) {
   const growth = (revenueInUSD - priorRevenueInUSD) / priorRevenueInUSD;
   const growthPercent = `${Math.round(growth * 100)}%`;
@@ -465,6 +496,16 @@ ${subtitle}
     newCollectives.length,
     priorNewCollectivesCount,
   )})${displayCollectives(newCollectives)}
+
+## ${closedIssues.length} issues closed last week
+${printIssues(closedIssues, 10)}
+
+[View all closed issues](https://github.com/opencollective/opencollective/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aclosed+)
+
+## ${openIssues.length} open issues created or updated last week
+${printIssues(openIssues, 10)}
+
+[View all open issues](https://github.com/opencollective/opencollective/issues)
 `;
 }
 

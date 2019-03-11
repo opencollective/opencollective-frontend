@@ -53,6 +53,7 @@ const templateNames = [
   'pledge.complete',
   'order.processing',
   'report.platform',
+  'report.platform.weekly',
   'subscription.canceled',
   'ticket.confirmed',
   'ticket.confirmed.text',
