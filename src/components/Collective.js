@@ -50,6 +50,14 @@ class Collective extends React.Component {
         defaultMessage:
           'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
       },
+      'collective.archived': {
+        id: 'collective.archived',
+        defaultMessage: 'Your collective has been archived.',
+      },
+      'collective.archived.description': {
+        id: 'collective.archived.description',
+        defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
+      },
       'collective.donate': {
         id: 'collective.donate',
         defaultMessage: 'donate',
@@ -123,6 +131,7 @@ class Collective extends React.Component {
 
   render() {
     const { intl, LoggedInUser, query, collective } = this.props;
+    const status = get(query, 'status');
 
     const donateParams = { collectiveSlug: collective.slug, verb: 'donate' };
     if (query.referral) {
@@ -132,13 +141,16 @@ class Collective extends React.Component {
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage') || defaultBackgroundImage;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
-    if (get(query, 'status') === 'collectiveCreated') {
+    if (status === 'collectiveCreated') {
       notification.title = intl.formatMessage(this.messages['collective.created']);
       notification.description = intl.formatMessage(this.messages['collective.created.description'], {
         host: collective.host.name,
       });
+    } else if (status === 'collectiveArchived' || collective.archived) {
+      notification.title = intl.formatMessage(this.messages['collective.archived']);
+      notification.description = intl.formatMessage(this.messages['collective.archived.description']);
+      notification.status = 'collectiveArchived';
     }
-
     const cta = collective.isActive && collective.host ? { href: '#contribute', label: 'contribute' } : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
@@ -214,7 +226,7 @@ class Collective extends React.Component {
         <Body>
           <div className="CollectivePage">
             <NotificationBar
-              status={this.state.status}
+              status={notification.status || status}
               title={notification.title}
               description={notification.description}
               error={this.state.error}
