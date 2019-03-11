@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
+import slugify from 'limax';
 
 import CustomDataTypes from './DataTypes';
 import { maxInteger } from '../constants/math';
@@ -35,7 +36,7 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.STRING,
         set(slug) {
           if (slug && slug.toLowerCase) {
-            this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-'));
+            this.setDataValue('slug', slugify(slug));
           }
         },
       },
@@ -83,19 +84,25 @@ export default function(Sequelize, DataTypes) {
       // Max quantity of tickets to sell (0 for unlimited)
       maxQuantity: {
         type: DataTypes.INTEGER,
-        min: 0,
+        validate: {
+          min: 0,
+        },
       },
 
       // Max quantity of tickets per user (0 for unlimited)
       maxQuantityPerUser: {
         type: DataTypes.INTEGER,
-        min: 0,
+        validate: {
+          min: 0,
+        },
       },
 
       // Goal to reach
       goal: {
         type: DataTypes.INTEGER,
-        min: 0,
+        validate: {
+          min: 0,
+        },
       },
 
       password: {
