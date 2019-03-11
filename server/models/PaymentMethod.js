@@ -7,7 +7,7 @@ import { get, intersection } from 'lodash';
 import { TransactionTypes } from '../constants/transactions';
 
 import { sumTransactions } from '../lib/hostlib';
-import { formatCurrency, formatArrayToString } from '../lib/utils';
+import { formatCurrency, formatArrayToString, cleanTags } from '../lib/utils';
 import { getFxRate } from '../lib/currency';
 
 import CustomDataTypes from './DataTypes';
@@ -22,6 +22,8 @@ export default function(Sequelize, DataTypes) {
   const { models, Op } = Sequelize;
 
   const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
+
+  const payoutTypes = ['creditcard', 'prepaid', 'payment', 'collective', 'adaptive', 'bitcoin', 'virtualcard'];
 
   const PaymentMethod = Sequelize.define(
     'PaymentMethod',
@@ -72,6 +74,9 @@ export default function(Sequelize, DataTypes) {
       // Monthly limit in cents for each member of this.CollectiveId (in the currency of that collective)
       monthlyLimitPerMember: {
         type: DataTypes.INTEGER,
+        validate: {
+          min: 0,
+        },
       },
 
       currency: CustomDataTypes(DataTypes).currency,
@@ -89,6 +94,12 @@ export default function(Sequelize, DataTypes) {
 
       type: {
         type: DataTypes.STRING,
+        validate: {
+          isIn: {
+            args: [payoutTypes],
+            msg: `Must be in ${payoutTypes}`,
+          },
+        },
       },
 
       data: DataTypes.JSON,
@@ -119,16 +130,25 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         description:
           'Initial balance on this payment method. Current balance should be a computed value based on transactions.',
+        validate: {
+          min: 0,
+        },
       },
 
       matching: {
         type: DataTypes.INTEGER,
         description: 'if not null, this payment method can only be used to match x times the donation amount',
+        validate: {
+          min: 0,
+        },
       },
 
       limitedToTags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         description: 'if not null, this payment method can only be used for collectives that have one the tags',
+        set(tags) {
+          this.setDataValue('limitedToTags', cleanTags(tags));
+        },
       },
 
       limitedToCollectiveIds: {

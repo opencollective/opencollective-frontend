@@ -642,3 +642,22 @@ export const firstParagraph = (str, length = 256) => {
     return firstSentence(str, length);
   }
 };
+
+/**
+ * Clean a tags list before inserting to the db. Trim tags, remove empty ones...
+ * Will return `null` if the list is empty.
+ */
+export const cleanTags = tags => {
+  if (!tags) {
+    return null;
+  } else if (typeof tags === 'string') {
+    tags = [tags];
+  }
+
+  const cleanTagsList = tags
+    .filter(t => Boolean(t)) // Remove null values
+    .map(t => t.trim()) // Trim tags
+    .filter(t => t.length > 0); // Remove empty tags
+
+  return cleanTagsList.length > 0 ? cleanTagsList : null;
+};
