@@ -22,7 +22,7 @@ describe('edit collective', () => {
   });
 
   it('edit info', () => {
-    cy.get('.name.inputField input').type(' edited');
+    cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
     cy.get('.description.inputField input').type(' edited');
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
     cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
