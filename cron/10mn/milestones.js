@@ -115,6 +115,10 @@ const processNewMembersCount = async newMembersCount => {
     console.log(`🎉 ${collective.slug} just passed the 100 backers milestone with ${backersCount} backers`);
     return await processMilestone('oneHundredBackers', collective);
   }
+  if (hasPassedMilestone(50)) {
+    console.log(`🎉 ${collective.slug} just passed the 50 backers milestone with ${backersCount} backers`);
+    return await processMilestone('fiftyBackers', collective);
+  }
   if (hasPassedMilestone(10)) {
     console.log(
       `🎉 ${collective.slug} got ${count} new ${pluralize(
