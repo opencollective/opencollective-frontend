@@ -653,10 +653,12 @@ export async function archiveCollective(_, args, req) {
     });
   }
 
-  collective.getTiers().then(tiers => {
-    tiers.destory();
+  let tiers = await collective.getTiers();
+  tiers = tiers.map(async tier => {
+    return await tier.destroy();
   });
-  // Cancle all active subscription
+
+  // Cancel all active subscription
   let orders = await collective.getIncomingOrders({
     where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
     include: [{ model: models.Subscription }, { model: models.Collective, as: 'collective' }],
@@ -666,6 +668,6 @@ export async function archiveCollective(_, args, req) {
     return await Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]);
   });
 
-  await Promise.all(orders);
-  return collective.update({ isActive: false, archiveAt: Date.now() });
+  await Promise.all([...orders, ...tiers]);
+  return collective.update({ isActive: false, deactivatedAt: Date.now() });
 }
