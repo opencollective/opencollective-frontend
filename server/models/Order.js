@@ -66,22 +66,36 @@ export default function(Sequelize, DataTypes) {
 
       quantity: {
         type: DataTypes.INTEGER,
-        min: 0,
+        validate: {
+          min: 1,
+        },
       },
 
       currency: CustomDataTypes(DataTypes).currency,
 
       totalAmount: {
         type: DataTypes.INTEGER, // Total amount of the order in cents
+        validate: {
+          min: 0,
+        },
       },
 
       taxAmount: {
         type: DataTypes.INTEGER,
+        validate: {
+          min: 0,
+        },
       },
 
       description: DataTypes.STRING,
 
-      publicMessage: DataTypes.STRING,
+      publicMessage: {
+        type: DataTypes.STRING,
+        validate: {
+          len: [1, 240],
+        },
+      },
+
       privateMessage: DataTypes.STRING,
 
       SubscriptionId: {
