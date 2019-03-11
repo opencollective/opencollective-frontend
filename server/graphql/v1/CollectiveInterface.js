@@ -520,6 +520,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       path: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
+      archived: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
@@ -850,6 +851,13 @@ const CollectiveFields = () => {
       type: GraphQLBoolean,
       resolve(collective) {
         return Boolean(collective.settings && collective.settings.apply);
+      },
+    },
+    archived: {
+      description: 'Returns whether this collective was archived',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return Boolean(collective.deactivatedAt && !collective.isActive);
       },
     },
     host: {

@@ -354,7 +354,7 @@ export default function(Sequelize, DataTypes) {
         type: new DataTypes.VIRTUAL(DataTypes.INTEGER),
       },
 
-      archivedAt: {
+      deactivatedAt: {
         type: DataTypes.DATE,
         allowNull: true,
       },
