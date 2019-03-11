@@ -30,6 +30,9 @@ export default function(Sequelize, DataTypes) {
 
       webhookUrl: {
         type: DataTypes.STRING,
+        validate: {
+          isUrl: true,
+        },
       },
     },
     {
