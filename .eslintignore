@@ -2,5 +2,13 @@ node_modules/
 scripts/
 seeders/
 migrations/
-coverage/
+
+# Build and auto-generated files
 dist/
+coverage/
+.nyc_output
+
+# VSCode
+.vscode
+.history
+
