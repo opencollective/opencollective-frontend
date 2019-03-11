@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Flex } from '@rebass/grid';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
 import { withUser } from '../components/UserProvider';
 
 import { capitalize } from '../lib/utils';
@@ -75,7 +77,7 @@ class ActionPage extends React.Component {
           {loadingLoggedInUser ? (
             <Loading />
           ) : (
-            <div className="content">
+            <Flex justifyContent="center" alignItems="center" className="content" px={2} py={5}>
               {loading && this.mutation === 'approveCollective' && (
                 <FormattedMessage id="actions.approveCollective.processing" defaultMessage="Approving collective" />
               )}
@@ -85,7 +87,11 @@ class ActionPage extends React.Component {
               {loading && this.mutation === 'rejectExpense' && (
                 <FormattedMessage id="actions.rejectExpense.processing" defaultMessage="Rejecting expense" />
               )}
-              {!loading && !this.state.error && <FormattedMessage id="actions.done" defaultMessage="done " />}
+              {!loading && !this.state.error && (
+                <MessageBox type="success" withIcon>
+                  <FormattedMessage id="actions.done" defaultMessage="Done" />
+                </MessageBox>
+              )}
               {this.state.error && (
                 <div className="error">
                   <h2>
@@ -94,7 +100,7 @@ class ActionPage extends React.Component {
                   <div className="message">{this.state.error.message}</div>
                 </div>
               )}
-            </div>
+            </Flex>
           )}
         </Body>
         <Footer />

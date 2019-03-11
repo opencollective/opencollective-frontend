@@ -31,7 +31,16 @@ const NavList = styled(Flex)`
   list-style: none;
   min-width: 20rem;
   text-align: right;
+  align-items: center;
 `;
+
+const NavLinkContainer = styled(Box)`
+  text-align: center;
+`;
+NavLinkContainer.defaultProps = {
+  as: 'li',
+  px: [1, 2, 3],
+};
 
 const NavLink = styled.a`
   color: #777777;
@@ -117,30 +126,30 @@ class TopBar extends React.Component {
 
           <Hide xs>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-              <Box as="li" px={3}>
+              <NavLinkContainer>
                 <Link route="discover" passHref>
                   <NavLink>
                     <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                   </NavLink>
                 </Link>
-              </Box>
-              <Box as="li" px={3}>
+              </NavLinkContainer>
+              <NavLinkContainer>
                 <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
                   <NavLink>
                     <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                   </NavLink>
                 </Link>
-              </Box>
-              <Box as="li" px={3}>
+              </NavLinkContainer>
+              <NavLinkContainer>
                 <NavLink href="https://docs.opencollective.com">
                   <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
                 </NavLink>
-              </Box>
-              <Box as="li" px={3}>
+              </NavLinkContainer>
+              <NavLinkContainer>
                 <NavLink href="https://medium.com/open-collective">
                   <FormattedMessage id="menu.blog" defaultMessage="Blog" />
                 </NavLink>
-              </Box>
+              </NavLinkContainer>
             </NavList>
           </Hide>
 
