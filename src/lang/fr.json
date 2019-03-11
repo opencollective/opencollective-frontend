@@ -781,7 +781,7 @@
   "actions.approveCollective.processing": "Approbation du collectif en cours",
   "actions.approveExpense.processing": "Approbation de la dépense en cours",
   "actions.rejectExpense.processing": "Rejet de la dépense en cours",
-  "actions.done": "terminé",
+  "actions.done": "Done",
   "error.label": "Erreur",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organisation soutient} other {organisations soutiennent}} {collective}",
   "widget.becomeSponsor": "Deviens un sponsor",
