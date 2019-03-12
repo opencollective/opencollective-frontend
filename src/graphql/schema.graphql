@@ -522,6 +522,9 @@ type Event implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
+  """Returns whether this collective was archived"""
+  isArchived: Boolean
+
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
@@ -1771,6 +1774,9 @@ type User implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective was archived"""
+  isArchived: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
