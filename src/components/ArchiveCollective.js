@@ -15,6 +15,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
   const [archiving, setArchiving] = useState(false);
+  const [isArchived, setIsArchived] = useState(collective.isArchived);
 
   const collectiveType = collective.type === 'ORGANIZATION' ? 'Organization' : 'Collective';
   const handleArchiveCollective = async ({ archiveCollective, id }) => {
@@ -23,6 +24,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       setArchiving(true);
       await archiveCollective(id);
       setArchiving(false);
+      setIsArchived(true);
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
       setError(`An error occur while archiving your ${collectiveType.toLocaleLowerCase()}. Please try again later.`);
@@ -47,7 +49,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
         />
       </P>
       {error && <P color="#ff5252">{error}</P>}
-      {!collective.isArchived && (
+      {!isArchived && (
         <StyledButton onClick={() => setShowModal(true)} loading={archiving}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
@@ -56,7 +58,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
           />
         </StyledButton>
       )}
-      {collective.isArchived && (
+      {isArchived && (
         <MessageBox withIcon type="info">
           <FormattedMessage
             values={{ type: collectiveType }}
