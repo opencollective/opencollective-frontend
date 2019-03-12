@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
+import classNames from 'classnames';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -46,6 +47,14 @@ class UserCollective extends React.Component {
         id: 'organization.created.description',
         defaultMessage:
           'You can now make contributions as an organization. You can also edit your organization profile, add members and other administrators and attach a credit card that can be used by its members within a monthly limit.',
+      },
+      'organization.isArchived': {
+        id: 'organization.isArchived',
+        defaultMessage: '{name} has been archived.',
+      },
+      'organization.isArchived.description': {
+        id: 'organization.isArchived.description',
+        defaultMessage: 'This organization has been archived and can no longer be used for any activities.',
       },
       'organization.collective.since': {
         id: 'organization.collective.since',
@@ -203,9 +212,8 @@ class UserCollective extends React.Component {
 
     const order = { fromCollective: collective };
     const { intl, LoggedInUser, query } = this.props;
-    if (LoggedInUser) {
-      this.classNames.push('LoggedInUser');
-    }
+    const status = get(query, 'status');
+
     const isProfileEmpty = !(collective.description || collective.longDescription);
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const type = collective.type.toLowerCase();
@@ -229,8 +237,21 @@ class UserCollective extends React.Component {
       });
     }
 
+    if (collective.type === 'ORGANIZATION' && (status === 'collectiveArchived' || collective.isArchived)) {
+      notification.title = intl.formatMessage(this.messages['organization.isArchived'], {
+        name: collective.name,
+      });
+      notification.description = intl.formatMessage(this.messages['organization.isArchived.description']);
+      notification.status = 'collectiveArchived';
+    }
+
     return (
-      <div className={this.classNames.join(' ')}>
+      <div
+        className={classNames('UserCollectivePage', {
+          LoggedInUser: LoggedInUser ? true : false,
+          archiveCollective: collective.isArchived,
+        })}
+      >
         <style jsx>
           {`
             h1 {
@@ -281,6 +302,12 @@ class UserCollective extends React.Component {
             }
             .adminActions ul li {
               margin: 0 2rem;
+            }
+            .archiveCollective {
+              -webkit-filter: grayscale(100%);
+              -moz-filter: grayscale(100%);
+              -ms-filter: grayscale(100%);
+              filter: grayscale(100%);
             }
           `}
         </style>
