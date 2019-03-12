@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { clamp } from 'lodash';
+import { clamp, isNil } from 'lodash';
 
 import StyledInputGroup from './StyledInputGroup';
 import { getCurrencySymbol } from '../lib/utils';
@@ -18,12 +18,15 @@ const StyledInputAmount = ({ currency, min, max, value, onChange, ...props }) =>
       step="1"
       min={min}
       max={max}
-      value={!value ? '' : clamp(value, 1, max)}
+      value={isNil(value) || value === '' ? '' : clamp(value, !min ? 0 : 1, max)}
       prepend={getCurrencySymbol(currency)}
       onChange={e => {
         // We don't cap on min because we want the user to be able to erase the input
         // and to progressively type the number without forcing a value.
-        e.target.value = !e.target.value ? '' : clamp(e.target.value, 1, max);
+        if (e.target.value !== '' && !isNil(e.target.value)) {
+          e.target.value = clamp(e.target.value, !min ? 0 : 1, max);
+        }
+
         onChange(e);
       }}
       {...props}

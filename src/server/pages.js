@@ -57,7 +57,7 @@ pages
 // Special route to force Legacy Flow
 pages.add(
   'orderCollectiveLegacyForce',
-  '/:collectiveSlug/:verb(donate|pay|contribute|order)/legacy',
+  '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/legacy',
   'createOrderLegacy',
 );
 
@@ -72,30 +72,41 @@ pages.add(
 pages
   .add(
     'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment|summary)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
-  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute|order)/success', 'orderSuccess')
+  .add(
+    'orderCollectiveNewSuccess',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/success',
+    'orderSuccess',
+  )
   .add(
     'orderCollectiveTierNewSuccess',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/success',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/success',
     'orderSuccess',
   );
 
 // Generic Route
 pages.add(
   'orderCollective',
-  '/:collectiveSlug/:verb(donate|pay|contribute|order)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+  '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
   'createOrder',
 );
 
-// New contribution flow not applied to events yet
-pages.add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrderLegacy');
+// Events
+pages.add(
+  'orderEventTier',
+  '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/:step(contributeAs|details|payment|summary)?',
+  'createOrder',
+);
+
+// Events
+pages.add('orderEventTierSuccess', '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/success', 'orderSuccess');
 
 // Pledges
 // -------

@@ -55,6 +55,7 @@ export const getItems = (options, keyGetter) => {
 const SelectContainer = styled(Container)`
   cursor: pointer;
   outline: none;
+  line-height: 1.5;
   &:hover,
   &:focus {
     border-color: ${themeGet('colors.primary.300')};

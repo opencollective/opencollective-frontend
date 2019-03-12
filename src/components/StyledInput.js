@@ -121,7 +121,8 @@ StyledInput.defaultProps = {
   borderRadius: '4px',
   px: 3,
   py: 2,
-  lineHeight: '1em',
+  lineHeight: '1.5',
+  fontSize: 'Paragraph',
 };
 
 export const TextInput = styled(StyledInput)``;

@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
 
 import StyledButton from './StyledButton';
+import Container from './Container';
 
 const borderRadius = '4px';
 
@@ -11,6 +11,7 @@ const comboStyle = ({ combo }) => (combo ? '0' : `0 ${borderRadius} ${borderRadi
 
 const StyledButtonItem = styled(StyledButton)`
   border-radius: 0;
+  line-height: 1.5;
   flex-grow: 1;
   &:active p {
     color: white;
@@ -55,7 +56,7 @@ const StyledButtonSet = ({
   disabled,
   ...props
 }) => (
-  <Flex {...props}>
+  <Container display="flex" {...props}>
     {items.map(item => (
       <StyledButtonItem
         combo={combo || undefined}
@@ -72,7 +73,7 @@ const StyledButtonSet = ({
         {children({ item, isSelected: item === selected })}
       </StyledButtonItem>
     ))}
-  </Flex>
+  </Container>
 );
 
 StyledButtonSet.propTypes = {
@@ -97,6 +98,7 @@ StyledButtonSet.propTypes = {
 StyledButtonSet.defaultProps = {
   combo: false,
   size: 'medium',
+  fontSize: 'Paragraph',
 };
 
 export default StyledButtonSet;

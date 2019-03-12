@@ -25,10 +25,10 @@ describe('Contribution Flow: Donate', () => {
       cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
 
       // Has default amount selected
-      cy.get('#totalAmount button.selected').should('exist');
+      cy.get('#amount button.selected').should('exist');
 
       // Change amount
-      cy.get('input[type=number][name=totalAmount]').type('{selectall}1337');
+      cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00');
 

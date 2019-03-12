@@ -51,12 +51,14 @@ const ContributionFlowStepsProgress = ({
         } else if (step.name === 'details') {
           label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
           if (stepDetails && stepDetails.totalAmount) {
-            const formattedAmount = formatCurrency(stepDetails.totalAmount, currency);
+            const formattedAmount = formatCurrency(stepDetails.amount, currency);
+            const formattedTotalAmount =
+              stepDetails.quantity > 1 ? `${formattedAmount} x ${stepDetails.quantity}` : formattedAmount;
             details = !stepDetails.interval ? (
-              formattedAmount
+              formattedTotalAmount
             ) : (
               <Span>
-                {formattedAmount}{' '}
+                {formattedTotalAmount}{' '}
                 <FormattedMessage
                   id="tier.interval"
                   defaultMessage="per {interval, select, month {month} year {year} other {}}"
