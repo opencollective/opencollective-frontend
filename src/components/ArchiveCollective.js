@@ -24,10 +24,6 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       setArchiving(true);
       await archiveCollective(id);
       setArchiving(false);
-      Router.pushRoute('collective', {
-        slug: collective.slug,
-        status: 'collectiveArchived',
-      });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
       setError(`An error occur while archiving your ${collectiveType.toLocaleLowerCase()}. Please try again later.`);
