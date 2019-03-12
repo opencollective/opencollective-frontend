@@ -78,13 +78,13 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       >
         <Container display="flex" justifyContent="space-between" width={1} mt={4}>
           <StyledButton onClick={() => setShowModal(false)}>
-            <FormattedMessage id="collective.archive.confirm.cancel" defaultMessage={'Cancel'} />
+            <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
           </StyledButton>
           <StyledButton
             buttonStyle="primary"
             onClick={() => handleArchiveCollective({ archiveCollective, id: collective.id })}
           >
-            <FormattedMessage id="collective.archive.confirm.archive" defaultMessage={'Archive'} />
+            <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
           </StyledButton>
         </Container>
       </Modal>
