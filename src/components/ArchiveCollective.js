@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { addArchiveCollectiveMutation } from '../graphql/mutations';
+import withIntl from '../lib/withIntl';
+
 import { H2, P } from './Text';
 import Container from './Container';
 import StyledButton from './StyledButton';
@@ -34,17 +37,37 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
 
   return (
     <Container>
-      <H2>Archive this {collectiveType}.</H2>
-      <P>Mark this {collectiveType.toLocaleLowerCase()} as archived, delete all tiers and cancel all subscriptions.</P>
+      <H2>
+        <FormattedMessage
+          values={{ type: collectiveType }}
+          id="collective.archive.title"
+          defaultMessage={'Archive this {type}.'}
+        />
+      </H2>
+      <P>
+        <FormattedMessage
+          values={{ type: collectiveType.toLowerCase() }}
+          id="collective.archive.description"
+          defaultMessage={'Mark this {type} as archived, delete all tiers and cancel all subscriptions.'}
+        />
+      </P>
       {error && <P color="#ff5252">{error}</P>}
       {!collective.isArchived && (
         <StyledButton onClick={() => setShowModal(true)} loading={archiving}>
-          Archive this {collectiveType.toLocaleLowerCase()}
+          <FormattedMessage
+            values={{ type: collectiveType.toLowerCase() }}
+            id="collective.archive.button"
+            defaultMessage={'Archive this {type}.'}
+          />
         </StyledButton>
       )}
       {collective.isArchived && (
         <MessageBox withIcon type="info">
-          {collectiveType} already archived.
+          <FormattedMessage
+            values={{ type: collectiveType }}
+            id="collective.archive.archivedMessage"
+            defaultMessage={'{type} already archived.'}
+          />
         </MessageBox>
       )}
       <Modal
@@ -54,12 +77,14 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
         title={`Are you sure you want to archive ${collectiveType.toLocaleLowerCase()}?`}
       >
         <Container display="flex" justifyContent="space-between" width={1} mt={4}>
-          <StyledButton onClick={() => setShowModal(false)}>Cancel</StyledButton>
+          <StyledButton onClick={() => setShowModal(false)}>
+            <FormattedMessage id="collective.archive.confirm.cancel" defaultMessage={'Cancel'} />
+          </StyledButton>
           <StyledButton
             buttonStyle="primary"
             onClick={() => handleArchiveCollective({ archiveCollective, id: collective.id })}
           >
-            Archive
+            <FormattedMessage id="collective.archive.confirm.archive" defaultMessage={'Archive'} />
           </StyledButton>
         </Container>
       </Modal>
@@ -72,4 +97,4 @@ ArchiveCollective.propTypes = {
   archiveCollective: PropTypes.func,
 };
 
-export default addArchiveCollectiveMutation(ArchiveCollective);
+export default withIntl(addArchiveCollectiveMutation(ArchiveCollective));
