@@ -10,7 +10,6 @@ import Container from './Container';
 import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
 import Modal from './Modal';
-import { Router } from '../server/pages';
 
 const ArchiveCollective = ({ collective, archiveCollective }) => {
   const [showModal, setShowModal] = useState(false);
