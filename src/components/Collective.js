@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
 
@@ -52,7 +53,7 @@ class Collective extends React.Component {
       },
       'collective.isArchived': {
         id: 'collective.isArchived',
-        defaultMessage: 'Your collective has been archived.',
+        defaultMessage: '{name} has been archived.',
       },
       'collective.isArchived.description': {
         id: 'collective.isArchived.description',
@@ -147,7 +148,9 @@ class Collective extends React.Component {
         host: collective.host.name,
       });
     } else if (status === 'collectiveArchived' || collective.isArchived) {
-      notification.title = intl.formatMessage(this.messages['collective.isArchived']);
+      notification.title = intl.formatMessage(this.messages['collective.isArchived'], {
+        name: collective.name,
+      });
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
@@ -156,7 +159,7 @@ class Collective extends React.Component {
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
     return (
-      <div className={`CollectivePage ${collective.type}`}>
+      <div className={classNames(`CollectivePage ${collective.type} `, { archiveCollective: collective.isArchived })}>
         <style jsx>
           {`
             .sidebar {
@@ -209,6 +212,12 @@ class Collective extends React.Component {
                 float: right;
                 margin: 3rem 0 3rem 3rem;
               }
+            }
+            .archiveCollective {
+              -webkit-filter: grayscale(100%);
+              -moz-filter: grayscale(100%);
+              -ms-filter: grayscale(100%);
+              filter: grayscale(100%);
             }
           `}
         </style>
