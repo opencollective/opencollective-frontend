@@ -86,7 +86,7 @@ type Collective implements CollectiveInterface {
   canApply: Boolean
 
   """Returns whether this collective was archived"""
-  archived: Boolean
+  isArchived: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
@@ -242,7 +242,7 @@ interface CollectiveInterface {
   path: String
   isHost: Boolean
   canApply: Boolean
-  archived: Boolean
+  isArchived: Boolean
   host: CollectiveInterface
 
   """
@@ -1175,7 +1175,7 @@ type Organization implements CollectiveInterface {
   canApply: Boolean
 
   """Returns whether this collective was archived"""
-  archived: Boolean
+  isArchived: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective

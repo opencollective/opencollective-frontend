@@ -37,12 +37,12 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       <H2>Archive this {collectiveType}.</H2>
       <P>Mark this {collectiveType.toLocaleLowerCase()} as archived, delete all tiers and cancel all subscriptions.</P>
       {error && <P color="#ff5252">{error}</P>}
-      {!collective.archived && (
+      {!collective.isArchived && (
         <StyledButton onClick={() => setShowModal(true)} loading={archiving}>
           Archive this {collectiveType.toLocaleLowerCase()}
         </StyledButton>
       )}
-      {collective.archived && (
+      {collective.isArchived && (
         <MessageBox withIcon type="info">
           {collectiveType} already archived.
         </MessageBox>

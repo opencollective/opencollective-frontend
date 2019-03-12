@@ -50,12 +50,12 @@ class Collective extends React.Component {
         defaultMessage:
           'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
       },
-      'collective.archived': {
-        id: 'collective.archived',
+      'collective.isArchived': {
+        id: 'collective.isArchived',
         defaultMessage: 'Your collective has been archived.',
       },
-      'collective.archived.description': {
-        id: 'collective.archived.description',
+      'collective.isArchived.description': {
+        id: 'collective.isArchived.description',
         defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
       },
       'collective.donate': {
@@ -146,9 +146,9 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.created.description'], {
         host: collective.host.name,
       });
-    } else if (status === 'collectiveArchived' || collective.archived) {
-      notification.title = intl.formatMessage(this.messages['collective.archived']);
-      notification.description = intl.formatMessage(this.messages['collective.archived.description']);
+    } else if (status === 'collectiveArchived' || collective.isArchived) {
+      notification.title = intl.formatMessage(this.messages['collective.isArchived']);
+      notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
     const cta = collective.isActive && collective.host ? { href: '#contribute', label: 'contribute' } : null;
