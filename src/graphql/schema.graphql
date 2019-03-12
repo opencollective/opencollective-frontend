@@ -787,6 +787,7 @@ type Mutation {
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
+  archiveCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface

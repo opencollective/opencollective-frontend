@@ -122,6 +122,7 @@ const editCollectiveQuery = gql`
       githubHandle
       countryISO
       isActive
+      isArchived
       hostFeePercent
       host {
         id
