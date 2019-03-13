@@ -27,7 +27,8 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       setIsArchived(true);
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
-      setError(`An error occur while archiving your ${collectiveType.toLocaleLowerCase()}. Please try again later.`);
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      setError(errorMsg);
       setArchiving(false);
     }
   };
