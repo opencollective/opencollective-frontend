@@ -5,11 +5,6 @@ const pages = nextRoutes();
 pages
   .add('home', '/')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy)', 'staticPage')
-  .add(
-    'faq',
-    '/:path(faq)/:pageSlug(collectives|backers|expenses|hosts|becoming-an-open-collective-host)?',
-    'staticPage',
-  )
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
