@@ -9,7 +9,6 @@ import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
-import ArchiveCollective from './ArchiveCollective';
 
 import { capitalize } from '../lib/utils';
 
@@ -545,9 +544,6 @@ class InputField extends React.Component {
             <MarkdownEditor defaultValue={field.defaultValue} onChange={this.handleChange} />
           </div>
         );
-        break;
-      case 'archiveCollective':
-        this.input = <ArchiveCollective collective={context} />;
         break;
       default: {
         const addressDefaultValue = field.name === 'address' ? context['location'][field.name] : '';

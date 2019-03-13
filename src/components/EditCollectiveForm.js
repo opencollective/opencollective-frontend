@@ -23,6 +23,7 @@ import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
+import ArchiveCollective from './ArchiveCollective';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -731,6 +732,7 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
+              {this.state.section === 'advanced' && <ArchiveCollective collective={collective} />}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
