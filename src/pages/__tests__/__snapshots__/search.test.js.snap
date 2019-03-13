@@ -328,10 +328,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://docs.opencollective.com"
+                href="/pricing"
               >
                 <span>
-                  Docs & Help
+                  Pricing
                 </span>
               </a>
             </li>
@@ -340,10 +340,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://medium.com/open-collective"
+                href="https://docs.opencollective.com"
               >
                 <span>
-                  Blog
+                  Docs & Help
                 </span>
               </a>
             </li>
@@ -1061,6 +1061,17 @@ Array [
             >
               <a
                 className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -1249,8 +1260,7 @@ Array [
             >
               <a
                 className="c14"
-                href="/about"
-                onClick={[Function]}
+                href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
@@ -1623,10 +1633,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://docs.opencollective.com"
+                href="/pricing"
               >
                 <span>
-                  Docs & Help
+                  Pricing
                 </span>
               </a>
             </li>
@@ -1635,10 +1645,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://medium.com/open-collective"
+                href="https://docs.opencollective.com"
               >
                 <span>
-                  Blog
+                  Docs & Help
                 </span>
               </a>
             </li>
@@ -2356,6 +2366,17 @@ Array [
             >
               <a
                 className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -2544,8 +2565,7 @@ Array [
             >
               <a
                 className="c14"
-                href="/about"
-                onClick={[Function]}
+                href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
@@ -3433,10 +3453,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c18"
-                href="https://docs.opencollective.com"
+                href="/pricing"
               >
                 <span>
-                  Docs & Help
+                  Pricing
                 </span>
               </a>
             </li>
@@ -3445,10 +3465,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c18"
-                href="https://medium.com/open-collective"
+                href="https://docs.opencollective.com"
               >
                 <span>
-                  Blog
+                  Docs & Help
                 </span>
               </a>
             </li>
@@ -3796,6 +3816,17 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c41"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
+              </a>
+            </li>
+            <li
+              className="c40"
+            >
+              <a
+                className="c41"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -3984,8 +4015,7 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c41"
-                href="/about"
-                onClick={[Function]}
+                href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
@@ -4358,10 +4388,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://docs.opencollective.com"
+                href="/pricing"
               >
                 <span>
-                  Docs & Help
+                  Pricing
                 </span>
               </a>
             </li>
@@ -4370,10 +4400,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://medium.com/open-collective"
+                href="https://docs.opencollective.com"
               >
                 <span>
-                  Blog
+                  Docs & Help
                 </span>
               </a>
             </li>
@@ -5186,6 +5216,17 @@ Array [
             >
               <a
                 className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -5374,8 +5415,7 @@ Array [
             >
               <a
                 className="c14"
-                href="/about"
-                onClick={[Function]}
+                href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
@@ -5748,10 +5788,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://docs.opencollective.com"
+                href="/pricing"
               >
                 <span>
-                  Docs & Help
+                  Pricing
                 </span>
               </a>
             </li>
@@ -5760,10 +5800,10 @@ Array [
             >
               <a
                 className="c12"
-                href="https://medium.com/open-collective"
+                href="https://docs.opencollective.com"
               >
                 <span>
-                  Blog
+                  Docs & Help
                 </span>
               </a>
             </li>
@@ -6732,6 +6772,17 @@ Array [
             >
               <a
                 className="c14"
+                href="/pricing"
+                onClick={[Function]}
+              >
+                Pricing
+              </a>
+            </li>
+            <li
+              className="c13"
+            >
+              <a
+                className="c14"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -6920,8 +6971,7 @@ Array [
             >
               <a
                 className="c14"
-                href="/about"
-                onClick={[Function]}
+                href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
