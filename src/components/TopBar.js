@@ -141,13 +141,13 @@ class TopBar extends React.Component {
                 </Link>
               </NavLinkContainer>
               <NavLinkContainer>
-                <NavLink href="https://docs.opencollective.com">
-                  <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
+                <NavLink href="/pricing">
+                  <FormattedMessage id="menu.blog" defaultMessage="Pricing" />
                 </NavLink>
               </NavLinkContainer>
               <NavLinkContainer>
-                <NavLink href="https://medium.com/open-collective">
-                  <FormattedMessage id="menu.blog" defaultMessage="Blog" />
+                <NavLink href="https://docs.opencollective.com">
+                  <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
                 </NavLink>
               </NavLinkContainer>
             </NavList>
