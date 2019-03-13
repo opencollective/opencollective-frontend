@@ -67,7 +67,10 @@ describe('api.v1.test.js', () => {
           expect(e).to.not.exist;
           const transactions = orderTransactions(res.body.result);
           expect(transactions.length).to.equal(9);
-          expect(omit(transactions[0], ['id', 'createdAt'])).to.matchSnapshot();
+          const debits = transactions.filter(t => t.type === 'DEBIT');
+          const credits = transactions.filter(t => t.type === 'CREDIT');
+          expect(omit(debits[0], ['id', 'createdAt'])).to.matchSnapshot();
+          expect(omit(credits[0], ['id', 'createdAt'])).to.matchSnapshot();
           done();
         });
     });
