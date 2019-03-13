@@ -26,12 +26,7 @@ class StaticPage extends React.Component {
   static async getInitialProps(props) {
     const { path, pageSlug } = props.query;
 
-    let content = getContent(path, pageSlug);
-
-    // we rewrite the links to be relative to root /
-    if (path === 'faq') {
-      content = content.replace(/href="(?!['"]?(?:data|http|\/))['"]?([^'")\s>]+)/g, 'href="/faq/$1');
-    }
+    const content = getContent(path, pageSlug);
 
     // get the title from the html of the markdown
     // e.g. <h1 id="about-open-collective">About Open Collective</h1> => About Open Collective

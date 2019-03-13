@@ -45,6 +45,7 @@ const navigation = {
   PLATFORM: {
     Discover: '/discover',
     'How it Works': '/how-it-works',
+    Pricing: '/pricing',
     'Join Free': '/create-account',
     Login: '/signin',
   },
@@ -63,7 +64,7 @@ const navigation = {
     'Email Support': 'mailto:support@opencollective.com',
   },
   COMPANY: {
-    About: '/about',
+    About: 'https://docs.opencollective.com/help/about',
     Blog: 'https://medium.com/open-collective',
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',

@@ -47,7 +47,7 @@ class HostsCover extends React.Component {
     const findOutMoreMessage = intl.formatMessage(this.messages['hosts.findOutMoreLink']);
     const findOutMoreLink = (
       <CoverSmallCTA>
-        <Link route="/faq/becoming-an-open-collective-host">{findOutMoreMessage}</Link>
+        <Link route="https://docs.opencollective.com/help/hosts/become-host">{findOutMoreMessage}</Link>
       </CoverSmallCTA>
     );
     const descriptionNode = (
