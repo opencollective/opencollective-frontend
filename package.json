@@ -29,7 +29,7 @@
     "cloudflare-ip": "0.0.7",
     "cross-fetch": "3.0.1",
     "currency-symbol-map": "4.0.4",
-    "dotenv": "6.2.0",
+    "dotenv": "7.0.0",
     "downshift": "3.2.7",
     "draft-js": "0.10.5",
     "express": "4.16.4",
