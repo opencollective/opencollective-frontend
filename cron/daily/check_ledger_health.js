@@ -6,7 +6,7 @@ import '../../server/env';
  */
 
 import Promise from 'bluebird';
-// import json2csv from 'json2csv';
+// import { parse as json2csv } from 'json2csv';
 import models, { sequelize, Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 // import * as transactionsLib from '../../server/lib/transactions';
@@ -432,10 +432,7 @@ const checkTransactions = () => {
         if (funkyTransactions.length > 0) {
           attachments.push({
             filename: `${moment(new Date()).format('YYYYMMDD')}-invalid-transactions.csv`,
-            content: await Promise.promisify(json2csv)({
-              data: funkyTransactions,
-              fields,
-            }),
+            content: json2csv(funkyTransactions, {fields}),
           });
         }
         subHeader("Transactions that don't add up", funkyTransactions.length);

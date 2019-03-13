@@ -1,5 +1,5 @@
 import models, { sequelize } from '../server/models';
-import json2csv from 'json2csv';
+import { parse as json2csv } from 'json2csv';
 import fs from 'fs';
 import Promise from 'bluebird';
 import moment from 'moment';
@@ -129,10 +129,12 @@ async function run() {
       return row;
     });
 
-    return json2csv({ data: res }, (err, csv) => {
-      if (err) console.log(err);
-      else fs.writeFileSync(`${path}/${query.filename}`, csv);
-    });
+    try {
+      const csv = json2csv(res);
+      fs.writeFileSync(`${path}/${query.filename}`, csv);
+    } catch (err) {
+      console.log(err);
+    }
   });
   console.log('done');
   process.exit(0);

@@ -1,5 +1,5 @@
 import { paginateOffset } from '../lib/utils';
-import json2csv from 'json2csv';
+import { parse as json2csv } from 'json2csv';
 import moment from 'moment';
 import _ from 'lodash';
 import queries from '../lib/queries';
@@ -41,10 +41,9 @@ export const format = format => {
             return row;
           });
           const fields = data.length > 0 ? Object.keys(data[0]) : [];
-          json2csv({ data, fields }, (err, csv) => {
-            res.setHeader('content-type', 'text/csv');
-            send.call(res, csv);
-          });
+          const csv = json2csv(data, { fields });
+          res.setHeader('content-type', 'text/csv');
+          send.call(res, csv);
         };
         return next();
       }
