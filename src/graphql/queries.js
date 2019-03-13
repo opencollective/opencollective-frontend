@@ -131,6 +131,7 @@ export const getLoggedInUserQuery = gql`
             balance
             expiryDate
           }
+          settings
         }
       }
     }

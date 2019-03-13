@@ -527,6 +527,11 @@ class CreateOrderPage extends React.Component {
     return get(this.props.data, 'Collective.host.id') === 11004 && !get(this.state, 'stepDetails.interval');
   }
 
+  /* We might have problems with postal code and this should be disablable */
+  shouldHideCreditCardPostalCode() {
+    return get(this.state, 'stepProfile.settings.hideCreditCardPostalCode', false);
+  }
+
   /**
    * When using an order with fixed amount, this function returns the details to
    * show the user order amount as step details is skipped.
@@ -680,6 +685,7 @@ class CreateOrderPage extends React.Component {
               onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
               withPaypal={this.hasPaypal()}
               manual={this.getManualPaymentMethod()}
+              hideCreditCardPostalCode={this.shouldHideCreditCardPostalCode()}
               margins="0 auto"
             />
           </Flex>

@@ -249,6 +249,7 @@ class ContributePayment extends React.Component {
                     error={errors.newCreditCardInfo}
                     onChange={this.onChange}
                     onReady={this.props.onNewCardFormReady}
+                    hidePostalCode={this.props.hideCreditCardPostalCode}
                   />
                 </Box>
               )}
@@ -288,12 +289,17 @@ ContributePayment.propTypes = {
   onNewCardFormReady: PropTypes.func,
   /** From withStripeLoader */
   loadStripe: PropTypes.func.isRequired,
+  /**
+   * Wether we should ask for postal code in Credit Card form
+   */
+  hideCreditCardPostalCode: PropTypes.bool,
 };
 
 ContributePayment.defaultProps = {
   withPaypal: false,
   paymentMethods: [],
   collective: null,
+  hideCreditCardPostalCode: false,
 };
 
 export default withIntl(withStripeLoader(ContributePayment));
