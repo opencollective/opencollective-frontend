@@ -1,5 +1,6 @@
 {{#if interval }}
-Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}/{{interval}} à {{collective.name}}
+Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}/{{interval}} à
+{{collective.name}}
 {{else}}
 Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} à {{collective.name}}
 {{/if}}
@@ -16,12 +17,16 @@ Subject: Merci pour votre donation de {{{currency order.totalAmount currency=ord
 
 {{#if interval}}
 
-  {{#if firstPayment }}
-    <p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
-    <p>Veuillez noter que vos futurs paiements seront effectués au premier du mois (<a href='https://opencollective.com/faq#charge-date-notice'>plus d'info</a>).</p>
-  {{else}}
-    <p>Votre dernière donation de {{{currency order.totalAmount currency=order.currency}}} vient d'être reçue. Merci pour continuer à nous soutenir!</p>
-  {{/if}}
+{{#if firstPayment }}
+<p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} par {{interval}}. Votre premier
+  paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
+<p>Veuillez noter que vos futurs paiements seront effectués au premier du mois (<a
+    href='https://github.com/opencollective/documentation/blob/master/backers-and-sponsors/payment.md#why-do-you-charge-recurring-monthly-subscriptions-on-1st-of-every-month'>plus
+    d'info</a>).</p>
+{{else}}
+<p>Votre dernière donation de {{{currency order.totalAmount currency=order.currency}}} vient d'être reçue. Merci pour
+  continuer à nous soutenir!</p>
+{{/if}}
 
 {{else}}
 <p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}.
@@ -29,28 +34,32 @@ Subject: Merci pour votre donation de {{{currency order.totalAmount currency=ord
 {{/if}}
 
 {{#if matchingFund}}
-<p>🎉 Votre donation a été multipliée {{matchingFund.matching}}x par <a href="https://opencollective.com/{{matchingFund.collective.slug}}">{{matchingFund.collective.name}}</a>!</p>
+<p>🎉 Votre donation a été multipliée {{matchingFund.matching}}x par <a
+    href="https://opencollective.com/{{matchingFund.collective.slug}}">{{matchingFund.collective.name}}</a>!</p>
 {{/if}}
 
-<p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur la page de notre collectif ouvert:
+<p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur la page de notre collectif
+  ouvert:
   <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
 
 <h2>Aidez-nous à récolter plus d'argent!</h2>
-<p>Partagez cette URL: <a href="https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}">https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}</a><br />
-Cela nous permettra de savoir combien de dons vous aurez réussi à récolter (cette info sera affichée sur votre profil: <a href="https://opencollective.com/{{fromCollective.slug}}">https://opencollective.com/{{fromCollective.slug}}</a>).
+<p>Partagez cette URL: <a
+    href="https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}">https://opencollective.com/{{collective.slug}}/donate?referral={{fromCollective.id}}</a><br />
+  Cela nous permettra de savoir combien de dons vous aurez réussi à récolter (cette info sera affichée sur votre profil:
+  <a href="https://opencollective.com/{{fromCollective.slug}}">https://opencollective.com/{{fromCollective.slug}}</a>).
 
 
-{{#if subscriptionsLink}}
+  {{#if subscriptionsLink}}
   <p>
     Vous pouvez modifier ou annuler vos abonnements quand vous le souhaitez <a href="{{subscriptionsLink}}">ici</a>.
   </p>
-{{/if}}
+  {{/if}}
 
-<p>Encore merci! 🙏</p>
+  <p>Encore merci! 🙏</p>
 
-<p>
-  – Le collectif {{collective.name}}
-</p>
+  <p>
+    – Le collectif {{collective.name}}
+  </p>
 
-{{> footer}}
+  {{> footer}}
