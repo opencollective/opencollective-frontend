@@ -12,24 +12,31 @@ import MessageBox from './MessageBox';
 import Modal from './Modal';
 
 const ArchiveCollective = ({ collective, archiveCollective }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState(null);
-  const [archiving, setArchiving] = useState(false);
-  const [isArchived, setIsArchived] = useState(collective.isArchived);
-
   const collectiveType = collective.type === 'ORGANIZATION' ? 'Organization' : 'Collective';
+  const [showModal, setShowModal] = useState(false);
+  const [archiveStatus, setArchiveStatus] = useState({
+    archiving: false,
+    isArchived: collective.isArchived,
+    error: null,
+    confirmationMesg: '',
+  });
+
+  const { archiving, isArchived, error, confirmationMesg } = archiveStatus;
   const handleArchiveCollective = async ({ archiveCollective, id }) => {
     setShowModal(false);
     try {
-      setArchiving(true);
+      setArchiveStatus({ ...archiveStatus, archiving: true });
       await archiveCollective(id);
-      setArchiving(false);
-      setIsArchived(true);
+      setArchiveStatus({
+        ...archiveStatus,
+        archiving: false,
+        isArchived: true,
+        confirmationMesg: `The ${collectiveType.toLowerCase()} was successfully archived`,
+      });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-      setError(errorMsg);
-      setArchiving(false);
+      setArchiveStatus({ ...archiveStatus, archiving: false, error: errorMsg });
     }
   };
 
@@ -59,14 +66,24 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
           />
         </StyledButton>
       )}
-      {isArchived && (
+      {isArchived && confirmationMesg && (
         <MessageBox withIcon type="info">
           <FormattedMessage
-            values={{ type: collectiveType }}
-            id="collective.archive.archivedMessage"
-            defaultMessage={'{type} already archived.'}
+            values={{ message: confirmationMesg }}
+            id="collective.archive.archivedConfirmMessage"
+            defaultMessage={'{message}.'}
           />
         </MessageBox>
+      )}
+
+      {isArchived && !confirmationMesg && (
+        <P>
+          <FormattedMessage
+            values={{ type: collectiveType.toLowerCase() }}
+            id="collective.archive.archivedMessage"
+            defaultMessage={'This {type} is archived.'}
+          />
+        </P>
       )}
       <Modal
         onClose={() => setShowModal(false)}
