@@ -312,12 +312,10 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
 };
 
 const isNotificationActive = async (template, data) => {
-  // Skip active email notification check for unit test
-  if (config.env === 'test' || config.env === 'circleci') {
-    logger.info('Skips active email notification checks for unit test');
-    return true;
+  if (data.user && data.user.id) {
+    return models.Notification.isActive(template, data.user.id, data.collective);
   } else {
-    return models.Notification.isActive(template, data.collective.id, data.user.id);
+    return true;
   }
 };
 
