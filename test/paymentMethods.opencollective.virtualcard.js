@@ -524,7 +524,7 @@ describe('opencollective.virtualcard', () => {
 
       before(async () => {
         hostCollective = await models.Collective.create({
-          type: 'HOST',
+          type: 'ORGANIZATION',
           name: 'Test HOST',
           currency: CURRENCY,
           isActive: true,

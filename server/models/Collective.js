@@ -22,8 +22,8 @@ import userlib from '../lib/userlib';
 import emailLib from '../lib/email';
 import queries from '../lib/queries';
 import { convertToCurrency } from '../lib/currency';
-import { isBlacklistedCollectiveSlug } from '../lib/collectivelib';
-import { capitalize, flattenArray, getDomain, formatCurrency } from '../lib/utils';
+import { isBlacklistedCollectiveSlug, collectiveSlugBlacklist } from '../lib/collectivelib';
+import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags } from '../lib/utils';
 
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -92,6 +92,8 @@ export const defaultTiers = (HostCollectiveId, currency) => {
   return tiers;
 };
 
+const validTypes = ['USER', 'COLLECTIVE', 'ORGANIZATION', 'EVENT', 'BOT'];
+
 /**
  * Collective Model.
  *
@@ -113,8 +115,14 @@ export default function(Sequelize, DataTypes) {
       },
 
       type: {
-        type: DataTypes.STRING, // COLLECTIVE, USER, EVENT
+        type: DataTypes.STRING,
         defaultValue: 'COLLECTIVE',
+        validate: {
+          isIn: {
+            args: [validTypes],
+            msg: `Must be one of: ${validTypes}`,
+          },
+        },
       },
 
       slug: {
@@ -131,6 +139,14 @@ export default function(Sequelize, DataTypes) {
                 .replace(/\./g, ''),
             );
           }
+        },
+        validate: {
+          len: [1, 255],
+          isLowercase: true,
+          notIn: {
+            args: [collectiveSlugBlacklist],
+            msg: 'The slug given for this collective is a reserved keyword',
+          },
         },
       },
 
@@ -182,6 +198,10 @@ export default function(Sequelize, DataTypes) {
       hostFeePercent: {
         type: DataTypes.FLOAT,
         defaultValue: HOST_FEE_PERCENT,
+        validate: {
+          min: 0,
+          max: 100,
+        },
       },
 
       mission: DataTypes.STRING, // max 95 characters
@@ -214,12 +234,17 @@ export default function(Sequelize, DataTypes) {
       // Max amount to raise across all tiers
       maxAmount: {
         type: DataTypes.INTEGER, // In cents
-        min: 0,
+        validate: {
+          min: 0,
+        },
       },
 
       // Max quantity of tickets across all tiers
       maxQuantity: {
         type: DataTypes.INTEGER,
+        validate: {
+          min: 0,
+        },
       },
 
       locationName: DataTypes.STRING,
@@ -332,6 +357,13 @@ export default function(Sequelize, DataTypes) {
             ? `https://twitter.com/${this.getDataValue('twitterHandle')}`
             : null;
         },
+        set(url) {
+          if (url) {
+            this.setDataValue('website', prependHttp(url, { https: true }));
+          } else {
+            this.setDataValue('website', null);
+          }
+        },
       },
 
       publicUrl: {
@@ -343,6 +375,9 @@ export default function(Sequelize, DataTypes) {
 
       tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
+        set(tags) {
+          this.setDataValue('tags', cleanTags(tags));
+        },
       },
 
       isSupercollective: {
