@@ -142,7 +142,7 @@ class TopBar extends React.Component {
               </NavLinkContainer>
               <NavLinkContainer>
                 <NavLink href="/pricing">
-                  <FormattedMessage id="menu.blog" defaultMessage="Pricing" />
+                  <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                 </NavLink>
               </NavLinkContainer>
               <NavLinkContainer>
