@@ -32,7 +32,7 @@ class HostDashboard extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { selectedCollective: null };
+    this.state = { selectedCollective: null, expensesFilters: null };
   }
 
   pickCollective(selectedCollective) {
@@ -156,7 +156,9 @@ class HostDashboard extends React.Component {
                   host={host}
                   includeHostedCollectives={includeHostedCollectives}
                   LoggedInUser={LoggedInUser}
-                  filters={true}
+                  hasFilters
+                  filters={this.state.expensesFilters}
+                  onFiltersChange={expensesFilters => this.setState({ expensesFilters })}
                   editable={true}
                 />
               </div>

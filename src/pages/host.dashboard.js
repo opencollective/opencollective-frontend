@@ -7,6 +7,7 @@ import Loading from '../components/Loading';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
+import Page from '../components/Page';
 
 class HostExpensesPage extends React.Component {
   static getInitialProps({ query: { hostCollectiveSlug } }) {
@@ -17,7 +18,8 @@ class HostExpensesPage extends React.Component {
     hostCollectiveSlug: PropTypes.string, // for addData
     ssr: PropTypes.bool,
     data: PropTypes.object, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
+    LoggedInUser: PropTypes.object, // from withUser
   };
 
   render() {
@@ -26,7 +28,9 @@ class HostExpensesPage extends React.Component {
     return (
       <div className="HostExpensesPage">
         {loadingLoggedInUser ? (
-          <Loading />
+          <Page>
+            <Loading />
+          </Page>
         ) : (
           <HostDashboard hostCollectiveSlug={this.props.hostCollectiveSlug} LoggedInUser={LoggedInUser} />
         )}
