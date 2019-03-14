@@ -301,7 +301,7 @@
   "creditcard.error": "Carte de crédit non valide",
   "saved": "sauvegardé",
   "event.create.btn": "Créer un événement",
-  "collective.changeUrl.label": "Change your URL",
+  "collective.changeUrl.label": "URL slug",
   "collective.tos.description": "Lien vers les conditions d'utilisation que les collectifs qui souhaitent être hébergés doivent accepter",
   "collective.tags.edit.description": "Make your collective discoverable in search and related collectives (comma separated)",
   "collective.longDescription.label": "Longue description",
