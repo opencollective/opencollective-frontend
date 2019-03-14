@@ -249,7 +249,6 @@ class UserCollective extends React.Component {
       <div
         className={classNames('UserCollectivePage', {
           LoggedInUser: LoggedInUser ? true : false,
-          archiveCollective: collective.isArchived,
         })}
       >
         <style jsx>
@@ -323,7 +322,7 @@ class UserCollective extends React.Component {
         />
 
         <Body>
-          <div>
+          <div className={classNames({ archiveCollective: collective.isArchived })}>
             <NotificationBar
               status={this.state.status}
               title={notification.title}

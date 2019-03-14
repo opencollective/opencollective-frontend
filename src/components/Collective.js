@@ -159,7 +159,7 @@ class Collective extends React.Component {
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
     return (
-      <div className={classNames(`CollectivePage ${collective.type} `, { archiveCollective: collective.isArchived })}>
+      <div className={classNames(`CollectivePage ${collective.type}`)}>
         <style jsx>
           {`
             .sidebar {
@@ -233,7 +233,7 @@ class Collective extends React.Component {
         />
 
         <Body>
-          <div className="CollectivePage">
+          <div className={classNames('CollectivePage', { archiveCollective: collective.isArchived })}>
             <NotificationBar
               status={notification.status || status}
               title={notification.title}
