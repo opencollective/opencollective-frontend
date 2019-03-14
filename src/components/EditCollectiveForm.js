@@ -430,14 +430,6 @@ class EditCollectiveForm extends React.Component {
           when: () =>
             this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
         },
-        {
-          name: 'archiveCollective',
-          type: 'archiveCollective',
-          className: 'archiveField',
-          when: () =>
-            this.state.section === 'advanced' &&
-            (collective.type === 'ORGANIZATION' || collective.type === 'COLLECTIVE'),
-        },
       ],
     };
 
