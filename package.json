@@ -40,7 +40,6 @@
     "file-saver": "2.0.1",
     "glob": "7.1.3",
     "graphql": "14.1.1",
-    "graphql-request": "1.8.2",
     "graphql-tag": "2.10.1",
     "html-pdf": "2.2.0",
     "i18n-iso-countries": "3.7.8",
