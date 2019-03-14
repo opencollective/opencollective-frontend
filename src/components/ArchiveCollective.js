@@ -34,7 +34,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
   };
 
   return (
-    <Container>
+    <Container display="flex" flexDirection="column" width={1}>
       <H2>
         <FormattedMessage
           values={{ type: collectiveType }}
@@ -51,7 +51,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       </P>
       {error && <P color="#ff5252">{error}</P>}
       {!isArchived && (
-        <StyledButton onClick={() => setShowModal(true)} loading={archiving}>
+        <StyledButton width={0.3} onClick={() => setShowModal(true)} loading={archiving}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.button"
