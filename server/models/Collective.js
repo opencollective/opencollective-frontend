@@ -388,6 +388,11 @@ export default function(Sequelize, DataTypes) {
       monthlySpending: {
         type: new DataTypes.VIRTUAL(DataTypes.INTEGER),
       },
+
+      deactivatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       paranoid: true,
