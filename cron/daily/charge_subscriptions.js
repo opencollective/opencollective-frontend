@@ -63,7 +63,7 @@ async function run(options) {
   if (data.length > 0) {
     vprint(options, 'Writing the output to a CSV file');
     try {
-      const csv = json2csv({ data, fields: csvFields });
+      const csv = json2csv(data, { fields: csvFields });
       if (options.dryRun) {
         fs.writeFileSync('charge_subscriptions.output.csv', csv);
       } else {
