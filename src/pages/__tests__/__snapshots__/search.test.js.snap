@@ -6005,7 +6005,8 @@ Array [
   border-radius: 4px;
   border-color: black.300;
   border-radius: 4px;
-  line-height: 1em;
+  font-size: Paragraph;
+  line-height: 1.5;
   margin-left: 4px;
   margin-right: 4px;
   padding-top: 4px;
@@ -6025,7 +6026,8 @@ Array [
   border-radius: 4px;
   border-color: black.300;
   border-radius: 4px;
-  line-height: 1em;
+  font-size: Paragraph;
+  line-height: 1.5;
   margin-left: 4px;
   margin-right: 4px;
   padding-top: 4px;
@@ -6045,7 +6047,8 @@ Array [
   border-radius: 4px;
   border-color: black.300;
   border-radius: 4px;
-  line-height: 1em;
+  font-size: Paragraph;
+  line-height: 1.5;
   margin-left: 4px;
   margin-right: 4px;
   padding-top: 4px;
@@ -6065,7 +6068,8 @@ Array [
   border-radius: 4px;
   border-color: black.300;
   border-radius: 4px;
-  line-height: 1em;
+  font-size: Paragraph;
+  line-height: 1.5;
   margin-left: 4px;
   margin-right: 4px;
   padding-top: 4px;
