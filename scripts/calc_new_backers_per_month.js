@@ -8,7 +8,7 @@ import '../server/env';
 import Promise from 'bluebird';
 import fs from 'fs';
 import moment from 'moment';
-import json2csv from 'json2csv';
+import { parse as json2csv } from 'json2csv';
 import models, { sequelize, Op } from '../server/models';
 
 const done = err => {
@@ -73,11 +73,14 @@ const calculateNewBackersPerMonth = () => {
         oldBackers: results[result].oldBackers,
       }));
       console.log(data);
-      json2csv({ data, fields: csvFields }, (err, csv) => {
-        console.log('Writing the output to', outputFilename);
-        if (err) console.log(err);
+
+      console.log('Writing the output to', outputFilename);
+      try {
+        const csv = json2csv(data, { fields: csvFields });
         fs.writeFileSync(outputFilename, csv);
-      });
+      } catch (err) {
+        console.log(err);
+      }
     });
 };
 

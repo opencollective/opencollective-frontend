@@ -61,7 +61,7 @@
     "intl-messageformat": "2.2.0",
     "isomorphic-fetch": "2.2.1",
     "joi": "14.3.1",
-    "json2csv": "3.4.2",
+    "json2csv": "4.3.5",
     "jsonwebtoken": "5.7.0",
     "juice": "5.1.0",
     "knox": "github:automattic/knox#278337d7673341658efcc81e631c3f63fa53d374",

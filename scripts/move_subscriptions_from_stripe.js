@@ -3,7 +3,7 @@ import '../server/env';
 
 import fs from 'fs';
 import moment from 'moment';
-import json2csv from 'json2csv';
+import { parse as json2csv } from 'json2csv';
 import { ArgumentParser } from 'argparse';
 import { Op } from 'sequelize';
 
@@ -159,11 +159,13 @@ async function run(options) {
   );
 
   if (data.length > 0) {
-    json2csv({ data, fields: csvFields }, (err, csv) => {
-      vprint(options, 'Writing the output to a CSV file');
-      if (err) console.log(err);
-      else fs.writeFileSync('move_subscriptions_from_stripe.output.csv', csv);
-    });
+    vprint(options, 'Writing the output to a CSV file');
+    try {
+      const csv = json2csv(data, { fields: csvFields });
+      fs.writeFileSync('move_subscriptions_from_stripe.output.csv', csv);
+    } catch (err) {
+      console.log(err);
+    }
   } else {
     vprint(options, 'Not generating CSV file');
   }

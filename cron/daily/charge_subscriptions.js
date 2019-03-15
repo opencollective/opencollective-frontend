@@ -2,7 +2,7 @@
 import '../../server/env';
 
 import fs from 'fs';
-import json2csv from 'json2csv';
+import { parse as json2csv } from 'json2csv';
 import { ArgumentParser } from 'argparse';
 
 import emailLib from '../../server/lib/email';
@@ -61,26 +61,26 @@ async function run(options) {
   );
 
   if (data.length > 0) {
-    await json2csv({ data, fields: csvFields }, async (err, csv) => {
-      vprint(options, 'Writing the output to a CSV file');
-      if (err) console.log(err);
-      else {
-        if (options.dryRun) {
-          fs.writeFileSync('charge_subscriptions.output.csv', csv);
-        } else {
-          if (!options.dryRun) {
-            vprint(options, 'Sending email report');
-            const attachments = [
-              {
-                filename: `${new Date().toLocaleDateString()}.csv`,
-                content: csv,
-              },
-            ];
-            await emailReport(start, orders, groupProcessedOrders(data), attachments);
-          }
+    vprint(options, 'Writing the output to a CSV file');
+    try {
+      const csv = json2csv(data, { fields: csvFields });
+      if (options.dryRun) {
+        fs.writeFileSync('charge_subscriptions.output.csv', csv);
+      } else {
+        if (!options.dryRun) {
+          vprint(options, 'Sending email report');
+          const attachments = [
+            {
+              filename: `${new Date().toLocaleDateString()}.csv`,
+              content: csv,
+            },
+          ];
+          await emailReport(start, orders, groupProcessedOrders(data), attachments);
         }
       }
-    });
+    } catch (err) {
+      console.log(err);
+    }
   } else {
     vprint(options, 'Not generating CSV file');
     if (!options.dryRun) await emailReportNoCharges(start);
