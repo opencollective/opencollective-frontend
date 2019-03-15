@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
@@ -133,14 +134,13 @@ ${description}`;
       get(collective, 'stats.yearlyBudget') > 0 ||
       get(collective, 'settings.goals[0].title');
 
-    const classNames = ['CollectiveCover', className, type];
-
-    if (!collective.backgroundImage) {
-      classNames.push('defaultBackgroundImage');
-    }
-
     return (
-      <div className={classNames.join(' ')}>
+      <div
+        className={classNames(CollectiveCover, className, type, {
+          defaultBackgroundImage: !collective.backgroundImage ? true : false,
+          archiveCollective: collective.isArchived,
+        })}
+      >
         <style jsx>
           {`
             .cover {
@@ -317,6 +317,12 @@ ${description}`;
             .small .statsContainer,
             .small .members {
               display: none;
+            }
+            .archiveCollective {
+              -webkit-filter: grayscale(100%);
+              -moz-filter: grayscale(100%);
+              -ms-filter: grayscale(100%);
+              filter: grayscale(100%);
             }
           `}
         </style>
