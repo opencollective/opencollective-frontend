@@ -133,20 +133,20 @@ export default function(Sequelize, DataTypes) {
     }).then(us => us.map(us => us.UserId));
   };
   /**
-   * Check if notification with `NotificationType` and `UserId` is active.
-   * @param {*} CotificationType
-   * @param {*} UserId
-   * @param {*} [Collective]
+   * Check if notification with `notificationType` and `user` is active.
+   * @param {*} notificationType
+   * @param {*} user
+   * @param {*} [collective]
    */
-  Notification.isActive = (NotificationType, UserId, Collective) => {
-    debug('isActive', NotificationType, UserId);
+  Notification.isActive = (notificationType, user, collective) => {
+    debug('isActive', notificationType, user.id);
     const where = {
-      type: NotificationType,
-      UserId,
+      type: notificationType,
+      UserId: user.id,
     };
 
-    if (Collective && Collective.id) {
-      where.CollectiveId = Collective.id;
+    if (collective && collective.id) {
+      where.CollectiveId = collective.id;
     }
 
     return models.Notification.findOne({ where }).then(notification => {
