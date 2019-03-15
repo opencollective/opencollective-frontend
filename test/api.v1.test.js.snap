@@ -145,7 +145,7 @@ Object {
 
 exports[`api.v1.test.js #get get the latest transactions 2`] = `
 Object {
-  "amount": 5000,
+  "amount": 10000,
   "collective": Object {
     "id": 3,
     "image": null,
@@ -170,8 +170,12 @@ Object {
   "hostCurrency": null,
   "hostCurrencyFxRate": null,
   "hostFeeInHostCurrency": null,
-  "netAmountInCollectiveCurrency": 4500,
-  "paymentMethod": null,
+  "netAmountInCollectiveCurrency": 9000,
+  "paymentMethod": Object {
+    "id": 1,
+    "name": "Scouts d'arlon Collective",
+    "service": "opencollective",
+  },
   "paymentProcessorFeeInHostCurrency": null,
   "platformFeeInHostCurrency": null,
   "type": "CREDIT",
