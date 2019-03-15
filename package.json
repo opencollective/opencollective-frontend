@@ -141,7 +141,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "sinon": "^7.2.3",
-    "supertest": "^3.4.2",
+    "supertest": "^4.0.2",
     "supertest-as-promised": "^4.0.2"
   },
   "scripts": {
