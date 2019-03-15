@@ -310,15 +310,15 @@ const ContributionBreakdown = ({
                 </Box>
               )}
             </Flex>
-            <Span fontSize="LeadParagraph">+ {formatCurrency(taxInfo.amount, currency)}</Span>
+            <Span fontSize="LeadParagraph">{taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}</Span>
           </AmountLine>
           <StyledHr my={3} />
           <AmountLine>
             <Label fontWeight="bold">
               <FormattedMessage id="contribution.total" defaultMessage="TOTAL" />
             </Label>
-            <Span fontWeight="bold" fontSize="LeadParagraph">
-              {formatCurrency(amount + taxInfo.amount, currency)}
+            <Span fontWeight="bold" fontSize="LeadParagraph" color={taxInfo.isReady ? 'black.800' : 'black.400'}>
+              {formatCurrency(amount + (taxInfo.isReady ? taxInfo.amount : 0), currency)}
             </Span>
           </AmountLine>
         </React.Fragment>
