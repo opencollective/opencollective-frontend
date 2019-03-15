@@ -163,6 +163,8 @@ export default class StyledSelect extends React.Component {
     /** used to display the value of an item */
     children: PropTypes.func,
     defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()]),
+    /** Use this to control the component state */
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()]),
     /** disable selecion */
     disabled: PropTypes.bool,
     /** show error state */
@@ -205,12 +207,26 @@ export default class StyledSelect extends React.Component {
     }
   }
 
+  /** Return the value if component is controlled, otherwise undefined */
+  getValue() {
+    if (this.props.value === undefined) {
+      return undefined;
+    }
+
+    return this.props.value ? getItems([this.props.value], this.props.keyGetter)[0] : null;
+  }
+
   render() {
     const { ItemsListRenderer, error, defaultValue, disabled, id, name, onChange, success, mode } = this.props;
-    const initialSelectedItem = defaultValue ? getItems([defaultValue], this.props.keyGetter)[0] : null;
+    const initialSelectedItem = defaultValue ? getItems([defaultValue], this.props.keyGetter)[0] : undefined;
 
     return (
-      <Downshift onChange={onChange} initialSelectedItem={initialSelectedItem} itemToString={item => item && item.key}>
+      <Downshift
+        onChange={onChange}
+        initialSelectedItem={initialSelectedItem}
+        selectedItem={this.getValue()}
+        itemToString={item => item && item.key}
+      >
         {({ getInputProps, getItemProps, getMenuProps, highlightedIndex, isOpen, selectedItem, toggleMenu }) => (
           <div>
             <SelectContainer

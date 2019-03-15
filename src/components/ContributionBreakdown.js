@@ -8,6 +8,7 @@ import { Close } from 'styled-icons/material/Close';
 
 import { formatCurrency, capitalize } from '../lib/utils';
 import getPaymentMethodFees from '../lib/fees';
+import fetchGeoLocation from '../lib/geolocation_api';
 import StyledCard from './StyledCard';
 import { Span } from './Text';
 import StyledHr from './StyledHr';
@@ -163,18 +164,25 @@ const ContributionBreakdown = ({
 }) => {
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
   const taxInfo = prepareTaxInfo(amount, tax, collectiveTaxInfo);
+  const dispatchChange = newValues => onChange(prepareTaxInfo(amount, tax, { ...taxInfo, ...newValues }));
 
-  // Dispatch initial value on mount
   useEffect(() => {
-    if (onChange && (!collectiveTaxInfo || taxInfo.amount !== collectiveTaxInfo.amount)) {
-      onChange(taxInfo);
+    // Dispatch initial value on mount
+    onChange(taxInfo);
+
+    // Resolve country from IP if none provided
+    if (tax && !collectiveTaxInfo.countryISO) {
+      fetchGeoLocation().then(countryISO => {
+        // User country may have changed
+        if (!collectiveTaxInfo.countryISO && countryISO) {
+          dispatchChange({ countryISO, isReady: !formState.isEnabled });
+        }
+      });
     }
-  });
+  }, []);
 
   const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
   const countryHasTax = tax && isTaxedCountry(tax, taxInfo.countryISO);
-  const dispatchChange = newValues => onChange(prepareTaxInfo(amount, tax, { ...taxInfo, ...newValues }));
-
   return (
     <StyledCard width={1} maxWidth={464} px={[24, 48]} py={24}>
       {showFees && (
@@ -202,7 +210,7 @@ const ContributionBreakdown = ({
                 </Span>
                 <InputTypeCountry
                   mode="underlined"
-                  defaultValue={taxInfo.countryISO}
+                  value={taxInfo.countryISO}
                   onChange={({ code }) => dispatchChange({ countryISO: code, isReady: !formState.isEnabled })}
                   labelBuilder={({ code, name }) => {
                     return `${name} (+${tax.countries && !tax.countries.includes(code) ? 0 : tax.percentage}%)`;

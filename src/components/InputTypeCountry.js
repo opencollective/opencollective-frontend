@@ -13,6 +13,8 @@ class InputTypeCountry extends Component {
     onChange: PropTypes.func.isRequired,
     name: PropTypes.string,
     defaultValue: PropTypes.string,
+    /** Use this to control the component state */
+    value: PropTypes.string,
     labelBuilder: PropTypes.func,
     /** Switch between display modes */
     mode: PropTypes.oneOf(['select', 'underlined']),
@@ -94,9 +96,17 @@ class InputTypeCountry extends Component {
     );
   }
 
+  getValue(countries, value) {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    return value && this.prepareCountry(countries, value);
+  }
+
   render() {
     const { error, countries } = this.state;
-    const { name, defaultValue, mode } = this.props;
+    const { name, defaultValue, value, mode } = this.props;
     const defaultCountry = defaultValue && defaultValue.toUpperCase();
 
     return (
@@ -104,6 +114,7 @@ class InputTypeCountry extends Component {
         name={name}
         options={countries}
         keyGetter={({ code }) => code}
+        value={this.getValue(countries, value)}
         defaultValue={defaultCountry && this.prepareCountry(countries, defaultCountry)}
         onChange={this.handleChange}
         error={error}
