@@ -14,7 +14,7 @@ describe('Archive Collective', () => {
           .contains('button', 'Archive')
           .click();
         cy.wait(500);
-        cy.contains('Organization already archived.');
+        cy.contains('The organization was successfully archived.');
       });
     });
   });
@@ -33,7 +33,7 @@ describe('Archive Collective', () => {
           .contains('button', 'Archive')
           .click();
         cy.wait(500);
-        cy.contains('Collective already archived.');
+        cy.contains('The collective was successfully archived.');
       });
     });
   });
