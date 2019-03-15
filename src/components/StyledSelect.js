@@ -9,6 +9,7 @@ import tag from 'clean-tag';
 
 import { getInputBorderColor } from '../lib/styled_components_utils';
 import Container from './Container';
+import { Span } from './Text';
 
 /**
  * Returns a function that will return a unique key from iteratee. As we rely on
@@ -175,6 +176,8 @@ export default class StyledSelect extends React.Component {
     name: PropTypes.string,
     /** event handler for when a selection is made */
     onChange: PropTypes.func,
+    /** A placeholder to show when nothing's selected */
+    placeholder: PropTypes.node,
     /** list or map of options to display */
     options: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),
@@ -194,6 +197,7 @@ export default class StyledSelect extends React.Component {
     children: ({ value }) => value,
     ItemsListRenderer: DefaultItemsListRenderer,
     mode: 'select',
+    placeholder: '',
   };
 
   constructor(props) {
@@ -247,7 +251,11 @@ export default class StyledSelect extends React.Component {
               })}
             >
               <Box flex="1 1 auto" mr={1}>
-                {selectedItem && this.props.children(selectedItem)}
+                {selectedItem ? (
+                  this.props.children(selectedItem)
+                ) : (
+                  <Span color="black.400">{this.props.placeholder}</Span>
+                )}
               </Box>
               {mode === 'select' && <Icon size="1.2em" disabled={disabled} error={error} success={success} />}
             </SelectContainer>

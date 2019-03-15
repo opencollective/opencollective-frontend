@@ -4,6 +4,7 @@ import { orderBy, truncate } from 'lodash';
 import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
 import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
 import { FixedSizeList } from 'react-window';
+import { FormattedMessage } from 'react-intl';
 
 import StyledSelect from './StyledSelect';
 import withIntl from '../lib/withIntl';
@@ -15,6 +16,7 @@ class InputTypeCountry extends Component {
     defaultValue: PropTypes.string,
     /** Use this to control the component state */
     value: PropTypes.string,
+    /** Placeholder */
     labelBuilder: PropTypes.func,
     /** Switch between display modes */
     mode: PropTypes.oneOf(['select', 'underlined']),
@@ -120,6 +122,7 @@ class InputTypeCountry extends Component {
         error={error}
         mode={mode}
         ItemsListRenderer={this.ItemsListRenderer}
+        placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select a country" />}
       >
         {({ value }) => this.props.labelBuilder(value)}
       </StyledSelect>
