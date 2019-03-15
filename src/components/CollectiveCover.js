@@ -136,7 +136,7 @@ ${description}`;
 
     return (
       <div
-        className={classNames(CollectiveCover, className, type, {
+        className={classNames('CollectiveCover', className, type, {
           defaultBackgroundImage: !collective.backgroundImage ? true : false,
           archiveCollective: collective.isArchived,
         })}
