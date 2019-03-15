@@ -102,7 +102,7 @@ class NotificationBar extends React.Component {
               margin: 0.5rem;
             }
             .collectiveArchived {
-              background: rgba(200, 10, 10, 0.9);
+              background: #414141;
             }
           `}
         </style>
