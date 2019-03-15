@@ -5,6 +5,7 @@ import http from 'http';
 import express from 'express';
 import next from 'next';
 import accepts from 'accepts';
+import cookieParser from 'cookie-parser';
 import cloudflareIps from 'cloudflare-ip/ips.json';
 
 import routes from './routes';
@@ -26,12 +27,22 @@ const port = process.env.PORT;
 app.prepare().then(() => {
   server.use(loggerMiddleware.logger);
 
+  server.use(cookieParser());
+
   server.use((req, res, next) => {
     const accept = accepts(req);
-    // Detect language as query string in the URL
+
     if (req.query.language && languages.includes(req.query.language)) {
+      // Detect language as query string in the URL
       req.language = req.query.language;
+      if (req.query.set) {
+        res.cookie('language', req.language);
+      }
+    } else if (req.cookies.language && languages.includes(req.cookies.language)) {
+      // Detect language in Cookie
+      req.language = req.cookies.language;
     }
+
     req.locale = req.language || accept.language(languages) || 'en';
     logger.debug('url %s locale %s', req.url, req.locale);
     req.localeDataScript = getLocaleDataScript(req.locale);

@@ -90,6 +90,24 @@ class Footer extends React.Component {
             <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>
               An organization for your community, transparent by design.
             </P>
+            <Container color="#6E747A" textAlign={['center', null, 'left']}>
+              <P fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={2} pt={2}>
+                LANGUAGES
+              </P>
+              <P>
+                <a href="?language=en&set=1">English</a>
+                <br />
+                <a href="?language=fr&set=1" title="French">
+                  Français
+                </a>{' '}
+                (59%)
+                <br />
+                <a href="?language=es&set=1" title="Espanol">
+                  Espanol
+                </a>{' '}
+                (14%)
+              </P>
+            </Container>
           </Container>
           <Container
             display="flex"
