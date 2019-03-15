@@ -191,6 +191,8 @@ export default class StyledSelect extends React.Component {
     mode: PropTypes.oneOf(['select', 'underlined']),
     /** A custom list renderer. Usefull for windowing or progressive loading */
     ItemsListRenderer: PropTypes.func,
+    /** Is this input required? */
+    required: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -254,7 +256,7 @@ export default class StyledSelect extends React.Component {
                 {selectedItem ? (
                   this.props.children(selectedItem)
                 ) : (
-                  <Span color="black.400">{this.props.placeholder}</Span>
+                  <Span color={this.props.required ? 'primary.700' : 'black.600'}>{this.props.placeholder}</Span>
                 )}
               </Box>
               {mode === 'select' && <Icon size="1.2em" disabled={disabled} error={error} success={success} />}

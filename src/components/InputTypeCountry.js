@@ -22,6 +22,8 @@ class InputTypeCountry extends Component {
     mode: PropTypes.oneOf(['select', 'underlined']),
     /** From withIntl */
     intl: PropTypes.object.isRequired,
+    /** Is this input required? */
+    required: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -122,7 +124,8 @@ class InputTypeCountry extends Component {
         error={error}
         mode={mode}
         ItemsListRenderer={this.ItemsListRenderer}
-        placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select a country" />}
+        placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
+        required={this.props.required}
       >
         {({ value }) => this.props.labelBuilder(value)}
       </StyledSelect>

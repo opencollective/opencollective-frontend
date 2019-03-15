@@ -212,9 +212,7 @@ const ContributionBreakdown = ({
                   mode="underlined"
                   value={taxInfo.countryISO}
                   onChange={({ code }) => dispatchChange({ countryISO: code, isReady: !formState.isEnabled })}
-                  labelBuilder={({ code, name }) => {
-                    return `${name} (+${tax.countries && !tax.countries.includes(code) ? 0 : tax.percentage}%)`;
-                  }}
+                  required
                 />
               </Container>
               {taxInfo.countryISO && countryHasTax && (
@@ -244,7 +242,7 @@ const ContributionBreakdown = ({
                     >
                       <FormattedMessage
                         id="contribute.enterTaxNumber"
-                        defaultMessage="Enter {taxName} number"
+                        defaultMessage="Enter {taxName} number (if you have one)"
                         values={{ taxName: tax.name }}
                       />
                     </ClickableLabel>
@@ -336,7 +334,10 @@ ContributionBreakdown.propTypes = {
   platformFeePercent: PropTypes.number,
   /** Host fees, as an integer percentage */
   hostFeePercent: PropTypes.number,
-  /** Tax as defined in host settings */
+  /**
+   * Tax as defined in host settings.
+   * See https://docs.opencollective.com/help/hosts/local-tax
+   */
   tax: PropTypes.shape({
     /** Tax value, as an integer percentage */
     percentage: PropTypes.number,
