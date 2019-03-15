@@ -194,6 +194,7 @@ const archiveCollectiveQuery = gql`
   mutation archiveCollective($id: Int!) {
     archiveCollective(id: $id) {
       id
+      isArchived
     }
   }
 `;
