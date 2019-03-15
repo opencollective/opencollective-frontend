@@ -1203,7 +1203,7 @@ export default function(Sequelize, DataTypes) {
                 where: {
                   CollectiveId: this.id,
                   FromCollectiveId: member.MemberCollectiveId,
-                  status: { [Op.in]: ['ACTIVE', 'PAID'] },
+                  // status: { [Op.in]: ['ACTIVE', 'PAID'] },
                 },
                 include: [
                   { model: models.Tier },
