@@ -520,13 +520,6 @@ export default {
       },
       {
         description: 'Donation to that great project',
-        amount: 5000,
-        netAmountInCollectiveCurrency: 4500,
-        type: 'CREDIT',
-        currency: 'USD',
-      },
-      {
-        description: 'Donation to that great project',
         amount: 10000,
         netAmountInCollectiveCurrency: 9000,
         type: 'CREDIT',
@@ -534,6 +527,14 @@ export default {
         paypalEmail: 'userpaypal@gmail.com',
         createdAt: '2015-05-29T07:00:00.000Z',
         PaymentMethodId: 1,
+      },
+      {
+        description: 'Donation to that great project',
+        amount: 5000,
+        netAmountInCollectiveCurrency: 4500,
+        type: 'CREDIT',
+        currency: 'USD',
+        createdAt: '2018-05-29T07:00:00.000Z',
       },
     ],
   },
