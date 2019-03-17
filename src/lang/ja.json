@@ -228,7 +228,7 @@
   "contribution.paymentFee": "Payment processor fee",
   "contribution.your": "Your contribution",
   "contribute.changeTaxNumber": "Change {taxName} number",
-  "contribute.enterTaxNumber": "Enter {taxName} number",
+  "contribute.enterTaxNumber": "Enter {taxName} number (if you have one)",
   "contribute.taxNumberBtn": "Done",
   "contribute.taxInfoInvalid": "Invalid {taxName} number",
   "contribution.total": "TOTAL",
