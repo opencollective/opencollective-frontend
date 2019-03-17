@@ -467,13 +467,18 @@ class CreateOrderPage extends React.Component {
     return forceInterval && forceAmount;
   }
 
+  /** Return the tax applicable to the order or null */
+  getTax() {
+    const tier = this.props.data.Tier;
+    return tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
+  }
+
   /** Returs the steps list */
   getSteps() {
     const tier = this.props.data.Tier;
     const isFixedPriceTier = this.isFixedPriceTier();
     const minAmount = this.getOrderMinAmount();
     const isFreeTier = minAmount === 0;
-    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
 
     const steps = [
       {
@@ -504,7 +509,7 @@ class CreateOrderPage extends React.Component {
     }
 
     // Show the summary step only if the order has tax
-    if (tax) {
+    if (this.getTax()) {
       steps.push({
         name: 'summary',
         isCompleted: this.state.stepSummary && this.state.stepSummary.isReady,
@@ -573,7 +578,7 @@ class CreateOrderPage extends React.Component {
     const amount = get(this.state.stepDetails, 'totalAmount');
     const interval = get(this.state.stepDetails, 'interval');
     const taxAmount = get(this.state.stepSummary, 'amount', 0);
-    const tax = tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
+    const tax = this.getTax();
 
     return (
       <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
@@ -759,7 +764,7 @@ class CreateOrderPage extends React.Component {
               collectiveTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
               onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
-              tax={tier ? get(this.props.data.Collective, `host.taxes.${tier.type}`) : null}
+              tax={this.getTax()}
             />
           </Container>
           {this.renderTierDetails(tier)}
