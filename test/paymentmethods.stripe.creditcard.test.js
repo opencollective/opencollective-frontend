@@ -102,7 +102,6 @@ describe('stripe.creditcard', () => {
     it('has tax information stored in transaction', async () => {
       const taxAmount = 100;
       const { order } = await createOrderWithPaymentMethod('name', { taxAmount });
-      console.log(order.dataValues);
       const transaction = await creditcard.processOrder(order);
       expect(transaction.taxAmount).to.be.equal(taxAmount);
     });

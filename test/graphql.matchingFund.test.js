@@ -174,7 +174,7 @@ describe('graphql.matchingFund.test.js', () => {
     expect(transactions[3].amount).to.equal(user1.paymentMethod.matching * order.totalAmount);
 
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
-    expect(balance.amount).to.equal(141621); // €1,500 - $100
+    expect(balance.amount).to.equal(141226); // €1,500 - $100
   });
 
   it('happy path recurring donation', async () => {
@@ -213,7 +213,7 @@ describe('graphql.matchingFund.test.js', () => {
     expect(transactions[3].amount).to.equal(user1.paymentMethod.matching * order.totalAmount);
 
     const balance = await user1.paymentMethod.getBalanceForUser(user2);
-    expect(balance.amount).to.equal(141621); // €1,500 - $100
+    expect(balance.amount).to.equal(141226); // €1,500 - $100
 
     const subscriptions = await models.Subscription.findAll();
     expect(subscriptions.length).to.equal(1);
