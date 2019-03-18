@@ -186,10 +186,10 @@ const getCollectiveToEditQuery = gql`
         image
         backgroundImage
         settings
-        taxes
         description
         website
         twitterHandle
+        countryISO
         stats {
           id
           collectives {
