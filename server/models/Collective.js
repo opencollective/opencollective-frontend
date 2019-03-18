@@ -1203,13 +1203,14 @@ export default function(Sequelize, DataTypes) {
                 where: {
                   CollectiveId: this.id,
                   FromCollectiveId: member.MemberCollectiveId,
+                  // status: { [Op.in]: ['ACTIVE', 'PAID'] },
                 },
                 include: [
                   { model: models.Tier },
                   { model: models.Subscription },
                   { model: models.Collective, as: 'referral' },
                 ],
-                order: [['createdAt', 'ASC']],
+                order: [['createdAt', 'DESC']],
               },
               sequelizeParams,
             ),
