@@ -1,30 +1,61 @@
-# Database
+# PostgreSQL Database
 
-You need to have Postgres 9.x with the Postgis extension.
+You need to have PostgreSQL 9.x, 10.x or 11.x with the Postgis extension.
+
+In production, we're currently running 9.6.11.
 
 ## Installation
 
 ### On macOS
 
-Last time we checked, the simplest way to get this running was using [Postgres.app](http://postgresapp.com/).
+#### With Homebrew
 
-Using brew was not an option:
+`brew install postgresql postgis`
 
-- `brew install postgresql postgis` would end up with Postgres 10.x
-- `brew install postgresql@9.x` would end up with Postgres 9.x without possibility to install Postgis
+#### With Postgres.app
 
-## Setting Up The database
+Get the app from [Postgres.app](http://postgresapp.com/). Install it.
 
-Now, assuming the postgres database superuser is `postgres`:
+Then to enable the CLI tools, follow the steps from: https://postgresapp.com/documentation/cli-tools.html
+
+## Setup
+
+#### Development
+
+Please be aware of the `NODE_ENV` variable. By default, it's set to `development` and the `opencollective_dvl` database will be used.
+
+The development database should be automatically installed after `npm install`.
+
+To trigger the postinstall script again, run `npm run postinstall`.
+
+To force a restore run `npm run db:restore`, then `npm run db:migrate`.
+
+#### Test
+
+Please be aware of the `NODE_ENV` variable. By default, it's set to `development` and the `opencollective_dvl` database will be used. You have to set it yourself to `test` to switch to the test environment and use `opencollective_test` instead.
+
+To setup the database for tests, run `npm run db:setup` or run `NODE_ENV=test npm run db:setup` to force the environment.
+
+If you want to do the steps manually, first, make sure the `opencollective` user is existing:
+
+`createuser opencollective`
+
+Then:
 
 ```
-createdb -U postgres opencollective_test
-createdb -U postgres opencollective_dvl
-createuser -U postgres opencollective
-psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE opencollective_dvl TO opencollective'
-psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO opencollective'
-psql -U postgres -d opencollective_dvl -c 'CREATE EXTENSION postgis'
-psql -U postgres -d opencollective_test -c 'CREATE EXTENSION postgis'
+createdb opencollective_test
+psql -d opencollective_test -c 'GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO opencollective'
+psql -d opencollective_test -c 'CREATE EXTENSION postgis'
+```
+
+## Reset
+
+Sometime, things dont't work as expected and you need to start from scratch. Do:
+
+```
+dropdb opencollective_dvl
+dropdb opencollective_test
+dropuser opencollective
 ```
 
 ## Troubleshooting
@@ -36,3 +67,7 @@ For development, ensure that local connections do not require a password. Locate
 ### error: type "geometry" does not exist
 
 Make sure Postgis is available and activated.
+
+### Unhandled rejection error: permission denied to create extension "postgis"
+
+Follow the **Reset** steps and try again.

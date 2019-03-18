@@ -7,7 +7,7 @@
     }
   },
   "maintenancedb": {
-    "options": { "host": "localhost" }
+    "url": "postgres://postgres@localhost:5432/postgres"
   },
   "keys": {
     "opencollective": {

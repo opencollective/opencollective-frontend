@@ -11,7 +11,7 @@
     }
   },
   "maintenancedb": {
-    "url": "postgres://postgres@127.0.0.1:5432/postgres"
+    "url": "postgres://127.0.0.1:5432/postgres"
   },
   "keys": {
     "opencollective": {

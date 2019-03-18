@@ -54,6 +54,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - <<: *persist_cache
       - run: npm run prettier:check
+
   test-bdd:
     docker:
       - image: circleci/node:11.8.0
@@ -64,9 +65,10 @@ jobs:
       - checkout
       - <<: *restore_cache
       - run: npm ci
-      - run: npm run db:setup && npm run db:migrate
+      - run: npm run db:setup
       - <<: *persist_cache
-      - run: npm run test:bdd:dev
+      - run: npm run test:bdd
+
   test-unit:
     docker:
       - image: circleci/node:11.8.0
@@ -80,7 +82,7 @@ jobs:
       - <<: *restore_cache
       - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: npm ci
-      - run: npm run db:setup && npm run db:migrate
+      - run: npm run db:setup
       - <<: *persist_cache
       - run: npm run test:unit
       - run: npm run coverage
@@ -91,8 +93,10 @@ workflows:
   version: 2
   main:
     jobs:
-      - lint
-      - prettier
+      - lint:
+          <<: *test_filters
+      - prettier:
+          <<: *test_filters
       - test-bdd:
           <<: *test_filters
       - test-unit:
