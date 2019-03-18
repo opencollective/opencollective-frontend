@@ -49,20 +49,22 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
           defaultMessage={'Archive this {type}.'}
         />
       </H2>
-      <P>
-        <FormattedMessage
-          values={{ type: collectiveType.toLowerCase() }}
-          id="collective.archive.description"
-          defaultMessage={'Mark this {type} as archived, delete all tiers and cancel all subscriptions.'}
-        />
-      </P>
+      {!isArchived && (
+        <P>
+          <FormattedMessage
+            values={{ type: collectiveType.toLowerCase() }}
+            id="collective.archive.description"
+            defaultMessage={'Mark this {type} as archived, delete all tiers and cancel all subscriptions.'}
+          />
+        </P>
+      )}
       {error && <P color="#ff5252">{error}</P>}
       {!isArchived && (
         <StyledButton width={0.3} onClick={() => setShowModal(true)} loading={archiving}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.button"
-            defaultMessage={'Archive this {type}.'}
+            defaultMessage={'Archive this {type}'}
           />
         </StyledButton>
       )}
@@ -89,7 +91,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
         onClose={() => setShowModal(false)}
         show={showModal}
         className="confirm-ArchiveCollective"
-        title={`Are you sure you want to archive ${collectiveType.toLocaleLowerCase()}?`}
+        title={`Are you sure you want to archive this ${collectiveType.toLocaleLowerCase()}?`}
       >
         <Container display="flex" justifyContent="space-between" width={1} mt={4}>
           <StyledButton onClick={() => setShowModal(false)}>
