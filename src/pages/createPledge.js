@@ -498,7 +498,7 @@ class CreatePledgePage extends React.Component {
                       currency={data.Collective.currency}
                       precision={0}
                     />{' '}
-                    {data.Collective.currency} pledged
+                    {data.Collective.currency}
                   </H5>
 
                   <P color="black.600">

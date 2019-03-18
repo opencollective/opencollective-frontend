@@ -925,6 +925,7 @@ const query = gql`
         fromCollective {
           id
           image
+          description
           name
           slug
           type

@@ -43,7 +43,6 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
     </P>
 
     <P fontSize="Tiny" textAlign="center" mt={2} px={2} pb={2}>
-      Has pledged:
       <br />
       <Span fontSize="Caption">
         <Currency fontWeight="bold" value={totalAmount} currency={currency} precision={0} abbreviate />

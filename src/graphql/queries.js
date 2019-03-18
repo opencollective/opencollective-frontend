@@ -485,6 +485,7 @@ const getCollectiveQuery = gql`
           name
           image
           slug
+          description
           type
         }
       }

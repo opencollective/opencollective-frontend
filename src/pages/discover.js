@@ -8,14 +8,52 @@ import withIntl from '../lib/withIntl';
 
 import { getBaseApiUrl } from '../lib/utils';
 import { queryString } from '../lib/api';
-
+import styled from 'styled-components';
+import Link from 'next/link';
+import { FormattedMessage } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
+
 import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
+import SearchForm from '../components/SearchForm';
+import PledgedCollectiveCard from '../components/PledgedCollectiveCard';
+
+const NavList = styled(Flex)`
+  list-style: none;
+  min-width: 20rem;
+  text-align: right;
+`;
+
+const SelectWrapper = styled.select`
+  background: white;
+  padding: 5px;
+  border: 1px solid silver;
+`;
+
+const Nava = styled.a`
+  color: grey;
+  fo :hover {
+    color: blue;
+    cursor: pointer;
+  }
+`;
+const SearchFormContainer = styled(Box)`
+  max-width: 30rem;
+  min-width: 83rem;
+  padding: 64px;
+`;
+const SearchInput = styled(Box)`
+  && {
+    appearance: none;
+    background-color: white;
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
+  }
+`;
 
 const _transformData = collective => ({
   ...collective,
@@ -60,7 +98,7 @@ function useCollectives(query) {
 
 const DiscoverPage = ({ router }) => {
   const { query } = router;
-  const { collectives, offset, total, show, sort, tags = [] } = useCollectives(query);
+  const { slug, collective, collectives, offset, total, show, sort, tags = [] } = useCollectives(query);
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
 
@@ -69,6 +107,13 @@ const DiscoverPage = ({ router }) => {
     router.push({
       pathname: router.pathname,
       query: { ...router.query, offset: 0, [name]: value },
+    });
+  };
+
+  const onLoadCollectives = (e, value) => {
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, offset: 0, show: value },
     });
   };
 
@@ -84,16 +129,20 @@ const DiscoverPage = ({ router }) => {
             backgroundRepeat="no-repeat"
             display="flex"
             flexDirection="column"
-            height={560}
+            height={364}
             justifyContent="center"
             textAlign="center"
           >
             <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']}>
               Discover awesome collectives to support
             </H1>
-            <P color="white.full" fontSize="H4" lineHeight="H4" mt={4}>
+            <P color="white.full" fontSize="H4" lineHeight="H4">
               Let&apos;s make great things together.
             </P>
+            <SearchFormContainer p={2}>
+              <SearchInput />
+              <SearchForm />
+            </SearchFormContainer>
           </Container>
           <Container
             alignItems="center"
@@ -102,44 +151,66 @@ const DiscoverPage = ({ router }) => {
             justifyContent="center"
             maxWidth={1200}
             mx="auto"
-            position="relative"
+            padding="34px"
             px={2}
-            top={-120}
+            top={58}
             width={1}
           >
-            <Flex width={[1, 0.8, 0.6]} justifyContent="space-evenly" flexWrap="wrap" mb={4}>
-              <Flex width={[1, null, 0.5]} justifyContent="center" alignItems="center" mb={[3, null, 0]}>
-                <P as="label" htmlFor="sort" color="white.full" fontSize="LeadParagraph" pr={2}>
-                  Sort By
-                </P>
-                <select name="sort" id="sort" value={sort} onChange={onChange}>
-                  <option value="most popular">Most Popular</option>
-                  <option value="newest">Newest</option>
-                </select>
-              </Flex>
-
-              <Flex width={[1, null, 0.5]} justifyContent="center" alignItems="center">
-                <P as="label" htmlFor="show" color="white.full" fontSize="LeadParagraph" pr={2}>
-                  Show
-                </P>
-                <select name="show" id="show" value={show} onChange={onChange}>
-                  {tagOptions.map(tag => (
-                    <option key={tag} value={tag}>
-                      {tag}
-                    </option>
-                  ))}
-                </select>
-              </Flex>
+            <Flex justifyContent="space-evenly" flexWrap="wrap" mb={4} width="100%">
+              <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin-right: 256px;">
+                <Box as="li" px={3}>
+                  <Link href="/discover" passHref scroll={false}>
+                    <Nava>
+                      <FormattedMessage id="menu.allCollectives" defaultMessage="All collectives" />
+                    </Nava>
+                  </Link>
+                </Box>
+                <Box as="li" px={3}>
+                  <Link href="/discover?offset=0&show=open%20source" passHref scroll={false}>
+                    <Nava>
+                      <FormattedMessage id="menu.openSourceCollectives" defaultMessage="Open source collectives" />
+                    </Nava>
+                  </Link>
+                </Box>
+                <Box as="li" px={3}>
+                  <Link route="PledgeCollectiveCard" params={{ slug: collective.slug }} passHref scroll={false}>
+                    <Nava>
+                      <FormattedMessage id="menu.pledgedCollective" defaultMessage="Pledged collectives" />
+                    </Nava>
+                  </Link>
+                </Box>
+                <Box as="li" px={3}>
+                  <Link href="/discover?offset=0&show=other" passHref scroll={false}>
+                    <Nava>
+                      <FormattedMessage id="menu.others" defaultMessage="Others" />
+                    </Nava>
+                  </Link>
+                </Box>
+              </NavList>
+              <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+                <Box as="li" px={3}>
+                  <SelectWrapper name="show" id="show" value={show} onChange={onChange}>
+                    {tagOptions.map(tag => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </SelectWrapper>
+                </Box>
+              </NavList>
             </Flex>
 
             {collectives && (
               <Fragment>
                 <Flex flexWrap="wrap" width={1} justifyContent="center">
-                  {collectives.map(c => (
-                    <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                      <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
-                    </Flex>
-                  ))}
+                  {collectives.map(c => {
+                    return (
+                      <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
+                        <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                        <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                      </Flex>
+                    );
+                  })}
                 </Flex>
                 {total > limit && (
                   <Flex justifyContent="center" mt={3}>

@@ -9,8 +9,9 @@ import { Router } from '../server/pages';
 import SearchIcon from './SearchIcon';
 
 const SearchInputContainer = styled(Flex)`
-  border: solid 1px var(--silver-four);
+  border: solid 1px silver;
   border-radius: 20px;
+  background-color: white;
 `;
 
 const SearchInput = styled(Box)`
