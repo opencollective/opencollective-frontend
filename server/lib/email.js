@@ -9,6 +9,7 @@ import path from 'path';
 import he from 'he';
 import { isArray, pick, get, merge, includes } from 'lodash';
 
+import models from '../models';
 import logger from './logger';
 import templates from './emailTemplates';
 import { isEmailInternal } from './utils';
@@ -223,6 +224,7 @@ const getNotificationLabel = (template, recipients) => {
     onboarding: 'onboarding emails',
     'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports',
+    thankyou: 'thank you for your donation',
   };
 
   return notificationTypeLabels[template];
@@ -309,14 +311,29 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   return Promise.resolve(renderedTemplate);
 };
 
+const isNotificationActive = async (template, data) => {
+  if (data.user && data.user.id) {
+    return models.Notification.isActive(template, data.user, data.collective);
+  } else {
+    return true;
+  }
+};
+
 /*
  * Given a template, recipient and data, generates email and sends it.
  */
-const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
+const generateEmailFromTemplateAndSend = async (template, recipient, data, options = {}) => {
   if (!recipient) {
     logger.info(`Email with template '${template}' not sent. No recipient.`);
     return;
   }
+
+  const notificationIsActive = await isNotificationActive(template, data);
+  if (!notificationIsActive) {
+    logger.info(`Email with template '${template}' not sent. Recipient email notification is not active.`);
+    return;
+  }
+
   return generateEmailFromTemplate(template, recipient, data, options).then(renderedTemplate => {
     const attributes = getTemplateAttributes(renderedTemplate.html);
     options.text = renderedTemplate.text;
