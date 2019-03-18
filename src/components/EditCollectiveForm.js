@@ -724,7 +724,9 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
-              {this.state.section === 'advanced' && <ArchiveCollective collective={collective} />}
+              {this.state.section === 'advanced' && collective.type !== 'USER' && (
+                <ArchiveCollective collective={collective} />
+              )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
