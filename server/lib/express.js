@@ -5,8 +5,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import errorHandler from 'errorhandler';
 import passport from 'passport';
-import connectSessionSequelize from 'connect-session-sequelize';
-import session from 'express-session';
 import helmet from 'helmet';
 import debug from 'debug';
 import cloudflareIps from 'cloudflare-ip/ips.json';
@@ -17,11 +15,8 @@ import { has, get } from 'lodash';
 
 import forest from './forest';
 import cacheMiddleware from '../middleware/cache';
-import { sequelize as db } from '../models';
 import { middleware } from '../graphql/loaders';
 import { sanitizeForLogs } from '../lib/utils';
-
-const SequelizeStore = connectSessionSequelize(session.Store);
 
 export default function(app) {
   app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
@@ -98,11 +93,6 @@ export default function(app) {
   // Forest
   forest(app);
 
-  // Authentication
-
-  passport.serializeUser((user, cb) => cb(null, user));
-  passport.deserializeUser((obj, cb) => cb(null, obj));
-
   const verify = (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile });
 
   if (has(config, 'github.clientID') && has(config, 'github.clientSecret')) {
@@ -122,16 +112,6 @@ export default function(app) {
   }
 
   app.use(cookieParser());
-  app.use(
-    session({
-      secret: config.keys.opencollective.sessionSecret,
-      resave: false,
-      cookie: { maxAge: 1000 * 60 * 5 },
-      saveUninitialized: false,
-      store: new SequelizeStore({ db }),
-      proxy: true,
-    }),
-  );
+
   app.use(passport.initialize());
-  app.use(passport.session());
 }
