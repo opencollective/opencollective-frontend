@@ -46,7 +46,7 @@
     "html-pdf": "2.2.0",
     "i18n-iso-countries": "4.0.0",
     "intl": "1.2.5",
-    "jsonwebtoken": "8.5.0",
+    "jsonwebtoken": "8.5.1",
     "load-script": "1.0.0",
     "lodash": "4.17.11",
     "lru-cache": "5.1.1",
