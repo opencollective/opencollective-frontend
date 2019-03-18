@@ -308,6 +308,7 @@
   "virtualCards.create.sendEmails": "Envoyer les cartes par email",
   "virtualCards.create.generateCodes": "J'enverrai les codes moi-même",
   "creditcard.error": "Carte de crédit non valide",
+  "collective.isArchived.edit.description": "This {type} has been archived and can no longer be used for any activities.",
   "saved": "sauvegardé",
   "event.create.btn": "Créer un événement",
   "collective.changeUrl.label": "Change your URL",
