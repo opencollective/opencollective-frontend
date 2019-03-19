@@ -82,8 +82,8 @@ class PledgedCollectiveCard extends React.Component {
               <TruncatedText minHeight={15} fontSize="Tiny" textAlign="center" color="black.500">
                 <FormattedMessage id="Pledgecollective.card" defaultMessage="PLEDGED COLLECTIVES" />
               </TruncatedText>
-              <StyledLink href={website} color="primary.500" fontSize="Caption">
-                <ExternalLinkAlt size="1em" /> {website}
+              <StyledLink href={website} color="primary.700" fontSize="Caption">
+                <ExternalLinkAlt size="2em" /> {website}
               </StyledLink>
               <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
                 <StyledLink buttonStyle="primary" mb={4} mx="auto" buttonSize="small">
