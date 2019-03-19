@@ -20,7 +20,7 @@ import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
-import PledgedCollectiveCard from '../components/PledgedCollectiveCard';
+import PledgedCollectiveCard from '../components/PledgeCollectiveCard';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -98,7 +98,7 @@ function useCollectives(query) {
 
 const DiscoverPage = ({ router }) => {
   const { query } = router;
-  const { slug, collective, collectives, offset, total, show, sort, tags = [] } = useCollectives(query);
+  const { collectives, offset, total, show, sort, tags = [] } = useCollectives(query);
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
 
@@ -173,7 +173,7 @@ const DiscoverPage = ({ router }) => {
                   </Link>
                 </Box>
                 <Box as="li" px={3}>
-                  <Link route="PledgeCollectiveCard" params={{ slug: collective.slug }} passHref scroll={false}>
+                  <Link href="/discover?offset=0&show=open%20source" passHref scroll={false}>
                     <Nava>
                       <FormattedMessage id="menu.pledgedCollective" defaultMessage="Pledged collectives" />
                     </Nava>
@@ -206,8 +206,8 @@ const DiscoverPage = ({ router }) => {
                   {collectives.map(c => {
                     return (
                       <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                        <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                         <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                        <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                       </Flex>
                     );
                   })}
