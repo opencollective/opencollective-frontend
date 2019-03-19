@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { ArrowBack } from 'styled-icons/material/ArrowBack';
 
 import { Router } from '../server/pages';
-import { getEnvVar } from '../lib/utils';
+import { getEnvVar, parseToBoolean } from '../lib/utils';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
@@ -44,7 +44,7 @@ const MenuItem = styled(Link)`
   ${({ selected }) => selected && selectedStyle};
 `;
 
-const archiveIsEnabled = getEnvVar('SHOW_ARCHIVE_COLLECTIVE');
+const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
