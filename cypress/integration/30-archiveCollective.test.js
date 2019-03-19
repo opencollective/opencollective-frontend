@@ -8,7 +8,7 @@ describe('Archive Collective', () => {
         cy.wait(1000);
         cy.contains('button', 'edit organization').click();
         cy.contains('a', 'Advanced').click();
-        cy.contains('button', 'Archive this organization.').click();
+        cy.contains('button', 'Archive this organization').click();
         cy.get('.confirm-ArchiveCollective').should('exist');
         cy.get('.confirm-ArchiveCollective')
           .contains('button', 'Archive')
@@ -27,7 +27,7 @@ describe('Archive Collective', () => {
         cy.visit(`/${collectiveSlug}/edit`);
         cy.wait(1000);
         cy.contains('a', 'Advanced').click();
-        cy.contains('button', 'Archive this collective.').click();
+        cy.contains('button', 'Archive this collective').click();
         cy.get('.confirm-ArchiveCollective').should('exist');
         cy.get('.confirm-ArchiveCollective')
           .contains('button', 'Archive')
