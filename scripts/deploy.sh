@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 env=$1
 
 # current branch name
@@ -7,13 +9,13 @@ current_branch_name="(unnamed branch)"     # detached HEAD
 current_branch_name=${current_branch_name##refs/heads/}
 
 # Set env variables
-if [ $env = "staging" ]
+if [ "$env" = "staging" ]
 then
   branch_name="staging"
   # adding -f to always force staging
   remote="-f https://git.heroku.com/opencollective-staging-api.git"
   from_branch="master"
-elif [ $env = "production" ]
+elif [ "$env" = "production" ]
 then
   branch_name="production"
   remote="https://git.heroku.com/opencollective-prod-api.git"
@@ -30,9 +32,9 @@ git checkout $from_branch
 git merge origin/$from_branch
 
 # If it's staging, increase version patch on master
-if [ $env = "staging" ]
+if [ "$env" = "staging" ]
 then
-  npm version patch
+  npm version patch -f
 fi
 
 
@@ -55,4 +57,5 @@ git push $remote $branch_name:master
 git push origin $from_branch
 
 # Go back to the previous branch before deploying
-git checkout $current_branch_name
+git checkout "$current_branch_name"
+
