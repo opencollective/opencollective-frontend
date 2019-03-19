@@ -49,7 +49,7 @@
     "fs-extra": "7.0.1",
     "graphql": "0.13.2",
     "graphql-iso-date": "3.6.1",
-    "graphql-type-json": "0.2.1",
+    "graphql-type-json": "0.2.2",
     "handlebars": "4.1.1",
     "hashids": "1.2.2",
     "he": "1.2.0",
