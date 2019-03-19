@@ -92,7 +92,6 @@ npm run styleguide:deploy
 You can run the tests using `npm test` or more specifically:
 
 - `npm run test:jest` for pages and components
-- `npm run test:server` for api
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
 To update:
