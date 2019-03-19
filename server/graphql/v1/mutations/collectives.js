@@ -682,3 +682,26 @@ export async function archiveCollective(_, args, req) {
       return collective.update({ isActive: false, deactivatedAt: Date.now() });
     });
 }
+
+export async function unarchiveCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to unarchive a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(collective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as an Admin.',
+    });
+  }
+
+  return collective.update({ isActive: true, deactivatedAt: null });
+}

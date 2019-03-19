@@ -7,6 +7,7 @@ import {
   approveCollective,
   createCollectiveFromGithub,
   archiveCollective,
+  unarchiveCollective,
 } from './mutations/collectives';
 import {
   createOrder,
@@ -133,6 +134,15 @@ const mutations = {
     },
     resolve(_, args, req) {
       return archiveCollective(_, args, req);
+    },
+  },
+  unarchiveCollective: {
+    type: CollectiveInterfaceType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(_, args, req) {
+      return unarchiveCollective(_, args, req);
     },
   },
   createUser: {
