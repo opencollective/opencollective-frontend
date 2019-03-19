@@ -122,6 +122,7 @@ const editCollectiveQuery = gql`
       githubHandle
       countryISO
       isActive
+      isArchived
       hostFeePercent
       host {
         id
@@ -185,6 +186,15 @@ const deleteCollectiveQuery = gql`
   mutation deleteCollective($id: Int!) {
     deleteCollective(id: $id) {
       id
+    }
+  }
+`;
+
+const archiveCollectiveQuery = gql`
+  mutation archiveCollective($id: Int!) {
+    archiveCollective(id: $id) {
+      id
+      isArchived
     }
   }
 `;
@@ -427,6 +437,14 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
 export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
   props: ({ mutate }) => ({
     deleteCollective: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+export const addArchiveCollectiveMutation = graphql(archiveCollectiveQuery, {
+  props: ({ mutate }) => ({
+    archiveCollective: async id => {
       return await mutate({ variables: { id } });
     },
   }),

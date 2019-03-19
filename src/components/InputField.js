@@ -545,7 +545,6 @@ class InputField extends React.Component {
           </div>
         );
         break;
-
       default: {
         const addressDefaultValue = field.name === 'address' ? context['location'][field.name] : '';
         this.input = (
@@ -603,6 +602,11 @@ class InputField extends React.Component {
             .inputField .switch {
               display: flex;
               align-items: center;
+            }
+            .archiveField {
+              width: 100%;
+              display: flex;
+              padding-top: 20px;
             }
           `}
         </style>

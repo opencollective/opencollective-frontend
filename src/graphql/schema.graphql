@@ -85,6 +85,9 @@ type Collective implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
+  """Returns whether this collective was archived"""
+  isArchived: Boolean
+
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
@@ -239,6 +242,7 @@ interface CollectiveInterface {
   path: String
   isHost: Boolean
   canApply: Boolean
+  isArchived: Boolean
   host: CollectiveInterface
 
   """
@@ -518,6 +522,9 @@ type Event implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
+  """Returns whether this collective was archived"""
+  isArchived: Boolean
+
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
@@ -780,6 +787,7 @@ type Mutation {
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
+  archiveCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
@@ -1169,6 +1177,9 @@ type Organization implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective was archived"""
+  isArchived: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
@@ -1764,6 +1775,9 @@ type User implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective was archived"""
+  isArchived: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective

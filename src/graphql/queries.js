@@ -211,6 +211,7 @@ const getCollectiveToEditQuery = gql`
       settings
       createdAt
       isActive
+      isArchived
       isHost
       hostFeePercent
       expensePolicy
@@ -401,6 +402,7 @@ const getCollectiveQuery = gql`
       isHost
       hostFeePercent
       canApply
+      isArchived
       host {
         id
         slug

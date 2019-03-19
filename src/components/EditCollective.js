@@ -8,6 +8,7 @@ import Footer from './Footer';
 import SignInForm from './SignInForm';
 import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveCover from './CollectiveCover';
+import NotificationBar from './NotificationBar';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
@@ -20,6 +21,7 @@ class EditCollective extends React.Component {
     editCollective: PropTypes.func.isRequired,
     deleteCollective: PropTypes.func.isRequired,
     loggedInEditDataLoaded: PropTypes.bool.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -31,6 +33,14 @@ class EditCollective extends React.Component {
       'creditcard.error': {
         id: 'creditcard.error',
         defaultMessage: 'Invalid credit card',
+      },
+      'collective.isArchived': {
+        id: 'collective.isArchived',
+        defaultMessage: '{name} has been archived.',
+      },
+      'collective.isArchived.edit.description': {
+        id: 'collective.isArchived.edit.description',
+        defaultMessage: 'This {type} has been archived and can no longer be used for any activities.',
       },
     });
   }
@@ -141,12 +151,22 @@ class EditCollective extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
+    const { intl, LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
 
     if (!collective || !collective.slug) return <div />;
 
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const notification = {};
+    if (collective.isArchived) {
+      notification.title = intl.formatMessage(this.messages['collective.isArchived'], {
+        name: collective.name,
+      });
+      notification.description = intl.formatMessage(this.messages['collective.isArchived.edit.description'], {
+        type: collective.type.toLowerCase(),
+      });
+      notification.status = 'collectiveArchived';
+    }
 
     return (
       <div className="EditCollective">
@@ -178,8 +198,14 @@ class EditCollective extends React.Component {
         />
 
         <Body>
+          {collective.isArchived && (
+            <NotificationBar
+              status={notification.status || status}
+              title={notification.title}
+              description={notification.description}
+            />
+          )}
           <CollectiveCover href={`/${collective.slug}`} collective={collective} title={title} className="small" />
-
           <div className="content">
             {!canEditCollective && (
               <div className="login">
