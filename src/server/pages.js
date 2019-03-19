@@ -54,13 +54,6 @@ pages
 // Contribute Flow
 // ---------------
 
-// Special route to force Legacy Flow
-pages.add(
-  'orderCollectiveLegacyForce',
-  '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/legacy',
-  'createOrderLegacy',
-);
-
 // Legacy create order route. Deprectated on 2019-02-12
 pages.add(
   'orderCollectiveTier',
