@@ -91,7 +91,7 @@ class EditCollectiveForm extends React.Component {
       },
       'slug.label': {
         id: 'collective.changeUrl.label',
-        defaultMessage: 'Change your URL',
+        defaultMessage: 'URL slug',
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
@@ -317,6 +317,11 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
         },
         {
+          name: 'slug',
+          pre: 'https://opencollective.com/',
+          placeholder: '',
+        },
+        {
           name: 'twitterHandle',
           type: 'text',
           pre: 'https://twitter.com/',
@@ -398,13 +403,6 @@ class EditCollectiveForm extends React.Component {
         },
       ],
       advanced: [
-        {
-          name: 'slug',
-          className: 'horizontal',
-          pre: 'https://opencollective.com/',
-          placeholder: '',
-          when: () => this.state.section === 'advanced',
-        },
         {
           name: 'sendInvoiceByEmail',
           className: 'horizontal',

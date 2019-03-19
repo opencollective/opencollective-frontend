@@ -301,7 +301,7 @@
   "creditcard.error": "Invalid credit card",
   "saved": "saved",
   "event.create.btn": "Create Event",
-  "collective.changeUrl.label": "Change your URL",
+  "collective.changeUrl.label": "URL slug",
   "collective.tos.description": "Link to the terms by which this host will collect money on behalf of their collectives",
   "collective.tags.edit.description": "Make your collective discoverable in search and related collectives (comma separated)",
   "collective.longDescription.label": "Long description",
