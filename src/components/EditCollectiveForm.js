@@ -4,6 +4,7 @@ import { withRouter } from 'next/router';
 import { ArrowBack } from 'styled-icons/material/ArrowBack';
 
 import { Router } from '../server/pages';
+import { getEnvVar } from '../lib/utils';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
@@ -42,6 +43,8 @@ const MenuItem = styled(Link)`
   }
   ${({ selected }) => selected && selectedStyle};
 `;
+
+const archiveIsEnabled = getEnvVar('SHOW_ARCHIVE_COLLECTIVE');
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -724,7 +727,7 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
-              {this.state.section === 'advanced' && collective.type !== 'USER' && (
+              {archiveIsEnabled && this.state.section === 'advanced' && collective.type !== 'USER' && (
                 <ArchiveCollective collective={collective} />
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
