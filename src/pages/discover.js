@@ -206,8 +206,9 @@ const DiscoverPage = ({ router }) => {
                   {collectives.map(c => {
                     return (
                       <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                        <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                         <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+
+                        <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                       </Flex>
                     );
                   })}
