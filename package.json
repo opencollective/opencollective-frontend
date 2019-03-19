@@ -11,7 +11,7 @@
   "dependencies": {
     "@babel/core": "7.4.0",
     "@babel/node": "7.2.2",
-    "@babel/plugin-proposal-class-properties": "7.3.4",
+    "@babel/plugin-proposal-class-properties": "7.4.0",
     "@babel/plugin-transform-async-to-generator": "7.3.4",
     "@babel/preset-env": "7.3.4",
     "@octokit/rest": "16.20.0",
