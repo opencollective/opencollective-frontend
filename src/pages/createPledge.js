@@ -498,6 +498,7 @@ class CreatePledgePage extends React.Component {
                       currency={data.Collective.currency}
                       precision={0}
                     />{' '}
+                    pledged
                     {data.Collective.currency}
                   </H5>
 

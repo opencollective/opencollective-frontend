@@ -85,10 +85,10 @@ class CollectiveCard extends React.Component {
 
     return (
       <Link route={route} target="_top" params={params}>
-        <div className={`PledgeCollectiveCard ${collective.type}`}>
+        <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>
             {`
-              .PledgeCollectiveCard {
+              .CollectiveCard {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
