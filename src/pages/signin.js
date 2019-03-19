@@ -59,6 +59,7 @@ class SigninPage extends React.Component {
       this.props.login();
     }
   }
+
   async componentDidUpdate(oldProps) {
     const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
     if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {

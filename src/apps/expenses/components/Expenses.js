@@ -12,9 +12,11 @@ class Expenses extends React.Component {
     collective: PropTypes.object,
     host: PropTypes.object,
     expenses: PropTypes.array,
-    refetch: PropTypes.func,
     fetchMore: PropTypes.func,
+    status: PropTypes.string,
+    updateVariables: PropTypes.func,
     editable: PropTypes.bool,
+    loading: PropTypes.bool,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid)
@@ -23,25 +25,7 @@ class Expenses extends React.Component {
 
   constructor(props) {
     super(props);
-    this.refetch = this.refetch.bind(this);
-    this.fetchMore = this.fetchMore.bind(this);
-    this.state = { loading: false, isPayActionLocked: {} };
-  }
-
-  fetchMore(e) {
-    e.target.blur();
-    this.setState({ loading: true });
-    this.props.fetchMore().then(() => {
-      this.setState({ loading: false });
-    });
-  }
-
-  refetch(status) {
-    this.setState({ status, loading: true });
-    if (status === 'READY') status = 'APPROVED';
-    this.props.refetch({ status }).then(() => {
-      this.setState({ loading: false });
-    });
+    this.state = { isPayActionLocked: {} };
   }
 
   setPayActionLock(val) {
@@ -49,7 +33,19 @@ class Expenses extends React.Component {
   }
 
   render() {
-    const { collective, host, expenses, LoggedInUser, editable, view, includeHostedCollectives, filters } = this.props;
+    const {
+      collective,
+      host,
+      expenses,
+      LoggedInUser,
+      editable,
+      view,
+      includeHostedCollectives,
+      filters,
+      status,
+      loading,
+      updateVariables,
+    } = this.props;
 
     if (!expenses) {
       return <div />;
@@ -118,40 +114,40 @@ class Expenses extends React.Component {
               <Button
                 className="filterBtn all"
                 bsSize="small"
-                bsStyle={!this.state.status ? 'primary' : 'default'}
-                onClick={() => this.refetch()}
+                bsStyle={!status ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: null })}
               >
                 <FormattedMessage id="expenses.all" defaultMessage="all" />
               </Button>
               <Button
                 className="filterBtn pending"
                 bsSize="small"
-                bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'}
-                onClick={() => this.refetch('PENDING')}
+                bsStyle={status === 'PENDING' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'PENDING' })}
               >
                 <FormattedMessage id="expenses.pending" defaultMessage="pending" />
               </Button>
               <Button
                 className="filterBtn approved"
                 bsSize="small"
-                bsStyle={this.state.status === 'APPROVED' ? 'primary' : 'default'}
-                onClick={() => this.refetch('APPROVED')}
+                bsStyle={status === 'APPROVED' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'APPROVED' })}
               >
                 <FormattedMessage id="expenses.approved" defaultMessage="approved" />
               </Button>
               <Button
                 className="filterBtn ready"
                 bsSize="small"
-                bsStyle={this.state.status === 'READY' ? 'primary' : 'default'}
-                onClick={() => this.refetch('READY')}
+                bsStyle={status === 'READY' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'READY' })}
               >
                 <FormattedMessage id="expenses.ready" defaultMessage="ready to pay" />
               </Button>
               <Button
                 className="filterBtn paid"
                 bsSize="small"
-                bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'}
-                onClick={() => this.refetch('PAID')}
+                bsStyle={status === 'PAID' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'PAID' })}
               >
                 <FormattedMessage id="expenses.paid" defaultMessage="paid" />
               </Button>
@@ -160,15 +156,14 @@ class Expenses extends React.Component {
         )}
 
         <div className="itemsList">
-          {this.state.loading && (
+          {loading && (
             <div className="loading">
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           )}
           {expenses.map(
             expense =>
-              (this.state.status !== 'READY' ||
-                get(expense.collective || collective, 'stats.balance') > expense.amount) && (
+              (status !== 'READY' || get(expense.collective || collective, 'stats.balance') > expense.amount) && (
                 <div className="item" key={expense.id}>
                   <Expense
                     collective={expense.collective || collective}
@@ -194,9 +189,9 @@ class Expenses extends React.Component {
           )}
           {expenses.length >= 10 && expenses.length % 10 === 0 && (
             <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.fetchMore}>
-                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+              <Button bsStyle="default" onClick={this.props.fetchMore}>
+                {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                {!loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
               </Button>
             </div>
           )}

@@ -131,6 +131,7 @@ export const getLoggedInUserQuery = gql`
             balance
             expiryDate
           }
+          settings
         }
       }
     }
@@ -887,7 +888,9 @@ export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = (component, options) => {
   return graphql(getCollectiveCoverQuery, options)(component);
 };
-export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
+export const addCollectiveToEditData = (component, options) => {
+  return graphql(getCollectiveToEditQuery, options)(component);
+};
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
 export const addSubscriptionsData = graphql(getSubscriptionsQuery);

@@ -32,7 +32,7 @@ class ExpenseDetails extends React.Component {
     };
     this.messages = defineMessages({
       paypal: {
-        id: 'expense.payoutMethod.paypal',
+        id: 'expense.payoutMethod.paypal.hidden',
         defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})',
       },
       // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
@@ -172,6 +172,10 @@ class ExpenseDetails extends React.Component {
             .col.large {
               width: 100%;
             }
+
+            .privateMessage {
+              white-space: pre-line;
+            }
           `}
         </style>
 
@@ -290,7 +294,7 @@ class ExpenseDetails extends React.Component {
           {(expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) && (
             <div className="col large privateMessage">
               <label>
-                <FormattedMessage id="expense.privateMessage" defaultMessage="private note" />
+                <FormattedMessage id="expense.privateNote" defaultMessage="private note" />
               </label>
               {(!editMode || !isAuthor) && capitalize(expense.privateMessage)}
               {editMode && (isAuthor || canEditExpense) && (

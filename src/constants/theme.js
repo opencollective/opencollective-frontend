@@ -97,6 +97,7 @@ const theme = {
   fontSizes,
   lineHeights,
   space,
+  breakpoints: ['40em', '52em', '64em'],
   buttons: {
     standard: {
       backgroundColor: 'white',

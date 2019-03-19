@@ -4,12 +4,7 @@ const pages = nextRoutes();
 
 pages
   .add('home', '/')
-  .add('about', '/:pageSlug(about|widgets|tos|privacypolicy)', 'staticPage')
-  .add(
-    'faq',
-    '/:path(faq)/:pageSlug(about|collectives|backers|expenses|hosts|becoming-an-open-collective-host)?',
-    'staticPage',
-  )
+  .add('static', '/:pageSlug(widgets|tos|privacypolicy)', 'staticPage')
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
@@ -59,13 +54,6 @@ pages
 // Contribute Flow
 // ---------------
 
-// Special route to force Legacy Flow
-pages.add(
-  'orderCollectiveLegacyForce',
-  '/:collectiveSlug/:verb(donate|pay|contribute|order)/legacy',
-  'createOrderLegacy',
-);
-
 // Legacy create order route. Deprectated on 2019-02-12
 pages.add(
   'orderCollectiveTier',
@@ -77,30 +65,41 @@ pages.add(
 pages
   .add(
     'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/:step(contributeAs|details|payment|summary)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add(
     'orderCollectiveTierNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
-  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|contribute|order)/success', 'orderSuccess')
+  .add(
+    'orderCollectiveNewSuccess',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/success',
+    'orderSuccess',
+  )
   .add(
     'orderCollectiveTierNewSuccess',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order)/tier/:tierId-:tierSlug?/success',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/success',
     'orderSuccess',
   );
 
 // Generic Route
 pages.add(
   'orderCollective',
-  '/:collectiveSlug/:verb(donate|pay|contribute|order)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+  '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
   'createOrder',
 );
 
-// New contribution flow not applied to events yet
-pages.add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrderLegacy');
+// Events
+pages.add(
+  'orderEventTier',
+  '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/:step(contributeAs|details|payment|summary)?',
+  'createOrder',
+);
+
+// Events
+pages.add('orderEventTierSuccess', '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/success', 'orderSuccess');
 
 // Pledges
 // -------

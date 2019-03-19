@@ -23,6 +23,7 @@ import {
   height,
   justifyContent,
   left,
+  lineHeight,
   maxHeight,
   maxWidth,
   minHeight,
@@ -67,6 +68,7 @@ const Container = styled(tag)`
   ${height}
   ${justifyContent}
   ${left}
+  ${lineHeight}
   ${maxHeight}
   ${maxWidth}
   ${minHeight}

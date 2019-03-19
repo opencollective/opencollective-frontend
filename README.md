@@ -35,12 +35,14 @@ npm install
 
 ### Environment variables
 
-This project requires an access to the Open Collective API. You have two options:
+This project requires an access to the Open Collective API.
 
-- `cp .env.staging .env` to connect to the Open Collective staging API
-- `cp .env.local .env` to connect to the API running locally
+By default, it will try to connect to the Open Colllective staging API, **you don't have to change anything**.
 
-If you decide to pick the local strategy, make sure you install and run the [opencollective-api](https://github.com/opencollective/opencollective-api) project.
+If case you want to connect to the Open Collective API running locally:
+
+- clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)
+- in this project, copy [`.env.local`](.env.local) to `.env`.
 
 ### Start
 
@@ -90,7 +92,6 @@ npm run styleguide:deploy
 You can run the tests using `npm test` or more specifically:
 
 - `npm run test:jest` for pages and components
-- `npm run test:server` for api
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
 To update:

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
-import { get, isNil } from 'lodash';
+import { get } from 'lodash';
 
 import Container from './Container';
 import { Flex } from '@rebass/grid';
@@ -12,6 +12,7 @@ import StyledSelect from './StyledSelect';
 import { P, Span } from './Text';
 import Currency from './Currency';
 import StyledInputAmount from './StyledInputAmount';
+import StyledInput from './StyledInput';
 
 const frequencyOptions = {
   oneTime: 'One time',
@@ -20,36 +21,11 @@ const frequencyOptions = {
 };
 
 const getChangeFromState = state => ({
-  totalAmount: state.totalAmount,
+  amount: state.amount,
+  quantity: state.quantity,
+  totalAmount: state.amount * (state.quantity || 1),
   interval: state.interval === 'oneTime' ? null : state.interval,
 });
-
-const useContributeDetails = ({ amountOptions, defaultAmount, defaultInterval, onChange }) => {
-  let totalAmount = 500;
-  if (!isNil(defaultAmount)) {
-    totalAmount = defaultAmount;
-  } else if (amountOptions && amountOptions.length > 0) {
-    totalAmount = amountOptions[Math.floor(amountOptions.length / 2)];
-  }
-  const [state, setState] = useState({
-    totalAmount,
-    amount: totalAmount / 100,
-    interval: defaultInterval || Object.keys(frequencyOptions)[0],
-  });
-
-  useEffect(() => {
-    onChange(getChangeFromState(state));
-  });
-
-  return {
-    state,
-    onChange: newState => {
-      newState = { ...state, ...newState };
-      setState(newState);
-      onChange(getChangeFromState(newState));
-    },
-  };
-};
 
 /** Build a map of display props for the options */
 const buildDisplayMap = options => {
@@ -75,20 +51,22 @@ const ContributeDetails = ({
   disabledInterval,
   disabledAmount,
   minAmount,
-  defaultAmount,
-  defaultInterval,
-  ...props
+  amount,
+  interval,
+  quantity,
+  maxQuantity,
+  showQuantity,
+  showInterval,
+  onChange,
 }) => {
-  const { state, onChange } = useContributeDetails({
-    amountOptions,
-    defaultAmount,
-    defaultInterval,
-    onChange: props.onChange,
-  });
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
+  const dispatchChange = values => onChange(getChangeFromState({ amount, interval, quantity, ...values }));
+
+  interval = interval || Object.keys(frequencyOptions)[0];
+
   return (
-    <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap" {...props}>
+    <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap">
       <Flex mb={3}>
         {hasOptions && (
           <StyledInputField
@@ -99,7 +77,7 @@ const ContributeDetails = ({
                 defaultMessage="Amount ({currency})"
               />
             }
-            htmlFor="totalAmount"
+            htmlFor="amount"
             css={{ flexGrow: 1 }}
             disabled={disabledAmount}
           >
@@ -108,8 +86,8 @@ const ContributeDetails = ({
                 {...fieldProps}
                 combo
                 items={amountOptions}
-                selected={state.totalAmount}
-                onChange={totalAmount => onChange({ totalAmount, amount: totalAmount / 100 })}
+                selected={amount}
+                onChange={amount => dispatchChange({ amount })}
                 buttonPropsBuilder={({ item }) => ({ display: displayMap[item] })}
               >
                 {({ item }) => <Currency value={item} currency={currency} />}
@@ -130,7 +108,7 @@ const ContributeDetails = ({
                 />
               )
             }
-            htmlFor="totalAmount"
+            htmlFor="custom-amount"
             disabled={disabledAmount}
           >
             {fieldProps => (
@@ -139,9 +117,9 @@ const ContributeDetails = ({
                 currency={currency}
                 min={minAmount / 100}
                 {...fieldProps}
-                value={state.amount}
+                value={amount / 100}
                 width={1}
-                onChange={({ target }) => onChange({ amount: target.value, totalAmount: Number(target.value) * 100 })}
+                onChange={({ target }) => dispatchChange({ amount: parseInt(target.value) * 100 })}
                 containerProps={{ borderRadius: hasOptions ? '0 4px 4px 0' : 3, ml: '-1px' }}
                 prependProps={{ pl: 2, pr: 0, bg: 'white.full', color: 'black.800' }}
                 px="2px"
@@ -149,42 +127,65 @@ const ContributeDetails = ({
             )}
           </StyledInputField>
         </Container>
+        {showQuantity && (
+          <StyledInputField
+            htmlFor="quantity"
+            label={<FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />}
+            ml={2}
+          >
+            {fieldProps => (
+              <StyledInput
+                type="number"
+                min={1}
+                max={maxQuantity}
+                {...fieldProps}
+                value={quantity}
+                width={1}
+                maxWidth={80}
+                onChange={({ target }) => dispatchChange({ quantity: parseInt(target.value) })}
+                mr={3}
+              />
+            )}
+          </StyledInputField>
+        )}
       </Flex>
 
-      <StyledInputField
-        label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
-        htmlFor="interval"
-        disabled={disabledInterval}
-      >
-        {fieldProps => (
-          <Flex alignItems="center">
-            <StyledSelect
-              {...fieldProps}
-              options={frequencyOptions}
-              defaultValue={frequencyOptions[state.interval]}
-              onChange={({ key }) => onChange({ interval: key })}
-            >
-              {({ value }) => <Container minWidth={100}>{value}</Container>}
-            </StyledSelect>
-            {state.interval !== 'oneTime' && (
-              <P color="black.500" ml={3}>
-                <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />{' '}
-                <Span color="primary.500">
-                  <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
-                </Span>
-                <br />
-                <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
-                <Span color="primary.500">
-                  {moment()
-                    .add(1, state.interval)
-                    .date(1)
-                    .format('MMM D, YYYY')}
-                </Span>
-              </P>
-            )}
-          </Flex>
-        )}
-      </StyledInputField>
+      {showInterval && (
+        <StyledInputField
+          label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
+          htmlFor="interval"
+          disabled={disabledInterval}
+        >
+          {fieldProps => (
+            <Flex alignItems="center">
+              <StyledSelect
+                {...fieldProps}
+                options={frequencyOptions}
+                defaultValue={frequencyOptions[interval]}
+                onChange={({ key }) => dispatchChange({ interval: key })}
+              >
+                {({ value }) => <Container minWidth={100}>{value}</Container>}
+              </StyledSelect>
+              {interval !== 'oneTime' && (
+                <P color="black.500" ml={3}>
+                  <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />{' '}
+                  <Span color="primary.500">
+                    <FormattedMessage id="contribution.subscription.today" defaultMessage="Today" />
+                  </Span>
+                  <br />
+                  <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
+                  <Span color="primary.500">
+                    {moment()
+                      .add(1, interval)
+                      .date(1)
+                      .format('MMM D, YYYY')}
+                  </Span>
+                </P>
+              )}
+            </Flex>
+          )}
+        </StyledInputField>
+      )}
     </Flex>
   );
 };
@@ -203,20 +204,31 @@ ContributeDetails.propTypes = {
   disabledInterval: PropTypes.bool,
   /** If true, the input for amount will be disabled */
   disabledAmount: PropTypes.bool,
-  /** Initial value for frequency select, defaults to one time. */
-  defaultInterval: PropTypes.string,
-  /** initial value for amount options, defaults to the first option */
-  defaultAmount: PropTypes.number,
+  /** value for frequency select, defaults to one time. */
+  interval: PropTypes.string,
+  /** value for amount options, defaults to the first option */
+  amount: PropTypes.number,
+  /** value for quantity */
+  quantity: PropTypes.number,
+  /** max number of items that user can order */
+  maxQuantity: PropTypes.number,
   /** Min amount in cents */
   minAmount: PropTypes.number,
+  /** Enable the quantity input */
+  showQuantity: PropTypes.bool,
+  /** Enable the interval input */
+  showInterval: PropTypes.bool,
 };
 
 ContributeDetails.defaultProps = {
   onChange: () => {},
   disabledInterval: false,
   disabledAmount: false,
+  showQuantity: false,
+  showInterval: true,
   interval: null,
   minAmount: 100,
+  quantity: 1,
 };
 
 export default ContributeDetails;

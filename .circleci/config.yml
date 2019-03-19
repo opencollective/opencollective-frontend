@@ -94,10 +94,26 @@ jobs:
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - <<: *persist_npm_cache
 
+      - restore_cache:
+          name: Restore next build cache
+          keys:
+            - next-build-cache-{{ .Revision }}
+            - next-build-cache-
+
       - run: npm run build:clean
       - run: npm run build:updates
-      - run: npm run build:server
       - run: npm run build:next
+      - run: npm run build:server
+
+      - save_cache:
+          name: Persist next build cache
+          key: next-build-cache-{{ .Revision }}
+          paths:
+            # In Next.js 7 it is
+            - ./node_modules/.cache/terser-webpack-plugin
+
+            # In Next.js 8 it will be
+            - ./node_modules/.cache/next-minifier
 
       # # We prune to save space in node_modules persistence
       # # If we don't persist node_modules, we don't need it
@@ -204,41 +220,6 @@ jobs:
       CYPRESS_TEST_FILES: 2*.js
     <<: *e2e_steps
 
-  test-server:
-    docker:
-      - image: circleci/node:11.8.0
-      - image: circleci/postgres:9.6.8-alpine-postgis-ram
-      - image: circleci/redis
-      - image: memcached
-    environment:
-      NODE_ENV: circleci
-    steps:
-      - run: sudo apt -y update
-
-      # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
-      - run: sudo apt -y install postgresql-client
-
-      - attach_workspace:
-          at: ..
-
-      - checkout
-
-      - <<: *restore_npm_cache
-      - run: CYPRESS_INSTALL_BINARY=0 npm ci
-
-      # # We run npm ci in case node_modules are not persisted
-      # # When it is persisted we don't need it
-      # - run: cd ~/api && npm ci --only-prod
-
-      # We run npm ci in case node_modules are not persisted
-      # When it is persisted we don't need it
-      - run: cd ~/frontend && npm ci --only=prod
-
-      # Loading the opencollective_dvl dump database
-      - run: ./scripts/setup_circleci_db.sh
-
-      - run: npm run test:server
-
 workflows:
   version: 2
   lint-build-test:
@@ -247,10 +228,6 @@ workflows:
       - jest
       - build
       - build-api
-      - test-server:
-          requires:
-            - build
-            - build-api
       - test-e2e-0:
           requires:
             - build

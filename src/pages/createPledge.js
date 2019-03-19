@@ -1,9 +1,10 @@
 import React, { Fragment, useState } from 'react';
+import PropTypes from 'prop-types';
 import slugify from 'slugify';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
 import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 
@@ -17,7 +18,7 @@ import { defaultImage } from '../constants/collectives';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import { H3, H4, H5, P, Span } from '../components/Text';
+import { H3, H4, H5, P } from '../components/Text';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputGroup from '../components/StyledInputGroup';
 import { Box, Flex } from '@rebass/grid';
@@ -65,7 +66,7 @@ const WordCountTextarea = () => {
     <Flex flexDirection="column">
       <Flex justifyContent="space-between">
         <P {...labelStyles} htmlFor="publicMessage">
-          A message for the community <Span fontWeight="200">- Optional</Span>
+          <FormattedMessage id="createPledge.message" defaultMessage="A message for the community (optional)" />
         </P>
         <P {...labelStyles} as="p">
           {wordCount}
@@ -124,6 +125,29 @@ class CreatePledgePage extends React.Component {
       slug: query.slug,
     };
   }
+
+  static messages = defineMessages({
+    'menu.createPledge': {
+      id: 'menu.createPledge',
+      defaultMessage: 'Make a Pledge',
+    },
+    'frequency.monthly': {
+      id: 'createPledge.monthly',
+      defaultMessage: 'Monthly',
+    },
+    'frequency.yearly': {
+      id: 'createPledge.yearly',
+      defaultMessage: 'Yearly',
+    },
+    'frequency.oneTime': {
+      id: 'createPledge.oneTime',
+      defaultMessage: 'One-Time',
+    },
+  });
+
+  static propTypes = {
+    intl: PropTypes.object.isRequired, // from withIntl
+  };
 
   state = {
     errorMessage: null,
@@ -192,7 +216,7 @@ class CreatePledgePage extends React.Component {
 
   render() {
     const { errorMessage, submitting } = this.state;
-    const { data = {}, name, slug, githubHandle, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data = {}, name, slug, githubHandle, LoggedInUser, loadingLoggedInUser, intl } = this.props;
 
     let website;
     if (data.Collective) {
@@ -223,7 +247,11 @@ class CreatePledgePage extends React.Component {
 
     return (
       <Fragment>
-        <Header title="Make a Pledge" className={loadingLoggedInUser ? 'loading' : ''} LoggedInUser={LoggedInUser} />
+        <Header
+          title={intl.formatMessage(CreatePledgePage.messages['menu.createPledge'])}
+          className={loadingLoggedInUser ? 'loading' : ''}
+          LoggedInUser={LoggedInUser}
+        />
         <Body>
           <Container
             mx="auto"
@@ -243,42 +271,61 @@ class CreatePledgePage extends React.Component {
               width={[1, null, 0.5]}
             >
               <H3 as="h1" color="black.900" textAlign="left" mb={4}>
-                Make a pledge
+                <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
               </H3>
 
               <P my={3} color="black.500">
-                If the cause or collective that you want to support is not yet on Open Collective, you can make a
+                <FormattedMessage
+                  id="createPledge.why"
+                  defaultMessage="If the cause or collective that you want to support is not yet on Open Collective, you can make a
                 pledge. This will incentivize them to create an open collective for their activities and offer you much
-                more visibility on how your money is spent to advance their cause.
+                more visibility on how your money is spent to advance their cause."
+                />
               </P>
 
               <P my={3} color="black.500">
-                Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an
-                email to ask you to fulfill your pledge.
+                <FormattedMessage
+                  id="createPledge.onceTheyCreateIt"
+                  defaultMessage="Once they create it (and verify that they own the URL you’ll enter in this form), you will receive an
+                email to ask you to fulfill your pledge."
+                />
               </P>
 
               <P my={3} color="black.500">
-                At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We
-                request the project to have a least 100 stars on GitHub!
+                <FormattedMessage
+                  id="createPledge.conditions"
+                  defaultMessage="At the moment, you can only pledge for Open Source projects with a GitHub repository or organization. We
+                request the project to have a least 100 stars on GitHub!"
+                />
               </P>
 
               {loadingLoggedInUser && (
                 <P my={3} color="black.500">
-                  Loading profile...
+                  <FormattedMessage id="createPledge.loadingProfile" defaultMessage="Loading profile..." />
                 </P>
               )}
 
               {!loadingLoggedInUser && !LoggedInUser && (
                 <P mt={[5, null, 4]} color="black.700" fontSize="LeadParagraph" lineHeight="LeadParagraph">
-                  <Link
-                    route="signin"
-                    params={{
-                      next: slug ? `/${slug}/pledges/new` : '/pledges/new',
+                  <FormattedMessage
+                    id="createPledge.signinToCreate"
+                    defaultMessage="{signInLink} to create a pledge."
+                    values={{
+                      signInLink: (
+                        <Link
+                          route="signin"
+                          passHref
+                          params={{
+                            next: slug ? `/${slug}/pledges/new` : '/pledges/new',
+                          }}
+                        >
+                          <a>
+                            <FormattedMessage id="createPledge.signInLink" defaultMessage="Sign in or join free" />
+                          </a>
+                        </Link>
+                      ),
                     }}
-                  >
-                    <a>Sign up or login</a>
-                  </Link>{' '}
-                  to create a pledge.
+                  />
                 </P>
               )}
 
@@ -287,7 +334,10 @@ class CreatePledgePage extends React.Component {
                   {!slug && (
                     <Box mb={3}>
                       <H5 textAlign="left" mb={4}>
-                        Details of the new collective:
+                        <FormattedMessage
+                          id="createPledge.collectiveDetails"
+                          defaultMessage="Details of the new collective:"
+                        />
                       </H5>
 
                       <Container position="relative">
@@ -295,12 +345,17 @@ class CreatePledgePage extends React.Component {
                           <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
                         </Container>
 
-                        <P fontWeight="bold">You are the first pledger!</P>
+                        <P fontWeight="bold">
+                          <FormattedMessage id="createPledge.first" defaultMessage="You are the first pledger!" />
+                        </P>
                       </Container>
 
                       <P color="black.500" fontSize="Caption" mt={2}>
-                        You’ve earned the priviledge to name and describe this awesome cause. We’ll create a pledged
-                        collective page for it so other people can find it and pledge to it too.
+                        <FormattedMessage
+                          id="createPledge.priviledge"
+                          defaultMessage="You’ve earned the priviledge to name and describe this awesome cause. We’ll create a pledged
+                        collective page for it so other people can find it and pledge to it too."
+                        />
                       </P>
 
                       <Flex
@@ -311,14 +366,14 @@ class CreatePledgePage extends React.Component {
                       >
                         <Flex flexDirection="column" mb={3} pr={[0, null, 3]}>
                           <P {...labelStyles} htmlFor="name">
-                            Name
+                            <FormattedMessage id="createPledge.name" defaultMessage="Name" />
                           </P>
                           <TextInput name="name" id="name" defaultValue={name} />
                         </Flex>
 
                         <Flex flexDirection="column" mb={3}>
                           <P {...labelStyles} htmlFor="slug">
-                            Collective URL
+                            <FormattedMessage id="createPledge.collectiveURL" defaultMessage="Collective URL" />
                           </P>
                           <StyledInputGroup
                             prepend="https://opencollective.com/"
@@ -331,7 +386,10 @@ class CreatePledgePage extends React.Component {
 
                       <Flex flexDirection="column" mb={3}>
                         <P {...labelStyles} htmlFor="githubHandle">
-                          GitHub URL: repository or organization with at least 100 stars!
+                          <FormattedMessage
+                            id="createPledge.githubURL"
+                            defaultMessage="GitHub URL: repository or organization with at least 100 stars!"
+                          />
                         </P>
                         <StyledInputGroup
                           prepend="https://github.com/"
@@ -346,13 +404,13 @@ class CreatePledgePage extends React.Component {
 
                   <Box my={5}>
                     <H5 textAlign="left" mb={3}>
-                      Pledge as:
+                      <FormattedMessage id="createPledge.pledgeAs" defaultMessage="Pledge as:" />
                     </H5>
 
                     {LoggedInUser && (
                       <Flex flexDirection="column" my={3}>
                         <P {...labelStyles} htmlFor="fromCollective">
-                          Choose a profile
+                          <FormattedMessage id="createPledge.profile" defaultMessage="Choose a profile" />
                         </P>
                         <select id="fromCollective" name="fromCollective" defaultValue={LoggedInUser.CollectiveId}>
                           {profiles.map(({ collective }) => (
@@ -367,24 +425,24 @@ class CreatePledgePage extends React.Component {
 
                   <Box mb={5}>
                     <H5 textAlign="left" mb={3}>
-                      Pledge details:
+                      <FormattedMessage id="createPledge.pledgeDetails" defaultMessage="Pledge details:" />
                     </H5>
 
                     <AmountField LoggedInUser={LoggedInUser} />
 
                     <Flex flexDirection="column" mb={3} width={200}>
                       <P {...labelStyles} htmlFor="interval">
-                        Frequency
+                        <FormattedMessage id="createPledge.frequency" defaultMessage="Frequency" />
                       </P>
                       <select id="interval" name="interval" defaultValue="monthly">
                         <option key="monthly" value="month">
-                          Monthly
+                          {intl.formatMessage(CreatePledgePage.messages['frequency.monthly'])}
                         </option>
                         <option key="yearly" value="year">
-                          Yearly
+                          {intl.formatMessage(CreatePledgePage.messages['frequency.yearly'])}
                         </option>
                         <option key="none" value="none">
-                          One-Time
+                          {intl.formatMessage(CreatePledgePage.messages['frequency.oneTime'])}
                         </option>
                       </select>
                     </Flex>
@@ -445,7 +503,7 @@ class CreatePledgePage extends React.Component {
 
                   <P color="black.600">
                     <FormattedMessage
-                      id="pledge.stats"
+                      id="create.pledge.stats"
                       values={{
                         both: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE && pledgeStats.USER ? 1 : 0,
                         orgCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE,
@@ -533,27 +591,54 @@ class CreatePledgePage extends React.Component {
               </H4>
 
               <Details>
-                <summary>What is a pledge?</summary>A pledge allows supporters (companies and individuals) to pledge
+                <summary>
+                  <FormattedMessage id="createPledge.faq.whatSummary" defaultMessage="What is a pledge?" />
+                </summary>
+                <FormattedMessage
+                  id="createPledge.faq.what"
+                  defaultMessage="A pledge allows supporters (companies and individuals) to pledge
                 funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to
-                support, pledge to it!
+                support, pledge to it!"
+                />
               </Details>
 
               <Details>
-                <summary>What happens after I pledge?</summary>
-                Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam
-                folks, so please help us reach out to the community via twitter / github or, if you can, via email.
+                <summary>
+                  <FormattedMessage
+                    id="createPledge.faq.whatHappensSummary"
+                    defaultMessage="What happens after I pledge?"
+                  />
+                </summary>
+                <FormattedMessage
+                  id="createPledge.faq.whatHappens"
+                  defaultMessage="Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam
+                folks, so please help us reach out to the community via twitter / github or, if you can, via email."
+                />
               </Details>
 
               <Details>
-                <summary>When do I pay?</summary>
-                Once that pledged collective is claimed, we will email you to fulfill your pledge.
+                <summary>
+                  <FormattedMessage id="createPledge.faq.paySummary" defaultMessage="When do I pay?" />
+                </summary>
+                <FormattedMessage
+                  id="createPledge.faq.pay"
+                  defaultMessage="Once that pledged collective is claimed, we will email you to fulfill your pledge."
+                />
               </Details>
 
               <Details>
-                <summary>How do I claim a pledged collective?</summary>
-                You’ll need to authenticate with the github profile that owns / admins that project. Just click on the
+                <summary>
+                  <FormattedMessage
+                    id="createPledge.faq.howToClaimSummary"
+                    defaultMessage="How do I claim a pledged collective?"
+                  />
+                </summary>
+                <FormattedMessage
+                  id="createPledge.faq.howToClaim"
+                  defaultMessage="You’ll need to authenticate with the github profile that owns / admins that project. Just click on the
                 Claim Collective button in the pledged collective. We will be rolling out other forms of authentication
-                in the future.
+                in the future."
+                />
               </Details>
             </Container>
           </Container>

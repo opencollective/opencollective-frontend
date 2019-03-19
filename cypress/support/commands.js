@@ -10,14 +10,14 @@ import { randomEmail } from './faker';
  *    - email: User email
  */
 Cypress.Commands.add('login', (params = {}) => {
-  const { email = defaultTestUserEmail, redirect = null } = params;
+  const { email = defaultTestUserEmail, redirect = null, visitParams } = params;
   const user = { email, newsletterOptIn: false };
 
   return signinRequest(user, redirect).then(({ body: { redirect } }) => {
     // Test users are allowed to signin directly with E2E, thus a signin URL
     // is directly returned by the API. See signin function in
     // opencollective-api/server/controllers/users.js for more info
-    return cy.visit(redirect).then(() => user);
+    return cy.visit(redirect, visitParams).then(() => user);
   });
 });
 
@@ -99,6 +99,17 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
 
   Array.isArray(enabled) ? enabled.forEach(isEnabled) : isEnabled(enabled);
   Array.isArray(disabled) ? disabled.forEach(isDisabled) : isDisabled(disabled);
+});
+
+/**
+ * Check if user is logged in by searching for its username in navbar
+ */
+Cypress.Commands.add('assertLoggedIn', (username, timeout) => {
+  cy.log('Ensure user is logged in');
+  const loginSection = cy.get('.LoginTopBarProfileButton-name', { timeout });
+  if (username) {
+    loginSection.should('contain', username);
+  }
 });
 
 /**

@@ -87,7 +87,7 @@ class BannerIframe extends React.Component {
     if (!collective) {
       return (
         <div ref={node => (this.node = node)}>
-          <FormattedMessage id="notFound" defaultMessage="not found" />
+          <FormattedMessage id="notFound" defaultMessage="Not found" />
         </div>
       );
     }

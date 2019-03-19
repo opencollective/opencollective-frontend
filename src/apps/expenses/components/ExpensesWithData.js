@@ -13,11 +13,14 @@ class ExpensesWithData extends React.Component {
     host: PropTypes.object,
     limit: PropTypes.number,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
-    filter: PropTypes.object, // { category, recipient }
+    hasFilters: PropTypes.bool,
+    filters: PropTypes.object, // { category, recipient, status }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
-    filters: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    fetchMore: PropTypes.func, // from addExpensesData
+    data: PropTypes.object, // from addExpensesData
+    onFiltersChange: PropTypes.func, // from addExpensesData
   };
 
   constructor(props) {
@@ -25,7 +28,7 @@ class ExpensesWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, host, view, includeHostedCollectives, filters } = this.props;
+    const { data, LoggedInUser, collective, host, view, includeHostedCollectives } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -40,11 +43,13 @@ class ExpensesWithData extends React.Component {
           collective={collective}
           host={host}
           expenses={expenses}
-          refetch={data.refetch}
           editable={view !== 'compact'}
           view={view}
           fetchMore={this.props.fetchMore}
-          filters={filters}
+          updateVariables={this.props.onFiltersChange}
+          loading={data.loading}
+          status={data.variables.status}
+          filters={this.props.hasFilters}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
         />
@@ -120,7 +125,7 @@ const getExpensesVariables = props => {
     offset: 0,
     limit: props.limit || EXPENSES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
-    ...props.filter,
+    ...props.filters,
   };
   if (vars.category) {
     vars.fromCollectiveSlug = null;

@@ -90,12 +90,12 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Create Event',
       },
       'slug.label': {
-        id: 'collective.slug.label',
-        defaultMessage: 'Change your URL',
+        id: 'collective.changeUrl.label',
+        defaultMessage: 'URL slug',
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
       'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
-      'tags.label': { id: 'collective.tags.label', defaultMessage: 'tags' },
+      'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'collective.tos.label',
         defaultMessage: 'Terms of Service',
@@ -105,7 +105,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Link to the terms by which this host will collect money on behalf of their collectives',
       },
       'tags.description': {
-        id: 'collective.tags.description',
+        id: 'collective.tags.edit.description',
         defaultMessage: 'Make your collective discoverable in search and related collectives (comma separated)',
       },
       'company.label': {
@@ -317,6 +317,11 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
         },
         {
+          name: 'slug',
+          pre: 'https://opencollective.com/',
+          placeholder: '',
+        },
+        {
           name: 'twitterHandle',
           type: 'text',
           pre: 'https://twitter.com/',
@@ -398,13 +403,6 @@ class EditCollectiveForm extends React.Component {
         },
       ],
       advanced: [
-        {
-          name: 'slug',
-          className: 'horizontal',
-          pre: 'https://opencollective.com/',
-          placeholder: '',
-          when: () => this.state.section === 'advanced',
-        },
         {
           name: 'sendInvoiceByEmail',
           className: 'horizontal',

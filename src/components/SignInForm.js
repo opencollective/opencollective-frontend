@@ -65,7 +65,7 @@ class LoginForm extends React.Component {
       },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'description.label': {
-        id: 'user.description.label',
+        id: 'user.shortBio.label',
         defaultMessage: 'Short bio',
       },
       'description.description': {
@@ -301,7 +301,7 @@ class LoginForm extends React.Component {
           inputEmail.description = (
             <FormattedMessage
               id="signin.emailSent.description"
-              defaultMessage="Login email sent. Please follow the instructions in that email to proceed"
+              defaultMessage="Login email sent. Please follow the instructions in that email to proceed."
             />
           );
         }

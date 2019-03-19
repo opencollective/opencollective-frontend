@@ -292,6 +292,43 @@ class OrderSuccessPage extends React.Component {
     return this.props.intl.formatMessage(this.messages[msgId], values);
   }
 
+  renderContributionSummary(tier, collective, fromCollective) {
+    if (!tier) {
+      return (
+        <FormattedMessage
+          id="contributeFlow.successMessageBacker"
+          defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
+          values={{
+            fromCollectiveName: fromCollective.name,
+            collectiveName: collective.name,
+          }}
+        />
+      );
+    }
+
+    return tier.type === 'TICKET' ? (
+      <FormattedMessage
+        id="contributeFlow.successMessageTicket"
+        defaultMessage="{fromCollectiveName, select, anonymous {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})"
+        values={{
+          fromCollectiveName: fromCollective.name,
+          eventName: <strong>{collective.name}</strong>,
+          tierName: get(tier, 'name', 'ticket'),
+        }}
+      />
+    ) : (
+      <FormattedMessage
+        id="contributeFlow.successMessage"
+        defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
+        values={{
+          fromCollectiveName: fromCollective.name,
+          collectiveName: <strong>{collective.name}</strong>,
+          tierName: get(tier, 'name', 'backer'),
+        }}
+      />
+    );
+  }
+
   render() {
     const { data, LoggedInUser, loggedInUserLoading, intl } = this.props;
 
@@ -325,27 +362,8 @@ class OrderSuccessPage extends React.Component {
               <H3 fontWeight={800} color="black.900" mb={3} textAlign="center">
                 <FormattedMessage id="contributeFlow.successTitle" defaultMessage="Woot woot! 🎉" />
               </H3>
-              <P p={2} textAlign="center">
-                {tier ? (
-                  <FormattedMessage
-                    id="contributeFlow.successMessage"
-                    defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
-                    values={{
-                      fromCollectiveName: fromCollective.name,
-                      collectiveName: collective.name,
-                      tierName: get(tier, 'name', 'backer'),
-                    }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="contributeFlow.successMessageBacker"
-                    defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
-                    values={{
-                      fromCollectiveName: fromCollective.name,
-                      collectiveName: collective.name,
-                    }}
-                  />
-                )}
+              <P p={2} textAlign="center" style={{ maxWidth: 600 }}>
+                {this.renderContributionSummary(tier, collective, fromCollective)}
               </P>
             </Box>
           )}
@@ -503,6 +521,7 @@ const getOrder = graphql(gql`
         tags
       }
       tier {
+        type
         name
         amount
         presets

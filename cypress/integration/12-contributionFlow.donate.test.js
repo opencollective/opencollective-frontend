@@ -25,10 +25,10 @@ describe('Contribution Flow: Donate', () => {
       cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
 
       // Has default amount selected
-      cy.get('#totalAmount button.selected').should('exist');
+      cy.get('#amount button.selected').should('exist');
 
       // Change amount
-      cy.get('input[type=number][name=totalAmount]').type('{selectall}1337');
+      cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00');
 
@@ -127,7 +127,8 @@ describe('Contribution Flow: Donate', () => {
       // Should display the tier details
       cy.contains('Tier details:');
       cy.contains('You’ll contribute with the amount of $42.00 yearly.');
-      cy.contains('Your next charge will be on: May 1, 2043');
+      cy.contains('First charge: Today');
+      cy.contains('Next charge: May 1, 2043');
 
       // Submit order
       cy.contains('button', 'Make contribution').click();

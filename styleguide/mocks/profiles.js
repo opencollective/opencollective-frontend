@@ -1,32 +1,39 @@
 export const personalProfile = {
+  id: 42,
   email: 'example.person@example.com',
   name: 'Example Person',
   type: 'USER',
 };
 
-export default {
-  '13': {
+export default [
+  {
+    id: 1,
     name: 'Open Collective Inc.',
     type: 'COLLECTIVE',
   },
-  '26': {
+  {
+    id: 2,
     name: 'Sustain',
     type: 'COLLECTIVE',
   },
-  '39': {
+  {
+    id: 3,
     name: 'Democracy Earth Foundation',
     type: 'COLLECTIVE',
   },
-  '52': {
+  {
+    id: 4,
     name: 'Airbnb',
     type: 'ORGANIZATION',
   },
-  '65': {
+  {
+    id: 5,
     name: 'Trivago',
     type: 'ORGANIZATION',
   },
-  '65': {
+  {
+    id: 6,
     name: 'Trivago',
     type: 'ORGANIZATION',
   },
-};
+];

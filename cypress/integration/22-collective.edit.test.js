@@ -22,7 +22,7 @@ describe('edit collective', () => {
   });
 
   it('edit info', () => {
-    cy.get('.name.inputField input').type(' edited');
+    cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
     cy.get('.description.inputField input').type(' edited');
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
     cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
@@ -104,7 +104,7 @@ describe('edit collective', () => {
     // Ensure the new tiers are properly displayed on order form
     cy.contains('button', 'Next step', { timeout: 20000 }).click();
     cy.get('#interval').contains('Monthly');
-    cy.get('#totalAmount > button').should('have.length', 3);
+    cy.get('#amount > button').should('have.length', 3);
 
     cy.visit('/testcollective/edit/tiers');
     cy.get('.EditTiers .tier')

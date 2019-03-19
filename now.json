@@ -1,16 +1,5 @@
 {
   "version": 1,
   "name": "opencollective-frontend",
-  "type": "docker",
-  "env": {},
-  "scale": {
-    "sfo1": {
-      "min": 1,
-      "max": 1
-    },
-    "bru1": {
-      "min": 1,
-      "max": 1
-    }
-  }
+  "type": "docker"
 }
