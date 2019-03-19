@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+
+import { connectAccount } from '../lib/api';
 import withIntl from '../lib/withIntl';
 import Currency from './Currency';
 import SmallButton from './SmallButton';
-import { FormattedMessage } from 'react-intl';
-import { connectAccount } from '../lib/api';
+import MessageBox from './MessageBox';
+import { P } from './Text';
 
 class ConnectPaypal extends React.Component {
   static propTypes = {
@@ -32,6 +35,50 @@ class ConnectPaypal extends React.Component {
     } catch (e) {
       this.setState({ connectingPaypal: false });
       console.error(e);
+    }
+  }
+
+  getTimeBeforeExpiry(paymentMethod) {
+    const paypalExpiryDate = new Date(paymentMethod.expiryDate);
+    return paypalExpiryDate - new Date();
+  }
+
+  renderPaypalKeyDetails(paymentMethod) {
+    const timeBeforeExpiry = this.getTimeBeforeExpiry(paymentMethod);
+    const twoWeeks = 1000 * 60 * 60 * 24 * 14;
+
+    if (timeBeforeExpiry < 0) {
+      return (
+        <MessageBox type="error" withIcon my={3}>
+          <FormattedMessage
+            id="ConnectPaypal.expired"
+            defaultMessage="Your PayPal pre-approval has expired, please reconnect your account by clicking on 'Refill Balance'."
+          />
+        </MessageBox>
+      );
+    } else if (timeBeforeExpiry < twoWeeks) {
+      return (
+        <MessageBox type="warning" withIcon my={3}>
+          <FormattedMessage
+            id="ConnectPaypal.expireSoon"
+            defaultMessage="Your PayPal pre-approval will expire soon. Renew it by clicking on 'Refill Balance'."
+          />
+        </MessageBox>
+      );
+    } else {
+      return (
+        <P fontSize="Caption" color="black.500" mt={3}>
+          <FormattedMessage
+            id="collective.connectedAccounts.paypal.connected"
+            defaultMessage="Paypal account {paypalEmail} connected on {createdAt, date, short}, token will expire on {expiryDate, date, short}"
+            values={{
+              createdAt: new Date(paymentMethod.createdAt),
+              expiryDate: new Date(paymentMethod.expiryDate),
+              paypalEmail: paymentMethod.name,
+            }}
+          />
+        </P>
+      );
     }
   }
 
@@ -85,10 +132,17 @@ class ConnectPaypal extends React.Component {
           {paypalPaymentMethod && (
             <div style={{ textAlign: 'center' }}>
               <div className="balance">
-                <FormattedMessage id="host.dashboard.paypal.balance" defaultMessage="PayPal card balance:" />
+                <FormattedMessage id="host.dashboard.paypal.balance" defaultMessage="PayPal pre-approval balance:" />
                 <div className="amount">
-                  <Currency value={paypalPaymentMethod.balance} currency={paypalPaymentMethod.currency} />
+                  {this.getTimeBeforeExpiry(paypalPaymentMethod) >= 0 && (
+                    <Currency
+                      value={paypalPaymentMethod.balance}
+                      currency={paypalPaymentMethod.currency}
+                      precision={2}
+                    />
+                  )}
                 </div>
+
                 <div>
                   <SmallButton
                     bsStyle="primary"
@@ -96,21 +150,15 @@ class ConnectPaypal extends React.Component {
                     onClick={this.connectPaypal}
                     disabled={this.state.connectingPaypal}
                   >
-                    {this.state.connectingPaypal && 'Processing...'}
-                    {!this.state.connectingPaypal && 'refill balance'}
+                    {this.state.connectingPaypal ? (
+                      <FormattedMessage id="ConnectPaypal.processing" defaultMessage="Processing..." />
+                    ) : (
+                      <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
+                    )}
                   </SmallButton>
                 </div>
               </div>
-              <div className="description">
-                <FormattedMessage
-                  id="collective.connectedAccounts.paypal.connected"
-                  defaultMessage="Paypal account ({paypalEmail}) connected on {createdAt, date, short}"
-                  values={{
-                    createdAt: new Date(paypalPaymentMethod.createdAt),
-                    paypalEmail: paypalPaymentMethod.name,
-                  }}
-                />
-              </div>
+              {this.renderPaypalKeyDetails(paypalPaymentMethod)}
             </div>
           )}
           {!paypalPaymentMethod && (

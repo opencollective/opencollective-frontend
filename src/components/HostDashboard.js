@@ -209,6 +209,7 @@ const getDataQuery = gql`
         service
         name
         createdAt
+        expiryDate
         balance
         currency
       }
