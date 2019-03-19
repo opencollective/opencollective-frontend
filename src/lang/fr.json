@@ -38,6 +38,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.archivedMessage": "{type} already archived.",
   "collective.archive.button": "Archive this {type}.",
+  "collective.unarchive.button": "Unarchive this {type}",
   "collective.archive.cancel.btn": "Cancel",
   "collective.archive.confirm.btn": "Archive",
   "collective.archive.description": "Mark this {type} as archived, delete all tiers and cancel all subscriptions.",
