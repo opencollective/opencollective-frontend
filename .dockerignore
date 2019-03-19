@@ -1,6 +1,7 @@
 *
 !.babelrc
 !src
+!scripts
 !package.json
 !package-lock.json
 src/.next

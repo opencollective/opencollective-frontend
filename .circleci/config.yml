@@ -94,10 +94,26 @@ jobs:
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - <<: *persist_npm_cache
 
+      - restore_cache:
+          name: Restore next build cache
+          keys:
+            - next-build-cache-{{ .Revision }}
+            - next-build-cache-
+
       - run: npm run build:clean
       - run: npm run build:updates
-      - run: npm run build:server
       - run: npm run build:next
+      - run: npm run build:server
+
+      - save_cache:
+          name: Persist next build cache
+          key: next-build-cache-{{ .Revision }}
+          paths:
+            # In Next.js 7 it is
+            - ./node_modules/.cache/terser-webpack-plugin
+
+            # In Next.js 8 it will be
+            - ./node_modules/.cache/next-minifier
 
       # # We prune to save space in node_modules persistence
       # # If we don't persist node_modules, we don't need it
