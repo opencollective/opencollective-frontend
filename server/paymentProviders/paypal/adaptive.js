@@ -97,7 +97,10 @@ export default {
             paymentMethod.currency,
           )} across ${totalTransactions} transactions between ${firstTransactionAt} and ${lastTransactionAt}`,
         );
-        return 200000 + totalSpent; // total spent has a negative value (in cents)
+        const paypalPreApprovalLimit = 200000;
+        const initialBalance = paymentMethod.data.balance || paypalPreApprovalLimit;
+        // total spent has a negative value (in cents)
+        return { amount: initialBalance + totalSpent, currency: paymentMethod.currency };
       });
   },
 };
