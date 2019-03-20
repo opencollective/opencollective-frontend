@@ -347,22 +347,28 @@ export function editCollective(_, args, req) {
     return Promise.reject(new errors.ValidationFailed({ message: 'collective.id required' }));
   }
 
-  const location = args.collective.location || {};
-
   const newCollectiveData = {
-    ...args.collective,
-    locationName: location.name,
-    address: location.address,
+    ...omit(args.collective, ['location']),
     LastEditedByUserId: req.remoteUser.id,
+    type: args.collective.type || 'COLLECTIVE',
   };
 
-  newCollectiveData.type = newCollectiveData.type || 'COLLECTIVE';
-
+  // Set location values
+  const location = args.collective.location || {};
   if (location.lat) {
     newCollectiveData.geoLocationLatLong = {
       type: 'Point',
       coordinates: [location.lat, location.long],
     };
+  }
+  if (location.name !== undefined) {
+    newCollectiveData.locationName = location.name;
+  }
+  if (location.address !== undefined) {
+    newCollectiveData.address = location.address;
+  }
+  if (location.country !== undefined) {
+    newCollectiveData.countryISO = location.country;
   }
 
   let collective, parentCollective;
