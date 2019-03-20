@@ -656,16 +656,9 @@ export async function archiveCollective(_, args, req) {
   }
 
   return collective
-    .getTiers()
-    .then(tiers => {
-      return map(tiers, tier => tier.destroy(), { concurrency: 3 });
-    })
-    .then(() => {
-      debugArchive('deleteCollectiveTiers');
-      return collective.getIncomingOrders({
-        where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
-        include: [{ model: models.Subscription }, { model: models.Collective, as: 'collective' }],
-      });
+    .getIncomingOrders({
+      where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
+      include: [{ model: models.Subscription }, { model: models.Collective, as: 'collective' }],
     })
     .then(orders => {
       // Map through the `orders` but only create 3 promises to update/cancel orders at a time
