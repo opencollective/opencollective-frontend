@@ -388,8 +388,8 @@ class CreateOrderPage extends React.Component {
   getContributingProfileCountry() {
     return (
       get(this.state.stepSummary, 'countryISO') ||
-      get(this.state.stepProfile, 'countryISO') ||
-      get(this.props.LoggedInUser, 'collective.countryISO')
+      get(this.state.stepProfile, 'location.country') ||
+      get(this.props.LoggedInUser, 'collective.location.country')
     );
   }
 

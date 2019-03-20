@@ -115,12 +115,15 @@ const editCollectiveQuery = gql`
       description
       longDescription
       location {
+        name
         address
+        country
+        lat
+        long
       }
       website
       twitterHandle
       githubHandle
-      countryISO
       isActive
       isArchived
       hostFeePercent
@@ -312,7 +315,6 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'description',
         'longDescription',
         'location',
-        'countryISO',
         'twitterHandle',
         'githubHandle',
         'website',
@@ -331,7 +333,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
       CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
         pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
       );
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({
         variables: { collective: CollectiveInputType },
         update: (store, { data: { createCollective } }) => {
@@ -384,7 +386,6 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'website',
         'twitterHandle',
         'githubHandle',
-        'countryISO',
         'location',
         'startsAt',
         'endsAt',
@@ -428,7 +429,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
           };
         });
       }
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({ variables: { collective: CollectiveInputType } });
     },
   }),
