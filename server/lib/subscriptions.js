@@ -70,11 +70,18 @@ export async function processOrderWithSubscription(options, order) {
   };
 
   let orderProcessedStatus = 'unattempted',
+    collectiveIsArchived = false,
     transaction;
   if (!options.dryRun) {
     if (hasReachedQuantity(order)) {
       orderProcessedStatus = 'failure';
       csvEntry.error = 'Your subscription is over';
+      cancelSubscription(order);
+    } else if (order.collective.deactivatedAt) {
+      // This means the collective has been archived and the subscription should be cancelled.
+      orderProcessedStatus = 'unattempted';
+      csvEntry.error = 'The collective has been archived';
+      collectiveIsArchived = true;
       cancelSubscription(order);
     } else {
       try {
@@ -103,7 +110,7 @@ export async function processOrderWithSubscription(options, order) {
 
   if (!options.dryRun) {
     try {
-      await handleRetryStatus(order, transaction);
+      await handleRetryStatus(order, transaction, collectiveIsArchived);
     } catch (error) {
       console.log(`Error notifying order #${order.id} ${error}`);
     } finally {
@@ -136,7 +143,7 @@ function dateFormat(date) {
  *   3. WARN_USER: The last attempt failed. Warn user about the
  *      failure and allow them to update the payment method.
  */
-export async function handleRetryStatus(order, transaction) {
+export async function handleRetryStatus(order, transaction, collectiveIsArchived) {
   switch (order.Subscription.chargeRetryCount) {
     case 0:
       await sendThankYouEmail(order, transaction);
@@ -145,7 +152,11 @@ export async function handleRetryStatus(order, transaction) {
       await cancelSubscriptionAndNotifyUser(order);
       break;
     default:
-      await sendFailedEmail(order, false);
+      if (collectiveIsArchived) {
+        await notifyUserForArchivedCollective(order);
+      } else {
+        await sendFailedEmail(order, false);
+      }
       break;
   }
 }
@@ -251,6 +262,24 @@ export function groupProcessedOrders(orders) {
 export async function cancelSubscriptionAndNotifyUser(order) {
   cancelSubscription(order);
   return sendFailedEmail(order, true);
+}
+
+/** Send `archived.collective` email */
+export async function notifyUserForArchivedCollective(order) {
+  const user = order.createdByUser;
+  return emailLib.send(
+    'archived.collective',
+    user.email,
+    {
+      order: order.info,
+      collective: order.collective.info,
+      fromCollective: order.fromCollective.minimal,
+      subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
+    },
+    {
+      from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
+    },
+  );
 }
 
 /** Send `payment.failed` email */
