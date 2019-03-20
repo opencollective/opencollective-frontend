@@ -228,10 +228,10 @@ class CollectivePickerWithData extends React.Component {
             .submenu {
               width: 100%;
               min-height: 16rem;
-              padding: 2rem 2rem 2rem 6rem;
+              padding: 3rem 2rem 3rem 6rem;
               display: flex;
               justify-content: space-between;
-              align-items: baseline;
+              align-items: start;
             }
 
             .submenu .title {
@@ -292,7 +292,7 @@ class CollectivePickerWithData extends React.Component {
             }
           `}
         </style>
-        <div className="submenu">
+        <div className="submenu" style={{ flexWrap: 'wrap' }}>
           <div>
             <div className="title">
               <h1>
@@ -328,7 +328,9 @@ class CollectivePickerWithData extends React.Component {
               </div>
             )}
           </div>
-          <div className="right">{this.canEdit() && <ConnectPaypal collective={this.hostCollective} />}</div>
+          <div className="right" style={{ maxWidth: 450 }}>
+            {this.canEdit() && <ConnectPaypal collective={this.hostCollective} />}
+          </div>
         </div>
         <div>
           {selectedCollective && this.state.showAddFunds && (
