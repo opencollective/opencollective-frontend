@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { sync as globSync } from 'glob';
 import { sync as mkdirpSync } from 'mkdirp';
+import { orderBy } from 'lodash';
 
 const MESSAGES_PATTERN = './dist/messages/**/*.json';
 const LANG_DIR = './src/lang/';
@@ -16,7 +17,7 @@ const defaultMessages = globSync(MESSAGES_PATTERN)
     descriptors.forEach(({ id, defaultMessage }) => {
       if (collection.hasOwnProperty(id)) {
         if (collection[id] !== defaultMessage) {
-          console.error(`[Error] Duplicate message id with different messages: ${id}`);
+          console.error(`🛑 [Error] Duplicate message id with different messages: ${id}`);
         }
         return;
       }
@@ -37,7 +38,7 @@ const translatedMessages = locale => {
   // Check if there are unused keys in the translation file
   Object.keys(json).map(id => {
     if (!defaultMessages.hasOwnProperty(id)) {
-      console.info(`Removing unused ${id} from ${filename}`);
+      console.info(`🗑️ Removing unused ${id} from ${filename}`);
     }
   });
 
@@ -50,8 +51,15 @@ const translatedMessages = locale => {
     }, {});
 };
 
+/**
+ * Convert to JSON and ensure that the keys are sorted properly.
+ */
+const convertToJSON = obj => {
+  return `${JSON.stringify(obj, orderBy(Object.keys(obj), [key => key.toLowerCase()]), 2)}\n`;
+};
+
 mkdirpSync(LANG_DIR);
-fs.writeFileSync(`${LANG_DIR}en.json`, JSON.stringify(defaultMessages, null, 2));
-fs.writeFileSync(`${LANG_DIR}fr.json`, JSON.stringify(translatedMessages('fr'), null, 2));
-fs.writeFileSync(`${LANG_DIR}es.json`, JSON.stringify(translatedMessages('es'), null, 2));
-fs.writeFileSync(`${LANG_DIR}ja.json`, JSON.stringify(translatedMessages('ja'), null, 2));
+fs.writeFileSync(`${LANG_DIR}en.json`, convertToJSON(defaultMessages));
+fs.writeFileSync(`${LANG_DIR}fr.json`, convertToJSON(translatedMessages('fr')));
+fs.writeFileSync(`${LANG_DIR}es.json`, convertToJSON(translatedMessages('es')));
+fs.writeFileSync(`${LANG_DIR}ja.json`, convertToJSON(translatedMessages('ja')));
