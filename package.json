@@ -191,6 +191,7 @@
       "@babel/core",
       "@babel/node",
       "@babel/runtime",
+      "react-dropzone",
       "styled-jsx"
     ]
   },
