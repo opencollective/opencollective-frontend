@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Map from './Map';
 import colors from '../constants/colors';
+import ExternalLinkNewTab from './ExternalLinkNewTab';
 
 class Location extends React.Component {
   static propTypes = {
@@ -14,7 +15,7 @@ class Location extends React.Component {
   };
 
   render() {
-    const { name, address, lat, long } = this.props.location;
+    const { name, address, lat, long, country } = this.props.location;
 
     return (
       <section id="location" className="location">
@@ -36,9 +37,10 @@ class Location extends React.Component {
           {this.props.showTitle && <h1>Location</h1>}
           <div className="name">{name}</div>
           <div className="address" style={{ color: colors.darkgray }}>
-            <a href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank" rel="noopener noreferrer">
+            <ExternalLinkNewTab href={`https://www.openstreetmap.org/#map=16/${lat}/${long}`}>
               {address}
-            </a>
+              {country ? `, ${country}` : ''}
+            </ExternalLinkNewTab>
           </div>
         </div>
         {lat && long && (

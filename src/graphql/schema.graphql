@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Mar 01 2019 18:23:51 GMT+0100 (GMT+01:00)
+# timestamp: Wed Mar 20 2019 12:32:04 GMT+0100 (GMT+01:00)
 
 """Application model"""
 type Application {
@@ -85,7 +85,7 @@ type Collective implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
-  """Returns whether this collective was archived"""
+  """Returns whether this collective is archived"""
   isArchived: Boolean
 
   """
@@ -224,7 +224,7 @@ interface CollectiveInterface {
   tags: [String]
   countryISO: String
 
-  """Name, address, lat, long of the location."""
+  """Name, address, country, lat, long of the location."""
   location: LocationType
   createdAt: String
   startsAt: String
@@ -522,7 +522,7 @@ type Event implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
-  """Returns whether this collective was archived"""
+  """Returns whether this collective is archived"""
   isArchived: Boolean
 
   """
@@ -743,17 +743,37 @@ scalar JSON
 
 """Input type for Location"""
 input LocationInputType {
+  """A short name for the location (eg. Google Headquarters)"""
   name: String
+
+  """Postal address without country (eg. 12 opensource avenue, 7500 Paris)"""
   address: String
+
+  """Two letters country code (eg. FR, BE...etc)"""
+  country: String
+
+  """Latitude"""
   lat: Float
+
+  """Longitude"""
   long: Float
 }
 
 """Type for Location"""
 type LocationType {
+  """A short name for the location (eg. Google Headquarters)"""
   name: String
+
+  """Postal address without country (eg. 12 opensource avenue, 7500 Paris)"""
   address: String
+
+  """Two letters country code (eg. FR, BE...etc)"""
+  country: String
+
+  """Latitude"""
   lat: Float
+
+  """Longitude"""
   long: Float
 }
 
@@ -787,10 +807,10 @@ type Mutation {
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
-  archiveCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
+  archiveCollective(id: Int!): CollectiveInterface
 
   """Create a user with an optional organization."""
   createUser(
@@ -1178,7 +1198,7 @@ type Organization implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
-  """Returns whether this collective was archived"""
+  """Returns whether this collective is archived"""
   isArchived: Boolean
 
   """
@@ -1776,7 +1796,7 @@ type User implements CollectiveInterface {
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
 
-  """Returns whether this collective was archived"""
+  """Returns whether this collective is archived"""
   isArchived: Boolean
 
   """

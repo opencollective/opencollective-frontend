@@ -89,7 +89,9 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
-        countryISO
+        location {
+          country
+        }
         paymentMethods(limit: 10, hasBalanceAboveZero: true) {
           id
           uuid
@@ -148,9 +150,11 @@ const getTiersQuery = gql`
       backgroundImage
       twitterHandle
       description
-      countryISO
       currency
       settings
+      location {
+        country
+      }
       tiers {
         id
         type
@@ -200,10 +204,13 @@ const getCollectiveToEditQuery = gql`
       description
       longDescription
       location {
+        name
         address
+        country
+        lat
+        long
       }
       tags
-      countryISO
       twitterHandle
       githubHandle
       website
@@ -333,12 +340,15 @@ const getCollectiveQuery = gql`
       description
       longDescription
       location {
+        name
         address
+        country
+        lat
+        long
       }
       twitterHandle
       githubHandle
       website
-      countryISO
       currency
       settings
       createdAt
@@ -513,12 +523,12 @@ const getEventCollectiveQuery = gql`
       startsAt
       endsAt
       timezone
-      countryISO
       currency
       settings
       location {
         name
         address
+        country
         lat
         long
       }

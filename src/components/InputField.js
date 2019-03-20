@@ -140,7 +140,7 @@ class InputField extends React.Component {
   }
 
   handleChange(value) {
-    const { type, name } = this.props;
+    const { type } = this.props;
     if (type === 'number') {
       value = parseInt(value) || null;
     } else if (type === 'currency') {
@@ -151,10 +151,6 @@ class InputField extends React.Component {
       this.setState({ validationState: null });
     } else {
       this.setState({ validationState: 'error' });
-    }
-
-    if (name === 'address') {
-      value = { address: value };
     }
 
     this.setState({ value });
@@ -546,7 +542,6 @@ class InputField extends React.Component {
         );
         break;
       default: {
-        const addressDefaultValue = field.name === 'address' ? context['location'][field.name] : '';
         this.input = (
           <FieldGroup
             onChange={event => this.handleChange(event.target.value)}
@@ -562,7 +557,7 @@ class InputField extends React.Component {
             autoFocus={field.focus}
             placeholder={field.placeholder}
             className={field.className}
-            defaultValue={field.defaultValue || addressDefaultValue}
+            defaultValue={field.defaultValue || ''}
             validationState={this.state.validationState}
           />
         );

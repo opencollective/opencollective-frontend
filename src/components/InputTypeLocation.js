@@ -24,18 +24,31 @@ class InputTypeLocation extends React.Component {
     }
   }
 
+  removeCountryFromAddress(address) {
+    return address
+      .split(', ')
+      .slice(0, -1)
+      .join(', ');
+  }
+
   handleChange(value) {
     if (!value) {
       this.setState({ value: {} });
       return this.props.onChange({});
     }
-    const label = value.label && value.label.replace(/,.+/, '');
+
+    const countryComponent = value.gmaps['address_components'].find(c => c.types.includes('country'));
     const location = {
-      name: label,
-      address: value.gmaps.formatted_address,
+      // Remove country from address
+      address: this.removeCountryFromAddress(value.gmaps.formatted_address),
+      // Keep only the first part for location name
+      name: value.label && value.label.replace(/,.+/, ''),
+      // Normally returned addresses always have a country, this is just defensive
+      country: countryComponent ? countryComponent['short_name'] : null,
       lat: value.location.lat,
       long: value.location.lng,
     };
+
     this.setState({ value: location });
     return this.props.onChange(location);
   }
@@ -77,9 +90,9 @@ class InputTypeLocation extends React.Component {
               right: 0;
               max-height: 25em;
               padding: 0;
-              margin-top: -1px;
+              margin-top: -2px;
               background: #fff;
-              border: 2px solid #267dc0;
+              border: 1px solid #267dc0;
               border-top-width: 0;
               overflow-x: hidden;
               overflow-y: auto;
