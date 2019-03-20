@@ -191,7 +191,6 @@
       "@babel/core",
       "@babel/node",
       "@babel/runtime",
-      "react-mde",
       "styled-jsx"
     ]
   },
