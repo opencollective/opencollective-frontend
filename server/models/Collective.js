@@ -402,6 +402,7 @@ export default function(Sequelize, DataTypes) {
           return {
             name: this.locationName,
             address: this.address,
+            country: this.countryISO,
             lat:
               this.geoLocationLatLong && this.geoLocationLatLong.coordinates && this.geoLocationLatLong.coordinates[0],
             long:
@@ -658,6 +659,9 @@ export default function(Sequelize, DataTypes) {
         let location = this.location.name || '';
         if (this.location.address) {
           location += `, ${this.location.address}`;
+        }
+        if (this.location.country) {
+          location += `, ${this.location.country}`;
         }
         const alarms = [
           {

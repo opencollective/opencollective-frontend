@@ -129,7 +129,10 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     longDescription: { type: GraphQLString },
     expensePolicy: { type: GraphQLString },
     location: { type: LocationInputType },
-    countryISO: { type: GraphQLString },
+    countryISO: {
+      type: GraphQLString,
+      deprecationReason: 'From 03/20/2019 - use `location.country` instead',
+    },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
@@ -181,7 +184,10 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     twitterHandle: { type: GraphQLString },
     githubHandle: { type: GraphQLString },
     location: { type: LocationInputType },
-    countryISO: { type: GraphQLString },
+    countryISO: {
+      type: GraphQLString,
+      deprecationReason: 'From 03/20/2019 - use `location.country` instead',
+    },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
@@ -196,10 +202,26 @@ export const LocationInputType = new GraphQLInputObjectType({
   name: 'LocationInputType',
   description: 'Input type for Location',
   fields: () => ({
-    name: { type: GraphQLString },
-    address: { type: GraphQLString },
-    lat: { type: GraphQLFloat },
-    long: { type: GraphQLFloat },
+    name: {
+      type: GraphQLString,
+      description: 'A short name for the location (eg. Google Headquarters)',
+    },
+    address: {
+      type: GraphQLString,
+      description: 'Postal address without country (eg. 12 opensource avenue, 7500 Paris)',
+    },
+    country: {
+      type: GraphQLString,
+      description: 'Two letters country code (eg. FR, BE...etc)',
+    },
+    lat: {
+      type: GraphQLFloat,
+      description: 'Latitude',
+    },
+    long: {
+      type: GraphQLFloat,
+      description: 'Longitude',
+    },
   }),
 });
 

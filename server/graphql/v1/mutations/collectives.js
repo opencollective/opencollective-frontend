@@ -353,6 +353,7 @@ export function editCollective(_, args, req) {
     ...args.collective,
     locationName: location.name,
     address: location.address,
+    countryISO: location.country,
     LastEditedByUserId: req.remoteUser.id,
   };
 
