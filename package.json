@@ -81,7 +81,7 @@
     "react-tag-input": "5.2.3",
     "react-tooltip": "3.10.0",
     "react-window": "1.7.1",
-    "regenerator-runtime": "0.13.1",
+    "regenerator-runtime": "0.13.2",
     "rehype-react": "3.1.0",
     "rehype-sanitize": "2.0.2",
     "remark-parse": "6.0.3",
