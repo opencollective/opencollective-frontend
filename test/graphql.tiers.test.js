@@ -7,7 +7,6 @@ import * as utils from './utils';
 import models from '../server/models';
 
 describe('graphql.tiers.test', () => {
-  const productTax = { name: 'VAT', description: 'European unified VAT', percentage: 20.4 };
   let user1, user2, host, collective1, collective2, tier1, tierProduct, paymentMethod1;
   let sandbox;
 
@@ -26,11 +25,7 @@ describe('graphql.tiers.test', () => {
   // Create host
   beforeEach(async () => {
     host = await models.User.createUserWithCollective(utils.data('host1'));
-    await host.collective.update({
-      taxes: {
-        PRODUCT: productTax,
-      },
-    });
+    await host.collective.update({ countryISO: 'BE' });
   });
 
   // Create payment method
@@ -289,11 +284,12 @@ describe('graphql.tiers.test', () => {
       });
     });
 
-    describe('taxes', () => {
+    describe('VAT', () => {
       const createOrderQuery = `
         mutation createOrder($order: OrderInputType!) {
           createOrder(order: $order) {
             taxAmount
+            data
             transactions {
               taxAmount
             }
@@ -301,7 +297,8 @@ describe('graphql.tiers.test', () => {
         }`;
 
       it('stores tax in order and transaction', async () => {
-        const taxAmount = Math.round(tierProduct.amount * (productTax.percentage / 100));
+        const belgiumVAT = 21;
+        const taxAmount = Math.round(tierProduct.amount * (belgiumVAT / 100));
         const order = {
           description: 'test order with tax',
           collective: { id: collective1.id },
@@ -309,7 +306,55 @@ describe('graphql.tiers.test', () => {
           paymentMethod: { uuid: paymentMethod1.uuid },
           totalAmount: tierProduct.amount + taxAmount,
           taxAmount,
+          countryISO: 'BE', // Required when order has tax
+        };
+
+        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+        const createdOrder = queryResult.data.createOrder;
+
+        expect(createdOrder.taxAmount).to.equal(taxAmount);
+        expect(createdOrder.data.tax).to.deep.equal({
+          id: 'VAT',
+          taxerCountry: 'BE',
+          taxedCountry: 'BE',
+          percentage: 21,
+        });
+        createdOrder.transactions.map(transaction => {
+          expect(transaction.taxAmount).to.equal(taxAmount);
+        });
+      });
+
+      it("doesn't have tax when tax id number is set for other EU countries", async () => {
+        const order = {
+          description: 'test order with tax',
+          collective: { id: collective1.id },
+          tier: { id: tierProduct.id },
+          paymentMethod: { uuid: paymentMethod1.uuid },
+          totalAmount: tierProduct.amount,
+          taxAmount: 0,
           countryISO: 'FR', // Required when order has tax
+          taxIDNumber: 'FRXX999999998',
+        };
+        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+        const createdOrder = queryResult.data.createOrder;
+        expect(createdOrder.taxAmount).to.equal(0);
+        createdOrder.transactions.map(transaction => {
+          expect(transaction.taxAmount).to.equal(0);
+        });
+      });
+
+      it('have tax when tax id number is set with same EU country', async () => {
+        const belgiumVAT = 21;
+        const taxAmount = Math.round(tierProduct.amount * (belgiumVAT / 100));
+        const order = {
+          description: 'test order with tax',
+          collective: { id: collective1.id },
+          tier: { id: tierProduct.id },
+          paymentMethod: { uuid: paymentMethod1.uuid },
+          totalAmount: tierProduct.amount + taxAmount,
+          taxAmount,
+          countryISO: 'BE',
+          taxIDNumber: 'BE0414445663',
         };
         const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
         const createdOrder = queryResult.data.createOrder;
@@ -319,7 +364,7 @@ describe('graphql.tiers.test', () => {
         });
       });
 
-      it("doesn't have tax when tax id number is set", async () => {
+      it('reject orders without country when subject to VAT', async () => {
         const order = {
           description: 'test order with tax',
           collective: { id: collective1.id },
@@ -327,15 +372,44 @@ describe('graphql.tiers.test', () => {
           paymentMethod: { uuid: paymentMethod1.uuid },
           totalAmount: tierProduct.amount,
           taxAmount: 0,
-          countryISO: 'FR', // Required when order has tax
-          taxIDNumber: '012345678',
+          taxIDNumber: 'FRXX999999998',
         };
+
         const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
-        const createdOrder = queryResult.data.createOrder;
-        expect(createdOrder.taxAmount).to.equal(0);
-        createdOrder.transactions.map(transaction => {
-          expect(transaction.taxAmount).to.equal(0);
-        });
+        expect(queryResult.errors[0].message).to.equal('This order has a tax attached, you must set a country');
+      });
+
+      it('rejects invalid VAT ID numbers', async () => {
+        const order = {
+          description: 'test order with tax',
+          collective: { id: collective1.id },
+          tier: { id: tierProduct.id },
+          paymentMethod: { uuid: paymentMethod1.uuid },
+          totalAmount: tierProduct.amount,
+          taxAmount: 0,
+          countryISO: 'FR',
+          taxIDNumber: 'Not a valid number!',
+        };
+
+        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+        expect(queryResult.errors[0].message).to.equal('Invalid VAT number');
+      });
+
+      it('rejects invalid tax amount', async () => {
+        const order = {
+          description: 'test order with tax',
+          collective: { id: collective1.id },
+          tier: { id: tierProduct.id },
+          paymentMethod: { uuid: paymentMethod1.uuid },
+          totalAmount: tierProduct.amount,
+          taxAmount: 0,
+          countryISO: 'BE', // Required when order has tax
+        };
+
+        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+        expect(queryResult.errors[0].message).to.equal(
+          'This tier uses a fixed amount. Order total must be $50.00 + $10.50 tax. You set: $50.00',
+        );
       });
     });
   });

@@ -5,6 +5,7 @@ import md5 from 'md5';
 import Promise from 'bluebird';
 import { pick, omit, get, min, isNil } from 'lodash';
 import config from 'config';
+import * as LibTaxes from '@opencollective/taxes';
 
 import models from '../../../models';
 import * as errors from '../../errors';
@@ -324,23 +325,36 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     // ---- Taxes (VAT) ----
+    let taxFromCountry = null;
     let taxPercent = 0;
 
-    // Load tax info from DB
-    if (tier && order.collective.HostCollectiveId) {
-      const hostCollective = await loaders.collective.findById.load(order.collective.HostCollectiveId);
-      const tax = get(hostCollective, `taxes.${tier.type}`);
+    // Load tax info from DB, ignore if amount is 0
+    if (order.totalAmount !== 0 && tier && LibTaxes.isTierTypeSubjectToVAT(tier.type)) {
+      let hostCollective = null;
+
+      // Load host
+      if (collective.HostCollectiveId) {
+        hostCollective = await loaders.collective.findById.load(collective.HostCollectiveId);
+      } else if (collective.ParentCollectiveId) {
+        const parentCollective = await loaders.collective.findById.load(collective.ParentCollectiveId);
+        if (parentCollective) {
+          hostCollective = await loaders.collective.findById.load(parentCollective.HostCollectiveId);
+        }
+      }
+
+      const hostCountry = get(hostCollective, 'countryISO');
+      taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, hostCountry, collective.countryISO);
 
       // Adapt tax based on country / tax ID number
-      if (tax && tax.percentage > 0) {
+      if (taxFromCountry) {
         if (!order.countryISO) {
           throw Error('This order has a tax attached, you must set a country');
+        } else if (order.taxIDNumber && !LibTaxes.checkVATNumberFormat(order.taxIDNumber).isValid) {
+          throw Error('Invalid VAT number');
         }
 
-        const isTaxedCountry = !tax.countries || tax.countries.includes(order.countryISO);
-        if (isTaxedCountry && !order.taxIDNumber) {
-          taxPercent = tax.percentage;
-        }
+        const hasVatNumber = Boolean(order.taxIDNumber);
+        taxPercent = LibTaxes.getVatPercentage(tier.type, taxFromCountry, order.countryISO, hasVatNumber);
       }
     }
 
@@ -360,9 +374,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     // Don't allow custom values if using a tier with fixed amount
     if (tier && tier.amount && !tier.presets) {
-      // Manually force the totalAmount if it has no been passed
+      // Manually force the totalAmount if it has not been passed
       if (isNil(order.totalAmount)) {
-        order.totalAmount = order.quantity * tier.amount;
+        order.totalAmount = Math.round(order.quantity * tier.amount * (1 + taxPercent / 100));
       }
 
       const netAmountForCollective = order.totalAmount - order.taxAmount;
@@ -370,9 +384,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       const expectedTaxAmount = Math.round((expectedAmountForCollective * taxPercent) / 100);
 
       if (netAmountForCollective !== expectedAmountForCollective || order.taxAmount !== expectedTaxAmount) {
-        const prettyTotalAmount = formatCurrency(order.totalAmount, currency);
-        const prettyExpectedAmount = formatCurrency(expectedAmountForCollective, currency);
-        const taxInfo = expectedTaxAmount ? ` + ${formatCurrency(expectedTaxAmount, currency)} tax` : '';
+        const prettyTotalAmount = formatCurrency(order.totalAmount, currency, 2);
+        const prettyExpectedAmount = formatCurrency(expectedAmountForCollective, currency, 2);
+        const taxInfo = expectedTaxAmount ? ` + ${formatCurrency(expectedTaxAmount, currency, 2)} tax` : '';
         throw new Error(
           `This tier uses a fixed amount. Order total must be ${prettyExpectedAmount}${taxInfo}. You set: ${prettyTotalAmount}`,
         );
@@ -419,8 +433,13 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       data: {
         reqIp,
         recaptchaResponse,
-        countryISO: order.countryISO || fromCollective.collectiveId,
-        taxIDNumber: order.taxIDNumber,
+        tax: taxFromCountry && {
+          id: 'VAT',
+          taxerCountry: taxFromCountry,
+          taxedCountry: order.countryISO,
+          percentage: taxPercent,
+          taxIDNumber: order.taxIDNumber,
+        },
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };

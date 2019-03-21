@@ -1253,6 +1253,13 @@ export const OrderType = new GraphQLObjectType({
           return order.status;
         },
       },
+      data: {
+        type: GraphQLJSON,
+        description: 'Additional information on order: tax',
+        resolve(order) {
+          return pick(order.data, ['tax']) || null;
+        },
+      },
     };
   },
 });
