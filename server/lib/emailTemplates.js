@@ -10,6 +10,7 @@ const templates = {};
 export const templateNames = [
   'announcement',
   'announcement.text',
+  'archived.collective',
   'donationmatched',
   'donationmatched.wwcode',
   'email.approve',
