@@ -79,7 +79,7 @@ export async function processOrderWithSubscription(options, order) {
       cancelSubscription(order);
     } else if (order.collective.deactivatedAt) {
       // This means the collective has been archived and the subscription should be cancelled.
-      orderProcessedStatus = 'unattempted';
+      orderProcessedStatus = 'failure';
       csvEntry.error = 'The collective has been archived';
       collectiveIsArchived = true;
       cancelSubscription(order);
@@ -144,6 +144,11 @@ function dateFormat(date) {
  *      failure and allow them to update the payment method.
  */
 export async function handleRetryStatus(order, transaction, collectiveIsArchived) {
+  if (collectiveIsArchived) {
+    await notifyUserForArchivedCollective(order);
+    return;
+  }
+
   switch (order.Subscription.chargeRetryCount) {
     case 0:
       await sendThankYouEmail(order, transaction);
@@ -152,11 +157,7 @@ export async function handleRetryStatus(order, transaction, collectiveIsArchived
       await cancelSubscriptionAndNotifyUser(order);
       break;
     default:
-      if (collectiveIsArchived) {
-        await notifyUserForArchivedCollective(order);
-      } else {
-        await sendFailedEmail(order, false);
-      }
+      await sendFailedEmail(order, false);
       break;
   }
 }
