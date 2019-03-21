@@ -812,7 +812,6 @@ type Mutation {
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
-  archiveCollective(id: Int!): CollectiveInterface
 
   """Create a user with an optional organization."""
   createUser(
