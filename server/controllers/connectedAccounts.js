@@ -70,6 +70,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
           userCollective.locationName = userCollective.locationName || profile.location;
           userCollective.website = userCollective.website || profile.blog || profile.html_url;
           userCollective.image = userCollective.image || image;
+          userCollective.githubHandle = data.profile.username;
           userCollective.save();
         })
         .then(() =>
