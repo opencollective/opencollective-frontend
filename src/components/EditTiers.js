@@ -5,7 +5,7 @@ import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import uuidv4 from 'uuid/v4';
 import { Box, Flex } from '@rebass/grid';
-import { getStandardVatRate } from '@opencollective/taxes';
+import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import InputField from './InputField';
@@ -253,7 +253,8 @@ class EditTiers extends React.Component {
   renderTier(tier, index) {
     const { intl, collective } = this.props;
     const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
-    const vatPercentage = getStandardVatRate(tier.type, get(collective, 'host.countryISO'), collective.countryISO);
+    const vatOriginCountry = getVatOriginCountry(tier.type, get(collective, 'host.countryISO'), collective.countryISO);
+    const vatPercentage = getStandardVatRate(tier.type, vatOriginCountry);
 
     const defaultValues = {
       ...tier,

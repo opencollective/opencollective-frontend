@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
-import { checkVATNumberFormat, getVatPercentage } from '@opencollective/taxes';
+import { checkVATNumberFormat, getVatPercentage, getVatOriginCountry } from '@opencollective/taxes';
 
 import { Close } from 'styled-icons/material/Close';
 
@@ -122,7 +122,8 @@ const prepareTaxInfo = (userTaxInfo, amount, taxPercentage, hasForm) => {
 };
 
 const getTaxPerentageForProfile = (tierType, hostCountry, collectiveCountry, profile) => {
-  return getVatPercentage(tierType, hostCountry, collectiveCountry, get(profile, 'countryISO'), get(profile, 'number'));
+  const originCountry = getVatOriginCountry(tierType, hostCountry, collectiveCountry);
+  return getVatPercentage(tierType, originCountry, get(profile, 'countryISO'), get(profile, 'number'));
 };
 
 /**
@@ -155,14 +156,18 @@ const ContributionBreakdown = ({
     return onChange && onChange(prepareTaxInfo(newTaxInfo, amount, percent, hasForm));
   };
 
+  console.log('render', get(userTaxInfo, 'countryISO'));
+
   useEffect(() => {
     // Dispatch initial value on mount
     dispatchChange();
 
     // Resolve country from IP if none provided
     if (!get(userTaxInfo, 'countryISO')) {
+      console.log('fetch start', get(userTaxInfo, 'countryISO'));
       fetchGeoLocation().then(countryISO => {
         // Country may have been changed by the user by the time geolocation API respond
+        console.log('fetch done', get(userTaxInfo, 'countryISO'));
         if (!get(userTaxInfo, 'countryISO')) {
           dispatchChange({ countryISO });
         }

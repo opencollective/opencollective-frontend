@@ -63,17 +63,13 @@ describe('event.createOrder page', () => {
     cy.contains('button', 'Next step').click();
     cy.get('input[type=number][name=quantity]').type('{selectall}8');
     cy.contains('button', 'Next step').click();
-    cy.wait(500);
-    cy.fillStripeInput();
+    cy.useAnyPaymentMethod();
     cy.contains('button', 'Next step').click();
 
     // Check step summary
     cy.contains('.breakdown-line', 'Item price').contains('€10.00');
     cy.contains('.breakdown-line', 'Quantity').contains('8');
     cy.contains('.breakdown-line', 'Your contribution').contains('€80.00');
-
-    // Wait to simulate a real usage: here gelocation API should trigger
-    cy.wait(500);
 
     // Afghanistan should not have taxes
     cy.get('div[name=country]').click();
@@ -140,5 +136,6 @@ describe('event.createOrder page', () => {
 
     // Let's submit this order!
     cy.contains('button', 'Make contribution').click();
+    cy.contains('Test User Admin has registered for the event BrusselsTogether Meetup 2 (donate)');
   });
 });

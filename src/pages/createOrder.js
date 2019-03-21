@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { isURL } from 'validator';
 import moment from 'moment';
 import uuid from 'uuid/v4';
-import { vatMayApply } from '@opencollective/taxes';
+import * as LibTaxes from '@opencollective/taxes';
 
 import { Router } from '../server/pages';
 
@@ -477,7 +477,14 @@ class CreateOrderPage extends React.Component {
   /** Returns true if taxes may apply with this tier/host */
   taxesMayApply() {
     const { Tier, Collective } = this.props.data;
-    return Tier ? vatMayApply(Tier.type, Collective.host.countryISO, Collective.countryISO) : false;
+
+    if (!Tier) {
+      return false;
+    }
+
+    const hostCountry = get(Collective, 'host.countryISO');
+    const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.countryISO);
+    return LibTaxes.vatMayApply(Tier.type, country);
   }
 
   /** Returns the steps list */
