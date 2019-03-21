@@ -344,7 +344,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
       const hostCountry = get(hostCollective, 'countryISO');
       taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, hostCountry, collective.countryISO);
-
       // Adapt tax based on country / tax ID number
       if (taxFromCountry) {
         if (!order.countryISO) {
@@ -371,7 +370,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.totalAmount < 0) {
       throw new Error('Total amount cannot be a negative value');
     }
-
     // Don't allow custom values if using a tier with fixed amount
     if (tier && tier.amount && !tier.presets) {
       // Manually force the totalAmount if it has not been passed
