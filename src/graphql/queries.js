@@ -189,7 +189,9 @@ const getCollectiveToEditQuery = gql`
         description
         website
         twitterHandle
-        countryISO
+        location {
+          country
+        }
         stats {
           id
           collectives {

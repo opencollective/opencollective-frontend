@@ -482,8 +482,8 @@ class CreateOrderPage extends React.Component {
       return false;
     }
 
-    const hostCountry = get(Collective, 'host.countryISO');
-    const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.countryISO);
+    const hostCountry = get(Collective, 'host.location.country');
+    const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.location.country);
     return LibTaxes.vatMayApply(Tier.type, country);
   }
 
@@ -778,8 +778,8 @@ class CreateOrderPage extends React.Component {
               onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
               tierType={get(tier, 'type')}
-              hostCountry={get(data.Collective, 'host.countryISO')}
-              collectiveCountry={get(data.Collective, 'countryISO')}
+              hostCountry={get(data.Collective, 'host.location.country')}
+              collectiveCountry={get(data.Collective, 'location.country')}
               applyTaxes
             />
           </Container>
@@ -956,13 +956,17 @@ const collectiveFields = `
   currency
   hostFeePercent
   tags
-  countryISO
+  location {
+    country
+  }
   host {
     id
     name
     settings
     taxes
-    countryISO
+    location {
+      country
+    }
   }
   parentCollective {
     image

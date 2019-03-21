@@ -253,7 +253,8 @@ class EditTiers extends React.Component {
   renderTier(tier, index) {
     const { intl, collective } = this.props;
     const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
-    const vatOriginCountry = getVatOriginCountry(tier.type, get(collective, 'host.countryISO'), collective.countryISO);
+    const hostCountry = get(collective, 'host.location.country');
+    const vatOriginCountry = getVatOriginCountry(tier.type, hostCountry, collective.location.country);
     const vatPercentage = getStandardVatRate(tier.type, vatOriginCountry);
 
     const defaultValues = {
