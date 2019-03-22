@@ -17,6 +17,7 @@ import { types } from '../../../constants/collectives';
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
 const debugArchive = debug('archive');
+const debugDeleteCollective = debug('delete');
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -278,7 +279,7 @@ export async function createCollectiveFromGithub(_, args, req) {
   collectiveData.currency = 'USD';
   collectiveData.CreatedByUserId = user.id;
   collectiveData.LastEditedByUserId = user.id;
-  collectiveData.teirs = [
+  collectiveData.tiers = [
     {
       name: 'backer',
       title: 'Backers',
@@ -709,4 +710,115 @@ export async function unarchiveCollective(_, args, req) {
   }
 
   return collective.update({ isActive: true, deactivatedAt: null });
+}
+
+export async function deleteCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to delete a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(collective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as an Admin.',
+    });
+  }
+
+  const transactionCount = await models.Transaction.count({
+    where: {
+      [Op.or]: [{ CollectiveId: collective.id }, { FromCollectiveId: collective.id }],
+    },
+  });
+  const orderCount = await models.Order.count({
+    where: {
+      [Op.or]: [{ CollectiveId: collective.id }, { FromCollectiveId: collective.id }],
+    },
+  });
+
+  if (transactionCount > 0 || orderCount > 0) {
+    throw new Error('Can not delete collective with existing orders.');
+  }
+
+  const expenseCount = await models.Expense.count({
+    where: { CollectiveId: collective.id, status: 'PAID' },
+  });
+
+  if (expenseCount > 0) {
+    throw new Error('Can not delete collective with paid expenses.');
+  }
+
+  return models.Member.findAll({
+    where: { CollectiveId: collective.id },
+  })
+    .then(members => {
+      return map(
+        members,
+        member => {
+          return member.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDeleteCollective('deleteCollectiveMembers'))
+    .then(async () => {
+      const expenses = await models.Expense.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        expenses,
+        expense => {
+          return expense.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDeleteCollective('deleteCollectiveExpenses'))
+    .then(async () => {
+      const tiers = await models.Tier.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        tiers,
+        tier => {
+          return tier.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDeleteCollective('deleteCollectiveTiers'))
+    .then(async () => {
+      const paymentMethods = await models.PaymentMethod.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        paymentMethods,
+        paymentMethod => {
+          return paymentMethod.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDeleteCollective('deleteCollectivePaymentMethods'))
+    .then(async () => {
+      const connectedAccounts = await models.ConnectedAccount.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        connectedAccounts,
+        connectedAccount => {
+          return connectedAccount.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDeleteCollective('deleteCollectiveConnectedAccounts'))
+    .then(() => collective.destroy());
 }
