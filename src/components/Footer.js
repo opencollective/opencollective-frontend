@@ -61,7 +61,7 @@ const navigation = {
     'Report an issue': 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     'Docs & help': 'https://docs.opencollective.com',
-    'Email Support': 'mailto:support@opencollective.com',
+    Support: '/support',
   },
   COMPANY: {
     About: 'https://docs.opencollective.com/help/about',
