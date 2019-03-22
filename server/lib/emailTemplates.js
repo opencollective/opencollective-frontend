@@ -7,7 +7,7 @@ import handlebars from './handlebars';
 
 const templates = {};
 
-const templateNames = [
+export const templateNames = [
   'announcement',
   'announcement.text',
   'donationmatched',
@@ -22,6 +22,7 @@ const templateNames = [
   'collective.confirm',
   'collective.created',
   'collective.created.meetup',
+  'collective.created.opensource',
   'collective.expense.approved',
   'collective.expense.approved.for.host',
   'collective.expense.created',
@@ -39,8 +40,11 @@ const templateNames = [
   'host.report.text',
   'host.report.summary',
   'onboarding.day2',
-  'onboarding.day7.widgets',
+  'onboarding.day2.opensource',
+  'onboarding.day7',
+  'onboarding.day7.opensource',
   'onboarding.noExpenses',
+  'onboarding.noExpenses.opensource',
   'onboarding.noUpdates',
   'onboarding.day21.noTwitter',
   'onboarding.day28',
