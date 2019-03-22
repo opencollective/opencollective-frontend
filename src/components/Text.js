@@ -32,7 +32,7 @@ export const P = styled(tag.p)`
 `;
 
 P.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat(['textTransform', 'whiteSpace', 'cursor']),
+  omitProps: tag.defaultProps.omitProps.concat(['textTransform', 'whiteSpace', 'cursor']),
   fontSize: 'Paragraph',
   letterSpacing: '-0.2px',
   lineHeight: 'Paragraph',

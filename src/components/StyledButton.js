@@ -76,7 +76,7 @@ const StyledButton = ({ loading, ...props }) =>
 
 StyledButton.propTypes = {
   /** @ignore */
-  blacklist: PropTypes.arrayOf(PropTypes.string),
+  omitProps: PropTypes.arrayOf(PropTypes.string),
   /**
    * Based on the design system theme
    */
@@ -123,7 +123,7 @@ StyledButton.propTypes = {
 };
 
 StyledButton.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'asLink'),
+  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'asLink'),
   buttonSize: 'medium',
   buttonStyle: 'standard',
   loading: false,

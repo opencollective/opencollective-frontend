@@ -42,7 +42,7 @@ const Hide = styled(Box)`
 `;
 
 Hide.defaultProps = {
-  blacklist: ['xs', 'sm', 'md', 'lg'],
+  omitProps: ['xs', 'sm', 'md', 'lg'],
 };
 
 Hide.propTypes = {
