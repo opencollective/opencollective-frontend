@@ -156,18 +156,14 @@ const ContributionBreakdown = ({
     return onChange && onChange(prepareTaxInfo(newTaxInfo, amount, percent, hasForm));
   };
 
-  console.log('render', get(userTaxInfo, 'countryISO'));
-
   useEffect(() => {
     // Dispatch initial value on mount
     dispatchChange();
 
     // Resolve country from IP if none provided
     if (!get(userTaxInfo, 'countryISO')) {
-      console.log('fetch start', get(userTaxInfo, 'countryISO'));
       fetchGeoLocation().then(countryISO => {
         // Country may have been changed by the user by the time geolocation API respond
-        console.log('fetch done', get(userTaxInfo, 'countryISO'));
         if (!get(userTaxInfo, 'countryISO')) {
           dispatchChange({ countryISO });
         }

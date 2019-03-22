@@ -59,12 +59,13 @@ describe('event.createOrder page', () => {
   });
 
   it('makes an order for tickets with VAT', () => {
-    cy.login({ redirect: '/brusselstogether/events/meetup-2/order/2' });
+    cy.signup({ redirect: '/brusselstogether/events/meetup-2/order/2' });
     cy.contains('button', 'Next step').click();
     cy.get('input[type=number][name=quantity]').type('{selectall}8');
     cy.contains('button', 'Next step').click();
     cy.useAnyPaymentMethod();
     cy.contains('button', 'Next step').click();
+    cy.wait(300);
 
     // Check step summary
     cy.contains('.breakdown-line', 'Item price').contains('€10.00');
