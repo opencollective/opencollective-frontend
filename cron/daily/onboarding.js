@@ -5,6 +5,7 @@ import Promise from 'bluebird';
 import models, { Op } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import { get } from 'lodash';
+import { templateNames } from '../../server/lib/emailTemplates';
 
 let totalCollectives = 0;
 
@@ -97,6 +98,9 @@ async function processCollective(collective, template) {
   const recipients = users.filter(u => u && unsubscribers.indexOf(u.id) === -1).map(u => u.email);
   if (!recipients || recipients.length === 0) {
     return;
+  }
+  if ((collective.tags || []).includes('opensource') && templateNames.includes(`${template}.opensource`)) {
+    template = `${template}.opensource`;
   }
   console.log(`>>> Sending ${template} email to the ${recipients.length} admin(s) of`, collective.slug);
   return Promise.map(recipients, recipient =>
