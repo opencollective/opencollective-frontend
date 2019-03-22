@@ -19,7 +19,7 @@ class EditCollective extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     editCollective: PropTypes.func.isRequired,
-    deleteCollective: PropTypes.func.isRequired,
+    deleteEventCollective: PropTypes.func.isRequired,
     loggedInEditDataLoaded: PropTypes.bool.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -27,7 +27,7 @@ class EditCollective extends React.Component {
   constructor(props) {
     super(props);
     this.editCollective = this.editCollective.bind(this);
-    this.deleteCollective = this.deleteCollective.bind(this);
+    this.deleteEventCollective = this.deleteEventCollective.bind(this);
     this.state = { status: null, result: {} };
     this.messages = defineMessages({
       'creditcard.error': {
@@ -129,12 +129,12 @@ class EditCollective extends React.Component {
     }
   }
 
-  async deleteCollective() {
+  async deleteEventCollective() {
     const { collective } = this.props;
     if (confirm('😱 Are you really sure you want to delete this collective?')) {
       this.setState({ status: 'loading' });
       try {
-        await this.props.deleteCollective(collective.id);
+        await this.props.deleteEventCollective(collective.id);
         this.setState({
           status: null,
           result: { success: 'Collective deleted successfully' },
@@ -142,7 +142,7 @@ class EditCollective extends React.Component {
         const collectiveRoute = `/${collective.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {
-        console.error('>>> deleteCollective error: ', JSON.stringify(err));
+        console.error('>>> deleteEventCollective error: ', JSON.stringify(err));
         const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
         this.setState({ result: { error: errorMsg } });
         throw new Error(errorMsg);
@@ -227,7 +227,7 @@ class EditCollective extends React.Component {
                   status={this.state.status}
                 />
                 <div className="actions">
-                  {collective.type === 'EVENT' && <a onClick={this.deleteCollective}>delete event</a>}
+                  {collective.type === 'EVENT' && <a onClick={this.deleteEventCollective}>delete event</a>}
                   <div className="result">
                     <div className="success">{this.state.result.success}</div>
                     <div className="error">{this.state.result.error}</div>

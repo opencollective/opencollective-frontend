@@ -7,13 +7,14 @@ import EditEventForm from './EditEventForm';
 import CollectiveCover from './CollectiveCover';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
+import { addEditCollectiveMutation, addDeleteEventCollectiveMutation } from '../graphql/mutations';
 import { Router } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
 
 class EditEvent extends React.Component {
   static propTypes = {
     event: PropTypes.object,
+    deleteEventCollective: PropTypes.func,
   };
 
   constructor(props) {
@@ -45,7 +46,7 @@ class EditEvent extends React.Component {
     if (confirm('😱 Are you really sure you want to delete this event?')) {
       this.setState({ status: 'loading' });
       try {
-        await this.props.deleteCollective(this.props.event.id);
+        await this.props.deleteEventCollective(this.props.event.id);
         this.setState({
           status: 'idle',
           result: { success: 'Event deleted successfully' },
@@ -143,4 +144,4 @@ class EditEvent extends React.Component {
   }
 }
 
-export default addEditCollectiveMutation(addDeleteCollectiveMutation(EditEvent));
+export default addEditCollectiveMutation(addDeleteEventCollectiveMutation(EditEvent));

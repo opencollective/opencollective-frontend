@@ -185,9 +185,9 @@ const editCollectiveQuery = gql`
   }
 `;
 
-const deleteCollectiveQuery = gql`
-  mutation deleteCollective($id: Int!) {
-    deleteCollective(id: $id) {
+const deleteEventCollectiveQuery = gql`
+  mutation deleteEventCollective($id: Int!) {
+    deleteEventCollective(id: $id) {
       id
     }
   }
@@ -444,9 +444,9 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
   }),
 });
 
-export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
+export const addDeleteEventCollectiveMutation = graphql(deleteEventCollectiveQuery, {
   props: ({ mutate }) => ({
-    deleteCollective: async id => {
+    deleteEventCollective: async id => {
       return await mutate({ variables: { id } });
     },
   }),

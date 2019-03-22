@@ -805,7 +805,7 @@ type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
-  deleteCollective(id: Int!): CollectiveInterface
+  deleteEventCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
