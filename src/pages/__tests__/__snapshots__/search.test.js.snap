@@ -1230,9 +1230,10 @@ Array [
             >
               <a
                 className="c14"
-                href="mailto:support@opencollective.com"
+                href="/support"
+                onClick={[Function]}
               >
-                Email Support
+                Support
               </a>
             </li>
           </ul>
@@ -2535,9 +2536,10 @@ Array [
             >
               <a
                 className="c14"
-                href="mailto:support@opencollective.com"
+                href="/support"
+                onClick={[Function]}
               >
-                Email Support
+                Support
               </a>
             </li>
           </ul>
@@ -3985,9 +3987,10 @@ exports[`Search Page renders error message 1`] = `
             >
               <a
                 className="c41"
-                href="mailto:support@opencollective.com"
+                href="/support"
+                onClick={[Function]}
               >
-                Email Support
+                Support
               </a>
             </li>
           </ul>
@@ -5385,9 +5388,10 @@ Array [
             >
               <a
                 className="c14"
-                href="mailto:support@opencollective.com"
+                href="/support"
+                onClick={[Function]}
               >
-                Email Support
+                Support
               </a>
             </li>
           </ul>
@@ -6945,9 +6949,10 @@ Array [
             >
               <a
                 className="c14"
-                href="mailto:support@opencollective.com"
+                href="/support"
+                onClick={[Function]}
               >
-                Email Support
+                Support
               </a>
             </li>
           </ul>
