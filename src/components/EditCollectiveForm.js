@@ -25,6 +25,7 @@ import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
 import ArchiveCollective from './ArchiveCollective';
+import DeleteCollective from './DeleteCollective';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -739,6 +740,9 @@ class EditCollectiveForm extends React.Component {
               )}
               {archiveIsEnabled && this.state.section === 'advanced' && collective.type !== 'USER' && (
                 <ArchiveCollective collective={collective} />
+              )}
+              {collective.type !== 'EVENT' && this.state.section === 'advanced' && (
+                <DeleteCollective collective={collective} />
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
