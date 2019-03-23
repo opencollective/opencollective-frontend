@@ -81,7 +81,8 @@ class Modal extends React.Component {
               }
             }
 
-            .confirm-ArchiveCollective {
+            .confirm-ArchiveCollective,
+            .confirm-deleteCollective {
               height: 130px;
             }
           `}
