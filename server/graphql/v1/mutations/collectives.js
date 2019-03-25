@@ -661,6 +661,12 @@ export async function archiveCollective(_, args, req) {
     });
   }
 
+  const balance = await collective.getBalance();
+
+  if (balance > 0) {
+    throw new Error('Cannot archive collective with balance > 0');
+  }
+
   return collective
     .getIncomingOrders({
       where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
