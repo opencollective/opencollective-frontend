@@ -17,6 +17,7 @@
   "keys": {
     "opencollective": {
       "apiKey": "dvl-1510egmf4a23d80342403fb599qd",
+      "sessionSecret": "mei0ieD3ahli9fengie7teeceeCaicho",
       "jwtSecret": "vieneixaGhahk2aej2pohsh2aeB1oa6o",
       "hashidSalt": "aiwiurohyohleevoo4ohraigi3auTohz"
     }

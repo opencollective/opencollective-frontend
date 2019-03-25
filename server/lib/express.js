@@ -7,6 +7,9 @@ import errorHandler from 'errorhandler';
 import passport from 'passport';
 import helmet from 'helmet';
 import debug from 'debug';
+import session from 'express-session';
+import connectRedis from 'connect-redis';
+
 import cloudflareIps from 'cloudflare-ip/ips.json';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
@@ -112,6 +115,23 @@ export default function(app) {
   }
 
   app.use(cookieParser());
+
+  // Setup session (required by passport)
+
+  let store;
+  if (get(config, 'redis.serverUrl')) {
+    const RedisStore = connectRedis(session);
+    store = new RedisStore({ url: get(config, 'redis.serverUrl') });
+  }
+
+  app.use(
+    session({
+      store,
+      secret: config.keys.opencollective.sessionSecret,
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
 
   app.use(passport.initialize());
 }
