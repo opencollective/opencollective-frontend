@@ -36,6 +36,8 @@
   "collective.address.label": "Address",
   "collective.amount.label": "montant",
   "collective.archive.archivedConfirmMessage": "{message}.",
+  "collective.archive.archivedMessage": "{type} already archived.",
+  "collective.archive.availableBalance": "This {type} has available balance, submit an expense for the remaining balance or transfer to another collective before archiving.",
   "collective.archive.button": "Archive this {type}.",
   "collective.archive.cancel.btn": "Cancel",
   "collective.archive.confirm.btn": "Archive",
