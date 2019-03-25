@@ -36,7 +36,7 @@ export const getProvider = providerType => {
 const getDefaultProviderType = () => {
   if (get(config, 'redis.serverUrl')) {
     return PROVIDER_TYPES.REDIS;
-  } else if (get(config, 'redis.servers')) {
+  } else if (get(config, 'memcache.servers')) {
     return PROVIDER_TYPES.MEMCACHE;
   } else {
     return PROVIDER_TYPES.MEMORY;
