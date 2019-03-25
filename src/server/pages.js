@@ -8,6 +8,7 @@ pages
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
+  .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
   .add('create-account', '/:form(create-account)', 'signin')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
