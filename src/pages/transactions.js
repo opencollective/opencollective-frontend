@@ -75,6 +75,7 @@ class TransactionsPage extends React.Component {
               LoggedInUser={this.state.LoggedInUser}
               showCSVlink={true}
               filters={true}
+              dateDisplayType="date"
             />
           </div>
         </Body>
