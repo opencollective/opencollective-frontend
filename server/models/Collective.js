@@ -14,6 +14,7 @@ import moment from 'moment';
 import * as ics from 'ics';
 import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
+import { Op } from 'sequelize';
 
 import CustomDataTypes from './DataTypes';
 
@@ -103,7 +104,7 @@ const validTypes = ['USER', 'COLLECTIVE', 'ORGANIZATION', 'EVENT', 'BOT'];
  * - Event: Time based collective with a parent collective
  */
 export default function(Sequelize, DataTypes) {
-  const { models, Op } = Sequelize;
+  const { models } = Sequelize;
 
   const Collective = Sequelize.define(
     'Collective',

@@ -3,6 +3,7 @@
 import libdebug from 'debug';
 import Promise from 'bluebird';
 import { get, intersection } from 'lodash';
+import { Op } from 'sequelize';
 
 import { TransactionTypes } from '../constants/transactions';
 
@@ -19,7 +20,7 @@ import { maxInteger } from '../constants/math';
 const debug = libdebug('PaymentMethod');
 
 export default function(Sequelize, DataTypes) {
-  const { models, Op } = Sequelize;
+  const { models } = Sequelize;
 
   const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
 
