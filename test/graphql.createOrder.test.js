@@ -3,6 +3,7 @@ import nock from 'nock';
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { cloneDeep } from 'lodash';
+import uuid from 'uuid/v4';
 
 import models from '../server/models';
 import twitter from '../server/lib/twitter';
@@ -399,6 +400,33 @@ describe('createOrder', () => {
     const fromCollective = res.data.createOrder.fromCollective;
     expect(fromCollective.slug).to.match(/anonymous/);
     expect(fromCollective.name).to.match(/anonymous/);
+  });
+
+  it("doesn't store the payment method for user if order fail", async () => {
+    const uniqueName = uuid();
+
+    // Given an order request
+    const newOrder = {
+      ...cloneDeep(baseOrder),
+      collective: { id: fearlesscitiesbrussels.id },
+      user: { firstName: '', lastName: '', email: store.randEmail('rejectedcard@protonmail.ch') },
+      paymentMethod: {
+        name: uniqueName,
+        token: 'tok_chargeDeclinedProcessingError', // See https://stripe.com/docs/testing#cards
+        data: {
+          expMonth: 10,
+          expYear: 1999,
+          brand: 'Visa',
+          country: 'US',
+          funding: 'credit',
+        },
+      },
+    };
+
+    const res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
+    expect(res.errors[0].message).to.equal('Your card was declined.');
+    const pm = await models.PaymentMethod.findOne({ where: { name: uniqueName } });
+    expect(pm.CollectiveId).to.equal(null);
   });
 
   it('creates an order as logged in user', async () => {
