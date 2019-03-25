@@ -34,7 +34,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
     try {
       setDeleteStatus({ ...deleteStatus, deleting: true });
       await deleteCollective(collective.id);
-      Router.pushRoute('/');
+      await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
       console.error('>>> deleteUserCollective error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
@@ -47,6 +47,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
       setDeleteStatus({ ...deleteStatus, deleting: true });
       await deleteUserCollective(collective.id);
       logout();
+      await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
       console.error('>>> deleteUserCollective error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
