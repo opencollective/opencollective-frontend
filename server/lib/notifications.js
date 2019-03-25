@@ -106,8 +106,8 @@ async function notifySubscribers(users, activity, options = {}) {
       switch (activity.type) {
         case activityType.COLLECTIVE_EXPENSE_CREATED:
           data.actions = {
-            approve: u.generateLoginLink(`/${data.collective.slug}/expenses/${data.expense.id}/approve`),
-            reject: u.generateLoginLink(`/${data.collective.slug}/expenses/${data.expense.id}/reject`),
+            approve: `/${data.collective.slug}/expenses/${data.expense.id}/approve`,
+            reject: `/${data.collective.slug}/expenses/${data.expense.id}/reject`,
           };
           break;
 
@@ -115,7 +115,7 @@ async function notifySubscribers(users, activity, options = {}) {
         case activityType.COLLECTIVE_APPLY:
           if (data.host) {
             data.actions = {
-              approve: u.generateLoginLink(`/${data.host.slug}/collectives/${data.collective.id}/approve`),
+              approve: `/${data.host.slug}/collectives/${data.collective.id}/approve`,
             };
           }
           break;
