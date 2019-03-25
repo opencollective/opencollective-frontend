@@ -89,6 +89,21 @@ Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
 Cypress.Commands.add('fillStripeInput', fillStripeInput);
 
 /**
+ * To use on the "Payment" step in the contribution flow.
+ * Use the first payment method if available or fill the
+ * stripe form otherwise.
+ */
+Cypress.Commands.add('useAnyPaymentMethod', () => {
+  return cy.get('#PaymentMethod').then($paymentMethod => {
+    // Checks if the organization already has a payment method configured
+    if (!$paymentMethod.text().includes('VISA **** 4242')) {
+      cy.wait(1000); // Wait for stripe to be loaded
+      cy.fillStripeInput();
+    }
+  });
+});
+
+/**
  * A helper for the `StepsProgress` component to check that the steps in params
  * are enabled or disabled. `enabled` and `disabled` can both be passed an array
  * of strings or a single string.

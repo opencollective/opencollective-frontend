@@ -4,11 +4,12 @@ import { get } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import uuidv4 from 'uuid/v4';
+import { Box, Flex } from '@rebass/grid';
+import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
+import { getCurrencySymbol, capitalize } from '../lib/utils';
 import InputField from './InputField';
 import InputFieldPresets from './InputFieldPresets';
-import { getCurrencySymbol, capitalize } from '../lib/utils';
-import { Box, Flex } from '@rebass/grid';
 import { Span } from './Text';
 import MessageBox from './MessageBox';
 
@@ -252,6 +253,11 @@ class EditTiers extends React.Component {
   renderTier(tier, index) {
     const { intl, collective } = this.props;
     const key = tier.id ? `tier-${tier.id}` : `newTier-${tier.__uuid};`;
+    const hostCountry = get(collective, 'host.location.country');
+    const collectiveCountry =
+      get(collective, 'location.country') || get(collective, 'parentCollective.location.country');
+    const vatOriginCountry = getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
+    const vatPercentage = getStandardVatRate(tier.type, vatOriginCountry);
 
     const defaultValues = {
       ...tier,
@@ -259,7 +265,6 @@ class EditTiers extends React.Component {
       _amountType: tier._amountType || (tier.presets ? 'flexible' : 'fixed'),
     };
 
-    const tax = get(collective, `host.taxes.${tier.type}`);
     return (
       <div className={`tier ${tier.slug}`} key={key}>
         <div className="tierActions">
@@ -275,7 +280,7 @@ class EditTiers extends React.Component {
                   <InputField
                     className="horizontal"
                     name={field.name}
-                    label={this.renderLabel(field, Boolean(tax))}
+                    label={this.renderLabel(field, Boolean(vatPercentage))}
                     component={field.component}
                     description={field.description}
                     type={field.type}
@@ -285,17 +290,22 @@ class EditTiers extends React.Component {
                     placeholder={field.placeholder}
                     onChange={value => this.editTier(index, field.name, value)}
                   />
-                  {field.name === 'type' && tax && (
+                  {field.name === 'type' && vatPercentage > 0 && (
                     <Flex mb={4}>
                       <Box width={0.166} px={15} />
                       <MessageBox type="info" withIcon css={{ flexGrow: 1 }}>
                         <strong>
-                          {tax.name || <FormattedMessage id="tax.vat" defaultMessage="Value-added tax (VAT)" />}
+                          <FormattedMessage id="tax.vat" defaultMessage="Value-added tax (VAT)" />
                           {': '}
-                          {tax.percentage}%
+                          {vatPercentage}%
                         </strong>
                         <br />
-                        <Span>{tax.description}</Span>
+                        <Span>
+                          <FormattedMessage
+                            id="tax.vat.description"
+                            defaultMessage="Use this tier type conform with legislation on VAT in Europe."
+                          />
+                        </Span>
                       </MessageBox>
                     </Flex>
                   )}

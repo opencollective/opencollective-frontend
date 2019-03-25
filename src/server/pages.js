@@ -28,7 +28,6 @@ pages
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
-  .add('collectiveTaxes', '/:collectiveSlug/taxes')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
   .add(

@@ -1,5 +1,5 @@
 /** A list of all countries codes that are part of the European Union */
-export default [
+const europeanCountries = [
   'AT',
   'BE',
   'BG',
@@ -29,3 +29,9 @@ export default [
   'SE',
   'GB',
 ];
+
+export const isEuropeanCountry = countryCode => {
+  return europeanCountries.includes(countryCode);
+};
+
+export default europeanCountries;
