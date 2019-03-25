@@ -1,5 +1,5 @@
 import { get, set } from 'lodash';
-import Temporal from 'sequelize-temporal';
+import Historical from 'sequelize-historical';
 import { TransactionTypes } from '../constants/transactions';
 import activities from '../constants/activities';
 import status from '../constants/expense_status';
@@ -281,6 +281,7 @@ export default function(Sequelize, DataTypes) {
     return reduceArrayToCurrency(arr, baseCurrency);
   };
 
-  Temporal(Expense, Sequelize);
+  Historical(Expense, Sequelize);
+
   return Expense;
 }

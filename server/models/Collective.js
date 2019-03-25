@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import Temporal from 'sequelize-temporal';
+import Historical from 'sequelize-historical';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import prependHttp from 'prepend-http';
@@ -2256,7 +2256,7 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Tier, { as: 'tiers' });
   };
 
-  Temporal(Collective, Sequelize);
+  Historical(Collective, Sequelize);
 
   return Collective;
 }

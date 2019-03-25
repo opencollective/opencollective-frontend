@@ -100,7 +100,7 @@
     "sanitize-html": "1.20.1",
     "sequelize": "5.1.0",
     "sequelize-cli": "4.0.0",
-    "sequelize-temporal": "1.0.6",
+    "sequelize-historical": "5.1.0",
     "showdown": "1.9.0",
     "stripe": "6.31.1",
     "twitter": "1.7.1",

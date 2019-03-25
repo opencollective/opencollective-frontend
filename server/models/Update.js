@@ -2,7 +2,7 @@
  * Dependencies.
  */
 import config from 'config';
-import Temporal from 'sequelize-temporal';
+import Historical from 'sequelize-historical';
 import slugify from 'limax';
 import Promise from 'bluebird';
 import showdown from 'showdown';
@@ -335,7 +335,7 @@ export default function(Sequelize, DataTypes) {
     Update.belongsTo(m.User, { foreignKey: 'LastEditedByUserId', as: 'user' });
   };
 
-  Temporal(Update, Sequelize);
+  Historical(Update, Sequelize);
 
   return Update;
 }
