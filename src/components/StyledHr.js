@@ -39,7 +39,7 @@ StyledHr.propTypes = {
 
 StyledHr.defaultProps = {
   /** @ignore */
-  blacklist: tag.defaultProps.blacklist.concat('borderStyle'),
+  omitProps: tag.defaultProps.omitProps.concat('borderStyle'),
 };
 
 /** @component */

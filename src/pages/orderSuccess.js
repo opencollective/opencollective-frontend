@@ -58,7 +58,7 @@ ShareLink.defaultProps = {
   mx: 2,
   mb: 2,
   target: '_blank',
-  blacklist: StyledLink.defaultProps.blacklist,
+  omitProps: StyledLink.defaultProps.omitProps,
 };
 
 const CollectiveLogoContainer = styled(Flex)`

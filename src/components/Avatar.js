@@ -27,7 +27,7 @@ export const StyledAvatar = styled(Flex)`
 `;
 
 StyledAvatar.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('backgroundImage'),
+  omitProps: tag.defaultProps.omitProps.concat('backgroundImage'),
 };
 
 const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {

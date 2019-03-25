@@ -55,7 +55,7 @@ const StyledLink = styled(tag.a)`
 
 StyledLink.propTypes = {
   /** @ignore */
-  blacklist: PropTypes.arrayOf(PropTypes.string),
+  omitProps: PropTypes.arrayOf(PropTypes.string),
   /**
    * Based on the design system theme
    */
@@ -90,7 +90,7 @@ StyledLink.propTypes = {
 };
 
 StyledLink.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'whiteSpace'),
+  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'whiteSpace'),
 };
 
 /** @component */

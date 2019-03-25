@@ -85,7 +85,7 @@ const SelectContainer = styled(Container)`
 `;
 
 SelectContainer.defaultProps = {
-  blacklist: SelectContainer.defaultProps.blacklist.concat('mode'),
+  omitProps: SelectContainer.defaultProps.omitProps.concat('mode'),
 };
 
 const SelectPopupContainer = styled(Container)`
@@ -124,7 +124,7 @@ const StyledListItem = styled(tag.li)`
 `;
 
 StyledListItem.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('isHighlighted', 'isSelected'),
+  omitProps: tag.defaultProps.omitProps.concat('isHighlighted', 'isSelected'),
 };
 
 const Icon = styled(CaretDown)`

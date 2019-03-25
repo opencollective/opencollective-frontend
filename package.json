@@ -25,7 +25,7 @@
     "bluebird": "3.5.3",
     "bootstrap": "3.4.1",
     "classnames": "2.2.6",
-    "clean-tag": "2.0.3",
+    "clean-tag": "3.1.0",
     "cloudflare-ip": "0.0.7",
     "cross-fetch": "3.0.1",
     "currency-symbol-map": "4.0.4",
