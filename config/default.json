@@ -7,8 +7,7 @@
         "max": 10,
         "acquire": 1200000
       },
-      "logging": false,
-      "operatorsAliases": false
+      "logging": false
     }
   },
   "maintenancedb": {
