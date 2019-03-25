@@ -72,9 +72,9 @@ describe('event.createOrder page', () => {
     cy.contains('.breakdown-line', 'Quantity').contains('8');
     cy.contains('.breakdown-line', 'Your contribution').contains('€80.00');
 
-    // Afghanistan should not have taxes
+    // Algeria should not have taxes
     cy.get('div[name=country]').click();
-    cy.contains('ul[role=listbox] li', 'Afghanistan - AF').click();
+    cy.contains('ul[role=listbox] li', 'Algeria').click({ force: true });
     cy.contains('.breakdown-line', 'VAT').contains('+ €0.00');
     cy.contains('.breakdown-line', 'TOTAL').contains('€80.00');
     cy.contains('button', 'Make contribution').should('not.be.disabled');
@@ -137,6 +137,6 @@ describe('event.createOrder page', () => {
 
     // Let's submit this order!
     cy.contains('button', 'Make contribution').click();
-    cy.contains('Test User Admin has registered for the event BrusselsTogether Meetup 2 (donate)');
+    cy.contains("You've registered for the event BrusselsTogether Meetup 2 (donate)");
   });
 });
