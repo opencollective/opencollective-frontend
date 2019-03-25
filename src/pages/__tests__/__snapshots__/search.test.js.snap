@@ -16,11 +16,10 @@ Array [
 
 .c0 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
-  min-height: 68px;
+  padding-left: 16px;
+  padding-right: 16px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -128,9 +127,8 @@ Array [
 
 .c10 {
   box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
   margin: 0;
+  padding: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -187,13 +185,23 @@ Array [
 @media screen and (min-width:40em) {
   .c11 {
     padding-left: 8px;
-    padding-right: 8px;
   }
 }
 
 @media screen and (min-width:52em) {
   .c11 {
     padding-left: 16px;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
     padding-right: 16px;
   }
 }
@@ -601,7 +609,6 @@ Array [
   margin-left: auto;
   margin-right: auto;
   padding: 8px;
-  max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -788,10 +795,10 @@ Array [
 
 .c12 {
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -1322,11 +1329,10 @@ Array [
 
 .c0 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
-  min-height: 68px;
+  padding-left: 16px;
+  padding-right: 16px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1434,9 +1440,8 @@ Array [
 
 .c10 {
   box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
   margin: 0;
+  padding: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1493,13 +1498,23 @@ Array [
 @media screen and (min-width:40em) {
   .c11 {
     padding-left: 8px;
-    padding-right: 8px;
   }
 }
 
 @media screen and (min-width:52em) {
   .c11 {
     padding-left: 16px;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
     padding-right: 16px;
   }
 }
@@ -1907,7 +1922,6 @@ Array [
   margin-left: auto;
   margin-right: auto;
   padding: 8px;
-  max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2094,10 +2108,10 @@ Array [
 
 .c12 {
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -2675,7 +2689,6 @@ exports[`Search Page renders error message 1`] = `
   margin-left: auto;
   margin-right: auto;
   padding: 8px;
-  max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2729,11 +2742,10 @@ exports[`Search Page renders error message 1`] = `
 
 .c0 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
-  min-height: 68px;
+  padding-left: 16px;
+  padding-right: 16px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2768,10 +2780,10 @@ exports[`Search Page renders error message 1`] = `
 
 .c22 {
   box-sizing: border-box;
-  padding-left: 8px;
-  padding-right: 8px;
   padding-top: 32px;
   padding-bottom: 32px;
+  padding-left: 8px;
+  padding-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2991,9 +3003,9 @@ exports[`Search Page renders error message 1`] = `
 
 .c9 {
   box-sizing: border-box;
-  padding-left: 16px;
   padding-top: 4px;
   padding-bottom: 4px;
+  padding-left: 16px;
   width: 100%;
 }
 
@@ -3042,9 +3054,8 @@ exports[`Search Page renders error message 1`] = `
 
 .c16 {
   box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
   margin: 0;
+  padding: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -3117,10 +3128,10 @@ exports[`Search Page renders error message 1`] = `
 
 .c39 {
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -3191,6 +3202,11 @@ exports[`Search Page renders error message 1`] = `
 @media screen and (min-width:40em) {
   .c22 {
     padding-top: 128px;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c22 {
     padding-bottom: 128px;
   }
 }
@@ -3260,13 +3276,23 @@ exports[`Search Page renders error message 1`] = `
 @media screen and (min-width:40em) {
   .c17 {
     padding-left: 8px;
-    padding-right: 8px;
   }
 }
 
 @media screen and (min-width:52em) {
   .c17 {
     padding-left: 16px;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c17 {
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c17 {
     padding-right: 16px;
   }
 }
@@ -4079,11 +4105,10 @@ Array [
 
 .c0 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
-  min-height: 68px;
+  padding-left: 16px;
+  padding-right: 16px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4191,9 +4216,8 @@ Array [
 
 .c10 {
   box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
   margin: 0;
+  padding: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4250,13 +4274,23 @@ Array [
 @media screen and (min-width:40em) {
   .c11 {
     padding-left: 8px;
-    padding-right: 8px;
   }
 }
 
 @media screen and (min-width:52em) {
   .c11 {
     padding-left: 16px;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
     padding-right: 16px;
   }
 }
@@ -4759,7 +4793,6 @@ Array [
   margin-left: auto;
   margin-right: auto;
   padding: 8px;
-  max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -4946,10 +4979,10 @@ Array [
 
 .c12 {
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -5480,11 +5513,10 @@ Array [
 
 .c0 {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
-  min-height: 68px;
+  padding-left: 16px;
+  padding-right: 16px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5592,9 +5624,8 @@ Array [
 
 .c10 {
   box-sizing: border-box;
-  margin: 0px;
-  padding: 0px;
   margin: 0;
+  padding: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -5651,13 +5682,23 @@ Array [
 @media screen and (min-width:40em) {
   .c11 {
     padding-left: 8px;
-    padding-right: 8px;
   }
 }
 
 @media screen and (min-width:52em) {
   .c11 {
     padding-left: 16px;
+  }
+}
+
+@media screen and (min-width:40em) {
+  .c11 {
+    padding-right: 8px;
+  }
+}
+
+@media screen and (min-width:52em) {
+  .c11 {
     padding-right: 16px;
   }
 }
@@ -5912,10 +5953,10 @@ Array [
 
 .c7 {
   box-sizing: border-box;
-  margin-left: 8px;
-  margin-right: 8px;
   margin-top: 16px;
   margin-bottom: 16px;
+  margin-left: 8px;
+  margin-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -6320,7 +6361,6 @@ Array [
   margin-left: auto;
   margin-right: auto;
   padding: 8px;
-  max-width: 1300px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -6507,10 +6547,10 @@ Array [
 
 .c12 {
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   box-sizing: border-box;
-  padding-left: 0px;
+  padding-left: 0;
   padding-right: 8px;
   display: -webkit-box;
   display: -webkit-flex;
