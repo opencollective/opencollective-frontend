@@ -47,8 +47,7 @@ class ConfirmCollectiveDeletion extends Component {
             </P>
           ) : (
             <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
-              We&apos;ve deleted your collective, expenses, members, tiers and all related entities relating to this
-              collective.
+              We&apos;ve deleted your collective, expenses, members, tiers and all related entities to this collective.
             </P>
           )}
         </Container>
