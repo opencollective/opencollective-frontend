@@ -236,7 +236,7 @@ const processBacker = async FromCollectiveId => {
         month,
         fromCollective: backerCollective,
         collectives: collectivesWithOrders,
-        manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
+        manageSubscriptionsUrl: '/subscriptions',
         relatedCollectives,
         stats,
         tags: stats.allTags || {},
