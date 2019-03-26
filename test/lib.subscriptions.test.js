@@ -212,8 +212,8 @@ describe('LibSubscription', () => {
       const order = {
         Subscription: { chargeRetryCount: 0 },
         collective: { getRelatedCollectives: () => Promise.resolve(null) },
-        fromCollective: {},
-        createdByUser: { email: 'test@oc.com', generateLoginLink: () => '/' },
+        fromCollective: { slug: 'cslug' },
+        createdByUser: { email: 'test@oc.com' },
       };
 
       // And given that we expect the method send from the mock to be
@@ -235,8 +235,8 @@ describe('LibSubscription', () => {
       const order = {
         Subscription: { chargeRetryCount: 1 },
         collective: {},
-        fromCollective: {},
-        createdByUser: { email: 'test@oc.com', generateLoginLink: () => '/' },
+        fromCollective: { slug: 'cslug' },
+        createdByUser: { email: 'test@oc.com' },
       };
 
       // And given that we expect the method send from the mock to be
@@ -249,7 +249,7 @@ describe('LibSubscription', () => {
           order: order.info,
           collective: order.collective.info,
           fromCollective: order.fromCollective.minimal,
-          subscriptionsLink: '/',
+          subscriptionsLink: '/cslug/subscriptions',
         });
 
       // When the status of the order is handled
@@ -264,8 +264,8 @@ describe('LibSubscription', () => {
       const order = {
         Subscription: { chargeRetryCount: MAX_RETRIES },
         collective: {},
-        fromCollective: {},
-        createdByUser: { email: 'test@oc.com', generateLoginLink: () => '/' },
+        fromCollective: { slug: 'cslug' },
+        createdByUser: { email: 'test@oc.com' },
       };
 
       // And given that we expect the method send from the mock to be
@@ -278,7 +278,7 @@ describe('LibSubscription', () => {
           order: order.info,
           collective: order.collective.info,
           fromCollective: order.fromCollective.minimal,
-          subscriptionsLink: '/',
+          subscriptionsLink: '/cslug/subscriptions',
         });
 
       // When the status of the order is handled
