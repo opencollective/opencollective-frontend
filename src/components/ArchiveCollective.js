@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { addArchiveCollectiveMutation } from '../graphql/mutations';
+import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../graphql/mutations';
 import withIntl from '../lib/withIntl';
 
 import { H2, P } from './Text';
@@ -11,32 +11,51 @@ import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
 import Modal from './Modal';
 
-const ArchiveCollective = ({ collective, archiveCollective }) => {
+const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
   const collectiveType = collective.type === 'ORGANIZATION' ? 'Organization' : 'Collective';
-  const [showModal, setShowModal] = useState(false);
+  const defaultAction = isArchived ? 'Archive' : 'Unarchive';
+  const [modal, setModal] = useState({ type: defaultAction, show: false });
   const [archiveStatus, setArchiveStatus] = useState({
-    archiving: false,
+    processing: false,
     isArchived: collective.isArchived,
     error: null,
     confirmationMesg: '',
   });
 
-  const { archiving, isArchived, error, confirmationMesg } = archiveStatus;
+  const { processing, isArchived, error, confirmationMesg } = archiveStatus;
   const handleArchiveCollective = async ({ archiveCollective, id }) => {
-    setShowModal(false);
+    setModal({ type: 'Archive', show: false });
     try {
-      setArchiveStatus({ ...archiveStatus, archiving: true });
+      setArchiveStatus({ ...archiveStatus, processing: true });
       await archiveCollective(id);
       setArchiveStatus({
         ...archiveStatus,
-        archiving: false,
+        processing: false,
         isArchived: true,
         confirmationMesg: `The ${collectiveType.toLowerCase()} was successfully archived`,
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-      setArchiveStatus({ ...archiveStatus, archiving: false, error: errorMsg });
+      setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
+    }
+  };
+
+  const handleUnarchiveCollective = async ({ unarchiveCollective, id }) => {
+    setModal({ type: 'Unarchive', show: false });
+    try {
+      setArchiveStatus({ ...archiveStatus, processing: true });
+      await unarchiveCollective(id);
+      setArchiveStatus({
+        ...archiveStatus,
+        processing: false,
+        isArchived: false,
+        confirmationMesg: `The ${collectiveType.toLowerCase()} was successfully unarchived`,
+      });
+    } catch (err) {
+      console.error('>>> archiveCollective error: ', JSON.stringify(err));
+      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }
   };
 
@@ -60,7 +79,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
       )}
       {error && <P color="#ff5252">{error}</P>}
       {!isArchived && (
-        <StyledButton width={0.3} onClick={() => setShowModal(true)} loading={archiving}>
+        <StyledButton width={0.3} onClick={() => setModal({ type: 'Archive', show: true })} loading={processing}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.button"
@@ -69,7 +88,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
         </StyledButton>
       )}
       {isArchived && confirmationMesg && (
-        <MessageBox withIcon type="info">
+        <MessageBox withIcon width={0.6} type="info" mb={4}>
           <FormattedMessage
             values={{ message: confirmationMesg }}
             id="collective.archive.archivedConfirmMessage"
@@ -78,30 +97,40 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
         </MessageBox>
       )}
 
-      {isArchived && !confirmationMesg && (
-        <P>
+      {isArchived && (
+        <StyledButton width={0.3} onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
-            id="collective.archive.archivedMessage"
-            defaultMessage={'This {type} is archived.'}
+            id="collective.unarchive.button"
+            defaultMessage={'Unarchive this {type}'}
           />
-        </P>
+        </StyledButton>
       )}
       <Modal
-        onClose={() => setShowModal(false)}
-        show={showModal}
+        onClose={() => setModal({ ...modal, show: false })}
+        show={modal.show}
         className="confirm-ArchiveCollective"
-        title={`Are you sure you want to archive this ${collectiveType.toLocaleLowerCase()}?`}
+        title={`Are you sure you want to ${modal.type.toLowerCase()} this ${collectiveType.toLocaleLowerCase()}?`}
       >
         <Container display="flex" justifyContent="space-between" width={1} mt={4}>
-          <StyledButton onClick={() => setShowModal(false)}>
+          <StyledButton onClick={() => setModal({ ...modal, show: false })}>
             <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
           </StyledButton>
           <StyledButton
             buttonStyle="primary"
-            onClick={() => handleArchiveCollective({ archiveCollective, id: collective.id })}
+            onClick={() => {
+              if (modal.type === 'Unarchive') {
+                handleUnarchiveCollective({ unarchiveCollective, id: collective.id });
+              } else {
+                handleArchiveCollective({ archiveCollective, id: collective.id });
+              }
+            }}
           >
-            <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+            <FormattedMessage
+              id="collective.archive.confirm.btn"
+              values={{ action: modal.type }}
+              defaultMessage={'{action}'}
+            />
           </StyledButton>
         </Container>
       </Modal>
@@ -112,6 +141,7 @@ const ArchiveCollective = ({ collective, archiveCollective }) => {
 ArchiveCollective.propTypes = {
   collective: PropTypes.object.isRequired,
   archiveCollective: PropTypes.func,
+  unarchiveCollective: PropTypes.func,
 };
 
-export default withIntl(addArchiveCollectiveMutation(ArchiveCollective));
+export default withIntl(addArchiveCollectiveMutation(addUnarchiveCollectiveMutation(ArchiveCollective)));
