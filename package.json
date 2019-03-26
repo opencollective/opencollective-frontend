@@ -168,6 +168,7 @@
     "test:server": "./scripts/db_restore.sh -d opencollective_dvl -f test/dbdumps/opencollective_dvl.pgsql && PG_DATABASE=opencollective_dvl npm run dev",
     "test:dev": "npm run test:unit:dev && npm run test:bdd:dev",
     "test:unit:dev": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:unit:dev:grep": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml --grep ",
     "test:unit": "nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
     "test:bdd:dev": "cucumber-js --require-module @babel/register --require-module @babel/polyfill --backtrace --order random ./test/features",
     "test:bdd": "nyc cucumber-js --require-module @babel/register --require-module @babel/polyfill --backtrace --order random ./test/features",

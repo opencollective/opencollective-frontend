@@ -12,6 +12,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json';
 import { Kind } from 'graphql/language';
+import { IsoDateString } from './types';
 
 const EmailType = new GraphQLScalarType({
   name: 'Email',
@@ -388,6 +389,19 @@ export const ExpenseInputType = new GraphQLInputObjectType({
       attachment: { type: GraphQLString },
       user: { type: UserInputType },
       collective: { type: CollectiveAttributesInputType },
+    };
+  },
+});
+
+export const InvoiceInputType = new GraphQLInputObjectType({
+  name: 'InvoiceInputType',
+  description: 'Input dates and collectives for Invoice',
+  fields: () => {
+    return {
+      dateFrom: { type: IsoDateString },
+      dateTo: { type: IsoDateString },
+      collectiveSlug: { type: GraphQLString },
+      fromCollectiveSlug: { type: GraphQLString },
     };
   },
 });

@@ -1,17 +1,21 @@
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLError,
   GraphQLFloat,
   GraphQLInt,
   GraphQLInputObjectType,
   GraphQLList,
   GraphQLObjectType,
   GraphQLString,
+  GraphQLScalarType,
 } from 'graphql';
 
+import { Kind } from 'graphql/language';
 import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
 import { pick } from 'lodash';
+import moment from 'moment';
 
 import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
 
@@ -337,6 +341,27 @@ export const LocationType = new GraphQLObjectType({
   }),
 });
 
+export const IsoDateString = new GraphQLScalarType({
+  name: 'IsoDateString',
+  serialize: value => {
+    return value;
+  },
+  parseValue: value => {
+    return value;
+  },
+  parseLiteral: ast => {
+    if (ast.kind !== Kind.STRING) {
+      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
+    }
+
+    const date = moment.parseZone(ast.value);
+    if (!date.isValid()) {
+      throw new GraphQLError('Query error: unable to pass date string. Expected a valid ISO-8601 date string.');
+    }
+    return date;
+  },
+});
+
 export const InvoiceType = new GraphQLObjectType({
   name: 'InvoiceType',
   description: 'This represents an Invoice',
@@ -356,20 +381,35 @@ export const InvoiceType = new GraphQLObjectType({
           return invoice.title || 'Donation Receipt';
         },
       },
+      dateFrom: {
+        type: IsoDateString,
+        description:
+          'dateFrom and dateTo will be set for any invoice over a period of time. They will not be set for an invoice for a single transaction.',
+        resolve: invoice => invoice.dateFrom,
+      },
+      dateTo: {
+        type: IsoDateString,
+        description:
+          'dateFrom and dateTo will be set for any invoice over a period of time. They will not be set for an invoice for a single transaction.',
+        resolve: invoice => invoice.dateTo,
+      },
       year: {
         type: GraphQLInt,
+        description: 'year will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo',
         resolve(invoice) {
           return invoice.year;
         },
       },
       month: {
         type: GraphQLInt,
+        description: 'month will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo',
         resolve(invoice) {
           return invoice.month;
         },
       },
       day: {
         type: GraphQLInt,
+        description: 'day will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo',
         resolve(invoice) {
           return invoice.day;
         },
@@ -406,16 +446,13 @@ export const InvoiceType = new GraphQLObjectType({
             return invoice.transactions;
           }
 
-          const startsAt = new Date(`${invoice.year}-${invoice.month}-01`);
-          const endsAt = new Date(startsAt);
-          endsAt.setMonth(startsAt.getMonth() + 1);
           const where = {
             [Op.or]: {
               FromCollectiveId: invoice.FromCollectiveId,
               UsingVirtualCardFromCollectiveId: invoice.FromCollectiveId,
             },
             type: 'CREDIT',
-            createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
+            createdAt: { [Op.gte]: invoice.dateFrom, [Op.lt]: invoice.dateTo },
           };
           if (invoice.HostCollectiveId) {
             where.HostCollectiveId = invoice.HostCollectiveId;
