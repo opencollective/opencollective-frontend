@@ -1,5 +1,5 @@
 /** @module lib/payments */
-
+import config from 'config';
 import Promise from 'bluebird';
 import { includes, pick, get, find } from 'lodash';
 import { Op } from 'sequelize';
@@ -16,6 +16,7 @@ import * as libtransactions from './transactions';
 import { getRecommendedCollectives } from './data';
 import { formatCurrency } from '../lib/utils';
 import debugLib from 'debug';
+
 const debug = debugLib('payments');
 
 /** Check if paymentMethod has a given fully qualified name
@@ -412,7 +413,7 @@ const sendOrderConfirmedEmail = async order => {
       recommendedCollectives,
       monthlyInterval: interval === 'month',
       firstPayment: true,
-      subscriptionsLink: interval && `/${fromCollective.slug}/subscriptions`,
+      subscriptionsLink: interval && `${config.host.website}/${fromCollective.slug}/subscriptions`,
     };
 
     let matchingFundCollective;
@@ -455,7 +456,7 @@ const sendOrderProcessingEmail = async order => {
     collective: collective.info,
     host: host.info,
     fromCollective: fromCollective.minimal,
-    subscriptionsLink: `/${fromCollective.slug}/subscriptions`,
+    subscriptionsLink: `${config.host.website}/${fromCollective.slug}/subscriptions`,
   };
   const instructions = get(host, 'settings.paymentMethods.manual.instructions');
   if (instructions) {
