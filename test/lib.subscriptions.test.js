@@ -1,3 +1,5 @@
+import config from 'config';
+
 // Testing tools
 import sinon from 'sinon';
 import { expect } from 'chai';
@@ -249,7 +251,7 @@ describe('LibSubscription', () => {
           order: order.info,
           collective: order.collective.info,
           fromCollective: order.fromCollective.minimal,
-          subscriptionsLink: '/cslug/subscriptions',
+          subscriptionsLink: `${config.host.website}/cslug/subscriptions`,
         });
 
       // When the status of the order is handled
@@ -278,7 +280,7 @@ describe('LibSubscription', () => {
           order: order.info,
           collective: order.collective.info,
           fromCollective: order.fromCollective.minimal,
-          subscriptionsLink: '/cslug/subscriptions',
+          subscriptionsLink: `${config.host.website}/cslug/subscriptions`,
         });
 
       // When the status of the order is handled

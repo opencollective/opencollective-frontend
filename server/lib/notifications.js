@@ -1,8 +1,8 @@
 import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
-
 import { get, set, template } from 'lodash';
+
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
@@ -12,6 +12,7 @@ import { W9_BOT_SLUG } from '../constants/collectives';
 import models from '../models';
 import debugLib from 'debug';
 import { formatCurrency } from './utils';
+
 const debug = debugLib('notification');
 
 export default async (Sequelize, activity) => {
@@ -88,8 +89,8 @@ async function notifySubscribers(users, activity, options = {}) {
   switch (activity.type) {
     case activityType.COLLECTIVE_EXPENSE_CREATED:
       data.actions = {
-        approve: `/${data.collective.slug}/expenses/${data.expense.id}/approve`,
-        reject: `/${data.collective.slug}/expenses/${data.expense.id}/reject`,
+        approve: `${config.host.website}/${data.collective.slug}/expenses/${data.expense.id}/approve`,
+        reject: `${config.host.website}/${data.collective.slug}/expenses/${data.expense.id}/reject`,
       };
       break;
 
@@ -97,7 +98,7 @@ async function notifySubscribers(users, activity, options = {}) {
     case activityType.COLLECTIVE_APPLY:
       if (data.host) {
         data.actions = {
-          approve: `/${data.host.slug}/collectives/${data.collective.id}/approve`,
+          approve: `${config.host.website}/${data.host.slug}/collectives/${data.collective.id}/approve`,
         };
       }
       break;
