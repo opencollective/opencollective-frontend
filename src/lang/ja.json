@@ -36,6 +36,7 @@
   "collective.address.label": "Address",
   "collective.amount.label": "額",
   "collective.archive.archivedConfirmMessage": "{message}.",
+  "collective.archive.availableBalance": "This {type} has available balance, submit an expense for the remaining balance or transfer to another collective before archiving.",
   "collective.archive.button": "Archive this {type}.",
   "collective.archive.cancel.btn": "Cancel",
   "collective.archive.confirm.btn": "Archive",

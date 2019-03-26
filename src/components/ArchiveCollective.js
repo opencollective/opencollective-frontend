@@ -79,13 +79,29 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
       )}
       {error && <P color="#ff5252">{error}</P>}
       {!isArchived && (
-        <StyledButton width={0.3} onClick={() => setModal({ type: 'Archive', show: true })} loading={processing}>
+        <StyledButton
+          width={0.3}
+          onClick={() => setModal({ type: 'Archive', show: true })}
+          loading={processing}
+          disabled={collective.stats.balance > 0 ? true : false}
+        >
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.button"
             defaultMessage={'Archive this {type}'}
           />
         </StyledButton>
+      )}
+      {!isArchived && collective.stats.balance >= 0 && (
+        <P>
+          <FormattedMessage
+            values={{ type: collectiveType.toLowerCase() }}
+            id="collective.archive.availableBalance"
+            defaultMessage={
+              'This {type} has available balance, submit an expense for the remaining balance or transfer to another collective before archiving.'
+            }
+          />
+        </P>
       )}
       {isArchived && confirmationMesg && (
         <MessageBox withIcon width={0.6} type="info" mb={4}>
