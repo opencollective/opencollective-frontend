@@ -264,7 +264,7 @@ export async function sendFailedEmail(order, lastAttempt) {
       order: order.info,
       collective: order.collective.info,
       fromCollective: order.fromCollective.minimal,
-      subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
+      subscriptionsLink: `/${order.fromCollective.slug}/subscriptions`,
     },
     {
       from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
@@ -291,7 +291,7 @@ export async function sendThankYouEmail(order, transaction) {
       recommendedCollectives,
       config: { host: config.host },
       interval: order.Subscription.interval,
-      subscriptionsLink: user.generateLoginLink(`/${order.fromCollective.slug}/subscriptions`),
+      subscriptionsLink: `/${order.fromCollective.slug}/subscriptions`,
     },
     {
       from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
