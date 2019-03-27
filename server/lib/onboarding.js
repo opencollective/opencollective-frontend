@@ -4,7 +4,7 @@ import models, { Op } from '../models';
 import Promise from 'bluebird';
 
 const emailOptions = {
-  from: 'Pia Mancini<pia@opencollective.com>',
+  from: 'Open Collective <support@opencollective.com>',
   type: 'onboarding',
 };
 
