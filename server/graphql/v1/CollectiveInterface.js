@@ -517,7 +517,6 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       image: { type: GraphQLString },
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
-      taxes: { type: GraphQLJSON },
       data: { type: GraphQLJSON },
       slug: { type: GraphQLString },
       path: { type: GraphQLString },
@@ -822,12 +821,6 @@ const CollectiveFields = () => {
     isPledged: {
       description: 'Defines if a collective is pledged',
       type: GraphQLBoolean,
-    },
-    taxes: {
-      type: GraphQLJSON,
-      resolve(collective) {
-        return collective.taxes || {};
-      },
     },
     data: {
       type: GraphQLJSON,
