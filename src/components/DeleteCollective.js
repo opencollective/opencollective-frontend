@@ -30,23 +30,15 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
     error: null,
   });
 
-  const handleDeleteCollective = async () => {
+  const handleDelete = async () => {
     try {
       setDeleteStatus({ ...deleteStatus, deleting: true });
-      await deleteCollective(collective.id);
-      await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
-    } catch (err) {
-      console.error('>>> deleteUserCollective error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-      setDeleteStatus({ deleting: false, error: errorMsg });
-    }
-  };
-
-  const handleDeleteUserCollective = async () => {
-    try {
-      setDeleteStatus({ ...deleteStatus, deleting: true });
-      await deleteUserCollective(collective.id);
-      logout();
+      if (collective.type === 'USER') {
+        await logout();
+        await deleteUserCollective(collective.id);
+      } else {
+        await deleteCollective(collective.id);
+      }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
       console.error('>>> deleteUserCollective error: ', JSON.stringify(err));
@@ -111,12 +103,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
             buttonStyle="primary"
             onClick={() => {
               setShowModal(false);
-
-              if (collective.type === 'USER') {
-                handleDeleteUserCollective();
-              } else {
-                handleDeleteCollective();
-              }
+              handleDelete();
             }}
           >
             <FormattedMessage id="collective.delete.confirm.btn" defaultMessage={'Delete'} />
