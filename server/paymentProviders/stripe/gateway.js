@@ -237,3 +237,16 @@ export const extractFees = balance => {
   });
   return fees;
 };
+
+/**
+ * Returns true if token is a valid stripe test token.
+ * See https://stripe.com/docs/testing#cards
+ */
+export const isTestToken = token => {
+  return [
+    'tok_bypassPending',
+    'tok_chargeDeclined',
+    'tok_chargeDeclinedExpiredCard',
+    'tok_chargeDeclinedProcessingError',
+  ].includes(token);
+};

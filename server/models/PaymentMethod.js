@@ -181,13 +181,7 @@ export default function(Sequelize, DataTypes) {
               throw new Error(`${instance.service} payment method requires a token`);
             }
             if (instance.service === 'stripe' && !instance.token.match(/^(tok|src)_[a-zA-Z0-9]{24}/)) {
-              if (
-                process.env.NODE_ENV !== 'production' &&
-                instance.token === 'tok_bypassPending' &&
-                instance.data.expMonth === 11 &&
-                instance.data.expYear === 23 &&
-                instance.data.zip === 10014
-              ) {
+              if (process.env.NODE_ENV !== 'production' && stripe.isTestToken(instance.token)) {
                 // test token for end to end tests
               } else {
                 throw new Error(`Invalid Stripe token ${instance.token}`);

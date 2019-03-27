@@ -213,9 +213,15 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
   /* Little helper function that returns the stub with a given
    * value. */
   const factory = name => async () => values[name];
-  sandbox.stub(stripeGateway, 'createCustomer').callsFake(factory('customer'));
   sandbox.stub(stripeGateway, 'createToken').callsFake(factory('token'));
   sandbox.stub(stripeGateway, 'createCharge').callsFake(factory('charge'));
+  sandbox.stub(stripeGateway, 'createCustomer').callsFake(async (account, token) => {
+    if (token.startsWith('tok_chargeDeclined')) {
+      throw new Error('Your card was declined.');
+    }
+
+    return values.customer;
+  });
 }
 
 export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0, stripeFee = 0) {

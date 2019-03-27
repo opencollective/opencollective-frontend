@@ -463,11 +463,19 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         await orderCreated.setPaymentMethod(order.paymentMethod);
       }
       // also adds the user as a BACKER of collective
-      await libPayments.executeOrder(
-        remoteUser || user,
-        orderCreated,
-        pick(order, ['hostFeePercent', 'platformFeePercent']),
-      );
+      try {
+        await libPayments.executeOrder(
+          remoteUser || user,
+          orderCreated,
+          pick(order, ['hostFeePercent', 'platformFeePercent']),
+        );
+      } catch (e) {
+        // Don't save new card for user if order failed
+        if (!order.paymentMethod.id && !order.paymentMethod.uuid) {
+          await orderCreated.paymentMethod.update({ CollectiveId: null });
+        }
+        throw e;
+      }
     } else if (!paymentRequired && order.interval && collective.type === types.COLLECTIVE) {
       // create inactive subscription to hold the interval info for the pledge
       const subscription = await models.Subscription.create({
