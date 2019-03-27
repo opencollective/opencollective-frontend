@@ -3,16 +3,8 @@ import '../../server/env';
 
 import Promise from 'bluebird';
 import models, { Op } from '../../server/models';
-import emailLib from '../../server/lib/email';
 import { get } from 'lodash';
-import { templateNames } from '../../server/lib/emailTemplates';
-
-let totalCollectives = 0;
-
-const emailOptions = {
-  from: 'Pia Mancini<pia@opencollective.com',
-  type: 'onboarding',
-};
+import { processOnBoardingTemplate } from '../../server/lib/onboarding';
 
 const XDaysAgo = days => {
   const d = new Date();
@@ -66,46 +58,3 @@ Promise.all([
   console.log('>>> all done');
   process.exit(0);
 });
-
-async function processOnBoardingTemplate(template, startsAt, filter = () => true) {
-  const endsAt = new Date(startsAt.getFullYear(), startsAt.getMonth(), startsAt.getDate() + 1);
-  console.log(`\n>>> ${template} (from ${startsAt.toString()} to ${endsAt.toString()})`);
-
-  return models.Collective.findAll({
-    where: {
-      type: 'COLLECTIVE',
-      isActive: true,
-      createdAt: { [Op.gte]: startsAt, [Op.lt]: endsAt },
-    },
-  })
-    .tap(collectives => console.log(`${template}> processing ${collectives.length} collectives`))
-    .filter(filter)
-    .tap(collectives => console.log(`${template}> processing ${collectives.length} collectives after filter`))
-    .map(c => processCollective(c, template))
-    .then(() => {
-      console.log(`${totalCollectives} collectives processed.`);
-    })
-    .catch(e => {
-      console.log('>>> error caught', e);
-    });
-}
-
-async function processCollective(collective, template) {
-  totalCollectives++;
-  console.log('-', collective.slug);
-  const users = await collective.getAdminUsers();
-  const unsubscribers = await models.Notification.getUnsubscribersUserIds('onboarding', collective.id);
-  const recipients = users.filter(u => u && unsubscribers.indexOf(u.id) === -1).map(u => u.email);
-  if (!recipients || recipients.length === 0) {
-    return;
-  }
-  if ((collective.tags || []).includes('opensource') && templateNames.includes(`${template}.opensource`)) {
-    template = `${template}.opensource`;
-  }
-  console.log(`>>> Sending ${template} email to the ${recipients.length} admin(s) of`, collective.slug);
-  return Promise.map(recipients, recipient =>
-    emailLib.send(template, recipient, { collective }, emailOptions).catch(e => {
-      console.warn('Unable to send email to ', collective.slug, recipient, 'error:', e);
-    }),
-  );
-}
