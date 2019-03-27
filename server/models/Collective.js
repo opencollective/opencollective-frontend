@@ -273,6 +273,12 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.JSON,
       },
 
+      isPledged: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+
       data: {
         type: DataTypes.JSON,
         allowNull: true,

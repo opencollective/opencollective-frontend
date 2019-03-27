@@ -819,6 +819,10 @@ const CollectiveFields = () => {
         return collective.settings || {};
       },
     },
+    isPledged: {
+      description: 'Defines if a collective is pledged',
+      type: GraphQLBoolean,
+    },
     taxes: {
       type: GraphQLJSON,
       resolve(collective) {

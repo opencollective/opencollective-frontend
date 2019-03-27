@@ -4,6 +4,7 @@ import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
 import { parseToBoolean } from '../../lib/utils';
 import { fetchLedgerTransactionsGroupedByLegacyIds, parseLedgerTransactions } from '../../lib/ledger';
+import DbQueries from '../../lib/queries';
 
 import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
 
@@ -737,6 +738,10 @@ const queries = {
         description: 'Only return active collectives',
         type: GraphQLBoolean,
       },
+      isPledged: {
+        description: 'Only return pledged or non-pledged collectives',
+        type: GraphQLBoolean,
+      },
       memberOfCollectiveSlug: {
         type: GraphQLString,
         description: 'Fetch all collectives that `memberOfCollectiveSlug` is a member of',
@@ -802,6 +807,7 @@ const queries = {
       if (args.type) query.where.type = args.type;
       if (args.tags) query.where.tags = { [Op.overlap]: args.tags };
       if (typeof args.isActive === 'boolean') query.where.isActive = args.isActive;
+      if (typeof args.isPledged === 'boolean') query.where.isPledged = args.isPledged;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId || args.tags)) {
         const { total, collectives } = await rawQueries.getCollectivesWithBalance(query.where, args);
@@ -890,6 +896,14 @@ const queries = {
         offset: args.offset,
       };
     },
+  },
+
+  /**
+   * Helper to get all tags used in collectives
+   */
+  allCollectiveTags: {
+    type: new GraphQLList(GraphQLString),
+    resolve: DbQueries.getUniqueCollectiveTags,
   },
 
   /*
