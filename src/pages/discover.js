@@ -13,13 +13,14 @@ import Link from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 
-import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
+
+import CollectiveCard from '../components/CollectiveCard';
 import PledgedCollectiveCard from '../components/PledgeCollectiveCard';
 
 const NavList = styled(Flex)`
@@ -36,7 +37,7 @@ const SelectWrapper = styled.select`
 
 const Nava = styled.a`
   color: grey;
-  fo :hover {
+  :hover {
     color: blue;
     cursor: pointer;
   }
@@ -47,12 +48,10 @@ const SearchFormContainer = styled(Box)`
   padding: 64px;
 `;
 const SearchInput = styled(Box)`
-  && {
-    appearance: none;
-    background-color: white;
-    font-size: 1.2rem;
-    letter-spacing: 0.1rem;
-  }
+  appearance: none;
+  background-color: white;
+  font-size: 1.2rem;
+  letter-spacing: 0.1rem;
 `;
 
 const _transformData = collective => ({
@@ -117,6 +116,12 @@ const DiscoverPage = ({ router }) => {
     });
   };
 
+  const collectiveChecks = {};
+
+  collectiveChecks.isPledge = () => router.asPath.includes('/discover?offset=0&show=pledged');
+  collectiveChecks.isOpenSource = () => router.asPath.includes('/discover?offset=0&show=open%20source');
+  collectiveChecks.isOther = () => router.asPath.includes('/discover?offset=0&show=other');
+
   return (
     <Page title="Discover">
       {({ LoggedInUser }) => (
@@ -161,21 +166,21 @@ const DiscoverPage = ({ router }) => {
                 <Box as="li" px={3}>
                   <Link href="/discover" passHref scroll={false}>
                     <Nava>
-                      <FormattedMessage id="menu.allCollectives" defaultMessage="All collectives" />
+                      <FormattedMessage id="menu.allCollectives" defaultMessage="All Collectives" />
                     </Nava>
                   </Link>
                 </Box>
                 <Box as="li" px={3}>
                   <Link href="/discover?offset=0&show=open%20source" passHref scroll={false}>
                     <Nava>
-                      <FormattedMessage id="menu.openSourceCollectives" defaultMessage="Open source collectives" />
+                      <FormattedMessage id="menu.openSourceCollectives" defaultMessage="OpenSource Collectives" />
                     </Nava>
                   </Link>
                 </Box>
                 <Box as="li" px={3}>
-                  <Link href="/discover?offset=0&show=open%20source" passHref scroll={false}>
+                  <Link href="/discover?offset=0&show=pledged" passHref scroll={false}>
                     <Nava>
-                      <FormattedMessage id="menu.pledgedCollective" defaultMessage="Pledged collectives" />
+                      <FormattedMessage id="menu.pledgedCollective" defaultMessage="Pledged Collectives" />
                     </Nava>
                   </Link>
                 </Box>
@@ -206,9 +211,11 @@ const DiscoverPage = ({ router }) => {
                   {collectives.map(c => {
                     return (
                       <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                        <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
-
-                        <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                        {collectiveChecks.isPledge() ? (
+                          <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                        ) : (
+                          <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                        )}
                       </Flex>
                     );
                   })}
