@@ -52,21 +52,43 @@ const getPaymentMethodIcon = (pm, collective) => {
   }
 };
 
+/** Returns payment method's subtitles */
 const getPaymentMethodMetadata = pm => {
   const expiryDate = paymentMethodExpiration(pm);
   if (pm.type === 'creditcard') {
-    return `Expires on ${expiryDate}`;
+    return (
+      <FormattedMessage
+        id="ContributePayment.expiresOn"
+        defaultMessage="Expires on {expiryDate}"
+        values={{ expiryDate }}
+      />
+    );
   } else if (pm.type === 'virtualcard') {
-    const balanceLeft = `${formatCurrency(pm.balance, pm.balance.curency)} left`;
     if (expiryDate) {
-      return `${balanceLeft}, expires on ${expiryDate}`;
+      return (
+        <FormattedMessage
+          id="ContributePayment.balanceAndExpiry"
+          defaultMessage="{balance} left, expires on {expiryDate}"
+          values={{ expiryDate, balance: formatCurrency(pm.balance, pm.currency) }}
+        />
+      );
     } else {
-      return balanceLeft;
+      return (
+        <FormattedMessage
+          id="ContributePayment.balanceLeft"
+          defaultMessage="{balance} left"
+          values={{ balance: formatCurrency(pm.balance, pm.currency) }}
+        />
+      );
     }
-  } else if (pm.type === 'prepaid') {
-    return `${formatCurrency(pm.balance, pm.balance.curency)} left`;
-  } else if (pm.type === 'collective') {
-    return `${formatCurrency(pm.balance, pm.balance.curency)} available`;
+  } else if (['prepaid', 'collective'].includes(pm.type)) {
+    return (
+      <FormattedMessage
+        id="ContributePayment.balanceLeft"
+        defaultMessage="{balance} left"
+        values={{ balance: formatCurrency(pm.balance, pm.currency) }}
+      />
+    );
   }
 };
 
@@ -206,6 +228,7 @@ class ContributePayment extends React.Component {
 
   render() {
     const { paymentMethodsOptions, errors } = this.state;
+
     return (
       <StyledCard width={1} maxWidth={500} mx="auto">
         <StyledRadioList
