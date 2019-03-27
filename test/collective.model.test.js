@@ -340,7 +340,7 @@ describe('Collective model', () => {
     await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
     // utils.inspectSpy(sendEmailSpy, 3);
     expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
-    expect(sendEmailSpy.firstCall.args[1]).to.equal('Welcome to Open Collective 🙌');
+    expect(sendEmailSpy.firstCall.args[1]).to.equal('Your Organization on Open Collective');
     expect(sendEmailSpy.firstCall.args[2]).to.contain('Discover');
   });
 

@@ -762,7 +762,7 @@ describe('Mutation Tests', () => {
           expect(emailSendMessageSpy.callCount).to.equal(2);
           // utils.inspectSpy(emailSendMessageSpy, 2);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal('user2@opencollective.com');
-          expect(emailSendMessageSpy.firstCall.args[1]).to.equal('Welcome to Open Collective 🙌');
+          expect(emailSendMessageSpy.firstCall.args[1]).to.equal('Your Organization on Open Collective');
           expect(emailSendMessageSpy.secondCall.args[0]).to.equal('user1@opencollective.com');
           expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Google joined Scouts d'Arlon as backer");
           expect(emailSendMessageSpy.secondCall.args[2]).to.contain('Looking forward!'); // publicMessage
