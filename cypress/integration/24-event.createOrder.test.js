@@ -65,7 +65,6 @@ describe('event.createOrder page', () => {
     cy.contains('button', 'Next step').click();
     cy.useAnyPaymentMethod();
     cy.contains('button', 'Next step').click();
-    cy.wait(300);
 
     // Check step summary
     cy.contains('.breakdown-line', 'Item price').contains('€10.00');
@@ -73,14 +72,17 @@ describe('event.createOrder page', () => {
     cy.contains('.breakdown-line', 'Your contribution').contains('€80.00');
 
     // Algeria should not have taxes
+    cy.wait(500);
     cy.get('div[name=country]').click();
-    cy.contains('ul[role=listbox] li', 'Algeria').click({ force: true });
+    cy.wait(250);
+    cy.contains('ul[role=listbox] li', 'Algeria').click();
     cy.contains('.breakdown-line', 'VAT').contains('+ €0.00');
     cy.contains('.breakdown-line', 'TOTAL').contains('€80.00');
     cy.contains('button', 'Make contribution').should('not.be.disabled');
 
     // French should have taxes
     cy.get('div[name=country]').click();
+    cy.wait(250);
     cy.get('ul[role=listbox] > div').scrollTo(0, 2250);
     cy.contains('ul[role=listbox] li', 'France - FR').click();
     cy.contains('.breakdown-line', 'VAT').contains('+ €16.80');
@@ -120,6 +122,7 @@ describe('event.createOrder page', () => {
     // However if it's the same country than the collective than VAT should still apply,
     // even if the contributor is an organization
     cy.get('div[name=country]').click();
+    cy.wait(250);
     cy.get('ul[role=listbox] > div').scrollTo(0, 500);
     cy.contains('ul[role=listbox] li', 'Belgium - BE').click();
     cy.contains('.breakdown-line', 'VAT').contains('+ €16.80');
