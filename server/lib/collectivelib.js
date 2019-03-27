@@ -13,6 +13,8 @@ export const collectiveSlugBlacklist = [
   'donate',
   'edit',
   'expenses',
+  'event',
+  'events',
   'faq',
   'gift-card',
   'gift-cards',
