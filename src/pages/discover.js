@@ -97,7 +97,7 @@ function useCollectives(query) {
 
 const DiscoverPage = ({ router }) => {
   const { query } = router;
-  const { collectives, offset, total, show, sort, tags = [] } = useCollectives(query);
+  const { collectives, offset, total, show, tags = [] } = useCollectives(query);
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
 
@@ -109,12 +109,12 @@ const DiscoverPage = ({ router }) => {
     });
   };
 
-  const onLoadCollectives = (e, value) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, offset: 0, show: value },
-    });
-  };
+  // const onLoadCollectives = (e, value) => {
+  // router.push({
+  // pathname: router.pathname,
+  // query: { ...router.query, offset: 0, show: value },
+  // });
+  // };
 
   const collectiveChecks = {};
 
