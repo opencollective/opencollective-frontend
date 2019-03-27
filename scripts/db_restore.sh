@@ -85,3 +85,7 @@ echo "DB restored to postgres://localhost/${LOCALDBNAME}"
   psql "${LOCALDBNAME}" -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${LOCALDBUSER};"
 
 } | tee >/dev/null
+
+# Note: I have to run after this script:
+# $> psql opencollective_test -c "REASSIGN OWNED BY xdamman TO opencollective;"
+# Because the views created by the CIS extension are not owned by the opencollective user
