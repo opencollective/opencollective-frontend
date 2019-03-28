@@ -963,7 +963,6 @@ const collectiveFields = `
     id
     name
     settings
-    taxes
     location {
       country
     }
