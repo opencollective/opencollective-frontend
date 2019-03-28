@@ -524,6 +524,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       isHost: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
       isArchived: { type: GraphQLBoolean },
+      isDeletable: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
@@ -862,6 +863,30 @@ const CollectiveFields = () => {
       type: GraphQLBoolean,
       resolve(collective) {
         return Boolean(collective.deactivatedAt && !collective.isActive);
+      },
+    },
+    isDeletable: {
+      description: 'Returns whether this collective is deletable',
+      type: GraphQLBoolean,
+      async resolve(collective) {
+        const transactionCount = await models.Transaction.count({
+          where: {
+            [Op.or]: [{ CollectiveId: collective.id }, { FromCollectiveId: collective.id }],
+          },
+        });
+        const orderCount = await models.Order.count({
+          where: {
+            [Op.or]: [{ CollectiveId: collective.id }, { FromCollectiveId: collective.id }],
+          },
+        });
+        const expenseCount = await models.Expense.count({
+          where: { CollectiveId: collective.id, status: 'PAID' },
+        });
+
+        if (transactionCount > 0 || orderCount > 0 || expenseCount > 0) {
+          return false;
+        }
+        return true;
       },
     },
     host: {
