@@ -29,8 +29,20 @@ class ConfirmCollectiveDeletion extends Component {
     return {};
   }
 
+  getCollectiveType(type) {
+    switch (type) {
+      case 'ORGANIZATION':
+        return 'organization';
+      case 'COLLECTIVE':
+        return 'collective';
+      default:
+        return 'account';
+    }
+  }
+
   render() {
     const { type } = this.props;
+    const collectiveType = this.getCollectiveType(type);
 
     return (
       <Page title="Deletion Confirmation">
@@ -39,7 +51,7 @@ class ConfirmCollectiveDeletion extends Component {
             <Icon size="60" />
           </Flex>
           <H3 as="h1" fontWeight="800">
-            Your {type === 'USER' ? 'account' : 'collective'} has been deleted.
+            Your {collectiveType} has been deleted.
           </H3>
           {type === 'USER' ? (
             <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
@@ -47,7 +59,8 @@ class ConfirmCollectiveDeletion extends Component {
             </P>
           ) : (
             <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
-              We&apos;ve deleted your collective, expenses, members, tiers and all related entities to this collective.
+              We&apos;ve deleted your {collectiveType}, expenses, members, tiers and all related entities to this{' '}
+              {collectiveType}.
             </P>
           )}
         </Container>
