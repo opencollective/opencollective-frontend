@@ -307,7 +307,7 @@ export async function createCollectiveFromGithub(_, args, req) {
   collectiveData.currency = 'USD';
   collectiveData.CreatedByUserId = user.id;
   collectiveData.LastEditedByUserId = user.id;
-  collectiveData.teirs = [
+  collectiveData.tiers = [
     {
       name: 'backer',
       title: 'Backers',
