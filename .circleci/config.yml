@@ -93,7 +93,6 @@ jobs:
       - <<: *restore_npm_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - <<: *persist_npm_cache
-      - run: npm run build:langs
       - run: ./scripts/check_translations.sh
 
   build:
