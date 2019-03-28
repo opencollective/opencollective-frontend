@@ -32,12 +32,10 @@ class ConfirmCollectiveDeletion extends Component {
 
   constructor(props) {
     super(props);
-    this.props.logout();
+    if (props.type === 'USER') {
+      this.props.logout();
+    }
   }
-
-  // async componentDidMount () {
-  //   await
-  // }
 
   getCollectiveType(type) {
     switch (type) {

@@ -471,7 +471,11 @@ export const addDeleteEventCollectiveMutation = graphql(deleteEventCollectiveQue
 export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
   props: ({ mutate }) => ({
     deleteCollective: async id => {
-      return await mutate({ variables: { id } });
+      return await mutate({
+        variables: { id },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
+      });
     },
   }),
 });

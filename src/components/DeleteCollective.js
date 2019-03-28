@@ -22,7 +22,7 @@ const getCollectiveType = type => {
   }
 };
 
-const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, logout }) => {
+const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, ...props }) => {
   const collectiveType = getCollectiveType(collective.type);
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({
@@ -37,6 +37,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         await deleteUserCollective(collective.id);
       } else {
         await deleteCollective(collective.id);
+        await props.refetchLoggedInUser();
       }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
