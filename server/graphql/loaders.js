@@ -321,6 +321,17 @@ export const loaders = req => {
           order: [['createdAt', 'DESC']],
         }).then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', [])),
       ),
+      findPendingOrdersForCollective: new DataLoader(CollectiveIds => {
+        return models.Order.findAll({
+          where: {
+            CollectiveId: { [Op.in]: CollectiveIds },
+            status: 'PENDING',
+          },
+          order: [['createdAt', 'DESC']],
+        }).then(results => {
+          return sortResults(CollectiveIds, results, 'CollectiveId', []);
+        });
+      }),
       stats: {
         transactions: new DataLoader(ids =>
           models.Transaction.findAll({
