@@ -329,7 +329,7 @@
   "editCollective.menu.export": "Exporter",
   "editCollective.menu.advanced": "Avancé",
   "virtualCards.returnToEdit": "Retour à la liste des cartes cadeaux",
-  "collective.edit.backToProfile": "ou retourner à la page précédente",
+  "collective.edit.backToProfile": "voir la page {type}",
   "collective.connectedAccounts.reconnect.button": "Reconnecter",
   "collective.create.connectedAccounts.stripe.description": "Connect a Stripe account to create collectives and start accepting donations.",
   "collective.connectedAccounts.stripe.connected": "Compte Stripe account connecté le {createdAt, date, short}",
