@@ -131,7 +131,7 @@
   "host.apply.create.btn": "Postuler pour créer un collectif",
   "host.hostFee.help": "Les frais de l’hôte sont les frais que l’hôte facture à votre collectif pour prendre en charge le fait de payer les frais qui ont été approuvés et de prendre soin d’enregistrer toutes les transactions dans leurs livres pour se conformer aux autorités fiscales locales.",
   "host.tos": "Conditions d'utilisation",
-  "host.apply.btn": "Appliquer pour héberger votre collectif {collective}",
+  "host.apply.btn": "Postuler pour héberger votre collectif {collective}",
   "host.apply.pending": "Demande en attente pour {collective}",
   "subscription.cancel.btn": "oui",
   "collective.created": "Votre collectif a été créé avec succès.",
