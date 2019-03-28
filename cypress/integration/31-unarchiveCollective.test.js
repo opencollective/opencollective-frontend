@@ -15,7 +15,7 @@ describe('Unarchive collective', () => {
           .contains('button', 'Archive')
           .click();
         cy.wait(500);
-        cy.contains('The organization was successfully archived.');
+        cy.contains('This organization has been archived');
         // Unarchive collective
         cy.contains('button', 'Unarchive this organization').click();
         cy.get('.confirm-ArchiveCollective')
