@@ -269,10 +269,6 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.JSON,
       },
 
-      taxes: {
-        type: DataTypes.JSON,
-      },
-
       isPledged: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
