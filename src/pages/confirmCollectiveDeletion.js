@@ -6,6 +6,7 @@ import { themeGet } from 'styled-system';
 import { Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import Page from '../components/Page';
+import { withUser } from '../components/UserProvider';
 import { H3, P } from '../components/Text';
 import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane';
 
@@ -28,6 +29,15 @@ class ConfirmCollectiveDeletion extends Component {
     }
     return {};
   }
+
+  constructor(props) {
+    super(props);
+    this.props.logout();
+  }
+
+  // async componentDidMount () {
+  //   await
+  // }
 
   getCollectiveType(type) {
     switch (type) {
@@ -71,6 +81,7 @@ class ConfirmCollectiveDeletion extends Component {
 
 ConfirmCollectiveDeletion.propTypes = {
   type: PropTypes.string.isRequired,
+  logout: PropTypes.func,
 };
 
-export default ConfirmCollectiveDeletion;
+export default withUser(ConfirmCollectiveDeletion);

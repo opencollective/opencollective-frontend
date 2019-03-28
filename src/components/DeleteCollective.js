@@ -35,7 +35,6 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
       setDeleteStatus({ ...deleteStatus, deleting: true });
       if (collective.type === 'USER') {
         await deleteUserCollective(collective.id);
-        await logout();
       } else {
         await deleteCollective(collective.id);
       }
