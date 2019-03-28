@@ -1072,10 +1072,12 @@ const CollectiveFields = () => {
       args: {
         status: { type: OrderStatusType },
       },
-      resolve(collective, args = {}) {
+      resolve(collective, args = {}, req) {
         const where = {};
 
-        if (args.status) {
+        if (args.status === 'PENDING') {
+          return req.loaders.orders.findPendingOrdersForCollective.load(collective.id);
+        } else if (args.status) {
           where.status = args.status;
         } else {
           where.processedAt = { [Op.ne]: null };
