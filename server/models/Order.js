@@ -91,9 +91,6 @@ export default function(Sequelize, DataTypes) {
 
       publicMessage: {
         type: DataTypes.STRING,
-        validate: {
-          len: [1, 240],
-        },
       },
 
       privateMessage: DataTypes.STRING,

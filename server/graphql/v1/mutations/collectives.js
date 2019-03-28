@@ -600,6 +600,7 @@ export async function claimCollective(_, args, req) {
   collective = await collective.update({
     CreatedByUserId: req.remoteUser.id,
     LastEditedByUserId: req.remoteUser.id,
+    isPledged: false,
   });
 
   // add opensource collective as host
