@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Mar 20 2019 12:32:04 GMT+0100 (GMT+01:00)
+# timestamp: Thu Mar 28 2019 12:48:57 GMT+0100 (GMT+01:00)
 
 """Application model"""
 type Application {
@@ -58,7 +58,7 @@ type Collective implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -72,7 +72,9 @@ type Collective implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -222,7 +224,7 @@ interface CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, country, lat, long of the location."""
   location: LocationType
@@ -236,7 +238,6 @@ interface CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
   data: JSON
   slug: String
   path: String
@@ -360,9 +361,7 @@ type CollectivesStatsType {
   """Returns the collectives hosted by this collective"""
   hosted: Int
 
-  """
-  Returns the number of collectives that have this collective has parent
-  """
+  """Returns the number of collectives that have this collective has parent"""
   memberOf: Int
 
   """Returns the number of events that have this collective has parent"""
@@ -495,7 +494,7 @@ type Event implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -509,7 +508,9 @@ type Event implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -807,11 +808,11 @@ type Mutation {
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
-  archiveCollective(id: Int!): CollectiveInterface
-  unarchiveCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
+  archiveCollective(id: Int!): CollectiveInterface
+  unarchiveCollective(id: Int!): CollectiveInterface
 
   """Create a user with an optional organization."""
   createUser(
@@ -1156,6 +1157,9 @@ type OrderType {
 
   """Current status for an order"""
   status: OrderStatus
+
+  """Additional information on order: tax"""
+  data: JSON
 }
 
 """This represents a Organization Collective"""
@@ -1172,7 +1176,7 @@ type Organization implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -1186,7 +1190,9 @@ type Organization implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -1446,6 +1452,9 @@ type Query {
     """Only return active collectives"""
     isActive: Boolean
 
+    """Only return pledged or non-pledged collectives"""
+    isPledged: Boolean
+
     """Fetch all collectives that `memberOfCollectiveSlug` is a member of"""
     memberOfCollectiveSlug: String
 
@@ -1479,6 +1488,7 @@ type Query {
     limit: Int = 10
     offset: Int = 0
   ): CollectiveSearchResults
+  allCollectiveTags: [String]
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -1770,7 +1780,7 @@ type User implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -1784,7 +1794,9 @@ type User implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
