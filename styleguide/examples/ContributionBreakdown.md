@@ -1,3 +1,8 @@
+```jsx noeditor
+// See https://github.com/styleguidist/react-styleguidist/issues/1278
+import { creditCard } from '../mocks/payment_methods';
+```
+
 ### Don't show payment method fees (contribution flow's default)
 
 ```js
@@ -29,7 +34,7 @@ initialState = { countryISO: 'BE' };
 Folowing example is resizable.
 
 ```js
-const { creditCard } = require('../mocks/payment_methods');
+import { creditCard } from '../mocks/payment_methods';
 initialState = { countryISO: 'FR' };
 <div
   style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', minWidth: '100px', maxWidth: '95%' }}
@@ -53,7 +58,7 @@ initialState = { countryISO: 'FR' };
 ### Without tax
 
 ```js
-const { creditCard } = require('../mocks/payment_methods');
+import { creditCard } from '../mocks/payment_methods';
 <ContributionBreakdown amount={500000} currency="USD" hostFeePercent={5} paymentMethod={creditCard} />;
 ```
 
@@ -71,6 +76,6 @@ Paypal fee cannot be guessed in advance, so we prepend a `~` to the amount to sh
 the user that we're not sure about this one.
 
 ```js
-const { paypal } = require('../mocks/payment_methods');
+import { paypal } from '../mocks/payment_methods';
 <ContributionBreakdown amount={500000} currency="USD" paymentMethod={paypal} />;
 ```
