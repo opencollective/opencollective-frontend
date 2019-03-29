@@ -19,10 +19,10 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
     processing: false,
     isArchived: collective.isArchived,
     error: null,
-    confirmationMesg: '',
+    confirmationMsg: '',
   });
 
-  const { processing, isArchived, error, confirmationMesg } = archiveStatus;
+  const { processing, isArchived, error, confirmationMsg } = archiveStatus;
   const handleArchiveCollective = async ({ archiveCollective, id }) => {
     setModal({ type: 'Archive', show: false });
     try {
@@ -32,7 +32,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         ...archiveStatus,
         processing: false,
         isArchived: true,
-        confirmationMesg: `The ${collectiveType.toLowerCase()} was successfully archived`,
+        // confirmationMsg: `The ${collectiveType.toLowerCase()} was successfully archived`,
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
@@ -50,7 +50,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         ...archiveStatus,
         processing: false,
         isArchived: false,
-        confirmationMesg: `The ${collectiveType.toLowerCase()} was successfully unarchived`,
+        // confirmationMsg: `The ${collectiveType.toLowerCase()} was successfully unarchived`,
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
@@ -65,7 +65,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         <FormattedMessage
           values={{ type: collectiveType }}
           id="collective.archive.title"
-          defaultMessage={'Archive this {type}.'}
+          defaultMessage={'Archive this {type}'}
         />
       </H2>
       {!isArchived && (
@@ -73,8 +73,15 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.description"
-            defaultMessage={'Mark this {type} as archived, delete all tiers and cancel all subscriptions.'}
+            defaultMessage={'This will mark this {type} as archived.'}
           />
+          &nbsp;
+          {collective.type === 'COLLECTIVE' && (
+            <FormattedMessage
+              id="collective.archive.subscriptions"
+              defaultMessage={'Subscriptions will be automatically canceled next time they occurs.'}
+            />
+          )}
         </P>
       )}
       {error && <P color="#ff5252">{error}</P>}
@@ -92,21 +99,21 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           />
         </StyledButton>
       )}
-      {!isArchived && collective.stats.balance >= 0 && (
-        <P>
+      {!isArchived && collective.stats.balance > 0 && (
+        <P color="rgb(224, 183, 0)">
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.availableBalance"
             defaultMessage={
-              'This {type} has available balance, submit an expense for the remaining balance or transfer to another collective before archiving.'
+              "This {type} has a non-empty balance and can't be archived. To empty it, submit an expense or donate to another collective."
             }
           />
         </P>
       )}
-      {isArchived && confirmationMesg && (
+      {isArchived && confirmationMsg && (
         <MessageBox withIcon width={0.6} type="info" mb={4}>
           <FormattedMessage
-            values={{ message: confirmationMesg }}
+            values={{ message: confirmationMsg }}
             id="collective.archive.archivedConfirmMessage"
             defaultMessage={'{message}.'}
           />

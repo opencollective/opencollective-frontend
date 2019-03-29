@@ -55,7 +55,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         <FormattedMessage
           values={{ type: collectiveType }}
           id="collective.delete.title"
-          defaultMessage={'Delete this {type}.'}
+          defaultMessage={'Delete this {type}'}
         />
       </H2>
       <P>
@@ -63,7 +63,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.description"
           defaultMessage={
-            'This will delete {type} and delete all related data such as: memberships, payment methods etc.'
+            'This will delete {type} and delete all related data such as memberships, payment methods, etc.'
           }
         />
       </P>
@@ -81,11 +81,13 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         />
       </StyledButton>
       {!collective.isDeletable && (
-        <P>
+        <P color="rgb(224, 183, 0)">
           <FormattedMessage
             values={{ type: collectiveType }}
             id="collective.delete.isNotDeletable-message"
-            defaultMessage={'{type} with transcations, order or paid expense cannot be deleted.'}
+            defaultMessage={
+              '{type} with transactions, orders or paid expenses cannot be deleted. You can archive it instead.'
+            }
           />
         </P>
       )}
