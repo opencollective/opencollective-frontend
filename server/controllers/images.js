@@ -2,7 +2,7 @@ import path from 'path';
 import uuidv1 from 'uuid/v1';
 
 import errors from '../lib/errors';
-import knox from '../gateways/knox';
+import knox from '../lib/knox';
 
 // Use a 2 minutes timeout for image upload requests as the default 25 seconds
 // often leads to failing requests.
