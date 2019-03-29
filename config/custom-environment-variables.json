@@ -54,6 +54,11 @@
       "bucket": "AWS_S3_BUCKET"
     }
   },
+  "cloudflare": {
+    "key": "CLOUDFLARE_KEY",
+    "email": "CLOUDFLARE_EMAIL",
+    "zone": "CLOUDFLARE_ZONE"
+  },
   "paypal": {
     "classic": {
       "email": "PAYPAL_EMAIL",
