@@ -169,169 +169,168 @@ const getTiersQuery = gql`
   }
 `;
 
-export const getCollectiveToEditQueryFields = gql`
-  fragment CollectiveToEditFields on Collective {
+export const getCollectiveToEditQueryFields = `
+  id
+  type
+  slug
+  createdByUser {
     id
-    type
+  }
+  host {
+    id
+    createdAt
     slug
-    createdByUser {
-      id
-    }
-    host {
-      id
-      createdAt
-      slug
-      name
-      currency
-      image
-      backgroundImage
-      settings
-      description
-      website
-      twitterHandle
-      location {
-        country
-      }
-      stats {
-        id
-        collectives {
-          hosted
-        }
-      }
-    }
     name
-    company
+    currency
     image
     backgroundImage
-    description
-    longDescription
-    location {
-      name
-      address
-      country
-      lat
-      long
-    }
-    tags
-    twitterHandle
-    githubHandle
-    website
-    currency
     settings
-    createdAt
-    isActive
-    isArchived
-    isDeletable
-    isHost
-    hostFeePercent
-    expensePolicy
+    description
+    website
+    twitterHandle
+    location {
+      country
+    }
     stats {
       id
-      yearlyBudget
-      balance
-      backers {
-        all
+      collectives {
+        hosted
       }
-      totalAmountSpent
     }
-    tiers {
+  }
+  name
+  company
+  image
+  backgroundImage
+  description
+  longDescription
+  location {
+    name
+    address
+    country
+    lat
+    long
+  }
+  tags
+  twitterHandle
+  githubHandle
+  website
+  currency
+  settings
+  createdAt
+  isActive
+  isArchived
+  isDeletable
+  isHost
+  hostFeePercent
+  expensePolicy
+  stats {
+    id
+    yearlyBudget
+    balance
+    backers {
+      all
+    }
+    totalAmountSpent
+  }
+  tiers {
+    id
+    slug
+    type
+    name
+    description
+    amount
+    presets
+    interval
+    currency
+    maxQuantity
+  }
+  memberOf {
+    id
+    createdAt
+    role
+    stats {
+      totalDonations
+    }
+    tier {
       id
+      name
+    }
+    collective {
+      id
+      type
       slug
-      type
       name
-      description
-      amount
-      presets
-      interval
       currency
-      maxQuantity
-    }
-    memberOf {
-      id
-      createdAt
-      role
-      stats {
-        totalDonations
-      }
-      tier {
-        id
-        name
-      }
-      collective {
-        id
-        type
-        slug
-        name
-        currency
-        description
-        settings
-        image
-        stats {
-          id
-          backers {
-            all
-          }
-          yearlyBudget
-        }
-      }
-    }
-    members(roles: ["ADMIN", "MEMBER", "HOST"]) {
-      id
-      createdAt
-      role
       description
-      stats {
-        totalDonations
-      }
-      tier {
-        id
-        name
-      }
-      member {
-        id
-        name
-        image
-        slug
-        twitterHandle
-        description
-        ... on User {
-          email
-        }
-      }
-    }
-    paymentMethods(types: ["creditcard", "virtualcard", "prepaid"], hasBalanceAboveZero: true) {
-      id
-      uuid
-      name
-      data
-      monthlyLimitPerMember
-      service
-      type
-      balance
-      currency
-      expiryDate
-      orders(hasActiveSubscription: true) {
-        id
-      }
-    }
-    connectedAccounts {
-      id
-      service
-      username
-      createdAt
       settings
+      image
+      stats {
+        id
+        backers {
+          all
+        }
+        yearlyBudget
+      }
     }
+  }
+  members(roles: ["ADMIN", "MEMBER", "HOST"]) {
+    id
+    createdAt
+    role
+    description
+    stats {
+      totalDonations
+    }
+    tier {
+      id
+      name
+    }
+    member {
+      id
+      name
+      image
+      slug
+      twitterHandle
+      description
+      ... on User {
+        email
+      }
+    }
+  }
+  paymentMethods(types: ["creditcard", "virtualcard", "prepaid"], hasBalanceAboveZero: true) {
+    id
+    uuid
+    name
+    data
+    monthlyLimitPerMember
+    service
+    type
+    balance
+    currency
+    expiryDate
+    orders(hasActiveSubscription: true) {
+      id
+    }
+  }
+  connectedAccounts {
+    id
+    service
+    username
+    createdAt
+    settings
   }
 `;
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const getCollectiveToEditQuery = gql`
   query Collective($slug: String) {
     Collective(slug: $slug) {
-      ...CollectiveToEditFields
+      ${getCollectiveToEditQueryFields}
     }
   }
-  ${getCollectiveToEditQueryFields}
 `;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const getCollectiveQuery = gql`
   query Collective($slug: String) {

@@ -166,8 +166,8 @@ class GoalsCover extends React.Component {
     window.addEventListener('resize', this.updateGoals);
   }
 
-  componentDidUpdate() {
-    if (this.state.firstMount) {
+  componentDidUpdate(oldProps) {
+    if (this.state.firstMount || this.props.collective !== oldProps.collective) {
       this.updateGoals();
     }
   }

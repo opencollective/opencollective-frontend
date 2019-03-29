@@ -103,14 +103,15 @@ const createCollectiveFromGithubQuery = gql`
   }
 `;
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
-      ...CollectiveToEditFields
+      ${getCollectiveToEditQueryFields}
     }
   }
-  ${getCollectiveToEditQueryFields}
 `;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const deleteEventCollectiveQuery = gql`
   mutation deleteEventCollective($id: Int!) {
