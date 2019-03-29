@@ -1,4 +1,5 @@
 import React from 'react';
+import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
@@ -23,8 +24,12 @@ class Overlay extends React.Component {
   constructor(props) {
     super(props);
     this.renderMonth = this.renderMonth.bind(this);
+    this.renderYear = this.renderYear.bind(this);
     this.renderInvoice = this.renderInvoice.bind(this);
-    this.state = { year: new Date().getFullYear() };
+    this.state = {
+      year: new Date().getFullYear(),
+      isDisplayYearly: false,
+    };
   }
 
   arrayToFormOptions(arr) {
@@ -35,8 +40,7 @@ class Overlay extends React.Component {
     });
   }
 
-  renderInvoiceLabel(invoice, isLoading) {
-    const { totalAmount, currency, host } = invoice;
+  renderInvoiceLabel(isLoading, totalAmount, currency, host) {
     const formattedAmount = formatCurrency(totalAmount, currency, { precision: 0 });
     const image = isLoading
       ? '/static/images/loading.gif'
@@ -48,7 +52,7 @@ class Overlay extends React.Component {
     );
   }
 
-  renderInvoice(invoice) {
+  renderInvoice(invoice, dateFrom, dateTo, totalAmount) {
     return (
       <div className="invoice" key={invoice.slug}>
         <style jsx>
@@ -63,13 +67,38 @@ class Overlay extends React.Component {
         </style>
         <InvoiceDownloadLink
           type="invoice"
-          fromCollectiveSlug={this.props.fromCollectiveSlug}
+          fromCollectiveSlug={invoice.fromCollective.slug}
+          toCollectiveSlug={invoice.host.slug}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
           invoice={invoice}
-          viewLoading={() => this.renderInvoiceLabel(invoice, true)}
+          viewLoading={() => this.renderInvoiceLabel(true, totalAmount, invoice.currency, invoice.host)}
         >
-          {this.renderInvoiceLabel(invoice, false)}
+          {this.renderInvoiceLabel(false, totalAmount, invoice.currency, invoice.host)}
         </InvoiceDownloadLink>
       </div>
+    );
+  }
+  renderYear(year) {
+    const invoices = this.props.data.allInvoices.filter(i => Number(i.year) === Number(year));
+
+    const total = invoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0);
+    const dateFrom = moment(year, 'YYYY').toISOString();
+    const dateTo = moment(year + 1, 'YYYY').toISOString();
+    return (
+      invoices.length > 0 && (
+        <div key={`${this.state.year}-${year}`}>
+          <style jsx>
+            {`
+              h2 {
+                font-size: 1.8rem;
+              }
+            `}
+          </style>
+          <h2>{year}</h2>
+          {this.renderInvoice(invoices[0], dateFrom, dateTo, total)}
+        </div>
+      )
     );
   }
 
@@ -77,19 +106,23 @@ class Overlay extends React.Component {
     const invoices = this.props.data.allInvoices.filter(
       i => Number(i.year) === Number(this.state.year) && Number(i.month) === Number(month),
     );
+    const dateFrom = moment(`${this.state.year}${month}`, 'YYYYMM').toISOString();
+    const dateTo = moment(`${this.state.year}${month + 1}`, 'YYYYMM').toISOString();
     const month2digit = month < 10 ? `0${month}` : month;
     return (
-      <div key={`${this.state.year}-${month}`}>
-        <style jsx>
-          {`
-            h2 {
-              font-size: 1.8rem;
-            }
-          `}
-        </style>
-        <h2>{moment(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
-        {invoices.map(this.renderInvoice)}
-      </div>
+      invoices.length > 0 && (
+        <div key={`${this.state.year}-${month}`}>
+          <style jsx>
+            {`
+              h2 {
+                font-size: 1.8rem;
+              }
+            `}
+          </style>
+          <h2>{moment(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
+          {this.renderInvoice(invoices[0], dateFrom, dateTo, invoices[0].totalAmount)}
+        </div>
+      )
     );
   }
 
@@ -113,15 +146,30 @@ class Overlay extends React.Component {
 
     return (
       <Popover id="downloadInvoicesPopover" title="Download invoices" {...forwardedProps}>
-        {years.length > 1 && (
+        <ul className="nav nav-tabs">
+          <li
+            role="presentation"
+            onClick={() => this.setState({ isDisplayYearly: false })}
+            className={classnames({ active: !this.state.isDisplayYearly })}
+          >
+            <a>Monthly</a>
+          </li>
+          <li
+            role="presentation"
+            onClick={() => this.setState({ isDisplayYearly: true })}
+            className={classnames({ active: this.state.isDisplayYearly })}
+          >
+            <a>Yearly</a>
+          </li>
+        </ul>
+        {this.state.isDisplayYearly && years.length > 1 && (
           <InputField
             type="select"
             options={this.arrayToFormOptions(years)}
             onChange={year => this.setState({ year })}
           />
         )}
-
-        <div>{months.map(this.renderMonth)}</div>
+        <div>{this.state.isDisplayYearly ? years.map(this.renderYear) : months.map(this.renderMonth)}</div>
       </Popover>
     );
   }
@@ -135,11 +183,11 @@ const getInvoicesQuery = gql`
       month
       totalAmount
       currency
-      host {
-        id
+      fromCollective {
         slug
-        name
-        image
+      }
+      host {
+        slug
       }
     }
   }
