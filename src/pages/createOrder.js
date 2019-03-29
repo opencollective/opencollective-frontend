@@ -483,6 +483,7 @@ class CreateOrderPage extends React.Component {
     }
 
     const hostCountry = get(Collective, 'host.location.country');
+    console.log(Collective);
     const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.location.country);
     return LibTaxes.vatMayApply(Tier.type, country);
   }
@@ -942,49 +943,51 @@ class CreateOrderPage extends React.Component {
   }
 }
 
-const collectiveFields = `
-  id
-  slug
-  name
-  description
-  longDescription
-  twitterHandle
-  type
-  website
-  image
-  backgroundImage
-  currency
-  hostFeePercent
-  tags
-  location {
-    country
-  }
-  host {
+const CreateOrderCollectiveFields = gql`
+  fragment CreateOrderCollectiveFields on CollectiveInterface {
     id
+    slug
     name
-    settings
+    description
+    longDescription
+    twitterHandle
+    type
+    website
+    image
+    backgroundImage
+    currency
+    hostFeePercent
+    tags
     location {
       country
     }
-  }
-  parentCollective {
-    image
+    host {
+      id
+      name
+      settings
+      location {
+        country
+      }
+    }
+    parentCollective {
+      image
+    }
   }
 `;
 
-/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const CollectiveDataQuery = gql`
   query Collective($slug: String!) {
     Collective(slug: $slug) {
-      ${collectiveFields}
+      ...CreateOrderCollectiveFields
     }
   }
+  ${CreateOrderCollectiveFields}
 `;
 
 const CollectiveWithTierDataQuery = gql`
   query CollectiveWithTier($slug: String!, $tierId: Int!) {
     Collective(slug: $slug) {
-      ${collectiveFields}
+      ...CreateOrderCollectiveFields
     }
     Tier(id: $tierId) {
       id
@@ -1002,6 +1005,7 @@ const CollectiveWithTierDataQuery = gql`
       }
     }
   }
+  ${CreateOrderCollectiveFields}
 `;
 
 export const addCreateOrderMutation = graphql(
