@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
@@ -23,8 +24,14 @@ class ExpensesWithData extends React.Component {
     onFiltersChange: PropTypes.func, // from addExpensesData
   };
 
-  constructor(props) {
-    super(props);
+  /**
+   * `addExpensesData` may hack the status variable by turning `READY` into `APPROVED`
+   * to speak the language of the API. Here we prefer to rely on the `this.props.filters.status`
+   * variable as is stays untouched but we fallback on `data.variables` to ensure
+   * we don't miss defaults if not provided.
+   */
+  getStatus() {
+    return get(this.props.filters, 'status') || get(this.props.data, 'variables.status');
   }
 
   render() {
@@ -36,7 +43,6 @@ class ExpensesWithData extends React.Component {
     }
 
     const expenses = data.allExpenses;
-
     return (
       <div className="ExpensesWithData">
         <Expenses
@@ -48,7 +54,7 @@ class ExpensesWithData extends React.Component {
           fetchMore={this.props.fetchMore}
           updateVariables={this.props.onFiltersChange}
           loading={data.loading}
-          status={data.variables.status}
+          status={this.getStatus()}
           filters={this.props.hasFilters}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
@@ -120,12 +126,17 @@ const getExpensesQuery = gql`
 `;
 
 const getExpensesVariables = props => {
+  const filters = { ...props.filters };
+  if (filters.status === 'READY') {
+    filters.status = 'APPROVED';
+  }
+
   const vars = {
     CollectiveId: props.collective.id,
     offset: 0,
     limit: props.limit || EXPENSES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
-    ...props.filters,
+    ...filters,
   };
   if (vars.category) {
     vars.fromCollectiveSlug = null;
@@ -140,6 +151,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
   options(props) {
     return {
       variables: getExpensesVariables(props),
+      fetchPolicy: 'network-only',
     };
   },
   props: ({ data }) => ({
