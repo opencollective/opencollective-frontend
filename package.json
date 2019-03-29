@@ -28,6 +28,7 @@
     "classnames": "2.2.6",
     "clean-tag": "3.1.0",
     "cloudflare-ip": "0.0.7",
+    "cookie-parser": "1.4.4",
     "cross-fetch": "3.0.2",
     "currency-symbol-map": "4.0.4",
     "dotenv": "7.0.0",
