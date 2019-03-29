@@ -17,6 +17,7 @@ import { types } from '../../../constants/collectives';
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
 const debugArchive = debug('archive');
+const debugDelete = debug('delete');
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -511,7 +512,7 @@ export async function approveCollective(remoteUser, CollectiveId) {
   return collective.update({ isActive: true });
 }
 
-export function deleteCollective(_, args, req) {
+export function deleteEventCollective(_, args, req) {
   if (!req.remoteUser) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in to delete a collective',
@@ -709,4 +710,223 @@ export async function unarchiveCollective(_, args, req) {
   }
 
   return collective.update({ isActive: true, deactivatedAt: null });
+}
+
+export async function deleteCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to delete a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(collective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as an Admin.',
+    });
+  }
+
+  const transactionCount = await models.Transaction.count({
+    where: {
+      [Op.or]: [{ CollectiveId: collective.id }, { FromCollectiveId: collective.id }],
+    },
+  });
+  const orderCount = await models.Order.count({
+    where: {
+      [Op.or]: [{ CollectiveId: collective.id }, { FromCollectiveId: collective.id }],
+    },
+  });
+
+  if (transactionCount > 0 || orderCount > 0) {
+    throw new Error('Can not delete collective with existing orders.');
+  }
+
+  const expenseCount = await models.Expense.count({
+    where: { CollectiveId: collective.id, status: 'PAID' },
+  });
+
+  if (expenseCount > 0) {
+    throw new Error('Can not delete collective with paid expenses.');
+  }
+
+  return models.Member.findAll({
+    where: { CollectiveId: collective.id },
+  })
+    .then(members => {
+      return map(
+        members,
+        member => {
+          return member.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteCollectiveMembers'))
+    .then(async () => {
+      const expenses = await models.Expense.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        expenses,
+        expense => {
+          return expense.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteCollectiveExpenses'))
+    .then(async () => {
+      const tiers = await models.Tier.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        tiers,
+        tier => {
+          return tier.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteCollectiveTiers'))
+    .then(async () => {
+      const paymentMethods = await models.PaymentMethod.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        paymentMethods,
+        paymentMethod => {
+          return paymentMethod.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteCollectivePaymentMethods'))
+    .then(async () => {
+      const connectedAccounts = await models.ConnectedAccount.findAll({
+        where: { CollectiveId: collective.id },
+      });
+      return map(
+        connectedAccounts,
+        connectedAccount => {
+          return connectedAccount.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteCollectiveConnectedAccounts'))
+    .then(() => {
+      // Update collective slug to free the current slug for future
+      const newSlug = `${collective.slug}-${Date.now()}`;
+      return collective.update({ slug: newSlug });
+    })
+    .then(() => collective.destroy())
+    .then(() => collective);
+}
+
+export async function deleteUserCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to delete your account',
+    });
+  }
+  const user = await models.User.findOne({ where: { id: req.remoteUser.id } });
+  const userCollective = await models.Collective.findOne({
+    where: { id: args.id },
+  });
+  const transactionCount = await models.Transaction.count({
+    where: { FromCollectiveId: userCollective.id },
+  });
+  const orderCount = await models.Order.count({
+    where: { FromCollectiveId: userCollective.id },
+  });
+
+  if (transactionCount > 0 || orderCount > 0) {
+    throw new Error('Can not delete user with existing orders.');
+  }
+
+  const expenseCount = await models.Expense.count({
+    where: { UserId: user.id, status: 'PAID' },
+  });
+
+  if (expenseCount > 0) {
+    throw new Error('Can not delete user with paid expenses.');
+  }
+
+  return models.Member.findAll({
+    where: { MemberCollectiveId: userCollective.id },
+  })
+    .then(members => {
+      return map(
+        members,
+        member => {
+          return member.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteUserMemberships'))
+    .then(async () => {
+      const expenses = await models.Expense.findAll({ where: { UserId: user.id } });
+      return map(
+        expenses,
+        expense => {
+          return expense.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteUserExpenses'))
+    .then(async () => {
+      const paymentMethods = await models.PaymentMethod.findAll({
+        where: { CollectiveId: userCollective.id },
+      });
+      return map(
+        paymentMethods,
+        paymentMethod => {
+          return paymentMethod.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteUserPaymentMethods'))
+    .then(async () => {
+      const connectedAccounts = await models.ConnectedAccount.findAll({
+        where: { CollectiveId: userCollective.id },
+      });
+      return map(
+        connectedAccounts,
+        connectedAccount => {
+          return connectedAccount.destroy();
+        },
+        { concurrency: 3 },
+      );
+    })
+    .then(() => debugDelete('deleteUserConnectedAccounts'))
+    .then(() => {
+      // Update collective slug to free the current slug for future
+      const newSlug = `${userCollective.slug}-${Date.now()}`;
+      return userCollective.update({ slug: newSlug });
+    })
+    .then(() => {
+      return userCollective.destroy();
+    })
+    .then(() => debugDelete('deleteUserCollective'))
+    .then(() => {
+      // Update user email in order to free up for future reuse
+      // Split the email, username from host domain
+      const splitedEmail = user.email.split('@');
+      // Add the current timestamp to email username
+      const newEmail = `${splitedEmail[0]}-${Date.now()}@${splitedEmail[1]}`;
+      return user.update({ email: newEmail });
+    })
+    .then(() => {
+      return user.destroy();
+    })
+    .then(() => userCollective);
 }

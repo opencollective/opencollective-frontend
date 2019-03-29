@@ -390,16 +390,16 @@ describe('Mutation Tests', () => {
   });
 
   describe('delete Collective', () => {
-    const deleteCollectiveQuery = `
-      mutation deleteCollective($id: Int!) {
-        deleteCollective(id: $id) {
+    const deleteEventCollectiveQuery = `
+      mutation deleteEventCollective($id: Int!) {
+        deleteEventCollective(id: $id) {
           id,
           name
         }
       }`;
 
     it('fails to delete a collective if not logged in', async () => {
-      const result = await utils.graphqlQuery(deleteCollectiveQuery, {
+      const result = await utils.graphqlQuery(deleteEventCollectiveQuery, {
         id: event1.id,
       });
       expect(result.errors).to.exist;
@@ -410,7 +410,7 @@ describe('Mutation Tests', () => {
     });
 
     it('fails to delete a collective if logged in as another user', async () => {
-      const result = await utils.graphqlQuery(deleteCollectiveQuery, { id: event1.id }, user2);
+      const result = await utils.graphqlQuery(deleteEventCollectiveQuery, { id: event1.id }, user2);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
         'You need to be logged in as a core contributor or as a host to delete this collective',
@@ -421,7 +421,7 @@ describe('Mutation Tests', () => {
     });
 
     it('deletes a collective', async () => {
-      const res = await utils.graphqlQuery(deleteCollectiveQuery, { id: event1.id }, user1);
+      const res = await utils.graphqlQuery(deleteEventCollectiveQuery, { id: event1.id }, user1);
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
       return models.Collective.findByPk(event1.id).then(event => {
