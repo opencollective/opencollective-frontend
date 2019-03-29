@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import europeanCountries from '../constants/europeanCountries';
+import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
 /**
  * A helper to return the fee for given payment method.
@@ -27,7 +27,7 @@ const getPaymentMethodFees = (paymentMethod, amount) => {
         stripeFeePercent = 0.014;
       } else if (!currency) {
         const country = get(paymentMethod, 'data.country');
-        if (country && europeanCountries.includes(country)) {
+        if (country && isMemberOfTheEuropeanUnion(country)) {
           stripeFeePercent = 0.014;
         }
       }
