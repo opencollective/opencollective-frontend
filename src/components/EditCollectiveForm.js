@@ -25,6 +25,7 @@ import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
 import ArchiveCollective from './ArchiveCollective';
+import DeleteCollective from './DeleteCollective';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -45,6 +46,7 @@ const MenuItem = styled(Link)`
 `;
 
 const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
+const deleteIsEnabled = parseToBoolean(getEnvVar('SHOW_DELETE_COLLECTIVE'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -739,6 +741,9 @@ class EditCollectiveForm extends React.Component {
               )}
               {archiveIsEnabled && this.state.section === 'advanced' && collective.type !== 'USER' && (
                 <ArchiveCollective collective={collective} />
+              )}
+              {deleteIsEnabled && collective.type !== 'EVENT' && this.state.section === 'advanced' && (
+                <DeleteCollective collective={collective} />
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>

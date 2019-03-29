@@ -90,6 +90,9 @@ type Collective implements CollectiveInterface {
   """Returns whether this collective is archived"""
   isArchived: Boolean
 
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
+
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
@@ -244,6 +247,7 @@ interface CollectiveInterface {
   isHost: Boolean
   canApply: Boolean
   isArchived: Boolean
+  isDeletable: Boolean
   host: CollectiveInterface
 
   """
@@ -526,6 +530,9 @@ type Event implements CollectiveInterface {
   """Returns whether this collective is archived"""
   isArchived: Boolean
 
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
+
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
@@ -806,8 +813,12 @@ type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
-  deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
+
+  """Delete a collective"""
+  deleteCollective(id: Int!): CollectiveInterface
+  deleteUserCollective(id: Int!): CollectiveInterface
+  deleteEventCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
@@ -1207,6 +1218,9 @@ type Organization implements CollectiveInterface {
 
   """Returns whether this collective is archived"""
   isArchived: Boolean
+
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
@@ -1811,6 +1825,9 @@ type User implements CollectiveInterface {
 
   """Returns whether this collective is archived"""
   isArchived: Boolean
+
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective

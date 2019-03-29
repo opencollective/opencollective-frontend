@@ -185,9 +185,25 @@ const editCollectiveQuery = gql`
   }
 `;
 
+const deleteEventCollectiveQuery = gql`
+  mutation deleteEventCollective($id: Int!) {
+    deleteEventCollective(id: $id) {
+      id
+    }
+  }
+`;
+
 const deleteCollectiveQuery = gql`
   mutation deleteCollective($id: Int!) {
     deleteCollective(id: $id) {
+      id
+    }
+  }
+`;
+
+const deleteUserCollectiveQuery = gql`
+  mutation deleteUserCollective($id: Int!) {
+    deleteUserCollective(id: $id) {
       id
     }
   }
@@ -444,9 +460,29 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
   }),
 });
 
+export const addDeleteEventCollectiveMutation = graphql(deleteEventCollectiveQuery, {
+  props: ({ mutate }) => ({
+    deleteEventCollective: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
 export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
   props: ({ mutate }) => ({
     deleteCollective: async id => {
+      return await mutate({
+        variables: { id },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
+      });
+    },
+  }),
+});
+
+export const addDeleteUserCollectiveMutation = graphql(deleteUserCollectiveQuery, {
+  props: ({ mutate }) => ({
+    deleteUserCollective: async id => {
       return await mutate({ variables: { id } });
     },
   }),

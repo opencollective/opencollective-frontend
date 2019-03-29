@@ -89,6 +89,7 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
+        isDeletable
         location {
           country
         }
@@ -221,6 +222,7 @@ const getCollectiveToEditQuery = gql`
       createdAt
       isActive
       isArchived
+      isDeletable
       isHost
       hostFeePercent
       expensePolicy
@@ -415,6 +417,7 @@ const getCollectiveQuery = gql`
       hostFeePercent
       canApply
       isArchived
+      isDeletable
       host {
         id
         slug
