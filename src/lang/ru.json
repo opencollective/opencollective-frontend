@@ -186,7 +186,7 @@
   "comment.badPermissions": "У вас нет прав комментировать данную затрату.",
   "comment.btn": "Комментировать",
   "comment.cancelEdit": "отменить редактирование",
-  "comment.edit": "edit",
+  "comment.edit": "редактировать",
   "comment.login": "Войдите чтобы комментировать",
   "comment.payoutMethod.manual": "Other (give instructions)",
   "comment.payoutMethod.paypal": "PayPal ({paypalEmail})",
