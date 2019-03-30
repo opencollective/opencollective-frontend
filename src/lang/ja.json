@@ -3,7 +3,7 @@
   "actions.approveExpense.processing": "Approving expense",
   "actions.done": "完了",
   "actions.rejectExpense.processing": "Rejecting expense",
-  "addfunds.amount.label": "amount",
+  "addfunds.amount.label": "額",
   "addfunds.description.label": "説明",
   "addfunds.details": "詳細",
   "addfunds.disclaimer": "By clicking below, you agree to set aside {amount} in your bank account on behalf of the collective",
