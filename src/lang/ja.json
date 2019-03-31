@@ -326,7 +326,7 @@
   "editCollective.menu.tiers": "tiers",
   "editCollective.menu.virtualCards": "ギフトカード",
   "editCollective.notFound": "No collective data to edit",
-  "error.addOnGithub": "Add an issue on Github",
+  "error.addOnGithub": "GitHub に Issue を作る",
   "error.code.invalid": "Invalid gift card code",
   "error.contactSupport": "サポートに問い合わせ",
   "error.details": "エラーの詳細",
