@@ -139,7 +139,7 @@
   "collective.menu.member": "member of {n} {n, plural, one {collective} other {collectives}}",
   "collective.messages.StripeAccountConnected": "Stripe アカウントの連携に成功しました",
   "collective.name.label": "名前",
-  "collective.orders.title": "{n, plural, one {Latest order} other {Latest orders}}",
+  "collective.orders.title": "{n, plural, one {最近の経費申請} other {最近の経費申請}}",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {つの組織が} other {つの組織が}} {collective} をサポートしています",
   "collective.section.backers.users.title": "{n} {n, plural, one {人が} other {人が}} {collective} をサポートしています",
   "collective.section.contributors.empty": "You don't have any contributors yet.",
