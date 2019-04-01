@@ -263,7 +263,8 @@ export async function createCollectiveFromGithub(_, args, req) {
         message: "We could not verify that you're admin of the GitHub repository",
       });
     }
-    collectiveData.tags = repo.topics;
+    collectiveData.tags = repo.topics || [];
+    collectiveData.tags.push('opensource');
     collectiveData.description = repo.description;
     collectiveData.settings = {
       githubRepo: githubHandle,
