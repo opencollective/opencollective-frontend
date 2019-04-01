@@ -28,6 +28,7 @@
 | API_URL                 | .host.api                              | API exposed url                               |
 | WEBAPP_URL              | .host.webapp                           | webapp URL                                    |
 | WEBSITE_URL             | .host.website                          | UI URL                                        |
+| FRONTEND_URL            | .host.frontend                         | URL of the frontend service (for caching)     |
 | SLACK_HOOK_URL          | .slack.webhookUrl                      | slack hook url                                |
 | CLEARBIT_KEY            | .clearbit.key                          | clearbit key                                  |
 | GITHUB_CLIENT_ID        | .github.clientId                       | github client ID                              |
