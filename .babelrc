@@ -31,7 +31,8 @@
             "removeImport": true
           }
         ],
-        "transform-styled-components-remove-prop-types"
+        "transform-styled-components-remove-prop-types",
+        ["react-remove-properties", { "properties": ["data-cy"] }]
       ]
     }
   }
