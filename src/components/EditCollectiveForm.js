@@ -363,6 +363,7 @@ class EditCollectiveForm extends React.Component {
           name: 'address',
           placeholder: '',
           maxLength: 255,
+          type: 'textarea',
         },
         // {
         //   name: 'location',
