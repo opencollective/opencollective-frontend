@@ -446,6 +446,7 @@
   "goal.description.label": "説明",
   "goal.remove": "目標を削除",
   "goal.title.label": "タイトル",
+  "goal.title.placeholder": "Required if you want the goal to be displayed on the collective page",
   "goal.type.label": "タイプ",
   "goal.yearlyBudget.label": "年間予算",
   "home.activeCollectives": "アクティブなコレクティブ",
