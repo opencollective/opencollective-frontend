@@ -4,7 +4,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import { URL } from 'url';
 
-import clearbit from '../gateways/clearbit';
+import clearbit from './clearbit';
 
 const debugClearbit = debug('clearbit');
 

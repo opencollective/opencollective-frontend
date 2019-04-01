@@ -7,7 +7,7 @@ import '../server/env';
 
 const app = require('../server/index');
 import models, { Op } from '../server/models';
-import { retrieveCharge } from '../server/gateways/stripe';
+import { retrieveCharge } from '../server/paymentProviders/stripe/gateway';
 
 const done = err => {
   if (err) console.log('err', err);

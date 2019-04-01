@@ -1,4 +1,4 @@
-import clearbit from '../server/gateways/clearbit';
+import clearbit from '../server/lib/clearbit';
 import sinon from 'sinon';
 import { expect } from 'chai';
 import * as utils from '../test/utils';
