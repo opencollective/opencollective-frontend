@@ -2,7 +2,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick, isArray } from 'lodash';
 
-import { getLoggedInUserQuery } from './queries';
+import { getLoggedInUserQuery, getCollectiveToEditQueryFields } from './queries';
 
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
@@ -103,87 +103,15 @@ const createCollectiveFromGithubQuery = gql`
   }
 `;
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
-      id
-      type
-      slug
-      name
-      image
-      backgroundImage
-      description
-      longDescription
-      location {
-        name
-        address
-        country
-        lat
-        long
-      }
-      website
-      twitterHandle
-      githubHandle
-      isActive
-      isArchived
-      hostFeePercent
-      host {
-        id
-        createdAt
-        slug
-        name
-        image
-        backgroundImage
-        settings
-        description
-        website
-        twitterHandle
-        stats {
-          id
-          collectives {
-            hosted
-          }
-        }
-      }
-      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
-        id
-        createdAt
-        role
-        description
-        stats {
-          totalDonations
-        }
-        tier {
-          id
-          name
-        }
-        member {
-          id
-          name
-          image
-          slug
-          twitterHandle
-          description
-          ... on User {
-            email
-          }
-        }
-      }
-      tiers {
-        id
-        slug
-        type
-        name
-        description
-        amount
-        presets
-        interval
-        currency
-        maxQuantity
-      }
+      ${getCollectiveToEditQueryFields}
     }
   }
 `;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const deleteEventCollectiveQuery = gql`
   mutation deleteEventCollective($id: Int!) {

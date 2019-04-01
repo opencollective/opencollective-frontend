@@ -38,6 +38,10 @@ class EditGoals extends React.Component {
         defaultMessage: 'yearly budget',
       },
       'title.label': { id: 'goal.title.label', defaultMessage: 'title' },
+      'title.placeholder': {
+        id: 'goal.title.placeholder',
+        defaultMessage: 'Required if you want the goal to be displayed on the collective page',
+      },
       'description.label': {
         id: 'goal.description.label',
         defaultMessage: 'description',
@@ -70,6 +74,7 @@ class EditGoals extends React.Component {
         name: 'title',
         label: intl.formatMessage(this.messages['title.label']),
         maxLength: 64,
+        placeholder: intl.formatMessage(this.messages['title.placeholder']),
       },
       {
         name: 'description',
