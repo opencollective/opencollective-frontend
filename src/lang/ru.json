@@ -446,6 +446,7 @@
   "goal.description.label": "описание",
   "goal.remove": "удалить цель",
   "goal.title.label": "заголовок",
+  "goal.title.placeholder": "Required if you want the goal to be displayed on the collective page",
   "goal.type.label": "тип",
   "goal.yearlyBudget.label": "годовой бюджет",
   "home.activeCollectives": "Активные коллективы",
