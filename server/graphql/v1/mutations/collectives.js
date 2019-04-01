@@ -13,6 +13,7 @@ import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
 import status from '../../../constants/order_status';
 import { types } from '../../../constants/collectives';
+import { purgeCacheForPage } from '../../../lib/cloudflare';
 
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
@@ -161,6 +162,14 @@ export async function createCollective(_, args, req) {
 
   await Promise.all(promises);
 
+  // Purge cache for parent collective (for events) and hosts
+  if (parentCollective) {
+    purgeCacheForPage(`/${parentCollective.slug}`);
+  }
+  if (hostCollective) {
+    purgeCacheForPage(`/${hostCollective.slug}`);
+  }
+
   // if the type of collective is an organization or an event, we don't notify the host
   if (collective.type !== types.COLLECTIVE) {
     return collective;
@@ -179,6 +188,7 @@ export async function createCollective(_, args, req) {
       },
     },
   });
+
   return collective;
 }
 
@@ -465,7 +475,11 @@ export function editCollective(_, args, req) {
         return collective;
       }
     })
-    .then(() => collective);
+    .then(() => {
+      // Ask cloudflare to refresh the cache for this collective's page
+      purgeCacheForPage(`/${collective.slug}`);
+      return collective;
+    });
 }
 
 export async function approveCollective(remoteUser, CollectiveId) {

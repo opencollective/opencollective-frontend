@@ -16,6 +16,9 @@
 | AWS_KEY                 | .aws.s3.key                            | AWS key                                       |
 | AWS_SECRET              | .aws.s3.secret                         | AWS secret                                    |
 | AWS_S3_BUCKET           | .aws.s3.bucket                         | AWS s3 bucket to send files                   |
+| CLOUDFLARE_KEY          | .cloudflare.key                        | CLOUDFLARE key                                |
+| CLOUDFLARE_EMAIL        | .cloudflare.email                      | CLOUDFLARE email                              |
+| CLOUDFLARE_ZONE         | .cloudflare.zone                       | CLOUDFLARE zone                               |
 | PAYPAL_EMAIL            | .paypal.classic.email                  | Paypal main email                             |
 | PAYPAL_APP_ID           | .paypal.classic.appId                  | Paypal APP ID                                 |
 | PAYPAL_PASSWORD         | .paypal.classic.password               | Paypal password                               |
