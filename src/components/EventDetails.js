@@ -16,7 +16,8 @@ const EventDetails = ({ event, tier }) => {
   const description = event.longDescription || event.description;
   const truncatedDescription =
     isExpended || !description ? description : truncate(description, { length: TruncatedLength });
-  return (
+
+  return !tier.maxQuantity && !description ? null : (
     <StyledCard p={3}>
       {tier.maxQuantity > 0 && (
         <Box mb={2}>
