@@ -446,6 +446,7 @@
   "goal.description.label": "description",
   "goal.remove": "supprimer cet objectif",
   "goal.title.label": "titre",
+  "goal.title.placeholder": "Required if you want the goal to be displayed on the collective page",
   "goal.type.label": "type",
   "goal.yearlyBudget.label": "budget annuel",
   "home.activeCollectives": "Collectifs actifs",
