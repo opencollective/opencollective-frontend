@@ -26,6 +26,7 @@ import {
   OrderStatusType,
   PaginatedPaymentMethodsType,
   ImageFormatType,
+  NotificationType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
