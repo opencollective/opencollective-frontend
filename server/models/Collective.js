@@ -1590,6 +1590,9 @@ export default function(Sequelize, DataTypes) {
       .then(() => this.getTiers());
   };
 
+  // edit the notifications of this collective (create/update/remove)
+  Collective.prototype.editNotifications = function(notifications) {};
+
   /*
    * Assumes:
    * - only credit cards on stripe can be updated

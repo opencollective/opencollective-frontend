@@ -13,6 +13,7 @@ import {
 import GraphQLJSON from 'graphql-type-json';
 import { Kind } from 'graphql/language';
 import { IsoDateString } from './types';
+import { NotificationType } from './types';
 
 const EmailType = new GraphQLScalarType({
   name: 'Email',
@@ -146,6 +147,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     settings: { type: GraphQLJSON },
     data: { type: GraphQLJSON },
     members: { type: new GraphQLList(MemberInputType) },
+    notification: { type: new GraphQLList(NotificationType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
     HostCollectiveId: { type: GraphQLInt },
     hostFeePercent: { type: GraphQLInt },
