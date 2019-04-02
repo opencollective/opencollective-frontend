@@ -21,7 +21,7 @@ class Member extends React.Component {
     super(props);
 
     this.messages = defineMessages({
-      'membership.since': { id: 'membership.since', defaultMessage: 'since' },
+      'membership.since': { id: 'membership.since', defaultMessage: 'since {date}' },
       ADMIN: { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
       BACKER: { id: 'roles.backer.label', defaultMessage: 'Backer' },
@@ -50,12 +50,15 @@ class Member extends React.Component {
       : this.messages[membership.role]
       ? intl.formatMessage(this.messages[membership.role])
       : membership.role;
-    const className = this.props.className || '';
     let memberSinceStr = '';
     if (tierName) {
-      memberSinceStr = capitalize(tierName);
+      memberSinceStr += capitalize(tierName);
     }
-    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'])} ${formatDate(membership.createdAt)}`;
+    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'], {
+      date: formatDate(membership.createdAt),
+      tierName: tierName ? capitalize(tierName) : '',
+    })}`;
+    const className = this.props.className || '';
     const totalDonationsStr = membership.stats
       ? `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(
           membership.stats.totalDonations,
