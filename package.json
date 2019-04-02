@@ -110,7 +110,7 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "7.2.3",
+    "@babel/cli": "7.4.3",
     "@babel/polyfill": "7.4.0",
     "@babel/register": "7.4.0",
     "babel-eslint": "^10.0.1",
