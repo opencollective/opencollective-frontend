@@ -573,6 +573,7 @@ class InputField extends React.Component {
               width: 100%;
             }
             .inputField {
+              overflow: auto;
               margin: 1rem 0;
             }
             .inputField,

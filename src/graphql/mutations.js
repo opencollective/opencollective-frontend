@@ -431,3 +431,21 @@ export const addUnarchiveCollectiveMutation = graphql(unarchiveCollectiveQuery, 
     },
   }),
 });
+
+export const addUpdateUserEmailMutation = graphql(
+  gql`
+    mutation updateUserEmail($email: String!) {
+      updateUserEmail(email: $email) {
+        id
+        emailWaitingForValidation
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      updateUserEmail: email => {
+        return mutate({ variables: { email } });
+      },
+    }),
+  },
+);
