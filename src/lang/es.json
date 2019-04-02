@@ -351,6 +351,7 @@
   "editCollective.menu.": "imagenes",
   "editCollective.menu.advanced": "avanzado",
   "editCollective.menu.connectedAccounts": "Connected Accounts",
+  "editCollective.menu.webhooks": "Webhooks",
   "editCollective.menu.expenses": "expenses",
   "editCollective.menu.export": "export",
   "editCollective.menu.goals": "goals",

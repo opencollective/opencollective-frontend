@@ -20,6 +20,7 @@ import EditHost from './EditHost';
 import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
+import EditWebhooks from './EditWebhooks';
 import ExportData from './ExportData';
 import Link from './Link';
 import StyledButton from './StyledButton';
@@ -79,6 +80,7 @@ class EditCollectiveForm extends React.Component {
       collective,
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
+      notifications: collective.notifications || [{}],
       goals: collective.settings.goals || [{}],
     };
 
@@ -635,6 +637,14 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
+            <MenuItem
+              selected={this.state.section === 'webhooks'}
+              route="editCollective"
+              params={{ slug: collective.slug, section: 'webhooks' }}
+              className="MenuItem webhooks"
+            >
+              <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
+            </MenuItem>
             {collective.type === 'COLLECTIVE' && (
               <MenuItem
                 selected={this.state.section === 'export'}
@@ -701,6 +711,14 @@ class EditCollectiveForm extends React.Component {
                 <EditMembers
                   title="Edit members"
                   members={this.members}
+                  collective={collective}
+                  onChange={this.handleObjectChange}
+                />
+              )}
+              {this.state.section === 'webhooks' && (
+                <EditWebhooks
+                  title="Edit webhooks"
+                  notiifcations={this.state.notifications}
                   collective={collective}
                   onChange={this.handleObjectChange}
                 />

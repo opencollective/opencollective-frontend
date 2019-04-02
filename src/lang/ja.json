@@ -355,6 +355,7 @@
   "editCollective.menu.export": "エクスポート",
   "editCollective.menu.goals": "目標",
   "editCollective.menu.host": "財政ホスト",
+  "editCollective.menu.webhooks": "Webhooks",
   "editCollective.menu.info": "情報",
   "editCollective.menu.members": "メンバー",
   "editCollective.menu.paymentMethods": "支払方法",
