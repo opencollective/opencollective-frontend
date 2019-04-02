@@ -100,12 +100,22 @@ class Footer extends React.Component {
                 <a href="?language=fr&set=1" title="French">
                   Français
                 </a>{' '}
-                (59%)
+                (62%)
                 <br />
-                <a href="?language=es&set=1" title="Espanol">
-                  Espanol
+                <a href="?language=ja&set=1" title="Japanese">
+                  日本語
                 </a>{' '}
-                (14%)
+                (39%)
+                <br />
+                <a href="?language=es&set=1" title="Spanish">
+                  Español
+                </a>{' '}
+                (16%)
+                <br />
+                <a href="?language=ru&set=1" title="Russian">
+                  Русский
+                </a>{' '}
+                (11%)
               </P>
             </Container>
           </Container>

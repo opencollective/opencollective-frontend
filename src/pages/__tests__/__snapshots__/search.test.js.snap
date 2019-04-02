@@ -961,16 +961,34 @@ Array [
               Français
             </a>
              
-            (59%)
+            (62%)
+            <br />
+            <a
+              href="?language=ja&set=1"
+              title="Japanese"
+            >
+              日本語
+            </a>
+             
+            (39%)
             <br />
             <a
               href="?language=es&set=1"
-              title="Espanol"
+              title="Spanish"
             >
-              Espanol
+              Español
             </a>
              
-            (14%)
+            (16%)
+            <br />
+            <a
+              href="?language=ru&set=1"
+              title="Russian"
+            >
+              Русский
+            </a>
+             
+            (11%)
           </p>
         </div>
       </div>
@@ -2338,16 +2356,34 @@ Array [
               Français
             </a>
              
-            (59%)
+            (62%)
+            <br />
+            <a
+              href="?language=ja&set=1"
+              title="Japanese"
+            >
+              日本語
+            </a>
+             
+            (39%)
             <br />
             <a
               href="?language=es&set=1"
-              title="Espanol"
+              title="Spanish"
             >
-              Espanol
+              Español
             </a>
              
-            (14%)
+            (16%)
+            <br />
+            <a
+              href="?language=ru&set=1"
+              title="Russian"
+            >
+              Русский
+            </a>
+             
+            (11%)
           </p>
         </div>
       </div>
@@ -3860,16 +3896,34 @@ exports[`Search Page renders error message 1`] = `
               Français
             </a>
              
-            (59%)
+            (62%)
+            <br />
+            <a
+              href="?language=ja&set=1"
+              title="Japanese"
+            >
+              日本語
+            </a>
+             
+            (39%)
             <br />
             <a
               href="?language=es&set=1"
-              title="Espanol"
+              title="Spanish"
             >
-              Espanol
+              Español
             </a>
              
-            (14%)
+            (16%)
+            <br />
+            <a
+              href="?language=ru&set=1"
+              title="Russian"
+            >
+              Русский
+            </a>
+             
+            (11%)
           </p>
         </div>
       </div>
@@ -5332,16 +5386,34 @@ Array [
               Français
             </a>
              
-            (59%)
+            (62%)
+            <br />
+            <a
+              href="?language=ja&set=1"
+              title="Japanese"
+            >
+              日本語
+            </a>
+             
+            (39%)
             <br />
             <a
               href="?language=es&set=1"
-              title="Espanol"
+              title="Spanish"
             >
-              Espanol
+              Español
             </a>
              
-            (14%)
+            (16%)
+            <br />
+            <a
+              href="?language=ru&set=1"
+              title="Russian"
+            >
+              Русский
+            </a>
+             
+            (11%)
           </p>
         </div>
       </div>
@@ -6964,16 +7036,34 @@ Array [
               Français
             </a>
              
-            (59%)
+            (62%)
+            <br />
+            <a
+              href="?language=ja&set=1"
+              title="Japanese"
+            >
+              日本語
+            </a>
+             
+            (39%)
             <br />
             <a
               href="?language=es&set=1"
-              title="Espanol"
+              title="Spanish"
             >
-              Espanol
+              Español
             </a>
              
-            (14%)
+            (16%)
+            <br />
+            <a
+              href="?language=ru&set=1"
+              title="Russian"
+            >
+              Русский
+            </a>
+             
+            (11%)
           </p>
         </div>
       </div>
