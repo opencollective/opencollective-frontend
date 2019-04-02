@@ -50,6 +50,20 @@ export default (Sequelize, DataTypes) => {
         },
       },
 
+      emailWaitingForValidation: {
+        type: DataTypes.STRING,
+        unique: true,
+        validate: {
+          isEmail: {
+            msg: 'Email must be valid',
+          },
+        },
+      },
+
+      emailConfirmationToken: {
+        type: DataTypes.STRING,
+      },
+
       billingAddress: DataTypes.STRING, // Used for the invoices, we should create a separate table for addresses (billing/shipping)
 
       paypalEmail: {
@@ -181,6 +195,7 @@ export default (Sequelize, DataTypes) => {
             firstName: this.firstName,
             lastName: this.lastName,
             email: this.email,
+            emailWaitingForValidation: this.emailWaitingForValidation,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             paypalEmail: this.paypalEmail,

@@ -29,6 +29,7 @@ import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
+import { updateUserEmail } from './mutations/users';
 
 import statuses from '../../constants/expense_status';
 
@@ -219,6 +220,19 @@ const mutations = {
         emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
         return { user, organization };
       });
+    },
+  },
+  updateUserEmail: {
+    type: UserType,
+    description: 'Update the email address for logged in user',
+    args: {
+      email: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'The new email address for user',
+      },
+    },
+    resolve: (_, { email }, { remoteUser }) => {
+      return updateUserEmail(remoteUser, email);
     },
   },
   editConnectedAccount: {

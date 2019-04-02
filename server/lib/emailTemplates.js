@@ -78,6 +78,8 @@ export const templateNames = [
   'user.card.claimed.text',
   'user.card.invited',
   'user.card.invited.text',
+  'user.changeEmail',
+  'user.changeEmail.text',
   'user.forgot.password',
   'user.monthlyreport',
   'user.monthlyreport.text',
