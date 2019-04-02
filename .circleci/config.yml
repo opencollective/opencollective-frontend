@@ -121,9 +121,6 @@ jobs:
           name: Persist next build cache
           key: next-build-cache-{{ .Revision }}
           paths:
-            # In Next.js 7 it is
-            - ./node_modules/.cache/terser-webpack-plugin
-
             # In Next.js 8 it will be
             - ./node_modules/.cache/next-minifier
 
