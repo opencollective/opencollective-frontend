@@ -598,6 +598,16 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt },
         },
       },
+      notifications: {
+        type: new GraphQLList(NotificationType),
+        description: 'List of all notifications for this collective',
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          channel: { type: GraphQLString },
+          type: { type: GraphQLString },
+        },
+      },
       maxQuantity: { type: GraphQLInt },
       tiers: {
         type: new GraphQLList(TierType),
@@ -1118,6 +1128,22 @@ const CollectiveFields = () => {
           limit: args.limit,
           offset: args.offset,
         }).then(memberships => memberships.memberCollective);
+      },
+    },
+    notifications: {
+      type: new GraphQLList(NotificationType),
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt },
+        channel: { type: GraphQLString },
+        type: { type: GraphQLString },
+      },
+      resolve(collective, args) {
+        return models.Notifications.findAll({
+          where: { CollectiveId: collective.id, args: { channel, type } },
+          limit: args.limit,
+          offset: args.offset,
+        });
       },
     },
     maxQuantity: {

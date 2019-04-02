@@ -33,7 +33,7 @@ export default async (Sequelize, activity) => {
   const where = {
     CollectiveId: activity.CollectiveId,
     type: [activityType.ACTIVITY_ALL, activity.type],
-    channel: ['gitter', 'slack', 'twitter'],
+    channel: ['gitter', 'slack', 'twitter', 'webhook'],
     active: true,
   };
 
@@ -46,6 +46,8 @@ export default async (Sequelize, activity) => {
       return publishToSlack(activity, notifConfig.webhookUrl, {});
     } else if (notifConfig.channel === 'twitter') {
       return twitter.tweetActivity(activity);
+    } else if (notifConfig.channel === 'webhook') {
+      return publishToWebhoook(activity, notifConfig.webhookUrl);
     } else {
       return Promise.resolve();
     }
@@ -66,6 +68,10 @@ function publishToGitter(activity, notifConfig) {
   } else {
     Promise.resolve();
   }
+}
+
+function publishToWebhoook(activity, notifConfig) {
+  return axios.post(notifConfig.webhookUrl, { activity });
 }
 
 function publishToSlack(activity, webhookUrl, options) {

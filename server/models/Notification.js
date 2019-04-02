@@ -47,6 +47,10 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
+  Notification.prototype.getUser = function() {
+    return models.User.findByPk(this.UserId);
+  };
+
   Notification.createMany = (notifications, defaultValues) => {
     return Promise.map(notifications, u => Notification.create(_.defaults({}, u, defaultValues))).catch(console.error);
   };
