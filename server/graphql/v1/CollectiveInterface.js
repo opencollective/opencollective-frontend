@@ -607,6 +607,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt },
           channel: { type: GraphQLString },
           type: { type: GraphQLString },
+          active: { type: GraphQLBoolean },
         },
       },
       maxQuantity: { type: GraphQLInt },
@@ -1138,10 +1139,23 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt },
         channel: { type: GraphQLString },
         type: { type: GraphQLString },
+        active: { type: GraphQLBoolean },
       },
       resolve(collective, args) {
-        return models.Notifications.findAll({
-          where: { CollectiveId: collective.id, args: { channel, type } },
+        let where = { CollectiveId: collective.id };
+
+        if (args.channel) {
+          where.channel = args.channel;
+        }
+        if (args.type) {
+          where.type = args.type;
+        }
+        if (args.active) {
+          where.active = args.active;
+        }
+
+        return models.Notification.findAll({
+          where: where,
           limit: args.limit,
           offset: args.offset,
         });
