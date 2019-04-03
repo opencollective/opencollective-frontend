@@ -15,3 +15,7 @@ export const ValidationFailed = createError('ValidationFailed', {
 export const NotFound = createError('NotFound', {
   message: 'Item not found',
 });
+
+export const InvalidToken = createError('InvalidToken', {
+  message: 'The provided token is not valid',
+});

@@ -29,7 +29,7 @@ import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
-import { updateUserEmail } from './mutations/users';
+import { updateUserEmail, confirmUserEmail } from './mutations/users';
 
 import statuses from '../../constants/expense_status';
 
@@ -233,6 +233,19 @@ const mutations = {
     },
     resolve: (_, { email }, { remoteUser }) => {
       return updateUserEmail(remoteUser, email);
+    },
+  },
+  confirmUserEmail: {
+    type: UserType,
+    description: 'Confirm the new user email from confirmation token',
+    args: {
+      token: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: "User's emailConfirmationToken",
+      },
+    },
+    resolve: (_, { token }) => {
+      return confirmUserEmail(token);
     },
   },
   editConnectedAccount: {

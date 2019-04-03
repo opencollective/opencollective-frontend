@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import models from '../../../models';
-import { Unauthorized, ValidationFailed } from '../../errors';
+import { Unauthorized, ValidationFailed, InvalidToken } from '../../errors';
 import emailLib from '../../../lib/email';
 
 /**
@@ -44,4 +44,29 @@ export const updateUserEmail = async (user, newEmail) => {
   await emailLib.send('user.changeEmail', user.emailWaitingForValidation, { user });
 
   return user;
+};
+
+/**
+ * From a given token (generated in `updateUserEmail`) confirm the new email
+ * and updates the user record.
+ */
+export const confirmUserEmail = async emailConfirmationToken => {
+  if (!emailConfirmationToken) {
+    throw new ValidationFailed({ message: 'Email confirmation token must be set' });
+  }
+
+  // Put some rate limiting here too so malicious users don't try to bruteforce the token
+  // TODO
+
+  const user = await models.User.findOne({ where: { emailConfirmationToken } });
+
+  if (!user) {
+    throw new InvalidToken({ internalData: { emailConfirmationToken } });
+  }
+
+  return user.update({
+    email: user.emailWaitingForValidation,
+    emailWaitingForValidation: null,
+    emailConfirmationToken: null,
+  });
 };
