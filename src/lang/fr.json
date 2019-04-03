@@ -44,6 +44,8 @@
   "collective.archive.subscriptions": "Les abonnements seront automatiquement annulés à la prochaine échéance.",
   "collective.archive.title": "Archiver ce {type}",
   "collective.backgroundImage.label": "Image de couverture",
+  "collective.balance.description": "Before archiving it might be useful to transfer the remaining balance to the host.",
+  "collective.balance.title": "Empty balance of Collective",
   "collective.card.collectives.count": "{n, plural, one {collectif hébergé} other {collectifs hébergés}}",
   "collective.card.memberOf.count": "{n, plural, one {collectif supporté} other {collectifs supportés}}",
   "collective.card.stats.backers": "{n, plural, one {contributeur} other {contributeurs}}",

@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 import { withRouter } from 'next/router';
 import { ArrowBack } from 'styled-icons/material/ArrowBack';
+import { get } from 'lodash';
+import { Flex, Box } from '@rebass/grid';
+import { Button } from 'react-bootstrap';
+import { FormattedMessage, defineMessages } from 'react-intl';
 
+import withIntl from '../lib/withIntl';
+import { getEnvVar, parseToBoolean, formatCurrency } from '../lib/utils';
+import { defaultBackgroundImage } from '../constants/collectives';
 import { Router } from '../server/pages';
-import { getEnvVar, parseToBoolean } from '../lib/utils';
+
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
@@ -13,20 +21,16 @@ import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
 import ExportData from './ExportData';
-import { FormattedMessage, defineMessages } from 'react-intl';
-import { defaultBackgroundImage } from '../constants/collectives';
-import withIntl from '../lib/withIntl';
-import { Button } from 'react-bootstrap';
 import Link from './Link';
-import { get } from 'lodash';
-import styled, { css } from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import Container from './Container';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
 import ArchiveCollective from './ArchiveCollective';
 import DeleteCollective from './DeleteCollective';
 import EditUserEmailForm from './EditUserEmailForm';
+import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
+import { H2, P } from './Text';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -746,8 +750,55 @@ class EditCollectiveForm extends React.Component {
                   />
                 </Flex>
               )}
+
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
+              )}
+
+              {this.state.section === 'advanced' && (
+                <Fragment>
+                  {collective.type === 'COLLECTIVE' && collective.host.collective && (
+                    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
+                      <H2>
+                        <FormattedMessage
+                          id="collective.balance.title"
+                          defaultMessage={'Empty balance of Collective'}
+                        />
+                      </H2>
+                      <P>
+                        <FormattedMessage
+                          id="collective.balance.description"
+                          defaultMessage={
+                            'Before archiving it might be useful to transfer the remaining balance to the host.'
+                          }
+                        />
+                      </P>
+                      {collective.stats.balance > 0 && (
+                        <SendMoneyToCollectiveBtn
+                          fromCollective={collective}
+                          toCollective={collective.host.collective}
+                          LoggedInUser={LoggedInUser}
+                          amount={collective.stats.balance}
+                          currency={collective.currency}
+                        />
+                      )}
+                      {collective.stats.balance === 0 && (
+                        <StyledButton disabled={true}>
+                          <FormattedMessage
+                            id="SendMoneyToCollective.btn"
+                            defaultMessage="Send {amount} to {collective}"
+                            values={{
+                              amount: formatCurrency(0, collective.currency),
+                              collective: collective.host.collective.name,
+                            }}
+                          />
+                        </StyledButton>
+                      )}
+                    </Container>
+                  )}
+                  {archiveIsEnabled && collective.type !== 'USER' && <ArchiveCollective collective={collective} />}
+                  {deleteIsEnabled && collective.type !== 'EVENT' && <DeleteCollective collective={collective} />}
+                </Fragment>
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>

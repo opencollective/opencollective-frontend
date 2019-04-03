@@ -50,7 +50,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
   const { deleting, error } = deleteStatus;
 
   return (
-    <Container display="flex" flexDirection="column" width={1}>
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
         <FormattedMessage
           values={{ type: collectiveType }}
@@ -68,12 +68,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         />
       </P>
       {error && <P color="#ff5252">{error}</P>}
-      <StyledButton
-        width={0.3}
-        onClick={() => setShowModal(true)}
-        loading={deleting}
-        disabled={!collective.isDeletable}
-      >
+      <StyledButton onClick={() => setShowModal(true)} loading={deleting} disabled={!collective.isDeletable}>
         <FormattedMessage
           values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.button"
