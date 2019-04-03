@@ -901,7 +901,7 @@ export const NotificationType = new GraphQLObjectType({
           return notification.active;
         },
       },
-      webhookURL: {
+      webhookUrl: {
         type: GraphQLString,
         resolve(notification) {
           return notification.webhookUrl;
