@@ -80,7 +80,7 @@ class EditCollectiveForm extends React.Component {
       collective,
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
-      notifications: collective.notifications || [{}],
+      webhooks: collective.notifications || [{}],
       goals: collective.settings.goals || [{}],
     };
 
@@ -716,12 +716,7 @@ class EditCollectiveForm extends React.Component {
                 />
               )}
               {this.state.section === 'webhooks' && (
-                <EditWebhooks
-                  title="Edit webhooks"
-                  notiifcations={this.state.notifications}
-                  collective={collective}
-                  onChange={this.handleObjectChange}
-                />
+                <EditWebhooks title="Edit webhooks" webhooks={this.state.webhooks} onChange={this.handleObjectChange} />
               )}
               {this.state.section === 'tiers' && (
                 <EditTiers

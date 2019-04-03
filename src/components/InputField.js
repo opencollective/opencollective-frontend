@@ -100,6 +100,7 @@ class InputField extends React.Component {
     onChange: PropTypes.func.isRequired,
     required: PropTypes.bool,
     style: PropTypes.object,
+    multiple: PropTypes.bool,
   };
 
   constructor(props) {
@@ -272,7 +273,7 @@ class InputField extends React.Component {
                   timezone={context.timezone || 'utc'}
                   isValidDate={field.validate}
                   onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
-                  closeOnSelect={closeOnSelect}
+                  closeOnSelectmember={closeOnSelect}
                 />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
@@ -428,6 +429,7 @@ class InputField extends React.Component {
             defaultValue={field.value || field.defaultValue || firstOptionValue}
             value={field.value}
             onChange={event => this.handleChange(event.target.value)}
+            multiple={field.multiple}
           >
             {field.options &&
               field.options.map(option => {

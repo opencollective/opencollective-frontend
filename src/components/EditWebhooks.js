@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
 import InputField from './InputField';
+import events from '../constants/events';
 
 class EditWebhooks extends React.Component {
   static propTypes = {
-    collective: PropTypes.object.isRequired,
-    members: PropTypes.arrayOf(PropTypes.object).isRequired,
+    webhooks: PropTypes.arrayOf(PropTypes.object).isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -18,36 +18,32 @@ class EditWebhooks extends React.Component {
     super(props);
     const { intl } = props;
 
-    this.state = { members: [...props.members] || [{}] };
-    this.renderMember = this.renderMember.bind(this);
-    this.addMember = this.addMember.bind(this);
-    this.removeMember = this.removeMember.bind(this);
-    this.editMember = this.editMember.bind(this);
+    this.state = { webhooks: [...props.webhooks] || [{}] };
+    this.renderWebhook = this.renderWebhook.bind(this);
+    this.addWebhook = this.addWebhook.bind(this);
+    this.removeWebhook = this.removeWebhook.bind(this);
+    this.editWebhook = this.editWebhook.bind(this);
     this.onChange = props.onChange.bind(this);
 
     this.defaultType = this.props.defaultType || 'TICKET';
 
     this.messages = defineMessages({
-      'members.role.label': {
-        id: 'members.role.label',
-        defaultMessage: 'role',
+      'webhooks.url.label': {
+        id: 'webhooks.url.label',
+        defaultMessage: 'URL',
       },
-      'members.add': {
-        id: 'members.add',
-        defaultMessage: 'add another member',
+      'webhooks.types.label': {
+        id: 'webhooks.types.label',
+        defaultMessage: 'Types',
       },
-      'members.remove': {
-        id: 'members.remove',
-        defaultMessage: 'remove member',
+      'webhooks.add': {
+        id: 'webhooks.add',
+        defaultMessage: 'add another webhook',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
-      MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
-      'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
-      'user.description.label': {
-        id: 'user.description.label',
-        defaultMessage: 'description',
+      'webhooks.remove': {
+        id: 'webhooks.remove',
+        defaultMessage: 'remove webhook',
       },
-      'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
     });
 
     const getOptions = arr => {
@@ -60,18 +56,29 @@ class EditWebhooks extends React.Component {
 
     this.fields = [
       {
-        name: 'description',
+        name: 'url',
         maxLength: 255,
-        label: intl.formatMessage(this.messages['user.description.label']),
+        type: 'url',
+        label: intl.formatMessage(this.messages['webhooks.url.label']),
+      },
+      {
+        name: 'types',
+        type: 'select',
+        label: intl.formatMessage(this.messages['webhooks.types.label']),
+        options: events.map(event => {
+          return { value: event, label: event };
+        }),
+        multiple: true,
+        defaultValue: [],
       },
     ];
   }
 
-  editMember(index, fieldname, value) {
-    const members = this.state.members;
-    members[index] = {
-      ...members[index],
-      role: members[index].role || 'ADMIN',
+  editWebhook(index, fieldname, value) {
+    const { webhooks } = this.state;
+    webhooks[index] = {
+      ...webhooks[index],
+      role: webhooks[index].role || 'ADMIN',
     };
     const obj = {};
     if (fieldname.indexOf('.') !== -1) {
@@ -80,58 +87,59 @@ class EditWebhooks extends React.Component {
       fieldname = tokens[1];
       obj[parent] = {};
       obj[parent][fieldname] = value;
-      members[index][parent] = {
-        ...members[index][parent],
+      webhooks[index][parent] = {
+        ...webhooks[index][parent],
         [fieldname]: value,
       };
     } else {
-      members[index][fieldname] = value;
+      webhooks[index][fieldname] = value;
     }
 
-    this.setState({ members });
-    this.onChange({ members });
+    this.setState({ webhooks });
+    this.onChange({ webhooks });
   }
 
-  addMember(member) {
-    const members = this.state.members;
-    members.push(member || {});
-    this.setState({ members });
+  addWebhook(webhook) {
+    const { webhooks } = this.state;
+    webhooks.push(webhook || {});
+    this.setState({ webhooks });
   }
 
-  removeMember(index) {
-    const members = this.state.members;
-    if (index < 0 || index > members.length) return;
-    members.splice(index, 1);
-    this.setState({ members });
-    this.onChange({ members });
+  removeWebhook(index) {
+    const { webhooks } = this.state;
+    if (index < 0 || index > webhooks.length) return;
+    webhooks.splice(index, 1);
+    this.setState({ webhooks });
+    this.onChange({ webhooks });
   }
 
-  renderMember(member, index) {
+  renderWebhook(webhook, index) {
     const { intl } = this.props;
 
     return (
-      <div className="member" key={`member-${index}-${member.id}`}>
-        <div className="memberActions">
-          <a className="removeMember" href="#" onClick={() => this.removeMember(index)}>
-            {intl.formatMessage(this.messages['members.remove'])}
+      <div className="webhook" key={`webhook-${index}-${webhook.id}`}>
+        <div className="webhookActions">
+          <a className="removeWebhook" href="#" onClick={() => this.removeWebhook(index)}>
+            {intl.formatMessage(this.messages['webhooks.remove'])}
           </a>
         </div>
         <Form horizontal>
           {this.fields.map(
             field =>
-              (!field.when || field.when(member)) && (
+              (!field.when || field.when(webhook)) && (
                 <InputField
                   className="horizontal"
                   key={field.name}
                   name={field.name}
                   label={field.label}
                   type={field.type}
-                  disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
-                  defaultValue={get(member, field.name) || field.defaultValue}
+                  disabled={typeof field.disabled === 'function' ? field.disabled(webhook) : field.disabled}
+                  defaultValue={get(webhook, field.name) || field.defaultValue}
                   options={field.options}
                   pre={field.pre}
                   placeholder={field.placeholder}
-                  onChange={value => this.editMember(index, field.name, value)}
+                  multiple={field.multiple || false}
+                  onChange={value => this.editWebhook(index, field.name, value)}
                 />
               ),
           )}
@@ -141,39 +149,39 @@ class EditWebhooks extends React.Component {
   }
 
   render() {
-    const { intl, collective } = this.props;
+    const { intl } = this.props;
 
     return (
-      <div className="EditMembers">
+      <div className="EditWebhooks">
         <style jsx>
           {`
-            :global(.memberActions) {
+            :global(.webhookActions) {
               text-align: right;
               font-size: 1.3rem;
             }
             :global(.field) {
               margin: 1rem;
             }
-            .editMembersActions {
+            .editWebhooksActions {
               text-align: right;
               margin-top: -1rem;
             }
             p {
               font-size: 1.3rem;
             }
-            :global(.member) {
+            :global(.webhook) {
               margin: 3rem 0;
             }
           `}
         </style>
 
-        <div className="members">
+        <div className="webhooks">
           <h2>{this.props.title}</h2>
-          {this.state.members.map(this.renderMember)}
+          {this.state.webhooks.map(this.renderWebhook)}
         </div>
-        <div className="editMembersActions">
-          <Button bsStyle="primary" onClick={() => this.addMember({})}>
-            {intl.formatMessage(this.messages['members.add'])}
+        <div className="editWebhooksActions">
+          <Button bsStyle="primary" onClick={() => this.addWebhook({})}>
+            {intl.formatMessage(this.messages['webhooks.add'])}
           </Button>
         </div>
       </div>

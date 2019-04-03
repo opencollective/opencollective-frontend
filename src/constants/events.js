@@ -1,3 +1,4 @@
+// Webhook notification events
 export default [
   'all',
   'connected_account.created',
