@@ -11,7 +11,12 @@ import moment from 'moment';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
+import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
+import { stripeTokenToPaymentMethod } from '../lib/stripe';
+import { formatCurrency, getEnvVar, parseToBoolean } from '../lib/utils';
+import { getPaypal } from '../lib/paypal';
+import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../lib/recaptcha';
 
 import { H2, H5, P, Span } from '../components/Text';
 import Logo from '../components/Logo';
@@ -20,14 +25,6 @@ import Page from '../components/Page';
 import Link from '../components/Link';
 import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
-
-import { addCreateCollectiveMutation } from '../graphql/mutations';
-
-import { stripeTokenToPaymentMethod } from '../lib/stripe';
-import { formatCurrency } from '../lib/utils';
-import { getPaypal } from '../lib/paypal';
-import withIntl from '../lib/withIntl';
-import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../lib/recaptcha';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
@@ -44,6 +41,8 @@ import ContributionBreakdown from '../components/ContributionBreakdown';
 import Steps from '../components/Steps';
 import ContributionFlowStepsProgress from '../components/ContributionFlowStepsProgress';
 import EventDetails from '../components/EventDetails';
+
+import { addCreateCollectiveMutation } from '../graphql/mutations';
 
 // Styles for the previous, next and submit buttons
 const PrevNextButton = styled(StyledButton)`
@@ -65,6 +64,8 @@ PaypalButtonContainer.defaultProps = {
   width: PrevNextButton.defaultProps.minWidth,
   m: PrevNextButton.defaultProps.m,
 };
+
+const recaptchaEnabled = parseToBoolean(getEnvVar('RECAPTCHA_ENABLED'));
 
 /**
  * Main contribution flow entrypoint. Render all the steps from contributeAs
@@ -149,10 +150,12 @@ class CreateOrderPage extends React.Component {
       getPaypal();
     }
 
-    try {
-      this.recaptcha = await getRecaptcha();
-    } catch {
-      this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+    if (recaptchaEnabled) {
+      try {
+        this.recaptcha = await getRecaptcha();
+      } catch {
+        this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+      }
     }
   }
 
@@ -172,7 +175,9 @@ class CreateOrderPage extends React.Component {
   }
 
   componentWillUnmount() {
-    unloadRecaptcha();
+    if (recaptchaEnabled) {
+      unloadRecaptcha();
+    }
   }
 
   loadInitialData() {
@@ -318,9 +323,12 @@ class CreateOrderPage extends React.Component {
     }
 
     // Load recaptcha token
-    const recaptchaToken = await this.fetchRecaptchaToken();
-    if (!recaptchaToken) {
-      this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+    let recaptchaToken;
+    if (recaptchaEnabled) {
+      recaptchaToken = await this.fetchRecaptchaToken();
+      if (!recaptchaToken) {
+        this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+      }
     }
 
     const tier = this.props.data.Tier;
