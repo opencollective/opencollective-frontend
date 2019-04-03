@@ -375,9 +375,10 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         CollectiveInputType.notifications = collective.notifications.map(notification => {
           return {
             id: notification.id,
+            channel: notification.channel,
             type: notification.type,
             active: notification.active,
-            webhookURL: notification.webhookURL,
+            webhookUrl: notification.webhookURL,
           };
         });
       }
