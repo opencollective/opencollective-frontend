@@ -18,12 +18,13 @@ const EditUserEmailForm = ({ user, updateUserEmail }) => {
   const isDone = step === 'already-sent' || step === 'success';
 
   return (
-    <Box my={4}>
+    <Box my={4} data-cy="EditUserEmailForm">
       <H2>
         <FormattedMessage id="EditUserEmailForm.title" defaultMessage="Email address" />
       </H2>
       <Flex flexWrap="wrap">
         <StyledInput
+          name="email"
           type="email"
           disabled={step !== 'form'}
           value={newEmail !== null ? newEmail : user.email}

@@ -437,6 +437,7 @@ export const addUpdateUserEmailMutation = graphql(
     mutation updateUserEmail($email: String!) {
       updateUserEmail(email: $email) {
         id
+        email
         emailWaitingForValidation
       }
     }

@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Apr 03 2019 12:24:14 GMT+0200 (GMT+02:00)
+# timestamp: Wed Apr 03 2019 13:29:15 GMT+0200 (GMT+02:00)
 
 """Application model"""
 type Application {

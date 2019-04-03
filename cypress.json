@@ -5,5 +5,8 @@
   "defaultCommandTimeout": 8000,
   "video": false,
   "chromeWebSecurity": false,
-  "blacklistHosts": ["wtfismyip.com"]
+  "blacklistHosts": ["wtfismyip.com"],
+  "env": {
+    "MAILDEV_URL": "http://localhost:1080"
+  }
 }
