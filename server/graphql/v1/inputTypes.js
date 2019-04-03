@@ -115,6 +115,20 @@ export const MemberInputType = new GraphQLInputObjectType({
   }),
 });
 
+export const NotificationInputType = new GraphQLInputObjectType({
+  name: 'NotificationInputType',
+  description: 'Input type for NotificationType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+    channel: { type: GraphQLString },
+    type: { type: GraphQLString },
+    active: { type: GraphQLBoolean },
+    webhookUrl: { type: GraphQLString },
+    UserId: { type: GraphQLInt },
+    CollectiveId: { type: GraphQLInt },
+  }),
+});
+
 export const CollectiveInputType = new GraphQLInputObjectType({
   name: 'CollectiveInputType',
   description: 'Input type for CollectiveType',
@@ -147,7 +161,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     settings: { type: GraphQLJSON },
     data: { type: GraphQLJSON },
     members: { type: new GraphQLList(MemberInputType) },
-    notification: { type: new GraphQLList(NotificationType) },
+    notification: { type: new GraphQLList(NotificationInputType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
     HostCollectiveId: { type: GraphQLInt },
     hostFeePercent: { type: GraphQLInt },

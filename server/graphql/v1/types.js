@@ -901,6 +901,12 @@ export const NotificationType = new GraphQLObjectType({
           return notification.active;
         },
       },
+      webhookURL: {
+        type: GraphQLString,
+        resolve(notification) {
+          return notification.webhookUrl;
+        },
+      },
       user: {
         type: UserType,
         resolve(notification) {
@@ -911,12 +917,6 @@ export const NotificationType = new GraphQLObjectType({
         type: CollectiveInterfaceType,
         resolve(notification, args, req) {
           return req.loaders.collective.findById.load(notification.CollectiveId);
-        },
-      },
-      webhookURL: {
-        type: GraphQLString,
-        resolve(notification) {
-          return notification.webhookUrl;
         },
       },
       createdAt: {
