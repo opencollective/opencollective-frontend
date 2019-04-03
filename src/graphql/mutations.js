@@ -378,7 +378,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
             channel: notification.channel,
             type: notification.type,
             active: notification.active,
-            webhookUrl: notification.webhookURL,
+            webhookUrl: notification.webhookUrl,
           };
         });
       }
