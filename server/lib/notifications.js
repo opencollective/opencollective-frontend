@@ -12,6 +12,7 @@ import { W9_BOT_SLUG } from '../constants/collectives';
 import models from '../models';
 import debugLib from 'debug';
 import { formatCurrency } from './utils';
+import { channels } from '../constants';
 
 const debug = debugLib('notification');
 
@@ -33,20 +34,20 @@ export default async (Sequelize, activity) => {
   const where = {
     CollectiveId: activity.CollectiveId,
     type: [activityType.ACTIVITY_ALL, activity.type],
-    channel: ['gitter', 'slack', 'twitter', 'webhook'],
+    channel: Object.values(channels),
     active: true,
   };
 
   const notificationChannels = await models.Notification.findAll({ where });
 
   return Promise.map(notificationChannels, notifConfig => {
-    if (notifConfig.channel === 'gitter') {
+    if (notifConfig.channel === channels.GITTER) {
       return publishToGitter(activity, notifConfig);
-    } else if (notifConfig.channel === 'slack') {
+    } else if (notifConfig.channel === channels.SLACK) {
       return publishToSlack(activity, notifConfig.webhookUrl, {});
-    } else if (notifConfig.channel === 'twitter') {
+    } else if (notifConfig.channel === channels.TWITTER) {
       return twitter.tweetActivity(activity);
-    } else if (notifConfig.channel === 'webhook') {
+    } else if (notifConfig.channel === channels.WEBHOOK) {
       return publishToWebhoook(activity, notifConfig.webhookUrl);
     } else {
       return Promise.resolve();

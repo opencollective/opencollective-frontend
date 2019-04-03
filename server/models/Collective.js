@@ -30,6 +30,7 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
+import { channels } from '../constants';
 
 const debug = debugLib('collective');
 
@@ -1591,7 +1592,31 @@ export default function(Sequelize, DataTypes) {
   };
 
   // edit the notifications of this collective (create/update/remove)
-  Collective.prototype.editNotifications = function(notifications) {};
+  Collective.prototype.editNotifications = function(notifications) {
+    if (!notifications) return Promise.resolve();
+
+    return this.getNotifications()
+      .then(oldNotifications => {
+        const diff = difference(oldNotifications.map(n => n.id), notifications.map(n => n.id));
+        debug('editNotifications', 'delete', diff);
+        return models.Notification.destroy({ where: { id: { [Op.in]: diff } } });
+      })
+      .then(() => {
+        return Promise.map(notifications, notification => {
+          if (!(notification.type in activities && notification.channel in channels)) return;
+
+          if (notification.id) {
+            const editableAttributes = pick(notification, ['type', 'active', 'webhookUrl']);
+            debug('editNotifications', 'update notification', notification.id, editableAttributes);
+            return models.Notification.update(editableAttributes, { where: { id: notification.id } });
+          }
+
+          notification.CollectiveId = this.id;
+          return models.Notification.create(notification);
+        });
+      })
+      .then(() => this.getNotifications());
+  };
 
   /*
    * Assumes:
