@@ -40,6 +40,10 @@
     "virtualCards": {
       "maxPerDay": 100,
       "maxAmountPerDay": 500000
+    },
+    "changeEmailPerHour": {
+      "update": 10,
+      "confirmToken": 15
     }
   },
   "email": {

@@ -1,7 +1,11 @@
 import crypto from 'crypto';
+import config from 'config';
 import models from '../../../models';
-import { Unauthorized, ValidationFailed, InvalidToken } from '../../errors';
+import { Unauthorized, ValidationFailed, InvalidToken, RateLimitExceeded } from '../../errors';
+import cache from '../../../lib/cache';
 import emailLib from '../../../lib/email';
+
+const oneHourInSeconds = 60 * 60;
 
 /**
  * Sets `emailWaitingForValidation` to `newEmail` for `user` and sends a confirmation
@@ -13,7 +17,12 @@ export const updateUserEmail = async (user, newEmail) => {
   }
 
   // Put some rate limiting for user so they can't bruteforce the system to guess emails
-  // TODO
+  const maxChangePerHour = config.limits.changeEmailPerHour.update;
+  const countCacheKey = `user_email_change_${user.id}`;
+  const existingCount = (await cache.get(countCacheKey)) || 0;
+  if (existingCount > maxChangePerHour) {
+    throw new RateLimitExceeded();
+  }
 
   // If somehow user tries to update the email to its existing value then we remove
   // any email waiting for confirmation
@@ -43,6 +52,9 @@ export const updateUserEmail = async (user, newEmail) => {
   // Send the email and return updated user
   await emailLib.send('user.changeEmail', user.emailWaitingForValidation, { user });
 
+  // Update the cache
+  cache.set(countCacheKey, existingCount + 1, oneHourInSeconds);
+
   return user;
 };
 
@@ -54,9 +66,6 @@ export const confirmUserEmail = async emailConfirmationToken => {
   if (!emailConfirmationToken) {
     throw new ValidationFailed({ message: 'Email confirmation token must be set' });
   }
-
-  // Put some rate limiting here too so malicious users don't try to bruteforce the token
-  // TODO
 
   const user = await models.User.findOne({ where: { emailConfirmationToken } });
 
