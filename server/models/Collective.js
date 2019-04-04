@@ -898,11 +898,12 @@ export default function(Sequelize, DataTypes) {
    * @param {*} startDate beginning of the time period
    * @param {*} endDate end of the time period
    */
-  Collective.prototype.getNewOrders = async function(startDate = 0, endDate = new Date()) {
+  Collective.prototype.getNewOrders = async function(startDate = 0, endDate = new Date(), where = {}) {
     const orders = await models.Order.findAll({
       where: {
         CollectiveId: this.id,
         createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
+        ...where,
       },
       paranoid: false,
       include: [{ model: models.Collective, as: 'fromCollective' }, { model: models.Tier }],
