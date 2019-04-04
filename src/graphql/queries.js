@@ -189,7 +189,7 @@ export const getCollectiveToEditQueryFields = `
     description
     website
     twitterHandle
-    collective {
+    hostCollective {
       id
       slug
       name

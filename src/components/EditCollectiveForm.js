@@ -757,7 +757,7 @@ class EditCollectiveForm extends React.Component {
 
               {this.state.section === 'advanced' && (
                 <Fragment>
-                  {collective.type === 'COLLECTIVE' && collective.host.collective && (
+                  {collective.type === 'COLLECTIVE' && collective.host.hostCollective && (
                     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
                       <H2>
                         <FormattedMessage
@@ -776,7 +776,7 @@ class EditCollectiveForm extends React.Component {
                       {collective.stats.balance > 0 && (
                         <SendMoneyToCollectiveBtn
                           fromCollective={collective}
-                          toCollective={collective.host.collective}
+                          toCollective={collective.host.hostCollective}
                           LoggedInUser={LoggedInUser}
                           amount={collective.stats.balance}
                           currency={collective.currency}
@@ -789,7 +789,7 @@ class EditCollectiveForm extends React.Component {
                             defaultMessage="Send {amount} to {collective}"
                             values={{
                               amount: formatCurrency(0, collective.currency),
-                              collective: collective.host.collective.name,
+                              collective: collective.host.hostCollective.name,
                             }}
                           />
                         </StyledButton>
