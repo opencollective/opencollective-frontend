@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -14,6 +15,8 @@ import { addCollectiveCoverData } from '../graphql/queries';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import Page from '../components/Page';
+import Loading from '../components/Loading';
 
 class TransactionsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
@@ -28,22 +31,41 @@ class TransactionsPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { Collective: get(props, 'data.Collective') };
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, data } = this.props;
     const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
+    const Collective = (data && data.Collective) || this.state.collective;
+    this.setState({ LoggedInUser, Collective });
+  }
+
+  componentDidUpdate(oldProps) {
+    // We store the component in state and update only if the next one is not
+    // null because of a bug in Apollo where it strips the `Collective` from data
+    // during re-hydratation.
+    // See https://github.com/opencollective/opencollective/issues/1872
+    const currentCollective = get(this.props, 'data.Collective');
+    if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
+      this.setState({ Collective: currentCollective });
+    }
   }
 
   render() {
-    const { data } = this.props;
     const { LoggedInUser } = this.state;
+    const collective = get(this.props, 'data.Collective') || this.state.Collective;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!collective && this.props.data.loading) {
+      return (
+        <Page title="Transactions">
+          <Loading />
+        </Page>
+      );
+    } else if (!collective) {
+      return <ErrorPage data={this.props.data} />;
+    }
 
-    const collective = data.Collective;
     const cta = ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1 && {
       href: `/${collective.slug}#contribute`,
       label: 'contribute',

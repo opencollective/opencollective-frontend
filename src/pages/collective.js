@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
@@ -11,6 +12,8 @@ import { addCollectiveData } from '../graphql/queries';
 import withIntl from '../lib/withIntl';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
+import Loading from '../components/Loading';
+import Page from '../components/Page';
 
 class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query }) {
@@ -29,7 +32,7 @@ class CollectivePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { Collective: get(props, 'data.Collective') };
   }
 
   async componentDidMount() {
@@ -40,26 +43,36 @@ class CollectivePage extends React.Component {
     if (query.refetch && data.refetch) {
       data.refetch();
     }
+
+    const Collective = data.Collective || this.state.collective;
+    this.setState({ Collective });
   }
 
-  shouldComponentUpdate(nextProps) {
-    // It can be that Apollo is resetting data when navigating from a page to another
-    // We try to detect that and prevent rendering
-    // This is a workaround and the root cause should be ultimately fixed
-    if (this.props.data.Collective && !nextProps.data.Collective) {
-      return false;
+  componentDidUpdate(oldProps) {
+    // We store the component in state and update only if the next one is not
+    // null because of a bug in Apollo where it strips the `Collective` from data
+    // during re-hydratation.
+    // See https://github.com/opencollective/opencollective/issues/1872
+    const currentCollective = get(this.props, 'data.Collective');
+    if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
+      this.setState({ Collective: currentCollective });
     }
-    return true;
   }
 
   render() {
-    const { data, query, LoggedInUser } = this.props;
+    const { query, LoggedInUser, data } = this.props;
+    const collective = get(data, 'Collective') || this.state.Collective;
 
-    if (!data.loading && !data.Collective) {
+    if (!data.loading && !collective) {
       ssrNotFoundError(data);
+    } else if (data.loading && !collective) {
+      return (
+        <Page>
+          <Loading />
+        </Page>
+      );
     }
 
-    const collective = data.Collective;
     const props = {
       collective,
       LoggedInUser,
