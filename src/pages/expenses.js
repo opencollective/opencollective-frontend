@@ -66,7 +66,7 @@ class ExpensesPage extends React.Component {
       }
       if (this.props.filter === 'recipients') {
         const recipient = decodeURIComponent(this.props.value);
-        filter = { recipient };
+        filter = { fromCollectiveSlug: recipient };
         subtitle = (
           <FormattedMessage id="expenses.byRecipient" defaultMessage="Expenses by {recipient}" values={{ recipient }} />
         );
@@ -130,7 +130,7 @@ class ExpensesPage extends React.Component {
 
             <div className=" columns">
               <div className="col large">
-                <ExpensesWithData collective={collective} LoggedInUser={this.state.LoggedInUser} filter={filter} />
+                <ExpensesWithData collective={collective} LoggedInUser={this.state.LoggedInUser} filters={filter} />
               </div>
 
               <div className="col side">

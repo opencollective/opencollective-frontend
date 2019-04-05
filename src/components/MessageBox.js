@@ -54,7 +54,7 @@ const MessageBox = ({ withIcon, children, ...props }) => {
 
 MessageBox.propTypes = {
   /** @ignore */
-  blacklist: PropTypes.arrayOf(PropTypes.string),
+  omitProps: PropTypes.arrayOf(PropTypes.string),
   /** Type of the message */
   type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
   /** Weither icon should be hidden. Icons are only set for info, success, warning and error messages. */
@@ -68,7 +68,7 @@ MessageBox.propTypes = {
 MessageBox.defaultProps = {
   type: 'white',
   withIcon: false,
-  blacklist: tag.defaultProps.blacklist.concat('type'),
+  omitProps: tag.defaultProps.omitProps.concat('type'),
 };
 
 export default MessageBox;

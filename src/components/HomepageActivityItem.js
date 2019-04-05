@@ -6,30 +6,27 @@ import { FormattedNumber } from 'react-intl';
 import Avatar from './Avatar';
 import Container from './Container';
 import { P, Span } from './Text';
-
-import { Link } from '../server/pages';
+import LinkCollective from './LinkCollective';
 
 const HomepageActivityItem = ({ amount, createdAt, currency, fromCollective, collective, subscription, type }) => {
   const formattedCreatedAt = new Date(createdAt).toISOString();
   return (
     <Container display="flex" alignItems="center">
-      <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-        <a title={fromCollective.name}>
-          <Avatar
-            src={fromCollective.image}
-            id={fromCollective.id}
-            radius={40}
-            className="noFrame"
-            type={fromCollective.type}
-            name={fromCollective.name}
-          />
-        </a>
-      </Link>
+      <LinkCollective collective={fromCollective} title={fromCollective.name}>
+        <Avatar
+          src={fromCollective.image}
+          id={fromCollective.id}
+          radius={40}
+          className="noFrame"
+          type={fromCollective.type}
+          name={fromCollective.name}
+        />
+      </LinkCollective>
       <Container ml={3}>
         <P fontSize="1.2rem" color="#9399A3" display="inline">
-          <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-            <a title={fromCollective.name}>{fromCollective.name}</a>
-          </Link>
+          <LinkCollective collective={fromCollective} title={fromCollective.name}>
+            {fromCollective.name}
+          </LinkCollective>
           {type === 'DEBIT' ? ' submitted a ' : ' contributed '}
           <Span color="#2E3033">
             <FormattedNumber
@@ -44,9 +41,9 @@ const HomepageActivityItem = ({ amount, createdAt, currency, fromCollective, col
           {subscription && ` a ${subscription.interval} `}
           {type === 'DEBIT' && ' expense '}
           {' to '}{' '}
-          <Link route="collective" params={{ slug: collective.slug }}>
-            <a title={collective.name}>{collective.name}</a>
-          </Link>
+          <LinkCollective collective={collective} title={collective.name}>
+            {collective.name}
+          </LinkCollective>
           .
         </P>
         <Container position="relative" top={4} left={4} display="inline-block">

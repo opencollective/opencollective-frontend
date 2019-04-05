@@ -101,6 +101,9 @@ class NotificationBar extends React.Component {
             .actions > div {
               margin: 0.5rem;
             }
+            .collectiveArchived {
+              background: #414141;
+            }
           `}
         </style>
         <div className="oc-message">
@@ -108,7 +111,7 @@ class NotificationBar extends React.Component {
           {error && <p>{error}</p>}
         </div>
         {title && (
-          <div className="NotificationLine">
+          <div className={`NotificationLine ${status}`}>
             <h1>{title}</h1>
             <p className="description">{description}</p>
             {actions && (

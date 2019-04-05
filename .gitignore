@@ -9,6 +9,7 @@ build
 cypress/screenshots
 cypress/videos
 dist
+stage
 *.swp
 styleguide/index.html
 styleguide/build/

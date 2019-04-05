@@ -23,6 +23,7 @@ import {
   height,
   justifyContent,
   left,
+  lineHeight,
   maxHeight,
   maxWidth,
   minHeight,
@@ -67,6 +68,7 @@ const Container = styled(tag)`
   ${height}
   ${justifyContent}
   ${left}
+  ${lineHeight}
   ${maxHeight}
   ${maxWidth}
   ${minHeight}
@@ -94,7 +96,7 @@ const Container = styled(tag)`
 `;
 
 Container.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('float', 'clear', 'clearfix', 'overflow'),
+  omitProps: tag.defaultProps.omitProps.concat('float', 'clear', 'clearfix', 'overflow'),
 };
 
 export default Container;

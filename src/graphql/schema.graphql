@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Mar 01 2019 18:23:51 GMT+0100 (GMT+01:00)
+# timestamp: Thu Mar 28 2019 12:48:57 GMT+0100 (GMT+01:00)
 
 """Application model"""
 type Application {
@@ -58,7 +58,7 @@ type Collective implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -72,7 +72,9 @@ type Collective implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -84,6 +86,12 @@ type Collective implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective is archived"""
+  isArchived: Boolean
+
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
@@ -219,9 +227,9 @@ interface CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
-  """Name, address, lat, long of the location."""
+  """Name, address, country, lat, long of the location."""
   location: LocationType
   createdAt: String
   startsAt: String
@@ -233,12 +241,13 @@ interface CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
   data: JSON
   slug: String
   path: String
   isHost: Boolean
   canApply: Boolean
+  isArchived: Boolean
+  isDeletable: Boolean
   host: CollectiveInterface
 
   """
@@ -356,9 +365,7 @@ type CollectivesStatsType {
   """Returns the collectives hosted by this collective"""
   hosted: Int
 
-  """
-  Returns the number of collectives that have this collective has parent
-  """
+  """Returns the number of collectives that have this collective has parent"""
   memberOf: Int
 
   """Returns the number of events that have this collective has parent"""
@@ -491,7 +498,7 @@ type Event implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -505,7 +512,9 @@ type Event implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -517,6 +526,12 @@ type Event implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective is archived"""
+  isArchived: Boolean
+
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
@@ -736,17 +751,37 @@ scalar JSON
 
 """Input type for Location"""
 input LocationInputType {
+  """A short name for the location (eg. Google Headquarters)"""
   name: String
+
+  """Postal address without country (eg. 12 opensource avenue, 7500 Paris)"""
   address: String
+
+  """Two letters country code (eg. FR, BE...etc)"""
+  country: String
+
+  """Latitude"""
   lat: Float
+
+  """Longitude"""
   long: Float
 }
 
 """Type for Location"""
 type LocationType {
+  """A short name for the location (eg. Google Headquarters)"""
   name: String
+
+  """Postal address without country (eg. 12 opensource avenue, 7500 Paris)"""
   address: String
+
+  """Two letters country code (eg. FR, BE...etc)"""
+  country: String
+
+  """Latitude"""
   lat: Float
+
+  """Longitude"""
   long: Float
 }
 
@@ -778,11 +813,17 @@ type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
-  deleteCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
+
+  """Delete a collective"""
+  deleteCollective(id: Int!): CollectiveInterface
+  deleteUserCollective(id: Int!): CollectiveInterface
+  deleteEventCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
+  archiveCollective(id: Int!): CollectiveInterface
+  unarchiveCollective(id: Int!): CollectiveInterface
 
   """Create a user with an optional organization."""
   createUser(
@@ -1127,6 +1168,9 @@ type OrderType {
 
   """Current status for an order"""
   status: OrderStatus
+
+  """Additional information on order: tax"""
+  data: JSON
 }
 
 """This represents a Organization Collective"""
@@ -1143,7 +1187,7 @@ type Organization implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -1157,7 +1201,9 @@ type Organization implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -1169,6 +1215,12 @@ type Organization implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective is archived"""
+  isArchived: Boolean
+
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective
@@ -1414,6 +1466,9 @@ type Query {
     """Only return active collectives"""
     isActive: Boolean
 
+    """Only return pledged or non-pledged collectives"""
+    isPledged: Boolean
+
     """Fetch all collectives that `memberOfCollectiveSlug` is a member of"""
     memberOfCollectiveSlug: String
 
@@ -1447,6 +1502,7 @@ type Query {
     limit: Int = 10
     offset: Int = 0
   ): CollectiveSearchResults
+  allCollectiveTags: [String]
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -1738,7 +1794,7 @@ type User implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String
+  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """Name, address, lat, long of the location."""
   location: LocationType
@@ -1752,7 +1808,9 @@ type User implements CollectiveInterface {
   image: String
   backgroundImage: String
   settings: JSON
-  taxes: JSON
+
+  """Defines if a collective is pledged"""
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -1764,6 +1822,12 @@ type User implements CollectiveInterface {
 
   """Returns whether this host accepts applications for new collectives"""
   canApply: Boolean
+
+  """Returns whether this collective is archived"""
+  isArchived: Boolean
+
+  """Returns whether this collective is deletable"""
+  isDeletable: Boolean
 
   """
   Get the host collective that is receiving the money on behalf of this collective

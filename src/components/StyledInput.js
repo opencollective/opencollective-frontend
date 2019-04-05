@@ -80,7 +80,7 @@ const StyledInput = styled(tag.input)`
 
 StyledInput.propTypes = {
   /** @ignore */
-  blacklist: PropTypes.arrayOf(PropTypes.string),
+  omitProps: PropTypes.arrayOf(PropTypes.string),
   /** true to hide styled borders */
   bare: PropTypes.bool,
   /** styled-system prop: accepts any css 'border' value */
@@ -115,13 +115,14 @@ StyledInput.propTypes = {
 };
 
 StyledInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare', 'error'),
+  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'bare', 'error'),
   border: '1px solid',
   borderColor: 'black.300',
   borderRadius: '4px',
   px: 3,
   py: 2,
-  lineHeight: '1em',
+  lineHeight: '1.5',
+  fontSize: 'Paragraph',
 };
 
 export const TextInput = styled(StyledInput)``;
@@ -137,7 +138,7 @@ export const SubmitInput = styled(StyledInput)`
 `;
 
 SubmitInput.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('buttonStyle', 'buttonSize', 'bare'),
+  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'bare'),
   buttonStyle: 'primary',
   buttonSize: 'large',
   fontWeight: 'bold',

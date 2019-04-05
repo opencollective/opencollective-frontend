@@ -29,6 +29,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     name: PropTypes.string,
     error: PropTypes.string,
     hasSaveCheckBox: PropTypes.bool,
+    hidePostalCode: PropTypes.bool,
     onChange: PropTypes.func,
     onReady: PropTypes.func,
     stripe: PropTypes.object,
@@ -36,6 +37,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 
   static defaultProps = {
     hasSaveCheckBox: true,
+    hidePostalCode: false,
   };
 
   componentDidMount() {
@@ -51,10 +53,13 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   }
 
   render() {
-    const { name, onChange, error, hasSaveCheckBox } = this.props;
+    const { name, onChange, error, hasSaveCheckBox, hidePostalCode } = this.props;
     return (
       <Flex flexDirection="column">
-        <StyledCardElement onChange={value => onChange({ name, type: 'StripeCreditCard', value })} />
+        <StyledCardElement
+          hidePostalCode={hidePostalCode}
+          onChange={value => onChange({ name, type: 'StripeCreditCard', value })}
+        />
         {error && (
           <Span display="block" color="red.500" pt={2} fontSize="Tiny">
             {error}

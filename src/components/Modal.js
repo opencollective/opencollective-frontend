@@ -80,6 +80,11 @@ class Modal extends React.Component {
                 background: white;
               }
             }
+
+            .confirm-ArchiveCollective,
+            .confirm-deleteCollective {
+              height: 130px;
+            }
           `}
         </style>
         <div className={`Modal-box ${this.props.className}`}>

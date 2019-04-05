@@ -4,6 +4,7 @@
 [![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
 [![Dependency Status](https://david-dm.org/opencollective/opencollective-frontend/status.svg)](https://david-dm.org/opencollective/opencollective-frontend)
 [![Greenkeeper badge](https://badges.greenkeeper.io/opencollective/opencollective-frontend.svg)](https://greenkeeper.io/)
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
@@ -92,7 +93,6 @@ npm run styleguide:deploy
 You can run the tests using `npm test` or more specifically:
 
 - `npm run test:jest` for pages and components
-- `npm run test:server` for api
 - `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
 
 To update:
@@ -102,13 +102,17 @@ To update:
 
 ## Localization
 
-To add a translation to a new language, copy paste the `en.json` from `src/lang` and rename the copy using the 2 or 4 letter code for your country/language (e.g. `fr-BE.json` or `fr.json`).
+Translating the interface doesn't require any technical skill, you can go on
+https://crowdin.com/project/opencollective and start translating right away!
 
-You will also need to copy paste the last line in `scripts/translate.js`, and replace `ja` with your 2-4 letter locale code.
+We're currently looking for contributions for the following languages:
 
-```
-fs.writeFileSync(`${LANG_DIR}ja.json`, JSON.stringify(translatedMessages('ja'), null, 2));
-```
+- French
+- Spanish
+- Japanese
+
+Want to add a new language for Open Collective? [Contact us](https://slack.opencollective.org),
+we'll be happy to help you to set it up!
 
 ## Deployment
 

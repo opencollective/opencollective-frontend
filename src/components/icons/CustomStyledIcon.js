@@ -18,7 +18,7 @@ const StyledSVG = styled(tag.svg)`
 `;
 
 StyledSVG.defaultProps = {
-  blacklist: tag.defaultProps.blacklist.concat('cursor'),
+  omitProps: tag.defaultProps.omitProps.concat('cursor'),
 };
 
 /**
