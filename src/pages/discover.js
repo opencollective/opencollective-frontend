@@ -19,6 +19,7 @@ import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
+import StyledLink from '../components/StyledLink';
 
 import CollectiveCard from '../components/CollectiveCard';
 import PledgedCollectiveCard from '../components/PledgeCollectiveCard';
@@ -35,16 +36,9 @@ const SelectWrapper = styled.select`
   border: 1px solid silver;
 `;
 
-const Nava = styled.a`
-  color: grey;
-  :hover {
-    color: blue;
-    cursor: pointer;
-  }
-`;
 const SearchFormContainer = styled(Box)`
-  max-width: 30rem;
-  min-width: 83rem;
+  max-width: 100%;
+  width: 100rem;
   padding: 64px;
 `;
 const SearchInput = styled(Box)`
@@ -165,30 +159,30 @@ const DiscoverPage = ({ router }) => {
               <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin-right: 256px;">
                 <Box as="li" px={3}>
                   <Link href="/discover" passHref scroll={false}>
-                    <Nava>
+                    <StyledLink color="black.600">
                       <FormattedMessage id="menu.allCollectives" defaultMessage="All Collectives" />
-                    </Nava>
+                    </StyledLink>
                   </Link>
                 </Box>
                 <Box as="li" px={3}>
                   <Link href="/discover?offset=0&show=open%20source" passHref scroll={false}>
-                    <Nava>
+                    <StyledLink color="black.600">
                       <FormattedMessage id="menu.openSourceCollectives" defaultMessage="OpenSource Collectives" />
-                    </Nava>
+                    </StyledLink>
                   </Link>
                 </Box>
                 <Box as="li" px={3}>
                   <Link href="/discover?offset=0&show=pledged" passHref scroll={false}>
-                    <Nava>
+                    <StyledLink color="black.600">
                       <FormattedMessage id="menu.pledgedCollective" defaultMessage="Pledged Collectives" />
-                    </Nava>
+                    </StyledLink>
                   </Link>
                 </Box>
                 <Box as="li" px={3}>
                   <Link href="/discover?offset=0&show=other" passHref scroll={false}>
-                    <Nava>
+                    <StyledLink color="black.600">
                       <FormattedMessage id="menu.others" defaultMessage="Others" />
-                    </Nava>
+                    </StyledLink>
                   </Link>
                 </Box>
               </NavList>

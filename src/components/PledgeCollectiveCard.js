@@ -20,7 +20,7 @@ const defaultPledgedLogo = '/static/images/default-collective-logo.svg';
 
 const CollectiveLogoContainer = styled(Flex)`
   justify-content: center;
-  border-top: 1px solid ${themeGet('colors.black.200')};
+  border-top: 1px solid ${themeGet('colors.black.300')};
 `;
 
 class PledgeCollectiveCard extends React.Component {
@@ -33,7 +33,8 @@ class PledgeCollectiveCard extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, collective } = this.props;
+    // eslint-disable-next-line react/prop-types
+    const { collective } = this.props;
 
     let website = collective.website;
     if (!website && collective.githubHandle) {
@@ -52,15 +53,15 @@ class PledgeCollectiveCard extends React.Component {
         overflow="hidden"
       >
         <CollectiveLogoContainer mt={52}>
-          <Box mt={-32}>
+          <Box mt={-50}>
             <Link route="collective" params={{ slug: collective.slug }}>
-              <img src={defaultPledgedLogo} alt="Pledged Collective" radius={8} width="94px" />
+              <img src={defaultPledgedLogo} alt="Pledged Collective" radius={8} width="94px" mb={-43} />
             </Link>
           </Box>
         </CollectiveLogoContainer>
 
-        <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3} color="black">
-          <Link route="collective" params={{ slug: collective.slug }}>
+        <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mb={-1} color="black">
+          <Link route="collective" params={{ slug: collective.slug }} color="black">
             {collective.name}
           </Link>
         </P>
@@ -74,12 +75,12 @@ class PledgeCollectiveCard extends React.Component {
           </StyledLink>
         </Link>
         <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
-          <StyledLink buttonStyle="primary" mb={4} mx="auto" buttonSize="small" margin-bottom="40px">
+          <StyledLink buttonStyle="primary" mb={4} mx="auto" buttonSize="small">
             <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
           </StyledLink>
         </Link>
         <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
-          <StyledLink textAlign="center" width={1} buttonSize="small" buttonStyle="standard">
+          <StyledLink textAlign="center" width={1} mb={4} buttonSize="small" buttonStyle="standard">
             <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
           </StyledLink>
         </Link>
