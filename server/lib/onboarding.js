@@ -18,7 +18,7 @@ export async function processCollective(collective, template) {
   }
 
   // if the collective is an open source one, we send the custom template if there is one.
-  if ((collective.tags || []).includes('opensource') && templateNames.includes(`${template}.opensource`)) {
+  if ((collective.tags || []).includes('open source') && templateNames.includes(`${template}.opensource`)) {
     template = `${template}.opensource`;
   }
 

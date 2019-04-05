@@ -264,7 +264,7 @@ export async function createCollectiveFromGithub(_, args, req) {
       });
     }
     collectiveData.tags = repo.topics || [];
-    collectiveData.tags.push('opensource');
+    collectiveData.tags.push('open source');
     collectiveData.description = repo.description;
     collectiveData.settings = {
       githubRepo: githubHandle,
