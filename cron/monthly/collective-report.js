@@ -167,7 +167,7 @@ const processCollective = collective => {
     collective.getExpenses(null, startDate, endDate),
     collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC'),
     collective.getBackersStats(startDate, endDate),
-    collective.getNewOrders(startDate, endDate, { status: 'PAID' }),
+    collective.getNewOrders(startDate, endDate, { status: { [Op.or]: ['ACTIVE', 'PAID'] } }),
     collective.getCancelledOrders(startDate, endDate),
     collective.getUpdates('published', startDate, endDate),
     collective.getNextGoal(endDate),
