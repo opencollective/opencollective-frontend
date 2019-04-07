@@ -19,6 +19,7 @@ import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
 import holidayGiftCardConfirmationHtml from '../static/holiday-gift-card/confirmation.html';
 import giftCardPageHtml from '../static/gift-cards-page/index.html';
 import giftCardPageConfirmationHtml from '../static/gift-cards-page/confirmation.html';
+import becomeAFiscalHostHtml from '../static/become-a-fiscal-host-page/index.html';
 
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
@@ -29,6 +30,7 @@ import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outp
 import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
 import giftCardPageStyle from '!css-loader!../static/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
+import becomeAFiscalHostStyle from '!css-loader!../static/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
 
 class MarketingPage extends React.Component {
   static async getInitialProps({ req, query: { pageSlug } }) {
@@ -103,6 +105,10 @@ class MarketingPage extends React.Component {
       html = confirmationPage ? giftCardPageConfirmationHtml : giftCardPageHtml;
       style = giftCardPageStyle;
       className = null;
+    } else if (pageSlug === 'become-a-fiscal-host') {
+      html = becomeAFiscalHostHtml;
+      style = becomeAFiscalHostStyle;
+      className = 'mkt-page-become-a-fiscal-host';
     }
 
     return (
