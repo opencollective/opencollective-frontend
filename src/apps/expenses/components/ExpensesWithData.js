@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
 import Error from '../../../components/Error';
@@ -13,19 +14,28 @@ class ExpensesWithData extends React.Component {
     host: PropTypes.object,
     limit: PropTypes.number,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
-    filter: PropTypes.object, // { category, recipient }
+    hasFilters: PropTypes.bool,
+    filters: PropTypes.object, // { category, recipient, status }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     includeHostedCollectives: PropTypes.bool,
-    filters: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    fetchMore: PropTypes.func, // from addExpensesData
+    data: PropTypes.object, // from addExpensesData
+    onFiltersChange: PropTypes.func, // from addExpensesData
   };
 
-  constructor(props) {
-    super(props);
+  /**
+   * `addExpensesData` may hack the status variable by turning `READY` into `APPROVED`
+   * to speak the language of the API. Here we prefer to rely on the `this.props.filters.status`
+   * variable as is stays untouched but we fallback on `data.variables` to ensure
+   * we don't miss defaults if not provided.
+   */
+  getStatus() {
+    return get(this.props.filters, 'status') || get(this.props.data, 'variables.status');
   }
 
   render() {
-    const { data, LoggedInUser, collective, host, view, includeHostedCollectives, filters } = this.props;
+    const { data, LoggedInUser, collective, host, view, includeHostedCollectives } = this.props;
 
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
@@ -33,18 +43,19 @@ class ExpensesWithData extends React.Component {
     }
 
     const expenses = data.allExpenses;
-
     return (
       <div className="ExpensesWithData">
         <Expenses
           collective={collective}
           host={host}
           expenses={expenses}
-          refetch={data.refetch}
           editable={view !== 'compact'}
           view={view}
           fetchMore={this.props.fetchMore}
-          filters={filters}
+          updateVariables={this.props.onFiltersChange}
+          loading={data.loading}
+          status={this.getStatus()}
+          filters={this.props.hasFilters}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
         />
@@ -115,12 +126,17 @@ const getExpensesQuery = gql`
 `;
 
 const getExpensesVariables = props => {
+  const filters = { ...props.filters };
+  if (filters.status === 'READY') {
+    filters.status = 'APPROVED';
+  }
+
   const vars = {
     CollectiveId: props.collective.id,
     offset: 0,
     limit: props.limit || EXPENSES_PER_PAGE * 2,
     includeHostedCollectives: props.includeHostedCollectives || false,
-    ...props.filter,
+    ...filters,
   };
   if (vars.category) {
     vars.fromCollectiveSlug = null;
@@ -135,6 +151,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
   options(props) {
     return {
       variables: getExpensesVariables(props),
+      fetchPolicy: 'network-only',
     };
   },
   props: ({ data }) => ({

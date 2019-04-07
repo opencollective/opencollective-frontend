@@ -1,49 +1,53 @@
-Default:
+### Full component
 
 ```js
 amountOptions = [500, 1000, 2000, 5000, 10000];
-currency = 'USD';
-<ContributeDetails onChange={console.log} amountOptions={amountOptions} currency={currency} />;
+initialState = { amount: 500, quantity: 1, totalAmount: 500, interval: null };
+<div>
+  <ContributeDetails onChange={setState} amountOptions={amountOptions} currency="USD" showQuantity {...state} />
+  <br />
+  <hr />
+  <div style={{ margin: 24, maxWidth: 300 }}>
+    <strong>State</strong>
+    <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(state, null, 2)}</pre>
+  </div>
+</div>;
 ```
 
-Set with initial value:
+### Quantity hidden by default
 
 ```js
 amountOptions = [500, 1000, 2000, 5000, 10000];
-currency = 'USD';
-initialValue = {
-  defaultAmount: 10000,
-  defaultInterval: 'month',
-};
-<ContributeDetails onChange={console.log} amountOptions={amountOptions} currency={currency} {...initialValue} />;
+initialState = { amount: 500, quantity: 1, totalAmount: 500, interval: null };
+<ContributeDetails onChange={setState} amountOptions={amountOptions} currency="EUR" {...state} />;
 ```
 
-Set with min amount (`$42`):
+### Set with min amount (`$42`)
 
 ```js
 amountOptions = [5000, 10000, 50000, 75000];
-currency = 'USD';
-<ContributeDetails onChange={console.log} amountOptions={amountOptions} currency={currency} minAmount={4200} />;
+initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
+<ContributeDetails onChange={setState} amountOptions={amountOptions} currency="USD" minAmount={4200} {...state} />;
 ```
 
-Without presets:
+### Without presets
 
 ```js
-currency = 'USD';
-<ContributeDetails onChange={console.log} currency={currency} defaultAmount={500} />;
+initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
+<ContributeDetails onChange={setState} currency="USD" {...state} />;
 ```
 
-Disabled interval:
+### Disabled interval:
 
 ```js
 amountOptions = [500, 1000, 2000, 5000, 10000];
-currency = 'USD';
-<ContributeDetails onChange={console.log} amountOptions={amountOptions} currency={currency} disabledInterval />;
+initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
+<ContributeDetails onChange={setState} amountOptions={amountOptions} currency="USD" disabledInterval {...state} />;
 ```
 
-Force value (disabledAmount):
+### Force value (disabledAmount):
 
 ```js
-currency = 'USD';
-<ContributeDetails onChange={console.log} currency={currency} defaultAmount={500} disabledInterval disabledAmount />;
+initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
+<ContributeDetails onChange={setState} currency="USD" defaultAmount={500} disabledInterval disabledAmount {...state} />;
 ```

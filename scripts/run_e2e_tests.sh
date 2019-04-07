@@ -25,6 +25,25 @@ else
   CYPRESS_RECORD=""
 fi
 
+# Wait for a service to be up
+function wait_for_service() {
+  echo "> Waiting for $1 to be ready... "
+  while true; do
+    nc -z "$2" "$3"
+    EXIT_CODE=$?
+    if [ $EXIT_CODE -eq 0 ]; then
+      echo "> Application $1 is up!"
+      break
+    fi
+    sleep 1
+  done
+}
+
+echo ""
+wait_for_service API 127.0.0.1 3000
+echo ""
+wait_for_service Frontend 127.0.0.1 3060
+
 echo ""
 echo "> Running cypress tests"
 npx cypress run ${CYPRESS_RECORD} --config ${CYPRESS_CONFIG}

@@ -103,6 +103,7 @@ const StyledInputGroup = ({
         borderRadius="4px"
         display="flex"
         alignItems="center"
+        lineHeight="1.5"
         {...containerProps}
       >
         {prepend && (

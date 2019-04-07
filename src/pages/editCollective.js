@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
+import { get } from 'lodash';
 
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
@@ -11,7 +12,7 @@ import ErrorPage from '../components/ErrorPage';
 import MessageBox from '../components/MessageBox';
 
 import { addCollectiveToEditData } from '../graphql/queries';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
+import { addEditCollectiveMutation, addDeleteEventCollectiveMutation } from '../graphql/mutations';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -34,11 +35,33 @@ class EditCollectivePage extends React.Component {
     LoggedInUser: PropTypes.object, // from withLoggedInUser
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withLoggedInUser
     editCollective: PropTypes.func.isRequired, // from addEditCollectiveMutation
-    deleteCollective: PropTypes.func.isRequired, // from addDeleteCollectiveMutation
+    deleteEventCollective: PropTypes.func.isRequired, // from addDeleteEventCollectiveMutation
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { Collective: get(props, 'data.Collective') };
+  }
+
+  async componentDidMount() {
+    const collective = get(this.props, 'data.Collective');
+    this.setState({ Collective: collective || this.state.Collective });
+  }
+
+  componentDidUpdate(oldProps) {
+    // We store the component in state and update only if the next one is not
+    // null because of a bug in Apollo where it strips the `Collective` from data
+    // during re-hydratation.
+    // See https://github.com/opencollective/opencollective/issues/1872
+    const currentCollective = get(this.props, 'data.Collective');
+    if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
+      this.setState({ Collective: currentCollective });
+    }
+  }
+
   render() {
-    const { data, editCollective, deleteCollective, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data, editCollective, deleteEventCollective, LoggedInUser, loadingLoggedInUser } = this.props;
+    const collective = get(data, 'Collective') || this.state.Collective;
 
     if ((data && data.loading) || loadingLoggedInUser) {
       return (
@@ -48,7 +71,7 @@ class EditCollectivePage extends React.Component {
       );
     } else if (data && data.error) {
       return <ErrorPage data={data} />;
-    } else if (!LoggedInUser || !data || !data.Collective) {
+    } else if (!LoggedInUser || !collective) {
       return (
         <Page>
           <Flex justifyContent="center" p={5}>
@@ -67,10 +90,10 @@ class EditCollectivePage extends React.Component {
     return (
       <div>
         <EditCollective
-          collective={data.Collective}
+          collective={collective}
           LoggedInUser={LoggedInUser}
           editCollective={editCollective}
-          deleteCollective={deleteCollective}
+          deleteEventCollective={deleteEventCollective}
           loggedInEditDataLoaded
         />
       </div>
@@ -84,7 +107,7 @@ const addGraphQL = compose(
       skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
     }),
   addEditCollectiveMutation,
-  addDeleteCollectiveMutation,
+  addDeleteEventCollectiveMutation,
 );
 
 export default withUser(withData(withIntl(addGraphQL(EditCollectivePage))));

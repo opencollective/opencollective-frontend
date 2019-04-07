@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
@@ -133,14 +134,13 @@ ${description}`;
       get(collective, 'stats.yearlyBudget') > 0 ||
       get(collective, 'settings.goals[0].title');
 
-    const classNames = ['CollectiveCover', className, type];
-
-    if (!collective.backgroundImage) {
-      classNames.push('defaultBackgroundImage');
-    }
-
     return (
-      <div className={classNames.join(' ')}>
+      <div
+        className={classNames('CollectiveCover', className, type, {
+          defaultBackgroundImage: !collective.backgroundImage ? true : false,
+          archiveCollective: collective.isArchived,
+        })}
+      >
         <style jsx>
           {`
             .cover {
@@ -318,6 +318,12 @@ ${description}`;
             .small .members {
               display: none;
             }
+            .archiveCollective {
+              -webkit-filter: grayscale(100%);
+              -moz-filter: grayscale(100%);
+              -ms-filter: grayscale(100%);
+              filter: grayscale(100%);
+            }
           `}
         </style>
         <style jsx global>
@@ -360,9 +366,14 @@ ${description}`;
                     {collective.host && collective.isActive && (
                       <div className="host">
                         <label>
-                          <FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" />
+                          <FormattedMessage
+                            id="collective.cover.hostedBy"
+                            defaultMessage="Hosted by {host}"
+                            values={{
+                              host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                            }}
+                          />
                         </label>
-                        <Link route={`/${collective.host.slug}`}>{collective.host.name} </Link>
                       </div>
                     )}
                     {collective.host &&
@@ -373,10 +384,12 @@ ${description}`;
                           <label>
                             <FormattedMessage
                               id="collective.cover.pendingApprovalFrom"
-                              defaultMessage="Pending approval from"
+                              defaultMessage="Pending approval from {host}"
+                              values={{
+                                host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                              }}
                             />
                           </label>
-                          <Link route={`/${collective.host.slug}`}>{collective.host.name} </Link>
                         </div>
                       )}
                     {twitterHandle && (

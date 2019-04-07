@@ -1,23 +1,16 @@
 const path = require('path');
-const fileExistsCaseInsensitive = require('react-styleguidist/scripts/utils/findFileCaseInsensitive');
+const fileExistsCaseInsensitive = require('react-styleguidist/lib/scripts/utils/findFileCaseInsensitive');
 
 module.exports = {
   assetsDir: 'styleguide',
-  compilerConfig: {
-    objectAssign: 'Object.assign',
-    transforms: {
-      dangerousTaggedTemplateString: true,
-    },
-  },
   getExampleFilename(componentPath) {
     const examplePath = path.join(__dirname, 'styleguide', 'examples', `${path.parse(componentPath).name}.md`);
-    const existingFile = fileExistsCaseInsensitive(examplePath);
-    if (existingFile) {
-      return existingFile;
-    }
-    return false;
+    return fileExistsCaseInsensitive(examplePath) || false;
   },
   pagePerSection: true,
+  moduleAliases: {
+    components: path.resolve(__dirname, 'src/components'),
+  },
   sections: [
     {
       name: 'Atoms',

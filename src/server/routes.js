@@ -8,7 +8,6 @@ import express from 'express';
 import proxy from 'express-http-proxy';
 
 import pages from './pages';
-import controllers from './controllers';
 import { maxAge } from './middlewares';
 import { logger } from './logger';
 import { getBaseApiUrl } from '../lib/utils';
@@ -72,23 +71,6 @@ export default (server, app) => {
     }
   });
 
-  /**
-   * For backward compatibility.
-   * Ideally we should consolidate those routes under:
-   * `/:collectiveSlug/members/:backerType(all|users|organizations)`
-   */
-
-  server.get('/:collectiveSlug.:format(json)', controllers.collectives.info);
-  server.get('/:collectiveSlug/members.:format(json|csv)', controllers.members.list);
-  server.get(
-    '/:collectiveSlug/members/:backerType(all|users|organizations).:format(json|csv)',
-    controllers.members.list,
-  );
-  server.get(
-    '/:collectiveSlug/tiers/:tierSlug/:backerType(all|users|organizations).:format(json|csv)',
-    controllers.members.list,
-  );
-
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';
     res.sendFile(
@@ -96,12 +78,6 @@ export default (server, app) => {
     );
   });
 
-  server.get('/:collectiveSlug/events.:format(json)', controllers.events.list);
-  server.get('/:collectiveSlug/events/:eventSlug.:format(json)', controllers.events.info);
-  server.get(
-    '/:collectiveSlug/events/:eventSlug/:role(attendees|followers|organizers|all).:format(json|csv)',
-    controllers.members.list,
-  );
   server.get('/:collectiveSlug/events/:eventSlug/nametags.:format(pdf|html)', (req, res, next) => {
     const { collectiveSlug, eventSlug, pageFormat, format } = req.params;
     const params = { ...req.params, ...req.query };

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
 
@@ -49,6 +50,14 @@ class Collective extends React.Component {
         id: 'collective.created.description',
         defaultMessage:
           'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
+      },
+      'collective.isArchived': {
+        id: 'collective.isArchived',
+        defaultMessage: '{name} has been archived.',
+      },
+      'collective.isArchived.description': {
+        id: 'collective.isArchived.description',
+        defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
       },
       'collective.donate': {
         id: 'collective.donate',
@@ -123,6 +132,7 @@ class Collective extends React.Component {
 
   render() {
     const { intl, LoggedInUser, query, collective } = this.props;
+    const status = get(query, 'status');
 
     const donateParams = { collectiveSlug: collective.slug, verb: 'donate' };
     if (query.referral) {
@@ -132,19 +142,24 @@ class Collective extends React.Component {
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage') || defaultBackgroundImage;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
-    if (get(query, 'status') === 'collectiveCreated') {
+    if (status === 'collectiveCreated') {
       notification.title = intl.formatMessage(this.messages['collective.created']);
       notification.description = intl.formatMessage(this.messages['collective.created.description'], {
         host: collective.host.name,
       });
+    } else if (status === 'collectiveArchived' || collective.isArchived) {
+      notification.title = intl.formatMessage(this.messages['collective.isArchived'], {
+        name: collective.name,
+      });
+      notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
+      notification.status = 'collectiveArchived';
     }
-
     const cta = collective.isActive && collective.host ? { href: '#contribute', label: 'contribute' } : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
     return (
-      <div className={`CollectivePage ${collective.type}`}>
+      <div className={classNames(`CollectivePage ${collective.type}`)}>
         <style jsx>
           {`
             .sidebar {
@@ -198,6 +213,12 @@ class Collective extends React.Component {
                 margin: 3rem 0 3rem 3rem;
               }
             }
+            .archiveCollective {
+              -webkit-filter: grayscale(100%);
+              -moz-filter: grayscale(100%);
+              -ms-filter: grayscale(100%);
+              filter: grayscale(100%);
+            }
           `}
         </style>
 
@@ -212,9 +233,9 @@ class Collective extends React.Component {
         />
 
         <Body>
-          <div className="CollectivePage">
+          <div className={classNames('CollectivePage', { archiveCollective: collective.isArchived })}>
             <NotificationBar
-              status={this.state.status}
+              status={notification.status || status}
               title={notification.title}
               description={notification.description}
               error={this.state.error}

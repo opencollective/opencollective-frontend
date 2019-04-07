@@ -26,7 +26,7 @@ describe('Contribution Flow: Order', () => {
       // ---- Step 2: Contribute details ----
       cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
       // Has default amount selected
-      cy.get('#totalAmount button.selected').should('exist');
+      cy.get('#amount button.selected').should('exist');
 
       // Change amount
       cy.contains('button', '$500').click();

@@ -45,14 +45,6 @@ export function filterCollection(array, cond, inverse) {
   return array.filter(r => (inverse ? !test(r, cond) : test(r, cond)));
 }
 
-/** @deprecated since 28/01/2018 - this doesn't work for path with a `_` in it */
-export const isValidUrl = url => {
-  if (typeof url !== 'string') return false;
-  return Boolean(
-    url.match(/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/),
-  );
-};
-
 /**
  * Validate a relative path.
  * > isValidRelativeUrl('a/b/c/d/e/f/g')

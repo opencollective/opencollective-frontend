@@ -89,7 +89,10 @@ export const getLoggedInUserQuery = gql`
         slug
         settings
         currency
-        countryISO
+        isDeletable
+        location {
+          country
+        }
         paymentMethods(limit: 10, hasBalanceAboveZero: true) {
           id
           uuid
@@ -131,6 +134,7 @@ export const getLoggedInUserQuery = gql`
             balance
             expiryDate
           }
+          settings
         }
       }
     }
@@ -147,9 +151,11 @@ const getTiersQuery = gql`
       backgroundImage
       twitterHandle
       description
-      countryISO
       currency
       settings
+      location {
+        country
+      }
       tiers {
         id
         type
@@ -163,155 +169,168 @@ const getTiersQuery = gql`
   }
 `;
 
-const getCollectiveToEditQuery = gql`
-  query Collective($slug: String) {
-    Collective(slug: $slug) {
+export const getCollectiveToEditQueryFields = `
+  id
+  type
+  slug
+  createdByUser {
+    id
+  }
+  host {
+    id
+    createdAt
+    slug
+    name
+    currency
+    image
+    backgroundImage
+    settings
+    description
+    website
+    twitterHandle
+    location {
+      country
+    }
+    stats {
       id
-      type
-      slug
-      createdByUser {
-        id
-      }
-      host {
-        id
-        createdAt
-        slug
-        name
-        currency
-        image
-        backgroundImage
-        settings
-        taxes
-        description
-        website
-        twitterHandle
-        stats {
-          id
-          collectives {
-            hosted
-          }
-        }
-      }
-      name
-      company
-      image
-      backgroundImage
-      description
-      longDescription
-      location {
-        address
-      }
-      tags
-      countryISO
-      twitterHandle
-      githubHandle
-      website
-      currency
-      settings
-      createdAt
-      isActive
-      isHost
-      hostFeePercent
-      expensePolicy
-      stats {
-        id
-        yearlyBudget
-        balance
-        backers {
-          all
-        }
-        totalAmountSpent
-      }
-      tiers {
-        id
-        slug
-        type
-        name
-        description
-        amount
-        presets
-        interval
-        currency
-        maxQuantity
-      }
-      memberOf {
-        id
-        createdAt
-        role
-        stats {
-          totalDonations
-        }
-        tier {
-          id
-          name
-        }
-        collective {
-          id
-          type
-          slug
-          name
-          currency
-          description
-          settings
-          image
-          stats {
-            id
-            backers {
-              all
-            }
-            yearlyBudget
-          }
-        }
-      }
-      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
-        id
-        createdAt
-        role
-        description
-        stats {
-          totalDonations
-        }
-        tier {
-          id
-          name
-        }
-        member {
-          id
-          name
-          image
-          slug
-          twitterHandle
-          description
-          ... on User {
-            email
-          }
-        }
-      }
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"], hasBalanceAboveZero: true) {
-        id
-        uuid
-        name
-        data
-        monthlyLimitPerMember
-        service
-        type
-        balance
-        currency
-        expiryDate
-        orders(hasActiveSubscription: true) {
-          id
-        }
-      }
-      connectedAccounts {
-        id
-        service
-        username
-        createdAt
-        settings
+      collectives {
+        hosted
       }
     }
   }
+  name
+  company
+  image
+  backgroundImage
+  description
+  longDescription
+  location {
+    name
+    address
+    country
+    lat
+    long
+  }
+  tags
+  twitterHandle
+  githubHandle
+  website
+  currency
+  settings
+  createdAt
+  isActive
+  isArchived
+  isDeletable
+  isHost
+  hostFeePercent
+  expensePolicy
+  stats {
+    id
+    yearlyBudget
+    balance
+    backers {
+      all
+    }
+    totalAmountSpent
+  }
+  tiers {
+    id
+    slug
+    type
+    name
+    description
+    amount
+    presets
+    interval
+    currency
+    maxQuantity
+  }
+  memberOf {
+    id
+    createdAt
+    role
+    stats {
+      totalDonations
+    }
+    tier {
+      id
+      name
+    }
+    collective {
+      id
+      type
+      slug
+      name
+      currency
+      description
+      settings
+      image
+      stats {
+        id
+        backers {
+          all
+        }
+        yearlyBudget
+      }
+    }
+  }
+  members(roles: ["ADMIN", "MEMBER", "HOST"]) {
+    id
+    createdAt
+    role
+    description
+    stats {
+      totalDonations
+    }
+    tier {
+      id
+      name
+    }
+    member {
+      id
+      name
+      image
+      slug
+      twitterHandle
+      description
+      ... on User {
+        email
+      }
+    }
+  }
+  paymentMethods(types: ["creditcard", "virtualcard", "prepaid"], hasBalanceAboveZero: true) {
+    id
+    uuid
+    name
+    data
+    monthlyLimitPerMember
+    service
+    type
+    balance
+    currency
+    expiryDate
+    orders(hasActiveSubscription: true) {
+      id
+    }
+  }
+  connectedAccounts {
+    id
+    service
+    username
+    createdAt
+    settings
+  }
 `;
+
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
+const getCollectiveToEditQuery = gql`
+  query Collective($slug: String) {
+    Collective(slug: $slug) {
+      ${getCollectiveToEditQueryFields}
+    }
+  }
+`;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const getCollectiveQuery = gql`
   query Collective($slug: String) {
@@ -331,12 +350,15 @@ const getCollectiveQuery = gql`
       description
       longDescription
       location {
+        name
         address
+        country
+        lat
+        long
       }
       twitterHandle
       githubHandle
       website
-      countryISO
       currency
       settings
       createdAt
@@ -400,6 +422,8 @@ const getCollectiveQuery = gql`
       isHost
       hostFeePercent
       canApply
+      isArchived
+      isDeletable
       host {
         id
         slug
@@ -511,12 +535,12 @@ const getEventCollectiveQuery = gql`
       startsAt
       endsAt
       timezone
-      countryISO
       currency
       settings
       location {
         name
         address
+        country
         lat
         long
       }

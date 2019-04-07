@@ -154,10 +154,11 @@ class Event extends React.Component {
     const params = trimObject({
       eventSlug: event.slug,
       collectiveSlug: event.parentCollective.slug,
-      TierId: order.tier.id,
+      tierId: order.tier.id,
       quantity: order.quantity,
       totalAmount: order.totalAmount,
       interval: order.interval,
+      verb: 'events',
     });
     Router.pushRoute('orderEventTier', params).then(() => {
       window.location.hash = '#content';

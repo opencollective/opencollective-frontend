@@ -933,6 +933,10 @@ const query = gql`
         collective {
           name
           slug
+          type
+          parentCollective {
+            slug
+          }
         }
         ... on Order {
           order {

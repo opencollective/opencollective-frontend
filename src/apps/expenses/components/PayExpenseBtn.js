@@ -163,6 +163,13 @@ const payExpenseQuery = gql`
           id
           balance
         }
+        host {
+          id
+          paymentMethods {
+            id
+            balance
+          }
+        }
       }
     }
   }

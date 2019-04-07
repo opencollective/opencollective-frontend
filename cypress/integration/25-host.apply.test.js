@@ -1,27 +1,17 @@
-const init = (skip_signin = false) => {
-  if (skip_signin) {
-    cy.visit(
-      '/signin/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImxvZ2luIiwiaWQiOjk0NzQsImVtYWlsIjoidGVzdHVzZXIrYWRtaW5Ab3BlbmNvbGxlY3RpdmUuY29tIiwiaWF0IjoxNTE1NDA5ODkxLCJleHAiOjE1MTgwMDE4OTEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzA2MCIsInN1YiI6OTQ3NH0.FdisGSpfUyCgVJaWnnV5hp_IhRfO4_27kDc6DcCwqcI?next=/brusselstogetherasbl/apply',
-    );
-  } else {
+describe('apply to host', () => {
+  it('as a new collective', () => {
     cy.visit('/brusselstogetherasbl');
     cy.get('#hosting h1').contains('We are hosting 2 collectives');
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
-      .click({ force: true });
-    cy.wait(500);
+      .click();
     cy.fillInputField('email', 'testuser@opencollective.com');
-    cy.get('.LoginForm button').click();
-  }
-};
-
-describe('apply to host', () => {
-  it('as a new collective', () => {
-    init(false);
+    cy.wait(500);
+    cy.contains('.LoginForm button', 'Sign In').click();
     cy.fillInputField('name', 'New collective');
     cy.fillInputField('description', 'short description for new collective');
     cy.fillInputField('website', 'https://xdamman.com');
-    cy.get('.tos input[type="checkbox"]').click({ force: true });
+    cy.get('.tos input[type="checkbox"]').click();
     cy.wait(300);
     cy.get('.actions button').click();
     cy.wait(1000);

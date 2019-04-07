@@ -20,6 +20,7 @@ class Transactions extends React.Component {
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    dateDisplayType: PropTypes.oneOf(['date', 'interval']),
   };
 
   constructor(props) {
@@ -179,6 +180,7 @@ class Transactions extends React.Component {
                 isRefund={Boolean(transaction.refundTransaction)}
                 canRefund={LoggedInUser && LoggedInUser.isRoot()}
                 canDownloadInvoice={this.canDownloadInvoice(transaction)}
+                dateDisplayType={this.props.dateDisplayType}
               />
             </Box>
           ))}

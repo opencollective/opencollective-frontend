@@ -317,9 +317,13 @@ class CollectiveCard extends React.Component {
                 <div className="role">{tierName}</div>
                 {membership.createdAt && (
                   <div className="since">
-                    <FormattedMessage id="membership.since" defaultMessage={'since'} />
-                    &nbsp;
-                    <FormattedDate value={membership.createdAt} month="long" year="numeric" />
+                    <FormattedMessage
+                      id="membership.since"
+                      defaultMessage={'since {date}'}
+                      values={{
+                        date: <FormattedDate value={membership.createdAt} month="long" year="numeric" />,
+                      }}
+                    />
                   </div>
                 )}
               </div>

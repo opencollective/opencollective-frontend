@@ -14,6 +14,7 @@ class TransactionsWithData extends React.Component {
     limit: PropTypes.number,
     filters: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    dateDisplayType: PropTypes.oneOf(['date', 'interval']),
   };
 
   constructor(props) {
@@ -46,6 +47,7 @@ class TransactionsWithData extends React.Component {
           filters={filters}
           LoggedInUser={LoggedInUser}
           showCSVlink={showCSVlink}
+          dateDisplayType={this.props.dateDisplayType}
         />
       </div>
     );

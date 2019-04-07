@@ -4,6 +4,7 @@ import { orderBy, truncate } from 'lodash';
 import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
 import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
 import { FixedSizeList } from 'react-window';
+import { FormattedMessage } from 'react-intl';
 
 import StyledSelect from './StyledSelect';
 import withIntl from '../lib/withIntl';
@@ -13,11 +14,16 @@ class InputTypeCountry extends Component {
     onChange: PropTypes.func.isRequired,
     name: PropTypes.string,
     defaultValue: PropTypes.string,
+    /** Use this to control the component state */
+    value: PropTypes.string,
+    /** Placeholder */
     labelBuilder: PropTypes.func,
     /** Switch between display modes */
     mode: PropTypes.oneOf(['select', 'underlined']),
     /** From withIntl */
     intl: PropTypes.object.isRequired,
+    /** Is this input required? */
+    required: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -94,9 +100,17 @@ class InputTypeCountry extends Component {
     );
   }
 
+  getValue(countries, value) {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    return value && this.prepareCountry(countries, value);
+  }
+
   render() {
     const { error, countries } = this.state;
-    const { name, defaultValue, mode } = this.props;
+    const { name, defaultValue, value, mode } = this.props;
     const defaultCountry = defaultValue && defaultValue.toUpperCase();
 
     return (
@@ -104,11 +118,14 @@ class InputTypeCountry extends Component {
         name={name}
         options={countries}
         keyGetter={({ code }) => code}
+        value={this.getValue(countries, value)}
         defaultValue={defaultCountry && this.prepareCountry(countries, defaultCountry)}
         onChange={this.handleChange}
         error={error}
         mode={mode}
         ItemsListRenderer={this.ItemsListRenderer}
+        placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
+        required={this.props.required}
       >
         {({ value }) => this.props.labelBuilder(value)}
       </StyledSelect>
