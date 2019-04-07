@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import fetch from 'node-fetch';
 import { pick } from 'lodash';
 
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+
 import { withRouter } from 'next/router';
 import withIntl from '../lib/withIntl';
 
@@ -109,12 +112,33 @@ const DiscoverPage = ({ router }) => {
   // query: { ...router.query, offset: 0, show: value },
   // });
   // };
+  const getPledgedCards = gql`
+    {
+      allCollectiveTags
+      allCollectives(isPledged: true, isActive: false) {
+        collectives {
+          id
+          description
+          slug
+          pledges: orders(status: PENDING) {
+            id
+            totalAmount
+            currency
+          }
+        }
+      }
+    }
+  `;
 
-  const collectiveChecks = {};
+  const pledgedCardData = graphql(getPledgedCards);
 
-  collectiveChecks.isPledge = () => router.asPath.includes('/discover?offset=0&show=pledged');
-  collectiveChecks.isOpenSource = () => router.asPath.includes('/discover?offset=0&show=open%20source');
-  collectiveChecks.isOther = () => router.asPath.includes('/discover?offset=0&show=other');
+  console.log('pledge card data', pledgedCardData);
+
+  // const collectiveChecks = {};
+
+  // collectiveChecks.isPledge = () => router.asPath.includes('/discover?offset=0&show=pledged');
+  // collectiveChecks.isOpenSource = () => router.asPath.includes('/discover?offset=0&show=open%20source');
+  // collectiveChecks.isOther = () => router.asPath.includes('/discover?offset=0&show=other');
 
   return (
     <Page title="Discover">
@@ -205,7 +229,7 @@ const DiscoverPage = ({ router }) => {
                   {collectives.map(c => {
                     return (
                       <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                        {collectiveChecks.isPledge() ? (
+                        {collective.isPledge() ? (
                           <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                         ) : (
                           <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />

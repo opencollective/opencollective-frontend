@@ -520,7 +520,7 @@ class CreateOrderPage extends React.Component {
 
   // Debounce state update functions that may be called successively
   updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
-  updateDetails = debounce(stepDetails => this.setState({ stepDetails }), 100, { leading: true, maxWait: 500 });
+  updateDetailgqls = debounce(stepDetails => this.setState({ stepDetails }), 100, { leading: true, maxWait: 500 });
 
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
