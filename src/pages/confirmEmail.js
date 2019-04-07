@@ -12,6 +12,7 @@ import withIntl from '../lib/withIntl';
 import Page from '../components/Page';
 import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
+import { withUser } from '../components/UserProvider';
 
 /**
  * Main contribution flow entrypoint. Render all the steps from contributeAs
@@ -27,13 +28,35 @@ class ConfirmEmailPage extends React.Component {
     token: PropTypes.string.isRequired,
     // from graphql
     confirmUserEmail: PropTypes.func.isRequired,
+    // from withUser
+    loadingLoggedInUser: PropTypes.bool.isRequired,
+    // from withUser
+    refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
-  state = { status: 'submitting', error: null };
+  state = { status: 'submitting', error: null, validationTriggered: false };
 
-  async componentDidMount() {
+  componentDidMount() {
+    if (!this.props.loadingLoggedInUser) {
+      return this.triggerEmailValidation();
+    }
+  }
+
+  componentDidUpdate() {
+    if (!this.state.validationTriggered && !this.props.loadingLoggedInUser) {
+      return this.triggerEmailValidation();
+    }
+  }
+
+  /**
+   * The reason for the logic arround the trigger of this function is that `refetchLoggedInUser`
+   * will not be effective if user is already loading (Apollo discards duplicate queries).
+   */
+  async triggerEmailValidation() {
     try {
+      this.setState({ validationTriggered: true });
       await this.props.confirmUserEmail(this.props.token);
+      setTimeout(this.props.refetchLoggedInUser, 3000);
       this.setState({ status: 'success' });
     } catch (e) {
       const error = get(e, 'graphQLErrors.0') || e;
@@ -101,6 +124,7 @@ export const addConfirmUserEmailMutation = graphql(
       confirmUserEmail(token: $token) {
         id
         email
+        emailWaitingForValidation
       }
     }
   `,
@@ -113,4 +137,4 @@ export const addConfirmUserEmailMutation = graphql(
   },
 );
 
-export default addConfirmUserEmailMutation(withIntl(ConfirmEmailPage));
+export default addConfirmUserEmailMutation(withIntl(withUser(ConfirmEmailPage)));
