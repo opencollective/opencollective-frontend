@@ -122,7 +122,7 @@ class PledgeCollectiveCard extends React.Component {
 
               .role {
                 min-height: 13px;
-                font-weight: 700;
+                font-weight: 800;
                 letter-spacing: 3px;
                 color: #75cc1f;
                 text-transform: uppercase;

@@ -113,7 +113,7 @@ const DiscoverPage = ({ router }) => {
   // });
   // };
   const getPledgedCards = gql`
-    {
+    query discover {
       allCollectiveTags
       allCollectives(isPledged: true, isActive: false) {
         collectives {
