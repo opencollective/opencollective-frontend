@@ -121,7 +121,11 @@ pages
 // Marketing Pages
 // ---------------
 
-pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|pricing)', 'marketingPage');
+pages.add(
+  'marketing',
+  '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
+  'marketingPage',
+);
 
 // Collective
 // ----------
