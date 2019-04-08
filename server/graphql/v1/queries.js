@@ -16,6 +16,8 @@ import {
   HostCollectiveOrderFieldType,
 } from './CollectiveInterface';
 
+import { InvoiceInputType } from './inputTypes';
+
 import {
   PaginatedTransactionsType,
   TransactionInterfaceType,
@@ -149,6 +151,7 @@ const queries = {
         const totalAmount = invoicesByKey[slug]
           ? invoicesByKey[slug].totalAmount + transaction.amountInHostCurrency
           : transaction.amountInHostCurrency;
+
         invoicesByKey[slug] = {
           HostCollectiveId,
           FromCollectiveId: fromCollective.id,
@@ -235,6 +238,77 @@ const queries = {
       invoice.totalAmount = totalAmount;
       invoice.currency = invoice.currency || host.currency;
       invoice.transactions = transactions;
+      return invoice;
+    },
+  },
+
+  InvoiceByDateRange: {
+    type: InvoiceType,
+    args: {
+      invoiceInputType: {
+        type: new GraphQLNonNull(InvoiceInputType),
+        description:
+          'Like the Slug of the invoice but spilt out into parts and includes dateFrom + dateTo for getting an invoice over a date range.',
+      },
+    },
+    async resolve(_, args, req) {
+      const { dateFrom, dateTo, fromCollectiveSlug, collectiveSlug } = args.invoiceInputType;
+
+      const fromCollective = await models.Collective.findOne({
+        where: { slug: fromCollectiveSlug },
+      });
+      if (!fromCollective) {
+        throw new errors.NotFound(`User or organization not found for slug ${args.fromCollective}`);
+      }
+      const host = await models.Collective.findBySlug(collectiveSlug);
+      if (!host) {
+        throw new errors.NotFound('Host not found');
+      }
+      if (!req.remoteUser || !req.remoteUser.isAdmin(fromCollective.id)) {
+        throw new errors.Unauthorized("You don't have permission to access invoices for this user");
+      }
+
+      if (dateTo < dateFrom) {
+        throw new errors.ValidationFailed(
+          'validation_failed',
+          ['InvoiceDateType'],
+          'Invalid date object. dateFrom must be before dateTo',
+        );
+      }
+
+      const where = {
+        [Op.or]: [
+          { FromCollectiveId: fromCollective.id, UsingVirtualCardFromCollectiveId: null },
+          { UsingVirtualCardFromCollectiveId: fromCollective.id },
+        ],
+        HostCollectiveId: host.id,
+        createdAt: { [Op.gte]: dateFrom, [Op.lt]: dateTo },
+        type: 'CREDIT',
+      };
+
+      const transactions = await models.Transaction.findAll({ where });
+      if (transactions.length === 0) {
+        throw new errors.NotFound('No transactions found');
+      }
+
+      const invoice = {
+        title: get(host, 'settings.invoiceTitle') || 'Donation Receipt',
+        HostCollectiveId: host.id,
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+      };
+
+      const totalAmount = transactions.reduce((total, transaction) => {
+        invoice.currency = transaction.hostCurrency;
+        total += transaction.amountInHostCurrency;
+        return total;
+      }, 0);
+
+      invoice.FromCollectiveId = fromCollective.id;
+      invoice.totalAmount = totalAmount;
+      invoice.currency = invoice.currency || host.currency;
+      invoice.transactions = transactions;
+
       return invoice;
     },
   },
