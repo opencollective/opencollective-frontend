@@ -283,7 +283,7 @@ const queries = {
           { UsingVirtualCardFromCollectiveId: fromCollective.id },
         ],
         HostCollectiveId: host.id,
-        createdAt: { [Op.gte]: dateFrom, [Op.lt]: dateTo },
+        createdAt: { [Op.gte]: dateFrom, [Op.lte]: dateTo },
         type: 'CREDIT',
       };
 
