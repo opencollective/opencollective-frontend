@@ -45,8 +45,8 @@ export default class InvoiceDownloadLink extends Component {
 
   getFilename() {
     const { fromCollectiveSlug, toCollectiveSlug, dateFrom, dateTo } = this.props;
-    const fromString = moment(dateFrom).format('YYYYMMDD');
-    const toString = moment(dateTo).format('YYYYMMDD');
+    const fromString = moment.utc(dateFrom).format('YYYYMMDD');
+    const toString = moment.utc(dateTo).format('YYYYMMDD');
 
     return this.props.type === 'transaction'
       ? `transaction-${this.props.transactionUuid}.pdf`
