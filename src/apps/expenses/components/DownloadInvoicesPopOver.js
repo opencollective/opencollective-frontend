@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
-import { uniq, omit } from 'lodash';
+import { uniq, omit, groupBy } from 'lodash';
 
 import withIntl from '../../../lib/withIntl';
 import { formatCurrency, imagePreview } from '../../../lib/utils';
@@ -81,10 +81,10 @@ class Overlay extends React.Component {
   }
   renderYear(year) {
     const invoices = this.props.data.allInvoices.filter(i => Number(i.year) === Number(year));
-
-    const total = invoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0);
+    const invoicesByHost = groupBy(invoices, 'host.slug');
     const dateFrom = moment(year, 'YYYY').toISOString();
     const dateTo = moment(year + 1, 'YYYY').toISOString();
+
     return (
       invoices.length > 0 && (
         <div key={`${this.state.year}-${year}`}>
@@ -96,7 +96,11 @@ class Overlay extends React.Component {
             `}
           </style>
           <h2>{year}</h2>
-          {this.renderInvoice(invoices[0], dateFrom, dateTo, total)}
+          {Object.keys(invoicesByHost).map(hostSlug => {
+            const hostInvoices = invoicesByHost[hostSlug];
+            const totalAmount = hostInvoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0);
+            return this.renderInvoice(hostInvoices[0], dateFrom, dateTo, totalAmount);
+          })}
         </div>
       )
     );
@@ -109,6 +113,7 @@ class Overlay extends React.Component {
     const dateFrom = moment(`${this.state.year}${month}`, 'YYYYMM').toISOString();
     const dateTo = moment(`${this.state.year}${month + 1}`, 'YYYYMM').toISOString();
     const month2digit = month < 10 ? `0${month}` : month;
+
     return (
       invoices.length > 0 && (
         <div key={`${this.state.year}-${month}`}>
@@ -120,7 +125,7 @@ class Overlay extends React.Component {
             `}
           </style>
           <h2>{moment(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
-          {this.renderInvoice(invoices[0], dateFrom, dateTo, invoices[0].totalAmount)}
+          {invoices.map(invoice => this.renderInvoice(invoice, dateFrom, dateTo, invoice.totalAmount))}
         </div>
       )
     );
@@ -162,11 +167,13 @@ class Overlay extends React.Component {
             <a>Yearly</a>
           </li>
         </ul>
-        {this.state.isDisplayYearly && years.length > 1 && (
+        {!this.state.isDisplayYearly && years.length > 1 && (
           <InputField
+            name="year-select"
             type="select"
             options={this.arrayToFormOptions(years)}
             onChange={year => this.setState({ year })}
+            defaultValue={this.state.year}
           />
         )}
         <div>{this.state.isDisplayYearly ? years.map(this.renderYear) : months.map(this.renderMonth)}</div>
