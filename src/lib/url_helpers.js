@@ -32,8 +32,8 @@ export const objectToQueryString = options => {
 
 // ---- Routes to other Open Collective services ----
 
-export const collectiveInvoiceURL = (collectiveSlug, invoiceSlug, format) => {
-  return `${invoiceServiceURL}/collectives/${collectiveSlug}/${invoiceSlug}.${format}`;
+export const collectiveInvoiceURL = (collectiveSlug, hostSlug, startDate, endDate, format) => {
+  return `${invoiceServiceURL}/collectives/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}.${format}`;
 };
 
 export const transactionInvoiceURL = transactionUUID => {

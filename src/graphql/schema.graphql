@@ -734,6 +734,8 @@ type InvoiceType {
   Title for the invoice. Depending on the type of legal entity, a host should issue an Invoice or a Receipt.
   """
   title: String
+  dateFrom: String
+  dateTo: String
   year: Int
   month: Int
   day: Int
