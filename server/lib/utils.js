@@ -412,17 +412,19 @@ export function exportToPDF(template, data, options) {
 
 /**
  * Default host id, set this for new collectives created through our flow
+ *
+ * @param {"opensource" | null} category of the collective
  */
-export const defaultHostCollective = tag => {
+export const defaultHostCollective = category => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-    if (tag === 'opensource') {
+    if (category === 'opensource') {
       return { id: 772, CollectiveId: 11004, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
       return {}; // Don't automatically assign a host anymore
     }
   }
   if (process.env.NODE_ENV === 'development' || process.env.E2E_TEST) {
-    if (tag === 'opensource') {
+    if (category === 'opensource') {
       return { CollectiveId: 9805, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
       return {}; // Don't automatically assign a host anymore
