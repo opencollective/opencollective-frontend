@@ -204,7 +204,7 @@ export default function() {
       ],
     );
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io', { encodedQueryParams: true })
     .get('/latest')
     .query({ access_key: config.fixer.accessKey, base: 'USD', symbols: 'EUR' })
     .reply(200, { success: true, timestamp: 1551453127, base: 'USD', date: '2019-03-01', rates: { EUR: 0.877445 } }, [

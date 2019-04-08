@@ -35,9 +35,9 @@ const updateLedgerEntry = (transaction, updateData) => {
   const query = `
   BEGIN;
   UPDATE "Transactions" SET "deletedAt"=:transaction_deletedAt WHERE id=:transaction_id;
-  INSERT INTO "Transactions" ("${Object.keys(newTransaction).join(
-    '","',
-  )}") VALUES (:${Object.keys(newTransaction).join(',:')});
+  INSERT INTO "Transactions" ("${Object.keys(newTransaction).join('","')}") VALUES (:${Object.keys(newTransaction).join(
+    ',:',
+  )});
   COMMIT;`;
   if (DRY_MODE) {
     // console.log(">>> updateLedgerEntry", newTransaction);
@@ -61,8 +61,7 @@ const addPaymentProcessorFee = transaction => {
         transaction.netAmountInCollectiveCurrency !=
         transaction.amount + transaction.paymentProcessorFeeInHostCurrency
       ) {
-        const newNetAmount =
-          transaction.amount + transaction.paymentProcessorFeeInHostCurrency;
+        const newNetAmount = transaction.amount + transaction.paymentProcessorFeeInHostCurrency;
         // console.log(">>> addPaymentProcessorFee", transaction.type, "id", transaction.id, "amount:", transaction.amount, transaction.currency, "paymentProcessorFee:", transaction.paymentProcessorFeeInHostCurrency, transaction.hostCurrency, "net amount:", transaction.netAmountInCollectiveCurrency, "new net amount: ", newNetAmount);
         return { netAmountInCollectiveCurrency: newNetAmount };
       }
@@ -70,12 +69,9 @@ const addPaymentProcessorFee = transaction => {
     case 'CREDIT':
       if (
         transaction.amount !=
-        transaction.netAmountInCollectiveCurrency -
-          transaction.paymentProcessorFeeInHostCurrency
+        transaction.netAmountInCollectiveCurrency - transaction.paymentProcessorFeeInHostCurrency
       ) {
-        const newAmount =
-          transaction.netAmountInCollectiveCurrency -
-          transaction.paymentProcessorFeeInHostCurrency;
+        const newAmount = transaction.netAmountInCollectiveCurrency - transaction.paymentProcessorFeeInHostCurrency;
         // console.log(">>> addPaymentProcessorFee", transaction.type, "id", transaction.id, "amount:", transaction.amount, transaction.currency, "paymentProcessorFee:", transaction.paymentProcessorFeeInHostCurrency, transaction.hostCurrency, "net amount:", transaction.netAmountInCollectiveCurrency, "new amount: ", newAmount);
         return { amount: newAmount };
       }
@@ -84,37 +80,19 @@ const addPaymentProcessorFee = transaction => {
 };
 
 const verifyTransaction = (tr, accuracy = 0) => {
-  if (
-    tr.hostCollectiveCurrency &&
-    tr.hostCurrency !== tr.hostCollectiveCurrency
-  )
-    return false; // if there is a discrepency between tr.hostCurrency and tr.host.currency
+  if (tr.hostCollectiveCurrency && tr.hostCurrency !== tr.hostCollectiveCurrency) return false; // if there is a discrepency between tr.hostCurrency and tr.host.currency
   if (tr.currency !== tr.hostCurrency) {
     if (!tr.hostCurrencyFxRate || tr.hostCurrencyFxRate === 1) return false;
   }
-  if (
-    tr.hostFeeInHostCurrency > 0 ||
-    tr.platformFeeInHostCurrency > 0 ||
-    tr.paymentProcessorFeeInHostCurrency > 0
-  ) {
+  if (tr.hostFeeInHostCurrency > 0 || tr.platformFeeInHostCurrency > 0 || tr.paymentProcessorFeeInHostCurrency > 0) {
     return false;
   }
-  const fees =
-    tr.hostFeeInHostCurrency +
-      tr.platformFeeInHostCurrency +
-      tr.paymentProcessorFeeInHostCurrency || 0;
-  const netAmountInCollectiveCurrency = Math.round(
-    (tr.amountInHostCurrency + fees) / tr.hostCurrencyFxRate,
-  );
+  const fees = tr.hostFeeInHostCurrency + tr.platformFeeInHostCurrency + tr.paymentProcessorFeeInHostCurrency || 0;
+  const netAmountInCollectiveCurrency = Math.round((tr.amountInHostCurrency + fees) / tr.hostCurrencyFxRate);
   if (netAmountInCollectiveCurrency === tr.netAmountInCollectiveCurrency) {
     return true;
   } else {
-    if (
-      relativeDiffInPercentage(
-        netAmountInCollectiveCurrency,
-        tr.netAmountInCollectiveCurrency,
-      ) < accuracy
-    ) {
+    if (relativeDiffInPercentage(netAmountInCollectiveCurrency, tr.netAmountInCollectiveCurrency) < accuracy) {
       // console.log(">>> ", tr.id, "netAmountInCollectiveCurrency != tr.netAmountInCollectiveCurrency by ", relativeDiffInPercentage(netAmountInCollectiveCurrency, tr.netAmountInCollectiveCurrency));
       return true;
     } else {
@@ -154,9 +132,7 @@ const cols = [
 console.log(cols.join('|'));
 
 const relativeDiffInPercentage = (a, b) => {
-  return Math.abs(
-    Math.round((Math.abs(a - b) / Math.min(a, b)) * 10000) / 10000,
-  );
+  return Math.abs(Math.round((Math.abs(a - b) / Math.min(a, b)) * 10000) / 10000);
 };
 
 const isRefundTransaction = tr => {
@@ -205,10 +181,7 @@ const fixTransaction = async tr => {
     if (tr.hostCollectiveCurrency) {
       update.hostCurrency = tr.hostCollectiveCurrency;
     }
-  } else if (
-    tr.hostCollectiveCurrency &&
-    tr.hostCurrency !== tr.hostCollectiveCurrency
-  ) {
+  } else if (tr.hostCollectiveCurrency && tr.hostCurrency !== tr.hostCollectiveCurrency) {
     reasons.push("hostCurrency doesn't match host.currency");
     update.hostCurrency = tr.hostCollectiveCurrency;
   }
@@ -218,15 +191,11 @@ const fixTransaction = async tr => {
   }
 
   if (!tr.hostCollectiveCurrency) {
-    errorsObject[tr.HostCollectiveId] = `${tr.host} (id: ${
-      tr.HostCollectiveId
-    }) doesn't have a currency set`;
+    errorsObject[tr.HostCollectiveId] = `${tr.host} (id: ${tr.HostCollectiveId}) doesn't have a currency set`;
   } else if (tr.hostCurrency !== tr.hostCollectiveCurrency) {
-    errorsObject[tr.HostCollectiveId] = `${tr.host} (id: ${
-      tr.HostCollectiveId
-    }) has a wrong currency set (${tr.hostCollectiveCurrency}, should be ${
-      tr.hostCurrency
-    })`;
+    errorsObject[tr.HostCollectiveId] = `${tr.host} (id: ${tr.HostCollectiveId}) has a wrong currency set (${
+      tr.hostCollectiveCurrency
+    }, should be ${tr.hostCurrency})`;
   }
 
   // fix amount in host currency for transactions in the same currency
@@ -246,34 +215,23 @@ const fixTransaction = async tr => {
       if (!tr.hostCurrencyFxRate || tr.hostCurrencyFxRate === 1) {
         reasons.push('no hostCurrencyFxRate');
         update.hostCurrencyFxRate = newFxRate;
-      } else if (
-        relativeDiffInPercentage(tr.hostCurrencyFxRate, newFxRate) < 0.1
-      ) {
+      } else if (relativeDiffInPercentage(tr.hostCurrencyFxRate, newFxRate) < 0.1) {
         // if tr.hostCurrencyFxRate is ~= newFxRate, no need to change it, but we need to verify that tr.amountInHostCurrency was correctly computed
-        const amountInHostCurrency = Math.round(
-          tr.amount * tr.hostCurrencyFxRate,
-        );
+        const amountInHostCurrency = Math.round(tr.amount * tr.hostCurrencyFxRate);
         if (tr.amountInHostCurrency != amountInHostCurrency) {
           reasons.push('amountInHostCurrency off');
           update.amountInHostCurrency = amountInHostCurrency;
         }
-      } else if (
-        relativeDiffInPercentage(tr.hostCurrencyFxRate, 1 / newFxRate) < 0.1
-      ) {
+      } else if (relativeDiffInPercentage(tr.hostCurrencyFxRate, 1 / newFxRate) < 0.1) {
         // if hostCurrencyFxRate ~= 1/newFxRate, then it was in the wrong direction => we flip it
         update.hostCurrencyFxRate = 1 / tr.hostCurrencyFxRate;
         reasons.push('hostCurrencyFxRate flipped');
       } else {
-        const diff = relativeDiffInPercentage(
-          tr.hostCurrencyFxRate,
-          Math.abs(tr.amountInHostCurrency / tr.amount),
-        );
+        const diff = relativeDiffInPercentage(tr.hostCurrencyFxRate, Math.abs(tr.amountInHostCurrency / tr.amount));
         // if diff is very small (< 10%)
         if (diff < 0.1) {
           reasons.push(`imprecise fx rate (diff ${diff})`);
-          update.hostCurrencyFxRate = Math.abs(
-            tr.amountInHostCurrency / tr.amount,
-          );
+          update.hostCurrencyFxRate = Math.abs(tr.amountInHostCurrency / tr.amount);
         } else {
           update.hostCurrencyFxRate = newFxRate;
           reasons.push(`hostCurrencyFxRate off (diff ${diff})`);
@@ -281,43 +239,29 @@ const fixTransaction = async tr => {
       }
     } catch (e) {
       console.error(
-        `Unable to fetch fxrate for transaction id ${tr.id} from ${
-          tr.currency
-        } to ${tr.hostCurrency}, date: ${tr.createdAt}`,
+        `Unable to fetch fxrate for transaction id ${tr.id} from ${tr.currency} to ${tr.hostCurrency}, date: ${
+          tr.createdAt
+        }`,
         e,
       );
     }
   }
-  const newAmountInHostCurrency = Math.round(
-    tr.amount * update.hostCurrencyFxRate,
-  );
-  if (
-    update.hostCurrencyFxRate &&
-    newAmountInHostCurrency !== tr.amountInHostCurrency
-  ) {
+  const newAmountInHostCurrency = Math.round(tr.amount * update.hostCurrencyFxRate);
+  if (update.hostCurrencyFxRate && newAmountInHostCurrency !== tr.amountInHostCurrency) {
     update.amountInHostCurrency = newAmountInHostCurrency;
     // if we change the amountInHostCurrency, we need to recompute the hostFees and platformFees since they were computed based on that amount.
     if (
       tr.platformFeeInHostCurrency < 0 &&
-      tr.platformFeeInHostCurrency !==
-        -Math.round(0.05 * Math.abs(update.amountInHostCurrency))
+      tr.platformFeeInHostCurrency !== -Math.round(0.05 * Math.abs(update.amountInHostCurrency))
     ) {
-      update.platformFeeInHostCurrency = -Math.round(
-        0.05 * Math.abs(update.amountInHostCurrency),
-      );
+      update.platformFeeInHostCurrency = -Math.round(0.05 * Math.abs(update.amountInHostCurrency));
     }
-    const hostFeePercent = Math.abs(
-      Math.round((tr.hostFeeInHostCurrency / tr.amountInHostCurrency) * 100) /
-        100,
-    );
+    const hostFeePercent = Math.abs(Math.round((tr.hostFeeInHostCurrency / tr.amountInHostCurrency) * 100) / 100);
     if (
       tr.hostFeeInHostCurrency < 0 &&
-      tr.hostFeeInHostCurrency !==
-        -Math.abs(Math.round(hostFeePercent * update.amountInHostCurrency))
+      tr.hostFeeInHostCurrency !== -Math.abs(Math.round(hostFeePercent * update.amountInHostCurrency))
     ) {
-      update.hostFeeInHostCurrency = -Math.abs(
-        Math.round(hostFeePercent * update.amountInHostCurrency),
-      );
+      update.hostFeeInHostCurrency = -Math.abs(Math.round(hostFeePercent * update.amountInHostCurrency));
     }
   }
 
@@ -329,13 +273,10 @@ const fixTransaction = async tr => {
   const totalFeesInCollectiveCurrency = Math.round(
     (newTransaction.hostFeeInHostCurrency +
       newTransaction.platformFeeInHostCurrency +
-      newTransaction.paymentProcessorFeeInHostCurrency || 0) /
-      newTransaction.hostCurrencyFxRate,
+      newTransaction.paymentProcessorFeeInHostCurrency || 0) / newTransaction.hostCurrencyFxRate,
   );
   const diff = Math.abs(
-    totalFeesInCollectiveCurrency +
-      newTransaction.amount -
-      newTransaction.netAmountInCollectiveCurrency,
+    totalFeesInCollectiveCurrency + newTransaction.amount - newTransaction.netAmountInCollectiveCurrency,
   );
   if (diff > 0) {
     reasons.push(`amount + fees != netAmount; diff: ${diff}`);
@@ -347,55 +288,40 @@ const fixTransaction = async tr => {
     transactionsFixed++;
   }
   if (
-    relativeDiffInPercentage(
-      tr.amountInHostCurrency,
-      update.amountInHostCurrency,
-    ) > 0.1 ||
+    relativeDiffInPercentage(tr.amountInHostCurrency, update.amountInHostCurrency) > 0.1 ||
     Math.abs(tr.amountInHostCurrency - update.amountInHostCurrency) > 500
   ) {
     warnings++;
     console.error(
-      `warning: tr ${tr.id} amountInHostCurrency is changing from ${
-        tr.amountInHostCurrency
-      } to ${update.amountInHostCurrency}`,
+      `warning: tr ${tr.id} amountInHostCurrency is changing from ${tr.amountInHostCurrency} to ${
+        update.amountInHostCurrency
+      }`,
     );
   }
   if (
-    relativeDiffInPercentage(
-      tr.netAmountInCollectiveCurrency,
-      update.netAmountInCollectiveCurrency,
-    ) > 0.1 ||
-    Math.abs(
-      tr.netAmountInCollectiveCurrency - update.netAmountInCollectiveCurrency,
-    ) > 500
+    relativeDiffInPercentage(tr.netAmountInCollectiveCurrency, update.netAmountInCollectiveCurrency) > 0.1 ||
+    Math.abs(tr.netAmountInCollectiveCurrency - update.netAmountInCollectiveCurrency) > 500
   ) {
     warnings++;
     console.error(
-      `warning: tr ${tr.id} netAmountInCollectiveCurrency is changing from ${
-        tr.netAmountInCollectiveCurrency
-      } to ${update.netAmountInCollectiveCurrency}`,
+      `warning: tr ${tr.id} netAmountInCollectiveCurrency is changing from ${tr.netAmountInCollectiveCurrency} to ${
+        update.netAmountInCollectiveCurrency
+      }`,
     );
   }
-  if (
-    tr.hostCurrencyFxRate !== 1 &&
-    relativeDiffInPercentage(tr.hostCurrencyFxRate, update.hostCurrencyFxRate) >
-      0.1
-  ) {
+  if (tr.hostCurrencyFxRate !== 1 && relativeDiffInPercentage(tr.hostCurrencyFxRate, update.hostCurrencyFxRate) > 0.1) {
     warnings++;
     console.error(
-      `warning: tr ${tr.id} hostCurrencyFxRate is changing from ${
-        tr.hostCurrencyFxRate
-      } to ${update.hostCurrencyFxRate}`,
+      `warning: tr ${tr.id} hostCurrencyFxRate is changing from ${tr.hostCurrencyFxRate} to ${
+        update.hostCurrencyFxRate
+      }`,
     );
   }
   const netAmountDelta =
     update.netAmountInCollectiveCurrency &&
-    Math.abs(
-      tr.netAmountInCollectiveCurrency - update.netAmountInCollectiveCurrency,
-    );
+    Math.abs(tr.netAmountInCollectiveCurrency - update.netAmountInCollectiveCurrency);
   const amountInHostCurrencyDelta =
-    update.amountInHostCurrency &&
-    Math.abs(tr.amountInHostCurrency - update.amountInHostCurrency);
+    update.amountInHostCurrency && Math.abs(tr.amountInHostCurrency - update.amountInHostCurrency);
   if (DRY_MODE) {
     const vals = [
       moment(tr.createdAt).format('YYYY-MM-DD HH:mm:ss'),
@@ -481,26 +407,17 @@ module.exports = {
             }
           }
           if (DRY_MODE) {
-            queries.map(q =>
-              console.log(
-                '> query:',
-                q.query,
-                'replacements:',
-                JSON.stringify(q.replacements),
-              ),
-            );
+            queries.map(q => console.log('> query:', q.query, 'replacements:', JSON.stringify(q.replacements)));
             throw new Error('Success!');
           } else {
             console.log('>>> running', queries.length, 'queries');
             return Promise.map(
               queries,
               query =>
-                queryInterface.sequelize
-                  .query(query.query, { replacements: query.replacements })
-                  .catch(e => {
-                    failedUpdates++;
-                    console.log('>>> error: ', JSON.stringify(e, null, '  '));
-                  }),
+                queryInterface.sequelize.query(query.query, { replacements: query.replacements }).catch(e => {
+                  failedUpdates++;
+                  console.log('>>> error: ', JSON.stringify(e, null, '  '));
+                }),
               { concurrency: 2 },
             );
           }
@@ -520,7 +437,7 @@ module.exports = {
  * We mock external calls to make sure we don't need depend on the network to perform this migration
  */
 const initNock = () => {
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -532,7 +449,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -544,7 +461,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'INR', symbols: 'USD' })
     .reply(200, {
@@ -556,7 +473,7 @@ const initNock = () => {
       rates: { USD: 0.014713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-28')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -568,7 +485,7 @@ const initNock = () => {
       rates: { USD: 1.23148 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -580,7 +497,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -592,7 +509,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -604,7 +521,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-23')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -616,7 +533,7 @@ const initNock = () => {
       rates: { UYU: 28.479966 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-04')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -628,7 +545,7 @@ const initNock = () => {
       rates: { USD: 0.743973 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -640,7 +557,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-28')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -652,7 +569,7 @@ const initNock = () => {
       rates: { USD: 1.408034 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -664,7 +581,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -676,7 +593,7 @@ const initNock = () => {
       rates: { GBP: 0.75252 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -688,7 +605,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -700,7 +617,7 @@ const initNock = () => {
       rates: { USD: 0.776459 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -712,7 +629,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -724,7 +641,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -736,7 +653,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-18')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -748,7 +665,7 @@ const initNock = () => {
       rates: { USD: 1.337954 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -760,7 +677,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -772,7 +689,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -784,7 +701,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-28')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -796,7 +713,7 @@ const initNock = () => {
       rates: { USD: 1.408034 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -808,7 +725,7 @@ const initNock = () => {
       rates: { USD: 0.77196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -820,7 +737,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -832,7 +749,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -844,7 +761,7 @@ const initNock = () => {
       rates: { USD: 0.77196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -856,7 +773,7 @@ const initNock = () => {
       rates: { EUR: 0.850404 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-26')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -868,7 +785,7 @@ const initNock = () => {
       rates: { USD: 0.712692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -880,7 +797,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -892,7 +809,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -904,7 +821,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -916,7 +833,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -928,7 +845,7 @@ const initNock = () => {
       rates: { USD: 0.763823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -940,7 +857,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -952,7 +869,7 @@ const initNock = () => {
       rates: { USD: 0.763823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -964,7 +881,7 @@ const initNock = () => {
       rates: { USD: 1.046353 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-15')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -976,7 +893,7 @@ const initNock = () => {
       rates: { USD: 0.820544 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -988,7 +905,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1000,7 +917,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1012,7 +929,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1024,7 +941,7 @@ const initNock = () => {
       rates: { USD: 1.262802 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-21')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1036,7 +953,7 @@ const initNock = () => {
       rates: { USD: 1.23518 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1048,7 +965,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-21')
     .query({ access_key: /.*/i, base: 'INR', symbols: 'USD' })
     .reply(200, {
@@ -1060,7 +977,7 @@ const initNock = () => {
       rates: { USD: 0.015497 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1072,7 +989,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-31')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'AUD' })
     .reply(200, {
@@ -1084,7 +1001,7 @@ const initNock = () => {
       rates: { AUD: 1.305497 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1096,7 +1013,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1108,7 +1025,7 @@ const initNock = () => {
       rates: { USD: 0.052346 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1120,7 +1037,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1132,7 +1049,7 @@ const initNock = () => {
       rates: { USD: 1.076194 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1144,7 +1061,7 @@ const initNock = () => {
       rates: { USD: 0.054425 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1156,7 +1073,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-14')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -1168,7 +1085,7 @@ const initNock = () => {
       rates: { GBP: 0.74444 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1180,7 +1097,7 @@ const initNock = () => {
       rates: { USD: 0.763823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-31')
     .times(2)
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
@@ -1193,7 +1110,7 @@ const initNock = () => {
       rates: { USD: 1.293878 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-31')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1205,7 +1122,7 @@ const initNock = () => {
       rates: { USD: 0.794222 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-03')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1217,7 +1134,7 @@ const initNock = () => {
       rates: { UYU: 28.219999 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-26')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1229,7 +1146,7 @@ const initNock = () => {
       rates: { USD: 0.712692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -1241,7 +1158,7 @@ const initNock = () => {
       rates: { NZD: 1.451104 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1253,7 +1170,7 @@ const initNock = () => {
       rates: { USD: 0.810669 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1265,7 +1182,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1277,7 +1194,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1289,7 +1206,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -1301,7 +1218,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1313,7 +1230,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1325,7 +1242,7 @@ const initNock = () => {
       rates: { USD: 1.339172 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1337,7 +1254,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1349,7 +1266,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1361,7 +1278,7 @@ const initNock = () => {
       rates: { USD: 0.719114 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-29')
     .times(2)
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
@@ -1374,7 +1291,7 @@ const initNock = () => {
       rates: { USD: 0.04849 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1386,7 +1303,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-29')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1398,7 +1315,7 @@ const initNock = () => {
       rates: { USD: 1.064994 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1410,7 +1327,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -1422,7 +1339,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-29')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1434,7 +1351,7 @@ const initNock = () => {
       rates: { USD: 0.04849 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'JPY', symbols: 'USD' })
     .reply(200, {
@@ -1446,7 +1363,7 @@ const initNock = () => {
       rates: { USD: 0.008542 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1458,7 +1375,7 @@ const initNock = () => {
       rates: { USD: 0.776516 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-29')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1470,7 +1387,7 @@ const initNock = () => {
       rates: { USD: 1.248985 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1482,7 +1399,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1494,7 +1411,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1506,7 +1423,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1518,7 +1435,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-08')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1530,7 +1447,7 @@ const initNock = () => {
       rates: { USD: 0.743165 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-07-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1542,7 +1459,7 @@ const initNock = () => {
       rates: { UYU: 30.54732 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-25')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1554,7 +1471,7 @@ const initNock = () => {
       rates: { USD: 0.808486 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1566,7 +1483,7 @@ const initNock = () => {
       rates: { USD: 0.052942 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1578,7 +1495,7 @@ const initNock = () => {
       rates: { USD: 1.2545 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1590,7 +1507,7 @@ const initNock = () => {
       rates: { USD: 0.797251 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1602,7 +1519,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1614,7 +1531,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1626,7 +1543,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1638,7 +1555,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1650,7 +1567,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1662,7 +1579,7 @@ const initNock = () => {
       rates: { USD: 0.778234 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1674,7 +1591,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-04')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1686,7 +1603,7 @@ const initNock = () => {
       rates: { USD: 0.778692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1698,7 +1615,7 @@ const initNock = () => {
       rates: { USD: 0.810637 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1710,7 +1627,7 @@ const initNock = () => {
       rates: { USD: 1.357091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1722,7 +1639,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1734,7 +1651,7 @@ const initNock = () => {
       rates: { USD: 0.051336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1746,7 +1663,7 @@ const initNock = () => {
       rates: { UYU: 30.55184 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1758,7 +1675,7 @@ const initNock = () => {
       rates: { USD: 0.77235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-14')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1770,7 +1687,7 @@ const initNock = () => {
       rates: { USD: 0.050883 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1782,7 +1699,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1794,7 +1711,7 @@ const initNock = () => {
       rates: { USD: 0.77196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1806,7 +1723,7 @@ const initNock = () => {
       rates: { USD: 0.754175 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -1818,7 +1735,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1830,7 +1747,7 @@ const initNock = () => {
       rates: { USD: 0.761264 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1842,7 +1759,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-19')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1854,7 +1771,7 @@ const initNock = () => {
       rates: { USD: 1.402426 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -1866,7 +1783,7 @@ const initNock = () => {
       rates: { GBP: 0.70971 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-23')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -1878,7 +1795,7 @@ const initNock = () => {
       rates: { USD: 0.753238 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1890,7 +1807,7 @@ const initNock = () => {
       rates: { USD: 0.788828 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-04')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1902,7 +1819,7 @@ const initNock = () => {
       rates: { USD: 1.189908 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-19')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1914,7 +1831,7 @@ const initNock = () => {
       rates: { USD: 0.053158 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1926,7 +1843,7 @@ const initNock = () => {
       rates: { USD: 1.182595 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-09-30')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -1938,7 +1855,7 @@ const initNock = () => {
       rates: { USD: 1.124475 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1950,7 +1867,7 @@ const initNock = () => {
       rates: { USD: 0.792014 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -1962,7 +1879,7 @@ const initNock = () => {
       rates: { USD: 1.357092 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -1974,7 +1891,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -1986,7 +1903,7 @@ const initNock = () => {
       rates: { USD: 0.788828 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -1998,7 +1915,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2010,7 +1927,7 @@ const initNock = () => {
       rates: { USD: 0.810637 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-30')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -2022,7 +1939,7 @@ const initNock = () => {
       rates: { NZD: 1.363604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2034,7 +1951,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-06')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2046,7 +1963,7 @@ const initNock = () => {
       rates: { USD: 0.741597 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-01')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2058,7 +1975,7 @@ const initNock = () => {
       rates: { USD: 1.105945 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2070,7 +1987,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2082,7 +1999,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2094,7 +2011,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2106,7 +2023,7 @@ const initNock = () => {
       rates: { GBP: 0.73684 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-27')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2118,7 +2035,7 @@ const initNock = () => {
       rates: { USD: 0.750823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-23')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2130,7 +2047,7 @@ const initNock = () => {
       rates: { UYU: 28.479966 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2142,7 +2059,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2154,7 +2071,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2166,7 +2083,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2178,7 +2095,7 @@ const initNock = () => {
       rates: { GBP: 0.75677 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2190,7 +2107,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2202,7 +2119,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2214,7 +2131,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-09-27')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2226,7 +2143,7 @@ const initNock = () => {
       rates: { UYU: 28.379999 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2238,7 +2155,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2250,7 +2167,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-22')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2262,7 +2179,7 @@ const initNock = () => {
       rates: { USD: 0.053542 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2274,7 +2191,7 @@ const initNock = () => {
       rates: { USD: 0.777273 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2286,7 +2203,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2298,7 +2215,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-21')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2310,7 +2227,7 @@ const initNock = () => {
       rates: { USD: 1.267539 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-21')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2322,7 +2239,7 @@ const initNock = () => {
       rates: { USD: 0.054845 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2334,7 +2251,7 @@ const initNock = () => {
       rates: { GBP: 0.75677 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-19')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2346,7 +2263,7 @@ const initNock = () => {
       rates: { USD: 0.053158 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2358,7 +2275,7 @@ const initNock = () => {
       rates: { USD: 0.051336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-21')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2370,7 +2287,7 @@ const initNock = () => {
       rates: { USD: 1.338007 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-10')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2382,7 +2299,7 @@ const initNock = () => {
       rates: { USD: 0.794054 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2394,7 +2311,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2406,7 +2323,7 @@ const initNock = () => {
       rates: { USD: 0.754175 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2418,7 +2335,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2430,7 +2347,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2442,7 +2359,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2454,7 +2371,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2466,7 +2383,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2478,7 +2395,7 @@ const initNock = () => {
       rates: { USD: 0.788828 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2490,7 +2407,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-09')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2502,7 +2419,7 @@ const initNock = () => {
       rates: { USD: 0.747676 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2514,7 +2431,7 @@ const initNock = () => {
       rates: { USD: 0.054425 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2526,7 +2443,7 @@ const initNock = () => {
       rates: { GBP: 0.71845 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2538,7 +2455,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2550,7 +2467,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2562,7 +2479,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2574,7 +2491,7 @@ const initNock = () => {
       rates: { USD: 0.054211 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2586,7 +2503,7 @@ const initNock = () => {
       rates: { USD: 0.777273 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-05')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2598,7 +2515,7 @@ const initNock = () => {
       rates: { USD: 0.706729 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2610,7 +2527,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-14')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2622,7 +2539,7 @@ const initNock = () => {
       rates: { USD: 1.423527 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-14')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2634,7 +2551,7 @@ const initNock = () => {
       rates: { USD: 0.750984 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2646,7 +2563,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2658,7 +2575,7 @@ const initNock = () => {
       rates: { USD: 0.714532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2670,7 +2587,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2682,7 +2599,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2694,7 +2611,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2706,7 +2623,7 @@ const initNock = () => {
       rates: { GBP: 0.73474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2718,7 +2635,7 @@ const initNock = () => {
       rates: { USD: 1.227567 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2730,7 +2647,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2742,7 +2659,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2754,7 +2671,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2766,7 +2683,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2778,7 +2695,7 @@ const initNock = () => {
       rates: { USD: 0.052346 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -2790,7 +2707,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2802,7 +2719,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-16')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2814,7 +2731,7 @@ const initNock = () => {
       rates: { UYU: 28.200001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2826,7 +2743,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2838,7 +2755,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -2850,7 +2767,7 @@ const initNock = () => {
       rates: { NZD: 1.3848 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2862,7 +2779,7 @@ const initNock = () => {
       rates: { USD: 1.182595 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2874,7 +2791,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -2886,7 +2803,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2898,7 +2815,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -2910,7 +2827,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2922,7 +2839,7 @@ const initNock = () => {
       rates: { USD: 0.719114 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-04-20')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2934,7 +2851,7 @@ const initNock = () => {
       rates: { USD: 1.130046 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -2946,7 +2863,7 @@ const initNock = () => {
       rates: { USD: 1.046353 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-03')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -2958,7 +2875,7 @@ const initNock = () => {
       rates: { USD: 0.735069 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -2970,7 +2887,7 @@ const initNock = () => {
       rates: { NZD: 1.387991 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-18')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -2982,7 +2899,7 @@ const initNock = () => {
       rates: { USD: 1.284538 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -2994,7 +2911,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3006,7 +2923,7 @@ const initNock = () => {
       rates: { USD: 1.31987 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-25')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -3018,7 +2935,7 @@ const initNock = () => {
       rates: { EUR: 0.838204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3030,7 +2947,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3042,7 +2959,7 @@ const initNock = () => {
       rates: { USD: 1.204091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3054,7 +2971,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3066,7 +2983,7 @@ const initNock = () => {
       rates: { USD: 0.754175 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-09')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3078,7 +2995,7 @@ const initNock = () => {
       rates: { USD: 0.747676 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3090,7 +3007,7 @@ const initNock = () => {
       rates: { USD: 1.395771 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3102,7 +3019,7 @@ const initNock = () => {
       rates: { USD: 1.241307 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3114,7 +3031,7 @@ const initNock = () => {
       rates: { USD: 0.737915 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -3126,7 +3043,7 @@ const initNock = () => {
       rates: { NZD: 1.396904 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3138,7 +3055,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-02')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3150,7 +3067,7 @@ const initNock = () => {
       rates: { USD: 0.055944 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-25')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -3162,7 +3079,7 @@ const initNock = () => {
       rates: { EUR: 0.838204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3174,7 +3091,7 @@ const initNock = () => {
       rates: { USD: 1.349747 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3186,7 +3103,7 @@ const initNock = () => {
       rates: { USD: 0.77235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-15')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3198,7 +3115,7 @@ const initNock = () => {
       rates: { USD: 0.055326 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3210,7 +3127,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-07-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3222,7 +3139,7 @@ const initNock = () => {
       rates: { UYU: 30.54732 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-15')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3234,7 +3151,7 @@ const initNock = () => {
       rates: { USD: 0.746235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-01-24')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3246,7 +3163,7 @@ const initNock = () => {
       rates: { UYU: 28.250188 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-23')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3258,7 +3175,7 @@ const initNock = () => {
       rates: { USD: 0.753238 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3270,7 +3187,7 @@ const initNock = () => {
       rates: { UYU: 28.580173 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -3282,7 +3199,7 @@ const initNock = () => {
       rates: { NZD: 1.363604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -3294,7 +3211,7 @@ const initNock = () => {
       rates: { NZD: 1.429095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3306,7 +3223,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3318,7 +3235,7 @@ const initNock = () => {
       rates: { USD: 0.788828 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3330,7 +3247,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3342,7 +3259,7 @@ const initNock = () => {
       rates: { USD: 0.714532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3354,7 +3271,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3366,7 +3283,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3378,7 +3295,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3390,7 +3307,7 @@ const initNock = () => {
       rates: { USD: 0.779077 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3402,7 +3319,7 @@ const initNock = () => {
       rates: { USD: 1.227567 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-07-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3414,7 +3331,7 @@ const initNock = () => {
       rates: { UYU: 30.54732 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-22')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3426,7 +3343,7 @@ const initNock = () => {
       rates: { USD: 0.053542 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-18')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3438,7 +3355,7 @@ const initNock = () => {
       rates: { UYU: 28.540001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3450,7 +3367,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3462,7 +3379,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3474,7 +3391,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3486,7 +3403,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3498,7 +3415,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3510,7 +3427,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3522,7 +3439,7 @@ const initNock = () => {
       rates: { USD: 0.810637 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-27')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3534,7 +3451,7 @@ const initNock = () => {
       rates: { USD: 1.255793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-14')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3546,7 +3463,7 @@ const initNock = () => {
       rates: { GBP: 0.76001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3558,7 +3475,7 @@ const initNock = () => {
       rates: { USD: 1.241307 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3570,7 +3487,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3582,7 +3499,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-15')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -3594,7 +3511,7 @@ const initNock = () => {
       rates: { USD: 0.746235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-03')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3606,7 +3523,7 @@ const initNock = () => {
       rates: { UYU: 28.219999 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3618,7 +3535,7 @@ const initNock = () => {
       rates: { UYU: 28.580173 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3630,7 +3547,7 @@ const initNock = () => {
       rates: { USD: 1.177296 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3642,7 +3559,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3654,7 +3571,7 @@ const initNock = () => {
       rates: { USD: 0.054211 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -3666,7 +3583,7 @@ const initNock = () => {
       rates: { EUR: 0.850404 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-30')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3678,7 +3595,7 @@ const initNock = () => {
       rates: { UYU: 30.74139 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3690,7 +3607,7 @@ const initNock = () => {
       rates: { USD: 0.773931 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -3702,7 +3619,7 @@ const initNock = () => {
       rates: { EUR: 0.855897 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3714,7 +3631,7 @@ const initNock = () => {
       rates: { GBP: 0.70233 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3726,7 +3643,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3738,7 +3655,7 @@ const initNock = () => {
       rates: { USD: 1.395771 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3750,7 +3667,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3762,7 +3679,7 @@ const initNock = () => {
       rates: { GBP: 0.75677 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3774,7 +3691,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-05-16')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3786,7 +3703,7 @@ const initNock = () => {
       rates: { USD: 0.054796 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3798,7 +3715,7 @@ const initNock = () => {
       rates: { GBP: 0.74225 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3810,7 +3727,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3822,7 +3739,7 @@ const initNock = () => {
       rates: { GBP: 0.71845 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3834,7 +3751,7 @@ const initNock = () => {
       rates: { USD: 1.175231 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3846,7 +3763,7 @@ const initNock = () => {
       rates: { USD: 0.052942 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3858,7 +3775,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3870,7 +3787,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -3882,7 +3799,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3894,7 +3811,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-27')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -3906,7 +3823,7 @@ const initNock = () => {
       rates: { USD: 1.255793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-26')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -3918,7 +3835,7 @@ const initNock = () => {
       rates: { USD: 0.808793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -3930,7 +3847,7 @@ const initNock = () => {
       rates: { EUR: 0.857204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -3942,7 +3859,7 @@ const initNock = () => {
       rates: { USD: 1.127362 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-02')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3954,7 +3871,7 @@ const initNock = () => {
       rates: { USD: 0.055944 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3966,7 +3883,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-23')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -3978,7 +3895,7 @@ const initNock = () => {
       rates: { UYU: 28.479966 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -3990,7 +3907,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-05')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -4002,7 +3919,7 @@ const initNock = () => {
       rates: { USD: 1.290606 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4014,7 +3931,7 @@ const initNock = () => {
       rates: { EUR: 0.813199 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4026,7 +3943,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4038,7 +3955,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4050,7 +3967,7 @@ const initNock = () => {
       rates: { GBP: 0.73684 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4062,7 +3979,7 @@ const initNock = () => {
       rates: { USD: 1.046353 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4074,7 +3991,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4086,7 +4003,7 @@ const initNock = () => {
       rates: { USD: 0.761264 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4098,7 +4015,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-21')
     .query({ access_key: /.*/i, base: 'INR', symbols: 'USD' })
     .reply(200, {
@@ -4110,7 +4027,7 @@ const initNock = () => {
       rates: { USD: 0.015497 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4122,7 +4039,7 @@ const initNock = () => {
       rates: { USD: 0.718182 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4134,7 +4051,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-18')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4146,7 +4063,7 @@ const initNock = () => {
       rates: { UYU: 28.540001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4158,7 +4075,7 @@ const initNock = () => {
       rates: { UYU: 30.55184 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-21')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4170,7 +4087,7 @@ const initNock = () => {
       rates: { EUR: 0.836803 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -4182,7 +4099,7 @@ const initNock = () => {
       rates: { NZD: 1.447304 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-04')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4194,7 +4111,7 @@ const initNock = () => {
       rates: { USD: 1.196596 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-14')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4206,7 +4123,7 @@ const initNock = () => {
       rates: { USD: 0.781226 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4218,7 +4135,7 @@ const initNock = () => {
       rates: { USD: 0.737915 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4230,7 +4147,7 @@ const initNock = () => {
       rates: { EUR: 0.830604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-05')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4242,7 +4159,7 @@ const initNock = () => {
       rates: { USD: 0.743973 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -4254,7 +4171,7 @@ const initNock = () => {
       rates: { USD: 1.40853 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-09')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -4266,7 +4183,7 @@ const initNock = () => {
       rates: { NZD: 1.399402 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4278,7 +4195,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4290,7 +4207,7 @@ const initNock = () => {
       rates: { EUR: 0.830604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-03')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -4302,7 +4219,7 @@ const initNock = () => {
       rates: { USD: 1.314441 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4314,7 +4231,7 @@ const initNock = () => {
       rates: { USD: 1.182595 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4326,7 +4243,7 @@ const initNock = () => {
       rates: { USD: 0.718495 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4338,7 +4255,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4350,7 +4267,7 @@ const initNock = () => {
       rates: { GBP: 0.70233 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4362,7 +4279,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4374,7 +4291,7 @@ const initNock = () => {
       rates: { GBP: 0.74225 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-09')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4386,7 +4303,7 @@ const initNock = () => {
       rates: { USD: 1.11969 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-21')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4398,7 +4315,7 @@ const initNock = () => {
       rates: { USD: 1.23518 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4410,7 +4327,7 @@ const initNock = () => {
       rates: { USD: 1.177296 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4422,7 +4339,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-22')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4434,7 +4351,7 @@ const initNock = () => {
       rates: { USD: 0.053542 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4446,7 +4363,7 @@ const initNock = () => {
       rates: { GBP: 0.73713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4458,7 +4375,7 @@ const initNock = () => {
       rates: { GBP: 0.72059 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4470,7 +4387,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-24')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4482,7 +4399,7 @@ const initNock = () => {
       rates: { GBP: 0.74722 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4494,7 +4411,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4506,7 +4423,7 @@ const initNock = () => {
       rates: { GBP: 0.72059 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4518,7 +4435,7 @@ const initNock = () => {
       rates: { USD: 0.750861 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4530,7 +4447,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-30')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4542,7 +4459,7 @@ const initNock = () => {
       rates: { UYU: 30.74139 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4554,7 +4471,7 @@ const initNock = () => {
       rates: { USD: 0.780336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-04-20')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4566,7 +4483,7 @@ const initNock = () => {
       rates: { USD: 1.130046 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4578,7 +4495,7 @@ const initNock = () => {
       rates: { USD: 0.763823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4590,7 +4507,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-21')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4602,7 +4519,7 @@ const initNock = () => {
       rates: { EUR: 0.836803 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-10')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4614,7 +4531,7 @@ const initNock = () => {
       rates: { USD: 0.782987 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -4626,7 +4543,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4638,7 +4555,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-14')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4650,7 +4567,7 @@ const initNock = () => {
       rates: { USD: 0.050883 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-20')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4662,7 +4579,7 @@ const initNock = () => {
       rates: { USD: 0.759753 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4674,7 +4591,7 @@ const initNock = () => {
       rates: { GBP: 0.73474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4686,7 +4603,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4698,7 +4615,7 @@ const initNock = () => {
       rates: { USD: 0.805484 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4710,7 +4627,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-02-28')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4722,7 +4639,7 @@ const initNock = () => {
       rates: { USD: 0.751106 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4734,7 +4651,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-05-10')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4746,7 +4663,7 @@ const initNock = () => {
       rates: { USD: 0.729343 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4758,7 +4675,7 @@ const initNock = () => {
       rates: { EUR: 0.830604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4770,7 +4687,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -4782,7 +4699,7 @@ const initNock = () => {
       rates: { EUR: 0.855897 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4794,7 +4711,7 @@ const initNock = () => {
       rates: { USD: 1.18497 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4806,7 +4723,7 @@ const initNock = () => {
       rates: { USD: 0.052346 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -4818,7 +4735,7 @@ const initNock = () => {
       rates: { NZD: 1.3848 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4830,7 +4747,7 @@ const initNock = () => {
       rates: { GBP: 0.74225 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4842,7 +4759,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4854,7 +4771,7 @@ const initNock = () => {
       rates: { USD: 0.052488 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-12')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -4866,7 +4783,7 @@ const initNock = () => {
       rates: { USD: 1.423812 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4878,7 +4795,7 @@ const initNock = () => {
       rates: { GBP: 0.74529 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -4890,7 +4807,7 @@ const initNock = () => {
       rates: { GBP: 0.74225 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -4902,7 +4819,7 @@ const initNock = () => {
       rates: { USD: 1.177446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -4914,7 +4831,7 @@ const initNock = () => {
       rates: { UYU: 28.580173 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -4926,7 +4843,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4938,7 +4855,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -4950,7 +4867,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4962,7 +4879,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4974,7 +4891,7 @@ const initNock = () => {
       rates: { USD: 0.789571 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -4986,7 +4903,7 @@ const initNock = () => {
       rates: { USD: 0.805484 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -4998,7 +4915,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5010,7 +4927,7 @@ const initNock = () => {
       rates: { NZD: 1.429095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -5022,7 +4939,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5034,7 +4951,7 @@ const initNock = () => {
       rates: { NZD: 1.387991 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5046,7 +4963,7 @@ const initNock = () => {
       rates: { GBP: 0.75252 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-01-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -5058,7 +4975,7 @@ const initNock = () => {
       rates: { UYU: 28.660367 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-05')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5070,7 +4987,7 @@ const initNock = () => {
       rates: { USD: 0.743973 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -5082,7 +4999,7 @@ const initNock = () => {
       rates: { EUR: 0.813199 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -5094,7 +5011,7 @@ const initNock = () => {
       rates: { USD: 1.234875 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -5106,7 +5023,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5118,7 +5035,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5130,7 +5047,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-03')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5142,7 +5059,7 @@ const initNock = () => {
       rates: { USD: 0.735069 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -5154,7 +5071,7 @@ const initNock = () => {
       rates: { USD: 0.052488 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5166,7 +5083,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -5178,7 +5095,7 @@ const initNock = () => {
       rates: { EUR: 0.849404 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5190,7 +5107,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-25')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -5202,7 +5119,7 @@ const initNock = () => {
       rates: { EUR: 0.838204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -5214,7 +5131,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -5226,7 +5143,7 @@ const initNock = () => {
       rates: { USD: 1.046353 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -5238,7 +5155,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5250,7 +5167,7 @@ const initNock = () => {
       rates: { GBP: 0.75582 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-14')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5262,7 +5179,7 @@ const initNock = () => {
       rates: { USD: 0.781226 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5274,7 +5191,7 @@ const initNock = () => {
       rates: { USD: 1.2545 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-14')
     .times(2)
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
@@ -5287,7 +5204,7 @@ const initNock = () => {
       rates: { USD: 0.791074 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5299,7 +5216,7 @@ const initNock = () => {
       rates: { USD: 1.31987 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -5311,7 +5228,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5323,7 +5240,7 @@ const initNock = () => {
       rates: { NZD: 1.447304 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -5335,7 +5252,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5347,7 +5264,7 @@ const initNock = () => {
       rates: { USD: 0.77235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -5359,7 +5276,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5371,7 +5288,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5383,7 +5300,7 @@ const initNock = () => {
       rates: { USD: 0.788828 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -5395,7 +5312,7 @@ const initNock = () => {
       rates: { USD: 1.182595 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-09')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5407,7 +5324,7 @@ const initNock = () => {
       rates: { NZD: 1.367702 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -5419,7 +5336,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-12')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5431,7 +5348,7 @@ const initNock = () => {
       rates: { USD: 1.390588 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-04')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5443,7 +5360,7 @@ const initNock = () => {
       rates: { USD: 0.743973 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5455,7 +5372,7 @@ const initNock = () => {
       rates: { GBP: 0.72021 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5467,7 +5384,7 @@ const initNock = () => {
       rates: { NZD: 1.346204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5479,7 +5396,7 @@ const initNock = () => {
       rates: { GBP: 0.73687 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5491,7 +5408,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-03')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5503,7 +5420,7 @@ const initNock = () => {
       rates: { USD: 0.735069 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5515,7 +5432,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5527,7 +5444,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5539,7 +5456,7 @@ const initNock = () => {
       rates: { USD: 0.792014 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5551,7 +5468,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5563,7 +5480,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -5575,7 +5492,7 @@ const initNock = () => {
       rates: { EUR: 0.849404 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5587,7 +5504,7 @@ const initNock = () => {
       rates: { USD: 1.357682 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5599,7 +5516,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5611,7 +5528,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-30')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -5623,7 +5540,7 @@ const initNock = () => {
       rates: { UYU: 30.74139 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-26')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5635,7 +5552,7 @@ const initNock = () => {
       rates: { USD: 0.808793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5647,7 +5564,7 @@ const initNock = () => {
       rates: { NZD: 1.363604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-04')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5659,7 +5576,7 @@ const initNock = () => {
       rates: { USD: 0.743973 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -5671,7 +5588,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -5683,7 +5600,7 @@ const initNock = () => {
       rates: { USD: 1.241307 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5695,7 +5612,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-09')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5707,7 +5624,7 @@ const initNock = () => {
       rates: { USD: 0.747676 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5719,7 +5636,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5731,7 +5648,7 @@ const initNock = () => {
       rates: { USD: 0.77235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5743,7 +5660,7 @@ const initNock = () => {
       rates: { USD: 0.802244 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-28')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5755,7 +5672,7 @@ const initNock = () => {
       rates: { NZD: 1.368601 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-14')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5767,7 +5684,7 @@ const initNock = () => {
       rates: { GBP: 0.74444 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -5779,7 +5696,7 @@ const initNock = () => {
       rates: { NZD: 1.351298 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5791,7 +5708,7 @@ const initNock = () => {
       rates: { GBP: 0.73684 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5803,7 +5720,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5815,7 +5732,7 @@ const initNock = () => {
       rates: { USD: 0.718495 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5827,7 +5744,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5839,7 +5756,7 @@ const initNock = () => {
       rates: { USD: 0.776516 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-14')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5851,7 +5768,7 @@ const initNock = () => {
       rates: { GBP: 0.728149 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5863,7 +5780,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-06')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -5875,7 +5792,7 @@ const initNock = () => {
       rates: { EUR: 0.848498 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -5887,7 +5804,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5899,7 +5816,7 @@ const initNock = () => {
       rates: { USD: 0.805484 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-11')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5911,7 +5828,7 @@ const initNock = () => {
       rates: { GBP: 0.75713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -5923,7 +5840,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5935,7 +5852,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5947,7 +5864,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -5959,7 +5876,7 @@ const initNock = () => {
       rates: { GBP: 0.73713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5971,7 +5888,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -5983,7 +5900,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-26')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -5995,7 +5912,7 @@ const initNock = () => {
       rates: { USD: 0.808793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6007,7 +5924,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6019,7 +5936,7 @@ const initNock = () => {
       rates: { USD: 0.777357 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6031,7 +5948,7 @@ const initNock = () => {
       rates: { USD: 0.776459 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6043,7 +5960,7 @@ const initNock = () => {
       rates: { USD: 0.77235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-24')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6055,7 +5972,7 @@ const initNock = () => {
       rates: { USD: 0.779952 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -6067,7 +5984,7 @@ const initNock = () => {
       rates: { NZD: 1.381604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6079,7 +5996,7 @@ const initNock = () => {
       rates: { USD: 1.228531 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6091,7 +6008,7 @@ const initNock = () => {
       rates: { USD: 0.778234 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-17')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6103,7 +6020,7 @@ const initNock = () => {
       rates: { USD: 0.764229 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-05')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6115,7 +6032,7 @@ const initNock = () => {
       rates: { USD: 0.772929 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -6127,7 +6044,7 @@ const initNock = () => {
       rates: { EUR: 0.813199 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6139,7 +6056,7 @@ const initNock = () => {
       rates: { USD: 1.199326 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -6151,7 +6068,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6163,7 +6080,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-10')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6175,7 +6092,7 @@ const initNock = () => {
       rates: { USD: 0.794054 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-23')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6187,7 +6104,7 @@ const initNock = () => {
       rates: { USD: 1.280312 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-19')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6199,7 +6116,7 @@ const initNock = () => {
       rates: { USD: 0.77647 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6211,7 +6128,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6223,7 +6140,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6235,7 +6152,7 @@ const initNock = () => {
       rates: { GBP: 0.750495 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6247,7 +6164,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6259,7 +6176,7 @@ const initNock = () => {
       rates: { USD: 0.750861 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6271,7 +6188,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6283,7 +6200,7 @@ const initNock = () => {
       rates: { USD: 0.798601 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -6295,7 +6212,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-31')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6307,7 +6224,7 @@ const initNock = () => {
       rates: { USD: 0.775699 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6319,7 +6236,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -6331,7 +6248,7 @@ const initNock = () => {
       rates: { EUR: 0.857204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-26')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6343,7 +6260,7 @@ const initNock = () => {
       rates: { USD: 0.712692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6355,7 +6272,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-31')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'AUD' })
     .reply(200, {
@@ -6367,7 +6284,7 @@ const initNock = () => {
       rates: { AUD: 1.305497 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-05')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6379,7 +6296,7 @@ const initNock = () => {
       rates: { USD: 0.772929 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6391,7 +6308,7 @@ const initNock = () => {
       rates: { USD: 1.076194 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6403,7 +6320,7 @@ const initNock = () => {
       rates: { GBP: 0.70971 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6415,7 +6332,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6427,7 +6344,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-09')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6439,7 +6356,7 @@ const initNock = () => {
       rates: { USD: 1.11969 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6451,7 +6368,7 @@ const initNock = () => {
       rates: { USD: 1.357091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-14')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6463,7 +6380,7 @@ const initNock = () => {
       rates: { USD: 1.423527 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6475,7 +6392,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6487,7 +6404,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6499,7 +6416,7 @@ const initNock = () => {
       rates: { USD: 0.718182 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6511,7 +6428,7 @@ const initNock = () => {
       rates: { USD: 0.776892 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6523,7 +6440,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-15')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6535,7 +6452,7 @@ const initNock = () => {
       rates: { USD: 0.746235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6547,7 +6464,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -6559,7 +6476,7 @@ const initNock = () => {
       rates: { NZD: 1.431904 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6571,7 +6488,7 @@ const initNock = () => {
       rates: { GBP: 0.73474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6583,7 +6500,7 @@ const initNock = () => {
       rates: { GBP: 0.73684 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-08')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6595,7 +6512,7 @@ const initNock = () => {
       rates: { USD: 0.743165 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-11')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6607,7 +6524,7 @@ const initNock = () => {
       rates: { GBP: 0.75713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6619,7 +6536,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6631,7 +6548,7 @@ const initNock = () => {
       rates: { GBP: 0.73779 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-05')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6643,7 +6560,7 @@ const initNock = () => {
       rates: { GBP: 0.75632 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-01-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6655,7 +6572,7 @@ const initNock = () => {
       rates: { UYU: 28.660367 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6667,7 +6584,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -6679,7 +6596,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6691,7 +6608,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6703,7 +6620,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -6715,7 +6632,7 @@ const initNock = () => {
       rates: { NZD: 1.489798 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-21')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6727,7 +6644,7 @@ const initNock = () => {
       rates: { USD: 0.775398 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -6739,7 +6656,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6751,7 +6668,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6763,7 +6680,7 @@ const initNock = () => {
       rates: { USD: 1.395771 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6775,7 +6692,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-02')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6787,7 +6704,7 @@ const initNock = () => {
       rates: { USD: 1.128154 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6799,7 +6716,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6811,7 +6728,7 @@ const initNock = () => {
       rates: { USD: 0.810637 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-29')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6823,7 +6740,7 @@ const initNock = () => {
       rates: { USD: 1.064994 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6835,7 +6752,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6847,7 +6764,7 @@ const initNock = () => {
       rates: { USD: 0.792014 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -6859,7 +6776,7 @@ const initNock = () => {
       rates: { USD: 1.177296 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6871,7 +6788,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-02')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6883,7 +6800,7 @@ const initNock = () => {
       rates: { USD: 1.322786 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -6895,7 +6812,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6907,7 +6824,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -6919,7 +6836,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -6931,7 +6848,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -6943,7 +6860,7 @@ const initNock = () => {
       rates: { USD: 1.357091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -6955,7 +6872,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6967,7 +6884,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -6979,7 +6896,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -6991,7 +6908,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7003,7 +6920,7 @@ const initNock = () => {
       rates: { GBP: 0.750495 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7015,7 +6932,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7027,7 +6944,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7039,7 +6956,7 @@ const initNock = () => {
       rates: { USD: 1.357682 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'JPY', symbols: 'USD' })
     .reply(200, {
@@ -7051,7 +6968,7 @@ const initNock = () => {
       rates: { USD: 0.008542 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7063,7 +6980,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7075,7 +6992,7 @@ const initNock = () => {
       rates: { GBP: 0.76087 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7087,7 +7004,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7099,7 +7016,7 @@ const initNock = () => {
       rates: { GBP: 0.74225 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-02-28')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7111,7 +7028,7 @@ const initNock = () => {
       rates: { USD: 0.751106 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7123,7 +7040,7 @@ const initNock = () => {
       rates: { USD: 0.780336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-25')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -7135,7 +7052,7 @@ const initNock = () => {
       rates: { EUR: 0.838204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -7147,7 +7064,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-10-21')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7159,7 +7076,7 @@ const initNock = () => {
       rates: { UYU: 28.040001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -7171,7 +7088,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-31')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7183,7 +7100,7 @@ const initNock = () => {
       rates: { USD: 0.812742 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-14')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7195,7 +7112,7 @@ const initNock = () => {
       rates: { USD: 0.050883 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -7207,7 +7124,7 @@ const initNock = () => {
       rates: { USD: 1.1613 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7219,7 +7136,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7231,7 +7148,7 @@ const initNock = () => {
       rates: { GBP: 0.73474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7243,7 +7160,7 @@ const initNock = () => {
       rates: { USD: 0.052346 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-02')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7255,7 +7172,7 @@ const initNock = () => {
       rates: { USD: 1.35949 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-30')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -7267,7 +7184,7 @@ const initNock = () => {
       rates: { NZD: 1.363604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7279,7 +7196,7 @@ const initNock = () => {
       rates: { USD: 0.771364 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -7291,7 +7208,7 @@ const initNock = () => {
       rates: { USD: 1.140376 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-10-07')
     .times(10)
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
@@ -7304,7 +7221,7 @@ const initNock = () => {
       rates: { USD: 1.243842 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7316,7 +7233,7 @@ const initNock = () => {
       rates: { USD: 0.761264 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-12')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7328,7 +7245,7 @@ const initNock = () => {
       rates: { USD: 1.423812 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7340,7 +7257,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-22')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7352,7 +7269,7 @@ const initNock = () => {
       rates: { GBP: 0.71681 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7364,7 +7281,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7376,7 +7293,7 @@ const initNock = () => {
       rates: { USD: 0.788828 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7388,7 +7305,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-09')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -7400,7 +7317,7 @@ const initNock = () => {
       rates: { USD: 0.747676 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7412,7 +7329,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7424,7 +7341,7 @@ const initNock = () => {
       rates: { GBP: 0.73713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'INR', symbols: 'USD' })
     .reply(200, {
@@ -7436,7 +7353,7 @@ const initNock = () => {
       rates: { USD: 0.014713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-09-27')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7448,7 +7365,7 @@ const initNock = () => {
       rates: { UYU: 28.379999 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7460,7 +7377,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7472,7 +7389,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7484,7 +7401,7 @@ const initNock = () => {
       rates: { USD: 0.054425 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7496,7 +7413,7 @@ const initNock = () => {
       rates: { USD: 1.357091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7508,7 +7425,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7520,7 +7437,7 @@ const initNock = () => {
       rates: { USD: 0.797251 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7532,7 +7449,7 @@ const initNock = () => {
       rates: { USD: 1.357091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-20')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -7544,7 +7461,7 @@ const initNock = () => {
       rates: { USD: 0.759753 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7556,7 +7473,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-05')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7568,7 +7485,7 @@ const initNock = () => {
       rates: { USD: 0.772929 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7580,7 +7497,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7592,7 +7509,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-14')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7604,7 +7521,7 @@ const initNock = () => {
       rates: { USD: 1.275543 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7616,7 +7533,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7628,7 +7545,7 @@ const initNock = () => {
       rates: { USD: 1.349747 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-20')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -7640,7 +7557,7 @@ const initNock = () => {
       rates: { USD: 1.178823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-06')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -7652,7 +7569,7 @@ const initNock = () => {
       rates: { EUR: 0.848498 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-09')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -7664,7 +7581,7 @@ const initNock = () => {
       rates: { NZD: 1.399402 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7676,7 +7593,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7688,7 +7605,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -7700,7 +7617,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-05-10')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7712,7 +7629,7 @@ const initNock = () => {
       rates: { USD: 0.729343 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7724,7 +7641,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7736,7 +7653,7 @@ const initNock = () => {
       rates: { USD: 0.054211 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -7748,7 +7665,7 @@ const initNock = () => {
       rates: { USD: 1.076194 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-03')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -7760,7 +7677,7 @@ const initNock = () => {
       rates: { EUR: 0.814196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .times(10)
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
@@ -7773,7 +7690,7 @@ const initNock = () => {
       rates: { USD: 0.780336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-31')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7785,7 +7702,7 @@ const initNock = () => {
       rates: { USD: 0.775699 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .times(10)
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
@@ -7798,7 +7715,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -7810,7 +7727,7 @@ const initNock = () => {
       rates: { USD: 0.782038 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7822,7 +7739,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -7834,7 +7751,7 @@ const initNock = () => {
       rates: { EUR: 0.84304 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .times(3)
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
@@ -7847,7 +7764,7 @@ const initNock = () => {
       rates: { USD: 1.186183 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -7859,7 +7776,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .times(2)
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
@@ -7872,7 +7789,7 @@ const initNock = () => {
       rates: { USD: 0.056174 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .times(2)
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
@@ -7885,7 +7802,7 @@ const initNock = () => {
       rates: { USD: 0.797955 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7897,7 +7814,7 @@ const initNock = () => {
       rates: { GBP: 0.73474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -7909,7 +7826,7 @@ const initNock = () => {
       rates: { EUR: 0.855897 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -7921,7 +7838,7 @@ const initNock = () => {
       rates: { EUR: 0.855897 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7933,7 +7850,7 @@ const initNock = () => {
       rates: { GBP: 0.73474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7945,7 +7862,7 @@ const initNock = () => {
       rates: { USD: 1.356613 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -7957,7 +7874,7 @@ const initNock = () => {
       rates: { GBP: 0.737959 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -7969,7 +7886,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -7981,7 +7898,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-02-21')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -7993,7 +7910,7 @@ const initNock = () => {
       rates: { USD: 1.05452 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8005,7 +7922,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8017,7 +7934,7 @@ const initNock = () => {
       rates: { GBP: 0.76087 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8029,7 +7946,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-11')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -8041,7 +7958,7 @@ const initNock = () => {
       rates: { EUR: 0.836 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8053,7 +7970,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8065,7 +7982,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-02')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8077,7 +7994,7 @@ const initNock = () => {
       rates: { USD: 0.780793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8089,7 +8006,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8101,7 +8018,7 @@ const initNock = () => {
       rates: { USD: 0.748782 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-14')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8113,7 +8030,7 @@ const initNock = () => {
       rates: { GBP: 0.728149 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-05-16')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8125,7 +8042,7 @@ const initNock = () => {
       rates: { USD: 0.054796 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-31')
     .times(2)
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
@@ -8138,7 +8055,7 @@ const initNock = () => {
       rates: { USD: 1.191327 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-08')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -8150,7 +8067,7 @@ const initNock = () => {
       rates: { USD: 1.159559 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-31')
     .times(2)
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
@@ -8163,7 +8080,7 @@ const initNock = () => {
       rates: { USD: 0.801629 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8175,7 +8092,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-22')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8187,7 +8104,7 @@ const initNock = () => {
       rates: { USD: 0.053542 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-24')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8199,7 +8116,7 @@ const initNock = () => {
       rates: { GBP: 0.74722 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8211,7 +8128,7 @@ const initNock = () => {
       rates: { USD: 1.228531 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8223,7 +8140,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -8235,7 +8152,7 @@ const initNock = () => {
       rates: { USD: 1.199326 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-11-01')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -8247,7 +8164,7 @@ const initNock = () => {
       rates: { USD: 1.105945 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8259,7 +8176,7 @@ const initNock = () => {
       rates: { USD: 0.719114 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-25')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8271,7 +8188,7 @@ const initNock = () => {
       rates: { USD: 1.327863 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8283,7 +8200,7 @@ const initNock = () => {
       rates: { USD: 1.228531 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8295,7 +8212,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8307,7 +8224,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-22')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8319,7 +8236,7 @@ const initNock = () => {
       rates: { USD: 0.761857 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8331,7 +8248,7 @@ const initNock = () => {
       rates: { GBP: 0.73713 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8343,7 +8260,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8355,7 +8272,7 @@ const initNock = () => {
       rates: { USD: 0.054425 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -8367,7 +8284,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-14')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8379,7 +8296,7 @@ const initNock = () => {
       rates: { USD: 0.781226 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8391,7 +8308,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8403,7 +8320,7 @@ const initNock = () => {
       rates: { GBP: 0.73779 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -8415,7 +8332,7 @@ const initNock = () => {
       rates: { NZD: 1.381604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -8427,7 +8344,7 @@ const initNock = () => {
       rates: { USD: 1.177296 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -8439,7 +8356,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8451,7 +8368,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8463,7 +8380,7 @@ const initNock = () => {
       rates: { USD: 1.2545 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8475,7 +8392,7 @@ const initNock = () => {
       rates: { GBP: 0.74719 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8487,7 +8404,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8499,7 +8416,7 @@ const initNock = () => {
       rates: { GBP: 0.74225 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8511,7 +8428,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-05')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8523,7 +8440,7 @@ const initNock = () => {
       rates: { GBP: 0.71388 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8535,7 +8452,7 @@ const initNock = () => {
       rates: { USD: 1.357092 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-30')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -8547,7 +8464,7 @@ const initNock = () => {
       rates: { UYU: 30.74139 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8559,7 +8476,7 @@ const initNock = () => {
       rates: { USD: 0.77196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-26')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8571,7 +8488,7 @@ const initNock = () => {
       rates: { USD: 0.808793 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-14')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8583,7 +8500,7 @@ const initNock = () => {
       rates: { USD: 0.050883 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8595,7 +8512,7 @@ const initNock = () => {
       rates: { USD: 1.395771 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8607,7 +8524,7 @@ const initNock = () => {
       rates: { GBP: 0.737959 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -8619,7 +8536,7 @@ const initNock = () => {
       rates: { USD: 1.045474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8631,7 +8548,7 @@ const initNock = () => {
       rates: { USD: 0.778234 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8643,7 +8560,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-03')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8655,7 +8572,7 @@ const initNock = () => {
       rates: { USD: 0.735069 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-11')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -8667,7 +8584,7 @@ const initNock = () => {
       rates: { EUR: 0.836 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8679,7 +8596,7 @@ const initNock = () => {
       rates: { USD: 0.792014 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-15')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8691,7 +8608,7 @@ const initNock = () => {
       rates: { USD: 0.055326 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8703,7 +8620,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8715,7 +8632,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8727,7 +8644,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8739,7 +8656,7 @@ const initNock = () => {
       rates: { USD: 0.798601 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8751,7 +8668,7 @@ const initNock = () => {
       rates: { USD: 0.737915 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-20')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -8763,7 +8680,7 @@ const initNock = () => {
       rates: { EUR: 0.863397 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8775,7 +8692,7 @@ const initNock = () => {
       rates: { USD: 0.799686 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8787,7 +8704,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-06')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8799,7 +8716,7 @@ const initNock = () => {
       rates: { GBP: 0.7388 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -8811,7 +8728,7 @@ const initNock = () => {
       rates: { EUR: 0.813199 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8823,7 +8740,7 @@ const initNock = () => {
       rates: { GBP: 0.74719 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-02')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8835,7 +8752,7 @@ const initNock = () => {
       rates: { USD: 0.054249 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -8847,7 +8764,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8859,7 +8776,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8871,7 +8788,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8883,7 +8800,7 @@ const initNock = () => {
       rates: { USD: 0.780336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -8895,7 +8812,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8907,7 +8824,7 @@ const initNock = () => {
       rates: { USD: 0.776516 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -8919,7 +8836,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-14')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -8931,7 +8848,7 @@ const initNock = () => {
       rates: { USD: 0.750984 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -8943,7 +8860,7 @@ const initNock = () => {
       rates: { USD: 1.349747 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-20')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -8955,7 +8872,7 @@ const initNock = () => {
       rates: { EUR: 0.863397 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -8967,7 +8884,7 @@ const initNock = () => {
       rates: { NZD: 1.351298 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -8979,7 +8896,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -8991,7 +8908,7 @@ const initNock = () => {
       rates: { USD: 0.052143 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-23')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9003,7 +8920,7 @@ const initNock = () => {
       rates: { UYU: 28.479966 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9015,7 +8932,7 @@ const initNock = () => {
       rates: { GBP: 0.75677 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9027,7 +8944,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9039,7 +8956,7 @@ const initNock = () => {
       rates: { USD: 1.204091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9051,7 +8968,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9063,7 +8980,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9075,7 +8992,7 @@ const initNock = () => {
       rates: { USD: 1.199326 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9087,7 +9004,7 @@ const initNock = () => {
       rates: { USD: 0.810637 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9099,7 +9016,7 @@ const initNock = () => {
       rates: { USD: 0.776892 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9111,7 +9028,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-08-17')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9123,7 +9040,7 @@ const initNock = () => {
       rates: { UYU: 28.580173 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-05')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9135,7 +9052,7 @@ const initNock = () => {
       rates: { USD: 1.356796 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9147,7 +9064,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-21')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9159,7 +9076,7 @@ const initNock = () => {
       rates: { USD: 1.23518 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9171,7 +9088,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-15')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9183,7 +9100,7 @@ const initNock = () => {
       rates: { USD: 0.746235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-16')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9195,7 +9112,7 @@ const initNock = () => {
       rates: { UYU: 28.200001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9207,7 +9124,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-19')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9219,7 +9136,7 @@ const initNock = () => {
       rates: { USD: 1.402426 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-10-21')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9231,7 +9148,7 @@ const initNock = () => {
       rates: { UYU: 28.040001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-30')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9243,7 +9160,7 @@ const initNock = () => {
       rates: { USD: 0.810637 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9255,7 +9172,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-07-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9267,7 +9184,7 @@ const initNock = () => {
       rates: { UYU: 30.54732 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9279,7 +9196,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-05')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9291,7 +9208,7 @@ const initNock = () => {
       rates: { GBP: 0.75632 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9303,7 +9220,7 @@ const initNock = () => {
       rates: { GBP: 0.73834 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9315,7 +9232,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-12')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9327,7 +9244,7 @@ const initNock = () => {
       rates: { GBP: 0.72196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-07')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9339,7 +9256,7 @@ const initNock = () => {
       rates: { GBP: 0.74529 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9351,7 +9268,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9363,7 +9280,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9375,7 +9292,7 @@ const initNock = () => {
       rates: { USD: 1.076194 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-06-28')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -9387,7 +9304,7 @@ const initNock = () => {
       rates: { NZD: 1.368601 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-18')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9399,7 +9316,7 @@ const initNock = () => {
       rates: { USD: 0.760468 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9411,7 +9328,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9423,7 +9340,7 @@ const initNock = () => {
       rates: { USD: 1.204091 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9435,7 +9352,7 @@ const initNock = () => {
       rates: { GBP: 0.73684 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9447,7 +9364,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9459,7 +9376,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -9471,7 +9388,7 @@ const initNock = () => {
       rates: { EUR: 0.84304 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -9483,7 +9400,7 @@ const initNock = () => {
       rates: { NZD: 1.431904 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-25')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9495,7 +9412,7 @@ const initNock = () => {
       rates: { USD: 0.781519 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9507,7 +9424,7 @@ const initNock = () => {
       rates: { USD: 1.203943 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -9519,7 +9436,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9531,7 +9448,7 @@ const initNock = () => {
       rates: { GBP: 0.71191 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -9543,7 +9460,7 @@ const initNock = () => {
       rates: { EUR: 0.830604 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9555,7 +9472,7 @@ const initNock = () => {
       rates: { USD: 1.356613 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -9567,7 +9484,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9579,7 +9496,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9591,7 +9508,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9603,7 +9520,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-03')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -9615,7 +9532,7 @@ const initNock = () => {
       rates: { EUR: 0.814196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9627,7 +9544,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-12')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9639,7 +9556,7 @@ const initNock = () => {
       rates: { GBP: 0.72196 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9651,7 +9568,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-21')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -9663,7 +9580,7 @@ const initNock = () => {
       rates: { EUR: 0.836803 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9675,7 +9592,7 @@ const initNock = () => {
       rates: { UYU: 31.01661 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9687,7 +9604,7 @@ const initNock = () => {
       rates: { USD: 1.356613 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9699,7 +9616,7 @@ const initNock = () => {
       rates: { USD: 0.776516 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -9711,7 +9628,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9723,7 +9640,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-18')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9735,7 +9652,7 @@ const initNock = () => {
       rates: { USD: 0.760468 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9747,7 +9664,7 @@ const initNock = () => {
       rates: { USD: 0.800173 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9759,7 +9676,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-04')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9771,7 +9688,7 @@ const initNock = () => {
       rates: { USD: 0.778692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9783,7 +9700,7 @@ const initNock = () => {
       rates: { USD: 1.255871 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -9795,7 +9712,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-07-10')
     .times(2)
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
@@ -9808,7 +9725,7 @@ const initNock = () => {
       rates: { USD: 0.055746 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-17')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9820,7 +9737,7 @@ const initNock = () => {
       rates: { USD: 0.764229 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-09')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9832,7 +9749,7 @@ const initNock = () => {
       rates: { USD: 0.780759 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9844,7 +9761,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9856,7 +9773,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-20')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9868,7 +9785,7 @@ const initNock = () => {
       rates: { USD: 1.400514 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-02')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -9880,7 +9797,7 @@ const initNock = () => {
       rates: { USD: 0.054249 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -9892,7 +9809,7 @@ const initNock = () => {
       rates: { USD: 0.792014 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-23')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9904,7 +9821,7 @@ const initNock = () => {
       rates: { USD: 0.753238 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-10')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -9916,7 +9833,7 @@ const initNock = () => {
       rates: { NZD: 1.466301 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9928,7 +9845,7 @@ const initNock = () => {
       rates: { USD: 1.357682 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9940,7 +9857,7 @@ const initNock = () => {
       rates: { USD: 1.076194 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -9952,7 +9869,7 @@ const initNock = () => {
       rates: { USD: 1.328974 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -9964,7 +9881,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-04')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -9976,7 +9893,7 @@ const initNock = () => {
       rates: { GBP: 0.75582 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-28')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -9988,7 +9905,7 @@ const initNock = () => {
       rates: { USD: 1.23148 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-09')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -10000,7 +9917,7 @@ const initNock = () => {
       rates: { NZD: 1.367702 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10012,7 +9929,7 @@ const initNock = () => {
       rates: { USD: 1.18497 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-22')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10024,7 +9941,7 @@ const initNock = () => {
       rates: { GBP: 0.71681 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10036,7 +9953,7 @@ const initNock = () => {
       rates: { USD: 0.053532 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10048,7 +9965,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10060,7 +9977,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-05')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10072,7 +9989,7 @@ const initNock = () => {
       rates: { USD: 0.706729 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-05')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10084,7 +10001,7 @@ const initNock = () => {
       rates: { GBP: 0.71388 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10096,7 +10013,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-07')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10108,7 +10025,7 @@ const initNock = () => {
       rates: { USD: 1.262802 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10120,7 +10037,7 @@ const initNock = () => {
       rates: { USD: 0.773931 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10132,7 +10049,7 @@ const initNock = () => {
       rates: { USD: 0.810669 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-28')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10144,7 +10061,7 @@ const initNock = () => {
       rates: { USD: 0.737915 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-25')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10156,7 +10073,7 @@ const initNock = () => {
       rates: { USD: 1.327863 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10168,7 +10085,7 @@ const initNock = () => {
       rates: { USD: 0.776516 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10180,7 +10097,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-05')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10192,7 +10109,7 @@ const initNock = () => {
       rates: { USD: 0.772929 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10204,7 +10121,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10216,7 +10133,7 @@ const initNock = () => {
       rates: { USD: 0.780336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10228,7 +10145,7 @@ const initNock = () => {
       rates: { USD: 0.776516 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-05-16')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10240,7 +10157,7 @@ const initNock = () => {
       rates: { USD: 1.109631 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-20')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10252,7 +10169,7 @@ const initNock = () => {
       rates: { USD: 1.178823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-20')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10264,7 +10181,7 @@ const initNock = () => {
       rates: { USD: 1.178823 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-10')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10276,7 +10193,7 @@ const initNock = () => {
       rates: { USD: 0.782987 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -10288,7 +10205,7 @@ const initNock = () => {
       rates: { NZD: 1.451104 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-06')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10300,7 +10217,7 @@ const initNock = () => {
       rates: { GBP: 0.7388 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -10312,7 +10229,7 @@ const initNock = () => {
       rates: { UYU: 30.6655 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-14')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10324,7 +10241,7 @@ const initNock = () => {
       rates: { USD: 0.781226 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10336,7 +10253,7 @@ const initNock = () => {
       rates: { USD: 0.052488 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10348,7 +10265,7 @@ const initNock = () => {
       rates: { USD: 1.395771 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-10')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -10360,7 +10277,7 @@ const initNock = () => {
       rates: { NZD: 1.466301 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10372,7 +10289,7 @@ const initNock = () => {
       rates: { USD: 1.228531 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10384,7 +10301,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10396,7 +10313,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-05-08')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10408,7 +10325,7 @@ const initNock = () => {
       rates: { USD: 1.092893 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-05')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10420,7 +10337,7 @@ const initNock = () => {
       rates: { USD: 1.341507 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10432,7 +10349,7 @@ const initNock = () => {
       rates: { GBP: 0.72446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-04')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10444,7 +10361,7 @@ const initNock = () => {
       rates: { USD: 0.778692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10456,7 +10373,7 @@ const initNock = () => {
       rates: { USD: 0.053698 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10468,7 +10385,7 @@ const initNock = () => {
       rates: { USD: 1.186798 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -10480,7 +10397,7 @@ const initNock = () => {
       rates: { EUR: 0.848097 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-15')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10492,7 +10409,7 @@ const initNock = () => {
       rates: { USD: 0.776892 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10504,7 +10421,7 @@ const initNock = () => {
       rates: { USD: 0.051336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10516,7 +10433,7 @@ const initNock = () => {
       rates: { GBP: 0.73687 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-13')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10528,7 +10445,7 @@ const initNock = () => {
       rates: { USD: 0.771706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-05')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10540,7 +10457,7 @@ const initNock = () => {
       rates: { USD: 0.772929 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10552,7 +10469,7 @@ const initNock = () => {
       rates: { USD: 0.048155 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10564,7 +10481,7 @@ const initNock = () => {
       rates: { GBP: 0.73684 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-21')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10576,7 +10493,7 @@ const initNock = () => {
       rates: { USD: 0.758164 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-08')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10588,7 +10505,7 @@ const initNock = () => {
       rates: { USD: 0.77235 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-09')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10600,7 +10517,7 @@ const initNock = () => {
       rates: { GBP: 0.73834 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10612,7 +10529,7 @@ const initNock = () => {
       rates: { USD: 0.052488 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-11-14')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10624,7 +10541,7 @@ const initNock = () => {
       rates: { GBP: 0.76001 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-14')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10636,7 +10553,7 @@ const initNock = () => {
       rates: { USD: 0.781226 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-02-26')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10648,7 +10565,7 @@ const initNock = () => {
       rates: { USD: 0.712692 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-27')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10660,7 +10577,7 @@ const initNock = () => {
       rates: { USD: 1.1613 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-02')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10672,7 +10589,7 @@ const initNock = () => {
       rates: { USD: 0.748782 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-08')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10684,7 +10601,7 @@ const initNock = () => {
       rates: { USD: 1.357092 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10696,7 +10613,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10708,7 +10625,7 @@ const initNock = () => {
       rates: { GBP: 0.70808 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10720,7 +10637,7 @@ const initNock = () => {
       rates: { USD: 1.238391 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-06')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10732,7 +10649,7 @@ const initNock = () => {
       rates: { USD: 1.395771 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-23')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10744,7 +10661,7 @@ const initNock = () => {
       rates: { USD: 0.792014 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-17')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10756,7 +10673,7 @@ const initNock = () => {
       rates: { USD: 0.800173 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10768,7 +10685,7 @@ const initNock = () => {
       rates: { USD: 1.229951 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-13')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10780,7 +10697,7 @@ const initNock = () => {
       rates: { GBP: 0.72021 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-17')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10792,7 +10709,7 @@ const initNock = () => {
       rates: { USD: 1.177446 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-12-18')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10804,7 +10721,7 @@ const initNock = () => {
       rates: { USD: 1.337954 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-01-24')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -10816,7 +10733,7 @@ const initNock = () => {
       rates: { UYU: 28.250188 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -10828,7 +10745,7 @@ const initNock = () => {
       rates: { NZD: 1.396904 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10840,7 +10757,7 @@ const initNock = () => {
       rates: { GBP: 0.70808 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-02-21')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10852,7 +10769,7 @@ const initNock = () => {
       rates: { USD: 1.05452 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-04-17')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10864,7 +10781,7 @@ const initNock = () => {
       rates: { USD: 0.054058 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-02-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10876,7 +10793,7 @@ const initNock = () => {
       rates: { GBP: 0.70095 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10888,7 +10805,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-09-21')
     .times(2)
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
@@ -10901,7 +10818,7 @@ const initNock = () => {
       rates: { EUR: 0.836803 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-17')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -10913,7 +10830,7 @@ const initNock = () => {
       rates: { USD: 1.393417 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-07')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -10925,7 +10842,7 @@ const initNock = () => {
       rates: { USD: 0.051336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-27')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -10937,7 +10854,7 @@ const initNock = () => {
       rates: { USD: 0.719114 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-29')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10949,7 +10866,7 @@ const initNock = () => {
       rates: { USD: 0.761264 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-12-23')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -10961,7 +10878,7 @@ const initNock = () => {
       rates: { USD: 1.045474 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-03-13')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10973,7 +10890,7 @@ const initNock = () => {
       rates: { USD: 0.771706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-10-11')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -10985,7 +10902,7 @@ const initNock = () => {
       rates: { USD: 0.803187 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -10997,7 +10914,7 @@ const initNock = () => {
       rates: { GBP: 0.75706 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -11009,7 +10926,7 @@ const initNock = () => {
       rates: { USD: 1.177296 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -11021,7 +10938,7 @@ const initNock = () => {
       rates: { GBP: 0.74002 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-06-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'GBP' })
     .reply(200, {
@@ -11033,7 +10950,7 @@ const initNock = () => {
       rates: { GBP: 0.74934 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-07-02')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -11045,7 +10962,7 @@ const initNock = () => {
       rates: { NZD: 1.489798 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-20')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -11057,7 +10974,7 @@ const initNock = () => {
       rates: { USD: 0.759753 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-04')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -11069,7 +10986,7 @@ const initNock = () => {
       rates: { USD: 0.743973 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-04-19')
     .query({ access_key: /.*/i, base: 'MXN', symbols: 'USD' })
     .reply(200, {
@@ -11081,7 +10998,7 @@ const initNock = () => {
       rates: { USD: 0.054211 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-18')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -11093,7 +11010,7 @@ const initNock = () => {
       rates: { USD: 1.177296 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-03')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -11105,7 +11022,7 @@ const initNock = () => {
       rates: { USD: 1.199326 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -11117,7 +11034,7 @@ const initNock = () => {
       rates: { USD: 0.780336 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -11129,7 +11046,7 @@ const initNock = () => {
       rates: { USD: 1.2545 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-19')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {
@@ -11141,7 +11058,7 @@ const initNock = () => {
       rates: { UYU: 30.57216 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-14')
     .query({ access_key: /.*/i, base: 'CAD', symbols: 'USD' })
     .reply(200, {
@@ -11153,7 +11070,7 @@ const initNock = () => {
       rates: { USD: 0.781226 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-08-01')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'NZD' })
     .reply(200, {
@@ -11165,7 +11082,7 @@ const initNock = () => {
       rates: { NZD: 1.346204 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-19')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -11177,7 +11094,7 @@ const initNock = () => {
       rates: { USD: 0.760534 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-05-22')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'EUR' })
     .reply(200, {
@@ -11189,7 +11106,7 @@ const initNock = () => {
       rates: { EUR: 0.848097 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-03-20')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -11201,7 +11118,7 @@ const initNock = () => {
       rates: { USD: 0.759753 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-10-19')
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })
     .reply(200, {
@@ -11213,7 +11130,7 @@ const initNock = () => {
       rates: { USD: 1.097813 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2017-03-31')
     .query({ access_key: /.*/i, base: 'GBP', symbols: 'USD' })
     .reply(200, {
@@ -11225,7 +11142,7 @@ const initNock = () => {
       rates: { USD: 1.2545 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2018-01-07')
     .query({ access_key: /.*/i, base: 'AUD', symbols: 'USD' })
     .reply(200, {
@@ -11237,7 +11154,7 @@ const initNock = () => {
       rates: { USD: 0.78635 },
     });
 
-  nock('http://data.fixer.io:80', { encodedQueryParams: true })
+  nock('https://data.fixer.io:80', { encodedQueryParams: true })
     .get('/2016-06-26')
     .query({ access_key: /.*/i, base: 'USD', symbols: 'UYU' })
     .reply(200, {

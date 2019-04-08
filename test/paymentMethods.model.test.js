@@ -5,7 +5,7 @@ import * as utils from '../test/utils';
 import models from '../server/models';
 import nock from 'nock';
 
-nock('http://data.fixer.io')
+nock('https://data.fixer.io')
   .get(/.*/)
   .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD' })
   .reply(200, { base: 'EUR', date: '2017-09-01', rates: { USD: 1.192 } });
