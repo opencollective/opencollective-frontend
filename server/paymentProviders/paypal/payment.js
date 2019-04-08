@@ -5,6 +5,7 @@ import roles from '../../constants/roles';
 
 import * as constants from '../../constants/transactions';
 import * as libpayments from '../../lib/payments';
+import logger from '../../lib/logger';
 
 /** Build an URL for the PayPal API */
 export function paypalUrl(path) {
@@ -43,8 +44,20 @@ export async function paypalRequest(urlPath, body) {
       'Content-Type': 'application/json',
     },
   };
+
   const result = await fetch(url, params);
-  if (!result.ok) throw new Error(result.statusText);
+  if (!result.ok) {
+    let errorData = null;
+    let errorMessage = 'PayPal payment rejected';
+    try {
+      errorData = await result.json();
+      errorMessage = `${errorMessage}: ${errorData.message}`;
+    } catch (e) {
+      errorData = e;
+    }
+    logger.error('PayPal payment failed', result, errorData);
+    throw new Error(errorMessage);
+  }
   return result.json();
 }
 
