@@ -27,9 +27,15 @@ Subject: {{remoteUser.collective.name}} added you as a {{role}} to {{collective.
   <tr><th>Avatar:</th><td>No avatar</td></tr>
   {{/if}}
   <tr><th>Name:</th><td>{{recipient.collective.name}}</td></tr>
-  <tr><th>Short description:</th><td>{{recipient.collective.description}}</td></tr>
-  <tr><th>Website:</th><td>{{recipient.collective.website}}</td></tr>
-  <tr><th>Twitter:</th><td>{{recipient.collective.twitterHandle}}</td></tr>
+  {{#if recipient.collective.description}}
+    <tr><th>Short description:</th><td>{{recipient.collective.description}}</td></tr>
+  {{/if}}
+  {{#if recipient.collective.website}}
+    <tr><th>Website:</th><td>{{recipient.collective.website}}</td></tr>
+  {{/if}}
+  {{#if recipient.collective.twitterHandle}}
+    <tr><th>Twitter:</th><td>{{recipient.collective.twitterHandle}}</td></tr>
+  {{/if}}
 </table>
 
 <p>You can login and edit your profile by <a href="{{loginLink}}">clicking here</a></p>
