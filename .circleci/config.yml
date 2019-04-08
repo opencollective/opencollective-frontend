@@ -83,6 +83,18 @@ jobs:
       - <<: *persist_npm_cache
       - run: npm run test:jest
 
+  update-langs:
+    docker:
+      - image: circleci/node:11.8.0
+    environment:
+      NODE_ENV: circleci
+    steps:
+      - checkout
+      - <<: *restore_npm_cache
+      - run: CYPRESS_INSTALL_BINARY=0 npm ci
+      - <<: *persist_npm_cache
+      - run: ./scripts/check_translations.sh
+
   build:
     docker:
       - image: circleci/node:11.8.0
@@ -109,9 +121,6 @@ jobs:
           name: Persist next build cache
           key: next-build-cache-{{ .Revision }}
           paths:
-            # In Next.js 7 it is
-            - ./node_modules/.cache/terser-webpack-plugin
-
             # In Next.js 8 it will be
             - ./node_modules/.cache/next-minifier
 
@@ -226,6 +235,7 @@ workflows:
     jobs:
       - lint
       - jest
+      - update-langs
       - build
       - build-api
       - test-e2e-0:

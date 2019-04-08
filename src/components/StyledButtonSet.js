@@ -41,7 +41,7 @@ StyledButtonItem.propTypes = {
 };
 
 StyledButtonItem.defaultProps = {
-  blacklist: StyledButton.defaultProps.blacklist.concat('combo'),
+  omitProps: StyledButton.defaultProps.omitProps.concat('combo'),
 };
 
 const StyledButtonSet = ({

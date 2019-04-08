@@ -25,6 +25,7 @@ import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
 import ArchiveCollective from './ArchiveCollective';
+import DeleteCollective from './DeleteCollective';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -45,6 +46,7 @@ const MenuItem = styled(Link)`
 `;
 
 const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
+const deleteIsEnabled = parseToBoolean(getEnvVar('SHOW_DELETE_COLLECTIVE'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -196,7 +198,7 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.location.label',
         defaultMessage: 'City',
       },
-      'countryISO.label': {
+      'country.label': {
         id: 'collective.country.label',
         defaultMessage: 'Country',
       },
@@ -257,10 +259,12 @@ class EditCollectiveForm extends React.Component {
 
   handleChange(fieldname, value) {
     const collective = {};
+
     // GrarphQL schema has address emebed within location
     // mutation expects { location: { address: '' } }
-    if (fieldname === 'address') {
-      collective['location'] = value;
+    if (['address', 'country'].includes(fieldname)) {
+      collective.location = collective.location || {};
+      collective.location[fieldname] = value;
     } else {
       collective[fieldname] = value;
     }
@@ -285,6 +289,16 @@ class EditCollectiveForm extends React.Component {
     };
     this.props.onSubmit(collective);
     this.setState({ modified: false });
+  }
+
+  getFieldDefaultValue(field) {
+    if (field.defaultValue !== undefined) {
+      return field.defaultValue;
+    } else if (['address', 'country'].includes(field.name)) {
+      return get(this.state.collective.location, field.name);
+    }
+
+    return this.state.collective[field.name];
   }
 
   render() {
@@ -349,6 +363,7 @@ class EditCollectiveForm extends React.Component {
           name: 'address',
           placeholder: '',
           maxLength: 255,
+          type: 'textarea',
         },
         // {
         //   name: 'location',
@@ -359,7 +374,7 @@ class EditCollectiveForm extends React.Component {
         //   }
         // },
         {
-          name: 'countryISO',
+          name: 'country',
           type: 'country',
           placeholder: 'Select country',
         },
@@ -647,7 +662,7 @@ class EditCollectiveForm extends React.Component {
                             <InputField
                               key={field.name}
                               className={field.className}
-                              defaultValue={field.defaultValue || this.state.collective[field.name]}
+                              defaultValue={this.getFieldDefaultValue(field)}
                               validate={field.validate}
                               ref={field.name}
                               name={field.name}
@@ -727,6 +742,9 @@ class EditCollectiveForm extends React.Component {
               )}
               {archiveIsEnabled && this.state.section === 'advanced' && collective.type !== 'USER' && (
                 <ArchiveCollective collective={collective} />
+              )}
+              {deleteIsEnabled && collective.type !== 'EVENT' && this.state.section === 'advanced' && (
+                <DeleteCollective collective={collective} />
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>

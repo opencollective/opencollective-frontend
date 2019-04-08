@@ -1,11 +1,19 @@
+```jsx noeditor
+// See https://github.com/styleguidist/react-styleguidist/issues/1278
+import { Flex, Box } from '@rebass/grid';
+import { P } from 'components/Text';
+import styled from 'styled-components';
+```
+
 [See `@rebass/grid` docs for more info](https://www.npmjs.com/package/@rebass/grid#flex)
 
-
 The `<Flex />` component extends the `<Box />` with `display: flex` on by default;
+
 ```js
-const { Box, Flex } = require('@rebass/grid');
-const { default: styled } = require('styled-components');
-const { P } = require('../../src/components/Text');
+import { Flex, Box } from '@rebass/grid';
+import styled from 'styled-components';
+import { P } from 'components/Text';
+
 const Block = styled(Box)`
   border: 1px solid black;
 `;
@@ -17,19 +25,19 @@ const Block = styled(Box)`
   <Block width={1} p={2}>
     <P>width: 100%;</P>
   </Block>
-</Flex>
+</Flex>;
 ```
 
 Use any of the flexbox style props: `alignItems`, `justifyContent`, `flexDirection`, `flexWrap`:
 
 ```js
-const { Box, Flex } = require('@rebass/grid');
-const { default: styled } = require('styled-components');
-const { P } = require('../../src/components/Text');
+import { Flex, Box } from '@rebass/grid';
+import styled from 'styled-components';
+import { P } from 'components/Text';
+
 const Block = styled(Box)`
   border: 1px solid black;
 `;
-
 
 <React.Fragment>
   <P>flexDirection: column</P>
@@ -44,38 +52,38 @@ const Block = styled(Box)`
 
   <P>flexWrap: wrap</P>
   <Flex flexWrap="wrap" mb={5}>
-    <Block width={1/2} p={2}>
+    <Block width={1 / 2} p={2}>
       <P>width: 25%;</P>
     </Block>
-    <Block width={1/2} p={2}>
+    <Block width={1 / 2} p={2}>
       <P>width: 25%;</P>
     </Block>
-    <Block width={1/2} p={2}>
+    <Block width={1 / 2} p={2}>
       <P>width: 25%;</P>
     </Block>
-    <Block width={1/2} p={2}>
+    <Block width={1 / 2} p={2}>
       <P>width: 25%;</P>
     </Block>
   </Flex>
 
   <P>alignItems: center</P>
   <Flex alignItems="center" mb={5}>
-    <Block width={1/2} p={4}>
+    <Block width={1 / 2} p={4}>
       <P>width: 25%; padding: 32px;</P>
     </Block>
-    <Block width={1/2} p={2}>
+    <Block width={1 / 2} p={2}>
       <P>width: 25%;</P>
     </Block>
   </Flex>
 
   <P>justifyContent: space-between</P>
   <Flex justifyContent="space-between">
-    <Block width={1/4} p={2}>
+    <Block width={1 / 4} p={2}>
       <P>width: 25%;</P>
     </Block>
-    <Block width={1/4} p={2}>
+    <Block width={1 / 4} p={2}>
       <P>width: 25%;</P>
     </Block>
   </Flex>
-</React.Fragment>
+</React.Fragment>;
 ```

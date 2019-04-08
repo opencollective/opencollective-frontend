@@ -1,5 +1,5 @@
-describe('Archive Collective', () => {
-  it('Should archive organization', () => {
+describe('Unarchive collective', () => {
+  it('Should unarchive organization', () => {
     cy.login().then(() => {
       // Create a new organization
       cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
@@ -8,6 +8,7 @@ describe('Archive Collective', () => {
         cy.wait(1000);
         cy.contains('button', 'edit organization').click();
         cy.contains('a', 'Advanced').click();
+        // Archive the collective
         cy.contains('button', 'Archive this organization').click();
         cy.get('.confirm-ArchiveCollective').should('exist');
         cy.get('.confirm-ArchiveCollective')
@@ -15,25 +16,15 @@ describe('Archive Collective', () => {
           .click();
         cy.wait(500);
         cy.contains('This organization has been archived');
-      });
-    });
-  });
-
-  it('Should archive collective', () => {
-    cy.login().then(() => {
-      // Create a new collective
-      cy.createCollective({ type: 'COLLECTIVE' }).then(collective => {
-        const collectiveSlug = collective.slug;
-        cy.visit(`/${collectiveSlug}/edit`);
-        cy.wait(1000);
-        cy.contains('a', 'Advanced').click();
-        cy.contains('button', 'Archive this collective').click();
-        cy.get('.confirm-ArchiveCollective').should('exist');
+        // Unarchive collective
+        cy.contains('button', 'Unarchive this organization').click();
         cy.get('.confirm-ArchiveCollective')
-          .contains('button', 'Archive')
+          .contains('button', 'Unarchive')
           .click();
-        cy.wait(500);
-        cy.contains('This collective has been archived');
+        cy.wait(1000);
+        // Archive this organization button should show back
+        // after unarchiving successfully
+        cy.contains('button', 'Archive this organization');
       });
     });
   });

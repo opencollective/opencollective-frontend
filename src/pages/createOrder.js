@@ -9,8 +9,14 @@ import styled from 'styled-components';
 import { isURL } from 'validator';
 import moment from 'moment';
 import uuid from 'uuid/v4';
+import * as LibTaxes from '@opencollective/taxes';
 
+import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
+import { stripeTokenToPaymentMethod } from '../lib/stripe';
+import { formatCurrency, getEnvVar, parseToBoolean } from '../lib/utils';
+import { getPaypal } from '../lib/paypal';
+import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../lib/recaptcha';
 
 import { H2, H5, P, Span } from '../components/Text';
 import Logo from '../components/Logo';
@@ -19,14 +25,6 @@ import Page from '../components/Page';
 import Link from '../components/Link';
 import ContributeAs from '../components/ContributeAs';
 import StyledInputField from '../components/StyledInputField';
-
-import { addCreateCollectiveMutation } from '../graphql/mutations';
-
-import { stripeTokenToPaymentMethod } from '../lib/stripe';
-import { formatCurrency } from '../lib/utils';
-import { getPaypal } from '../lib/paypal';
-import withIntl from '../lib/withIntl';
-import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../lib/recaptcha';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 import ContributePayment from '../components/ContributePayment';
@@ -43,6 +41,8 @@ import ContributionBreakdown from '../components/ContributionBreakdown';
 import Steps from '../components/Steps';
 import ContributionFlowStepsProgress from '../components/ContributionFlowStepsProgress';
 import EventDetails from '../components/EventDetails';
+
+import { addCreateCollectiveMutation } from '../graphql/mutations';
 
 // Styles for the previous, next and submit buttons
 const PrevNextButton = styled(StyledButton)`
@@ -64,6 +64,8 @@ PaypalButtonContainer.defaultProps = {
   width: PrevNextButton.defaultProps.minWidth,
   m: PrevNextButton.defaultProps.m,
 };
+
+const recaptchaEnabled = parseToBoolean(getEnvVar('RECAPTCHA_ENABLED'));
 
 /**
  * Main contribution flow entrypoint. Render all the steps from contributeAs
@@ -148,10 +150,12 @@ class CreateOrderPage extends React.Component {
       getPaypal();
     }
 
-    try {
-      this.recaptcha = await getRecaptcha();
-    } catch {
-      this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+    if (recaptchaEnabled) {
+      try {
+        this.recaptcha = await getRecaptcha();
+      } catch {
+        this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+      }
     }
   }
 
@@ -171,7 +175,9 @@ class CreateOrderPage extends React.Component {
   }
 
   componentWillUnmount() {
-    unloadRecaptcha();
+    if (recaptchaEnabled) {
+      unloadRecaptcha();
+    }
   }
 
   loadInitialData() {
@@ -317,9 +323,12 @@ class CreateOrderPage extends React.Component {
     }
 
     // Load recaptcha token
-    const recaptchaToken = await this.fetchRecaptchaToken();
-    if (!recaptchaToken) {
-      this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+    let recaptchaToken;
+    if (recaptchaEnabled) {
+      recaptchaToken = await this.fetchRecaptchaToken();
+      if (!recaptchaToken) {
+        this.setState({ error: CreateOrderPage.errorRecaptchaConnect });
+      }
     }
 
     const tier = this.props.data.Tier;
@@ -388,8 +397,8 @@ class CreateOrderPage extends React.Component {
   getContributingProfileCountry() {
     return (
       get(this.state.stepSummary, 'countryISO') ||
-      get(this.state.stepProfile, 'countryISO') ||
-      get(this.props.LoggedInUser, 'collective.countryISO')
+      get(this.state.stepProfile, 'location.country') ||
+      get(this.props.LoggedInUser, 'collective.location.country')
     );
   }
 
@@ -473,12 +482,26 @@ class CreateOrderPage extends React.Component {
     return tier && get(this.props.data.Collective, `host.taxes.${tier.type}`);
   }
 
-  /** Returs the steps list */
+  /** Returns true if taxes may apply with this tier/host */
+  taxesMayApply() {
+    const { Tier, Collective } = this.props.data;
+
+    if (!Tier) {
+      return false;
+    }
+
+    const hostCountry = get(Collective, 'host.location.country');
+    const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.location.country);
+    return LibTaxes.vatMayApply(Tier.type, country);
+  }
+
+  /** Returns the steps list */
   getSteps() {
+    const { stepDetails, stepPayment, stepSummary } = this.state;
     const tier = this.props.data.Tier;
     const isFixedPriceTier = this.isFixedPriceTier();
     const minAmount = this.getOrderMinAmount();
-    const isFreeTier = minAmount === 0;
+    const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
 
     const steps = [
       {
@@ -492,27 +515,27 @@ class CreateOrderPage extends React.Component {
     if (!isFixedPriceTier || (tier && tier.type === 'TICKET')) {
       steps.push({
         name: 'details',
-        isCompleted: Boolean(this.state.stepDetails && this.state.stepDetails.totalAmount >= minAmount),
+        isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
         validate: () => {
-          return this.state.stepDetails && this.activeFormRef.current && this.activeFormRef.current.reportValidity();
+          return stepDetails && this.activeFormRef.current && this.activeFormRef.current.reportValidity();
         },
       });
     }
 
     // Hide step payment if using a free tier with fixed price
-    if (!(isFreeTier && isFixedPriceTier)) {
+    if (!(minAmount === 0 && isFixedPriceTier)) {
       steps.push({
         name: 'payment',
-        isCompleted: Boolean(isFreeTier || this.state.stepPayment),
+        isCompleted: Boolean(noPaymentRequired || stepPayment),
         validate: this.validateStepPayment,
       });
     }
 
     // Show the summary step only if the order has tax
-    if (this.getTax()) {
+    if (this.taxesMayApply()) {
       steps.push({
         name: 'summary',
-        isCompleted: this.state.stepSummary && this.state.stepSummary.isReady,
+        isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
       });
     }
 
@@ -577,8 +600,7 @@ class CreateOrderPage extends React.Component {
   renderTierDetails(tier) {
     const amount = get(this.state.stepDetails, 'totalAmount');
     const interval = get(this.state.stepDetails, 'interval');
-    const taxAmount = get(this.state.stepSummary, 'amount', 0);
-    const tax = this.getTax();
+    const tax = this.state.stepSummary;
 
     return (
       <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
@@ -593,11 +615,9 @@ class CreateOrderPage extends React.Component {
               amount: (
                 <strong>
                   {formatCurrency(amount, get(tier, 'currency', this.props.data.Collective.currency))}
-                  {taxAmount > 0 && (
+                  {tax && tax.amount > 0 && (
                     /** Use non-breaking spaces to ensure amount and tax stay on the same line */
-                    <span>
-                      &nbsp;+&nbsp;{tax.name}&nbsp;({tax.percentage}%)
-                    </span>
+                    <span>&nbsp;+&nbsp;VAT&nbsp;({tax.percentage}%)</span>
                   )}
                   {interval ? ' ' : ''}
                 </strong>
@@ -758,13 +778,17 @@ class CreateOrderPage extends React.Component {
             </H5>
             <ContributionBreakdown
               amount={get(stepDetails, 'totalAmount')}
+              quantity={get(stepDetails, 'quantity')}
               currency={this.getCurrency()}
               hostFeePercent={get(data, 'Collective.hostFeePercent')}
               paymentMethod={get(stepPayment, 'paymentMethod')}
-              collectiveTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
+              userTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
               onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
-              tax={this.getTax()}
+              tierType={get(tier, 'type')}
+              hostCountry={get(data.Collective, 'host.location.country')}
+              collectiveCountry={get(data.Collective, 'location.country')}
+              applyTaxes
             />
           </Container>
           {this.renderTierDetails(tier)}
@@ -940,13 +964,16 @@ const collectiveFields = `
   currency
   hostFeePercent
   tags
-  countryISO
+  location {
+    country
+  }
   host {
     id
     name
     settings
-    taxes
-    countryISO
+    location {
+      country
+    }
   }
   parentCollective {
     image

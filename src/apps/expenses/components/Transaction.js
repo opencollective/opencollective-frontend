@@ -56,6 +56,12 @@ class Transaction extends React.Component {
     }),
     type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
     isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
+    /** Choose between date (eg. 2018/12/09) or interval (eg. two months ago) */
+    dateDisplayType: PropTypes.oneOf(['date', 'interval']),
+  };
+
+  static defaultProps = {
+    dateDisplayType: 'interval',
   };
 
   state = { showDetails: false };
@@ -114,6 +120,7 @@ class Transaction extends React.Component {
       collective,
       type,
       paymentProcessorFeeInHostCurrency,
+      dateDisplayType,
     } = this.props;
 
     if (!fromCollective) {
@@ -150,7 +157,7 @@ class Transaction extends React.Component {
           <Container fontSize="1.2rem" color="#AEB2B8">
             {this.renderPaymentOrigin()}
             {' | '}
-            <Moment relative={true} value={createdAt} />
+            <Moment relative={dateDisplayType === 'interval'} value={createdAt} />
             {paymentProcessorFeeInHostCurrency !== undefined && (
               <Fragment>
                 {' | '}

@@ -366,9 +366,14 @@ ${description}`;
                     {collective.host && collective.isActive && (
                       <div className="host">
                         <label>
-                          <FormattedMessage id="collective.cover.hostedBy" defaultMessage="Hosted by" />
+                          <FormattedMessage
+                            id="collective.cover.hostedBy"
+                            defaultMessage="Hosted by {host}"
+                            values={{
+                              host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                            }}
+                          />
                         </label>
-                        <Link route={`/${collective.host.slug}`}>{collective.host.name} </Link>
                       </div>
                     )}
                     {collective.host &&
@@ -379,10 +384,12 @@ ${description}`;
                           <label>
                             <FormattedMessage
                               id="collective.cover.pendingApprovalFrom"
-                              defaultMessage="Pending approval from"
+                              defaultMessage="Pending approval from {host}"
+                              values={{
+                                host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                              }}
                             />
                           </label>
-                          <Link route={`/${collective.host.slug}`}>{collective.host.name} </Link>
                         </div>
                       )}
                     {twitterHandle && (

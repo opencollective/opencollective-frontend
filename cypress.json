@@ -4,5 +4,6 @@
   "projectId": "yt5kwm",
   "defaultCommandTimeout": 8000,
   "video": false,
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "blacklistHosts": ["wtfismyip.com"]
 }

@@ -166,8 +166,8 @@ class GoalsCover extends React.Component {
     window.addEventListener('resize', this.updateGoals);
   }
 
-  componentDidUpdate() {
-    if (this.state.firstMount) {
+  componentDidUpdate(oldProps) {
+    if (this.state.firstMount || this.props.collective !== oldProps.collective) {
       this.updateGoals();
     }
   }
@@ -489,6 +489,7 @@ class GoalsCover extends React.Component {
               font-weight: bold;
               color: white;
               margin-left: 5px;
+              margin-right: 5px;
             }
             @media (max-width: 420px) {
               .barContainer {
@@ -502,11 +503,15 @@ class GoalsCover extends React.Component {
             <div className="budgetText">
               <FormattedMessage
                 id="cover.budget.text"
-                defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of"
+                defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of {yearlyBudget}"
+                values={{
+                  yearlyBudget: (
+                    <span className="annualBudget">
+                      {formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}
+                    </span>
+                  ),
+                }}
               />
-              <span className="annualBudget">
-                {formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}
-              </span>
             </div>
           )}
           <div

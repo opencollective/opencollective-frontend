@@ -2,7 +2,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick, isArray } from 'lodash';
 
-import { getLoggedInUserQuery } from './queries';
+import { getLoggedInUserQuery, getCollectiveToEditQueryFields } from './queries';
 
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
@@ -103,81 +103,20 @@ const createCollectiveFromGithubQuery = gql`
   }
 `;
 
+/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
+      ${getCollectiveToEditQueryFields}
+    }
+  }
+`;
+/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
+
+const deleteEventCollectiveQuery = gql`
+  mutation deleteEventCollective($id: Int!) {
+    deleteEventCollective(id: $id) {
       id
-      type
-      slug
-      name
-      image
-      backgroundImage
-      description
-      longDescription
-      location {
-        address
-      }
-      website
-      twitterHandle
-      githubHandle
-      countryISO
-      isActive
-      isArchived
-      hostFeePercent
-      host {
-        id
-        createdAt
-        slug
-        name
-        image
-        backgroundImage
-        settings
-        description
-        website
-        twitterHandle
-        stats {
-          id
-          collectives {
-            hosted
-          }
-        }
-      }
-      members(roles: ["ADMIN", "MEMBER", "HOST"]) {
-        id
-        createdAt
-        role
-        description
-        stats {
-          totalDonations
-        }
-        tier {
-          id
-          name
-        }
-        member {
-          id
-          name
-          image
-          slug
-          twitterHandle
-          description
-          ... on User {
-            email
-          }
-        }
-      }
-      tiers {
-        id
-        slug
-        type
-        name
-        description
-        amount
-        presets
-        interval
-        currency
-        maxQuantity
-      }
     }
   }
 `;
@@ -190,9 +129,26 @@ const deleteCollectiveQuery = gql`
   }
 `;
 
+const deleteUserCollectiveQuery = gql`
+  mutation deleteUserCollective($id: Int!) {
+    deleteUserCollective(id: $id) {
+      id
+    }
+  }
+`;
+
 const archiveCollectiveQuery = gql`
   mutation archiveCollective($id: Int!) {
     archiveCollective(id: $id) {
+      id
+      isArchived
+    }
+  }
+`;
+
+const unarchiveCollectiveQuery = gql`
+  mutation unarchiveCollective($id: Int!) {
+    unarchiveCollective(id: $id) {
       id
       isArchived
     }
@@ -312,7 +268,6 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'description',
         'longDescription',
         'location',
-        'countryISO',
         'twitterHandle',
         'githubHandle',
         'website',
@@ -331,7 +286,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
       CollectiveInputType.tiers = (collective.tiers || []).map(tier =>
         pick(tier, ['type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']),
       );
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({
         variables: { collective: CollectiveInputType },
         update: (store, { data: { createCollective } }) => {
@@ -384,7 +339,6 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'website',
         'twitterHandle',
         'githubHandle',
-        'countryISO',
         'location',
         'startsAt',
         'endsAt',
@@ -428,8 +382,16 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
           };
         });
       }
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long']);
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({ variables: { collective: CollectiveInputType } });
+    },
+  }),
+});
+
+export const addDeleteEventCollectiveMutation = graphql(deleteEventCollectiveQuery, {
+  props: ({ mutate }) => ({
+    deleteEventCollective: async id => {
+      return await mutate({ variables: { id } });
     },
   }),
 });
@@ -437,6 +399,18 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
 export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
   props: ({ mutate }) => ({
     deleteCollective: async id => {
+      return await mutate({
+        variables: { id },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
+      });
+    },
+  }),
+});
+
+export const addDeleteUserCollectiveMutation = graphql(deleteUserCollectiveQuery, {
+  props: ({ mutate }) => ({
+    deleteUserCollective: async id => {
       return await mutate({ variables: { id } });
     },
   }),
@@ -445,6 +419,14 @@ export const addDeleteCollectiveMutation = graphql(deleteCollectiveQuery, {
 export const addArchiveCollectiveMutation = graphql(archiveCollectiveQuery, {
   props: ({ mutate }) => ({
     archiveCollective: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+export const addUnarchiveCollectiveMutation = graphql(unarchiveCollectiveQuery, {
+  props: ({ mutate }) => ({
+    unarchiveCollective: async id => {
       return await mutate({ variables: { id } });
     },
   }),

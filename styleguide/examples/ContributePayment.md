@@ -1,7 +1,12 @@
+```jsx noeditor
+// See https://github.com/styleguidist/react-styleguidist/issues/1278
+import paymentMethods from '../mocks/payment_methods';
+```
+
 ### With PayPal and Manual
 
 ```js
-const { default: paymentMethods } = require('../mocks/payment_methods');
+import paymentMethods from '../mocks/payment_methods';
 <ContributePayment
   withPaypal
   onChange={console.log}

@@ -4,10 +4,11 @@ const pages = nextRoutes();
 
 pages
   .add('home', '/')
-  .add('static', '/:pageSlug(widgets|tos|privacypolicy)', 'staticPage')
+  .add('static', '/:pageSlug(widgets|tos|privacypolicy|support)', 'staticPage')
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
+  .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
   .add('create-account', '/:form(create-account)', 'signin')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
@@ -28,7 +29,6 @@ pages
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
-  .add('collectiveTaxes', '/:collectiveSlug/taxes')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
   .add(
