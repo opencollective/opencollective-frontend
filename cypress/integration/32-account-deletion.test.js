@@ -26,11 +26,13 @@ describe('Account Deletion', () => {
   it('Should delete user', () => {
     const userParams = { firstName: 'New', lastName: 'Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
-    cy.signup({ user: userParams, visitParams }).then(user => {
-      cy.visit(`/${user.slug}/edit`);
-      cy.wait(1000);
+    cy.signup({ user: userParams, visitParams }).then(() => {
+      cy.wait(2000);
+      cy.get('.LoginTopBarProfileButton-name').click();
+      cy.contains('a', 'Profile').click();
+      cy.contains('button', 'edit profile').click();
       cy.contains('a', 'Advanced').click();
-      cy.contains('button', 'Delete this account.').click();
+      cy.contains('button', 'Delete this account').click();
       cy.get('.confirm-deleteCollective').should('exist');
       cy.get('.confirm-deleteCollective')
         .contains('button', 'Delete')
