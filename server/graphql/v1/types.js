@@ -119,6 +119,12 @@ export const UserType = new GraphQLObjectType({
           return user.getPersonalDetails(req.remoteUser).then(user => user.email);
         },
       },
+      emailWaitingForValidation: {
+        type: GraphQLString,
+        resolve(user, args, req) {
+          return user.getPersonalDetails(req.remoteUser).then(user => user.emailWaitingForValidation);
+        },
+      },
       memberOf: {
         type: new GraphQLList(MemberType),
         resolve(user) {

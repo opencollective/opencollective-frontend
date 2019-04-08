@@ -1,0 +1,34 @@
+Subject: Confirm {{user.emailWaitingForValidation}} on Open Collective
+
+{{> header}}
+
+<h1>
+  Confirm your new email address
+</h1>
+
+<br />
+<br />
+<p>
+  Hello{{#if user.firstName}} {{user.firstName}}{{/if}}! It looks like
+  you changed your email address.
+  <br/><br/>
+  We need to verify that <strong>{{user.emailWaitingForValidation}}</strong> is your correct address.
+  Just tap the button bellow to confirm:
+</p>
+<br />
+<center>
+  <a href="{{config.host.website}}/confirm/email/{{user.emailConfirmationToken}}" class="btn blue"
+    style="padding: 1em 2em;">
+    <div style="font-size: 17px;">Confirm New Email</div>
+  </a>
+</center>
+<br />
+<br />
+<p>
+  Please note that this will <strong>replace your existing Open Collective account
+  email address ({{user.email}})</strong>. You will need to log in with your new
+  address from now on.
+</p>
+
+
+{{> footer}}

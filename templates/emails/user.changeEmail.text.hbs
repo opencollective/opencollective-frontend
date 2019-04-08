@@ -1,0 +1,11 @@
+Hello{{#if user.firstName}} {{user.firstName}}{{/if}}! It looks like you changed your
+email address. We just need you to verify that {{user.emailWaitingForValidation}}
+is your email address. 
+
+Just go to the link bellow to confirm:
+{{config.host.website}}/confirm/email/{{user.emailConfirmationToken}}
+
+Please note that this will replace your existing Open Collective account
+email address ({{user.email}}). You will need to log in with your new 
+email address from now on.
+
