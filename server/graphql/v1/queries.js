@@ -217,7 +217,8 @@ const queries = {
         type: 'CREDIT',
       };
 
-      const transactions = await models.Transaction.findAll({ where });
+      const order = [['createdAt', 'DESC']];
+      const transactions = await models.Transaction.findAll({ where, order });
       if (transactions.length === 0) {
         throw new errors.NotFound('No transactions found');
       }
@@ -286,7 +287,8 @@ const queries = {
         type: 'CREDIT',
       };
 
-      const transactions = await models.Transaction.findAll({ where });
+      const order = [['createdAt', 'DESC']];
+      const transactions = await models.Transaction.findAll({ where, order });
       if (transactions.length === 0) {
         throw new errors.NotFound('No transactions found');
       }
