@@ -829,7 +829,7 @@ class CreateOrderPage extends React.Component {
                 onClick={() => this.setState({ submitting: true })}
                 onAuthorize={pm => this.submitOrder(pm)}
                 onCancel={() => this.setState({ submitting: false })}
-                onError={e => this.setState({ submitting: false, error: `PayPal error: ${e.message}` })}
+                onError={() => this.setState({ submitting: false, error: 'PayPal payment failed' })}
               />
             </PaypalButtonContainer>
           ) : (
