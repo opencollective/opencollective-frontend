@@ -82,8 +82,9 @@ class Overlay extends React.Component {
   renderYear(year) {
     const invoices = this.props.data.allInvoices.filter(i => Number(i.year) === Number(year));
     const invoicesByHost = groupBy(invoices, 'host.slug');
-    const dateFrom = moment(year, 'YYYY').toISOString();
-    const dateTo = moment(year + 1, 'YYYY').toISOString();
+    const dateYear = moment.utc(year, 'YYYY');
+    const dateFrom = dateYear.toISOString();
+    const dateTo = dateYear.endOf('year').toISOString();
 
     return (
       invoices.length > 0 && (
@@ -110,8 +111,9 @@ class Overlay extends React.Component {
     const invoices = this.props.data.allInvoices.filter(
       i => Number(i.year) === Number(this.state.year) && Number(i.month) === Number(month),
     );
-    const dateFrom = moment(`${this.state.year}${month}`, 'YYYYMM').toISOString();
-    const dateTo = moment(`${this.state.year}${month + 1}`, 'YYYYMM').toISOString();
+    const dateMonth = moment.utc(`${this.state.year}${month}`, 'YYYYMM');
+    const dateFrom = dateMonth.toISOString();
+    const dateTo = dateMonth.endOf('month').toISOString();
     const month2digit = month < 10 ? `0${month}` : month;
 
     return (
@@ -124,7 +126,7 @@ class Overlay extends React.Component {
               }
             `}
           </style>
-          <h2>{moment(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
+          <h2>{moment.utc(new Date(`${this.state.year}-${month2digit}-01`)).format('MMMM')}</h2>
           {invoices.map(invoice => this.renderInvoice(invoice, dateFrom, dateTo, invoice.totalAmount))}
         </div>
       )
