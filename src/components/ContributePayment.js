@@ -230,7 +230,7 @@ class ContributePayment extends React.Component {
     const { paymentMethodsOptions, errors } = this.state;
 
     return (
-      <StyledCard width={1} maxWidth={500} mx="auto">
+      <StyledCard width={1} maxWidth={500} mx="auto" data-cy="ContributePayment">
         <StyledRadioList
           id="PaymentMethod"
           name="PaymentMethod"
@@ -246,6 +246,7 @@ class ContributePayment extends React.Component {
               borderBottom={index !== paymentMethodsOptions.length - 1 ? '1px solid' : 'none'}
               bg="white.full"
               borderColor="black.200"
+              data-cy={`payment-${key}`}
             >
               <Flex alignItems="center">
                 <Box as="span" mr={[2, 21]} flexWrap="wrap">

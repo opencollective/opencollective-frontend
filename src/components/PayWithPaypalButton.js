@@ -94,6 +94,6 @@ export default class PayWithPaypalButton extends Component {
   }
 
   render() {
-    return <div className="paypal-container" ref={this.container} />;
+    return <div data-cy="paypal-container" ref={this.container} />;
   }
 }

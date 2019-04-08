@@ -138,4 +138,20 @@ describe('Contribution Flow: Donate', () => {
       cy.contains("You're now a backer of APEX!");
     });
   });
+
+  it("Switching payment methods doesn't mess with the state", () => {
+    cy.signup({ redirect: '/apex/donate' }).then(() => {
+      cy.contains('button', 'Next step').click();
+      cy.wait(250);
+      cy.contains('button', 'Next step').click();
+      cy.wait(1000);
+      cy.get('[data-cy=ContributePayment] [data-cy=payment-paypal]').click();
+      cy.get('[data-cy=ContributePayment] [data-cy=payment-newCreditCard]').click();
+      cy.fillStripeInput(null, { creditCardNumber: '666' });
+      cy.get('[data-cy=ContributePayment] [data-cy=payment-paypal]').click();
+      cy.get('[data-cy=ContributePayment] [data-cy=payment-newCreditCard]').click();
+      cy.fillStripeInput();
+      cy.contains('button', 'Make contribution').click();
+    });
+  });
 });

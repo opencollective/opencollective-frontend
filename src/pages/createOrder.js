@@ -579,7 +579,10 @@ class CreateOrderPage extends React.Component {
 
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
-    return get(this.props.data, 'Collective.host.id') === 11004 && !get(this.state, 'stepDetails.interval');
+    const openSourceCollectiveId = ['staging', 'production'].includes(process.env.NODE_ENV) ? 11004 : 9805;
+    return (
+      get(this.props.data, 'Collective.host.id') === openSourceCollectiveId && !get(this.state, 'stepDetails.interval')
+    );
   }
 
   /* We might have problems with postal code and this should be disablable */
