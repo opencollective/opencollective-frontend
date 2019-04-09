@@ -8,7 +8,7 @@ describe('currencylib', () => {
   const endDate = '2017-03-01';
 
   before(() => {
-    nock('http://data.fixer.io')
+    nock('https://data.fixer.io')
       .get(`/${startDate}`)
       .query({
         access_key: config.fixer.accessKey,
@@ -17,7 +17,7 @@ describe('currencylib', () => {
       })
       .reply(200, { base: 'EUR', date: startDate, rates: { USD: 1.079 } });
 
-    nock('http://data.fixer.io')
+    nock('https://data.fixer.io')
       .get(`/${endDate}`)
       .query({
         access_key: config.fixer.accessKey,
@@ -26,7 +26,7 @@ describe('currencylib', () => {
       })
       .reply(200, { base: 'EUR', date: endDate, rates: { USD: 1.0533 } });
 
-    nock('http://data.fixer.io')
+    nock('https://data.fixer.io')
       .get(`/${endDate}`)
       .query({
         access_key: config.fixer.accessKey,

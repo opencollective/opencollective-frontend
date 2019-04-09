@@ -24,7 +24,7 @@ describe('lib.payments.test.js', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
 
   before(() => {
-    nock('http://data.fixer.io', { encodedQueryParams: true })
+    nock('https://data.fixer.io', { encodedQueryParams: true })
       .get('/latest')
       .times(19)
       .query({

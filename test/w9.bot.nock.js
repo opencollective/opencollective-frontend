@@ -1,7 +1,7 @@
 import nock from 'nock';
 
 export default function() {
-  nock('http://data.fixer.io', { encodedQueryParams: true })
+  nock('https://data.fixer.io', { encodedQueryParams: true })
     .get('/latest')
     .times(2)
     .query({ access_key: /.*/i, base: 'EUR', symbols: 'USD' })

@@ -39,7 +39,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
     const searchParams = Object.keys(params)
       .map(key => `${key}=${params[key]}`)
       .join('&');
-    fetch(`http://data.fixer.io/${date}?${searchParams}`)
+    fetch(`https://data.fixer.io/${date}?${searchParams}`)
       .then(res => res.json())
       .then(json => {
         try {

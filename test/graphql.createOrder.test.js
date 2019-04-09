@@ -83,7 +83,7 @@ describe('createOrder', () => {
   let sandbox, tweetStatusSpy, fearlesscitiesbrussels, emailSendMessageSpy;
 
   before(() => {
-    nock('http://data.fixer.io')
+    nock('https://data.fixer.io')
       .get(/20[0-9]{2}\-[0-9]{2}\-[0-9]{2}/)
       .times(5)
       .query({
@@ -93,7 +93,7 @@ describe('createOrder', () => {
       })
       .reply(200, { base: 'EUR', date: '2017-09-01', rates: { USD: 1.192 } });
 
-    nock('http://data.fixer.io')
+    nock('https://data.fixer.io')
       .get('/latest')
       .times(5)
       .query({
