@@ -525,6 +525,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       isArchived: { type: GraphQLBoolean },
       isDeletable: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
+      hostCollective: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
         description:
@@ -904,6 +905,16 @@ const CollectiveFields = () => {
             );
         }
 
+        return null;
+      },
+    },
+    hostCollective: {
+      description: 'A host might have a collective attached to it',
+      type: CollectiveInterfaceType,
+      resolve(collective, args, req) {
+        if (has(collective.settings, 'hostCollective.id')) {
+          return req.loaders.collective.findById.load(get(collective.settings, 'hostCollective.id'));
+        }
         return null;
       },
     },
