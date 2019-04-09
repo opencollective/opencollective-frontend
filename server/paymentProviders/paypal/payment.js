@@ -1,10 +1,12 @@
 import config from 'config';
+import { get } from 'lodash';
 
 import models from '../../models';
 import roles from '../../constants/roles';
 
 import * as constants from '../../constants/transactions';
 import * as libpayments from '../../lib/payments';
+import logger from '../../lib/logger';
 
 /** Build an URL for the PayPal API */
 export function paypalUrl(path) {
@@ -43,8 +45,20 @@ export async function paypalRequest(urlPath, body) {
       'Content-Type': 'application/json',
     },
   };
+
   const result = await fetch(url, params);
-  if (!result.ok) throw new Error(result.statusText);
+  if (!result.ok) {
+    let errorData = null;
+    let errorMessage = 'PayPal payment rejected';
+    try {
+      errorData = await result.json();
+      errorMessage = `${errorMessage}: ${errorData.message}`;
+    } catch (e) {
+      errorData = e;
+    }
+    logger.error('PayPal payment failed', result, errorData);
+    throw new Error(errorMessage);
+  }
   return result.json();
 }
 
@@ -88,10 +102,10 @@ export async function executePayment(order) {
 export async function createTransaction(order, paymentInfo) {
   /* The `* 100` in the next lines convert from PayPal format in
      dollars to Open Collective format in cents */
-  const amountFromPayPal = paymentInfo.transactions.map(t => parseFloat(t.amount.total)) * 100;
-  const paypalFee =
-    paymentInfo.transactions.map(t => t.related_resources.map(r => parseFloat(r.sale.transaction_fee.value))) * 100;
-  const currencyFromPayPal = paymentInfo.transactions.map(t => t.amount.currency)[0];
+  const transaction = paymentInfo.transactions[0];
+  const amountFromPayPal = parseFloat(transaction.amount.total) * 100;
+  const paypalFee = parseFloat(get(transaction, 'related_resources.0.sale.transaction_fee.value', '0.0')) * 100;
+  const currencyFromPayPal = transaction.amount.currency;
 
   const hostFeeInHostCurrency = libpayments.calcFee(amountFromPayPal, order.collective.hostFeePercent);
   const platformFeeInHostCurrency = libpayments.calcFee(amountFromPayPal, constants.OC_FEE_PERCENT);
