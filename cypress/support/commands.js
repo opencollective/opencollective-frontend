@@ -1,5 +1,6 @@
 import { defaultTestUserEmail } from './data';
 import { randomEmail } from './faker';
+import { getLoggedInUserQuery } from '../../src/graphql/queries';
 
 /**
  * Login with an exising account. If not provided in `params`, the email used for
@@ -25,7 +26,7 @@ Cypress.Commands.add('login', (params = {}) => {
  * Create a new account an SignIn. If no email is provided in `params`, the account
  * will be generated using a random email.
  */
-Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams }) => {
+Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {}) => {
   if (!user.email) {
     user.email = randomEmail();
   }
@@ -34,7 +35,70 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams }) => {
     // Test users are allowed to signin directly with E2E, thus a signin URL
     // is directly returned by the API. See signin function in
     // opencollective-api/server/controllers/users.js for more info
-    return cy.visit(redirect, visitParams).then(() => user);
+    const token = getTokenFromRedirectUrl(redirect);
+    if (token) {
+      return getLoggedInUserFromToken(token).then(user => {
+        return cy.visit(redirect, visitParams).then(() => user);
+      });
+    } else {
+      return cy.visit(redirect, visitParams).then(() => user);
+    }
+  });
+});
+
+/**
+ * Open a link not covered by `baseUrl`.
+ * See https://github.com/cypress-io/cypress/issues/1777
+ */
+Cypress.Commands.add('openExternalLink', url => {
+  cy.visit('/signin').then(window => {
+    const linkIdentifier = '__TMP_CY_EXTERNAL_LINK__';
+    const link = window.document.createElement('a');
+    link.innerHTML = linkIdentifier;
+    link.setAttribute('href', url);
+    link.setAttribute('id', linkIdentifier);
+    window.document.body.appendChild(link);
+    cy.get(`#${linkIdentifier}`).click();
+  });
+});
+
+/**
+ * Returns all the email sent by the API
+ */
+Cypress.Commands.add('getInbox', () => {
+  return cy
+    .request({
+      url: `${Cypress.env('MAILDEV_URL')}/email`,
+      method: 'GET',
+    })
+    .then(({ body }) => {
+      return body;
+    });
+});
+
+/**
+ * Navigate to an email in maildev.
+ *
+ * API must be configured to use maildev (MAILDEV=true) and the service must be
+ * started (`npm run maildev` on the API).
+ *
+ * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
+ *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
+ */
+Cypress.Commands.add('openEmail', emailMatcher => {
+  return loopOpenEmail(emailMatcher);
+});
+
+/**
+ * Clear maildev inbox.
+ */
+Cypress.Commands.add('clearInbox', () => {
+  return cy.request({
+    url: `${Cypress.env('MAILDEV_URL')}/email/all`,
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+    },
   });
 });
 
@@ -166,6 +230,15 @@ function graphqlQuery(token, body) {
   });
 }
 
+function getLoggedInUserFromToken(token) {
+  return graphqlQuery(token, {
+    operationName: 'LoggedInUser',
+    query: getLoggedInUserQuery.loc.source.body,
+  }).then(({ body }) => {
+    return body.data.LoggedInUser;
+  });
+}
+
 function fillStripeInput(
   container,
   cardParams = {
@@ -196,5 +269,17 @@ function fillStripeInput(
     fillInput(2, expirationDate);
     fillInput(3, cvcCode);
     fillInput(4, postalCode);
+  });
+}
+
+function loopOpenEmail(emailMatcher, timeout = 8000) {
+  return cy.getInbox().then(body => {
+    const email = body.find(emailMatcher);
+    if (email) {
+      return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
+    } else if (timeout > 0) {
+      cy.wait(100);
+      return loopOpenEmail(emailMatcher, timeout - 100);
+    }
   });
 }

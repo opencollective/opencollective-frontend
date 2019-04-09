@@ -130,6 +130,7 @@ class TopBarProfileMenu extends React.Component {
         top={40}
         width="max-content"
         zIndex={3000}
+        data-cy="user-menu"
       >
         <Container p={3}>
           <Flex alignItems="center">
@@ -306,7 +307,7 @@ class TopBarProfileMenu extends React.Component {
     const { LoggedInUser } = this.props;
 
     return (
-      <Flex alignItems="center" onClick={this.toggleProfileMenu}>
+      <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
         {LoggedInUser.image && (
           <Avatar
             radius="3rem"
@@ -326,6 +327,7 @@ class TopBarProfileMenu extends React.Component {
             mx={2}
             className="LoginTopBarProfileButton-name"
             cursor="pointer"
+            data-cy="topbar-login-username"
           >
             {LoggedInUser.username}
           </P>

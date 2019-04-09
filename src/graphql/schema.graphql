@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Mar 28 2019 12:48:57 GMT+0100 (GMT+01:00)
+# timestamp: Wed Apr 03 2019 13:29:15 GMT+0200 (GMT+02:00)
 
 """Application model"""
 type Application {
@@ -815,12 +815,10 @@ type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
   editCollective(collective: CollectiveInputType!): CollectiveInterface
-  claimCollective(id: Int!): CollectiveInterface
-
-  """Delete a collective"""
+  deleteEventCollective(id: Int!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   deleteUserCollective(id: Int!): CollectiveInterface
-  deleteEventCollective(id: Int!): CollectiveInterface
+  claimCollective(id: Int!): CollectiveInterface
 
   """Approve a collective"""
   approveCollective(id: Int!): CollectiveInterface
@@ -841,6 +839,18 @@ type Mutation {
     """The website URL originating the request"""
     websiteUrl: String
   ): CreateUserResult
+
+  """Update the email address for logged in user"""
+  updateUserEmail(
+    """The new email address for user"""
+    email: String!
+  ): UserDetails
+
+  """Confirm the new user email from confirmation token"""
+  confirmUserEmail(
+    """User's emailConfirmationToken"""
+    token: String!
+  ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
@@ -1903,6 +1913,7 @@ type UserDetails {
   name: String
   image: String
   email: String
+  emailWaitingForValidation: String
   memberOf: [Member]
   billingAddress: String
   paypalEmail: String
