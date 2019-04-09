@@ -1367,6 +1367,34 @@ export default function(Sequelize, DataTypes) {
 
     const promises = [models.Member.create(member), this.update(updatedValues)];
 
+    // Invalidate current collective payment method if there's one
+    const collectivePaymentMethod = await models.PaymentMethod.findOne({
+      where: {
+        CollectiveId: this.id,
+        service: 'opencollective',
+        type: 'collective',
+        deletedAt: null,
+      },
+    });
+
+    if (collectivePaymentMethod) {
+      promises.push(collectivePaymentMethod.destroy());
+    }
+
+    // Create the new payment method with host's currency
+    if ([types.COLLECTIVE, types.EVENT].includes(this.type)) {
+      promises.push(
+        models.PaymentMethod.create({
+          CollectiveId: this.id,
+          service: 'opencollective',
+          type: 'collective',
+          name: `${capitalize(this.name)} ${capitalize(this.type.toLowerCase())}`,
+          primary: true,
+          currency: hostCollective.currency,
+        }),
+      );
+    }
+
     if (this.type === types.COLLECTIVE) {
       let tiers = await this.getTiers();
       if (!tiers || tiers.length === 0) {
