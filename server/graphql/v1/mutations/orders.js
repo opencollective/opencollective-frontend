@@ -421,7 +421,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       quantity: order.quantity,
       totalAmount: order.totalAmount,
       currency,
-      taxAmount: order.taxAmount,
+      taxAmount: taxFromCountry ? order.taxAmount : null,
       interval: order.interval,
       description: order.description || defaultDescription,
       publicMessage: order.publicMessage,
