@@ -5,11 +5,13 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
+import { Router } from '../server/pages';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { withUser } from '../components/UserProvider';
 
 import { capitalize } from '../lib/utils';
@@ -62,6 +64,46 @@ class ActionPage extends React.Component {
     }
   }
 
+  renderContent() {
+    const { LoggedInUser } = this.props;
+    const { loading } = this.state;
+
+    if (!LoggedInUser) {
+      return (
+        <Flex justifyContent="center" alignItems="center" className="content" px={2} py={5}>
+          <SignInOrJoinFree redirect={Router.asPath} />
+        </Flex>
+      );
+    } else {
+      return (
+        <Flex justifyContent="center" alignItems="center" className="content" px={2} py={5}>
+          {loading && this.mutation === 'approveCollective' && (
+            <FormattedMessage id="actions.approveCollective.processing" defaultMessage="Approving collective" />
+          )}
+          {loading && this.mutation === 'approveExpense' && (
+            <FormattedMessage id="actions.approveExpense.processing" defaultMessage="Approving expense" />
+          )}
+          {loading && this.mutation === 'rejectExpense' && (
+            <FormattedMessage id="actions.rejectExpense.processing" defaultMessage="Rejecting expense" />
+          )}
+          {!loading && !this.state.error && (
+            <MessageBox type="success" withIcon>
+              <FormattedMessage id="actions.done" defaultMessage="Done" />
+            </MessageBox>
+          )}
+          {this.state.error && (
+            <div className="error">
+              <h2>
+                <FormattedMessage id="error.label" defaultMessage="Error" />
+              </h2>
+              <div className="message">{this.state.error.message}</div>
+            </div>
+          )}
+        </Flex>
+      );
+    }
+  }
+
   render() {
     const { action, LoggedInUser, loadingLoggedInUser } = this.props;
     const { loading } = this.state;
@@ -73,36 +115,7 @@ class ActionPage extends React.Component {
           className={loading || loadingLoggedInUser ? 'loading' : ''}
           LoggedInUser={LoggedInUser}
         />
-        <Body>
-          {loadingLoggedInUser ? (
-            <Loading />
-          ) : (
-            <Flex justifyContent="center" alignItems="center" className="content" px={2} py={5}>
-              {loading && this.mutation === 'approveCollective' && (
-                <FormattedMessage id="actions.approveCollective.processing" defaultMessage="Approving collective" />
-              )}
-              {loading && this.mutation === 'approveExpense' && (
-                <FormattedMessage id="actions.approveExpense.processing" defaultMessage="Approving expense" />
-              )}
-              {loading && this.mutation === 'rejectExpense' && (
-                <FormattedMessage id="actions.rejectExpense.processing" defaultMessage="Rejecting expense" />
-              )}
-              {!loading && !this.state.error && (
-                <MessageBox type="success" withIcon>
-                  <FormattedMessage id="actions.done" defaultMessage="Done" />
-                </MessageBox>
-              )}
-              {this.state.error && (
-                <div className="error">
-                  <h2>
-                    <FormattedMessage id="error.label" defaultMessage="Error" />
-                  </h2>
-                  <div className="message">{this.state.error.message}</div>
-                </div>
-              )}
-            </Flex>
-          )}
-        </Body>
+        <Body>{loadingLoggedInUser ? <Loading /> : this.renderContent()}</Body>
         <Footer />
       </div>
     );
