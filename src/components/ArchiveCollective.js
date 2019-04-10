@@ -11,8 +11,19 @@ import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
 import Modal from './Modal';
 
+const getCollectiveType = type => {
+  switch (type) {
+    case 'ORGANIZATION':
+      return 'Organization';
+    case 'COLLECTIVE':
+      return 'Collective';
+    default:
+      return 'Account';
+  }
+};
+
 const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
-  const collectiveType = collective.type === 'ORGANIZATION' ? 'Organization' : 'Collective';
+  const collectiveType = getCollectiveType(collective.type);
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
   const [archiveStatus, setArchiveStatus] = useState({
