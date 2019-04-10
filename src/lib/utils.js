@@ -260,6 +260,30 @@ export const getGraphqlUrl = () => {
   return `${getBaseApiUrl()}/graphql${apiKey ? `?api_key=${apiKey}` : ''}`;
 };
 
+/**
+ * From a GraphQL error exception, returns an object like:
+ *
+ * @returns {
+ *   id: 'Unique id of the error, can be null if not provided by the API',
+ *   message: 'A user-friendly error message',
+ * }
+ */
+export const getErrorFromGraphqlException = exception => {
+  const firstError = get(exception, 'graphQLErrors.0') || get(exception, 'networkError.result.errors.0');
+
+  if (!firstError) {
+    return {
+      id: 'unknown',
+      message: 'An unknown error occured',
+    };
+  }
+
+  return {
+    id: get(firstError, 'data.errorId'),
+    message: firstError.message,
+  };
+};
+
 export const translateApiUrl = url => {
   const withoutParams = getBaseApiUrl({ internal: true }) + url.replace('/api/', '/');
   const hasParams = `${url}`.match(/\?/);
