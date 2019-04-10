@@ -9,7 +9,7 @@ import Container from './Container';
 /**
  * Component for controlling a list of radio inputs
  */
-const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, ...props }) => {
+const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, disabled, ...props }) => {
   const [selected, setSelected] = useState(props.defaultValue);
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
@@ -44,6 +44,7 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, ...
                 id={id && key + id}
                 value={key}
                 defaultChecked={props.defaultValue !== undefined && defaultValueStr === key}
+                disabled={disabled}
               />
             ),
           })}
@@ -78,6 +79,8 @@ StyledRadioList.propTypes = {
   ]).isRequired,
   /** A key name of a getter function to extract the unique key from option */
   keyGetter: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  /** If true, user won't be able to interact with the element */
+  disabled: PropTypes.bool,
 };
 
 const defaultChild = ({ value, radio }) => (

@@ -758,6 +758,7 @@ class CreateOrderPage extends React.Component {
               manual={this.getManualPaymentMethod()}
               hideCreditCardPostalCode={this.shouldHideCreditCardPostalCode()}
               margins="0 auto"
+              disabled={this.state.submitting || this.state.submitted}
             />
           </Flex>
           {this.isFixedPriceTier() ? this.renderTierDetails(tier) : <Box width={[0, null, null, 1 / 5]} />}
