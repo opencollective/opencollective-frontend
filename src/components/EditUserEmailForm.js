@@ -18,7 +18,7 @@ const EditUserEmailForm = ({ user, updateUserEmail }) => {
   const isDone = step === 'already-sent' || step === 'success';
 
   return (
-    <Box my={4} data-cy="EditUserEmailForm">
+    <Box mb={4} data-cy="EditUserEmailForm">
       <H2>
         <FormattedMessage id="EditUserEmailForm.title" defaultMessage="Email address" />
       </H2>

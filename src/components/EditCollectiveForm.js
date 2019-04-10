@@ -652,6 +652,14 @@ class EditCollectiveForm extends React.Component {
           </Flex>
 
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
+            {this.state.section === 'advanced' && (
+              <Box>
+                {collective.type === 'USER' && <EditUserEmailForm user={LoggedInUser} />}
+                {archiveIsEnabled && collective.type !== 'USER' && <ArchiveCollective collective={collective} />}
+                {deleteIsEnabled && collective.type !== 'EVENT' && <DeleteCollective collective={collective} />}
+                <hr />
+              </Box>
+            )}
             <div className="FormInputs">
               {Object.keys(this.fields).map(
                 section =>
@@ -740,13 +748,6 @@ class EditCollectiveForm extends React.Component {
               )}
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
-              )}
-              {this.state.section === 'advanced' && (
-                <Box>
-                  {collective.type === 'USER' && <EditUserEmailForm user={LoggedInUser} />}
-                  {archiveIsEnabled && collective.type !== 'USER' && <ArchiveCollective collective={collective} />}
-                  {deleteIsEnabled && collective.type !== 'EVENT' && <DeleteCollective collective={collective} />}
-                </Box>
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
