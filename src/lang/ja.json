@@ -344,6 +344,7 @@
   "error.reload": "ページをリロード",
   "error.unexpected": "予期しないエラーが発生しました",
   "errorMsg": "エラー: {error}",
+  "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active subscriptions.",
   "event.amount.label": "金額",
   "event.create.btn": "イベントを作成",
   "event.description.label": "短い説明",

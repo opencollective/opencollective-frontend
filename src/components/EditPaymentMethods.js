@@ -129,11 +129,11 @@ class EditPaymentMethods extends React.Component {
   renderError(error) {
     if (typeof error === 'string') {
       return error;
-    } else if (error.id === 'pm_remove_has_active_subscriptions') {
+    } else if (error.id === 'PM.Remove.HasActiveSubscriptions') {
       return (
         <React.Fragment>
           <FormattedMessage
-            id="errors.pm_remove_has_active_subscriptions"
+            id="errors.PM.Remove.HasActiveSubscriptions"
             defaultMessage="This payment method cannot be removed because it has active subscriptions."
           />{' '}
           <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
@@ -231,6 +231,7 @@ class EditPaymentMethods extends React.Component {
             >
               <EditPaymentMethod
                 paymentMethod={pm}
+                subscriptions={pm.subscriptions}
                 hasMonthlyLimitPerMember={Collective.type === 'ORGANIZATION' && pm.type !== 'prepaid'}
                 currency={pm.currency || Collective.currency}
                 collectiveSlug={Collective.slug}
@@ -264,7 +265,7 @@ const getPaymentMethods = graphql(gql`
         balance
         currency
         expiryDate
-        orders(hasActiveSubscription: true) {
+        subscriptions: orders(hasActiveSubscription: true) {
           id
         }
       }
