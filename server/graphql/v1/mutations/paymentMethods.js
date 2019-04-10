@@ -4,6 +4,7 @@ import { URLSearchParams } from 'url';
 import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
 import emailLib from '../../../lib/email';
 import models, { Op } from '../../../models';
+import { Forbidden, ValidationFailed } from '../../errors';
 
 /** Create a Payment Method through a collective(organization or user)
  *
@@ -123,18 +124,38 @@ export async function claimPaymentMethod(args, remoteUser) {
 }
 
 /** Archive the given payment method */
-const permissionError = "This payment method does not exist or you don't have the permission to edit it.";
+const PaymentMethodPermissionError = new Forbidden({
+  message: "This payment method does not exist or you don't have the permission to edit it.",
+});
 
 export async function removePaymentMethod(paymentMethodId, remoteUser) {
   if (!remoteUser) {
-    throw Error(permissionError);
+    throw PaymentMethodPermissionError;
   }
 
   // Try to load payment method. Throw permission error if it doesn't exist
   // to prevent attackers from guessing which id is valid and which one is not
   const paymentMethod = await models.PaymentMethod.findByPk(paymentMethodId);
   if (!paymentMethod || !remoteUser.isAdmin(paymentMethod.CollectiveId)) {
-    throw Error(permissionError);
+    throw PaymentMethodPermissionError;
+  }
+
+  // Block the removal if the payment method has subscriptions linked
+  const subscriptions = await paymentMethod.getOrders({
+    include: [
+      {
+        model: models.Subscription,
+        where: { isActive: true },
+        required: true,
+      },
+    ],
+  });
+
+  if (subscriptions.length > 0) {
+    throw new ValidationFailed({
+      message: 'The payment method has active subscriptions',
+      data: { errorId: 'PM.Remove.HasActiveSubscriptions' },
+    });
   }
 
   return paymentMethod.update({ archivedAt: new Date() });
@@ -145,7 +166,7 @@ export async function updatePaymentMethod(args, remoteUser) {
   const allowedFields = ['name', 'monthlyLimitPerMember'];
   const paymentMethod = await models.PaymentMethod.findByPk(args.id);
   if (!paymentMethod || !remoteUser || !remoteUser.isAdmin(paymentMethod.CollectiveId)) {
-    throw Error(permissionError);
+    throw PaymentMethodPermissionError;
   }
 
   return models.PaymentMethod.update(pick(args, allowedFields), { where: { id: paymentMethod.id } });
