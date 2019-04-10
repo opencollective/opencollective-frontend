@@ -461,7 +461,7 @@ class SubscriptionCard extends React.Component {
                     <MenuItem key="divider" style={{ margin: '2px' }} divider />,
                   ]}
                   <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>
-                    <FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel contribution" />
+                    <FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel subscription" />
                   </MenuItem>
                 </Dropdown.Menu>
               </Dropdown>
