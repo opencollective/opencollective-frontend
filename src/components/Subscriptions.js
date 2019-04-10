@@ -138,7 +138,7 @@ class Subscriptions extends React.Component {
           {activeSubs.map(subscription => (
             <SubscriptionCard
               subscription={subscription}
-              key={`active-${subscription.collective.id}`}
+              key={`active-${subscription.id}`}
               LoggedInUser={LoggedInUser}
               paymentMethods={collective.paymentMethods}
               slug={collective.slug}
