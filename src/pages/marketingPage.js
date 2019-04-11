@@ -18,7 +18,6 @@ import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
 import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
 import holidayGiftCardConfirmationHtml from '../static/holiday-gift-card/confirmation.html';
 import giftCardPageHtml from '../static/gift-cards-page/index.html';
-import giftCardPageConfirmationHtml from '../static/gift-cards-page/confirmation.html';
 import becomeAFiscalHostHtml from '../static/become-a-fiscal-host-page/index.html';
 
 // hardcode loaders for specific files
@@ -102,7 +101,7 @@ class MarketingPage extends React.Component {
       style = holidayGiftCardPageStyle;
       className = null;
     } else if (pageSlug === 'gift-cards') {
-      html = confirmationPage ? giftCardPageConfirmationHtml : giftCardPageHtml;
+      html = giftCardPageHtml;
       style = giftCardPageStyle;
       className = null;
     } else if (pageSlug === 'become-a-fiscal-host') {
