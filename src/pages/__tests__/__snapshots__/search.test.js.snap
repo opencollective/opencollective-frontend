@@ -590,7 +590,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c12 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -631,7 +631,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c11 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -653,13 +653,13 @@ Array [
   justify-content: center;
 }
 
-.c10 {
+.c9 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c11 {
+.c10 {
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
@@ -692,17 +692,7 @@ Array [
   padding-bottom: 8px;
 }
 
-.c7 {
-  font-size: Paragraph;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0;
-}
-
-.c14 {
+.c13 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -715,7 +705,7 @@ Array [
   text-align: center;
 }
 
-.c16 {
+.c15 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -751,7 +741,7 @@ Array [
   text-align: center;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -774,7 +764,7 @@ Array [
   width: 100%;
 }
 
-.c9 {
+.c8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -794,12 +784,12 @@ Array [
   width: 48px;
 }
 
-.c9:hover,
-.c9:focus {
+.c8:hover,
+.c8:focus {
   opacity: 1;
 }
 
-.c17 {
+.c16 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -808,14 +798,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c16[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -836,7 +826,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c12 {
     width: 25%;
   }
 }
@@ -868,7 +858,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c11 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -882,13 +872,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c13 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c16 {
+  .c15 {
     text-align: left;
   }
 }
@@ -906,7 +896,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c8 {
+  .c7 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -945,63 +935,90 @@ Array [
           >
             LANGUAGES
           </p>
-          <p
-            className="c7"
-          >
-            <a
-              href="?language=en&set=1"
-            >
-              English
-            </a>
-            <br />
-            <a
-              href="?language=fr&set=1"
-              title="French"
-            >
-              Français
-            </a>
-             
-            (62%)
-            <br />
-            <a
-              href="?language=ja&set=1"
-              title="Japanese"
-            >
-              日本語
-            </a>
-             
-            (39%)
-            <br />
-            <a
-              href="?language=es&set=1"
-              title="Spanish"
-            >
-              Español
-            </a>
-             
-            (16%)
-            <br />
-            <a
-              href="?language=ru&set=1"
-              title="Russian"
-            >
-              Русский
-            </a>
-             
-            (11%)
-          </p>
+          <div>
+            <div>
+              <a
+                href="/?language=en&set=1"
+                onClick={[Function]}
+                title="English"
+              >
+                English
+              </a>
+               
+            </div>
+            <div>
+              <a
+                href="/?language=fr&set=1"
+                onClick={[Function]}
+                title="French"
+              >
+                Français
+              </a>
+               
+              <span>
+                (
+                66%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ja&set=1"
+                onClick={[Function]}
+                title="Japanese"
+              >
+                日本語
+              </a>
+               
+              <span>
+                (
+                37%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=es&set=1"
+                onClick={[Function]}
+                title="Spanish"
+              >
+                Español
+              </a>
+               
+              <span>
+                (
+                23%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ru&set=1"
+                onClick={[Function]}
+                title="Russian"
+              >
+                Русский
+              </a>
+               
+              <span>
+                (
+                10%
+                )
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div
-        className="c8"
+        className="c7"
       >
         <a
-          className="c9"
+          className="c8"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1016,12 +1033,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1036,12 +1053,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1056,12 +1073,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1076,12 +1093,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c10"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -1096,7 +1113,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c11"
         order={
           Array [
             "3",
@@ -1106,7 +1123,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -1116,18 +1133,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -1135,10 +1152,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -1146,10 +1163,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pricing"
                 onClick={[Function]}
               >
@@ -1157,10 +1174,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -1168,10 +1185,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -1181,7 +1198,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -1191,18 +1208,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create"
                 onClick={[Function]}
               >
@@ -1210,10 +1227,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -1221,10 +1238,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -1232,10 +1249,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -1243,10 +1260,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -1256,7 +1273,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -1266,18 +1283,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -1285,40 +1302,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/support"
                 onClick={[Function]}
               >
@@ -1328,7 +1345,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -1338,38 +1355,38 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -1377,10 +1394,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -1985,7 +2002,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c12 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -2026,7 +2043,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c11 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -2048,13 +2065,13 @@ Array [
   justify-content: center;
 }
 
-.c10 {
+.c9 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c11 {
+.c10 {
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
@@ -2087,17 +2104,7 @@ Array [
   padding-bottom: 8px;
 }
 
-.c7 {
-  font-size: Paragraph;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0;
-}
-
-.c14 {
+.c13 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -2110,7 +2117,7 @@ Array [
   text-align: center;
 }
 
-.c16 {
+.c15 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -2146,7 +2153,7 @@ Array [
   text-align: center;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -2169,7 +2176,7 @@ Array [
   width: 100%;
 }
 
-.c9 {
+.c8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -2189,12 +2196,12 @@ Array [
   width: 48px;
 }
 
-.c9:hover,
-.c9:focus {
+.c8:hover,
+.c8:focus {
   opacity: 1;
 }
 
-.c17 {
+.c16 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -2203,14 +2210,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c16[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -2231,7 +2238,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c12 {
     width: 25%;
   }
 }
@@ -2263,7 +2270,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c11 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -2277,13 +2284,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c13 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c16 {
+  .c15 {
     text-align: left;
   }
 }
@@ -2301,7 +2308,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c8 {
+  .c7 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -2340,63 +2347,90 @@ Array [
           >
             LANGUAGES
           </p>
-          <p
-            className="c7"
-          >
-            <a
-              href="?language=en&set=1"
-            >
-              English
-            </a>
-            <br />
-            <a
-              href="?language=fr&set=1"
-              title="French"
-            >
-              Français
-            </a>
-             
-            (62%)
-            <br />
-            <a
-              href="?language=ja&set=1"
-              title="Japanese"
-            >
-              日本語
-            </a>
-             
-            (39%)
-            <br />
-            <a
-              href="?language=es&set=1"
-              title="Spanish"
-            >
-              Español
-            </a>
-             
-            (16%)
-            <br />
-            <a
-              href="?language=ru&set=1"
-              title="Russian"
-            >
-              Русский
-            </a>
-             
-            (11%)
-          </p>
+          <div>
+            <div>
+              <a
+                href="/?language=en&set=1"
+                onClick={[Function]}
+                title="English"
+              >
+                English
+              </a>
+               
+            </div>
+            <div>
+              <a
+                href="/?language=fr&set=1"
+                onClick={[Function]}
+                title="French"
+              >
+                Français
+              </a>
+               
+              <span>
+                (
+                66%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ja&set=1"
+                onClick={[Function]}
+                title="Japanese"
+              >
+                日本語
+              </a>
+               
+              <span>
+                (
+                37%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=es&set=1"
+                onClick={[Function]}
+                title="Spanish"
+              >
+                Español
+              </a>
+               
+              <span>
+                (
+                23%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ru&set=1"
+                onClick={[Function]}
+                title="Russian"
+              >
+                Русский
+              </a>
+               
+              <span>
+                (
+                10%
+                )
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div
-        className="c8"
+        className="c7"
       >
         <a
-          className="c9"
+          className="c8"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2411,12 +2445,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2431,12 +2465,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2451,12 +2485,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2471,12 +2505,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c10"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -2491,7 +2525,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c11"
         order={
           Array [
             "3",
@@ -2501,7 +2535,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -2511,18 +2545,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -2530,10 +2564,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -2541,10 +2575,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pricing"
                 onClick={[Function]}
               >
@@ -2552,10 +2586,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -2563,10 +2597,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -2576,7 +2610,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -2586,18 +2620,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create"
                 onClick={[Function]}
               >
@@ -2605,10 +2639,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -2616,10 +2650,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -2627,10 +2661,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -2638,10 +2672,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -2651,7 +2685,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -2661,18 +2695,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -2680,40 +2714,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/support"
                 onClick={[Function]}
               >
@@ -2723,7 +2757,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -2733,38 +2767,38 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -2772,10 +2806,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -2803,7 +2837,7 @@ exports[`Search Page renders error message 1`] = `
   margin-right: 16px;
 }
 
-.c40 {
+.c39 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -2883,7 +2917,7 @@ exports[`Search Page renders error message 1`] = `
   justify-content: center;
 }
 
-.c39 {
+.c38 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -3035,17 +3069,7 @@ exports[`Search Page renders error message 1`] = `
   padding-bottom: 8px;
 }
 
-.c36 {
-  font-size: Paragraph;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0;
-}
-
-.c41 {
+.c40 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -3102,7 +3126,7 @@ exports[`Search Page renders error message 1`] = `
   text-decoration: none;
 }
 
-.c43 {
+.c42 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -3138,7 +3162,7 @@ exports[`Search Page renders error message 1`] = `
   text-align: center;
 }
 
-.c37 {
+.c36 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -3281,7 +3305,7 @@ exports[`Search Page renders error message 1`] = `
   font-size: 1.4rem;
 }
 
-.c38 {
+.c37 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3301,12 +3325,12 @@ exports[`Search Page renders error message 1`] = `
   width: 48px;
 }
 
-.c38:hover,
-.c38:focus {
+.c37:hover,
+.c37:focus {
   opacity: 1;
 }
 
-.c44 {
+.c43 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -3315,14 +3339,14 @@ exports[`Search Page renders error message 1`] = `
   padding: 0;
 }
 
-.c44[disabled] {
+.c43[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c42 {
+.c41 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -3356,7 +3380,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c40 {
+  .c39 {
     width: 25%;
   }
 }
@@ -3388,7 +3412,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c39 {
+  .c38 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -3439,13 +3463,13 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c41 {
+  .c40 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c43 {
+  .c42 {
     text-align: left;
   }
 }
@@ -3463,7 +3487,7 @@ exports[`Search Page renders error message 1`] = `
 }
 
 @media screen and (min-width:52em) {
-  .c37 {
+  .c36 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -3880,58 +3904,85 @@ exports[`Search Page renders error message 1`] = `
           >
             LANGUAGES
           </p>
-          <p
-            className="c36"
-          >
-            <a
-              href="?language=en&set=1"
-            >
-              English
-            </a>
-            <br />
-            <a
-              href="?language=fr&set=1"
-              title="French"
-            >
-              Français
-            </a>
-             
-            (62%)
-            <br />
-            <a
-              href="?language=ja&set=1"
-              title="Japanese"
-            >
-              日本語
-            </a>
-             
-            (39%)
-            <br />
-            <a
-              href="?language=es&set=1"
-              title="Spanish"
-            >
-              Español
-            </a>
-             
-            (16%)
-            <br />
-            <a
-              href="?language=ru&set=1"
-              title="Russian"
-            >
-              Русский
-            </a>
-             
-            (11%)
-          </p>
+          <div>
+            <div>
+              <a
+                href="/?language=en&set=1"
+                onClick={[Function]}
+                title="English"
+              >
+                English
+              </a>
+               
+            </div>
+            <div>
+              <a
+                href="/?language=fr&set=1"
+                onClick={[Function]}
+                title="French"
+              >
+                Français
+              </a>
+               
+              <span>
+                (
+                66%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ja&set=1"
+                onClick={[Function]}
+                title="Japanese"
+              >
+                日本語
+              </a>
+               
+              <span>
+                (
+                37%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=es&set=1"
+                onClick={[Function]}
+                title="Spanish"
+              >
+                Español
+              </a>
+               
+              <span>
+                (
+                23%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ru&set=1"
+                onClick={[Function]}
+                title="Russian"
+              >
+                Русский
+              </a>
+               
+              <span>
+                (
+                10%
+                )
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div
-        className="c37"
+        className="c36"
       >
         <a
-          className="c38"
+          className="c37"
           href="https://medium.com/open-collective"
         >
           <svg
@@ -3951,7 +4002,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c37"
           href="https://twitter.com/opencollect"
         >
           <svg
@@ -3971,7 +4022,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c37"
           href="https://github.com/opencollective"
         >
           <svg
@@ -3991,7 +4042,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c37"
           href="https://slack.opencollective.com"
         >
           <svg
@@ -4011,7 +4062,7 @@ exports[`Search Page renders error message 1`] = `
           </svg>
         </a>
         <a
-          className="c38"
+          className="c37"
           href="mailto:info@opencollective.com"
         >
           <svg
@@ -4031,7 +4082,7 @@ exports[`Search Page renders error message 1`] = `
         </a>
       </div>
       <nav
-        className="c39"
+        className="c38"
         order={
           Array [
             "3",
@@ -4041,7 +4092,7 @@ exports[`Search Page renders error message 1`] = `
         }
       >
         <div
-          className="c40"
+          className="c39"
           width={
             Array [
               0.5,
@@ -4051,18 +4102,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c41"
+            className="c40"
           >
             PLATFORM
           </p>
           <ul
-            className="c42"
+            className="c41"
           >
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -4070,10 +4121,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -4081,10 +4132,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/pricing"
                 onClick={[Function]}
               >
@@ -4092,10 +4143,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -4103,10 +4154,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -4116,7 +4167,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c39"
           width={
             Array [
               0.5,
@@ -4126,18 +4177,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c41"
+            className="c40"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c42"
+            className="c41"
           >
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/create"
                 onClick={[Function]}
               >
@@ -4145,10 +4196,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -4156,10 +4207,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -4167,10 +4218,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -4178,10 +4229,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -4191,7 +4242,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c39"
           width={
             Array [
               0.5,
@@ -4201,18 +4252,18 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c41"
+            className="c40"
           >
             COMMUNITY
           </p>
           <ul
-            className="c42"
+            className="c41"
           >
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -4220,40 +4271,40 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/support"
                 onClick={[Function]}
               >
@@ -4263,7 +4314,7 @@ exports[`Search Page renders error message 1`] = `
           </ul>
         </div>
         <div
-          className="c40"
+          className="c39"
           width={
             Array [
               0.5,
@@ -4273,38 +4324,38 @@ exports[`Search Page renders error message 1`] = `
           }
         >
           <p
-            className="c41"
+            className="c40"
           >
             COMPANY
           </p>
           <ul
-            className="c42"
+            className="c41"
           >
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -4312,10 +4363,10 @@ exports[`Search Page renders error message 1`] = `
               </a>
             </li>
             <li
-              className="c43"
+              className="c42"
             >
               <a
-                className="c44"
+                className="c43"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -5015,7 +5066,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c12 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -5056,7 +5107,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c11 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -5078,13 +5129,13 @@ Array [
   justify-content: center;
 }
 
-.c10 {
+.c9 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c11 {
+.c10 {
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
@@ -5117,17 +5168,7 @@ Array [
   padding-bottom: 8px;
 }
 
-.c7 {
-  font-size: Paragraph;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0;
-}
-
-.c14 {
+.c13 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -5140,7 +5181,7 @@ Array [
   text-align: center;
 }
 
-.c16 {
+.c15 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -5176,7 +5217,7 @@ Array [
   text-align: center;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -5199,7 +5240,7 @@ Array [
   width: 100%;
 }
 
-.c9 {
+.c8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -5219,12 +5260,12 @@ Array [
   width: 48px;
 }
 
-.c9:hover,
-.c9:focus {
+.c8:hover,
+.c8:focus {
   opacity: 1;
 }
 
-.c17 {
+.c16 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -5233,14 +5274,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c16[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -5261,7 +5302,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c12 {
     width: 25%;
   }
 }
@@ -5293,7 +5334,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c11 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -5307,13 +5348,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c13 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c16 {
+  .c15 {
     text-align: left;
   }
 }
@@ -5331,7 +5372,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c8 {
+  .c7 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -5370,63 +5411,90 @@ Array [
           >
             LANGUAGES
           </p>
-          <p
-            className="c7"
-          >
-            <a
-              href="?language=en&set=1"
-            >
-              English
-            </a>
-            <br />
-            <a
-              href="?language=fr&set=1"
-              title="French"
-            >
-              Français
-            </a>
-             
-            (62%)
-            <br />
-            <a
-              href="?language=ja&set=1"
-              title="Japanese"
-            >
-              日本語
-            </a>
-             
-            (39%)
-            <br />
-            <a
-              href="?language=es&set=1"
-              title="Spanish"
-            >
-              Español
-            </a>
-             
-            (16%)
-            <br />
-            <a
-              href="?language=ru&set=1"
-              title="Russian"
-            >
-              Русский
-            </a>
-             
-            (11%)
-          </p>
+          <div>
+            <div>
+              <a
+                href="/?language=en&set=1"
+                onClick={[Function]}
+                title="English"
+              >
+                English
+              </a>
+               
+            </div>
+            <div>
+              <a
+                href="/?language=fr&set=1"
+                onClick={[Function]}
+                title="French"
+              >
+                Français
+              </a>
+               
+              <span>
+                (
+                66%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ja&set=1"
+                onClick={[Function]}
+                title="Japanese"
+              >
+                日本語
+              </a>
+               
+              <span>
+                (
+                37%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=es&set=1"
+                onClick={[Function]}
+                title="Spanish"
+              >
+                Español
+              </a>
+               
+              <span>
+                (
+                23%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ru&set=1"
+                onClick={[Function]}
+                title="Russian"
+              >
+                Русский
+              </a>
+               
+              <span>
+                (
+                10%
+                )
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div
-        className="c8"
+        className="c7"
       >
         <a
-          className="c9"
+          className="c8"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -5441,12 +5509,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -5461,12 +5529,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -5481,12 +5549,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -5501,12 +5569,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c10"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -5521,7 +5589,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c11"
         order={
           Array [
             "3",
@@ -5531,7 +5599,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -5541,18 +5609,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -5560,10 +5628,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -5571,10 +5639,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pricing"
                 onClick={[Function]}
               >
@@ -5582,10 +5650,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -5593,10 +5661,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -5606,7 +5674,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -5616,18 +5684,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create"
                 onClick={[Function]}
               >
@@ -5635,10 +5703,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -5646,10 +5714,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -5657,10 +5725,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -5668,10 +5736,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -5681,7 +5749,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -5691,18 +5759,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -5710,40 +5778,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/support"
                 onClick={[Function]}
               >
@@ -5753,7 +5821,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -5763,38 +5831,38 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -5802,10 +5870,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
@@ -6665,7 +6733,7 @@ Array [
       </div>
     </div>
   </main>,
-  .c13 {
+  .c12 {
   box-sizing: border-box;
   margin-bottom: 16px;
   width: 50%;
@@ -6706,7 +6774,7 @@ Array [
   justify-content: center;
 }
 
-.c12 {
+.c11 {
   box-sizing: border-box;
   margin-top: 16px;
   -webkit-flex: 1 1 auto;
@@ -6728,13 +6796,13 @@ Array [
   justify-content: center;
 }
 
-.c10 {
+.c9 {
   display: inline-block;
   vertical-align: -.125em;
   overflow: hidden;
 }
 
-.c11 {
+.c10 {
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
@@ -6767,17 +6835,7 @@ Array [
   padding-bottom: 8px;
 }
 
-.c7 {
-  font-size: Paragraph;
-  line-height: Paragraph;
-  -webkit-letter-spacing: -0.2px;
-  -moz-letter-spacing: -0.2px;
-  -ms-letter-spacing: -0.2px;
-  letter-spacing: -0.2px;
-  margin: 0;
-}
-
-.c14 {
+.c13 {
   color: #C2C6CC;
   font-size: 1.2rem;
   line-height: Paragraph;
@@ -6790,7 +6848,7 @@ Array [
   text-align: center;
 }
 
-.c16 {
+.c15 {
   list-style: none;
   margin-bottom: 8px;
   text-align: center;
@@ -6826,7 +6884,7 @@ Array [
   text-align: center;
 }
 
-.c8 {
+.c7 {
   box-sizing: border-box;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -6849,7 +6907,7 @@ Array [
   width: 100%;
 }
 
-.c9 {
+.c8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -6869,12 +6927,12 @@ Array [
   width: 48px;
 }
 
-.c9:hover,
-.c9:focus {
+.c8:hover,
+.c8:focus {
   opacity: 1;
 }
 
-.c17 {
+.c16 {
   color: #6e747a;
   display: block;
   fontsize: 1.4rem;
@@ -6883,14 +6941,14 @@ Array [
   padding: 0;
 }
 
-.c17[disabled] {
+.c16[disabled] {
   pointer-events: none;
   cursor: default;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
-.c15 {
+.c14 {
   box-sizing: border-box;
   padding-left: 0px;
   padding-right: 8px;
@@ -6911,7 +6969,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c13 {
+  .c12 {
     width: 25%;
   }
 }
@@ -6943,7 +7001,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c12 {
+  .c11 {
     -webkit-order: 2;
     -ms-flex-order: 2;
     order: 2;
@@ -6957,13 +7015,13 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c14 {
+  .c13 {
     text-align: left;
   }
 }
 
 @media screen and (min-width:52em) {
-  .c16 {
+  .c15 {
     text-align: left;
   }
 }
@@ -6981,7 +7039,7 @@ Array [
 }
 
 @media screen and (min-width:52em) {
-  .c8 {
+  .c7 {
     -webkit-order: 3;
     -ms-flex-order: 3;
     order: 3;
@@ -7020,63 +7078,90 @@ Array [
           >
             LANGUAGES
           </p>
-          <p
-            className="c7"
-          >
-            <a
-              href="?language=en&set=1"
-            >
-              English
-            </a>
-            <br />
-            <a
-              href="?language=fr&set=1"
-              title="French"
-            >
-              Français
-            </a>
-             
-            (62%)
-            <br />
-            <a
-              href="?language=ja&set=1"
-              title="Japanese"
-            >
-              日本語
-            </a>
-             
-            (39%)
-            <br />
-            <a
-              href="?language=es&set=1"
-              title="Spanish"
-            >
-              Español
-            </a>
-             
-            (16%)
-            <br />
-            <a
-              href="?language=ru&set=1"
-              title="Russian"
-            >
-              Русский
-            </a>
-             
-            (11%)
-          </p>
+          <div>
+            <div>
+              <a
+                href="/?language=en&set=1"
+                onClick={[Function]}
+                title="English"
+              >
+                English
+              </a>
+               
+            </div>
+            <div>
+              <a
+                href="/?language=fr&set=1"
+                onClick={[Function]}
+                title="French"
+              >
+                Français
+              </a>
+               
+              <span>
+                (
+                66%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ja&set=1"
+                onClick={[Function]}
+                title="Japanese"
+              >
+                日本語
+              </a>
+               
+              <span>
+                (
+                37%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=es&set=1"
+                onClick={[Function]}
+                title="Spanish"
+              >
+                Español
+              </a>
+               
+              <span>
+                (
+                23%
+                )
+              </span>
+            </div>
+            <div>
+              <a
+                href="/?language=ru&set=1"
+                onClick={[Function]}
+                title="Russian"
+              >
+                Русский
+              </a>
+               
+              <span>
+                (
+                10%
+                )
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div
-        className="c8"
+        className="c7"
       >
         <a
-          className="c9"
+          className="c8"
           href="https://medium.com/open-collective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -7091,12 +7176,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://twitter.com/opencollect"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -7111,12 +7196,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://github.com/opencollective"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -7131,12 +7216,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="https://slack.opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c10"
+            className="c9"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -7151,12 +7236,12 @@ Array [
           </svg>
         </a>
         <a
-          className="c9"
+          className="c8"
           href="mailto:info@opencollective.com"
         >
           <svg
             aria-hidden="true"
-            className="c11"
+            className="c10"
             color="#9399A3"
             fill="currentColor"
             focusable="false"
@@ -7171,7 +7256,7 @@ Array [
         </a>
       </div>
       <nav
-        className="c12"
+        className="c11"
         order={
           Array [
             "3",
@@ -7181,7 +7266,7 @@ Array [
         }
       >
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -7191,18 +7276,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             PLATFORM
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/discover"
                 onClick={[Function]}
               >
@@ -7210,10 +7295,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/how-it-works"
                 onClick={[Function]}
               >
@@ -7221,10 +7306,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pricing"
                 onClick={[Function]}
               >
@@ -7232,10 +7317,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create-account"
                 onClick={[Function]}
               >
@@ -7243,10 +7328,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/signin"
                 onClick={[Function]}
               >
@@ -7256,7 +7341,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -7266,18 +7351,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             JOIN THE MOVEMENT
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/create"
                 onClick={[Function]}
               >
@@ -7285,10 +7370,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/become-a-sponsor"
                 onClick={[Function]}
               >
@@ -7296,10 +7381,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/chapters"
                 onClick={[Function]}
               >
@@ -7307,10 +7392,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/pledges/new"
                 onClick={[Function]}
               >
@@ -7318,10 +7403,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/gift-cards"
                 onClick={[Function]}
               >
@@ -7331,7 +7416,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -7341,18 +7426,18 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMMUNITY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/opensource"
                 onClick={[Function]}
               >
@@ -7360,40 +7445,40 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://github.com/opencollective/opencollective/issues"
               >
                 Report an issue
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://slack.opencollective.com"
               >
                 Slack
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com"
               >
                 Docs & help
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/support"
                 onClick={[Function]}
               >
@@ -7403,7 +7488,7 @@ Array [
           </ul>
         </div>
         <div
-          className="c13"
+          className="c12"
           width={
             Array [
               0.5,
@@ -7413,38 +7498,38 @@ Array [
           }
         >
           <p
-            className="c14"
+            className="c13"
           >
             COMPANY
           </p>
           <ul
-            className="c15"
+            className="c14"
           >
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://docs.opencollective.com/help/about"
               >
                 About
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="https://medium.com/open-collective"
               >
                 Blog
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/tos"
                 onClick={[Function]}
               >
@@ -7452,10 +7537,10 @@ Array [
               </a>
             </li>
             <li
-              className="c16"
+              className="c15"
             >
               <a
-                className="c17"
+                className="c16"
                 href="/privacypolicy"
                 onClick={[Function]}
               >
