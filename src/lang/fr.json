@@ -780,7 +780,7 @@
   "subscription.whyPastDueText": "Nous n'avons pas pu exécuter votre dernier paiement. Merci de mettre à jour le moyen de paiement pour continuer cet abonnement.",
   "subscription.whyPastDueTitle": "Mettre à jour le moyen de paiement",
   "tax.vat": "Taxe sur la valeur ajoutée (TVA)",
-  "tax.vat.description": "Use this tier type conform with legislation on VAT in Europe.",
+  "tax.vat.description": "Use this tier type to conform with legislation on VAT in Europe.",
   "tax.vatShort": "TVA",
   "TicketsConfirmed.ConfirmationSent": "Un email de confirmation a été envoyé à votre adresse email {email}",
   "TicketsConfirmed.SeeYouSoon": "A bientôt!",
