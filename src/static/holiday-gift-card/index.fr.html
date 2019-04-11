@@ -76,11 +76,11 @@
       </div>
       <div class='md-col-6 form-col'>
         <div class='form-wrapper'>
-        <form method="POST" action="">
+        <div>
           <div class='gift-card-wrapper'>
             <div class='gift-card'>
               <div class='gift-card-text'>
-                <p class='white100'>Let us know the details and we'll take care of it.</p>
+                <p class='white100'>Create an organization now and start issuing gift cards!</p>
               </div>
               <svg class='gift-card-svg' height='81px' preserveaspectratio='xMidYMax meet' viewbox='0 0 288 81' width='100%'>
                 <g fill-rule='evenodd' fill='none' stroke-width='1' stroke='none'>
@@ -91,89 +91,12 @@
               </svg>
             </div>
           </div>
-          <div class='sm-flex'>
-            <div class='sm-col-6 sm-pr1 pb2'>
-              <label class='paragraph neutralsolid600'>Gift card amount</label>
-              <div class='text-input'>
-                <div class='field-element'>$</div>
-                <input name="giftCardAmount" value='50' type="number" step="1" min="5" max="10000">
-              </div>
-            </div>
-            <div class='sm-col-6 sm-pl1 pb2'>
-              <label class='paragraph neutralsolid600'>Number of cards</label>
-              <div class='text-input'>
-                <input name="giftCardNumber" value="100" type="number" step="1" min="1" max="10000">
-              </div>
-            </div>
+          <div class='sm-flex create-org-btn-container'>
+            <a href="https://opencollective.com/organizations/new">
+              <button class='btn -large -primary w100'>Create an Organization</button>
+            </a>
           </div>
-          <div class='pb2'>
-            <label class='paragraph neutralsolid600'>Company name</label>
-            <div class='text-input'>
-              <input name="companyName" placeholder='i.e. Airbnb, Trivago, etc...'>
-            </div>
-            <!--
-            <div class='text-input -success'>
-              <div class='field-element'>http://</div>
-              <input placeholder='i.e. Airbnb, Trivago, etc...'>
-              <div class='field-icon'>
-                <svg height='8' width='8'>
-                  <use xlink:href='#svg-checkmark-tiny'></use>
-                </svg>
-              </div>
-            </div>
-            <div class='text-input -error'>
-              <div class='field-element'>http://</div>
-              <input placeholder='i.e. Airbnb, Trivago, etc...'>
-              <div class='field-icon'>
-                <svg height='8' width='8'>
-                  <use xlink:href='#svg-alert-tiny'></use>
-                </svg>
-              </div>
-            </div>
-            <div class='tiny red500'>Error message goes here and it can be this long or perhaps even longer.</div> -->
-          </div>
-          <div class='pb2'>
-            <label class='paragraph neutralsolid600'>Company website</label>
-            <div class='text-input'>
-              <div class='field-element'>https://</div>
-              <input name="companyWebsite" placeholder='yourwebsite.com'>
-            </div>
-          </div>
-          <div class='pb2'>
-            <label class='paragraph neutralsolid600'>Your name</label>
-            <div class='text-input'>
-              <input name="contactName">
-            </div>
-            <!--
-            <div class='text-input -success'>
-              <input>
-              <div class='field-icon'>
-                <svg height='8' width='8'>
-                  <use xlink:href='#svg-checkmark-tiny'></use>
-                </svg>
-              </div>
-            </div>
-            <div class='text-input -error'>
-              <input>
-              <div class='field-icon'>
-                <svg height='8' width='8'>
-                  <use xlink:href='#svg-alert-tiny'></use>
-                </svg>
-              </div>
-            </div>
-            <div class='tiny red500'>Error message goes here and it can be this long or perhaps even longer.</div> -->
-          </div>
-          <div class='pb4'>
-            <label class='paragraph neutralsolid600'>Your email</label>
-            <div class='text-input'>
-              <input name="contactEmail" type="email" placeholder='i.e. you@youremail.com'>
-            </div>
-          </div>
-          <button class='btn -large -primary w100'>Submit</button>
-          <!--
-          <button class='btn -large -primary w100' disabled>Submit</button>
-          -->
-        </form>
+        </div>
         </div>
       </div>
     </div>
