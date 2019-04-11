@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import { find, get, uniq } from 'lodash';
 import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
+import * as graphqlErrors from '../errors';
 import { parseToBoolean } from '../../lib/utils';
 import { fetchLedgerTransactionsGroupedByLegacyIds, parseLedgerTransactions } from '../../lib/ledger';
 import DbQueries from '../../lib/queries';
@@ -326,7 +327,11 @@ const queries = {
         description: 'Slug of the transaction.',
       },
     },
-    async resolve(_, args) {
+    async resolve(_, args, req) {
+      if (!req.remoteUser) {
+        throw new graphqlErrors.Unauthorized();
+      }
+
       // Fetch transaction
       const transaction = await models.Transaction.findOne({
         where: { uuid: args.transactionUuid },
@@ -338,6 +343,10 @@ const queries = {
 
       // If using a virtualcard, then billed collective will be the emitter
       const fromCollectiveId = transaction.paymentMethodProviderCollectiveId();
+
+      if (!req.remoteUser.isAdmin(fromCollectiveId)) {
+        throw new graphqlErrors.Forbidden("You don't have permission to access invoices for this user");
+      }
 
       // Load transaction host
       transaction.host = await transaction.getHostCollective();
