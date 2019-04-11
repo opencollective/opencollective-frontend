@@ -446,6 +446,7 @@
   "export.json.parameters.title": "パラメーター",
   "export.json.title": "JSON でエクスポート",
   "export.widget.title": "ウィジェット",
+  "Footer.Languages.JoinEffort": "No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐",
   "form.cancel": "キャンセル",
   "form.processing": "処理中",
   "forms.optional": "オプション",

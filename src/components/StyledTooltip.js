@@ -1,64 +1,64 @@
-import { Component, createRef, useState } from 'react';
+import React, { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Container from './Container';
 import StyledCard from './StyledCard';
 
 class Popup extends Component {
-  state = {
-    display: false,
-    position: { bottom: 20, left: -160 },
-  };
-  ref = createRef();
+  constructor(props) {
+    super(props);
+    this.ref = createRef();
+    this.state = {
+      display: false,
+      position: { bottom: 20, left: -160 },
+    };
+  }
 
   componentDidMount() {
-    // need to wait a tick to get access to the rendered container node
-    setTimeout(() => {
-      const containerRect = this.props.containerRef.current.getBoundingClientRect();
-      const { bottom, height, top, width } = this.ref.current.getBoundingClientRect();
-      const centerX = -(width / 2);
-      const centerY = -(height / 2);
+    const containerRect = this.ref.current.getBoundingClientRect();
+    const { bottom, height, top, width } = containerRect;
+    const centerX = -(width / 2);
+    const centerY = -(height / 2);
 
-      let nextX = width / 2 > containerRect.left ? { left: 0 } : { left: centerX };
-      let nextY = { bottom: 20 };
+    let nextX = width / 2 > containerRect.left ? { left: 0 } : { left: centerX };
+    let nextY = { bottom: 20 };
 
-      // popup is too tall
-      if (top < 0) {
-        // popup would be too low
-        // display centered on the y-axis, next to the container
-        if (containerRect.bottom + bottom > height - containerRect.height - 5) {
-          nextY = { bottom: centerY + containerRect.height / 2 };
-          nextX = { left: containerRect.width + 10 };
-        } else {
-          // diplay popup below container
-          nextY = { top: containerRect.height + 5 };
-        }
+    // popup is too tall
+    if (top < 0) {
+      // popup would be too low
+      // display centered on the y-axis, next to the container
+      if (containerRect.bottom + bottom > height - containerRect.height - 5) {
+        nextY = { bottom: centerY + containerRect.height / 2 };
+        nextX = { left: containerRect.width + 10 };
+      } else {
+        // diplay popup below container
+        nextY = { top: containerRect.height + 5 };
       }
+    }
 
-      // popup will show too far right
-      if (containerRect.right + width > document.body.clientWidth) {
-        nextX = { right: -containerRect.width };
-      }
+    // popup will show too far right
+    if (containerRect.right + width >= document.body.clientWidth) {
+      nextX = { left: document.body.clientWidth - (containerRect.right + width) };
+    }
 
-      this.setState({ display: true, position: { ...nextX, ...nextY } });
-    }, 0);
+    this.setState({ display: true, position: { ...nextX, ...nextY } });
   }
 
   render() {
-    const { children, ...styleProps } = this.props;
+    const { children } = this.props;
     const { display, position } = this.state;
     return (
-      <Container role="tooltip" position="absolute" {...position} style={{ pointerEvents: 'none' }}>
+      <Container role="tooltip" position="absolute" {...position} onClick={this.onClick}>
         <StyledCard
           borderColor="black.900"
-          bg="black.transparent.80"
+          bg="black.transparent.90"
           color="white.full"
           maxWidth={280}
           p={3}
           ref={this.ref}
           style={{ opacity: display ? 1 : 0 }}
           width="max-content"
-          {...styleProps}
         >
           {children}
         </StyledCard>
@@ -67,41 +67,67 @@ class Popup extends Component {
   }
 }
 
-const StyledTooltip = ({ children, content, ...styleProps }) => {
-  const [show, setShow] = useState(false);
-  const containerRef = createRef();
+const MainContainer = styled.div`
+  position: relative;
+  display: inline-block;
+  &:focus {
+    outline: none;
 
-  return (
-    <Container position="relative" ref={containerRef} display="inline-block">
-      {show && (
-        <Popup containerRef={containerRef} {...styleProps}>
-          {content}
-        </Popup>
-      )}
-      {children({
-        onBlur: () => setShow(false),
-        onClick: () => setShow(state => !state),
-        onFocus: () => setShow(true),
-        onMouseEnter: () => setShow(true),
-        onMouseLeave: () => setShow(false),
-        tabIndex: 0,
-      })}
-    </Container>
-  );
-};
+    [data-toggle='tooltip'] {
+      outline: 1px dashed lightgrey;
+    }
+  }
+`;
+
+class StyledTooltip extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { isDisplayed: false };
+    this.ref = React.createRef();
+  }
+
+  onMouseEnter = () => {
+    this.setState({ isDisplayed: true });
+  };
+
+  onMouseLeave = () => {
+    if (!this.state.isFocused) {
+      this.setState({ isDisplayed: false });
+    }
+  };
+
+  onBlur = e => {
+    // Ignore blur event if new target is self or a children
+    if (e.relatedTarget !== this.ref.current && !this.ref.current.contains(e.relatedTarget)) {
+      this.setState({ isDisplayed: false, isFocused: false });
+    }
+  };
+
+  onFocus = () => {
+    this.setState({ isDisplayed: true, isFocused: true });
+  };
+
+  render() {
+    const { content, children } = this.props;
+    return (
+      <MainContainer
+        tabIndex="0"
+        ref={this.ref}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+      >
+        {this.state.isDisplayed && <Popup>{content}</Popup>}
+        <div data-toggle="tooltip">{children}</div>
+      </MainContainer>
+    );
+  }
+}
 
 StyledTooltip.propTypes = {
-  /**
-   * Function to render child component that triggers tooltip
-   * @param {Object} props - properties used to control triggering of the tooltip
-   * @param {function} props.onBlur - hides the tooltip
-   * @param {function} props.onClick - toggles showing the tooltip
-   * @param {function} props.onFocus - shows the tooltip
-   * @param {function} props.onMouseEnter - shows the tooltip
-   * @param {function} props.onMouseLeave - hides the tooltip
-   * @param {number} props.tabIndex - allows focusing on the child element
-   */
-  children: PropTypes.func.isRequired,
+  /** Child component that triggers tooltip */
+  children: PropTypes.node,
   /** content to display in the tooltip */
   content: PropTypes.node.isRequired,
 };
