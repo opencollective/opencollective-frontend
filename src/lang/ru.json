@@ -780,7 +780,7 @@
   "subscription.whyPastDueText": "We were unable to charge your last payment. Please update your payment info to continue this subscription.",
   "subscription.whyPastDueTitle": "Update payment info",
   "tax.vat": "Value-added tax (VAT)",
-  "tax.vat.description": "Use this tier type conform with legislation on VAT in Europe.",
+  "tax.vat.description": "Use this tier type to conform with legislation on VAT in Europe.",
   "tax.vatShort": "НДС",
   "TicketsConfirmed.ConfirmationSent": "A confirmation email has been sent to your address {email}",
   "TicketsConfirmed.SeeYouSoon": "See you soon!",
