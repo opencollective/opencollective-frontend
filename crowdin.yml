@@ -7,4 +7,5 @@ files:
       - '*.fr.html'
       - '*.es.html'
       - '*.ja.html'
+      - '*.ru.html'
     translation: /%original_path%/%file_name%.%two_letters_code%.html
