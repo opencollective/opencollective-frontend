@@ -1,17 +1,18 @@
-import url from 'universal-url';
-import path from 'path';
-import { template } from 'lodash';
 import fs from 'fs';
+import path from 'path';
 import pdf from 'html-pdf';
 import moment from 'moment';
 import express from 'express';
 import proxy from 'express-http-proxy';
+import { template } from 'lodash';
+import { URL, URLSearchParams } from 'universal-url';
 
 import pages from './pages';
+import email from './lib/email';
+import { languages } from './intl';
 import { maxAge } from './middlewares';
 import { logger } from './logger';
 import { getBaseApiUrl } from '../lib/utils';
-import email from './lib/email';
 
 export default (server, app) => {
   const urlencodedParser = express.urlencoded({ extended: false });
@@ -24,6 +25,18 @@ export default (server, app) => {
       // When using Cloudflare, there might be a default cache
       // We're setting that for all requests to reduce the default to 1 minute
       res.set('Cache-Control', 'public, max-age=60');
+    }
+    next();
+  });
+
+  server.use((req, res, next) => {
+    if (req.query.language && languages.includes(req.query.language) && req.query.set) {
+      res.cookie('language', req.language);
+      const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+      url.searchParams.delete('language');
+      url.searchParams.delete('set');
+      res.redirect(`${url.pathname}${url.search}`);
+      return;
     }
     next();
   });
@@ -51,7 +64,7 @@ export default (server, app) => {
       },
       proxyReqPathResolver: req => {
         const [pathname, search] = req.url.split('?');
-        const searchParams = new url.URLSearchParams(search);
+        const searchParams = new URLSearchParams(search);
         searchParams.set('api_key', process.env.API_KEY);
         return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
       },
