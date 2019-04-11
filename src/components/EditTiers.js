@@ -303,7 +303,7 @@ class EditTiers extends React.Component {
                         <Span>
                           <FormattedMessage
                             id="tax.vat.description"
-                            defaultMessage="Use this tier type conform with legislation on VAT in Europe."
+                            defaultMessage="Use this tier type to conform with legislation on VAT in Europe."
                           />
                         </Span>
                       </MessageBox>
