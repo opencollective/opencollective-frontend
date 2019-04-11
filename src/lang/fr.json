@@ -344,6 +344,7 @@
   "error.reload": "Recharger la page",
   "error.unexpected": "Oups, une erreur inattendue est survenue",
   "errorMsg": "Erreur : {error}",
+  "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active subscriptions.",
   "event.amount.label": "montant",
   "event.create.btn": "Créer un événement",
   "event.description.label": "Courte description",
