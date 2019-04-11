@@ -769,7 +769,7 @@
   "subscription.cancel.no.btn": "no",
   "subscription.cancelled.label": "Cancelled Subscriptions",
   "subscription.login.message": "Are these your subscriptions? Login above to edit them",
-  "subscription.menu.cancel": "Cancel contribution",
+  "subscription.menu.cancel": "Cancel subscription",
   "subscription.menu.editAmount": "Update amount",
   "subscription.menu.editPaymentMethod": "Update payment method",
   "subscription.pastDue": "Past due. Please update payment method.",

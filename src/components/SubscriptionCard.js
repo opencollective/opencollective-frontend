@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
-import router from '../server/pages';
+import Link from './Link';
 import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 import colors from '../constants/colors';
@@ -461,7 +461,7 @@ class SubscriptionCard extends React.Component {
                     <MenuItem key="divider" style={{ margin: '2px' }} divider />,
                   ]}
                   <MenuItem style={menuItemStyle} eventKey={this.stateConstants.cancelConf}>
-                    <FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel contribution" />
+                    <FormattedMessage id="subscription.menu.cancel" defaultMessage="Cancel subscription" />
                   </MenuItem>
                 </Dropdown.Menu>
               </Dropdown>
@@ -473,9 +473,9 @@ class SubscriptionCard extends React.Component {
         </div>
 
         <div className="body">
-          <router.Link route={'collective'} params={{ slug: collective.slug }}>
+          <Link route={'collective'} params={{ slug: collective.slug }}>
             <div className="name">{collective.name}</div>
-          </router.Link>
+          </Link>
           <div className="description">{description}</div>
         </div>
 
