@@ -36,6 +36,7 @@ export const collectiveSlugBlacklist = [
   'orders',
   'pledge',
   'pledges',
+  'pricing',
   'privacypolicy',
   'redeem',
   'redeemed',
