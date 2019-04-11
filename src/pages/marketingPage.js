@@ -16,7 +16,6 @@ import pricingPageHtml from '../static/pricing-page/index.html';
 import howItWorksPageHtml from '../static/how-it-works-page/index.html';
 import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
 import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
-import holidayGiftCardConfirmationHtml from '../static/holiday-gift-card/confirmation.html';
 import giftCardPageHtml from '../static/gift-cards-page/index.html';
 import becomeAFiscalHostHtml from '../static/become-a-fiscal-host-page/index.html';
 
@@ -75,7 +74,7 @@ class MarketingPage extends React.Component {
   }
 
   render() {
-    const { pageSlug, confirmationPage, intl } = this.props;
+    const { pageSlug, intl } = this.props;
     const { LoggedInUser } = this.state;
 
     let html, style, className;
@@ -97,7 +96,7 @@ class MarketingPage extends React.Component {
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
     } else if (pageSlug === 'gift-of-giving') {
-      html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
+      html = holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
       className = null;
     } else if (pageSlug === 'gift-cards') {

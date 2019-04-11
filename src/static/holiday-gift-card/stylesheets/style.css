@@ -470,6 +470,9 @@
     .mkt-page-holiday-gift-card .form-col {
         padding-top: 45px;
         padding-left: 80px;
+        margin-top: 25px;
+        display: flex;
+        align-items: center;
     }
 }
 
@@ -493,6 +496,10 @@
     display: block;
 }
 
+.create-org-btn-container {
+    justify-content: center;
+}
+
 @media (min-width: 52em) {
     .mkt-page-holiday-gift-card .form-wrapper {
         position: relative;
@@ -501,6 +508,7 @@
         border-radius: 8px;
         background-color: #FFF;
         box-shadow: 0px 1px 4px rgba(26, 27, 31, 0.16);
+        flex: 1 1 450px;
     }
     .mkt-page-holiday-gift-card .form-wrapper .gift-card-wrapper {
         margin: -86px auto 38px;
