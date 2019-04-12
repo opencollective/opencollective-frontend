@@ -655,7 +655,7 @@ class EditCollectiveForm extends React.Component {
             {this.state.section === 'advanced' && (
               <Box>
                 {collective.type === 'USER' && <EditUserEmailForm user={LoggedInUser} />}
-                {archiveIsEnabled && collective.type !== 'USER' && <ArchiveCollective collective={collective} />}
+                {archiveIsEnabled && <ArchiveCollective collective={collective} />}
                 {deleteIsEnabled && collective.type !== 'EVENT' && <DeleteCollective collective={collective} />}
                 <hr />
               </Box>

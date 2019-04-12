@@ -42,6 +42,14 @@ class EditCollective extends React.Component {
         id: 'collective.isArchived.edit.description',
         defaultMessage: 'This {type} has been archived and can no longer be used for any activities.',
       },
+      'user.isArchived': {
+        id: 'user.isArchived',
+        defaultMessage: 'Account has been archived.',
+      },
+      'user.isArchived.edit.description': {
+        id: 'user.isArchived.edit.description',
+        defaultMessage: 'This account has been archived and can no longer be used for any activities.',
+      },
     });
   }
 
@@ -158,7 +166,11 @@ class EditCollective extends React.Component {
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
-    if (collective.isArchived) {
+    if (collective.isArchived && collective.type === 'USER') {
+      notification.title = intl.formatMessage(this.messages['user.isArchived']);
+      notification.description = intl.formatMessage(this.messages['user.isArchived.edit.description']);
+      notification.status = 'collectiveArchived';
+    } else if (collective.isArchived) {
       notification.title = intl.formatMessage(this.messages['collective.isArchived'], {
         name: collective.name,
       });
