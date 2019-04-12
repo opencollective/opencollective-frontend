@@ -5,13 +5,11 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
 
 import withIntl from '../lib/withIntl';
-import { Link } from '../server/pages';
 
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
-import TierCard from './TierCard';
 import NotificationBar from './NotificationBar';
 import MembersWithData from './MembersWithData';
 import CollectivesWithData from './CollectivesWithData';
