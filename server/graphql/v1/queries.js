@@ -225,7 +225,7 @@ const queries = {
       }
 
       const invoice = {
-        title: get(host, 'settings.invoiceTitle') || 'Donation Receipt',
+        title: get(host, 'settings.invoiceTitle'),
         HostCollectiveId: host.id,
         slug: args.invoiceSlug,
         year,
@@ -295,7 +295,7 @@ const queries = {
       }
 
       const invoice = {
-        title: get(host, 'settings.invoiceTitle') || 'Donation Receipt',
+        title: get(host, 'settings.invoiceTitle'),
         HostCollectiveId: host.id,
         dateFrom: dateFrom,
         dateTo: dateTo,
@@ -357,7 +357,7 @@ const queries = {
 
       // Generate invoice
       const invoice = {
-        title: get(transaction.host, 'settings.invoiceTitle') || 'Donation Receipt',
+        title: get(transaction.host, 'settings.invoiceTitle'),
         HostCollectiveId: get(transaction.host, 'id'),
         slug: `transaction-${args.transactionUuid}`,
         currency: transaction.hostCurrency,
