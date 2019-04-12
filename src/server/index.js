@@ -35,9 +35,6 @@ app.prepare().then(() => {
     if (req.query.language && languages.includes(req.query.language)) {
       // Detect language as query string in the URL
       req.language = req.query.language;
-      if (req.query.set) {
-        res.cookie('language', req.language);
-      }
     } else if (req.cookies.language && languages.includes(req.cookies.language)) {
       // Detect language in Cookie
       req.language = req.cookies.language;

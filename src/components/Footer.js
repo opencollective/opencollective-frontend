@@ -71,6 +71,21 @@ const navigation = {
   },
 };
 
+const languages = {
+  en: { name: 'English' },
+  fr: { name: 'French', nativeName: 'Français', completion: '66%' },
+  ja: { name: 'Japanese', nativeName: '日本語', completion: '37%' },
+  es: { name: 'Spanish', nativeName: 'Español', completion: '23%' },
+  ru: { name: 'Russian', nativeName: 'Русский', completion: '10%' },
+};
+
+const switchLanguage = (e, key) => {
+  e.preventDefault();
+  document.cookie = `language=${key};path=/`;
+  window.location.reload();
+  window.scrollTo(0, 0);
+};
+
 class Footer extends React.Component {
   render() {
     return (
@@ -94,29 +109,20 @@ class Footer extends React.Component {
               <P fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={2} pt={2}>
                 LANGUAGES
               </P>
-              <P>
-                <a href="?language=en&set=1">English</a>
-                <br />
-                <a href="?language=fr&set=1" title="French">
-                  Français
-                </a>{' '}
-                (62%)
-                <br />
-                <a href="?language=ja&set=1" title="Japanese">
-                  日本語
-                </a>{' '}
-                (39%)
-                <br />
-                <a href="?language=es&set=1" title="Spanish">
-                  Español
-                </a>{' '}
-                (16%)
-                <br />
-                <a href="?language=ru&set=1" title="Russian">
-                  Русский
-                </a>{' '}
-                (11%)
-              </P>
+              <div>
+                {Object.keys(languages).map(key => (
+                  <div key={key}>
+                    <a
+                      title={languages[key].name}
+                      href={`/?language=${key}&set=1`}
+                      onClick={e => switchLanguage(e, key)}
+                    >
+                      {languages[key].nativeName || languages[key].name}
+                    </a>{' '}
+                    {languages[key].completion && <span>({`${languages[key].completion}`})</span>}
+                  </div>
+                ))}
+              </div>
             </Container>
           </Container>
           <Container
