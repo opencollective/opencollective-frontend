@@ -218,7 +218,7 @@ class UserCollective extends React.Component {
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const type = collective.type.toLowerCase();
     let cta;
-    if (collective.canApply) {
+    if (collective.canApply && !collective.isArchived) {
       cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} sticky={false} />;
     }
 
