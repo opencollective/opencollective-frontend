@@ -154,6 +154,9 @@ class TierCard extends React.Component {
             .TierCard .fromCollectives.user:first-child {
               margin-left: 15px;
             }
+            .TiersPage {
+              margin: 0 20px;
+            }
           `}
         </style>
         <style jsx>
