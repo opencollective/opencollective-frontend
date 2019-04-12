@@ -446,6 +446,7 @@
   "export.json.parameters.title": "Параметры",
   "export.json.title": "Export in JSON",
   "export.widget.title": "Виджет",
+  "Footer.Languages.JoinEffort": "No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐",
   "form.cancel": "отмена",
   "form.processing": "обрабатываем",
   "forms.optional": "Optional",
