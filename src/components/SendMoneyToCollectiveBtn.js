@@ -148,4 +148,5 @@ const addData = compose(
   addMutation,
   addPaymentMethods,
 );
+
 export default addData(withIntl(SendMoneyToCollectiveBtn));

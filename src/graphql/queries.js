@@ -189,6 +189,12 @@ export const getCollectiveToEditQueryFields = `
     description
     website
     twitterHandle
+    hostCollective {
+      id
+      slug
+      name
+      currency
+    }
     location {
       country
     }

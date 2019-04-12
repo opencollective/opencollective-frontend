@@ -1,10 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 import { withRouter } from 'next/router';
 import { ArrowBack } from 'styled-icons/material/ArrowBack';
+import { get } from 'lodash';
+import { Flex, Box } from '@rebass/grid';
+import { Button } from 'react-bootstrap';
+import { FormattedMessage, defineMessages } from 'react-intl';
 
-import { Router } from '../server/pages';
+import withIntl from '../lib/withIntl';
 import { getEnvVar, parseToBoolean } from '../lib/utils';
+import { defaultBackgroundImage } from '../constants/collectives';
+import { Router } from '../server/pages';
+
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
@@ -13,19 +21,14 @@ import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
 import ExportData from './ExportData';
-import { FormattedMessage, defineMessages } from 'react-intl';
-import { defaultBackgroundImage } from '../constants/collectives';
-import withIntl from '../lib/withIntl';
-import { Button } from 'react-bootstrap';
 import Link from './Link';
-import { get } from 'lodash';
-import styled, { css } from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
-import ArchiveCollective from './ArchiveCollective';
-import DeleteCollective from './DeleteCollective';
+
+import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
+import EditCollectiveArchive from './EditCollectiveArchive';
+import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
 
 const selectedStyle = css`
@@ -48,6 +51,7 @@ const MenuItem = styled(Link)`
 
 const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
 const deleteIsEnabled = parseToBoolean(getEnvVar('SHOW_DELETE_COLLECTIVE'));
+const emptyBalanceIsEnabled = parseToBoolean(getEnvVar('SHOW_EMPTY_BALANCE_COLLECTIVE'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -655,8 +659,11 @@ class EditCollectiveForm extends React.Component {
             {this.state.section === 'advanced' && (
               <Box>
                 {collective.type === 'USER' && <EditUserEmailForm user={LoggedInUser} />}
-                {archiveIsEnabled && <ArchiveCollective collective={collective} />}
-                {deleteIsEnabled && collective.type !== 'EVENT' && <DeleteCollective collective={collective} />}
+                {emptyBalanceIsEnabled && collective.type === 'COLLECTIVE' && (
+                  <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
+                )}
+                {archiveIsEnabled && <EditCollectiveArchive collective={collective} />}
+                {deleteIsEnabled && collective.type !== 'EVENT' && <EditCollectiveDelete collective={collective} />}
                 <hr />
               </Box>
             )}
@@ -746,9 +753,11 @@ class EditCollectiveForm extends React.Component {
                   />
                 </Flex>
               )}
+
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
+
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
