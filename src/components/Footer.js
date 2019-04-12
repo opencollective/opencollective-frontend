@@ -1,18 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { MediumM } from 'styled-icons/fa-brands/MediumM';
 import { Slack } from 'styled-icons/fa-brands/Slack';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Mail } from 'styled-icons/material/Mail';
+import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle';
 
 import { Link } from '../server/pages';
 
-import { P } from './Text';
+import { P, Span } from './Text';
 import Container from './Container';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
+import StyledTooltip from './StyledTooltip';
+import ExternalLinkNewTab from './ExternalLinkNewTab';
 
 const SocialLink = styled.a`
   align-items: center;
@@ -106,8 +110,27 @@ class Footer extends React.Component {
               An organization for your community, transparent by design.
             </P>
             <Container color="#6E747A" textAlign={['center', null, 'left']}>
-              <P fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={2} pt={2}>
-                LANGUAGES
+              <P as="div" fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={2} pt={2}>
+                <Span mr={1} style={{ verticalAlign: 'middle' }}>
+                  LANGUAGES
+                </Span>
+                <StyledTooltip
+                  content={
+                    <FormattedMessage
+                      id="Footer.Languages.JoinEffort"
+                      defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
+                      values={{
+                        crowdinLink: (
+                          <ExternalLinkNewTab href="https://crowdin.com/project/opencollective">
+                            Crowdin
+                          </ExternalLinkNewTab>
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <InfoCircle size={16} cursor="pointer" />
+                </StyledTooltip>
               </P>
               <div>
                 {Object.keys(languages).map(key => (
