@@ -91,31 +91,20 @@ class TopBarProfileMenu extends React.Component {
 
   renderProfileMenu() {
     const { LoggedInUser, intl } = this.props;
-    const score = c => {
-      switch (c.role) {
-        case 'HOST':
-          return 0;
-        case 'ADMIN':
-          return 1;
-        case 'MEMBER':
-          return 2;
-        case 'BACKER':
-          return 3;
-      }
-    };
-    const collectives = uniqBy(
-      [...LoggedInUser.memberOf.filter(m => m.collective.type === 'COLLECTIVE')],
-      m => m.collective.id,
-    ).sort((a, b) => {
-      return `${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}` ? 1 : -1;
-    }); // order by role then az
 
-    const orgs = uniqBy(
-      [...LoggedInUser.memberOf.filter(m => m.collective.type === 'ORGANIZATION')],
-      m => m.collective.id,
-    ).sort((a, b) => {
-      return `${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}` ? 1 : -1;
-    }); // order by role then az
+    const memberships = uniqBy(LoggedInUser.memberOf.filter(m => m.role !== 'BACKER'), m => m.collective.id);
+
+    const collectives = memberships
+      .filter(m => m.collective.type === 'COLLECTIVE')
+      .sort((a, b) => {
+        return a.collective.slug.localeCompare(b.collective.slug);
+      });
+
+    const orgs = memberships
+      .filter(m => m.collective.type === 'ORGANIZATION')
+      .sort((a, b) => {
+        return a.collective.slug.localeCompare(b.collective.slug);
+      });
 
     return (
       <Container
@@ -172,7 +161,7 @@ class TopBarProfileMenu extends React.Component {
                         radius="2.8rem"
                         mr={2}
                       />
-                      {get(membership, 'collective.slug')}
+                      {get(membership, 'collective.name')}
                     </Flex>
                   </StyledLink>
                 </Link>
@@ -182,6 +171,15 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
             ))}
           </Box>
+          {collectives.length === 0 && (
+            <Box my={2}>
+              <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
+                <em>
+                  <FormattedMessage id="menu.collective.none" defaultMessage="No collectives yet" />
+                </em>
+              </P>
+            </Box>
+          )}
 
           <Flex alignItems="center" mt={3}>
             <P
@@ -222,7 +220,7 @@ class TopBarProfileMenu extends React.Component {
                         radius="2.8rem"
                         mr={2}
                       />
-                      {get(membership, 'collective.slug')}
+                      {get(membership, 'collective.name')}
                     </Flex>
                   </StyledLink>
                 </Link>
@@ -235,7 +233,9 @@ class TopBarProfileMenu extends React.Component {
           {orgs.length === 0 && (
             <Box my={2}>
               <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-                <em>No organizations yet</em>
+                <em>
+                  <FormattedMessage id="menu.organizations.none" defaultMessage="No organizations yet" />
+                </em>
               </P>
             </Box>
           )}
