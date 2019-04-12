@@ -44,6 +44,7 @@ export default class IntlDocument extends Document {
       'RECAPTCHA_ENABLED',
       'SHOW_ARCHIVE_COLLECTIVE',
       'SHOW_DELETE_COLLECTIVE',
+      'SHOW_EMPTY_BALANCE_COLLECTIVE',
     ]);
   }
 
