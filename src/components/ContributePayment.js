@@ -28,7 +28,6 @@ import NewCreditCardForm from './NewCreditCardForm';
 const PaymentEntryContainer = styled(Container)`
   display: flex;
   flex-direction: column;
-  cursor: pointer;
   background: ${themeGet('colors.white.full')};
   &:hover {
     background: ${themeGet('colors.black.50')};
@@ -238,6 +237,7 @@ class ContributePayment extends React.Component {
           options={paymentMethodsOptions}
           onChange={this.onChange}
           defaultValue={this.state.selectedOption.key}
+          disabled={this.props.disabled}
         >
           {({ radio, checked, index, value: { key, title, subtitle, icon, data } }) => (
             <PaymentEntryContainer
@@ -246,6 +246,7 @@ class ContributePayment extends React.Component {
               borderBottom={index !== paymentMethodsOptions.length - 1 ? '1px solid' : 'none'}
               bg="white.full"
               borderColor="black.200"
+              cursor={this.props.disabled ? 'not-allowed' : 'pointer'}
             >
               <Flex alignItems="center">
                 <Box as="span" mr={[2, 21]} flexWrap="wrap">
@@ -316,6 +317,8 @@ ContributePayment.propTypes = {
    * Wether we should ask for postal code in Credit Card form
    */
   hideCreditCardPostalCode: PropTypes.bool,
+  /** If true, user won't be able to interact with the element */
+  disabled: PropTypes.bool,
 };
 
 ContributePayment.defaultProps = {
