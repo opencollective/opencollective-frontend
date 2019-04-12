@@ -132,6 +132,7 @@ pages.add(
 // ----------
 
 pages.add('collective', '/:slug');
+pages.add('tiers', '/:collectiveSlug/tiers');
 
 export default pages;
 
