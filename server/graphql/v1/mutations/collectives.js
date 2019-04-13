@@ -160,6 +160,23 @@ export async function createCollective(_, args, req) {
     promises.push(collective.addHost(hostCollective, req.remoteUser));
   }
 
+  // We add the admins of the parent collective as admins
+  if (collectiveData.type === types.EVENT) {
+    const admins = await models.Member.findAll({ where: { CollectiveId: parentCollective.id, role: roles.ADMIN } });
+    admins.forEach(member => {
+      if (member.MemberCollectiveId !== req.remoteUser.CollectiveId) {
+        promises.push(
+          models.Member.create({
+            CreatedByUserId: req.remoteUser.id,
+            CollectiveId: collective.id,
+            MemberCollectiveId: member.MemberCollectiveId,
+            role: roles.ADMIN,
+          }),
+        );
+      }
+    });
+  }
+
   await Promise.all(promises);
 
   // Purge cache for parent collective (for events) and hosts
