@@ -112,9 +112,9 @@ const DiscoverPage = ({ router }) => {
   // query: { ...router.query, offset: 0, show: value },
   // });
   // };
+
   const getPledgedCards = gql`
-    query discover {
-      allCollectiveTags
+    query allCollective {
       allCollectives(isPledged: true, isActive: false) {
         collectives {
           id
@@ -133,12 +133,6 @@ const DiscoverPage = ({ router }) => {
   const pledgedCardData = graphql(getPledgedCards);
 
   console.log('pledge card data', pledgedCardData);
-
-  // const collectiveChecks = {};
-
-  // collectiveChecks.isPledge = () => router.asPath.includes('/discover?offset=0&show=pledged');
-  // collectiveChecks.isOpenSource = () => router.asPath.includes('/discover?offset=0&show=open%20source');
-  // collectiveChecks.isOther = () => router.asPath.includes('/discover?offset=0&show=other');
 
   return (
     <Page title="Discover">
@@ -229,7 +223,7 @@ const DiscoverPage = ({ router }) => {
                   {collectives.map(c => {
                     return (
                       <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                        {collective.isPledge() ? (
+                        {collective.isPledge ? (
                           <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                         ) : (
                           <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
