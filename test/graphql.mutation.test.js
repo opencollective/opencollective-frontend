@@ -8,7 +8,7 @@ import roles from '../server/constants/roles';
 import * as payments from '../server/lib/payments';
 import emailLib from '../server/lib/email';
 
-let host, user1, user2, collective1, event1, ticket1;
+let host, user1, user2, user3, collective1, event1, ticket1;
 let sandbox, executeOrderStub, emailSendSpy, emailSendMessageSpy;
 
 describe('Mutation Tests', () => {
@@ -58,11 +58,13 @@ describe('Mutation Tests', () => {
   );
 
   beforeEach('create user2', () => models.User.createUserWithCollective(utils.data('user2')).tap(u => (user2 = u)));
+  beforeEach('create user3', () => models.User.createUserWithCollective(utils.data('user3')).tap(u => (user3 = u)));
   beforeEach('create collective1', () =>
     models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)),
   );
   beforeEach('add host', () => collective1.addHost(host.collective, host));
   beforeEach('add user1 as admin to collective1', () => collective1.addUserWithRole(user1, roles.ADMIN));
+  beforeEach('add user2 as admin to collective1', () => collective1.addUserWithRole(user2, roles.ADMIN));
 
   beforeEach('create stripe account', done => {
     models.ConnectedAccount.create({
@@ -144,7 +146,7 @@ describe('Mutation Tests', () => {
         const result = await utils.graphqlQuery(
           createCollectiveQuery,
           { collective: getEventData(collective1) },
-          user2,
+          user3,
         );
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal(
@@ -159,7 +161,7 @@ describe('Mutation Tests', () => {
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
         result.errors && console.error(result.errors[0]);
         const createdEvent = result.data.createCollective;
-        expect(createdEvent.slug).to.equal('brusselstogether-meetup-3-4ev');
+        expect(createdEvent.slug).to.equal('brusselstogether-meetup-3-5ev');
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
         expect(createdEvent.isActive).to.be.true;
         event.id = createdEvent.id;
@@ -172,12 +174,14 @@ describe('Mutation Tests', () => {
           order: [['MemberCollectiveId', 'ASC']],
         });
 
-        expect(members).to.have.length(2);
+        expect(members).to.have.length(3);
         expect(members[0].CollectiveId).to.equal(event.id);
         expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
         expect(members[0].role).to.equal(roles.ADMIN);
         expect(members[1].role).to.equal(roles.HOST);
         expect(members[1].MemberCollectiveId).to.equal(collective1.HostCollectiveId);
+        expect(members[2].role).to.equal(roles.ADMIN);
+        expect(members[2].MemberCollectiveId).to.equal(user2.CollectiveId);
 
         // We remove the first tier
         event.tiers.shift();
@@ -203,7 +207,7 @@ describe('Mutation Tests', () => {
         expect(r2.errors).to.have.length(1);
         expect(r2.errors[0].message).to.equal('You need to be logged in to edit a collective');
 
-        const r3 = await utils.graphqlQuery(updateQuery, { collective: event }, user2);
+        const r3 = await utils.graphqlQuery(updateQuery, { collective: event }, user3);
         expect(r3.errors).to.have.length(1);
         expect(r3.errors[0].message).to.equal(
           'You must be logged in as the creator of this Event or as an admin of the scouts collective to edit this Event Collective',
@@ -310,7 +314,7 @@ describe('Mutation Tests', () => {
       });
 
       it('fails if not authenticated as host or member of collective', async () => {
-        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id }, user2);
+        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id }, user3);
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal(
           "You need to be logged in as a core contributor or as a host of the Scouts d'Arlon collective",
@@ -410,7 +414,7 @@ describe('Mutation Tests', () => {
     });
 
     it('fails to delete a collective if logged in as another user', async () => {
-      const result = await utils.graphqlQuery(deleteEventCollectiveQuery, { id: event1.id }, user2);
+      const result = await utils.graphqlQuery(deleteEventCollectiveQuery, { id: event1.id }, user3);
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal(
         'You need to be logged in as a core contributor or as a host to delete this collective',
@@ -589,7 +593,7 @@ describe('Mutation Tests', () => {
         const createMemberQuery = `
           mutation createMember {
             createMember(
-              member: { email: "${user2.email}" },
+              member: { email: "${user3.email}" },
               collective: { id: ${event1.id} },
               role: "FOLLOWER"
             ) {
@@ -612,14 +616,14 @@ describe('Mutation Tests', () => {
         expect(result).to.deep.equal({
           data: {
             createMember: {
-              id: 4,
+              id: 5,
               role: 'FOLLOWER',
               member: {
                 email: null, // note: since the logged in user cannot edit the collective, it cannot get back the email address of an order
-                id: 3,
+                id: 4,
               },
               collective: {
-                id: 5,
+                id: 6,
                 slug: 'jan-meetup',
               },
             },
@@ -759,7 +763,7 @@ describe('Mutation Tests', () => {
           expect(members).to.have.length(1);
 
           // Make sure we send the collective.member.created email notification to core contributor of collective1
-          expect(emailSendMessageSpy.callCount).to.equal(2);
+          expect(emailSendMessageSpy.callCount).to.equal(3);
           // utils.inspectSpy(emailSendMessageSpy, 2);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal('user2@opencollective.com');
           expect(emailSendMessageSpy.firstCall.args[1]).to.equal('Your Organization on Open Collective');
@@ -827,7 +831,7 @@ describe('Mutation Tests', () => {
           });
           expect(members).to.have.length(1);
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
-          expect(emailSendSpy.callCount).to.equal(1);
+          expect(emailSendSpy.callCount).to.equal(2);
           const activityData = emailSendSpy.lastCall.args[2];
           expect(activityData.member.role).to.equal(roles.BACKER);
           expect(activityData.collective.type).to.equal('COLLECTIVE');
@@ -836,7 +840,7 @@ describe('Mutation Tests', () => {
           expect(activityData.collective.slug).to.equal(collective1.slug);
           expect(activityData.member.memberCollective.slug).to.equal('slack');
           expect(emailSendSpy.lastCall.args[0]).to.equal('collective.member.created');
-          expect(emailSendMessageSpy.lastCall.args[0]).to.equal(user1.email);
+          expect(emailSendMessageSpy.lastCall.args[0]).to.equal(user2.email);
         });
       });
 
@@ -978,7 +982,7 @@ describe('Mutation Tests', () => {
                 },
                 createdByUser: {
                   email: null,
-                  id: 4,
+                  id: 5,
                 },
               },
             },
@@ -1065,7 +1069,7 @@ describe('Mutation Tests', () => {
           executeOrderStub.resetHistory();
           expect(executeOrderArgument[1].id).to.equal(1);
           expect(executeOrderArgument[1].TierId).to.equal(4);
-          expect(executeOrderArgument[1].CollectiveId).to.equal(5);
+          expect(executeOrderArgument[1].CollectiveId).to.equal(6);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(3);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
@@ -1186,10 +1190,10 @@ describe('Mutation Tests', () => {
                 },
                 createdByUser: {
                   email: null,
-                  id: 4,
+                  id: 5,
                 },
                 collective: {
-                  id: 5,
+                  id: 6,
                   slug: 'jan-meetup',
                 },
               },
@@ -1199,8 +1203,8 @@ describe('Mutation Tests', () => {
           expect(executeOrderStub.callCount).to.equal(1);
           expect(executeOrderArgument[1].id).to.equal(1);
           expect(executeOrderArgument[1].TierId).to.equal(4);
-          expect(executeOrderArgument[1].CollectiveId).to.equal(5);
-          expect(executeOrderArgument[1].CreatedByUserId).to.equal(4);
+          expect(executeOrderArgument[1].CollectiveId).to.equal(6);
+          expect(executeOrderArgument[1].CreatedByUserId).to.equal(5);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
           expect(executeOrderArgument[1].paymentMethod.token).to.equal('tok_123456781234567812345678');
