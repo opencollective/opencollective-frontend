@@ -761,7 +761,7 @@
   "signin.noAccount": "Pas encore de compte ?",
   "signin.signup.success.title": "✓ Compte créé avec succès",
   "signin.unknownEmail": "Il n'y a aucun utilisateur avec cette adresse e-mail.",
-  "signin.usingEmail": "Connectez-vous en utilisant votre adresse email :",
+  "signin.usingEmail": "Connectez-vous avec votre adresse email :",
   "signinup.description.description": "Présentez-vous en 60 caractères, ou moins!",
   "signinup.description.label": "Rapide description",
   "signinup.email.label": "email",
