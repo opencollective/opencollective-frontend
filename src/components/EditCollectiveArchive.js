@@ -70,6 +70,8 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
     }
   };
 
+  const hasBalance = collective.stats.balance > 0 && collective.type === 'COLLECTIVE';
+
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
@@ -100,7 +102,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         <StyledButton
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
-          disabled={collective.stats.balance > 0 ? true : false}
+          disabled={hasBalance ? true : false}
         >
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
@@ -109,7 +111,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           />
         </StyledButton>
       )}
-      {!isArchived && collective.stats.balance > 0 && (
+      {!isArchived && hasBalance && (
         <P color="rgb(224, 183, 0)">
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
