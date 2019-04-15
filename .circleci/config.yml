@@ -1,6 +1,8 @@
 version: 2
 
 aliases:
+  crowdin_branch: &crowdin_branch /i18n\/crowdin.*/
+
   restore_npm_cache: &restore_npm_cache
     restore_cache:
       name: Restore npm cache
@@ -246,20 +248,27 @@ workflows:
   version: 2
   lint-build-test:
     jobs:
-      - lint
-      - jest
       - update-langs
-      - build
-      - build-api
+      - lint:
+          filters: { branches: { ignore: [*crowdin_branch] } }
+      - jest:
+          filters: { branches: { ignore: [*crowdin_branch] } }
+      - build:
+          filters: { branches: { ignore: [*crowdin_branch] } }
+      - build-api:
+          filters: { branches: { ignore: [*crowdin_branch] } }
       - test-e2e-0:
+          filters: { branches: { ignore: [*crowdin_branch] } }
           requires:
             - build
             - build-api
       - test-e2e-1:
+          filters: { branches: { ignore: [*crowdin_branch] } }
           requires:
             - build
             - build-api
       - test-e2e-2:
+          filters: { branches: { ignore: [*crowdin_branch] } }
           requires:
             - build
             - build-api
