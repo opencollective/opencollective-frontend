@@ -76,9 +76,9 @@ class TiersPage extends React.Component {
                   Support this collective
                 </P>
               </Container>
-              <Container mx={4} px={4} my={4}>
+              <Container>
                 {collective.isActive && collective.host && (
-                  <Container display="flex" justifyContent="center" mx={4} width={1}>
+                  <Container display="flex" flexWrap="wrap" data-cy="tiers" justifyContent="center" m={4}>
                     {collective.tiers.map(tier => (
                       <TierCard
                         key={`TierCard-${tier.slug}`}
@@ -90,13 +90,15 @@ class TiersPage extends React.Component {
                     ))}
                   </Container>
                 )}
-                <Container display="flex" justifyContent="center" width={1} my={4}>
-                  <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
-                    <a>
-                      <FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" />
-                    </a>
-                  </Link>
-                </Container>
+                {collective.isActive && collective.host && (
+                  <Container display="flex" justifyContent="center" width={1} my={4}>
+                    <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
+                      <a>
+                        <FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" />
+                      </a>
+                    </Link>
+                  </Container>
+                )}
               </Container>
             </Fragment>
           )}

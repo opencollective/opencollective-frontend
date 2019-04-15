@@ -155,7 +155,7 @@ class TierCard extends React.Component {
               margin-left: 15px;
             }
             .TiersPage {
-              margin: 0 20px;
+              margin: 20px;
             }
           `}
         </style>
