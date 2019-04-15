@@ -69,6 +69,8 @@
     "react-apollo": "2.5.2",
     "react-bootstrap": "0.32.4",
     "react-datetime": "2.16.3",
+    "react-dnd": "5.0.0",
+    "react-dnd-html5-backend": "3.0.2",
     "react-dom": "16.8.6",
     "react-dropzone": "5.1.1",
     "react-geosuggest": "2.11.0",
@@ -80,7 +82,7 @@
     "react-scrollchor": "6.0.0",
     "react-stickynode": "2.1.1",
     "react-stripe-elements": "2.0.3",
-    "react-tag-input": "5.2.3",
+    "react-tag-input": "6.4.0",
     "react-tooltip": "3.10.0",
     "react-window": "1.8.1",
     "regenerator-runtime": "0.13.2",
@@ -196,6 +198,8 @@
       "@babel/core",
       "@babel/node",
       "@babel/runtime",
+      "react-dnd",
+      "react-dnd-html5-backend",
       "react-dropzone",
       "styled-jsx"
     ]
