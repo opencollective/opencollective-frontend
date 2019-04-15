@@ -420,6 +420,13 @@ class MenuBar extends React.Component {
                 </Link>
               </div>
             )}
+            {collective.type !== 'EVENT' && (
+              <div className="item">
+                <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" />
+                </Link>
+              </div>
+            )}
             <div className="separator" />
             <div className="item editCollective">
               <Link route={`${collective.path}/edit`}>
@@ -506,6 +513,7 @@ class MenuBar extends React.Component {
             }
             .MenuBar .item a {
               color: #aaaeb3;
+              text-transform: capitalize;
             }
             .MenuBar .item a:hover {
               color: white;

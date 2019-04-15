@@ -11,8 +11,19 @@ import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
 import Modal from './Modal';
 
+const getCollectiveType = type => {
+  switch (type) {
+    case 'ORGANIZATION':
+      return 'Organization';
+    case 'COLLECTIVE':
+      return 'Collective';
+    default:
+      return 'Account';
+  }
+};
+
 const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
-  const collectiveType = collective.type === 'ORGANIZATION' ? 'Organization' : 'Collective';
+  const collectiveType = getCollectiveType(collective.type);
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
   const [archiveStatus, setArchiveStatus] = useState({
@@ -60,7 +71,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
   };
 
   return (
-    <Container display="flex" flexDirection="column" width={1}>
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
         <FormattedMessage
           values={{ type: collectiveType }}
@@ -87,7 +98,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
       {error && <P color="#ff5252">{error}</P>}
       {!isArchived && (
         <StyledButton
-          width={0.3}
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
           disabled={collective.stats.balance > 0 ? true : false}
@@ -111,7 +121,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         </P>
       )}
       {isArchived && confirmationMsg && (
-        <MessageBox withIcon width={0.6} type="info" mb={4}>
+        <MessageBox withIcon type="info" mb={4}>
           <FormattedMessage
             values={{ message: confirmationMsg }}
             id="collective.archive.archivedConfirmMessage"
@@ -121,7 +131,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
       )}
 
       {isArchived && (
-        <StyledButton width={0.3} onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
+        <StyledButton onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.unarchive.button"

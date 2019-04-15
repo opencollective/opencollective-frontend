@@ -60,6 +60,9 @@ class HelpTooltip extends React.Component {
             .customTooltip.place-bottom::after {
               border-color: white transparent !important;
             }
+            span {
+              text-shadow: none;
+            }
           `}
         </style>
         {!this._isMounted && (

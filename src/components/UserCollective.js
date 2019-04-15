@@ -56,6 +56,14 @@ class UserCollective extends React.Component {
         id: 'organization.isArchived.description',
         defaultMessage: 'This organization has been archived and can no longer be used for any activities.',
       },
+      'user.isArchived': {
+        id: 'user.isArchived',
+        defaultMessage: 'Account has been archived.',
+      },
+      'user.isArchived.description': {
+        id: 'user.isArchived.description',
+        defaultMessage: 'This account has been archived and can no longer be used for any activities.',
+      },
       'organization.collective.since': {
         id: 'organization.collective.since',
         defaultMessage: 'Contributing Since {year}',
@@ -218,7 +226,7 @@ class UserCollective extends React.Component {
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const type = collective.type.toLowerCase();
     let cta;
-    if (collective.canApply) {
+    if (collective.canApply && !collective.isArchived) {
       cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} sticky={false} />;
     }
 
@@ -242,6 +250,12 @@ class UserCollective extends React.Component {
         name: collective.name,
       });
       notification.description = intl.formatMessage(this.messages['organization.isArchived.description']);
+      notification.status = 'collectiveArchived';
+    } else if (collective.type === 'USER' && (status === 'collectiveArchived' || collective.isArchived)) {
+      notification.title = intl.formatMessage(this.messages['user.isArchived'], {
+        name: collective.name,
+      });
+      notification.description = intl.formatMessage(this.messages['user.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
 

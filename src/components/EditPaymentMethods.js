@@ -10,7 +10,8 @@ import { Add } from 'styled-icons/material/Add';
 
 import withIntl from '../lib/withIntl';
 import { paymentMethodLabel } from '../lib/payment_method_label';
-import { H3 } from './Text';
+import { H3, Span } from './Text';
+import Link from './Link';
 import Loading from './Loading';
 import EditPaymentMethod from './EditPaymentMethod';
 import StyledButton from './StyledButton';
@@ -19,6 +20,7 @@ import { withStripeLoader } from './StripeProvider';
 import NewCreditCardForm from './NewCreditCardForm';
 import MessageBox from './MessageBox';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
+import { getErrorFromGraphqlException } from '../lib/utils';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -91,7 +93,8 @@ class EditPaymentMethods extends React.Component {
       await this.props.data.refetch();
       this.setState({ savingId: null });
     } catch (e) {
-      this.setState({ error: e.message, savingId: null });
+      this.showError(e.message);
+      this.setState({ savingId: null });
     }
   };
 
@@ -105,10 +108,15 @@ class EditPaymentMethods extends React.Component {
         this.setState({ error: null });
         await this.props.data.refetch();
       } catch (e) {
-        this.setState({ error: e.message });
+        this.showError(getErrorFromGraphqlException(e));
       }
     }
     this.setState({ removedId: null });
+  };
+
+  showError = error => {
+    this.setState({ error });
+    window.scrollTo(0, 0);
   };
 
   getPaymentMethodsToDisplay() {
@@ -116,6 +124,28 @@ class EditPaymentMethods extends React.Component {
       pm => pm.balance > 0 || (pm.type === 'virtualcard' && pm.monthlyLimitPerMember),
     );
     return sortBy(paymentMethods, ['type', 'id']);
+  }
+
+  renderError(error) {
+    if (typeof error === 'string') {
+      return error;
+    } else if (error.id === 'PM.Remove.HasActiveSubscriptions') {
+      return (
+        <React.Fragment>
+          <FormattedMessage
+            id="errors.PM.Remove.HasActiveSubscriptions"
+            defaultMessage="This payment method cannot be removed because it has active subscriptions."
+          />{' '}
+          <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
+            <Span textTransform="capitalize">
+              <FormattedMessage id="paymentMethod.editSubscriptions" defaultMessage="edit subscriptions" />
+            </Span>
+          </Link>
+        </React.Fragment>
+      );
+    } else {
+      return error.message;
+    }
   }
 
   render() {
@@ -127,37 +157,8 @@ class EditPaymentMethods extends React.Component {
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        <Flex className="paymentMethods" flexDirection="column" mb={2}>
-          {paymentMethods.map(pm => (
-            <Container
-              className="paymentMethod"
-              key={pm.id}
-              mb={4}
-              p={3}
-              border="1px solid #dedede"
-              boxShadow="0px 3px 18px #eaeaea"
-              borderRadius={4}
-              style={{ filter: pm.id === removedId ? 'blur(1px)' : 'none' }}
-            >
-              <EditPaymentMethod
-                paymentMethod={pm}
-                hasMonthlyLimitPerMember={Collective.type === 'ORGANIZATION' && pm.type !== 'prepaid'}
-                currency={pm.currency || Collective.currency}
-                collectiveSlug={Collective.slug}
-                onSave={pm => this.updatePaymentMethod(pm)}
-                onRemove={pm => this.removePaymentMethod(pm)}
-                isSaving={pm.id === savingId}
-              />
-            </Container>
-          ))}
-        </Flex>
-        {error && (
-          <MessageBox type="error" withIcon>
-            {error}
-          </MessageBox>
-        )}
         {!hasForm ? (
-          <Flex justifyContent="center" mx={3} mt={3} mb={4}>
+          <Flex justifyContent="center" mx={3} my={4}>
             <Box>
               <StyledButton buttonStyle="standard" buttonSize="large" onClick={() => this.setState({ hasForm: true })}>
                 <Add size="1em" />
@@ -171,8 +172,7 @@ class EditPaymentMethods extends React.Component {
             display="flex"
             alignItems="center"
             flexWrap="wrap"
-            mt={2}
-            mb={3}
+            my={4}
             px={3}
             py={1}
             borderRadius={4}
@@ -212,6 +212,36 @@ class EditPaymentMethods extends React.Component {
             </Box>
           </Container>
         )}
+        {error && (
+          <MessageBox type="error" withIcon mb={4}>
+            {this.renderError(error)}
+          </MessageBox>
+        )}
+        <Flex className="paymentMethods" flexDirection="column" my={2}>
+          {paymentMethods.map(pm => (
+            <Container
+              className="paymentMethod"
+              key={pm.id}
+              mb={4}
+              p={3}
+              border="1px solid #dedede"
+              boxShadow="0px 3px 18px #eaeaea"
+              borderRadius={4}
+              style={{ filter: pm.id === removedId ? 'blur(1px)' : 'none' }}
+            >
+              <EditPaymentMethod
+                paymentMethod={pm}
+                subscriptions={pm.subscriptions}
+                hasMonthlyLimitPerMember={Collective.type === 'ORGANIZATION' && pm.type !== 'prepaid'}
+                currency={pm.currency || Collective.currency}
+                collectiveSlug={Collective.slug}
+                onSave={pm => this.updatePaymentMethod(pm)}
+                onRemove={pm => this.removePaymentMethod(pm)}
+                isSaving={pm.id === savingId}
+              />
+            </Container>
+          ))}
+        </Flex>
       </Flex>
     );
   }
@@ -235,7 +265,7 @@ const getPaymentMethods = graphql(gql`
         balance
         currency
         expiryDate
-        orders(hasActiveSubscription: true) {
+        subscriptions: orders(hasActiveSubscription: true) {
           id
         }
       }

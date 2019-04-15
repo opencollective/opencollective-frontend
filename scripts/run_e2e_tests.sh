@@ -1,9 +1,14 @@
 #!/bin/bash
 
 if [ "$NODE_ENV" = "circleci" ]; then
-  echo "> Starting api server"
   cd ~/api
-  PG_DATABASE=opencollective_dvl npm start &
+
+  echo "> Starting maildev server"
+  npm run maildev &
+  MAILDEV_PID=$!
+
+  echo "> Starting api server"
+  PG_DATABASE=opencollective_dvl MAILDEV=true npm start &
   API_PID=$!
   cd -
   echo "> Starting frontend server"
@@ -40,6 +45,8 @@ function wait_for_service() {
 }
 
 echo ""
+wait_for_service MAILDEV 127.0.0.1 1080
+echo ""
 wait_for_service API 127.0.0.1 3000
 echo ""
 wait_for_service Frontend 127.0.0.1 3060
@@ -56,6 +63,7 @@ echo ""
 
 if [ "$NODE_ENV" = "circleci" ]; then
   echo "Killing all node processes"
+  kill $MAILDEV_PID;
   kill $API_PID;
   kill $FRONTEND_PID;
   echo "Exiting with code $RETURN_CODE"

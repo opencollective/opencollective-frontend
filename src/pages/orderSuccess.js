@@ -102,10 +102,6 @@ const PublicMessagePopup = styled.div`
   }
 `;
 
-PublicMessagePopup.defaultProps = {
-  className: 'public-message-popup',
-};
-
 const SpeechCaret = styled(SpeechTriangle)`
   position: absolute;
   left: -26px;
@@ -404,7 +400,7 @@ class OrderSuccessPage extends React.Component {
               </Flex>
             </StyledCollectiveCard>
             {this.state.hasPublicMessagePopup && (
-              <PublicMessagePopup>
+              <PublicMessagePopup data-cy="public-message-popup">
                 <Flex justifyContent="flex-end">
                   <Times
                     size="1em"

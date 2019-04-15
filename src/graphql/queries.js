@@ -79,6 +79,7 @@ export const getLoggedInUserQuery = gql`
       firstName
       lastName
       email
+      emailWaitingForValidation
       paypalEmail
       image
       CollectiveId
@@ -188,6 +189,12 @@ export const getCollectiveToEditQueryFields = `
     description
     website
     twitterHandle
+    hostCollective {
+      id
+      slug
+      name
+      currency
+    }
     location {
       country
     }

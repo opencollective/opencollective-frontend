@@ -66,7 +66,9 @@ class EditCollectivePage extends React.Component {
     if ((data && data.loading) || loadingLoggedInUser) {
       return (
         <Page>
-          <Loading />
+          <Flex justifyContent="center" py={6}>
+            <Loading />
+          </Flex>
         </Page>
       );
     } else if (data && data.error) {

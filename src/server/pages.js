@@ -10,6 +10,7 @@ pages
   .add('signinLinkSent', '/signin/sent')
   .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
+  .add('confirmEmail', '/confirm/email/:token')
   .add('create-account', '/:form(create-account)', 'signin')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
@@ -121,7 +122,11 @@ pages
 // Marketing Pages
 // ---------------
 
-pages.add('marketing', '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|pricing)', 'marketingPage');
+pages.add(
+  'marketing',
+  '/:pageSlug(become-a-sponsor|how-it-works|gift-of-giving|gift-cards|pricing|become-a-fiscal-host)',
+  'marketingPage',
+);
 
 // Collective
 // ----------

@@ -12,6 +12,7 @@ import { ExclamationTriangle } from 'styled-icons/fa-solid/ExclamationTriangle';
 
 import { messageType } from '../constants/theme';
 import StyledCard from './StyledCard';
+import StyledSpinner from './StyledSpinner';
 
 const Message = styled(Box)`
   border: 1px solid;
@@ -38,11 +39,16 @@ const icons = {
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ withIcon, children, ...props }) => {
+const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
   const icon = withIcon && icons[props.type];
   return (
     <Message {...props}>
-      {icon && (
+      {isLoading && (
+        <Box mr={2} css={{ display: 'inline-block' }}>
+          <StyledSpinner size="1.5em" />
+        </Box>
+      )}
+      {icon && !isLoading && (
         <Box mr={2} css={{ display: 'inline-block' }}>
           {icon}
         </Box>
@@ -59,6 +65,8 @@ MessageBox.propTypes = {
   type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
   /** Weither icon should be hidden. Icons are only set for info, success, warning and error messages. */
   withIcon: PropTypes.bool,
+  /** If true, a `StyledSpinner` will be displayed instead of the normal icon */
+  isLoading: PropTypes.bool,
   /** Message */
   children: PropTypes.node,
   /** All props from `StyledCard` */

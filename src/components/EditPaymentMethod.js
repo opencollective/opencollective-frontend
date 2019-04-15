@@ -14,7 +14,11 @@ import StyledLink from './StyledLink';
 
 class EditPaymentMethod extends React.Component {
   static propTypes = {
-    paymentMethod: PropTypes.object.isRequired,
+    paymentMethod: PropTypes.shape({
+      service: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+    }).isRequired,
+    subscriptions: PropTypes.arrayOf(PropTypes.any).isRequired,
     onRemove: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
     collectiveSlug: PropTypes.string.isRequired,
@@ -78,13 +82,13 @@ class EditPaymentMethod extends React.Component {
   };
 
   render() {
-    const { intl, paymentMethod, currency, isSaving } = this.props;
-    const { service, type, orders } = paymentMethod;
-    const hasOrders = orders && orders.length > 0;
+    const { intl, paymentMethod, currency, isSaving, subscriptions } = this.props;
+    const { service, type } = paymentMethod;
+    const hasSubscriptions = subscriptions && subscriptions.length > 0;
     const isStripeCreditCard = service === 'stripe' && type === 'creditcard';
-    const canRemove = !hasOrders && isStripeCreditCard;
+    const canRemove = !hasSubscriptions && isStripeCreditCard;
     const saved = this.state.paymentMethod.monthlyLimitPerMember === paymentMethod.monthlyLimitPerMember;
-    const hasActions = !saved || canRemove || hasOrders;
+    const hasActions = !saved || canRemove || hasSubscriptions;
 
     return (
       <div className="EditPaymentMethod">
@@ -107,12 +111,12 @@ class EditPaymentMethod extends React.Component {
             </Box>
             <Box>
               <div className="name col">{paymentMethodLabelWithIcon(intl, paymentMethod)}</div>
-              {hasOrders && (
+              {hasSubscriptions && (
                 <div className="actions">
                   <FormattedMessage
                     id="paymentMethod.activeSubscriptions"
                     defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}"
-                    values={{ n: orders.length }}
+                    values={{ n: subscriptions.length }}
                   />
                 </div>
               )}
@@ -137,7 +141,7 @@ class EditPaymentMethod extends React.Component {
                   <FormattedMessage id="save" defaultMessage="save" />
                 </StyledButton>
               )}
-              {hasOrders && (
+              {hasSubscriptions && (
                 <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }} passHref>
                   <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}

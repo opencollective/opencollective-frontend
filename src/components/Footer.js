@@ -1,18 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { MediumM } from 'styled-icons/fa-brands/MediumM';
 import { Slack } from 'styled-icons/fa-brands/Slack';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Mail } from 'styled-icons/material/Mail';
+import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle';
 
 import { Link } from '../server/pages';
 
-import { P } from './Text';
+import { P, Span } from './Text';
 import Container from './Container';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
+import StyledTooltip from './StyledTooltip';
+import ExternalLinkNewTab from './ExternalLinkNewTab';
 
 const SocialLink = styled.a`
   align-items: center;
@@ -71,6 +75,21 @@ const navigation = {
   },
 };
 
+const languages = {
+  en: { name: 'English' },
+  fr: { name: 'French', nativeName: 'Français', completion: '66%' },
+  ja: { name: 'Japanese', nativeName: '日本語', completion: '37%' },
+  es: { name: 'Spanish', nativeName: 'Español', completion: '23%' },
+  ru: { name: 'Russian', nativeName: 'Русский', completion: '10%' },
+};
+
+const switchLanguage = (e, key) => {
+  e.preventDefault();
+  document.cookie = `language=${key};path=/`;
+  window.location.reload();
+  window.scrollTo(0, 0);
+};
+
 class Footer extends React.Component {
   render() {
     return (
@@ -91,22 +110,42 @@ class Footer extends React.Component {
               An organization for your community, transparent by design.
             </P>
             <Container color="#6E747A" textAlign={['center', null, 'left']}>
-              <P fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={2} pt={2}>
-                LANGUAGES
+              <P as="div" fontSize="1.2rem" color="#C2C6CC" letterSpacing="1px" pb={2} pt={2}>
+                <Span mr={1} style={{ verticalAlign: 'middle' }}>
+                  LANGUAGES
+                </Span>
+                <StyledTooltip
+                  content={
+                    <FormattedMessage
+                      id="Footer.Languages.JoinEffort"
+                      defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
+                      values={{
+                        crowdinLink: (
+                          <ExternalLinkNewTab href="https://crowdin.com/project/opencollective">
+                            Crowdin
+                          </ExternalLinkNewTab>
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <InfoCircle size={16} cursor="pointer" />
+                </StyledTooltip>
               </P>
-              <P>
-                <a href="?language=en&set=1">English</a>
-                <br />
-                <a href="?language=fr&set=1" title="French">
-                  Français
-                </a>{' '}
-                (59%)
-                <br />
-                <a href="?language=es&set=1" title="Espanol">
-                  Espanol
-                </a>{' '}
-                (14%)
-              </P>
+              <div>
+                {Object.keys(languages).map(key => (
+                  <div key={key}>
+                    <a
+                      title={languages[key].name}
+                      href={`/?language=${key}&set=1`}
+                      onClick={e => switchLanguage(e, key)}
+                    >
+                      {languages[key].nativeName || languages[key].name}
+                    </a>{' '}
+                    {languages[key].completion && <span>({`${languages[key].completion}`})</span>}
+                  </div>
+                ))}
+              </div>
             </Container>
           </Container>
           <Container

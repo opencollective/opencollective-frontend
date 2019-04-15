@@ -353,6 +353,7 @@ class CreateOrderPage extends React.Component {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
       this.setState({ submitting: false, submitted: true, error: null });
+      this.props.refetchLoggedInUser();
       if (this.props.redirect && isURL(this.props.redirect)) {
         const transactionId = get(orderCreated, 'transactions[0].id', null);
         const status = orderCreated.status;
@@ -758,6 +759,7 @@ class CreateOrderPage extends React.Component {
               manual={this.getManualPaymentMethod()}
               hideCreditCardPostalCode={this.shouldHideCreditCardPostalCode()}
               margins="0 auto"
+              disabled={this.state.submitting || this.state.submitted}
             />
           </Flex>
           {this.isFixedPriceTier() ? this.renderTierDetails(tier) : <Box width={[0, null, null, 1 / 5]} />}

@@ -16,9 +16,8 @@ import pricingPageHtml from '../static/pricing-page/index.html';
 import howItWorksPageHtml from '../static/how-it-works-page/index.html';
 import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
 import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
-import holidayGiftCardConfirmationHtml from '../static/holiday-gift-card/confirmation.html';
 import giftCardPageHtml from '../static/gift-cards-page/index.html';
-import giftCardPageConfirmationHtml from '../static/gift-cards-page/confirmation.html';
+import becomeAFiscalHostHtml from '../static/become-a-fiscal-host-page/index.html';
 
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
@@ -29,6 +28,7 @@ import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outp
 import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
 import giftCardPageStyle from '!css-loader!../static/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
+import becomeAFiscalHostStyle from '!css-loader!../static/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
 
 class MarketingPage extends React.Component {
   static async getInitialProps({ req, query: { pageSlug } }) {
@@ -74,7 +74,7 @@ class MarketingPage extends React.Component {
   }
 
   render() {
-    const { pageSlug, confirmationPage, intl } = this.props;
+    const { pageSlug, intl } = this.props;
     const { LoggedInUser } = this.state;
 
     let html, style, className;
@@ -96,13 +96,17 @@ class MarketingPage extends React.Component {
       style = howItWorksPageStyle;
       className = 'mkt-page-how-it-works';
     } else if (pageSlug === 'gift-of-giving') {
-      html = confirmationPage ? holidayGiftCardConfirmationHtml : holidayGiftCardPageHtml;
+      html = holidayGiftCardPageHtml;
       style = holidayGiftCardPageStyle;
       className = null;
     } else if (pageSlug === 'gift-cards') {
-      html = confirmationPage ? giftCardPageConfirmationHtml : giftCardPageHtml;
+      html = giftCardPageHtml;
       style = giftCardPageStyle;
       className = null;
+    } else if (pageSlug === 'become-a-fiscal-host') {
+      html = becomeAFiscalHostHtml;
+      style = becomeAFiscalHostStyle;
+      className = 'mkt-page-become-a-fiscal-host';
     }
 
     return (

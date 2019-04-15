@@ -96,33 +96,34 @@ class ErrorPage extends React.Component {
 
   getGithubIssueURL(stackTrace) {
     const navigatorInfo = typeof navigator === 'undefined' ? {} : navigator;
+    const pageUrl = typeof window === 'undefined' ? '___________' : window.location;
 
     const title = 'Unexpected error when ___________';
     const body = `
 # Describe the bug
-*A clear and concise description of what the bug is.*
+
+<!-- A clear and concise description of what the bug is. -->
+<!-- If applicable, add screenshots to help explain your problem. -->
+
+I got an unexpected error on ${pageUrl} while I was trying to __________
 
 # To Reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
 
-# Screenshots
-*If applicable, add screenshots to help explain your problem.*
+<!-- Steps to reproduce the behavior -->
+
+1. Go to ________
+2. Click on ________
+3. Scroll down to ________
+4. See error
 
 # Device
 - OS: ${navigatorInfo.platform}
 - Browser: \`${navigatorInfo.appVersion}\`
 
-# Context
+# Technical details
 
-:warning: PLEASE REMOVE ANY PERSONAL INFORMATION BELOW :warning:
+<!-- PLEASE REMOVE ANY PERSONAL INFORMATION FROM THE LOGS BELOW -->
 
-**URL**: ${typeof window === 'undefined' ? 'Unknown' : window.location}
-
-**Stacktrace**:
 \`\`\`
 ${truncate(stackTrace, { length: 6000 })}
 \`\`\`
