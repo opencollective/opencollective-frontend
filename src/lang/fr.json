@@ -331,7 +331,6 @@
   "editCollective.menu.tiers": "Tiers",
   "editCollective.menu.virtualCards": "Cartes Cadeaux",
   "editCollective.notFound": "No collective data to edit",
-  "EditUserEmailForm.change": "Change email",
   "EditUserEmailForm.reSend": "Re-send confirmation",
   "EditUserEmailForm.submit": "Confirm new email",
   "EditUserEmailForm.success": "An email with a confirmation link has been sent to {email}.",
