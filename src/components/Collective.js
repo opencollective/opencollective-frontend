@@ -12,6 +12,8 @@ import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
 import NotificationBar from './NotificationBar';
 import MembersWithData from './MembersWithData';
+import Link from './Link';
+import TierCard from './TierCard';
 import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
 import TeamSection from './TeamSection';
@@ -152,8 +154,7 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
-    const cta =
-      collective.isActive && collective.host ? { href: `/${collective.slug}/tiers`, label: 'contribute' } : null;
+    const cta = collective.isActive && collective.host ? { href: '#contribute', label: 'contribute' } : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
@@ -260,6 +261,28 @@ class Collective extends React.Component {
 
                     <TeamSection collective={collective} LoggedInUser={LoggedInUser} limit={10} />
                   </div>
+                  {collective.isActive && collective.host && (
+                    <div className="sidebar tiers" id="contribute">
+                      {collective.tiers.map(tier => (
+                        <TierCard
+                          key={`TierCard-${tier.slug}`}
+                          collective={collective}
+                          tier={tier}
+                          referral={query.referral}
+                        />
+                      ))}
+                      <div className="CustomDonationTierCard">
+                        <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
+                          <a>
+                            <FormattedMessage
+                              id="collective.tiers.donate"
+                              defaultMessage="Or make a one time donation"
+                            />
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
