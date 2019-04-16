@@ -24,6 +24,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Link from '../components/Link';
 import ContributeAs from '../components/ContributeAs';
+import ContributeAsFAQ from '../components/faqs/ContributeAsFAQ';
 import StyledInputField from '../components/StyledInputField';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
@@ -663,26 +664,29 @@ class CreateOrderPage extends React.Component {
 
     if (step.name === 'contributeAs') {
       return (
-        <StyledInputField
-          htmlFor="contributeAs"
-          label={
-            <H5 textAlign="left" mb={3}>
-              <FormattedMessage id="contribute.profile.label" defaultMessage="Contribute As:" />
-            </H5>
-          }
-        >
-          {fieldProps => (
-            <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
-              <ContributeAs
-                {...fieldProps}
-                onProfileChange={this.updateProfile}
-                profiles={profiles}
-                personal={personal}
-                defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
-              />
-            </Container>
-          )}
-        </StyledInputField>
+        <Flex justifyContent="center" width={1}>
+          <StyledInputField
+            htmlFor="contributeAs"
+            label={
+              <H5 textAlign="left" mb={3}>
+                <FormattedMessage id="contribute.profile.label" defaultMessage="Contribute As:" />
+              </H5>
+            }
+          >
+            {fieldProps => (
+              <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
+                <ContributeAs
+                  {...fieldProps}
+                  onProfileChange={this.updateProfile}
+                  profiles={profiles}
+                  personal={personal}
+                  defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
+                />
+              </Container>
+            )}
+          </StyledInputField>
+          <ContributeAsFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+        </Flex>
       );
     } else if (step.name === 'details') {
       return (
