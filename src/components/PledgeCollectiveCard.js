@@ -78,7 +78,7 @@ class PledgeCollectiveCard extends React.Component {
           <FormattedMessage id="Pledgecollective.card" defaultMessage="PLEDGED COLLECTIVES" />
         </P>
         <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
-          <StyledLink href={website} color="primary.500" fontSize="Caption">
+          <StyledLink color="primary.500" fontSize="Caption">
             <ExternalLinkAlt size="1em" /> {website}
           </StyledLink>
         </Link>
@@ -93,7 +93,7 @@ class PledgeCollectiveCard extends React.Component {
           </StyledLink>
         </Link>
         <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
-          {collective.isActive && get(collective, 'stats.backers.all') > 0 && (
+          {collective.isPledged && get(collective, 'stats.backers.all') > 0 && (
             <Flex width={0.5} alignItems="center" flexDirection="column" key="backers">
               <P fontSize="1.2rem" fontWeight="bold">
                 {collective.stats.backers.all}

@@ -15,6 +15,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
+import StyledSelect from '../components/StyledSelect';
 
 import Container from '../components/Container';
 import Page from '../components/Page';
@@ -33,12 +34,6 @@ const NavList = styled(Flex)`
   text-align: right;
 `;
 
-const SelectWrapper = styled.select`
-  background: white;
-  padding: 5px;
-  border: 1px solid silver;
-`;
-
 const SearchFormContainer = styled(Box)`
   max-width: 100%;
   width: 100rem;
@@ -50,6 +45,25 @@ const SearchInput = styled(Box)`
   font-size: 1.2rem;
   letter-spacing: 0.1rem;
 `;
+
+const getPledgedCards = gql`
+  query allCollective {
+    allCollectives(isPledged: true, isActive: false) {
+      collectives {
+        id
+        description
+        slug
+        pledges: orders(status: PENDING) {
+          id
+          totalAmount
+          currency
+        }
+      }
+    }
+  }
+`;
+
+const pledgedCardData = graphql(getPledgedCards);
 
 const _transformData = collective => ({
   ...collective,
@@ -94,7 +108,7 @@ function useCollectives(query) {
 
 const DiscoverPage = ({ router }) => {
   const { query } = router;
-  const { collectives, offset, total, show, tags = [] } = useCollectives(query);
+  const { collectives, offset, total, show, tags, collective = [] } = useCollectives(query);
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
 
@@ -112,27 +126,6 @@ const DiscoverPage = ({ router }) => {
   // query: { ...router.query, offset: 0, show: value },
   // });
   // };
-
-  const getPledgedCards = gql`
-    query allCollective {
-      allCollectives(isPledged: true, isActive: false) {
-        collectives {
-          id
-          description
-          slug
-          pledges: orders(status: PENDING) {
-            id
-            totalAmount
-            currency
-          }
-        }
-      }
-    }
-  `;
-
-  const pledgedCardData = graphql(getPledgedCards);
-
-  console.log('pledge card data', pledgedCardData);
 
   return (
     <Page title="Discover">
@@ -206,13 +199,13 @@ const DiscoverPage = ({ router }) => {
               </NavList>
               <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
                 <Box as="li" px={3}>
-                  <SelectWrapper name="show" id="show" value={show} onChange={onChange}>
+                  <StyledSelect name="show" id="show" value={show} onChange={onChange}>
                     {tagOptions.map(tag => (
                       <option key={tag} value={tag}>
                         {tag}
                       </option>
                     ))}
-                  </SelectWrapper>
+                  </StyledSelect>
                 </Box>
               </NavList>
             </Flex>
@@ -223,7 +216,7 @@ const DiscoverPage = ({ router }) => {
                   {collectives.map(c => {
                     return (
                       <Flex key={c.id} width={[1, 1 / 2, 1 / 4]} mb={3} justifyContent="center">
-                        {collective.isPledge ? (
+                        {collective.isPledged ? (
                           <PledgedCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                         ) : (
                           <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
@@ -255,4 +248,4 @@ DiscoverPage.propTypes = {
   router: PropTypes.object,
 };
 
-export default withIntl(withRouter(DiscoverPage));
+export default withIntl(pledgedCardData(withRouter(DiscoverPage)));
