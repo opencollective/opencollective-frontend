@@ -1,9 +1,12 @@
+import config from 'config';
+
 import * as auth from '../lib/auth';
 import userLib from '../lib/userlib';
 import constants from '../constants/activities';
 import emailLib from '../lib/email';
 import models from '../models';
 import errors from '../lib/errors';
+import logger from '../lib/logger';
 import { isValidEmail } from '../lib/utils';
 
 const { User, Activity } = models;
@@ -138,6 +141,9 @@ export const signin = (req, res, next) => {
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       loginLink = u.generateLoginLink(redirect || '/', websiteUrl);
+      if (config.env === 'development') {
+        logger.info(`Login Link: ${loginLink}`);
+      }
       return emailLib.send('user.new.token', u.email, { loginLink }, { sendEvenIfNotProduction: true });
     })
     .then(() => {
