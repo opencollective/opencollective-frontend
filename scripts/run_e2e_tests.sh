@@ -21,12 +21,14 @@ if [ "$NODE_ENV" = "circleci" ]; then
     npm start &
     FRONTEND_PID=$!
   fi
-  # Record video and upload them if test fail on CI
-  CYPRESS_CONFIG="video=true,videoUploadOnPasses=true"
+  # Record videos on CI
   CYPRESS_RECORD="--record"
-else
-  # Never record video in dev
-  CYPRESS_CONFIG="video=false"
+fi
+
+
+# Set `$CYPRESS_VIDEO` to `true` in ENV to activate videos recording.
+# See https://docs.cypress.io/guides/references/configuration.html#Videos
+if [ "$CYPRESS_VIDEO" = "false" ]; then
   CYPRESS_RECORD=""
 fi
 
@@ -53,7 +55,7 @@ wait_for_service Frontend 127.0.0.1 3060
 
 echo ""
 echo "> Running cypress tests"
-npx cypress run ${CYPRESS_RECORD} --config ${CYPRESS_CONFIG}
+npx cypress run ${CYPRESS_RECORD}
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"
