@@ -167,7 +167,8 @@ export default function(Sequelize, DataTypes) {
         amountStr() {
           let str;
           if (this.presets) {
-            str = `${formatCurrency(this.presets[0], this.currency)}+`;
+            const minimumAmount = Math.min(this.presets[0], this.amount);
+            str = `${formatCurrency(minimumAmount, this.currency)}+`;
           } else {
             str = formatCurrency(this.amount, this.currency);
           }
