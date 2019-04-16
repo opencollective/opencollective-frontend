@@ -1,9 +1,11 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import sinon from 'sinon';
 import * as libcurrency from '../server/lib/currency';
+import paypalMock from './mocks/paypal';
+import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
 
 let host, admin, user, collective, paypalPaymentMethod;
 
@@ -318,6 +320,22 @@ describe('graphql.paymentMethods.test.js', () => {
   });
 
   describe('get the balance', () => {
+    let preapprovalDetailsStub = null;
+
+    before(() => {
+      preapprovalDetailsStub = sinon.stub(paypalAdaptive, 'preapprovalDetails').callsFake(() => {
+        return Promise.resolve({
+          ...paypalMock.adaptive.preapprovalDetails.created,
+          curPaymentsAmount: '12.50',
+          maxTotalAmountOfAllPayments: '2000.00',
+        });
+      });
+    });
+
+    after(() => {
+      preapprovalDetailsStub.restore();
+    });
+
     it('returns the balance', async () => {
       const query = `
       query Collective($slug: String) {
@@ -335,8 +353,15 @@ describe('graphql.paymentMethods.test.js', () => {
       `;
       const result = await utils.graphqlQuery(query, { slug: host.slug }, admin);
       result.errors && console.error(result.errors[0]);
+
+      // Ensure PayPal API is called
       expect(result.errors).to.not.exist;
+      expect(preapprovalDetailsStub.callCount).to.equal(1);
+      expect(preapprovalDetailsStub.firstCall.args).to.eql([paypalPaymentMethod.token]);
+
+      // Ensure balance is returned
       const paymentMethod = result.data.Collective.paymentMethods.find(pm => pm.service === 'paypal');
+      expect(preapprovalDetailsStub.callCount).to.equal(1);
       expect(paymentMethod.balance).to.equal(198750); // $2000 - $12.50
     });
   });
