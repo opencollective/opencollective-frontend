@@ -255,7 +255,7 @@
   "ContributePayment.balanceAndExpiry": "{balance} restant, expire le {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} restants",
   "ContributePayment.expiresOn": "Expire le {expiryDate}",
-  "contributeSuccess.discover": "Discover other related collectives to support:",
+  "contributeSuccess.discover": "Découvrez d'autres collectifs similaires à soutenir :",
   "contribution": "{n, plural, one {contribution} other {contributions}}",
   "contribution.amount.currency.label": "Montant ({currency})",
   "contribution.amount.other.label": "Autre",
