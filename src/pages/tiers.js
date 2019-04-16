@@ -48,11 +48,7 @@ class TiersPage extends React.Component {
 
     return (
       <div>
-        <Header
-          title={'Tiers'}
-          description="All the collectives that you are giving money to"
-          LoggedInUser={LoggedInUser}
-        />
+        <Header title={'Tiers'} description="Collective tiers" LoggedInUser={LoggedInUser} />
         <Body>
           {data.loading ? (
             <Loading />
@@ -73,7 +69,7 @@ class TiersPage extends React.Component {
                   </H3>
                 </Link>
                 <P lineHeight={4} fontSize="1.6rem" color="black.500">
-                  Support this collective
+                  <FormattedMessage id="tiers.support.message" defaultMessage="Support this collective" />
                 </P>
               </Container>
               <Container>
