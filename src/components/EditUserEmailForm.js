@@ -3,19 +3,24 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 import { Box, Flex } from '@rebass/grid';
+import { isNil } from 'lodash';
+
+import { addUpdateUserEmailMutation } from '../graphql/mutations';
+import { withUser } from './UserProvider';
 import { H2, Span } from './Text';
 import StyledInput from './StyledInput';
 import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
-import { addUpdateUserEmailMutation } from '../graphql/mutations';
 
-const EditUserEmailForm = ({ user, updateUserEmail }) => {
-  const [step, setStep] = useState(user.emailWaitingForValidation ? 'success' : 'initial');
-  const [newEmail, setNewEmail] = useState(user.emailWaitingForValidation);
+const EditUserEmailForm = ({ LoggedInUser, updateUserEmail, refetchLoggedInUser }) => {
+  const [step, setStep] = useState(LoggedInUser.emailWaitingForValidation ? 'success' : 'initial');
+  const [newEmail, setNewEmail] = useState(LoggedInUser.emailWaitingForValidation);
   const [error, setError] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
+  const [isResendingConrimation, setResendingConrimation] = useState(false);
   const isValid = newEmail && isEmail(newEmail);
   const isDone = step === 'already-sent' || step === 'success';
+  const isTouched = LoggedInUser.emailWaitingForValidation !== newEmail;
 
   return (
     <Box mb={4} data-cy="EditUserEmailForm">
@@ -26,11 +31,11 @@ const EditUserEmailForm = ({ user, updateUserEmail }) => {
         <StyledInput
           name="email"
           type="email"
-          disabled={step !== 'form'}
-          value={newEmail !== null ? newEmail : user.email}
+          value={isNil(newEmail) ? LoggedInUser.email : newEmail}
           mr={3}
           my={2}
           onChange={e => {
+            setStep('form');
             setError(false);
             setNewEmail(e.target.value);
           }}
@@ -39,45 +44,42 @@ const EditUserEmailForm = ({ user, updateUserEmail }) => {
           }
         />
         <Flex my={2}>
-          {step === 'form' ? (
+          <StyledButton
+            minWidth={180}
+            disabled={!isTouched || !newEmail || !isValid || isDone}
+            loading={isSubmitting}
+            mr={2}
+            onClick={async () => {
+              setSubmitting(true);
+              try {
+                const { data } = await updateUserEmail(newEmail);
+                setStep(newEmail === LoggedInUser.email ? 'initial' : 'success');
+                setNewEmail(data.updateUserEmail.emailWaitingForValidation || LoggedInUser.email);
+                setError(null);
+                refetchLoggedInUser();
+              } catch (e) {
+                setError(e.message.replace('GraphQL error: ', ''));
+              }
+              setSubmitting(false);
+            }}
+          >
+            <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
+          </StyledButton>
+
+          {isDone && (
             <StyledButton
-              disabled={!newEmail || !isValid || isDone}
-              loading={isSubmitting}
-              mr={2}
+              minWidth={180}
+              disabled={step === 'already-sent'}
+              loading={isResendingConrimation}
               onClick={async () => {
-                setSubmitting(true);
-                try {
-                  const { data } = await updateUserEmail(newEmail);
-                  setStep(newEmail === user.email ? 'initial' : 'success');
-                  setNewEmail(data.updateUserEmail.emailWaitingForValidation || user.email);
-                  setError(null);
-                } catch (e) {
-                  setError(e.message.replace('GraphQL error: ', ''));
-                }
-                setSubmitting(false);
+                setResendingConrimation(true);
+                await updateUserEmail(newEmail);
+                setResendingConrimation(false);
+                setStep('already-sent');
               }}
             >
-              <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
+              <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
             </StyledButton>
-          ) : (
-            <React.Fragment>
-              <StyledButton flex="1 1 175" mr={2} minWidth={175} onClick={() => setStep('form')}>
-                <FormattedMessage id="EditUserEmailForm.change" defaultMessage="Change email" />
-              </StyledButton>
-              {isDone && (
-                <StyledButton
-                  disabled={step === 'already-sent'}
-                  onClick={async () => {
-                    setSubmitting(true);
-                    await updateUserEmail(newEmail);
-                    setSubmitting(false);
-                    setStep('already-sent');
-                  }}
-                >
-                  <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
-                </StyledButton>
-              )}
-            </React.Fragment>
           )}
         </Flex>
       </Flex>
@@ -102,14 +104,15 @@ const EditUserEmailForm = ({ user, updateUserEmail }) => {
 };
 
 EditUserEmailForm.propTypes = {
-  /** The user to update the email for (normally, LoggedInUser) */
-  user: PropTypes.shape({
+  // From withData: A function to call to update user
+  updateUserEmail: PropTypes.func.isRequired,
+
+  // from withUser
+  refetchLoggedInUser: PropTypes.func.isRequired,
+  LoggedInUser: PropTypes.shape({
     email: PropTypes.string.isRequired,
     emailWaitingForValidation: PropTypes.string,
   }).isRequired,
-
-  /** A function to call to update user */
-  updateUserEmail: PropTypes.func.isRequired,
 };
 
-export default addUpdateUserEmailMutation(EditUserEmailForm);
+export default addUpdateUserEmailMutation(withUser(EditUserEmailForm));

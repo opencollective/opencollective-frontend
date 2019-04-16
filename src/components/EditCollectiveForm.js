@@ -658,7 +658,7 @@ class EditCollectiveForm extends React.Component {
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
             {this.state.section === 'advanced' && (
               <Box>
-                {collective.type === 'USER' && <EditUserEmailForm user={LoggedInUser} />}
+                {collective.type === 'USER' && <EditUserEmailForm />}
                 {emptyBalanceIsEnabled && collective.type === 'COLLECTIVE' && (
                   <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
                 )}
