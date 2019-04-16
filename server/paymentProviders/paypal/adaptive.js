@@ -1,10 +1,7 @@
-import models from '../../models';
 import paypalAdaptive from './adaptiveGateway';
 import config from 'config';
 import uuidv1 from 'uuid/v1';
-import { formatCurrency } from '../../lib/utils';
-import debugLib from 'debug';
-const debug = debugLib('paypal');
+import logger from '../../lib/logger';
 
 /**
  * PayPal paymentProvider
@@ -64,43 +61,15 @@ export default {
   },
 
   // Returns the balance in the currency of the paymentMethod
-  getBalance: paymentMethod => {
-    // TODO: fix using call to paypal to get real balance
-    let totalSpent = 0,
-      totalTransactions = 0,
-      firstTransactionAt,
-      lastTransactionAt;
-    return models.Transaction.findAll({
-      attributes: [
-        'amountInHostCurrency',
-        'paymentProcessorFeeInHostCurrency',
-        'platformFeeInHostCurrency',
-        'hostFeeInHostCurrency',
-      ],
-      where: {
-        type: 'DEBIT',
-        PaymentMethodId: paymentMethod.id,
-      },
-    })
-      .map(t => {
-        totalTransactions++;
-        if (!firstTransactionAt) {
-          firstTransactionAt = t.createdAt;
-        }
-        lastTransactionAt = t.createdAt;
-        totalSpent += t.netAmountInHostCurrency;
-      })
-      .then(() => {
-        debug(
-          `Total spent: ${formatCurrency(
-            totalSpent,
-            paymentMethod.currency,
-          )} across ${totalTransactions} transactions between ${firstTransactionAt} and ${lastTransactionAt}`,
-        );
-        const paypalPreApprovalLimit = 200000;
-        const initialBalance = paymentMethod.data.balance || paypalPreApprovalLimit;
-        // total spent has a negative value (in cents)
-        return { amount: initialBalance + totalSpent, currency: paymentMethod.currency };
-      });
+  getBalance: async paymentMethod => {
+    try {
+      const resp = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
+      const initialBalance = parseFloat(resp.maxTotalAmountOfAllPayments);
+      const totalSpent = parseFloat(resp.curPaymentsAmount);
+      return { amount: (initialBalance - totalSpent) * 100, currency: paymentMethod.currency };
+    } catch (e) {
+      logger.error('getBalance for PayPal pre-approval failed', e);
+      return { balance: 0, currency: paymentMethod.currency };
+    }
   },
 };
