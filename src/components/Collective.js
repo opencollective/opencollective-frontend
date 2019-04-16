@@ -154,7 +154,8 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
-    const cta = collective.isActive && collective.host ? { href: '#contribute', label: 'contribute' } : null;
+    const cta =
+      collective.isActive && collective.host ? { href: `/${collective.slug}/tiers`, label: 'contribute' } : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
