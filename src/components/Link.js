@@ -53,11 +53,28 @@ class Link extends React.Component {
       );
     } else {
       return (
-        <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
-          <a className={className} title={title}>
-            {children}
-          </a>
-        </router.Link>
+        <React.Fragment>
+          <style jsx>
+            {`
+              .contributeLink-btn {
+                --webkit-appearance: none;
+                font-size: 1.4rem;
+                font-weight: 500;
+                height: 3.6rem;
+                border: 2px solid #ffffff;
+                border-radius: 500px;
+                color: #ffffff;
+                background-color: #3385ff;
+                padding: 7px 28px;
+              }
+            `}
+          </style>
+          <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
+            <a className={className} title={title}>
+              {children}
+            </a>
+          </router.Link>
+        </React.Fragment>
       );
     }
   }

@@ -14,7 +14,6 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
 import Link from './Link';
-import Button from './Button';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
@@ -120,9 +119,9 @@ ${description}`;
       if (this.props.cta.href) {
         const label = this.props.cta.label;
         cta = (
-          <Button className="blue" href={this.props.cta.href}>
+          <Link className="contributeLink-btn" href={this.props.cta.href}>
             {this.messages[label] ? intl.formatMessage(this.messages[label]) : label}
-          </Button>
+          </Link>
         );
       } else {
         cta = this.props.cta;
@@ -323,6 +322,9 @@ ${description}`;
               -moz-filter: grayscale(100%);
               -ms-filter: grayscale(100%);
               filter: grayscale(100%);
+            }
+            .cta {
+              margin-top: 20px;
             }
           `}
         </style>
