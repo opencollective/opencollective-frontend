@@ -332,7 +332,6 @@
   "editCollective.menu.tiers": "Tier",
   "editCollective.menu.virtualCards": "ギフトカード",
   "editCollective.notFound": "編集するコレクティブのデータがありません",
-  "EditUserEmailForm.change": "Change email",
   "EditUserEmailForm.reSend": "Re-send confirmation",
   "EditUserEmailForm.submit": "Confirm new email",
   "EditUserEmailForm.success": "An email with a confirmation link has been sent to {email}.",
