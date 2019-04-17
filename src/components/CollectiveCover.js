@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import styled from 'styled-components';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
@@ -18,6 +19,26 @@ import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
 import UserCompany from './UserCompany';
+
+const ContributeLink = styled(Link)`
+  --webkit-appearance: none;
+  font-size: 1.4rem;
+  font-weight: 500;
+  height: 3.6rem;
+  border: 2px solid #ffffff;
+  border-radius: 500px;
+  color: #ffffff;
+  background-color: #3385ff;
+  padding: 7px 28px;
+  :hover {
+    border: 2px solid #2e8ae6;
+    color: #ffffff;
+  }
+  :active {
+    background-color: #297acc;
+    border-color: #297acc;
+  }
+`;
 
 class CollectiveCover extends React.Component {
   static propTypes = {
@@ -119,9 +140,9 @@ ${description}`;
       if (this.props.cta.href) {
         const label = this.props.cta.label;
         cta = (
-          <Link className="contributeLink-btn" href={this.props.cta.href}>
+          <ContributeLink href={this.props.cta.href}>
             {this.messages[label] ? intl.formatMessage(this.messages[label]) : label}
-          </Link>
+          </ContributeLink>
         );
       } else {
         cta = this.props.cta;
