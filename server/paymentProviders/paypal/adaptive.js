@@ -69,7 +69,7 @@ export default {
       return { amount: (initialBalance - totalSpent) * 100, currency: paymentMethod.currency };
     } catch (e) {
       logger.error('getBalance for PayPal pre-approval failed', e);
-      return { balance: 0, currency: paymentMethod.currency };
+      return { amount: 0, currency: paymentMethod.currency };
     }
   },
 };
