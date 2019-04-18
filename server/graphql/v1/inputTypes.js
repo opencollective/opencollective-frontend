@@ -161,7 +161,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     settings: { type: GraphQLJSON },
     data: { type: GraphQLJSON },
     members: { type: new GraphQLList(MemberInputType) },
-    notification: { type: new GraphQLList(NotificationInputType) },
+    notifications: { type: new GraphQLList(NotificationInputType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
     HostCollectiveId: { type: GraphQLInt },
     hostFeePercent: { type: GraphQLInt },
