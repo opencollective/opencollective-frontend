@@ -12,7 +12,7 @@ import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
 import * as ics from 'ics';
-import { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
+import { get, difference, uniqBy, pick, omit, defaults, includes, values, isNull } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 
@@ -1603,7 +1603,8 @@ export default function(Sequelize, DataTypes) {
       })
       .then(() => {
         return Promise.map(notifications, notification => {
-          if (!(notification.type in activities && notification.channel in channels)) return;
+          if (!(values(activities).includes(notification.type) && values(channels).includes(notification.channel)))
+            return;
 
           if (notification.id) {
             const editableAttributes = pick(notification, ['type', 'active', 'webhookUrl']);
