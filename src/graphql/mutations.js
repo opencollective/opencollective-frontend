@@ -380,7 +380,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
               channel: 'webhook',
               type: activity,
               active: true,
-              webhookUrl: notification.url,
+              webhookUrl: notification.webhookUrl,
             });
           }
         }

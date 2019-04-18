@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { withRouter } from 'next/router';
 import { ArrowBack } from 'styled-icons/material/ArrowBack';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -74,13 +74,23 @@ class EditCollectiveForm extends React.Component {
     const collective = { ...(props.collective || {}) };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
 
+    const webhooks = {};
+    collective.notifications &&
+      collective.notifications.forEach(x => {
+        if (!(x.webhookUrl in webhooks)) {
+          webhooks[x.webhookUrl] = pick(x, ['webhookUrl']);
+          webhooks[x.webhookUrl].activities = [];
+        }
+        webhooks[x.webhookUrl].activities.push(x.type);
+      });
+
     this.state = {
       modified: false,
       section: 'info',
       collective,
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
-      webhooks: collective.notifications || [{}],
+      webhooks: Object.values(webhooks) || [{}],
       goals: collective.settings.goals || [{}],
     };
 

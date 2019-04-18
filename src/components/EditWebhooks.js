@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages } from 'react-intl';
-import { get } from 'lodash';
+import { get, keys } from 'lodash';
 
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
@@ -44,7 +44,7 @@ class EditWebhooks extends React.Component {
 
     this.fields = [
       {
-        name: 'url',
+        name: 'webhookUrl',
         maxLength: 255,
         type: 'url',
         label: intl.formatMessage(this.messages['webhooks.url.label']),
