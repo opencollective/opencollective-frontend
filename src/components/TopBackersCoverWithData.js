@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Error from './Error';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import Avatar from './Avatar';
+import { Avatar } from './Avatar';
 import Logo from './Logo';
 import Link from './Link';
 import { formatCurrency } from '../lib/utils';
@@ -79,7 +79,7 @@ class TopBackersCoverWithData extends React.Component {
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
         <Link route="collective" params={{ slug: user.slug }} title={this.renderMemberTitle(member)} passHref>
           <Avatar
-            src={user.image}
+            src={user.imageUrl}
             name={user.name}
             type={user.type}
             radius={48}
@@ -210,6 +210,7 @@ const getTopBackersQuery = gql`
         description
         slug
         image
+        imageUrl
       }
     }
   }

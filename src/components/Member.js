@@ -8,7 +8,7 @@ import colors from '../constants/colors';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
 import Link from './Link';
 import CollectiveCard from './CollectiveCard';
-import Avatar from './Avatar';
+import { Avatar } from './Avatar';
 
 class Member extends React.Component {
   static propTypes = {
@@ -133,7 +133,7 @@ ${totalDonationsStr}`;
           {viewMode === 'USER' && (
             <Link route={'collective'} params={{ slug: this.props.member.member.slug }} target="_top" title={title}>
               <Flex mt={2}>
-                <Avatar src={member.image} radius={45} name={name} type={member.type} className="noFrame" />
+                <Avatar src={member.imageUrl} radius={45} name={name} type={member.type} className="noFrame" />
                 <div className="bubble">
                   <div className="name">{name}</div>
                   <div className="description" style={{ color: colors.darkgray }}>

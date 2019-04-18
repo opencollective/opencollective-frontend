@@ -32,7 +32,7 @@ export const StyledAvatar = styled(Flex)`
     `}
 `;
 
-const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
+export const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
   // Avoid setting null/undefined background images
   const backgroundImage = src ? `url(${src})` : undefined;
   return (
@@ -55,4 +55,6 @@ Avatar.propTypes = {
   animationDuration: PropTypes.number,
 };
 
-export default withFallbackImage(Avatar);
+export const AvatarWithFallbackImage = withFallbackImage(Avatar);
+
+export default AvatarWithFallbackImage;

@@ -235,6 +235,7 @@ const getMembersQuery = gql`
         description
         slug
         image
+        imageUrl
         backgroundImage
         website
       }
