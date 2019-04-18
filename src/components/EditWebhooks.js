@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages } from 'react-intl';
-import { get, keys } from 'lodash';
+import { get } from 'lodash';
 
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
