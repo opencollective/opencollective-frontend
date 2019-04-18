@@ -1701,3 +1701,14 @@ export const PaginatedExpensesType = new GraphQLObjectType({
 });
 
 export const PaginatedPaymentMethodsType = paginatedList(PaymentMethodType, 'PaymentMethod', 'paymentMethods');
+
+export const ImageFormatType = new GraphQLEnumType({
+  name: 'ImageFormat',
+  values: {
+    txt: {},
+    png: {},
+    jpg: {},
+    gif: {},
+    svg: {},
+  },
+});

@@ -1,3 +1,4 @@
+import config from 'config';
 import sequelize from 'sequelize';
 import SqlString from 'sequelize/lib/sql-string';
 import {
@@ -9,8 +10,9 @@ import {
   GraphQLObjectType,
   GraphQLEnumType,
 } from 'graphql';
-
 import GraphQLJSON from 'graphql-type-json';
+import { get, has, sortBy } from 'lodash';
+
 import queries from '../../lib/queries';
 
 import {
@@ -24,6 +26,7 @@ import {
   ExpenseType,
   OrderStatusType,
   PaginatedPaymentMethodsType,
+  ImageFormatType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -33,7 +36,6 @@ import { ApplicationType } from './Application';
 import { types } from '../../constants/collectives';
 import models, { Op } from '../../models';
 import roles from '../../constants/roles';
-import { get, has, sortBy } from 'lodash';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
   name: 'TypeOfCollective',
@@ -515,7 +517,25 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       hostFeePercent: { type: GraphQLInt },
       currency: { type: GraphQLString },
       image: { type: GraphQLString },
+      imageUrl: {
+        type: GraphQLString,
+        args: {
+          height: { type: GraphQLInt },
+          format: {
+            type: ImageFormatType,
+          },
+        },
+      },
       backgroundImage: { type: GraphQLString },
+      backgroundImageUrl: {
+        type: GraphQLString,
+        args: {
+          height: { type: GraphQLInt },
+          format: {
+            type: ImageFormatType,
+          },
+        },
+      },
       settings: { type: GraphQLJSON },
       data: { type: GraphQLJSON },
       slug: { type: GraphQLString },
@@ -810,10 +830,26 @@ const CollectiveFields = () => {
         return collective.image;
       },
     },
+    imageUrl: {
+      type: GraphQLString,
+      resolve(collective, args) {
+        const imageType = collective.type === 'USER' ? 'avatar' : 'logo';
+        const imageHeight = args.height ? `/${args.height}` : '';
+        return `${config.host.images}/${collective.slug}/${imageType}${imageHeight}.${args.format}`;
+      },
+    },
     backgroundImage: {
       type: GraphQLString,
       resolve(collective) {
         return collective.backgroundImage;
+      },
+    },
+    backgroundImageUrl: {
+      type: GraphQLString,
+      resolve(collective, args) {
+        const imageType = 'background';
+        const imageHeight = args.height ? `/${args.height}` : '';
+        return `${config.host.images}/${collective.slug}/${imageType}${imageHeight}.${args.format}`;
       },
     },
     settings: {
