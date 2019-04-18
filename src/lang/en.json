@@ -351,7 +351,6 @@
   "editCollective.menu.": "Images",
   "editCollective.menu.advanced": "Advanced",
   "editCollective.menu.connectedAccounts": "Connected Accounts",
-  "editCollective.menu.webhooks": "Webhooks",
   "editCollective.menu.expenses": "Expenses",
   "editCollective.menu.export": "Export",
   "editCollective.menu.goals": "Goals",
@@ -361,6 +360,7 @@
   "editCollective.menu.paymentMethods": "Payment Methods",
   "editCollective.menu.tiers": "Tiers",
   "editCollective.menu.virtualCards": "Gift Cards",
+  "editCollective.menu.webhooks": "Webhooks",
   "editCollective.notFound": "No collective data to edit",
   "EditUserEmailForm.reSend": "Re-send confirmation",
   "EditUserEmailForm.submit": "Confirm new email",
@@ -1046,6 +1046,10 @@
   "virtualCards.returnToEdit": "Go back to gift cards list",
   "virtualCards.sentTo": "sent to {email}",
   "virtualCards.viewDetails": "View Details",
+  "webhooks.add": "add another webhook",
+  "webhooks.remove": "remove webhook",
+  "webhooks.types.label": "Activities",
+  "webhooks.url.label": "URL",
   "widget.becomeBacker": "Become a backer",
   "widget.becomeSponsor": "Become a sponsor"
 }
