@@ -38,8 +38,6 @@ export default function(Sequelize, DataTypes) {
       },
     },
     {
-      paranoid: true,
-
       indexes: [
         {
           fields: ['type', 'CollectiveId', 'UserId'],

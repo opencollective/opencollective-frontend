@@ -1594,23 +1594,33 @@ export default function(Sequelize, DataTypes) {
   // edit the notifications of this collective (create/update/remove)
   Collective.prototype.editNotifications = function(notifications) {
     if (!notifications) return Promise.resolve();
+    let newNotifications = [];
 
     return this.getNotifications()
       .then(oldNotifications => {
-        const diff = difference(oldNotifications.map(n => n.id), notifications.map(n => n.id));
+        const diff = oldNotifications
+          .filter(
+            x1 =>
+              !notifications.some(x2 => {
+                return x2.channel === x1.channel && x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
+              }),
+          )
+          .map(x => x.id);
+
+        newNotifications = notifications.filter(
+          x1 =>
+            !oldNotifications.some(x2 => {
+              return x2.channel === x1.channel && x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
+            }),
+        );
+
         debug('editNotifications', 'delete', diff);
         return models.Notification.destroy({ where: { id: { [Op.in]: diff } } });
       })
       .then(() => {
-        return Promise.map(notifications, notification => {
+        return Promise.map(newNotifications, notification => {
           if (!(values(activities).includes(notification.type) && values(channels).includes(notification.channel)))
             return;
-
-          if (notification.id) {
-            const editableAttributes = pick(notification, ['type', 'active', 'webhookUrl']);
-            debug('editNotifications', 'update notification', notification.id, editableAttributes);
-            return models.Notification.update(editableAttributes, { where: { id: notification.id } });
-          }
 
           notification.CollectiveId = this.id;
           return models.Notification.create(notification);
