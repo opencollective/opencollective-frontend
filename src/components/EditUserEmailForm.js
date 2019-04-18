@@ -81,12 +81,13 @@ class EditUserEmailForm extends React.Component {
             onChange={e => {
               this.setState({ step: 'form', error: null, newEmail: e.target.value, isTouched: true });
             }}
-            onBlur={() =>
-              !isValid &&
-              this.setState({
-                error: <FormattedMessage id="error.email.invalid" defaultMessage="Invalid email address" />,
-              })
-            }
+            onBlur={() => {
+              if (newEmail && !isValid) {
+                this.setState({
+                  error: <FormattedMessage id="error.email.invalid" defaultMessage="Invalid email address" />,
+                });
+              }
+            }}
           />
           <Flex my={2}>
             <StyledButton
