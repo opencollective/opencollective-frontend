@@ -96,6 +96,7 @@ export default {
             CreatedByUserId: remoteUser.id,
             currency: collective.currency,
             service: 'paypal',
+            type: 'adaptive',
             CollectiveId,
             token: response.preapprovalKey,
             data: {
