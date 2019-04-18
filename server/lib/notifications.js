@@ -72,7 +72,7 @@ function publishToGitter(activity, notifConfig) {
 }
 
 function publishToWebhoook(activity, webhookUrl) {
-  return axios.post(webhookUrl, { activity });
+  return axios.post(webhookUrl, activity);
 }
 
 function publishToSlack(activity, webhookUrl, options) {
