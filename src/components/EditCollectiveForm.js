@@ -293,6 +293,7 @@ class EditCollectiveForm extends React.Component {
       tiers: this.state.tiers,
       goals: this.state.goals,
       members: this.state.members,
+      notifications: this.state.webhooks,
     };
     this.props.onSubmit(collective);
     this.setState({ modified: false });

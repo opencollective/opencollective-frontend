@@ -372,15 +372,20 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         });
       }
       if (isArray(collective.notifications)) {
-        CollectiveInputType.notifications = collective.notifications.map(notification => {
-          return {
-            id: notification.id,
-            channel: notification.channel,
-            type: notification.type,
-            active: notification.active,
-            webhookUrl: notification.webhookUrl,
-          };
-        });
+        const notifications = [];
+        for (const notification of collective.notifications) {
+          for (const activity of notification.activities) {
+            notifications.push({
+              id: notification.id,
+              channel: 'webhook',
+              type: activity,
+              active: true,
+              webhookUrl: notification.url,
+            });
+          }
+        }
+
+        CollectiveInputType.notifications = notifications;
       }
       CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({ variables: { collective: CollectiveInputType } });
