@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
-import { get } from 'lodash';
+import { get, filter, map } from 'lodash';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 
 import InputTypeDropzone from './InputTypeDropzone';
@@ -428,7 +428,11 @@ class InputField extends React.Component {
             autoFocus={field.focus}
             defaultValue={field.value || field.defaultValue || firstOptionValue}
             value={field.value}
-            onChange={event => this.handleChange(event.target.value)}
+            onChange={event =>
+              field.multiple
+                ? this.handleChange(map(filter(event.target.options, 'selected'), 'value'))
+                : this.handleChange(event.target.value)
+            }
             multiple={field.multiple}
           >
             {field.options &&
