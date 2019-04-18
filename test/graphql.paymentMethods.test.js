@@ -325,7 +325,7 @@ describe('graphql.paymentMethods.test.js', () => {
     before(() => {
       preapprovalDetailsStub = sinon.stub(paypalAdaptive, 'preapprovalDetails').callsFake(() => {
         return Promise.resolve({
-          ...paypalMock.adaptive.preapprovalDetails.created,
+          ...paypalMock.adaptive.preapprovalDetails.completed,
           curPaymentsAmount: '12.50',
           maxTotalAmountOfAllPayments: '2000.00',
         });

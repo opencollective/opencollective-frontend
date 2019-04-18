@@ -234,7 +234,6 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
       expense.paypalEmail,
       paymentMethod.token,
     );
-    paymentMethod.updateBalance();
     await createTransactionFromPaidExpense(
       host,
       paymentMethod,
@@ -246,6 +245,7 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
       fees.platformFeeInHostCurrency,
     );
     expense.setPaid(remoteUser.id);
+    await paymentMethod.updateBalance();
   } catch (err) {
     debug('paypal> error', JSON.stringify(err, null, '  '));
     if (

@@ -367,7 +367,9 @@ export default function(Sequelize, DataTypes) {
    * Updates the paymentMethod.data with the balance on the preapproved paypal card
    */
   PaymentMethod.prototype.updateBalance = async function() {
-    if (!this.service !== 'paypal') throw new Error('Can only update balance for paypal preapproved cards');
+    if (this.service !== 'paypal') {
+      throw new Error('Can only update balance for paypal preapproved cards');
+    }
     const paymentProvider = libpayments.findPaymentMethodProvider(this);
     return await paymentProvider.updateBalance(this);
   };
