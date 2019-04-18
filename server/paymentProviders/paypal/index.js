@@ -113,6 +113,7 @@ export default {
       return models.PaymentMethod.findOne({
         where: {
           service: 'paypal',
+          type: 'adaptive',
           token: req.query.preapprovalKey,
         },
         order: [['createdAt', 'DESC']],
@@ -163,6 +164,7 @@ export default {
                 models.PaymentMethod.findAll({
                   where: {
                     service: 'paypal',
+                    type: 'adaptive',
                     CollectiveId: paymentMethod.CollectiveId,
                     token: { [Op.ne]: req.query.preapprovalkey },
                   },
@@ -188,6 +190,7 @@ export default {
       const pm = await models.PaymentMethod.findOne({
         where: {
           service: 'paypal',
+          type: 'adaptive',
           token: req.query.preapprovalKey,
         },
         order: [['createdAt', 'DESC']],
