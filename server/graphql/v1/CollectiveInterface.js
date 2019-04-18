@@ -1271,6 +1271,9 @@ const CollectiveFields = () => {
             if (balance.amount > 0) {
               filteredArray.push(paymentMethod);
             }
+            if (args.limit && filteredArray.length >= args.limit) {
+              break;
+            }
           }
           paymentMethods = filteredArray;
         }
