@@ -2071,6 +2071,20 @@ export default function(Sequelize, DataTypes) {
       .tap(backers => debug('getTopBackers', backers.map(b => b.dataValues)));
   };
 
+  Collective.prototype.getImageUrl = function(args = {}) {
+    const imageType = this.type === 'USER' ? 'avatar' : 'logo';
+    const imageHeight = args.height ? `/${args.height}` : '';
+    const imageFormat = args.format || 'png';
+    return `${config.host.images}/${this.slug}/${imageType}${imageHeight}.${imageFormat}`;
+  };
+
+  Collective.prototype.getBackgroundImageUrl = function(args = {}) {
+    const imageType = 'background';
+    const imageHeight = args.height ? `/${args.height}` : '';
+    const imageFormat = args.format || 'png';
+    return `${config.host.images}/${this.slug}/${imageType}${imageHeight}.${imageFormat}`;
+  };
+
   /**
    * Class Methods
    */
