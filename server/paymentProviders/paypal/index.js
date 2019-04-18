@@ -166,7 +166,7 @@ export default {
                     service: 'paypal',
                     type: 'adaptive',
                     CollectiveId: paymentMethod.CollectiveId,
-                    token: { [Op.ne]: req.query.preapprovalkey },
+                    id: { [Op.ne]: paymentMethod.id },
                   },
                 }),
               )
