@@ -1,12 +1,43 @@
 import paypalAdaptive from './adaptiveGateway';
+import { get, isNil } from 'lodash';
 import config from 'config';
 import uuidv1 from 'uuid/v1';
 import logger from '../../lib/logger';
+import errors from '../../lib/errors';
 
 /**
  * PayPal paymentProvider
  * Provides a oAuth flow to creates a payment method that can be used to pay up to $2,000 USD or equivalent
  */
+
+/*
+ * Confirms that the preapprovalKey has been approved by PayPal
+ * and updates the paymentMethod
+ */
+const getPreapprovalDetailsAndUpdatePaymentMethod = async function(paymentMethod) {
+  if (!paymentMethod) {
+    return Promise.reject(new Error('No payment method provided to getPreapprovalDetailsAndUpdatePaymentMethod'));
+  }
+
+  const response = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
+  if (response.approved === 'false') {
+    throw new errors.BadRequest('This preapprovalkey is not approved yet.');
+  }
+
+  const data = {
+    redirect: paymentMethod.data.redirect,
+    details: response,
+    balance: (parseFloat(response.maxTotalAmountOfAllPayments) - parseFloat(response.curPaymentsAmount)) * 100,
+    currency: response.currencyCode,
+    transactionsCount: response.curPayments,
+  };
+
+  return paymentMethod.update({
+    confirmedAt: new Date(),
+    name: response.senderEmail,
+    data,
+  });
+};
 
 export default {
   features: {
@@ -63,13 +94,22 @@ export default {
   // Returns the balance in the currency of the paymentMethod
   getBalance: async paymentMethod => {
     try {
-      const resp = await paypalAdaptive.preapprovalDetails(paymentMethod.token);
-      const initialBalance = parseFloat(resp.maxTotalAmountOfAllPayments);
-      const totalSpent = parseFloat(resp.curPaymentsAmount);
-      return { amount: (initialBalance - totalSpent) * 100, currency: paymentMethod.currency };
+      // If balance is already available for the PM
+      const balance = get(paymentMethod, 'data.balance');
+      if (!isNil(balance)) {
+        return { amount: balance, currency: paymentMethod.currency };
+      }
+
+      // Otherwise we fetch is from PayPal API
+      const updatedPM = await getPreapprovalDetailsAndUpdatePaymentMethod(paymentMethod);
+      return { amount: updatedPM.data.balance, currency: updatedPM.currency };
     } catch (e) {
       logger.error('getBalance for PayPal pre-approval failed', e);
       return { amount: 0, currency: paymentMethod.currency };
     }
+  },
+
+  updateBalance: async paymentMethod => {
+    return await getPreapprovalDetailsAndUpdatePaymentMethod(paymentMethod);
   },
 };
