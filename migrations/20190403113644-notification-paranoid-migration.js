@@ -1,13 +1,17 @@
 'use strict';
 
 module.exports = {
-  up: function(queryInterface, DataTypes) {
-    return queryInterface.addColumn('Notifications', 'deletedAt', {
+  up: async function(queryInterface, DataTypes) {
+    await queryInterface.addIndex('Notifications', ['channel', 'type', 'webhookUrl', 'CollectiveId'], {
+      indicesType: 'UNIQUE',
+    });
+    await queryInterface.addColumn('Notifications', 'deletedAt', {
       type: DataTypes.DATE,
     });
   },
 
-  down: function(queryInterface, Sequelize) {
-    return queryInterface.removeColumn('Notifications', 'deletedAt');
+  down: async function(queryInterface, Sequelize) {
+    await queryInterface.removeIndex('Notifications', ['channel', 'type', 'webhookUrl', 'CollectiveId']);
+    await queryInterface.removeColumn('Notifications', 'deletedAt');
   },
 };
