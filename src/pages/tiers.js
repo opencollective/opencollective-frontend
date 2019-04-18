@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
@@ -17,6 +18,10 @@ import ErrorPage from '../components/ErrorPage';
 import { withUser } from '../components/UserProvider';
 import { addCollectiveData } from '../graphql/queries';
 import { P, H3 } from '../components/Text';
+
+const TierCardPage = styled(TierCard)`
+  margin: 20px;
+`;
 
 class TiersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
@@ -37,7 +42,7 @@ class TiersPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, data = {}, intl } = this.props;
+    const { LoggedInUser, data = {} } = this.props;
 
     if (!data || !data.Collective) {
       return <ErrorPage data={data} />;
@@ -56,14 +61,7 @@ class TiersPage extends React.Component {
             <Fragment>
               <Container display="flex" flexDirection="column" alignItems="center" width={1} my={4}>
                 <Link href={`/${collective.slug}`}>
-                  <Logo
-                    src={logo}
-                    className="TiersPage"
-                    type={collective.type}
-                    website={collective.website}
-                    height="10rem"
-                    key={logo}
-                  />
+                  <Logo src={logo} height="10rem" />
                   <H3 lineHeight={1.2} color="black.800" textAlign="center">
                     {collective.name}
                   </H3>
@@ -76,22 +74,14 @@ class TiersPage extends React.Component {
                 {collective.isActive && collective.host && (
                   <Container display="flex" flexWrap="wrap" data-cy="tiers" justifyContent="center" m={4}>
                     {collective.tiers.map(tier => (
-                      <TierCard
-                        key={`TierCard-${tier.slug}`}
-                        collective={collective}
-                        tier={tier}
-                        intl={intl}
-                        className="TiersPage"
-                      />
+                      <TierCardPage key={`TierCard-${tier.id}`} collective={collective} tier={tier} />
                     ))}
                   </Container>
                 )}
                 {collective.isActive && collective.host && (
                   <Container display="flex" justifyContent="center" width={1} my={4}>
                     <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
-                      <a>
-                        <FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" />
-                      </a>
+                      <FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" />
                     </Link>
                   </Container>
                 )}

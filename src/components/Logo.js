@@ -27,9 +27,6 @@ const Logo = ({ src, style = {}, height, className }) => {
             background-position: center center;
             background-size: cover;
           }
-          .TiersPage {
-            justify-content: center;
-          }
         `}
       </style>
       <img className="logo" src={src} style={style} />
