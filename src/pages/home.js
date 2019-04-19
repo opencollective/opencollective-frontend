@@ -179,6 +179,15 @@ class HomePage extends React.Component {
     this.setState({ stats });
   }
 
+  // See https://github.com/opencollective/opencollective/issues/1872
+  shouldComponentUpdate(newProps) {
+    if (this.props.data.transactions && !newProps.data.transactions) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   getCarouselContent() {
     const { formatMessage } = this.props.intl;
 
