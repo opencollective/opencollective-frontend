@@ -641,6 +641,11 @@ export const firstParagraph = (str, length = 256) => {
   if (matches && matches.length > 1) {
     return firstSentence(matches[1], length);
   } else {
+    // if the string is html, we can't blindly return the first sentence
+    // otherwise it creates this bug: https://github.com/opencollective/opencollective/issues/1943#issuecomment-484232364
+    // Ideally we should strip html tags and then take the first sentence.
+    // But for now it's good enough to simply return an empty string
+    if (str.match(/<[a-z]+>/)) return '';
     return firstSentence(str, length);
   }
 };
