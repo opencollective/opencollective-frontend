@@ -2,7 +2,6 @@
 
 import collective from './collective';
 import prepaid from './prepaid';
-import giftcard from './giftcard';
 import virtualcard from './virtualcard';
 import manual from './manual';
 
@@ -11,8 +10,6 @@ async function processOrder(order) {
   switch (order.paymentMethod.type) {
     case 'prepaid':
       return prepaid.processOrder(order);
-    case 'giftcard':
-      return giftcard.processOrder(order);
     case 'virtualcard':
       return virtualcard.processOrder(order);
     case 'manual':
@@ -30,7 +27,6 @@ export default {
   types: {
     default: collective,
     collective,
-    giftcard,
     manual,
     prepaid,
     virtualcard,
