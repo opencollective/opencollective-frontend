@@ -14,6 +14,7 @@ import StyledInput from './StyledInput';
 import StyledButton from './StyledButton';
 import Link from './Link';
 import StyledRadioList from './StyledRadioList';
+import ExternalLinkNewTab from './ExternalLinkNewTab';
 
 const useForm = () => {
   const [state, setState] = useState({ errors: '', useType: 'repository' });
@@ -178,9 +179,9 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
             </Container>
             <P textAlign="center" color="black.500" fontSize="1.2rem" fontWeight="normal">
               By pressing ‘Create Collective’ you agree to our <Link route="/tos">Terms of Service</Link>, to the{' '}
-              <a href="https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub">
+              <ExternalLinkNewTab href="https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub">
                 Terms of Fiscal Sponsorship
-              </a>{' '}
+              </ExternalLinkNewTab>{' '}
               and to the <Link route="/privacypolicy">Privacy Policy</Link> of the Fiscal Host that will collect money
               on behalf of this collective.
             </P>
