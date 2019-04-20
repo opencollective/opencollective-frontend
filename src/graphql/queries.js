@@ -256,12 +256,6 @@ export const getCollectiveToEditQueryFields = `
     currency
     maxQuantity
   }
-  notifications(channel: "webhook") {
-    id
-    type
-    active
-    webhookUrl
-  }
   memberOf {
     id
     createdAt

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { withRouter } from 'next/router';
 import { ArrowBack } from 'styled-icons/material/ArrowBack';
-import { get, pick } from 'lodash';
+import { get } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -74,23 +74,12 @@ class EditCollectiveForm extends React.Component {
     const collective = { ...(props.collective || {}) };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
 
-    const webhooks = {};
-    collective.notifications &&
-      collective.notifications.forEach(x => {
-        if (!(x.webhookUrl in webhooks)) {
-          webhooks[x.webhookUrl] = pick(x, ['webhookUrl']);
-          webhooks[x.webhookUrl].activities = [];
-        }
-        webhooks[x.webhookUrl].activities.push(x.type);
-      });
-
     this.state = {
       modified: false,
       section: 'info',
       collective,
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
-      webhooks: Object.values(webhooks) || [{}],
       goals: collective.settings.goals || [{}],
     };
 
@@ -303,7 +292,6 @@ class EditCollectiveForm extends React.Component {
       tiers: this.state.tiers,
       goals: this.state.goals,
       members: this.state.members,
-      notifications: this.state.webhooks,
     };
     this.props.onSubmit(collective);
     this.setState({ modified: false });
@@ -727,7 +715,7 @@ class EditCollectiveForm extends React.Component {
                 />
               )}
               {this.state.section === 'webhooks' && (
-                <EditWebhooks title="Edit webhooks" webhooks={this.state.webhooks} onChange={this.handleObjectChange} />
+                <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
               )}
               {this.state.section === 'tiers' && (
                 <EditTiers
@@ -793,6 +781,7 @@ class EditCollectiveForm extends React.Component {
               'gift-cards-create',
               'gift-cards-send',
               'payment-methods',
+              'webhooks',
             ].indexOf(this.state.section) === -1 && (
               <div className="actions">
                 <Button

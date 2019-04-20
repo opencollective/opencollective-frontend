@@ -371,22 +371,6 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
           };
         });
       }
-      if (isArray(collective.notifications)) {
-        const notifications = [];
-        for (const notification of collective.notifications) {
-          for (const activity of notification.activities) {
-            notifications.push({
-              id: notification.id,
-              channel: 'webhook',
-              type: activity,
-              active: true,
-              webhookUrl: notification.webhookUrl,
-            });
-          }
-        }
-
-        CollectiveInputType.notifications = notifications;
-      }
       CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({ variables: { collective: CollectiveInputType } });
     },
