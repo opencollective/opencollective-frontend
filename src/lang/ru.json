@@ -360,6 +360,7 @@
   "editCollective.menu.paymentMethods": "Методы оплаты",
   "editCollective.menu.tiers": "Уровни",
   "editCollective.menu.virtualCards": "Подарочные карты",
+  "editCollective.menu.webhooks": "Webhooks",
   "editCollective.notFound": "Нечего редактировать",
   "EditUserEmailForm.reSend": "Выслать подтверждение повторно",
   "EditUserEmailForm.submit": "Подтвердить новую почту",
@@ -1045,6 +1046,10 @@
   "virtualCards.returnToEdit": "Вернуться к подарочным открыткам",
   "virtualCards.sentTo": "отправлено на {email}",
   "virtualCards.viewDetails": "Показать детали",
+  "webhooks.add": "add another webhook",
+  "webhooks.remove": "remove webhook",
+  "webhooks.types.label": "Activities",
+  "webhooks.url.label": "URL",
   "widget.becomeBacker": "Стать попечителем",
   "widget.becomeSponsor": "Стать спонсором"
 }
