@@ -109,7 +109,8 @@ class EditWebhooks extends React.Component {
     this.setState({ webhooks, modified: true });
   };
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
+    this.setState({ status: 'loading' });
     const { webhooks } = this.state;
     const notifications = [];
     for (const notification of webhooks) {
@@ -124,7 +125,12 @@ class EditWebhooks extends React.Component {
       }
     }
 
-    this.setState({ modified: false });
+    await this.props.editNotifications({ id: this.props.data.Collective.id, notifications });
+
+    this.setState({ modified: false, status: 'saved' });
+    setTimeout(() => {
+      this.setState({ status: null });
+    }, 3000);
   };
 
   renderWebhook = (webhook, index) => {
@@ -163,11 +169,17 @@ class EditWebhooks extends React.Component {
   };
 
   render() {
-    const { webhooks } = this.state;
+    const { webhooks, status } = this.state;
     const {
       intl,
       data: { loading },
     } = this.props;
+
+    let submitBtnMessageId = 'save';
+    if (['loading', 'saved'].includes(status)) {
+      submitBtnMessageId = status;
+    }
+    const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
 
     return loading ? (
       <Loading />
@@ -216,7 +228,7 @@ class EditWebhooks extends React.Component {
             onClick={this.handleSubmit}
             disabled={loading || !this.state.modified}
           >
-            Save
+            {submitBtnLabel}
           </Button>
         </div>
       </div>
@@ -224,23 +236,43 @@ class EditWebhooks extends React.Component {
   }
 }
 
-const getWebhooks = graphql(gql`
-  query Collective($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
-      id
-      type
-      slug
-      currency
-      notifications(channel: "webhook") {
+const getWebhooks = graphql(
+  gql`
+    query Collective($collectiveSlug: String) {
+      Collective(slug: $collectiveSlug) {
         id
         type
-        active
-        webhookUrl
+        slug
+        currency
+        notifications(channel: "webhook") {
+          id
+          type
+          active
+          webhookUrl
+        }
       }
     }
-  }
-`);
+  `,
+);
 
-const addData = compose(getWebhooks);
+const editNotifications = graphql(
+  gql`
+    mutation editNotifications($id: Int!, $notifications: [NotificationInputType]) {
+      editNotifications(id: $id, notifications: $notifications) {
+        id
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      editNotifications: variables => mutate({ variables }),
+    }),
+  },
+);
+
+const addData = compose(
+  getWebhooks,
+  editNotifications,
+);
 
 export default withIntl(addData(EditWebhooks));
