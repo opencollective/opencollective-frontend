@@ -24,6 +24,7 @@ import {
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
+import { editNotifications } from './mutations/notifications';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
@@ -45,6 +46,7 @@ import {
   ConnectedAccountType,
   PaymentMethodType,
   UserType,
+  NotificationType,
 } from './types';
 
 import { CollectiveInterfaceType } from './CollectiveInterface';
@@ -68,6 +70,7 @@ import {
   PaymentMethodDataVirtualCardInputType,
   UserInputType,
   StripeCreditCardDataInputType,
+  NotificationInputType,
 } from './inputTypes';
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
 import models, { sequelize } from '../../models';
@@ -715,6 +718,16 @@ const mutations = {
     },
     resolve: async (_, args, req) => {
       return paymentMethodsMutation.removePaymentMethod(args.id, req.remoteUser);
+    },
+  },
+  editNotifications: {
+    type: new GraphQLList(NotificationType),
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      notifications: { type: new GraphQLList(NotificationInputType) },
+    },
+    resolve(_, args, req) {
+      return editNotifications(args, req.remoteUser);
     },
   },
 };

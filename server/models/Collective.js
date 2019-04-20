@@ -30,7 +30,6 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
-import { channels } from '../constants';
 
 const debug = debugLib('collective');
 
@@ -1589,44 +1588,6 @@ export default function(Sequelize, DataTypes) {
         });
       })
       .then(() => this.getTiers());
-  };
-
-  // edit the notifications of this collective (create/update/remove)
-  Collective.prototype.editNotifications = function(notifications) {
-    if (!notifications) return Promise.resolve();
-    let newNotifications = [];
-
-    return this.getNotifications()
-      .then(oldNotifications => {
-        const diff = oldNotifications
-          .filter(
-            x1 =>
-              !notifications.some(x2 => {
-                return x2.channel === x1.channel && x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
-              }),
-          )
-          .map(x => x.id);
-
-        newNotifications = notifications.filter(
-          x1 =>
-            !oldNotifications.some(x2 => {
-              return x2.channel === x1.channel && x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
-            }),
-        );
-
-        debug('editNotifications', 'delete', diff);
-        return models.Notification.destroy({ where: { id: { [Op.in]: diff } } });
-      })
-      .then(() => {
-        return Promise.map(newNotifications, notification => {
-          if (!(values(activities).includes(notification.type) && values(channels).includes(notification.channel)))
-            return;
-
-          notification.CollectiveId = this.id;
-          return models.Notification.create(notification);
-        });
-      })
-      .then(() => this.getNotifications());
   };
 
   /*

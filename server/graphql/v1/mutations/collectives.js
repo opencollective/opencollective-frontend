@@ -456,7 +456,6 @@ export function editCollective(_, args, req) {
     })
     .then(() => collective.update(omit(newCollectiveData, ['HostCollectiveId', 'hostFeePercent']))) // we omit those attributes that have already been updated above
     .then(() => collective.editTiers(args.collective.tiers))
-    .then(() => collective.editNotifications(args.collective.notifications))
     .then(() =>
       collective.editMembers(args.collective.members, {
         CreatedByUserId: req.remoteUser.id,
