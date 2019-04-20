@@ -47,3 +47,12 @@ export async function editNotifications(args, remoteUser) {
       });
     });
 }
+
+export async function createNotification(args, remoteUser) {
+  if (!remoteUser) {
+    throw NotificationPermissionError;
+  }
+
+  const collective = models.Collective.find({ where: { slug: args.slug } });
+  return models.Notifications.create({});
+}
