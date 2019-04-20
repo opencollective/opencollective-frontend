@@ -19,7 +19,6 @@ export async function editNotifications(args, remoteUser) {
 
   return models.Notification.findAll({ where: { CollectiveId: args.id, UserId: null } })
     .then(oldNotifications => {
-      console.log(oldNotifications, args);
       const diff = oldNotifications
         .filter(
           x1 =>
