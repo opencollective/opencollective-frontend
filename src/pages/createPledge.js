@@ -222,7 +222,7 @@ class CreatePledgePage extends React.Component {
     if (data.Collective) {
       website = data.Collective.githubHandle
         ? `https://github.com/${data.Collective.githubHandle}`
-        : data.Collective.website;
+        : data.Collective.websigqlte;
     }
 
     const profiles =

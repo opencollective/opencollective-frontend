@@ -9,7 +9,6 @@ import tag from 'clean-tag';
 
 import { getInputBorderColor } from '../lib/styled_components_utils';
 import Container from './Container';
-import { Span } from './Text';
 
 /**
  * Returns a function that will return a unique key from iteratee. As we rely on
@@ -56,7 +55,6 @@ export const getItems = (options, keyGetter) => {
 const SelectContainer = styled(Container)`
   cursor: pointer;
   outline: none;
-  line-height: 1.5;
   &:hover,
   &:focus {
     border-color: ${themeGet('colors.primary.300')};
@@ -85,7 +83,7 @@ const SelectContainer = styled(Container)`
 `;
 
 SelectContainer.defaultProps = {
-  omitProps: SelectContainer.defaultProps.omitProps.concat('mode'),
+  blacklist: SelectContainer.defaultProps.blacklist.concat('mode'),
 };
 
 const SelectPopupContainer = styled(Container)`
@@ -124,7 +122,7 @@ const StyledListItem = styled(tag.li)`
 `;
 
 StyledListItem.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('isHighlighted', 'isSelected'),
+  blacklist: tag.defaultProps.blacklist.concat('isHighlighted', 'isSelected'),
 };
 
 const Icon = styled(CaretDown)`
@@ -164,8 +162,6 @@ export default class StyledSelect extends React.Component {
     /** used to display the value of an item */
     children: PropTypes.func,
     defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()]),
-    /** Use this to control the component state */
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()]),
     /** disable selecion */
     disabled: PropTypes.bool,
     /** show error state */
@@ -176,8 +172,6 @@ export default class StyledSelect extends React.Component {
     name: PropTypes.string,
     /** event handler for when a selection is made */
     onChange: PropTypes.func,
-    /** A placeholder to show when nothing's selected */
-    placeholder: PropTypes.node,
     /** list or map of options to display */
     options: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),
@@ -191,15 +185,12 @@ export default class StyledSelect extends React.Component {
     mode: PropTypes.oneOf(['select', 'underlined']),
     /** A custom list renderer. Usefull for windowing or progressive loading */
     ItemsListRenderer: PropTypes.func,
-    /** Is this input required? */
-    required: PropTypes.bool,
   };
 
   static defaultProps = {
     children: ({ value }) => value,
     ItemsListRenderer: DefaultItemsListRenderer,
     mode: 'select',
-    placeholder: '',
   };
 
   constructor(props) {
@@ -213,26 +204,12 @@ export default class StyledSelect extends React.Component {
     }
   }
 
-  /** Return the value if component is controlled, otherwise undefined */
-  getValue() {
-    if (this.props.value === undefined) {
-      return undefined;
-    }
-
-    return this.props.value ? getItems([this.props.value], this.props.keyGetter)[0] : null;
-  }
-
   render() {
     const { ItemsListRenderer, error, defaultValue, disabled, id, name, onChange, success, mode } = this.props;
-    const initialSelectedItem = defaultValue ? getItems([defaultValue], this.props.keyGetter)[0] : undefined;
+    const initialSelectedItem = defaultValue ? getItems([defaultValue], this.props.keyGetter)[0] : null;
 
     return (
-      <Downshift
-        onChange={onChange}
-        initialSelectedItem={initialSelectedItem}
-        selectedItem={this.getValue()}
-        itemToString={item => item && item.key}
-      >
+      <Downshift onChange={onChange} initialSelectedItem={initialSelectedItem} itemToString={item => item && item.key}>
         {({ getInputProps, getItemProps, getMenuProps, highlightedIndex, isOpen, selectedItem, toggleMenu }) => (
           <div>
             <SelectContainer
@@ -253,11 +230,7 @@ export default class StyledSelect extends React.Component {
               })}
             >
               <Box flex="1 1 auto" mr={1}>
-                {selectedItem ? (
-                  this.props.children(selectedItem)
-                ) : (
-                  <Span color={this.props.required ? 'primary.700' : 'black.600'}>{this.props.placeholder}</Span>
-                )}
+                {selectedItem && this.props.children(selectedItem)}
               </Box>
               {mode === 'select' && <Icon size="1.2em" disabled={disabled} error={error} success={success} />}
             </SelectContainer>

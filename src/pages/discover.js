@@ -47,7 +47,7 @@ const SearchInput = styled(Box)`
 `;
 
 const getPledgedCards = gql`
-  query allCollective {
+  query allCollectives {
     allCollectives(isPledged: true, isActive: false) {
       collectives {
         id
@@ -106,9 +106,13 @@ function useCollectives(query) {
   return state;
 }
 
-const DiscoverPage = ({ router }) => {
-  const { query } = router;
-  const { collectives, offset, total, show, tags, collective = [] } = useCollectives(query);
+const DiscoverPage = ({ all, router, ...props }) => {
+  const {
+    query: { show },
+  } = router;
+  const { collectives, offset, total, tags = [] } = props.data;
+  const collective = props.data.Collectives;
+
   const tagOptions = ['all'].concat(tags.map(tag => tag.toLowerCase()).sort());
   const limit = 12;
 
@@ -199,7 +203,7 @@ const DiscoverPage = ({ router }) => {
               </NavList>
               <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
                 <Box as="li" px={3}>
-                  <StyledSelect name="show" id="show" value={show} onChange={onChange}>
+                  <StyledSelect name={show} options={all} keyGetter={show} value={show} onChange={onChange}>
                     {tagOptions.map(tag => (
                       <option key={tag} value={tag}>
                         {tag}
@@ -246,6 +250,9 @@ const DiscoverPage = ({ router }) => {
 
 DiscoverPage.propTypes = {
   router: PropTypes.object,
+  data: PropTypes.object.isRequired, // from withData
+  intl: PropTypes.object.isRequired, // from withIntl
+  all: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default withIntl(pledgedCardData(withRouter(DiscoverPage)));
