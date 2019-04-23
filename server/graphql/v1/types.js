@@ -964,6 +964,12 @@ export const TierType = new GraphQLObjectType({
           return tier.amount;
         },
       },
+      minimumAmount: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return tier.minimumAmount;
+        },
+      },
       currency: {
         type: GraphQLString,
         resolve(tier) {
