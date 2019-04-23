@@ -185,32 +185,6 @@ class EditWebhooks extends React.Component {
       <Loading />
     ) : (
       <div className="EditWebhooks">
-        <style jsx>
-          {`
-            :global(.webhookActions) {
-              text-align: right;
-              font-size: 1.3rem;
-            }
-            :global(.field) {
-              margin: 1rem;
-            }
-            .editWebhooksActions {
-              text-align: right;
-              margin-top: -1rem;
-            }
-            p {
-              font-size: 1.3rem;
-            }
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-            :global(.webhook) {
-              margin: 3rem 0;
-            }
-          `}
-        </style>
-
         <div className="webhooks">
           <h2>{this.props.title}</h2>
           {webhooks.map(this.renderWebhook)}
