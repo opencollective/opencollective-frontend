@@ -82,6 +82,15 @@ module.exports = {
           exclude: /node_modules/,
           use: [{ loader: 'babel-loader', options: { cacheDirectory: true } }],
         },
+        {
+          test: /components\/.*\.(svg)$/,
+          use: {
+            loader: 'url-loader',
+            options: {
+              limit: 1000000,
+            },
+          },
+        },
       ],
     },
   },

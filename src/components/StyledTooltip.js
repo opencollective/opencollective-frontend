@@ -118,7 +118,7 @@ class StyledTooltip extends React.Component {
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
       >
-        {this.state.isDisplayed && <Popup>{content}</Popup>}
+        {this.state.isDisplayed && <Popup>{content()}</Popup>}
         <div data-toggle="tooltip">{children}</div>
       </MainContainer>
     );
@@ -128,8 +128,8 @@ class StyledTooltip extends React.Component {
 StyledTooltip.propTypes = {
   /** Child component that triggers tooltip */
   children: PropTypes.node,
-  /** content to display in the tooltip */
-  content: PropTypes.node.isRequired,
+  /** A function to render the content to display in the tooltip */
+  content: PropTypes.func.isRequired,
 };
 
 export default StyledTooltip;
