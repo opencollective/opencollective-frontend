@@ -733,7 +733,7 @@ const mutations = {
   createNotification: {
     type: NotificationType,
     args: {
-      notification: NotificationInputType,
+      notification: { type: NotificationInputType },
     },
     resolve(_, args, req) {
       return createNotification(args, req.remoteUser);
