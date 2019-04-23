@@ -131,6 +131,9 @@ pages.add(
 // Collective
 // ----------
 
+// New collective page
+pages.add('new-collective-page', '/:slug/v2');
+
 pages.add('collective', '/:slug');
 
 export default pages;
