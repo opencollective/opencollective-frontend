@@ -743,7 +743,7 @@ const mutations = {
     type: NotificationType,
     args: {
       collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
-      notification: NotificationInputType,
+      notification: { type: NotificationInputType },
     },
     resolve(_, args, req) {
       return createWebhook(args, req.remoteUser);

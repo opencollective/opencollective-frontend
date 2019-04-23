@@ -10,7 +10,7 @@ const NotificationPermissionError = new Forbidden({
 });
 
 export async function editNotifications(args, remoteUser) {
-  if (!remoteUser) {
+  if (!(remoteUser && remoteUser.isAdmin(args.id))) {
     throw NotificationPermissionError;
   }
 
