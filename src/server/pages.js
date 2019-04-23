@@ -30,6 +30,7 @@ pages
   .add('events', '/:collectiveSlug/events')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
+  .add('host.pending-applications', '/:hostCollectiveSlug/collectives/pending')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
   .add(
