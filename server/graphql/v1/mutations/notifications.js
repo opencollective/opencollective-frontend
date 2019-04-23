@@ -78,3 +78,11 @@ export async function createWebhook(args, remoteUser) {
 
   return createNotification(args, remoteUser);
 }
+
+export async function deleteNotification(args, remoteUser) {
+  if (!remoteUser) {
+    throw NotificationPermissionError;
+  }
+
+  return await models.Notification.destroy({ where: { id: args.id } });
+}

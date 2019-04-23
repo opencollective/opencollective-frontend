@@ -24,7 +24,7 @@ import {
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
-import { createNotification, createWebhook, editNotifications } from './mutations/notifications';
+import { createNotification, createWebhook, deleteNotification, editNotifications } from './mutations/notifications';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
@@ -747,6 +747,15 @@ const mutations = {
     },
     resolve(_, args, req) {
       return createWebhook(args, req.remoteUser);
+    },
+  },
+  deleteNotification: {
+    type: NotificationType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(_, args, req) {
+      return deleteNotification(args, req.remoteUser);
     },
   },
 };
