@@ -36,15 +36,7 @@ class CollectivePage extends React.Component {
   }
 
   async componentDidMount() {
-    const { LoggedInUser, query, data = {} } = this.props;
-    window.OC = window.OC || {};
-    window.OC.LoggedInUser = LoggedInUser;
-
-    if (query.refetch && data.refetch) {
-      data.refetch();
-    }
-
-    const Collective = data.Collective || this.state.collective;
+    const Collective = get(this.props.data, 'Collective') || this.state.collective;
     this.setState({ Collective });
   }
 

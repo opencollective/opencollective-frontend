@@ -355,11 +355,11 @@ class GoalsCover extends React.Component {
     if (isServerSide) {
       maxCustomGoalsToShow = 0;
     } else {
-      availWidth = get(window, 'screen.availWidth') || 400;
-      if (availWidth <= 400) maxCustomGoalsToShow = 1;
-      else if (availWidth < 800) maxCustomGoalsToShow = 2;
-      else if (availWidth < 1000) maxCustomGoalsToShow = 3;
-      else if (availWidth < 1200) maxCustomGoalsToShow = 4;
+      availWidth = get(window, 'screen.availWidth') || 560;
+      if (availWidth <= 560) maxCustomGoalsToShow = 0;
+      else if (availWidth < 728) maxCustomGoalsToShow = 1;
+      else if (availWidth < 896) maxCustomGoalsToShow = 2;
+      else if (availWidth < 1120) maxCustomGoalsToShow = 3;
     }
 
     // Get all goals sorted by amount

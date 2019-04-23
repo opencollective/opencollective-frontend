@@ -17,9 +17,6 @@ describe('Users can change their email address', () => {
 
     // Initial form should have current email in it
     cy.get('[data-cy=EditUserEmailForm] input[name=email]').should('have.value', user.email);
-    cy.get('[data-cy=EditUserEmailForm] input[name=email]').should('be.disabled');
-
-    cy.contains('[data-cy=EditUserEmailForm] button', 'Change email').click();
 
     // Submit disabled if value is incorrect
     cy.get('[data-cy=EditUserEmailForm] input[name=email]').type('{selectall}NotAValidEmail');
@@ -58,7 +55,6 @@ describe('Users can change their email address', () => {
     const emailForDoubleConfirmation = randomEmail();
 
     cy.login({ email: newEmail, redirect: `/${user.collective.slug}/edit/advanced` });
-    cy.contains('[data-cy=EditUserEmailForm] button', 'Change email').click();
     cy.get('[data-cy=EditUserEmailForm] input[name=email]').type(`{selectall}${emailForDoubleConfirmation}`);
     cy.contains('[data-cy=EditUserEmailForm] button', 'Confirm new email').click();
     cy.contains('[data-cy=EditUserEmailForm] button', 'Re-send confirmation').click();

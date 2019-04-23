@@ -63,3 +63,4 @@ fs.writeFileSync(`${LANG_DIR}en.json`, convertToJSON(defaultMessages));
 fs.writeFileSync(`${LANG_DIR}fr.json`, convertToJSON(translatedMessages('fr')));
 fs.writeFileSync(`${LANG_DIR}es.json`, convertToJSON(translatedMessages('es')));
 fs.writeFileSync(`${LANG_DIR}ja.json`, convertToJSON(translatedMessages('ja')));
+fs.writeFileSync(`${LANG_DIR}ru.json`, convertToJSON(translatedMessages('ru')));

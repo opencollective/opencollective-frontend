@@ -49,6 +49,8 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
 
   const { deleting, error } = deleteStatus;
 
+  const hasBalance = collective.stats.balance > 0 && collective.type === 'COLLECTIVE';
+
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
@@ -80,10 +82,15 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           <FormattedMessage
             values={{ type: collectiveType }}
             id="collective.delete.isNotDeletable-message"
-            defaultMessage={
-              '{type} with transactions, orders or paid expenses cannot be deleted. You can archive it instead.'
-            }
-          />
+            defaultMessage={'{type} with transactions, orders or paid expenses cannot be deleted.'}
+          />{' '}
+          {!hasBalance && (
+            <FormattedMessage
+              values={{ type: collectiveType }}
+              id="collective.delete.archiveAvailable"
+              defaultMessage={'You can archive it instead.'}
+            />
+          )}
         </P>
       )}
       <Modal
