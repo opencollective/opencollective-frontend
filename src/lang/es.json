@@ -21,7 +21,7 @@
   "addfunds.platformFees": "Comisión de la plataforma ({platformFees})",
   "addfunds.submit": "Añadir fondos",
   "addfunds.title": "Añadir fondos a {collective}",
-  "addfunds.totalAmount": "Funding amount",
+  "addfunds.totalAmount": "Cantidad de fondos",
   "addfundstoorg.FromCollectiveId.label": "host",
   "amount.free": "gratuito",
   "api.error.unreachable": "No se puede acceder al servidor. Por favor intente nuevamente",
