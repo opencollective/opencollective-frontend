@@ -137,7 +137,7 @@ class EditWebhooks extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="webhook" key={`webhook-${index}-${webhook.id}`}>
+      <div className="webhook" key={`webhook-${webhook.id}`}>
         <div className="webhookActions">
           <a className="removeWebhook" href="#" onClick={() => this.removeWebhook(index)}>
             {intl.formatMessage(this.messages['webhooks.remove'])}
