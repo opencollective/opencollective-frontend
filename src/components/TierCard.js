@@ -109,7 +109,7 @@ class TierCard extends React.Component {
 
   render() {
     const { collective, tier, referral, intl } = this.props;
-    const amount = tier.presets ? Math.min(tier.presets[0], tier.amount) : tier.amount;
+    const amount = tier.minimumAmount;
     const disabled = (amount > 0 && !collective.isActive) || tier.stats.availableQuantity === 0;
     const totalActiveDistinctOrders = tier.stats.totalActiveDistinctOrders;
     let errorMsg;
