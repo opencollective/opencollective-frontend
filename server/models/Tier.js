@@ -69,6 +69,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
       },
 
+      minimumAmount: {
+        type: DataTypes.INTEGER,
+      },
+
       currency: CustomDataTypes(DataTypes).currency,
 
       interval: {
