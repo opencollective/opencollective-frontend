@@ -48,11 +48,33 @@ export async function editNotifications(args, remoteUser) {
     });
 }
 
+/**
+ * Creates a new notification
+ */
 export async function createNotification(args, remoteUser) {
   if (!remoteUser) {
     throw NotificationPermissionError;
   }
 
-  const collective = models.Collective.find({ where: { slug: args.slug } });
-  return models.Notifications.create({});
+  const { CollectiveId, webhookUrl, channel, type } = args.notification;
+
+  return await models.Notification.create({
+    UserId: remoteUser.id,
+    CollectiveId,
+    webhookUrl,
+    channel,
+    type,
+  });
+}
+
+/**
+ * Creates a Webhook subscription for a collective given a collective slug.
+ */
+export async function createWebhook(args, remoteUser) {
+  const collective = models.Collective.find({ where: { slug: args.collectiveSlug } });
+
+  args.notification.channel = channels.WEBHOOK;
+  args.notification.CollectiveId = collective.id;
+
+  return createNotification(args, remoteUser);
 }
