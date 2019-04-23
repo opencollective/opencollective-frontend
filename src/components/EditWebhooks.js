@@ -8,7 +8,7 @@ import gql from 'graphql-tag';
 
 import withIntl from '../lib/withIntl';
 import InputField from './InputField';
-import events from '../constants/events';
+import events from '../constants/notificationEvents';
 import Loading from './Loading';
 
 class EditWebhooks extends React.Component {
