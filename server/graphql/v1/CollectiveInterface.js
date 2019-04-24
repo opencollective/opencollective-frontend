@@ -567,6 +567,8 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           expenseStatus: { defaultValue: null, type: GraphQLString },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          isActive: { type: GraphQLBoolean },
+          isArchived: { type: GraphQLBoolean },
         },
       },
       followers: {
@@ -1014,6 +1016,8 @@ const CollectiveFields = () => {
         expenseStatus: { defaultValue: null, type: GraphQLString },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        isActive: { type: GraphQLBoolean },
+        isArchived: { type: GraphQLBoolean },
       },
       async resolve(collective, args) {
         const query = {
@@ -1022,6 +1026,13 @@ const CollectiveFields = () => {
           limit: args.limit,
           offset: args.offset,
         };
+
+        if (typeof args.isActive !== 'undefined') {
+          query.where.isActive = args.isActive;
+        } else if (typeof args.isArchived !== 'undefined') {
+          query.where.isArchived = args.isArchived;
+        }
+
         /* if any specific Expense status was passed */
         if (args.expenseStatus) {
           /* The escape trick came from here:
