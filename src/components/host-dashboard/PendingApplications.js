@@ -9,20 +9,18 @@ import { get } from 'lodash';
 import { Check } from 'styled-icons/boxicons-regular/Check';
 import { Github } from 'styled-icons/fa-brands/Github';
 
-import withIntl from '../lib/withIntl';
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Page from '../components/Page';
-import Loading from '../components/Loading';
-import StyledCard from '../components/StyledCard';
-import { H1, Span } from '../components/Text';
-import Container from '../components/Container';
-import LinkCollective from '../components/LinkCollective';
-import StyledButton from '../components/StyledButton';
-import StyledHr from '../components/StyledHr';
-import ExternalLinkNewTab from '../components/ExternalLinkNewTab';
-import Avatar from '../components/Avatar';
-import MessageBox from '../components/MessageBox';
+import withIntl from '../../lib/withIntl';
+import { withUser } from '../UserProvider';
+import Loading from '../Loading';
+import StyledCard from '../StyledCard';
+import { Span } from '../Text';
+import Container from '../Container';
+import LinkCollective from '../LinkCollective';
+import StyledButton from '../StyledButton';
+import StyledHr from '../StyledHr';
+import ExternalLinkNewTab from '../ExternalLinkNewTab';
+import Avatar from '../Avatar';
+import MessageBox from '../MessageBox';
 
 const GetPendingApplications = gql`
   query HostPendingApplications($hostCollectiveSlug: String!) {
@@ -53,21 +51,21 @@ const ApproveCollectiveMutation = gql`
   }
 `;
 
-class HostPendingApplicationsPage extends React.Component {
+class HostPendingApplications extends React.Component {
   static propTypes = {
-    loadingLoggedInUser: PropTypes.bool,
     hostCollectiveSlug: PropTypes.string.isRequired,
   };
 
-  static getInitialProps({ query: { hostCollectiveSlug } }) {
-    return { hostCollectiveSlug };
-  }
+  renderPendingCollectives(data, loading) {
+    if (loading) {
+      return (
+        <Box px={2} py={5}>
+          <Loading />
+        </Box>
+      );
+    }
 
-  renderPendingCollectives(data) {
     const pendingCollectives = get(data, 'Collective.pending.collectives', []);
-    const notApprovedCount = pendingCollectives.reduce((total, c) => {
-      return total + (c.isActive ? 0 : 1);
-    }, 0);
 
     return (
       <Container
@@ -78,30 +76,14 @@ class HostPendingApplicationsPage extends React.Component {
         px={2}
         py={5}
       >
-        <Container maxWidth={800}>
-          <H1 mb={5}>
-            <FormattedMessage
-              id="host.pending-applications.title"
-              defaultMessage="Pending applications for {hostName}"
-              values={{ hostName: data.Collective.name }}
-            />
-          </H1>
-        </Container>
-
-        <MessageBox type="info" withIcon mb={4}>
-          {notApprovedCount > 0 ? (
-            <FormattedMessage
-              id="host.pending-applications.pendingCount"
-              defaultMessage="{count, plural, one {One collective is} other {{count} collectives are}} waiting for your approval to be hosted"
-              values={{ count: notApprovedCount }}
-            />
-          ) : (
+        {pendingCollectives.length === 0 && (
+          <MessageBox type="info" withIcon mb={5}>
             <FormattedMessage
               id="host.pending-applications.noPending"
               defaultMessage="No collective waiting for approval"
             />
-          )}
-        </MessageBox>
+          </MessageBox>
+        )}
 
         {pendingCollectives.map(c => (
           <StyledCard
@@ -151,23 +133,17 @@ class HostPendingApplicationsPage extends React.Component {
   }
 
   render() {
-    const { loadingLoggedInUser, hostCollectiveSlug } = this.props;
+    const { hostCollectiveSlug } = this.props;
 
     return (
       <Query query={GetPendingApplications} variables={{ hostCollectiveSlug }}>
         {({ loading, error, data }) =>
           !data || error ? (
-            <ErrorPage data={data} />
+            <MessageBox type="error" withIcon>
+              {error.message}
+            </MessageBox>
           ) : (
-            <Page title="Pending host approvals">
-              {loading || loadingLoggedInUser ? (
-                <Box px={2} py={5}>
-                  <Loading />
-                </Box>
-              ) : (
-                this.renderPendingCollectives(data)
-              )}
-            </Page>
+            this.renderPendingCollectives(data, loading)
           )
         }
       </Query>
@@ -175,4 +151,4 @@ class HostPendingApplicationsPage extends React.Component {
   }
 }
 
-export default withUser(withIntl(HostPendingApplicationsPage));
+export default withUser(withIntl(HostPendingApplications));

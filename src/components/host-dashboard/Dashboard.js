@@ -1,31 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
-
-import ExpensesWithData from '../apps/expenses/components/ExpensesWithData';
-import OrdersWithData from '../apps/expenses/components/OrdersWithData';
-import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage from '../components/ErrorPage';
-import CollectivePicker from '../components/CollectivePickerWithData';
-
-import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 import { FormattedMessage } from 'react-intl';
-import MessageBox from './MessageBox';
-import Page from './Page';
+
+import ExpensesWithData from '../../apps/expenses/components/ExpensesWithData';
+import OrdersWithData from '../../apps/expenses/components/OrdersWithData';
+import ExpensesStatsWithData from '../../apps/expenses/components/ExpensesStatsWithData';
+
+import withIntl from '../../lib/withIntl';
+import withLoggedInUser from '../../lib/withLoggedInUser';
+import MessageBox from '../MessageBox';
+import Loading from '../Loading';
+import CollectivePicker from './CollectivePickerWithData';
 
 class HostDashboard extends React.Component {
   static propTypes = {
     hostCollectiveSlug: PropTypes.string, // for addData
+    view: PropTypes.oneOf(['finances', 'pending-applications']).isRequired,
     LoggedInUser: PropTypes.object,
     data: PropTypes.object, // from addData
   };
@@ -42,19 +35,17 @@ class HostDashboard extends React.Component {
   render() {
     const { LoggedInUser, data } = this.props;
 
-    if (!data.Collective) {
-      return <ErrorPage data={data} />;
-    }
-
-    if (!data.Collective.isHost) {
+    if (data.loading) {
       return (
-        <Page>
-          <Flex px={2} py={6} justifyContent="center">
-            <MessageBox type="error" withIcon>
-              <FormattedMessage id="page.error.collective.is.not.host" defaultMessage="This page is only for hosts" />
-            </MessageBox>
-          </Flex>
-        </Page>
+        <Flex py={5} justifyContent="center">
+          <Loading />
+        </Flex>
+      );
+    } else if (!data.Collective) {
+      return (
+        <MessageBox my={5} type="error" withIcon>
+          <FormattedMessage id="notFound" defaultMessage="Not found" />
+        </MessageBox>
       );
     }
 
@@ -113,83 +104,61 @@ class HostDashboard extends React.Component {
             }
           `}
         </style>
-
-        <Header
-          title={host.name}
-          description={host.description}
-          twitterHandle={host.twitterHandle}
-          image={host.image || host.backgroundImage}
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-        />
-
-        <Body>
-          <CollectiveCover
-            collective={host}
-            href={`/${host.slug}`}
-            className="small"
-            style={get(host, 'settings.style.hero.cover')}
+        {LoggedInUser && (
+          <CollectivePicker
+            host={host}
+            LoggedInUser={LoggedInUser}
+            onChange={selectedCollective => this.pickCollective(selectedCollective)}
           />
-
-          {LoggedInUser && (
-            <CollectivePicker
-              host={host}
-              LoggedInUser={LoggedInUser}
-              onChange={selectedCollective => this.pickCollective(selectedCollective)}
-            />
-          )}
-
-          <div className="content">
-            <div className="columns">
-              <div id="expenses" className="first col">
-                <div className="header">
-                  <h2>
-                    <FormattedMessage
-                      id="collective.expenses.title"
-                      values={{ n: this.totalExpenses }}
-                      defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
-                    />
-                  </h2>
-                </div>
-                <ExpensesWithData
-                  collective={selectedCollective}
-                  host={host}
-                  includeHostedCollectives={includeHostedCollectives}
-                  LoggedInUser={LoggedInUser}
-                  hasFilters
-                  filters={this.state.expensesFilters}
-                  onFiltersChange={expensesFilters => this.setState({ expensesFilters })}
-                  editable={true}
-                />
+        )}
+        <div className="content">
+          <div className="columns">
+            <div id="expenses" className="first col">
+              <div className="header">
+                <h2>
+                  <FormattedMessage
+                    id="collective.expenses.title"
+                    values={{ n: this.totalExpenses }}
+                    defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
+                  />
+                </h2>
               </div>
-              <div id="orders" className="second col">
-                <div className="header">
-                  <h2>
-                    <FormattedMessage
-                      id="collective.orders.title"
-                      values={{ n: this.totalOrders }}
-                      defaultMessage="{n, plural, one {Latest order} other {Latest orders}}"
-                    />
-                  </h2>
-                </div>
-                <OrdersWithData
-                  collective={selectedCollective}
-                  includeHostedCollectives={includeHostedCollectives}
-                  filters={true}
-                  LoggedInUser={LoggedInUser}
-                />
-              </div>
+              <ExpensesWithData
+                collective={selectedCollective}
+                host={host}
+                includeHostedCollectives={includeHostedCollectives}
+                LoggedInUser={LoggedInUser}
+                hasFilters
+                filters={this.state.expensesFilters}
+                onFiltersChange={expensesFilters => this.setState({ expensesFilters })}
+                editable={true}
+              />
             </div>
-
-            {this.state.selectedCollective && (
-              <div className="col side pullLeft">
-                <ExpensesStatsWithData slug={selectedCollective.slug} />
+            <div id="orders" className="second col">
+              <div className="header">
+                <h2>
+                  <FormattedMessage
+                    id="collective.orders.title"
+                    values={{ n: this.totalOrders }}
+                    defaultMessage="{n, plural, one {Latest order} other {Latest orders}}"
+                  />
+                </h2>
               </div>
-            )}
+              <OrdersWithData
+                collective={selectedCollective}
+                includeHostedCollectives={includeHostedCollectives}
+                filters={true}
+                LoggedInUser={LoggedInUser}
+              />
+            </div>
           </div>
-        </Body>
 
-        <Footer />
+          {this.state.selectedCollective && (
+            <div className="col side pullLeft">
+              <ExpensesStatsWithData slug={selectedCollective.slug} />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
