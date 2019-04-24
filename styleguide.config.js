@@ -1,10 +1,19 @@
+const fs = require('fs');
 const path = require('path');
 const fileExistsCaseInsensitive = require('react-styleguidist/lib/scripts/utils/findFileCaseInsensitive');
 
 module.exports = {
   assetsDir: 'styleguide',
   getExampleFilename(componentPath) {
-    const examplePath = path.join(__dirname, 'styleguide', 'examples', `${path.parse(componentPath).name}.md`);
+    const parsedPath = path.parse(componentPath);
+    const parentDirName = parsedPath.dir.split('src/components/')[1] || '';
+    const parentDirPath = path.join(__dirname, 'styleguide', 'examples', parentDirName);
+
+    if (!fs.existsSync(parentDirPath)) {
+      return false;
+    }
+
+    const examplePath = path.join(parentDirPath, `${parsedPath.name}.md`);
     return fileExistsCaseInsensitive(examplePath) || false;
   },
   pagePerSection: true,
@@ -21,7 +30,12 @@ module.exports = {
       name: 'UI',
       content: 'styleguide/pages/UI.md',
       components: 'src/components/*.js',
-      ignore: ['src/components/Contribute*.js', 'src/components/Styled*.js'],
+      ignore: ['src/components/Contribute*.js', 'src/components/Styled*.js', 'src/components/collective-page/*.js'],
+    },
+    {
+      name: 'Collective Page',
+      components: 'src/components/collective-page/*.js',
+      description: 'These components are used on the donate/contribute flow.',
     },
     {
       name: 'Contribution Flow',
