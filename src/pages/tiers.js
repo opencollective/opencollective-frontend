@@ -36,11 +36,6 @@ class TiersPage extends React.Component {
     intl: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   render() {
     const { LoggedInUser, data = {} } = this.props;
 
