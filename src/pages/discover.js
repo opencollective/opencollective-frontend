@@ -15,7 +15,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { FormattedMessage } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
-import StyledSelect from '../components/StyledSelect';
+// import StyledSelect from '../components/StyledSelect';
 
 import Container from '../components/Container';
 import Page from '../components/Page';
@@ -40,6 +40,13 @@ const SearchFormContainer = styled(Box)`
   padding: 64px;
 `;
 const SearchInput = styled(Box)`
+  appearance: none;
+  background-color: white;
+  font-size: 1.2rem;
+  letter-spacing: 0.1rem;
+`;
+
+const StyledSelected = styled(Box)`
   appearance: none;
   background-color: white;
   font-size: 1.2rem;
@@ -203,13 +210,19 @@ const DiscoverPage = ({ all, router, ...props }) => {
               </NavList>
               <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
                 <Box as="li" px={3}>
-                  <StyledSelect name={show} options={all} keyGetter={show} value={show} onChange={onChange}>
+                  <StyledSelected>
+                    name={show}
+                    options={all}
+                    keyGetter={show}
+                    value={show}
+                    onChange={onChange}
                     {tagOptions.map(tag => (
                       <option key={tag} value={tag}>
-                        {tag}
+                        {' '}
+                        {tag}{' '}
                       </option>
                     ))}
-                  </StyledSelect>
+                  </StyledSelected>
                 </Box>
               </NavList>
             </Flex>
