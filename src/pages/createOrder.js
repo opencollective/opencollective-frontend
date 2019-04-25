@@ -688,9 +688,7 @@ class CreateOrderPage extends React.Component {
               )}
             </StyledInputField>
           </Container>
-          <Container>
-            <ContributeAsFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
-          </Container>
+          <ContributeAsFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
         </Flex>
       );
     } else if (step.name === 'details') {
