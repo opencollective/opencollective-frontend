@@ -31,7 +31,7 @@ pages
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
-  .add('host.dashboard', '/:hostCollectiveSlug/dashboard', 'host.dashboard')
+  .add('host.dashboard', '/:hostCollectiveSlug/dashboard/:view(pending-applications)?', 'host.dashboard')
   .add(
     'host.expenses.approve',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)',
