@@ -1418,7 +1418,7 @@ export default function(Sequelize, DataTypes) {
           creatorUser.collective = await creatorUser.getCollective();
         }
         const data = {
-          host: pick(hostCollective, ['id', 'name', 'slug']),
+          host: pick(hostCollective, ['id', 'name', 'slug', 'hostFeePercent']),
           collective: pick(this, [
             'id',
             'slug',
