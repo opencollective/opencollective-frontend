@@ -112,7 +112,7 @@
   "devDependencies": {
     "@babel/cli": "7.4.4",
     "@babel/polyfill": "7.4.4",
-    "@babel/register": "7.4.0",
+    "@babel/register": "7.4.4",
     "babel-eslint": "^10.0.1",
     "babel-plugin-istanbul": "^5.1.0",
     "chai": "^4.2.0",
