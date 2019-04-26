@@ -33,17 +33,8 @@ class EditConnectedAccounts extends React.Component {
     if (collective.type === 'USER') {
       this.state.services.push('github');
     }
-  }
-
-  componentDidMount() {
-    const { collective } = this.props;
-    if (
-      window.location.href.match(/service=stripe/) &&
-      (collective.type === 'USER' || collective.type === 'ORGANIZATION')
-    ) {
-      const { services } = this.state;
-      services.push('stripe');
-      this.setState({ services });
+    if (collective.type === 'USER' || collective.type === 'ORGANIZATION') {
+      this.state.services.push('stripe');
     }
   }
 
