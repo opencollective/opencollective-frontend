@@ -296,7 +296,7 @@
   "createPledge.faq.whatHappens": "Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam\n                folks, so please help us reach out to the community via twitter / github or, if you can, via email.",
   "createPledge.faq.whatHappensSummary": "寄付の約束をした後はどうなりますか？",
   "createPledge.faq.whatSummary": "What is a pledge?",
-  "createPledge.first": "You are the first pledger!",
+  "createPledge.first": "あなたは最初のプレッジャーです！",
   "createPledge.frequency": "頻度",
   "createPledge.githubURL": "GitHub URL: 少なくとも100のスターを持つリポジトリか組織!",
   "createPledge.loadingProfile": "プロフィールの読み込み中...",
