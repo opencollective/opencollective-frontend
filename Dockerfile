@@ -39,6 +39,6 @@ RUN npm run build
 
 RUN npm prune --production
 
-EXPOSE ${PORT}
+EXPOSE $PORT
 
 CMD [ "npm", "run", "start" ]
