@@ -119,7 +119,7 @@ export default app => {
    * GraphQL v1
    */
   const graphqlServerV1 = GraphHTTP({
-    formatError: error => {
+    customFormatErrorFn: error => {
       logger.error(`GraphQL v1 error: ${error.message}`);
       logger.debug(error);
       return formatError(error);

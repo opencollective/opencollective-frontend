@@ -24,10 +24,13 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = async function(paymentMethod
     throw new errors.BadRequest('This preapprovalkey is not approved yet.');
   }
 
+  const balance = parseFloat(response.maxTotalAmountOfAllPayments) - parseFloat(response.curPaymentsAmount);
+  const balanceInCents = Math.trunc(balance * 100);
+
   const data = {
     redirect: paymentMethod.data.redirect,
     details: response,
-    balance: (parseFloat(response.maxTotalAmountOfAllPayments) - parseFloat(response.curPaymentsAmount)) * 100,
+    balance: balanceInCents,
     currency: response.currencyCode,
     transactionsCount: response.curPayments,
   };
@@ -97,7 +100,7 @@ export default {
       // If balance is already available for the PM
       const balance = get(paymentMethod, 'data.balance');
       if (!isNil(balance)) {
-        return { amount: balance, currency: paymentMethod.currency };
+        return { amount: Math.trunc(balance), currency: paymentMethod.currency };
       }
 
       // Otherwise we fetch is from PayPal API
