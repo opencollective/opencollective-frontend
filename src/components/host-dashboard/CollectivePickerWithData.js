@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
+import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
-import Currency from './Currency';
-import { FormattedMessage, defineMessages } from 'react-intl';
-import ConnectPaypal from './ConnectPaypal';
-import AddFundsForm from './AddFundsForm';
 import { pick } from 'lodash';
+
+import withIntl from '../../lib/withIntl';
+import Currency from '../Currency';
+import ConnectPaypal from '../ConnectPaypal';
+import AddFundsForm from '../AddFundsForm';
 
 class CollectivePickerWithData extends React.Component {
   static propTypes = {

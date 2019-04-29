@@ -50,6 +50,8 @@ Avatar.propTypes = {
   src: PropTypes.string,
   /** Collective type */
   type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+  /** Avatar size */
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default withFallbackImage(Avatar);
