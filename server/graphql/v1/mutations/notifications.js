@@ -75,13 +75,18 @@ export async function createWebhook(args, remoteUser) {
 
   args.notification.channel = channels.WEBHOOK;
   args.notification.CollectiveId = collective.id;
-  args.notification.UserId = remoteUser.id;
 
   return await createNotification(args, remoteUser);
 }
 
 export async function deleteNotification(args, remoteUser) {
   if (!remoteUser) {
+    throw NotificationPermissionError;
+  }
+
+  const notification = await models.Notification.find({ where: { id: args.id } });
+
+  if (!(remoteUser.id === notification.UserId || remoteUser.isAdmin(notification.CollectiveId))) {
     throw NotificationPermissionError;
   }
 
