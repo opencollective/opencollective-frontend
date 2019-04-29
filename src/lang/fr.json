@@ -90,7 +90,6 @@
   "collective.create.title": "Créez un Open Collective",
   "collective.created": "Votre collectif a été créé avec succès.",
   "collective.created.description": "Pendant que vous attendez l'approbation de votre hôte ({host}), vous pouvez déjà personnaliser votre collectif, soumettre des dépenses et même créer des événements.",
-  "collective.delete.archiveAvailable": "Vous pouvez toujours l'archiver.",
   "collective.delete.button": "Supprimer ce {type}",
   "collective.delete.cancel.btn": "Annuler",
   "collective.delete.confirm.btn": "Supprimer",
