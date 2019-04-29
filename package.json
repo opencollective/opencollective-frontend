@@ -166,7 +166,7 @@
     "husky": "^2.1.0",
     "jest": "^24.1.0",
     "jest-styled-components": "^6.3.1",
-    "jsdom": "^14.0.0",
+    "jsdom": "^15.0.0",
     "lint-staged": "^8.1.4",
     "mkdirp": "^0.5.1",
     "prettier": "1.17.0",
