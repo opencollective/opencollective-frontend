@@ -55,7 +55,7 @@
     "moment-timezone": "0.5.24",
     "next": "8.0.4",
     "next-routes": "1.4.2",
-    "node-fetch": "2.3.0",
+    "node-fetch": "2.4.1",
     "nodemailer": "6.1.0",
     "nprogress": "0.2.0",
     "nuka-carousel": "4.5.4",
