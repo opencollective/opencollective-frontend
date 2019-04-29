@@ -44,7 +44,7 @@
   "collective.archive.subscriptions": "Subscriptions will be automatically canceled next time they occurs.",
   "collective.archive.title": "Архивировать этот {type}",
   "collective.backgroundImage.label": "Обложка",
-  "collective.balance.description": "Before archiving it might be useful to transfer the remaining balance to the host.",
+  "collective.balance.description": "Transfer remaining balance to the fiscal host. Collective balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.",
   "collective.balance.title": "Пустой баланс коллектива",
   "collective.card.collectives.count": "{n, plural, one {collective} other {collectives}} hosted",
   "collective.card.memberOf.count": "{n, plural, one {collective} other {collectives}} backed",
