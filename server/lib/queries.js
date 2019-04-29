@@ -350,17 +350,12 @@ const getCollectivesWithBalance = async (where = {}, options) => {
     ORDER BY ${orderBy} ${orderDirection} NULLS LAST
   `.replace(/\s\s+/g, ' '); // remove the new lines and save log space
 
-  const [
-    [
-      {
-        dataValues: { total },
-      },
-    ],
-    collectives,
-  ] = await Promise.all([
+  const [[totalResult], collectives] = await Promise.all([
     sequelize.query(`${sql('COUNT(c.*) OVER() as "total"')} LIMIT 1`, params),
     sequelize.query(`${sql(allFields)} LIMIT ${limit} OFFSET ${offset}`, params),
   ]);
+
+  const total = totalResult ? get(totalResult, 'dataValues.total') : 0;
 
   return { total, collectives };
 };
