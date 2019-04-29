@@ -92,7 +92,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           {collective.type === 'COLLECTIVE' && (
             <FormattedMessage
               id="collective.archive.subscriptions"
-              defaultMessage={'Subscriptions will be automatically canceled next time they occurs.'}
+              defaultMessage={'Subscriptions will be automatically canceled.'}
             />
           )}
         </P>
@@ -117,7 +117,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.availableBalance"
             defaultMessage={
-              "This {type} has a non-empty balance and can't be archived. To empty it, submit an expense or donate to another collective."
+              "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option."
             }
           />
         </P>
