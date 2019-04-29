@@ -57,6 +57,8 @@ class TiersPage extends React.Component {
               <Container display="flex" flexDirection="column" alignItems="center" width={1} my={4}>
                 <Link href={`/${collective.slug}`}>
                   <Logo src={logo} height="10rem" />
+                </Link>
+                <Link href={`/${collective.slug}`}>
                   <H3 lineHeight={1.2} color="black.800" textAlign="center">
                     {collective.name}
                   </H3>
