@@ -630,7 +630,7 @@ describe('GraphQL Expenses API', () => {
     const addFunds = async (user, hostCollective, collective, amount) => {
       const currency = collective.currency || 'USD';
       const hostCurrencyFxRate = await getFxRate(currency, hostCollective.currency);
-      const amountInHostCurrency = hostCurrencyFxRate * amount;
+      const amountInHostCurrency = Math.round(hostCurrencyFxRate * amount);
       await models.Transaction.create({
         CreatedByUserId: user.id,
         HostCollectiveId: hostCollective.id,

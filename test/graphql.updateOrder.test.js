@@ -8,6 +8,7 @@ import models from '../server/models';
 const ordersData = utils.data('orders');
 
 const order = {
+  id: null,
   quantity: 1,
   interval: null,
   collective: {
