@@ -70,6 +70,20 @@ class CollectiveCover extends React.Component {
                 &nbsp; - &nbsp;
               </React.Fragment>
             )}
+            {props.collective.endsAt && (
+              <React.Fragment>
+                <FormattedDate
+                  value={props.collective.endsAt}
+                  timeZone={props.collective.timezone}
+                  weekday="short"
+                  day="numeric"
+                  month="long"
+                />
+                , &nbsp;
+                <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
+                &nbsp; - &nbsp;
+              </React.Fragment>
+            )}
             {get(props.collective, 'location.name')}
           </Link>
         </div>
