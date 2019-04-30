@@ -5,15 +5,15 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
 
 import withIntl from '../lib/withIntl';
-import { Link } from '../server/pages';
 
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
-import TierCard from './TierCard';
 import NotificationBar from './NotificationBar';
 import MembersWithData from './MembersWithData';
+import Link from './Link';
+import TierCard from './TierCard';
 import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
 import TeamSection from './TeamSection';
@@ -154,7 +154,8 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
-    const cta = collective.isActive && collective.host ? { href: '#contribute', label: 'contribute' } : null;
+    const cta =
+      collective.isActive && collective.host ? { href: `/${collective.slug}/tiers`, label: 'contribute' } : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
@@ -261,7 +262,6 @@ class Collective extends React.Component {
 
                     <TeamSection collective={collective} LoggedInUser={LoggedInUser} limit={10} />
                   </div>
-
                   {collective.isActive && collective.host && (
                     <div className="sidebar tiers" id="contribute">
                       {collective.tiers.map(tier => (

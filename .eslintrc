@@ -1,9 +1,9 @@
 {
   "extends": [
-    "opencollective",
+    "opencollective"
   ],
   "env": {
-    "jest": true,
+    "jest": true
   },
   "plugins": [
     "graphql",
