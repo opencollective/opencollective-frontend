@@ -604,52 +604,6 @@ export function parseToBoolean(value) {
   return false;
 }
 
-export const trim = (str, length) => {
-  if (!str) return '';
-
-  if (str.length <= length) return str;
-
-  const res = [];
-  let res_length = 0;
-  const words = str.split(' ');
-  let i = 0;
-  while (res_length < length && i < words.length) {
-    const w = words[i++];
-    res_length += w.length + 1;
-    res.push(w);
-  }
-  return `${res.join(' ')} …`;
-};
-
-export const firstSentence = (str, length = 256) => {
-  if (!str) return '';
-
-  str = str.replace(/&amp;/g, '&');
-
-  if (str.length <= length) return str;
-  const tokens = str.match(/\.|\?|!/);
-  if (tokens) {
-    str = str.substr(0, tokens.index + 1);
-  }
-  str = trim(str, length);
-  return str;
-};
-
-export const firstParagraph = (str, length = 256) => {
-  if (!str) return '';
-  const matches = str.match(/<p>((?:.(?!\<\/p\>))*.)<\/p>/i);
-  if (matches && matches.length > 1) {
-    return firstSentence(matches[1], length);
-  } else {
-    // if the string is html, we can't blindly return the first sentence
-    // otherwise it creates this bug: https://github.com/opencollective/opencollective/issues/1943#issuecomment-484232364
-    // Ideally we should strip html tags and then take the first sentence.
-    // But for now it's good enough to simply return an empty string
-    if (str.match(/<[a-z]+>/)) return '';
-    return firstSentence(str, length);
-  }
-};
-
 /**
  * Clean a tags list before inserting to the db. Trim tags, remove empty ones...
  * Will return `null` if the list is empty.

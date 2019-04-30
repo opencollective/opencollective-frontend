@@ -1,7 +1,6 @@
 import handlebars from 'handlebars';
 import moment from 'moment-timezone';
 import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './utils';
-import { firstParagraph } from '../lib/utils';
 
 // from https://stackoverflow.com/questions/8853396/logical-operator-in-a-handlebars-js-if-conditional
 handlebars.registerHelper('ifCond', (v1, operator, v2, options) => {
@@ -39,12 +38,6 @@ handlebars.registerHelper('sign', value => {
 handlebars.registerHelper('toLowerCase', str => {
   if (!str) return '';
   return str.toLowerCase();
-});
-
-handlebars.registerHelper('firstParagraph', (str, props) => {
-  if (!str) return '';
-  const { length } = props.hash;
-  return firstParagraph(str, length || 256);
 });
 
 handlebars.registerHelper('increment', str => {
