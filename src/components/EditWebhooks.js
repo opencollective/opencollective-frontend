@@ -76,6 +76,7 @@ class EditWebhooks extends React.Component {
         maxLength: 255,
         type: 'url',
         label: intl.formatMessage(this.messages['webhooks.url.label']),
+        required: true,
       },
       {
         name: 'activities',
@@ -86,6 +87,7 @@ class EditWebhooks extends React.Component {
         }),
         multiple: true,
         defaultValue: [],
+        required: true,
       },
     ];
   }
@@ -114,7 +116,11 @@ class EditWebhooks extends React.Component {
     const { webhooks } = this.state;
     const notifications = [];
     for (const notification of webhooks) {
+      if (!notification.webhookUrl) continue;
+
       for (const activity of notification.activities) {
+        if (!activity) continue;
+
         notifications.push({
           id: notification.id,
           channel: 'webhook',
@@ -160,6 +166,7 @@ class EditWebhooks extends React.Component {
                   placeholder={field.placeholder}
                   multiple={field.multiple || false}
                   onChange={value => this.editWebhook(index, field.name, value)}
+                  required={field.required}
                 />
               ),
           )}
