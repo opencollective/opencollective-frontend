@@ -27,9 +27,9 @@ module.exports = {
           if (!presets && amount) {
             minimumAmount = amount;
           } else if (presets && !amount) {
-            minimumAmount = Math.min(presets[0], presets[1]);
+            minimumAmount = Math.min(...presets);
           } else if (presets && amount) {
-            minimumAmount = Math.min(amount, presets[0]);
+            minimumAmount = Math.min(amount, ...presets);
           }
 
           return queryInterface.sequelize.query(
