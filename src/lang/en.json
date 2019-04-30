@@ -860,6 +860,7 @@
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.maxQuantity.description": "Leave it empty for unlimited",
   "tier.maxQuantity.label": "Available quantity",
+  "tier.minimumAmount.label": "minimum amount",
   "tier.name.backer": "backer",
   "tier.name.label": "name",
   "tier.name.sponsor": "sponsor",
