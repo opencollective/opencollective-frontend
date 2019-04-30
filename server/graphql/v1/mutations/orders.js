@@ -393,7 +393,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     // If using a tier, amount can never be less than the minimum amount
     if (tier && tier.presets) {
-      const minValue = tier.minimumAmount || min(isNil(tier.amount) ? tier.presets : [...tier.presets, tier.amount]);
+      const minValue = tier.minimumAmount;
       const minAmount = minValue * order.quantity;
       const minTotalAmount = taxPercent ? Math.round(minAmount * (1 + taxPercent / 100)) : minAmount;
       if ((order.totalAmount || 0) < minTotalAmount) {
