@@ -32,7 +32,7 @@
     "cross-fetch": "3.0.2",
     "currency-symbol-map": "4.0.4",
     "dotenv": "7.0.0",
-    "downshift": "3.2.7",
+    "downshift": "3.2.10",
     "draft-js": "0.10.5",
     "express": "4.16.4",
     "express-http-proxy": "1.5.1",
