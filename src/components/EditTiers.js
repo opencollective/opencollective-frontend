@@ -94,6 +94,7 @@ class EditTiers extends React.Component {
         defaultMessage: 'Amount type',
       },
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
+      'minimumAmount.label': { id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' },
       'defaultAmount.label': {
         id: 'tier.defaultAmount.label',
         defaultMessage: 'default amount',
@@ -189,6 +190,13 @@ class EditTiers extends React.Component {
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages['defaultAmount.label']),
+        when: tier => tier._amountType === 'flexible',
+      },
+      {
+        name: 'minimumAmount',
+        pre: getCurrencySymbol(props.currency),
+        type: 'currency',
+        label: intl.formatMessage(this.messages['minimumAmount.label']),
         when: tier => tier._amountType === 'flexible',
       },
       {
