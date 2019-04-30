@@ -355,8 +355,7 @@ const getCollectivesWithBalance = async (where = {}, options) => {
     sequelize.query(`${sql(allFields)} LIMIT ${limit} OFFSET ${offset}`, params),
   ]);
 
-  const total = totalResult ? get(totalResult, 'dataValues.total') : 0;
-
+  const total = get(totalResult, 'dataValues.total', 0);
   return { total, collectives };
 };
 
