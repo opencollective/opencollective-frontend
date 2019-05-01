@@ -93,7 +93,7 @@
     "pg-connection-string": "2.0.0",
     "pg-format": "1.0.4",
     "pg-hstore": "2.3.2",
-    "prepend-http": "2.0.0",
+    "prepend-http": "3.0.1",
     "redis": "2.8.0",
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.3",
