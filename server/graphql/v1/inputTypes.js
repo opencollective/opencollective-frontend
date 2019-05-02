@@ -242,6 +242,7 @@ export const TierInputType = new GraphQLInputObjectType({
     presets: { type: new GraphQLList(GraphQLInt) },
     interval: { type: GraphQLString },
     maxQuantity: { type: GraphQLInt },
+    minimumAmount: { type: GraphQLInt },
     maxQuantityPerUser: { type: GraphQLInt },
     goal: {
       type: GraphQLInt,
