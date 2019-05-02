@@ -273,7 +273,7 @@ class InputField extends React.Component {
                   timezone={context.timezone || 'utc'}
                   isValidDate={field.validate}
                   onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
-                  closeOnSelectmember={closeOnSelect}
+                  closeOnSelect={closeOnSelect}
                 />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
