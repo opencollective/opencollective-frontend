@@ -12,7 +12,7 @@ import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
 import * as ics from 'ics';
-import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
+import { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 
@@ -257,7 +257,7 @@ export default function(Sequelize, DataTypes) {
         validate: {
           len: 2,
           isCountryISO(value) {
-            if (!isISO31661Alpha2(value)) {
+            if (!(isNull(value) || isISO31661Alpha2(value))) {
               throw new Error('Invalid Country ISO.');
             }
           },
