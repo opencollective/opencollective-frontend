@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import md5 from 'md5';
 import Promise from 'bluebird';
-import { pick, omit, get, min, isNil } from 'lodash';
+import { pick, omit, get, isNil } from 'lodash';
 import config from 'config';
 import * as LibTaxes from '@opencollective/taxes';
 
