@@ -102,7 +102,7 @@
     "sequelize-cli": "5.4.0",
     "sequelize-historical": "5.1.0",
     "showdown": "1.9.0",
-    "stripe": "6.31.1",
+    "stripe": "6.31.2",
     "twitter": "1.7.1",
     "unicode": "11.0.1",
     "uuid": "3.3.2",
