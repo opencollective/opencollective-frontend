@@ -25,7 +25,7 @@ class Link extends React.Component {
   }
 
   render() {
-    const { route, params, children, className, title, ...otherProps } = this.props;
+    const { route, params, children, className, title, onClick, ...otherProps } = this.props;
     if (this.isHash) {
       const afterAnimate = () => {
         if (window.history) {
@@ -54,7 +54,7 @@ class Link extends React.Component {
     } else {
       return (
         <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
-          <a className={className} title={title}>
+          <a className={className} title={title} onClick={onClick}>
             {children}
           </a>
         </router.Link>
