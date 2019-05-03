@@ -184,7 +184,7 @@ export const CollectivesStatsType = new GraphQLObjectType({
               {
                 model: models.Collective,
                 as: 'collective',
-                where: { type: types.COLLECTIVE },
+                where: { type: types.COLLECTIVE, isActive: true },
               },
             ],
           });
