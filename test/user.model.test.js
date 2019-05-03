@@ -148,7 +148,7 @@ describe('user.models.test.js', () => {
       const decoded = auth.verifyJwt(token);
 
       // And then the decoded token should contain the user data
-      expect(decoded.sub).to.equal(user.id);
+      expect(+decoded.sub).to.equal(user.id);
       expect(decoded.id).to.equal(user.id);
       expect(decoded.email).to.equal('foo@oc.com');
 
