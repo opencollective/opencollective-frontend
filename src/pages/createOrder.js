@@ -665,7 +665,7 @@ class CreateOrderPage extends React.Component {
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
-          <Box width={[0, null, null, 1 / 4]} />
+          <Box width={[0, null, null, '24em']} />
           <Container>
             <StyledInputField
               htmlFor="contributeAs"
