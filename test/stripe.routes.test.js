@@ -172,7 +172,7 @@ describe('stripe.routes.test.js', () => {
 
           checkStripeAccount: [
             'request',
-            cb => {
+            (_, cb) => {
               return models.ConnectedAccount.findAndCountAll({})
                 .then(res => {
                   expect(res.count).to.be.equal(1);
@@ -193,7 +193,7 @@ describe('stripe.routes.test.js', () => {
 
           checkHost: [
             'checkStripeAccount',
-            (cb, results) => {
+            (results, cb) => {
               return models.Collective.findByPk(results.checkStripeAccount.CollectiveId)
                 .then(collective => {
                   expect(collective.id).to.be.equal(collective.id);
@@ -207,7 +207,7 @@ describe('stripe.routes.test.js', () => {
 
           checkPaymentMethod: [
             'checkStripeAccount',
-            (cb, results) => {
+            (results, cb) => {
               return models.PaymentMethod.findOne({
                 where: {
                   CollectiveId: results.checkStripeAccount.CollectiveId,
