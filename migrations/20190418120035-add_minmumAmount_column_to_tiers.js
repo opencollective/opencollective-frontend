@@ -26,10 +26,12 @@ module.exports = {
           let minimumAmount = null;
           if (!presets && amount) {
             minimumAmount = amount;
-          } else if (presets && !amount) {
+          } else if (presets && presets.length > 0 && !amount) {
             minimumAmount = Math.min(...presets);
-          } else if (presets && amount) {
+          } else if (presets && presets.length > 0 && amount) {
             minimumAmount = Math.min(amount, ...presets);
+          } else if (presets.length === 0 && amount) {
+            minimumAmount = amount;
           }
 
           return queryInterface.sequelize.query(
