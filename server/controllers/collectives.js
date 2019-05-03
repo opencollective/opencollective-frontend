@@ -135,7 +135,7 @@ export const deleteTransaction = (req, res, next) => {
 
       createActivity: [
         'deleteTransaction',
-        cb => {
+        (_, cb) => {
           Activity.create({
             type: 'collective.transaction.deleted',
             UserId: user.id,
