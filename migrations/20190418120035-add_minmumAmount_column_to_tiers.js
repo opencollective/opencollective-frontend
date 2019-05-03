@@ -24,13 +24,11 @@ module.exports = {
           const presets = tier.presets;
           const amount = tier.amount;
           let minimumAmount = null;
-          if (!presets && amount) {
-            minimumAmount = amount;
+          if (presets && presets.length > 0 && amount) {
+            minimumAmount = Math.min(amount, ...presets);
           } else if (presets && presets.length > 0 && !amount) {
             minimumAmount = Math.min(...presets);
-          } else if (presets && presets.length > 0 && amount) {
-            minimumAmount = Math.min(amount, ...presets);
-          } else if (presets.length === 0 && amount) {
+          } else if (amount) {
             minimumAmount = amount;
           }
 

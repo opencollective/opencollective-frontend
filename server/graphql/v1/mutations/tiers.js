@@ -13,9 +13,7 @@ export function editTiers(_, args, req) {
         tier.minimumAmount = Math.min(tier.amount, ...tier.presets);
       } else if (tier.presets && tier.presets.length > 0 && !tier.amount) {
         tier.minimumAmount = Math.min(...tier.presets);
-      } else if (!tier.presets && tier.amount) {
-        tier.minimumAmount = tier.amount;
-      } else if (tier.presets.length === 0 && tier.amount) {
+      } else if (tier.amount) {
         tier.minimumAmount = tier.amount;
       }
     }
