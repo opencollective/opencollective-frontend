@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, Sequelize) {
-    queryInterface
+    return queryInterface
       .createTable('Subscriptions', {
         id: {
           type: Sequelize.INTEGER,
@@ -44,11 +44,7 @@ module.exports = {
         },
       })
       .then(() => {
-        return queryInterface.addIndex(
-          'Subscriptions',
-          ['type', 'GroupId', 'UserId'],
-          { indicesType: 'UNIQUE' },
-        );
+        return queryInterface.addIndex('Subscriptions', ['type', 'GroupId', 'UserId'], { indicesType: 'UNIQUE' });
       });
   },
 

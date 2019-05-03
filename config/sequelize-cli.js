@@ -10,5 +10,4 @@ const dbConfig = getDBConf('database');
 export default {
   ...dbConfig,
   dialectOptions: get(config.database.options, 'dialectOptions', {}),
-  operatorsAliases: get(config.database.options, 'operatorsAliases', false),
 };

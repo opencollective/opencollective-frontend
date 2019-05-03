@@ -1,7 +1,7 @@
 import { TransactionTypes } from '../constants/transactions';
 import Promise from 'bluebird';
 import CustomDataTypes from './DataTypes';
-import Temporal from 'sequelize-temporal';
+import Historical from 'sequelize-historical';
 import { get } from 'lodash';
 
 import debugLib from 'debug';
@@ -309,6 +309,7 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
-  Temporal(Order, Sequelize);
+  Historical(Order, Sequelize);
+
   return Order;
 }

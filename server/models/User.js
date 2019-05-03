@@ -4,6 +4,7 @@ import Promise from 'bluebird';
 import slugify from 'limax';
 import debugLib from 'debug';
 import { extend, defaults, intersection } from 'lodash';
+import { Op } from 'sequelize';
 
 import logger from '../lib/logger';
 import * as auth from '../lib/auth';
@@ -23,7 +24,7 @@ const SALT_WORK_FACTOR = 10;
  * Model.
  */
 export default (Sequelize, DataTypes) => {
-  const { models, Op } = Sequelize;
+  const { models } = Sequelize;
 
   const User = Sequelize.define(
     'User',

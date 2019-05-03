@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface
+    return queryInterface
       .createTable('ConnectedAccounts', {
         id: {
           type: DataTypes.INTEGER,

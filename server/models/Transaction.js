@@ -8,7 +8,7 @@ import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import { toNegative } from '../lib/math';
 import { exportToCSV, parseToBoolean } from '../lib/utils';
-import { get } from 'lodash';
+import { get, isUndefined } from 'lodash';
 import moment from 'moment';
 import { postTransactionToLedger } from '../lib/ledger';
 
@@ -397,6 +397,11 @@ export default (Sequelize, DataTypes) => {
     transaction.TransactionGroup = uuidv4();
     transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;
 
+    if (!isUndefined(transaction.amountInHostCurrency)) {
+      // ensure this is always INT
+      transaction.amountInHostCurrency = Math.round(transaction.amountInHostCurrency);
+    }
+
     const oppositeTransaction = {
       ...transaction,
       type: -transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT,
@@ -405,7 +410,7 @@ export default (Sequelize, DataTypes) => {
       HostCollectiveId: await models.Collective.getHostCollectiveId(transaction.FromCollectiveId), // see https://github.com/opencollective/opencollective/issues/1154
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
-      amountInHostCurrency: -transaction.netAmountInCollectiveCurrency * transaction.hostCurrencyFxRate,
+      amountInHostCurrency: Math.round(-transaction.netAmountInCollectiveCurrency * transaction.hostCurrencyFxRate),
       hostFeeInHostCurrency: transaction.hostFeeInHostCurrency,
       platformFeeInHostCurrency: transaction.platformFeeInHostCurrency,
       paymentProcessorFeeInHostCurrency: transaction.paymentProcessorFeeInHostCurrency,

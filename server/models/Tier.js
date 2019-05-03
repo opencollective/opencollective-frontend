@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
 import slugify from 'limax';
+import { Op } from 'sequelize';
 
 import CustomDataTypes from './DataTypes';
 import { maxInteger } from '../constants/math';
@@ -10,7 +11,7 @@ import { capitalize, pluralize, days, formatCurrency } from '../lib/utils';
 const debug = debugLib('tier');
 
 export default function(Sequelize, DataTypes) {
-  const { models, Op } = Sequelize;
+  const { models } = Sequelize;
 
   const Tier = Sequelize.define(
     'Tier',

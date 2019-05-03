@@ -9,10 +9,12 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
+import { Op } from 'sequelize';
+
 const debug = debugLib('notification');
 
 export default function(Sequelize, DataTypes) {
-  const { models, Op } = Sequelize;
+  const { models } = Sequelize;
 
   const Notification = Sequelize.define(
     'Notification',

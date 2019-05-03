@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import Temporal from 'sequelize-temporal';
+import Historical from 'sequelize-historical';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import prependHttp from 'prepend-http';
@@ -12,8 +12,9 @@ import fetch from 'isomorphic-fetch';
 import crypto from 'crypto';
 import moment from 'moment';
 import * as ics from 'ics';
-import { get, difference, uniqBy, pick, omit, defaults, includes } from 'lodash';
+import { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
+import { Op } from 'sequelize';
 
 import CustomDataTypes from './DataTypes';
 
@@ -103,7 +104,7 @@ const validTypes = ['USER', 'COLLECTIVE', 'ORGANIZATION', 'EVENT', 'BOT'];
  * - Event: Time based collective with a parent collective
  */
 export default function(Sequelize, DataTypes) {
-  const { models, Op } = Sequelize;
+  const { models } = Sequelize;
 
   const Collective = Sequelize.define(
     'Collective',
@@ -256,7 +257,7 @@ export default function(Sequelize, DataTypes) {
         validate: {
           len: 2,
           isCountryISO(value) {
-            if (!isISO31661Alpha2(value)) {
+            if (!(isNull(value) || isISO31661Alpha2(value))) {
               throw new Error('Invalid Country ISO.');
             }
           },
@@ -2270,7 +2271,7 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Tier, { as: 'tiers' });
   };
 
-  Temporal(Collective, Sequelize);
+  Historical(Collective, Sequelize);
 
   return Collective;
 }
