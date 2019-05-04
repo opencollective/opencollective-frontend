@@ -1,12 +1,17 @@
 import Promise from 'bluebird';
 import { values } from 'lodash';
+import config from 'config';
 import models, { Op } from '../../../models';
 import activities from '../../../constants/activities';
 import { channels } from '../../../constants';
-import { Forbidden } from '../../errors';
+import { Forbidden, NotFound } from '../../errors';
 
 const NotificationPermissionError = new Forbidden({
   message: "This notification does not exist or you don't have the permission to edit it.",
+});
+
+const MaxWebhooksExceededError = new Forbidden({
+  message: 'You have reached the webhooks limit for this collective.',
 });
 
 /**
@@ -54,34 +59,34 @@ export async function editWebhooks(args, remoteUser) {
 }
 
 /**
- * Creates a new notification
+ * Creates a Webhook subscription for a collective given a collective slug.
  */
-export async function createNotification(args, remoteUser) {
+export async function createWebhook(args, remoteUser) {
   if (!remoteUser) {
     throw NotificationPermissionError;
   }
 
-  const { CollectiveId, webhookUrl, channel, type } = args.notification;
+  const collective = await models.Collective.findOne({ where: { slug: args.collectiveSlug } });
+  if (!collective) {
+    throw new NotFound({ message: `Collective with slug: ${args.collectiveSlug} not found.` });
+  }
+
+  const { maxWebhooksPerUserPerCollective } = config.limits;
+  const userWebhooksCount = await models.Notification.countRegisteredWebhooks(remoteUser.id, collective.id);
+
+  if (userWebhooksCount >= maxWebhooksPerUserPerCollective) {
+    throw MaxWebhooksExceededError;
+  }
+
+  const { webhookUrl, type } = args.notification;
 
   return models.Notification.create({
     UserId: remoteUser.id,
-    CollectiveId,
-    webhookUrl,
-    channel,
+    CollectiveId: collective.id,
+    channel: channels.WEBHOOK,
     type,
+    webhookUrl,
   });
-}
-
-/**
- * Creates a Webhook subscription for a collective given a collective slug.
- */
-export function createWebhook(args, remoteUser) {
-  const collective = models.Collective.find({ where: { slug: args.collectiveSlug } });
-
-  args.notification.channel = channels.WEBHOOK;
-  args.notification.CollectiveId = collective.id;
-
-  return createNotification(args, remoteUser);
 }
 
 /**
@@ -93,6 +98,9 @@ export async function deleteNotification(args, remoteUser) {
   }
 
   const notification = await models.Notification.find({ where: { id: args.id } });
+  if (!notification) {
+    throw new NotFound({ message: `Notification with ID ${args.id} not found.` });
+  }
 
   if (!(remoteUser.id === notification.UserId || remoteUser.isAdmin(notification.CollectiveId))) {
     throw NotificationPermissionError;

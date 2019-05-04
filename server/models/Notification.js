@@ -10,6 +10,7 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
 import { Op } from 'sequelize';
+import channels from '../constants/channels';
 
 const debug = debugLib('notification');
 
@@ -165,6 +166,16 @@ export default function(Sequelize, DataTypes) {
         return true;
       }
     });
+  };
+
+  /**
+   * Counts registered webhooks for a user, for a collective.
+   * @param {number} userId
+   * @param {number} CollectiveId
+   * @returns {Promise<number>} count
+   */
+  Notification.countRegisteredWebhooks = (userId, CollectiveId) => {
+    return models.Notification.count({ where: { UserId, CollectiveId, channel: channels.WEBHOOK } });
   };
 
   return Notification;

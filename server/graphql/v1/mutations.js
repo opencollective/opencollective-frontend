@@ -24,7 +24,7 @@ import {
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
-import { createNotification, createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
+import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
@@ -752,19 +752,6 @@ const mutations = {
     },
     resolve(_, args, req) {
       return createWebhook(args, req.remoteUser);
-    },
-  },
-  createNotification: {
-    type: NotificationType,
-    description: 'Registers a generic notification of any type and channel.',
-    args: {
-      notification: {
-        type: NotificationInputType,
-        description: 'The notification object.',
-      },
-    },
-    resolve(_, args, req) {
-      return createNotification(args, req.remoteUser);
     },
   },
   deleteNotification: {
