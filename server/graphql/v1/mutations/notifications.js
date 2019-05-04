@@ -9,6 +9,9 @@ const NotificationPermissionError = new Forbidden({
   message: "This notification does not exist or you don't have the permission to edit it.",
 });
 
+/**
+ * Edits (by replacing) the admin-level webhooks for a collective.
+ */
 export async function editWebhooks(args, remoteUser) {
   if (!(remoteUser && remoteUser.isAdmin(args.collectiveId))) {
     throw NotificationPermissionError;
@@ -59,7 +62,7 @@ export async function createNotification(args, remoteUser) {
 
   const { CollectiveId, webhookUrl, channel, type } = args.notification;
 
-  return await models.Notification.create({
+  return models.Notification.create({
     UserId: remoteUser.id,
     CollectiveId,
     webhookUrl,
@@ -71,15 +74,18 @@ export async function createNotification(args, remoteUser) {
 /**
  * Creates a Webhook subscription for a collective given a collective slug.
  */
-export async function createWebhook(args, remoteUser) {
+export function createWebhook(args, remoteUser) {
   const collective = models.Collective.find({ where: { slug: args.collectiveSlug } });
 
   args.notification.channel = channels.WEBHOOK;
   args.notification.CollectiveId = collective.id;
 
-  return await createNotification(args, remoteUser);
+  return createNotification(args, remoteUser);
 }
 
+/**
+ * Deletes a notification by ID.
+ */
 export async function deleteNotification(args, remoteUser) {
   if (!remoteUser) {
     throw NotificationPermissionError;
@@ -91,5 +97,5 @@ export async function deleteNotification(args, remoteUser) {
     throw NotificationPermissionError;
   }
 
-  return await models.Notification.destroy({ where: { id: args.id } });
+  return models.Notification.destroy({ where: { id: args.id } });
 }

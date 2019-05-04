@@ -722,37 +722,59 @@ const mutations = {
   },
   editWebhooks: {
     type: new GraphQLList(NotificationType),
+    description: 'Edits (by replacing) the admin-level webhooks for a collective.',
     args: {
-      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
-      notifications: { type: new GraphQLList(NotificationInputType) },
+      collectiveId: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the collective whose webhooks are edited.',
+      },
+      notifications: {
+        type: new GraphQLList(NotificationInputType),
+        description: 'New notifications for the collective.',
+      },
     },
     resolve(_, args, req) {
       return editWebhooks(args, req.remoteUser);
     },
   },
-  createNotification: {
-    type: NotificationType,
-    args: {
-      notification: { type: NotificationInputType },
-    },
-    resolve(_, args, req) {
-      return createNotification(args, req.remoteUser);
-    },
-  },
   createWebhook: {
     type: NotificationType,
+    description: 'Register user-level webhooks for a collective.',
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
-      notification: { type: NotificationInputType },
+      collectiveSlug: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Slug of the collective the webhook is created for.',
+      },
+      notification: {
+        type: NotificationInputType,
+        description: 'The notification object.',
+      },
     },
     resolve(_, args, req) {
       return createWebhook(args, req.remoteUser);
     },
   },
+  createNotification: {
+    type: NotificationType,
+    description: 'Registers a generic notification of any type and channel.',
+    args: {
+      notification: {
+        type: NotificationInputType,
+        description: 'The notification object.',
+      },
+    },
+    resolve(_, args, req) {
+      return createNotification(args, req.remoteUser);
+    },
+  },
   deleteNotification: {
     type: NotificationType,
+    description: 'Deletes a notification by ID.',
     args: {
-      id: { type: new GraphQLNonNull(GraphQLInt) },
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the notification to delete.',
+      },
     },
     resolve(_, args, req) {
       return deleteNotification(args, req.remoteUser);
