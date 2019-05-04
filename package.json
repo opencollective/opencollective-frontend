@@ -57,7 +57,7 @@
     "handlebars": "4.1.2",
     "hashids": "1.2.2",
     "he": "1.2.0",
-    "helmet": "3.16.0",
+    "helmet": "3.17.0",
     "html-pdf": "2.2.0",
     "ics": "2.13.2",
     "intl-messageformat": "2.2.0",
