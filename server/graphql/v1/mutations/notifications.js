@@ -18,43 +18,39 @@ export async function editWebhooks(args, remoteUser) {
   }
 
   if (!args.notifications) return Promise.resolve();
-  let toCreate = [];
 
-  return models.Notification.findAll({
+  const oldNotifications = await models.Notification.findAll({
     where: { CollectiveId: args.collectiveId, UserId: null, channel: channels.WEBHOOK },
-  })
-    .then(oldNotifications => {
-      const toDelete = oldNotifications
-        .filter(
-          oldNotification =>
-            !args.notifications.some(newNotification => {
-              return (
-                newNotification.type === oldNotification.type &&
-                newNotification.webhookUrl === oldNotification.webhookUrl
-              );
-            }),
-        )
-        .map(x => x.id);
+  });
 
-      toCreate = args.notifications.filter(
-        newNotification =>
-          !oldNotifications.some(oldNotification => {
-            return (
-              oldNotification.type === newNotification.type && oldNotification.webhookUrl === newNotification.webhookUrl
-            );
-          }),
-      );
+  const toDelete = oldNotifications
+    .filter(
+      oldNotification =>
+        !args.notifications.some(newNotification => {
+          return (
+            newNotification.type === oldNotification.type && newNotification.webhookUrl === oldNotification.webhookUrl
+          );
+        }),
+    )
+    .map(x => x.id);
 
-      return models.Notification.destroy({ where: { id: { [Op.in]: toDelete } } });
-    })
-    .then(() => {
-      return Promise.map(toCreate, notification => {
-        if (!(values(activities).includes(notification.type) && notification.channel === channels.WEBHOOK)) return;
+  const toCreate = args.notifications.filter(
+    newNotification =>
+      !oldNotifications.some(oldNotification => {
+        return (
+          oldNotification.type === newNotification.type && oldNotification.webhookUrl === newNotification.webhookUrl
+        );
+      }),
+  );
 
-        notification.CollectiveId = args.id;
-        return models.Notification.create(notification);
-      });
-    });
+  models.Notification.destroy({ where: { id: { [Op.in]: toDelete } } });
+
+  return Promise.map(toCreate, notification => {
+    if (!(values(activities).includes(notification.type) && notification.channel === channels.WEBHOOK)) return;
+
+    notification.CollectiveId = args.id;
+    return models.Notification.create(notification);
+  });
 }
 
 /**
