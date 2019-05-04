@@ -723,7 +723,7 @@ const mutations = {
   editWebhooks: {
     type: new GraphQLList(NotificationType),
     args: {
-      id: { type: new GraphQLNonNull(GraphQLInt) },
+      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       notifications: { type: new GraphQLList(NotificationInputType) },
     },
     resolve(_, args, req) {

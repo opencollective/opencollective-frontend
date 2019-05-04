@@ -10,14 +10,16 @@ const NotificationPermissionError = new Forbidden({
 });
 
 export async function editWebhooks(args, remoteUser) {
-  if (!(remoteUser && remoteUser.isAdmin(args.id))) {
+  if (!(remoteUser && remoteUser.isAdmin(args.collectiveId))) {
     throw NotificationPermissionError;
   }
 
   if (!args.notifications) return Promise.resolve();
   let newNotifications = [];
 
-  return models.Notification.findAll({ where: { CollectiveId: args.id, UserId: null, channel: channels.WEBHOOK } })
+  return models.Notification.findAll({
+    where: { CollectiveId: args.collectiveId, UserId: null, channel: channels.WEBHOOK },
+  })
     .then(oldNotifications => {
       const diff = oldNotifications
         .filter(
