@@ -18,32 +18,37 @@ export async function editWebhooks(args, remoteUser) {
   }
 
   if (!args.notifications) return Promise.resolve();
-  let newNotifications = [];
+  let toCreate = [];
 
   return models.Notification.findAll({
     where: { CollectiveId: args.collectiveId, UserId: null, channel: channels.WEBHOOK },
   })
     .then(oldNotifications => {
-      const diff = oldNotifications
+      const toDelete = oldNotifications
         .filter(
-          x1 =>
-            !args.notifications.some(x2 => {
-              return x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
+          oldNotification =>
+            !args.notifications.some(newNotification => {
+              return (
+                newNotification.type === oldNotification.type &&
+                newNotification.webhookUrl === oldNotification.webhookUrl
+              );
             }),
         )
         .map(x => x.id);
 
-      newNotifications = args.notifications.filter(
-        x1 =>
-          !oldNotifications.some(x2 => {
-            return x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
+      toCreate = args.notifications.filter(
+        newNotification =>
+          !oldNotifications.some(oldNotification => {
+            return (
+              oldNotification.type === newNotification.type && oldNotification.webhookUrl === newNotification.webhookUrl
+            );
           }),
       );
 
-      return models.Notification.destroy({ where: { id: { [Op.in]: diff } } });
+      return models.Notification.destroy({ where: { id: { [Op.in]: toDelete } } });
     })
     .then(() => {
-      return Promise.map(newNotifications, notification => {
+      return Promise.map(toCreate, notification => {
         if (!(values(activities).includes(notification.type) && notification.channel === channels.WEBHOOK)) return;
 
         notification.CollectiveId = args.id;
