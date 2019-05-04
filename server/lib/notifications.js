@@ -48,7 +48,7 @@ export default async (Sequelize, activity) => {
     } else if (notifConfig.channel === channels.TWITTER) {
       return twitter.tweetActivity(activity);
     } else if (notifConfig.channel === channels.WEBHOOK) {
-      return publishToWebhoook(activity, notifConfig.webhookUrl);
+      return publishToWebhook(activity, notifConfig.webhookUrl);
     } else {
       return Promise.resolve();
     }
@@ -71,7 +71,7 @@ function publishToGitter(activity, notifConfig) {
   }
 }
 
-function publishToWebhoook(activity, webhookUrl) {
+function publishToWebhook(activity, webhookUrl) {
   return axios.post(webhookUrl, activity);
 }
 
