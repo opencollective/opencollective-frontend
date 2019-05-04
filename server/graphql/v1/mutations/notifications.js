@@ -9,7 +9,7 @@ const NotificationPermissionError = new Forbidden({
   message: "This notification does not exist or you don't have the permission to edit it.",
 });
 
-export async function editNotifications(args, remoteUser) {
+export async function editWebhooks(args, remoteUser) {
   if (!(remoteUser && remoteUser.isAdmin(args.id))) {
     throw NotificationPermissionError;
   }
@@ -17,13 +17,13 @@ export async function editNotifications(args, remoteUser) {
   if (!args.notifications) return Promise.resolve();
   let newNotifications = [];
 
-  return models.Notification.findAll({ where: { CollectiveId: args.id, UserId: null } })
+  return models.Notification.findAll({ where: { CollectiveId: args.id, UserId: null, channel: channels.WEBHOOK } })
     .then(oldNotifications => {
       const diff = oldNotifications
         .filter(
           x1 =>
             !args.notifications.some(x2 => {
-              return x2.channel === x1.channel && x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
+              return x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
             }),
         )
         .map(x => x.id);
@@ -31,7 +31,7 @@ export async function editNotifications(args, remoteUser) {
       newNotifications = args.notifications.filter(
         x1 =>
           !oldNotifications.some(x2 => {
-            return x2.channel === x1.channel && x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
+            return x2.type === x1.type && x2.webhookUrl === x1.webhookUrl;
           }),
       );
 
@@ -39,8 +39,7 @@ export async function editNotifications(args, remoteUser) {
     })
     .then(() => {
       return Promise.map(newNotifications, notification => {
-        if (!(values(activities).includes(notification.type) && values(channels).includes(notification.channel)))
-          return;
+        if (!(values(activities).includes(notification.type) && notification.channel === channels.WEBHOOK)) return;
 
         notification.CollectiveId = args.id;
         return models.Notification.create(notification);
