@@ -4,7 +4,7 @@ import config from 'config';
 import models, { Op } from '../../../models';
 import { activities } from '../../../constants';
 import { channels } from '../../../constants';
-import { Forbidden, NotFound } from '../../errors';
+import { Forbidden, NotFound, Unauthorized } from '../../errors';
 
 const NotificationPermissionError = new Forbidden({
   message: "This notification does not exist or you don't have the permission to edit it.",
@@ -63,7 +63,7 @@ export async function editWebhooks(args, remoteUser) {
  */
 export async function createWebhook(args, remoteUser) {
   if (!remoteUser) {
-    throw NotificationPermissionError;
+    throw new Unauthorized({ message: 'You need to be logged in to create a webhook.' });
   }
 
   const collective = await models.Collective.findOne({ where: { slug: args.collectiveSlug } });
@@ -94,10 +94,10 @@ export async function createWebhook(args, remoteUser) {
  */
 export async function deleteNotification(args, remoteUser) {
   if (!remoteUser) {
-    throw NotificationPermissionError;
+    throw new Unauthorized({ message: 'You need to be logged in to delete a notification.' });
   }
 
-  const notification = await models.Notification.find({ where: { id: args.id } });
+  const notification = await models.Notification.findOne({ where: { id: args.id } });
   if (!notification) {
     throw new NotFound({ message: `Notification with ID ${args.id} not found.` });
   }
