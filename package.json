@@ -31,7 +31,7 @@
     "cookie-parser": "1.4.4",
     "cross-fetch": "3.0.2",
     "currency-symbol-map": "4.0.4",
-    "dotenv": "7.0.0",
+    "dotenv": "8.0.0",
     "downshift": "3.2.10",
     "draft-js": "0.10.5",
     "express": "4.16.4",
