@@ -1,13 +1,19 @@
 'use strict';
 
 module.exports = {
-  up: async function(queryInterface, DataTypes) {
-    await queryInterface.addIndex('Notifications', ['channel', 'type', 'webhookUrl', 'CollectiveId'], {
-      indicesType: 'UNIQUE',
-    });
+  up: function(queryInterface, DataTypes) {
+    return queryInterface
+      .addIndex('Notifications', ['channel', 'type', 'webhookUrl', 'CollectiveId'], {
+        indicesType: 'UNIQUE',
+      })
+      .then(() => {
+        queryInterface.removeIndex('Notifications', ['type', 'CollectiveId', 'UserId']);
+      });
   },
 
-  down: async function(queryInterface, Sequelize) {
-    await queryInterface.removeIndex('Notifications', ['channel', 'type', 'webhookUrl', 'CollectiveId']);
+  down: function(queryInterface, Sequelize) {
+    queryInterface.removeIndex('Notifications', ['channel', 'type', 'webhookUrl', 'CollectiveId']).then(() => {
+      queryInterface.addIndex('Notifications', ['type', 'CollectiveId', 'UserId'], { indicesType: 'UNIQUE' });
+    });
   },
 };

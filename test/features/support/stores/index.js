@@ -5,6 +5,7 @@
 
 /* Test libraries */
 import sinon from 'sinon';
+import uuidv4 from 'uuid/v4';
 import * as utils from '../../../utils';
 
 /* Libraries that create the objects */
@@ -29,6 +30,11 @@ export function randEmail(email) {
     .toString(36)
     .substring(2, 15);
   return `${user}-${rand}@${domain}`;
+}
+
+/** Returns a random URL. */
+export function randUrl() {
+  return `https://example.com/${uuidv4()}`;
 }
 
 /** Convert string to lower case and swap spaces with dashes */

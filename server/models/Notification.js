@@ -41,7 +41,7 @@ export default function(Sequelize, DataTypes) {
     {
       indexes: [
         {
-          fields: ['type', 'CollectiveId', 'UserId'],
+          fields: ['channel', 'type', 'webhookUrl', 'CollectiveId'],
           type: 'unique',
         },
       ],
@@ -170,11 +170,11 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Counts registered webhooks for a user, for a collective.
-   * @param {number} userId
+   * @param {number} UserId
    * @param {number} CollectiveId
    * @returns {Promise<number>} count
    */
-  Notification.countRegisteredWebhooks = (userId, CollectiveId) => {
+  Notification.countRegisteredWebhooks = (UserId, CollectiveId) => {
     return models.Notification.count({ where: { UserId, CollectiveId, channel: channels.WEBHOOK } });
   };
 

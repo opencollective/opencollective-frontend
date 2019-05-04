@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import { values } from 'lodash';
 import config from 'config';
 import models, { Op } from '../../../models';
-import activities from '../../../constants/activities';
+import { activities } from '../../../constants';
 import { channels } from '../../../constants';
 import { Forbidden, NotFound } from '../../errors';
 
