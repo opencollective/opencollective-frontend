@@ -11,12 +11,12 @@ export const HasMembersFields = {
     description: 'Get all members (admins, members, backers, followers)',
     type: MemberCollection,
     args: {
-      limit: { type: GraphQLInt },
-      offset: { type: GraphQLInt },
+      limit: { type: GraphQLInt, defaultValue: 100 },
+      offset: { type: GraphQLInt, defaultValue: 0 },
       role: { type: new GraphQLList(MemberRole) },
       accountType: { type: new GraphQLList(AccountType) },
     },
-    resolve(collective, args) {
+    async resolve(collective, args) {
       const where = { CollectiveId: collective.id };
 
       if (args.role && args.role.length > 0) {
@@ -28,7 +28,8 @@ export const HasMembersFields = {
           [Op.in]: args.accountType.map(value => AccountTypeToModelMapping[value]),
         };
       }
-      return models.Member.findAndCountAll({
+
+      const result = await models.Member.findAndCountAll({
         where,
         limit: args.limit,
         offset: args.offset,
@@ -40,6 +41,8 @@ export const HasMembersFields = {
           },
         ],
       });
+
+      return { limit: args.limit, offset: args.offset, ...result };
     },
   },
 };

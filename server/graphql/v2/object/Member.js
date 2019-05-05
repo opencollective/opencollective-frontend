@@ -1,20 +1,22 @@
-import { GraphQLInt, GraphQLString, GraphQLObjectType } from 'graphql';
+import { GraphQLString, GraphQLObjectType } from 'graphql';
+// import { GraphQLInt } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
 import { Account } from '../interface/Account';
 import { Amount } from '../object/Amount';
+import { Tier } from '../object/Tier';
 import { MemberRole } from '../enum/MemberRole';
 
 import { idEncode } from '../identifiers';
 
 const MemberFields = {
-  _internal_id: {
-    type: GraphQLInt,
-    resolve(member) {
-      return member.id;
-    },
-  },
+  // _internal_id: {
+  //   type: GraphQLInt,
+  //   resolve(member) {
+  //     return member.id;
+  //   },
+  // },
   id: {
     type: GraphQLString,
     resolve(member) {
@@ -25,6 +27,17 @@ const MemberFields = {
     type: MemberRole,
     resolve(member) {
       return member.role;
+    },
+  },
+  tier: {
+    type: Tier,
+    resolve(member, args, req) {
+      if (member.tier) {
+        return member.tier;
+      }
+      if (member.TierId) {
+        return req.loaders.tiers.findById.load(member.TierId);
+      }
     },
   },
   createdAt: {
@@ -42,14 +55,15 @@ const MemberFields = {
   totalDonations: {
     type: Amount,
     description: 'Total amount donated',
-    resolve(member, args, req) {
-      return (
-        member.totalDonations ||
-        req.loaders.transactions.totalAmountDonatedFromTo.load({
-          FromCollectiveId: member.MemberCollectiveId,
-          CollectiveId: member.CollectiveId,
-        })
-      );
+    async resolve(member, args, req) {
+      if (member.totalDonations) {
+        return { value: member.totalDonations };
+      }
+      const value = await req.loaders.transactions.totalAmountDonatedFromTo.load({
+        FromCollectiveId: member.MemberCollectiveId,
+        CollectiveId: member.CollectiveId,
+      });
+      return { value };
     },
   },
 };

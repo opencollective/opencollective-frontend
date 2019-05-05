@@ -7,6 +7,18 @@ export const MemberCollection = new GraphQLObjectType({
   description: 'A collection of "Members" (ie: Organization backing a Collective)',
   fields: () => {
     return {
+      offset: {
+        type: GraphQLInt,
+        resolve(result) {
+          return result.offset;
+        },
+      },
+      limit: {
+        type: GraphQLInt,
+        resolve(result) {
+          return result.limit;
+        },
+      },
       totalCount: {
         type: GraphQLInt,
         resolve(result) {
