@@ -71,6 +71,9 @@ export default function(Sequelize, DataTypes) {
 
       minimumAmount: {
         type: DataTypes.INTEGER,
+        validate: {
+          min: 0,
+        },
       },
 
       currency: CustomDataTypes(DataTypes).currency,
