@@ -100,14 +100,6 @@ describe('users.routes.test.js', () => {
    * Create.
    */
   describe('#create', () => {
-    it('fails if no api_key', () =>
-      request(app)
-        .post('/users')
-        .send({
-          user: userData,
-        })
-        .expect(400));
-
     it('fails if invalid api_key', () =>
       request(app)
         .post('/users')

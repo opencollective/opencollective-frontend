@@ -9,7 +9,6 @@ import { authenticateUser } from './authentication';
 import models from '../../models';
 
 const {
-  BadRequest,
   Forbidden, // I know who you are, but you permanently don't have access to this resource
   Unauthorized, // You are not authorized, try to authenticate again
 } = errors;
@@ -110,7 +109,7 @@ export function authorizeClientApp(req, res, next) {
     next(new Unauthorized(`Invalid API key: ${apiKey}`));
   } else {
     debug('auth')('Missing API key or Client Id');
-    next(new BadRequest('Missing API key or Client Id'));
+    next();
   }
 }
 
