@@ -8,7 +8,8 @@ export function editTiers(_, args, req) {
   }
 
   const tiers = map(args.tiers, tier => {
-    if (!tier.minimumAmount) {
+    // Compute a minimumAmount if no one is passed
+    if (typeof tier.minimumAmount === 'undefined') {
       if (tier.presets && tier.presets.length > 0 && tier.amount) {
         tier.minimumAmount = Math.min(tier.amount, ...tier.presets);
       } else if (tier.presets && tier.presets.length > 0 && !tier.amount) {
@@ -16,6 +17,10 @@ export function editTiers(_, args, req) {
       } else if (tier.amount) {
         tier.minimumAmount = tier.amount;
       }
+    }
+    // Make minimumAmount null if it's falsey (likely 0)
+    if (!tier.minimumAmount) {
+      tier.minimumAmount = null;
     }
     return tier;
   });
