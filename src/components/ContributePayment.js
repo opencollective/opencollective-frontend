@@ -227,6 +227,8 @@ class ContributePayment extends React.Component {
 
   render() {
     const { paymentMethodsOptions, errors } = this.state;
+    const { intl } = this.props;
+    const locale = intl.locale;
 
     return (
       <StyledCard width={1} maxWidth={500} mx="auto">
@@ -274,6 +276,7 @@ class ContributePayment extends React.Component {
                     onChange={this.onChange}
                     onReady={this.props.onNewCardFormReady}
                     hidePostalCode={this.props.hideCreditCardPostalCode}
+                    locale={locale}
                   />
                 </Box>
               )}
