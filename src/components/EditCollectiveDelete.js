@@ -110,6 +110,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
             </StyledButton>
             <StyledButton
               buttonStyle="primary"
+              data-cy="delete"
               onClick={() => {
                 setShowModal(false);
                 handleDelete();
