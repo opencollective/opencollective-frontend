@@ -173,7 +173,7 @@ export default function(Sequelize, DataTypes) {
         },
 
         amountStr() {
-          let str = `${formatCurrency(this.minimumAmount, this.currency)}+`;
+          let str = `${formatCurrency(this.minimumAmount || 0, this.currency)}+`;
           if (this.interval) {
             str += ` per ${this.interval}`;
           }
