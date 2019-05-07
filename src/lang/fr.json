@@ -43,7 +43,7 @@
   "collective.archive.description": "Cela archivera ce {type}.",
   "collective.archive.modal.body": "Are you sure you want {action} this {type}?",
   "collective.archive.modal.header": "{action} {name}",
-  "collective.archive.subscriptions": "Les abonnements seront automatiquement annulés à la prochaine échéance.",
+  "collective.archive.subscriptions": "Subscriptions will be automatically canceled.",
   "collective.archive.title": "Archiver ce {type}",
   "collective.backgroundImage.label": "Image de couverture",
   "collective.balance.description": "Transférer les fonds à l'hôte fiscal. Pour pour changer d'hôte ou archiver le collectif, le solde du compte doit être à zéro. Alternativement, vous pouvez soumettre une dépense ou donner à un autre collectif.",

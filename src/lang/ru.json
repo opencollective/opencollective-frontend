@@ -43,7 +43,7 @@
   "collective.archive.description": "This will mark this {type} as archived.",
   "collective.archive.modal.body": "Are you sure you want {action} this {type}?",
   "collective.archive.modal.header": "{action} {name}",
-  "collective.archive.subscriptions": "Subscriptions will be automatically canceled next time they occurs.",
+  "collective.archive.subscriptions": "Subscriptions will be automatically canceled.",
   "collective.archive.title": "Архивировать этот {type}",
   "collective.backgroundImage.label": "Обложка",
   "collective.balance.description": "Переведите остаток на счёт фискальному представителю. Баланс коллектива должен равняться нулю, чтобы его можно было добавить в архив или изменить представителя. Вы можете израсходовать содержимое или пожертвовать его другому коллективу.",
@@ -95,15 +95,10 @@
   "collective.delete.button": "Удалить этот {type}",
   "collective.delete.cancel.btn": "Отмена",
   "collective.delete.confirm.btn": "Удалить",
-<<<<<<< HEAD
-  "collective.delete.description": "This {type} will be deleted along with all related data, such as memberships and payment methods.",
-  "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, or paid expenses cannot be deleted. Please archive it instead.",
-=======
   "collective.delete.description": "This will delete {type} and delete all related data such as memberships, payment methods, etc.",
   "collective.delete.isNotDeletable-message": "{type} with transactions, orders or paid expenses cannot be deleted.",
   "collective.delete.modal.body": "Are you sure you want delete this {type}?",
   "collective.delete.modal.header": "Delete {name}",
->>>>>>> refactor(modal): update localization files
   "collective.delete.title": "Удалить этот {type}",
   "collective.description.label": "Короткое описание",
   "collective.donate": "пожертвовать",
