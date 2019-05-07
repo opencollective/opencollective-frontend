@@ -257,6 +257,8 @@
   "contribute.tierDetails": "あなたは{interval, select, month {月間} year {年間} other {}} {amount} の金額でコントリビュートするでしょう。",
   "contribute.tierDetailsTitle": "Tier の詳細:",
   "contribute.vatBadCountry": "The VAT number doesn't match the country",
+  "contributeAs.faq.anonymous.content": "Please log out and create a new account with another email address and don't provide any personal information.",
+  "contributeAs.faq.anonymous.title": "Looking to make an anonymous contribution?",
   "contributeAs.personal": "個人アカウント - {email}",
   "ContributeDetails.faq.frequency.content": "You will be charged today, and then on the 1st of each month (for monthly subscriptions) or the 1st of the same month next year (for yearly subscriptions). Warning: you may be charged twice in a short time frame if you are setting up a monthly subscription close to the end of the month.",
   "ContributeDetails.faq.frequency.title": "When will I be billed next time?",
