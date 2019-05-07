@@ -8,7 +8,7 @@ import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '..
 import { H2, P } from './Text';
 import Container from './Container';
 import StyledButton from './StyledButton';
-import Modal from './Modal';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 import { Router } from '../server/pages';
 
 const getCollectiveType = type => {
@@ -86,26 +86,39 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           />{' '}
         </P>
       )}
-      <Modal
-        onClose={() => setShowModal(false)}
-        show={showModal}
-        className="confirm-deleteCollective"
-        title={`Are you sure you want to delete this ${collectiveType.toLowerCase()}?`}
-      >
-        <Container display="flex" justifyContent="space-between" width={1} mt={4}>
-          <StyledButton onClick={() => setShowModal(false)}>
-            <FormattedMessage id="collective.delete.cancel.btn" defaultMessage={'Cancel'} />
-          </StyledButton>
-          <StyledButton
-            buttonStyle="primary"
-            onClick={() => {
-              setShowModal(false);
-              handleDelete();
-            }}
-          >
-            <FormattedMessage id="collective.delete.confirm.btn" defaultMessage={'Delete'} />
-          </StyledButton>
-        </Container>
+      <Modal show={showModal} width="570px" height="200px" onClose={() => setShowModal(false)}>
+        <ModalHeader>
+          <FormattedMessage
+            id="collective.delete.modal.header"
+            values={{ name: collective.name }}
+            defaultMessage={'Delete {name}'}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <P>
+            <FormattedMessage
+              id="collective.delete.modal.body"
+              values={{ type: collectiveType.toLowerCase() }}
+              defaultMessage={'Are you sure you want delete this {type}?'}
+            />
+          </P>
+        </ModalBody>
+        <ModalFooter>
+          <Container display="flex" justifyContent="flex-end">
+            <StyledButton margin="0 20px" onClick={() => setShowModal(false)}>
+              <FormattedMessage id="collective.delete.cancel.btn" defaultMessage={'Cancel'} />
+            </StyledButton>
+            <StyledButton
+              buttonStyle="primary"
+              onClick={() => {
+                setShowModal(false);
+                handleDelete();
+              }}
+            >
+              <FormattedMessage id="collective.delete.confirm.btn" defaultMessage={'Delete'} />
+            </StyledButton>
+          </Container>
+        </ModalFooter>
       </Modal>
     </Container>
   );
