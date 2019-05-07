@@ -37,7 +37,7 @@ const accountTransactions = {
       where.type = args.type;
     }
 
-    const result = models.Transaction.findAndCountAll({
+    const result = await models.Transaction.findAndCountAll({
       where,
       limit: args.limit,
       offset: args.offset,
