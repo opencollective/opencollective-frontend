@@ -9,41 +9,72 @@ import { IsMemberOfFields } from '../interface/IsMemberOf';
 
 import { MemberCollection, MemberOfCollection } from '../collection/MemberCollection';
 import { TransactionCollection } from '../collection/TransactionCollection';
+import { OrderCollection } from '../collection/OrderCollection';
 
-import { AccountType } from '../enum/AccountType';
-import { TransactionType } from '../enum/TransactionType';
-import { MemberRole } from '../enum/MemberRole';
-
-// import { AccountStats } from '../object/AccountStats';
+import { AccountType, ImageFormat, MemberRole, OrderStatus, TransactionType } from '../enum';
 
 import { ChronologicalOrder } from '../input/ChronologicalOrder';
 
-import models from '../../../models';
+import { NotFound } from '../../errors';
+
+import models, { Op } from '../../../models';
 
 const accountTransactions = {
   type: TransactionCollection,
   args: {
     type: { type: TransactionType },
-    limit: { type: GraphQLInt, defaultValue: 10 },
+    limit: { type: GraphQLInt, defaultValue: 100 },
     offset: { type: GraphQLInt, defaultValue: 0 },
     orderBy: {
       type: ChronologicalOrder,
       defaultValue: ChronologicalOrder.defaultValue,
     },
   },
-  resolve(collective, args) {
+  async resolve(collective, args) {
     const where = { CollectiveId: collective.id };
 
     if (args.type) {
       where.type = args.type;
     }
 
-    return models.Transaction.findAndCountAll({
+    const result = models.Transaction.findAndCountAll({
       where,
       limit: args.limit,
       offset: args.offset,
       order: [[args.orderBy.field, args.orderBy.direction]],
     });
+
+    return { limit: args.limit, offset: args.offset, ...result };
+  },
+};
+
+const accountOrders = {
+  type: OrderCollection,
+  args: {
+    limit: { type: GraphQLInt, defaultValue: 100 },
+    offset: { type: GraphQLInt, defaultValue: 0 },
+    status: { type: new GraphQLList(OrderStatus) },
+    tierSlug: { type: GraphQLString },
+  },
+  async resolve(collective, args) {
+    const where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
+
+    if (args.status && args.status.length > 0) {
+      where.status = { [Op.in]: args.status };
+    }
+
+    if (args.tierSlug) {
+      const tierSlug = args.tierSlug.toLowerCase();
+      const tier = await models.Tier.findOne({ where: { CollectiveId: collective.id, slug: tierSlug } });
+      if (!tier) {
+        throw new NotFound({ message: 'TierSlug Not Found' });
+      }
+      where.TierId = tier.id;
+    }
+
+    const result = await models.Order.findAndCountAll({ where, limit: args.limit, offset: args.offset });
+
+    return { limit: args.limit, offset: args.offset, ...result };
   },
 };
 
@@ -78,6 +109,24 @@ export const AccountFields = {
       return collective.description;
     },
   },
+  website: {
+    type: GraphQLString,
+    resolve(collective) {
+      return collective.website;
+    },
+  },
+  imageUrl: {
+    type: GraphQLString,
+    args: {
+      height: { type: GraphQLInt },
+      format: {
+        type: ImageFormat,
+      },
+    },
+    resolve(collective, args) {
+      return collective.getImageUrl(args);
+    },
+  },
   createdAt: {
     type: GraphQLDateTime,
     resolve(collective) {
@@ -99,6 +148,7 @@ export const AccountFields = {
   ...HasMembersFields,
   ...IsMemberOfFields,
   transactions: accountTransactions,
+  orders: accountOrders,
 };
 
 export const Account = new GraphQLInterfaceType({
@@ -124,13 +174,25 @@ export const Account = new GraphQLInterfaceType({
       description: {
         type: GraphQLString,
       },
+      website: {
+        type: GraphQLString,
+      },
+      imageUrl: {
+        type: GraphQLString,
+        args: {
+          height: { type: GraphQLInt },
+          format: {
+            type: ImageFormat,
+          },
+        },
+      },
       createdAt: {
         type: GraphQLDateTime,
-        description: 'The creation time',
+        description: 'The time of creation',
       },
       updatedAt: {
         type: GraphQLDateTime,
-        description: 'The update time',
+        description: 'The time of last update',
       },
       // stats: {
       //   type: AccountStats,
@@ -138,17 +200,20 @@ export const Account = new GraphQLInterfaceType({
       members: {
         type: MemberCollection,
         args: {
-          limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt },
+          limit: { type: GraphQLInt, defaultValue: 100 },
+          offset: { type: GraphQLInt, defaultValue: 0 },
           role: { type: new GraphQLList(MemberRole) },
-          accountType: { type: new GraphQLList(AccountType) },
+          accountType: {
+            type: new GraphQLList(AccountType),
+            description: 'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
+          },
         },
       },
       memberOf: {
         type: MemberOfCollection,
         args: {
-          limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt },
+          limit: { type: GraphQLInt, defaultValue: 100 },
+          offset: { type: GraphQLInt, defaultValue: 0 },
           role: { type: new GraphQLList(MemberRole) },
           accountType: {
             type: new GraphQLList(AccountType),
@@ -159,8 +224,8 @@ export const Account = new GraphQLInterfaceType({
       transactions: {
         type: TransactionCollection,
         args: {
-          limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt },
+          limit: { type: GraphQLInt, defaultValue: 100 },
+          offset: { type: GraphQLInt, defaultValue: 0 },
           type: {
             type: TransactionType,
             description: 'Type of transaction (DEBIT/CREDIT)',
@@ -168,6 +233,15 @@ export const Account = new GraphQLInterfaceType({
           orderBy: {
             type: ChronologicalOrder,
           },
+        },
+      },
+      orders: {
+        type: OrderCollection,
+        args: {
+          limit: { type: GraphQLInt, defaultValue: 100 },
+          offset: { type: GraphQLInt, defaultValue: 0 },
+          status: { type: new GraphQLList(OrderStatus) },
+          tierSlug: { type: GraphQLString },
         },
       },
     };

@@ -10,13 +10,13 @@ export const Amount = new GraphQLObjectType({
       value: {
         type: GraphQLFloat,
         resolve(amount) {
-          return parseInt(amount.value, 10) / 100 || 0;
+          return parseInt(amount.value, 10) / 100;
         },
       },
       currency: {
         type: Currency,
         resolve(amount) {
-          return amount.currency || 'USD';
+          return amount.currency;
         },
       },
     };
