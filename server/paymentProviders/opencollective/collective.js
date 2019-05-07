@@ -88,7 +88,7 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
   }
 
   if (order.paymentMethod.CollectiveId !== order.fromCollective.id && order.fromCollective.type === 'COLLECTIVE') {
-    throw new Error('Cannot use an opencollective payment method to make a payment on behalf of another collective');
+    throw new Error('Cannot use the opencollective payment method to make a payment on behalf of another collective');
   }
 
   const hostFeePercent = options.hostFeePercent || 0;
@@ -104,52 +104,13 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
         }) to add funds to this collective`,
       );
     }
-    // If Hosts are not the same, then check if both have the same currency collectives
-    // and also both hosts of these collectives have the same currency as well
-    // then look for fromCollectiveHost Credit Card
-    // and create transaction through the paymentLib Process order
   } else if (fromCollectiveHost.id !== collectiveHost.id) {
-    const fromCollectiveHost = await order.fromCollective.getHostCollective();
-    const collectiveHost = await order.collective.getHostCollective();
-    // Check if collectives have the same currency
-    if (order.fromCollective.currency !== order.collective.currency) {
-      throw new Error(
-        `Payments Across hosts are only allowed when both Collectives have the same currency. Collective ${
-          order.collective.name
-        }` + ` is ${order.collective.currency} and ${order.fromCollective.name} is ${order.fromCollective.currency}.`,
-      );
-    }
-    // Check if Hosts have the same currency as well
-    if (fromCollectiveHost.currency !== collectiveHost.currency) {
-      throw new Error(
-        `Payment Across Hosts are only allowed when both Hosts have the same currency. Host ${
-          fromCollectiveHost.name
-        }` + ` is ${fromCollectiveHost.currency} and ${collectiveHost.name} is ${collectiveHost.currency}.`,
-      );
-    }
-    // try to find a credit card for the fromCollectiveHost
-    const fromCollectiveHostPaymentMethod = await models.PaymentMethod.findOne({
-      where: {
-        CollectiveId: fromCollectiveHost.id,
-        type: 'creditcard',
-        matching: null,
-        archivedAt: null,
-        deletedAt: null,
-      },
-      order: [['initialBalance', 'DESC']],
-    });
-    if (!fromCollectiveHostPaymentMethod) {
-      throw new Error(
-        `Host ${fromCollectiveHost.name} needs to add a credit card to send money to a different host (${
-          collectiveHost.name
-        }).`,
-      );
-    }
-    // Change paymentMethod to use credit card instead of collective
-    order.paymentMethod = fromCollectiveHostPaymentMethod;
-    // setting order platform fee to 0 in cross-host transactions
-    order.platformFee = 0;
-    return paymentsLib.processOrder(order);
+    // NOTE: this used to be supported, check git history if you want to understand why and how
+    throw new Error(
+      `Cannot use the opencollective payment method to make a payment between different hosts: ${
+        fromCollectiveHost.name
+      } -> ${collectiveHost.name}`,
+    );
   }
 
   const payload = {
