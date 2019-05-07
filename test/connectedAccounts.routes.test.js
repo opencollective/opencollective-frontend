@@ -19,10 +19,6 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
       done();
     });
 
-    describe('WHEN calling without API key', () => {
-      it('THEN returns 400', () => req.expect(400));
-    });
-
     describe('WHEN calling /connected-accounts/github with API key', () => {
       beforeEach(done => {
         req = request(app)
@@ -51,9 +47,6 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
     beforeEach(done => {
       req = request(app).get('/connected-accounts/github/callback');
       done();
-    });
-    describe('WHEN calling without API key', () => {
-      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN calling with invalid API key', () => {

@@ -3,8 +3,12 @@ import GraphHTTP from 'express-graphql';
 import curlify from 'request-as-curl';
 import multer from 'multer';
 import debug from 'debug';
+import config from 'config';
+import redis from 'redis';
+import expressLimiter from 'express-limiter';
 import { ApolloServer } from 'apollo-server-express';
 import { formatError } from 'apollo-errors';
+import { get } from 'lodash';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
@@ -72,6 +76,42 @@ export default app => {
   app.use('*', auth.checkClientApp);
 
   app.use('*', auth.authorizeClientApp);
+
+  // Setup rate limiter
+  if (get(config, 'redis.serverUrl')) {
+    const client = redis.createClient(get(config, 'redis.serverUrl'));
+    const rateLimiter = expressLimiter(app, client)({
+      lookup: function(req, res, opts, next) {
+        if (req.clientApp) {
+          opts.lookup = 'clientApp.id';
+          // 100 requests / minute for registered API Key
+          opts.total = 100;
+          opts.expire = 1000 * 60;
+        } else {
+          opts.lookup = 'ip';
+          // 10 requests / minute / ip for anonymous requests
+          opts.total = 10;
+          opts.expire = 1000 * 60;
+        }
+        return next();
+      },
+      whitelist: function(req) {
+        const apiKey = req.query.api_key || req.body.api_key;
+        // No limit with internal API Key
+        return apiKey === config.keys.opencollective.apiKey;
+      },
+      onRateLimited: function(req, res) {
+        let message;
+        if (req.clientApp) {
+          message = 'Rate limit exceeded. Contact-us to get higher limits.';
+        } else {
+          message = 'Rate limit exceeded. Create an API Key to get higher limits.';
+        }
+        res.status(429).send({ error: { message } });
+      },
+    });
+    app.use('/graphql', rateLimiter);
+  }
 
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
