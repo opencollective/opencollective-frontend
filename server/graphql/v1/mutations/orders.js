@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import md5 from 'md5';
 import Promise from 'bluebird';
-import { pick, omit, get, min, isNil } from 'lodash';
+import { pick, omit, get, isNil } from 'lodash';
 import config from 'config';
 import * as LibTaxes from '@opencollective/taxes';
 
@@ -393,7 +393,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     // If using a tier, amount can never be less than the minimum amount
     if (tier && tier.presets) {
-      const minValue = min(isNil(tier.amount) ? tier.presets : [...tier.presets, tier.amount]);
+      const minValue = tier.minimumAmount;
       const minAmount = minValue * order.quantity;
       const minTotalAmount = taxPercent ? Math.round(minAmount * (1 + taxPercent / 100)) : minAmount;
       if ((order.totalAmount || 0) < minTotalAmount) {

@@ -70,6 +70,13 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
       },
 
+      minimumAmount: {
+        type: DataTypes.INTEGER,
+        validate: {
+          min: 0,
+        },
+      },
+
       currency: CustomDataTypes(DataTypes).currency,
 
       interval: {
@@ -166,13 +173,7 @@ export default function(Sequelize, DataTypes) {
         },
 
         amountStr() {
-          let str;
-          if (this.presets) {
-            const minimumAmount = Math.min(this.presets[0], this.amount);
-            str = `${formatCurrency(minimumAmount, this.currency)}+`;
-          } else {
-            str = formatCurrency(this.amount, this.currency);
-          }
+          let str = `${formatCurrency(this.minimumAmount, this.currency)}+`;
           if (this.interval) {
             str += ` per ${this.interval}`;
           }
