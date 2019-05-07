@@ -135,6 +135,7 @@ pages.add(
 pages.add('new-collective-page', '/:slug/v2');
 
 pages.add('collective', '/:slug');
+pages.add('tiers', '/:collectiveSlug/tiers');
 
 export default pages;
 

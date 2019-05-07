@@ -17,8 +17,9 @@ import CollectivePage from '../components/collective-page';
  */
 class NewCollectivePage extends React.Component {
   static propTypes = {
-    data: PropTypes.object.isRequired, // from withData
     slug: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired, // from withData
+    LoggedInUser: PropTypes.object, // from withUser
   };
 
   static getInitialProps({ query: { slug } }) {
@@ -51,13 +52,17 @@ class NewCollectivePage extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, LoggedInUser } = this.props;
 
     return !data || data.error ? (
       <ErrorPage data={data} />
     ) : (
       <Page {...this.getPageMetaData(data.collective)}>
-        {data.loading || !data.Collective ? <Loading /> : <CollectivePage collective={data.Collective} />}
+        {data.loading || !data.Collective ? (
+          <Loading />
+        ) : (
+          <CollectivePage collective={data.Collective} host={data.Collective.host} LoggedInUser={LoggedInUser} />
+        )}
       </Page>
     );
   }
@@ -71,12 +76,24 @@ const getCollective = graphql(gql`
       name
       description
       image
+      backgroundImage
       twitterHandle
       githubHandle
+      website
+      tags
+      type
       parentCollective {
         id
         image
         twitterHandle
+        type
+      }
+      host {
+        id
+        name
+        slug
+        image
+        type
       }
     }
   }

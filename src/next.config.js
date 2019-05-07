@@ -86,6 +86,17 @@ const nextConfig = {
       },
     );
 
+    // Load SVGs in base64
+    config.module.rules.push({
+      test: /components\/.*\.(svg)$/,
+      use: {
+        loader: 'url-loader',
+        options: {
+          limit: 1000000,
+        },
+      },
+    });
+
     // Disable the rule forcing react to be bundled in commons chunk
     // Currently needed to skip the react-dom shipped by react-tag-input
     if (get(config, 'optimization.splitChunks.cacheGroups.react')) {

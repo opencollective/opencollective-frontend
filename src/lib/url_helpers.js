@@ -53,6 +53,20 @@ export const tweetURL = opts => {
 };
 
 /**
+ * Generate a URL from a twitter handle
+ */
+export const twitterProfileUrl = twitterHandle => {
+  return `https://twitter.com/${twitterHandle}`;
+};
+
+/**
+ * Generate a URL from a Github handle
+ */
+export const githubProfileUrl = githubHandle => {
+  return `https://github.com/${githubHandle}`;
+};
+
+/**
  * @param opts {object} With the following attributes:
  *  - u: A URL to share in the tweet
  */

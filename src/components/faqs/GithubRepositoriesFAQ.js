@@ -12,24 +12,24 @@ const GithubRepositoriesFAQ = props => (
         <Entry>
           <Title>
             <FormattedMessage
-              id="ContributeDetails.faq.host.title"
+              id="GithubRepositories.faq.host.title"
               defaultMessage="Where is my collective going to be hosted (fiscal sponsored)?"
             />
           </Title>
           <Content>
             <FormattedMessage
-              id="ContributeDetails.faq.host.content"
+              id="GithubRepositories.faq.host.content"
               defaultMessage="We have created a non profit, the Open Source Collective 501c6 in the United States to act as a fiscal sponsor to host all open source projects. This makes it easy for companies to donate to your project since they can receive one consolidated invoice."
             />
           </Content>
         </Entry>
         <Entry>
           <Title>
-            <FormattedMessage id="ContributeDetails.faq.cost.title" defaultMessage="What is the cost?" />
+            <FormattedMessage id="GithubRepositories.faq.cost.title" defaultMessage="What is the cost?" />
           </Title>
           <Content>
             <FormattedMessage
-              id="ContributeDetails.faq.cost.content"
+              id="GithubRepositories.faq.cost.content"
               defaultMessage="The Open Source Collective 501c6 is taking 5% of all donation received (on top of the 5% for the Open Collective platform). This is to cover the administrative overhead, accounting, legal. That way you never have to worry about all that boring stuff and you can focus on your project."
             />
           </Content>

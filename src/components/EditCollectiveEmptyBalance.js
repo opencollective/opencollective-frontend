@@ -17,12 +17,14 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={2}>
       <H2>
-        <FormattedMessage id="collective.balance.title" defaultMessage={'Empty balance of Collective'} />
+        <FormattedMessage id="collective.balance.title" defaultMessage={'Empty Collective balance'} />
       </H2>
       <P>
         <FormattedMessage
           id="collective.balance.description"
-          defaultMessage={'Before archiving it might be useful to transfer the remaining balance to the host.'}
+          defaultMessage={
+            'Transfer remaining balance to the fiscal host. Collective balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
+          }
         />
       </P>
       {collective.stats.balance > 0 && (
