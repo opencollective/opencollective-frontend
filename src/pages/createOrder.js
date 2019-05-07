@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick, isNil, min } from 'lodash';
+import { debounce, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -424,8 +424,7 @@ class CreateOrderPage extends React.Component {
       return 0;
     }
 
-    // Return the minimum amongs presets and amount
-    return min(isNil(tier.amount) ? tier.presets : [...(tier.presets || []), tier.amount]);
+    return tier.minimumAmount;
   }
 
   getDefaultAmount() {
@@ -1010,6 +1009,7 @@ const CollectiveWithTierDataQuery = gql`
       slug
       description
       amount
+      minimumAmount
       currency
       interval
       presets

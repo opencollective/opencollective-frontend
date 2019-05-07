@@ -51,6 +51,7 @@ describe('edit collective', () => {
     cy.get('.EditTiers .tier:first .currency1.inputField input').type('{selectall}5');
     cy.get('.EditTiers .tier:first .currency2.inputField input').type('{selectall}10');
     cy.get('.EditTiers .tier:first .currency3.inputField input').type('{selectall}20');
+    cy.get('.EditTiers .tier:first .minimumAmount.inputField input').type('{selectall}5');
     cy.get('.EditTiers .tier:first .currency0.inputField input').type('{selectall}{backspace}');
     addTier({
       name: 'Donor (one time donation)',

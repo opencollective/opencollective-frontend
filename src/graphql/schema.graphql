@@ -1666,6 +1666,7 @@ type Tier {
   currency: String
   interval: String
   presets: [Int]
+  minimumAmount: Int
   maxQuantity: Int
   maxQuantityPerUser: Int
   goal: Int
@@ -1695,6 +1696,7 @@ input TierInputType {
   amount: Int
   currency: String
   presets: [Int]
+  minimumAmount: Int
   interval: String
   maxQuantity: Int
   maxQuantityPerUser: Int
