@@ -166,6 +166,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             </StyledButton>
             <StyledButton
               buttonStyle="primary"
+              data-cy="action"
               onClick={() => {
                 if (modal.type === 'Unarchive') {
                   handleUnarchiveCollective({ unarchiveCollective, id: collective.id });

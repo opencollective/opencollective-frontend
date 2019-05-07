@@ -9,10 +9,7 @@ describe('Archive Collective', () => {
         cy.contains('button', 'edit organization').click();
         cy.contains('a', 'Advanced').click();
         cy.contains('button', 'Archive this organization').click();
-        cy.get('.confirm-ArchiveCollective').should('exist');
-        cy.get('.confirm-ArchiveCollective')
-          .contains('button', 'Archive')
-          .click();
+        cy.get('[data-cy=action]').click();
         cy.wait(500);
         cy.contains('This organization has been archived');
       });
@@ -28,10 +25,7 @@ describe('Archive Collective', () => {
         cy.wait(1000);
         cy.contains('a', 'Advanced').click();
         cy.contains('button', 'Archive this collective').click();
-        cy.get('.confirm-ArchiveCollective').should('exist');
-        cy.get('.confirm-ArchiveCollective')
-          .contains('button', 'Archive')
-          .click();
+        cy.get('[data-cy=action]').click();
         cy.wait(500);
         cy.contains('This collective has been archived');
       });
