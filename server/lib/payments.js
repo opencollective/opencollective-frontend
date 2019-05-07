@@ -374,10 +374,6 @@ const validatePayment = payment => {
   if (!payment.amount) {
     throw new Error('payment.amount missing');
   }
-
-  if (payment.amount < 50) {
-    throw new Error('payment.amount must be at least $0.50');
-  }
 };
 
 const sendOrderConfirmedEmail = async order => {
