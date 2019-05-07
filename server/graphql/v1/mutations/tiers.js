@@ -1,4 +1,3 @@
-import { map } from 'lodash';
 import errors from '../../../lib/errors';
 
 export function editTiers(_, args, req) {
@@ -6,24 +5,6 @@ export function editTiers(_, args, req) {
   if (!req.remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to edit tiers');
   }
-
-  const tiers = map(args.tiers, tier => {
-    // Compute a minimumAmount if no one is passed
-    if (typeof tier.minimumAmount === 'undefined') {
-      if (tier.presets && tier.presets.length > 0 && tier.amount) {
-        tier.minimumAmount = Math.min(tier.amount, ...tier.presets);
-      } else if (tier.presets && tier.presets.length > 0 && !tier.amount) {
-        tier.minimumAmount = Math.min(...tier.presets);
-      } else if (tier.amount) {
-        tier.minimumAmount = tier.amount;
-      }
-    }
-    // Make minimumAmount null if it's falsey (likely 0)
-    if (!tier.minimumAmount) {
-      tier.minimumAmount = null;
-    }
-    return tier;
-  });
 
   return req.loaders.collective.findById
     .load(args.id)
@@ -38,5 +19,5 @@ export function editTiers(_, args, req) {
           `You need to be logged in as a core contributor or as a host of the ${collective.name} collective`,
         );
     })
-    .then(() => collective.editTiers(tiers));
+    .then(() => collective.editTiers(args.tiers));
 }
