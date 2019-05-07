@@ -9,7 +9,7 @@ import { H2, P } from './Text';
 import Container from './Container';
 import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
-import Modal from './Modal';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 
 const getCollectiveType = type => {
   switch (type) {
@@ -141,33 +141,47 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           />
         </StyledButton>
       )}
-      <Modal
-        onClose={() => setModal({ ...modal, show: false })}
-        show={modal.show}
-        className="confirm-ArchiveCollective"
-        title={`Are you sure you want to ${modal.type.toLowerCase()} this ${collectiveType.toLocaleLowerCase()}?`}
-      >
-        <Container display="flex" justifyContent="space-between" width={1} mt={4}>
-          <StyledButton onClick={() => setModal({ ...modal, show: false })}>
-            <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
-          </StyledButton>
-          <StyledButton
-            buttonStyle="primary"
-            onClick={() => {
-              if (modal.type === 'Unarchive') {
-                handleUnarchiveCollective({ unarchiveCollective, id: collective.id });
-              } else {
-                handleArchiveCollective({ archiveCollective, id: collective.id });
-              }
-            }}
-          >
+
+      <Modal show={modal.show} width="570px" height="200px" onClose={() => setModal({ ...modal, show: false })}>
+        <ModalHeader>
+          <FormattedMessage
+            id="collective.archive.modal.header"
+            values={{ name: collective.name, action: modal.type }}
+            defaultMessage={'{action} {name}'}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <P>
             <FormattedMessage
-              id="collective.archive.confirm.btn"
-              values={{ action: modal.type }}
-              defaultMessage={'{action}'}
+              id="collective.archive.modal.body"
+              values={{ type: collectiveType.toLowerCase(), action: modal.type.toLowerCase() }}
+              defaultMessage={'Are you sure you want {action} this {type}?'}
             />
-          </StyledButton>
-        </Container>
+          </P>
+        </ModalBody>
+        <ModalFooter>
+          <Container display="flex" justifyContent="flex-end">
+            <StyledButton margin="0 20px" onClick={() => setModal({ ...modal, show: false })}>
+              <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
+            </StyledButton>
+            <StyledButton
+              buttonStyle="primary"
+              onClick={() => {
+                if (modal.type === 'Unarchive') {
+                  handleUnarchiveCollective({ unarchiveCollective, id: collective.id });
+                } else {
+                  handleArchiveCollective({ archiveCollective, id: collective.id });
+                }
+              }}
+            >
+              <FormattedMessage
+                id="collective.archive.confirm.btn"
+                values={{ action: modal.type }}
+                defaultMessage={'{action}'}
+              />
+            </StyledButton>
+          </Container>
+        </ModalFooter>
       </Modal>
     </Container>
   );
