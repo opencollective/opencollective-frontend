@@ -1,10 +1,11 @@
 import Promise from 'bluebird';
-import app from '../server/index';
 import async from 'async';
-import { expect } from 'chai';
 import request from 'supertest';
-import * as utils from '../test/utils';
 import sinon from 'sinon';
+import { expect } from 'chai';
+
+import * as utils from '../test/utils';
+import app from '../server/index';
 import models from '../server/models';
 import paypalMock from './mocks/paypal';
 import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
@@ -46,7 +47,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         },
         createUserA: [
           'resetDB',
-          cb => {
+          (_, cb) => {
             models.User.createUserWithCollective(utils.data('user1'))
               .then(user => cb(null, user))
               .catch(cb);
@@ -54,7 +55,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         ],
         createUserB: [
           'createUserA',
-          cb => {
+          (_, cb) => {
             models.User.createUserWithCollective(utils.data('user2'))
               .then(user => cb(null, user))
               .catch(cb);

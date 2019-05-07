@@ -1,13 +1,14 @@
-import { expect } from 'chai';
-import request from 'supertest';
 import async from 'async';
-import nock from 'nock';
 import config from 'config';
+import nock from 'nock';
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import { expect } from 'chai';
+
+import * as utils from '../test/utils';
 import app from '../server/index';
 import models from '../server/models';
-import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
-import jwt from 'jsonwebtoken';
 
 const application = utils.data('application');
 
@@ -171,7 +172,7 @@ describe('stripe.routes.test.js', () => {
 
           checkStripeAccount: [
             'request',
-            cb => {
+            (_, cb) => {
               return models.ConnectedAccount.findAndCountAll({})
                 .then(res => {
                   expect(res.count).to.be.equal(1);
@@ -192,7 +193,7 @@ describe('stripe.routes.test.js', () => {
 
           checkHost: [
             'checkStripeAccount',
-            (cb, results) => {
+            (results, cb) => {
               return models.Collective.findByPk(results.checkStripeAccount.CollectiveId)
                 .then(collective => {
                   expect(collective.id).to.be.equal(collective.id);
@@ -206,7 +207,7 @@ describe('stripe.routes.test.js', () => {
 
           checkPaymentMethod: [
             'checkStripeAccount',
-            (cb, results) => {
+            (results, cb) => {
               return models.PaymentMethod.findOne({
                 where: {
                   CollectiveId: results.checkStripeAccount.CollectiveId,
