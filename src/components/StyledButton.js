@@ -18,6 +18,7 @@ import {
   textAlign,
   width,
   themeGet,
+  margin,
 } from 'styled-system';
 import { buttonSize, buttonStyle } from '../constants/theme';
 import StyledSpinner from './StyledSpinner';
@@ -67,6 +68,7 @@ const StyledButtonContent = styled(tag.button)`
   ${textAlign}
   ${width}
   ${height}
+  ${margin}
 `;
 
 const StyledButton = ({ loading, ...props }) =>
