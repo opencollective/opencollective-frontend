@@ -1,8 +1,9 @@
 import debug from 'debug';
 import slugify from 'limax';
 import { get, omit } from 'lodash';
+import { map } from 'bluebird';
 
-import models from '../../../models';
+import models, { Op } from '../../../models';
 import * as errors from '../../errors';
 import emailLib from '../../../lib/email';
 import * as github from '../../../lib/github';
