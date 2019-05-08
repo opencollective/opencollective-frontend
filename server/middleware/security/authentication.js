@@ -80,7 +80,7 @@ export const checkJwtExpiry = (req, res, next) => {
  */
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
-  const userid = req.jwtPayload.sub;
+  const userid = Number(req.jwtPayload.sub);
   User.findByPk(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
@@ -154,7 +154,7 @@ export function authenticateInternalUserByJwt() {
 }
 
 export const _authenticateInternalUserById = (req, res, next) => {
-  if (req.jwtPayload && contains([1, 2, 4, 5, 6, 7, 8, 30, 40, 212, 772], req.jwtPayload.sub)) {
+  if (req.jwtPayload && contains([1, 2, 4, 5, 6, 7, 8, 30, 40, 212, 772], Number(req.jwtPayload.sub))) {
     next();
   } else {
     throw new Unauthorized();
