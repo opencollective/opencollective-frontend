@@ -49,8 +49,6 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
 
   const { deleting, error } = deleteStatus;
 
-  const hasBalance = collective.stats.balance > 0 && collective.type === 'COLLECTIVE';
-
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
