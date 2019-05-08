@@ -260,7 +260,7 @@
   "contributeAs.faq.anonymous.title": "Looking to make an anonymous contribution?",
   "contributeAs.personal": "Compte personnel - {email}",
   "ContributeDetails.faq.frequency.content": "You will be charged today, and then on the 1st of each month (for monthly subscriptions) or the 1st of the same month next year (for yearly subscriptions). Warning: you may be charged twice in a short time frame if you are setting up a monthly subscription close to the end of the month.",
-  "ContributeDetails.faq.frequency.title": "Quand serais-je être facturé la prochaine fois ?",
+  "ContributeDetails.faq.frequency.title": "Quand serais-je facturé la prochaine fois ?",
   "contributeFlow.contributedTotal": "Total de votre contribution :",
   "contributeFlow.createProfile.legal": "En rejoignant, vous acceptez nos {tosLink} et notre {privacyPolicyLink}.",
   "contributeFlow.successMessage": "{fromCollectiveName, select, anonymous {Vous êtes} other {{fromCollectiveName} est}} maintenant un membre du groupe '{tierName}' de {collectiveName}.",
