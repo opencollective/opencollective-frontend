@@ -1,9 +1,9 @@
 #!/bin/bash
 
 usage() {
-  echo "Usage: db_restore.sh -d DBNAME -U dbuser -f DBDUMP_FILE";
+  echo "Usage: db_restore.sh -d DBNAME -U DBUSER -f DBDUMP_FILE";
   echo "e.g.";
-  echo "> db_restore.sh -d opencollective_dvl -U dbuser -f opencollective-api/test/dbdumps/opencollective_dvl.pgsql"
+  echo "> db_restore.sh -d opencollective_dvl -U opencollective -f test/dbdumps/opencollective_dvl.pgsql"
   exit 0;
 }
 
@@ -32,6 +32,8 @@ shift # past argument or value
 done
 
 LOCALDBUSER=${LOCALDBUSER:-"opencollective"}
+LOCALDBNAME=${LOCALDBNAME:-"opencollective_dvl"}
+DBDUMP_FILE=${DBDUMP_FILE:-"test/dbdumps/opencollective_dvl.pgsql"}
 
 echo "LOCALDBUSER=$LOCALDBUSER"
 echo "LOCALDBNAME=$LOCALDBNAME"

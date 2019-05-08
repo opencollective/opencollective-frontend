@@ -15,14 +15,17 @@ If you see a step below that could be improved (or is outdated), please update t
 
 1. Make sure you have Node.js version >= 10.
 
-- We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
+- We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
 2. Make sure you have a PostgreSQL database available
 
-- Check the version: 10.3, 9.6.8, 9.5.12, 9.4.17, 9.3.22 or newer
+- Check the version: 11.0, 10.3, 9.6.8, 9.5.12, 9.4.17, 9.3.22 or newer
 - Check that the [PostGIS](https://postgis.net/install/) extension is available
+- More info in our [PostgreSQL Database](docs/postgres.md) documentation
 
-3. For [node-gyp](https://github.com/nodejs/node-gyp), make sure you have Python 2 available and configured as the active version. You can use [pyenv](https://github.com/pyenv/pyenv) to manage Python versions.
+3. For [node-gyp](https://github.com/nodejs/node-gyp), make sure you have Python 2 available and configured as the active version.
+
+- You can use [pyenv](https://github.com/pyenv/pyenv) to manage Python versions.
 
 ### Install
 
@@ -42,58 +45,21 @@ npm run dev
 
 #### Troubleshooting
 
-- If you're running into `node-gyp` issues related to Python 3 vs Python 2, you can run:
-  `npm rebuild`
-- The `postinstall` script should bootstrap the database along with some seed data. If it failed, you can try again with:
-  `npm run db:setup && npx babel-node ./scripts/db_restore.js opencollective_dvl`
-
-#### Local Email
-
-Email templates can be viewed locally by running `npm run compile:email <template name>` and making sure there is data for that template in `scripts/compile-email.js`.
-
-Email sending can done by running [`npm run maildev`](https://danfarrelly.nyc/MailDev/) locally and setting the `MAILDEV` environment variable to `true`. Then open `http://localhost:1080` to see any outgoing emails from the `opencollective-api` server.
+- If you're running into `node-gyp` issues related to Python 3 vs Python 2, you can run: `npm rebuild`
+- If you have issues with PostgreSQL, check our [dedicated documentation](docs/postgres.md)
 
 ## Deployment
 
-To deploy to staging or production, you need to be a core member of the Open Collective team.
+**Summary**: This project is currently deployed to staging and production with [Heroku](https://www.heroku.com/). To deploy, you need to be a core member of the Open Collective team.
 
-### (Optional) Configure Slack token
-
-Setting a Slack token will post a message on `#engineering` with the changes you're
-about to deploy. It is not required, but you can activate it like this:
-
-1. Go to https://api.slack.com/custom-integrations/legacy-tokens
-2. Generate a token for the OpenCollective workspace
-3. Add this token to your `.env` file:
-
-```bash
-OC_SLACK_USER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-### Staging (heroku)
-
-```bash
-npm run deploy:staging
-```
-
-URL: https://api-staging.opencollective.com/
-
-### Production (heroku)
-
-```bash
-npm run deploy:production
-```
-
-URL: https://api.opencollective.com/
+See: [docs/deployment.md](docs/deployment.md)
 
 ## More documentation:
 
+- [PostgreSQL Database](docs/postgres.md)
 - [List of supported environment variables](docs/environment_variables.md)
-
-## Data exports
-
-We generate once a month data exports to https://drive.opencollective.com. This contains a list of top backers, top collectives and all transactions of the month.
-To run the data export, run: `npm run export:csv`.
+- [Developing with Emails](docs/emails.md)
+- [Data Exports](docs/data_exports.md)
 
 ## Discussion
 
