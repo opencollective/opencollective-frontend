@@ -48,12 +48,6 @@ npm run dev
 - If you're running into `node-gyp` issues related to Python 3 vs Python 2, you can run: `npm rebuild`
 - If you have issues with PostgreSQL, check our [dedicated documentation](docs/postgres.md)
 
-#### Local Email
-
-Email templates can be viewed locally by running `npm run compile:email <template name>` and making sure there is data for that template in `scripts/compile-email.js`.
-
-Email sending can done by running [`npm run maildev`](https://danfarrelly.nyc/MailDev/) locally and setting the `MAILDEV` environment variable to `true`. Then open `http://localhost:1080` to see any outgoing emails from the `opencollective-api` server.
-
 ## Deployment
 
 **Summary**: This project is currently deployed to staging and production with [Heroku](https://www.heroku.com/). To deploy, you need to be a core member of the Open Collective team.
@@ -64,6 +58,7 @@ See: [docs/deployment.md](docs/deployment.md)
 
 - [PostgreSQL Database](docs/postgres.md)
 - [List of supported environment variables](docs/environment_variables.md)
+- [Developing with Emails](docs/emails.md)
 - [Data Exports](docs/data_exports.md)
 
 ## Discussion
