@@ -307,26 +307,6 @@ export async function createCollectiveFromGithub(_, args, req) {
   collectiveData.currency = 'USD';
   collectiveData.CreatedByUserId = user.id;
   collectiveData.LastEditedByUserId = user.id;
-  collectiveData.tiers = [
-    {
-      name: 'backer',
-      title: 'Backers',
-      description: 'Support us with a monthly donation and help us continue our activities.',
-      button: 'Become a backer',
-      range: [2, 100000],
-      presets: [2, 5, 10, 25, 50],
-      interval: 'monthly',
-    },
-    {
-      name: 'sponsor',
-      title: 'Sponsors',
-      description: 'Become a sponsor and get your logo on our README on Github with a link to your site.',
-      button: 'Become a sponsor',
-      range: [100, 500000],
-      presets: [100, 250, 500],
-      interval: 'monthly',
-    },
-  ];
 
   try {
     collective = await models.Collective.create(collectiveData);
