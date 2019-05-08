@@ -49,8 +49,6 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
 
   const { deleting, error } = deleteStatus;
 
-  const hasBalance = collective.stats.balance > 0 && collective.type === 'COLLECTIVE';
-
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
@@ -65,7 +63,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.description"
           defaultMessage={
-            'This will delete {type} and delete all related data such as memberships, payment methods, etc.'
+            'This {type} will be deleted along with all related data, such as memberships and payment methods.'
           }
         />
       </P>
@@ -82,15 +80,10 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           <FormattedMessage
             values={{ type: collectiveType }}
             id="collective.delete.isNotDeletable-message"
-            defaultMessage={'{type} with transactions, orders or paid expenses cannot be deleted.'}
+            defaultMessage={
+              '{type}s with transactions, orders, or paid expenses cannot be deleted. Please archive it instead.'
+            }
           />{' '}
-          {!hasBalance && (
-            <FormattedMessage
-              values={{ type: collectiveType }}
-              id="collective.delete.archiveAvailable"
-              defaultMessage={'You can archive it instead.'}
-            />
-          )}
         </P>
       )}
       <Modal

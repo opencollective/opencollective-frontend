@@ -40,11 +40,13 @@ class OrderWithData extends React.Component {
 
     return (
       <div className="OrderWithData">
-        <style jsx>{`
-          .comments {
-            margin-top: 3rem;
-          }
-        `}</style>
+        <style jsx>
+          {`
+            .comments {
+              margin-top: 3rem;
+            }
+          `}
+        </style>
         <Order
           key={order.id}
           collective={collective}
