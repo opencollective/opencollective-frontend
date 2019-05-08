@@ -11,13 +11,11 @@ import { defaultHostCollective } from '../../../lib/utils';
 
 import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
-import status from '../../../constants/order_status';
 import { types } from '../../../constants/collectives';
 import { purgeCacheForPage } from '../../../lib/cloudflare';
 
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
-const debugArchive = debug('archive');
 const debugDelete = debug('delete');
 
 export async function createCollective(_, args, req) {
@@ -680,25 +678,7 @@ export async function archiveCollective(_, args, req) {
     throw new Error('Cannot archive collective with balance > 0');
   }
 
-  return collective
-    .getIncomingOrders({
-      where: { status: status.ACTIVE, [Op.and]: { status: status.PENDING } },
-      include: [{ model: models.Subscription }, { model: models.Collective, as: 'collective' }],
-    })
-    .then(orders => {
-      // Map through the `orders` but only create 3 promises to update/cancel orders at a time
-      return map(
-        orders,
-        order => {
-          return Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]);
-        },
-        { concurrency: 3 },
-      );
-    })
-    .then(() => debugArchive('updateOrderAndCancelSubscription'))
-    .then(() => {
-      return collective.update({ isActive: false, deactivatedAt: Date.now() });
-    });
+  return collective.update({ isActive: false, deactivatedAt: Date.now() });
 }
 
 export async function unarchiveCollective(_, args, req) {
