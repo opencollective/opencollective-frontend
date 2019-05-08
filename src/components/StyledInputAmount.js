@@ -15,7 +15,7 @@ const StyledInputAmount = ({ currency, min, max, value, onChange, ...props }) =>
       name="amount"
       maxWidth="10em"
       type="number"
-      step="1"
+      step="0.01"
       min={min}
       max={max}
       value={isNil(value) || value === '' ? '' : clamp(value, !min ? 0 : 1, max)}
