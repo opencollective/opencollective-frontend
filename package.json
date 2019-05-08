@@ -170,7 +170,6 @@
     "test:bdd": "TZ=UTC cucumber-js --require-module @babel/register --require-module @babel/polyfill --backtrace --order random ./test/features",
     "test:coverage": "nyc report --reporter=text-lcov | coveralls",
     "test:clean": "rm -rf .nyc_output coverage",
-    "coverage": "npm run test:coverage",
     "db:clean": "babel-node ./scripts/replace_stripe_accounts.js",
     "db:setup": "babel-node ./scripts/db_setup.js",
     "db:restore": "./scripts/db_restore.sh",
