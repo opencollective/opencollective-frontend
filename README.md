@@ -64,11 +64,7 @@ See: [docs/deployment.md](docs/deployment.md)
 
 - [PostgreSQL Database](docs/postgres.md)
 - [List of supported environment variables](docs/environment_variables.md)
-
-## Data exports
-
-We generate once a month data exports to https://drive.opencollective.com. This contains a list of top backers, top collectives and all transactions of the month.
-To run the data export, run: `npm run export:csv`.
+- [Data Exports](docs/data_exports.md)
 
 ## Discussion
 
