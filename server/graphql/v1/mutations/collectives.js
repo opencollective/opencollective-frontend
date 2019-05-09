@@ -1,6 +1,6 @@
 import debug from 'debug';
 import slugify from 'limax';
-import { get, omit } from 'lodash';
+import { get, omit, forEach } from 'lodash';
 import { map } from 'bluebird';
 
 import models, { Op } from '../../../models';
@@ -379,6 +379,23 @@ export function editCollective(_, args, req) {
   }
 
   let collective, parentCollective;
+
+  const tiers = args.collective.tiers;
+  forEach(tiers, tier => {
+    const presets = tier.presets || [];
+    const amount = tier.amount;
+    const amountType = tier.amountType;
+    const minPreset = Math.min(...presets);
+    if (amountType === 'FLEXIBLE' && presets.indexOf(amount) === -1) {
+      throw new Error('Default amount must be one of suggested values amounts');
+    }
+
+    if (amountType === 'FLEXIBLE' && minPreset < tier.minimumAmount) {
+      throw new Error('Minimum amount cannot be less than minimum suggested amounts');
+    }
+
+    return tier;
+  });
 
   const promises = [
     req.loaders.collective.findById.load(args.collective.id).then(c => {
