@@ -49,7 +49,7 @@ class ApplyToHostBtn extends React.Component {
             <span>
               &nbsp; - &nbsp;
               <a href={get(host, 'settings.tos')}>
-                <FormattedMessage id="host.tos" defaultMessage="Terms of Service" />
+                <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
               </a>
             </span>
           )}
