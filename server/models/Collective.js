@@ -77,6 +77,7 @@ export const defaultTiers = (HostCollectiveId, currency) => {
       interval: 'month',
       currency: currency,
       minimumAmount: 500,
+      amountType: 'FLEXIBLE',
     });
     tiers.push({
       type: 'TIER',
@@ -87,6 +88,7 @@ export const defaultTiers = (HostCollectiveId, currency) => {
       interval: 'month',
       currency: currency,
       minimumAmount: 10000,
+      amountType: 'FLEXIBLE',
     });
   }
   return tiers;
