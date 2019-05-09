@@ -58,7 +58,6 @@ const Divider = styled.div`
   width: 100%;
   height: 1px;
   background-color: #e1e4e6;
-  background-color: var(--silver-four);
 `;
 
 const CloseIcon = styled(Times)`
