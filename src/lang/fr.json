@@ -332,7 +332,7 @@
   "currency": "devise",
   "editCollective.host.balance": "Votre hôte a {balance} au nom de votre collectif.",
   "editCollective.host.cancelApplicationBtn": "Annuler la demande",
-  "editCollective.host.change.balanceNotEmpty": "Si vous souhaitez changer d'hôte, il faut d'abord vider votre solde en enregistrant vos dépenses ou en transférant les fonds à un autre collectif.",
+  "editCollective.host.change.balanceNotEmpty": "Si vous souhaitez changer d'hôte, il vous faut d'abord solder votre compte en enregistrant des dépenses ou en transférant les fonds à un autre collectif.",
   "editCollective.host.change.removeFirst": "Une fois supprimée, vous ne serez plus capables de recevoir des dons. Vous seriez toutefois toujours capables de choisir un autre hôte pour votre collectif.",
   "editCollective.host.label": "Votre hôte est {host}. Il héberge {collectives, plural, one {un collectif} other {{collectives} collectifs}}",
   "editCollective.host.pending": "Vous avez demandé pour être hébergé par {host} le {date}. Dès que l'hôte accepte, vous pourrez commencer à recevoir de l'argent pour votre collectif.",
