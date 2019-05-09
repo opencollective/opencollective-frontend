@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
 
@@ -10,7 +11,7 @@ const ModalWrapper = styled(Container)`
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  max-width: 100%;
+  max-width: 95%;
   max-height: 100%;
   z-index: 100;
   border: 1px solid rgba(9, 10, 10, 0.12);
@@ -31,12 +32,7 @@ const ModalOverlay = styled.div`
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
   z-index: 90;
-  display: none;
-  ${props =>
-    props.show &&
-    `
-      display: block;
-    `}
+  display: block;
 `;
 
 const Header = styled(Container)`
@@ -95,6 +91,9 @@ export const ModalFooter = ({ children }) => (
   </Container>
 );
 
+/**
+ * Modal component
+ */
 const Modal = ({ children, show, width, height, onClose }) => {
   if (show) {
     return (
@@ -107,12 +106,23 @@ const Modal = ({ children, show, width, height, onClose }) => {
             return child;
           })}
         </ModalWrapper>
-        <ModalOverlay show={show} onClick={onClose} />
+        <ModalOverlay onClick={onClose} />
       </React.Fragment>
     );
   } else {
     return null;
   }
+};
+
+Modal.propTypes = {
+  /** a boolean to determin when to show modal */
+  show: PropTypes.bool.isRequired,
+  /** width of the modal component */
+  width: PropTypes.string,
+  /** height of the modal component */
+  height: PropTypes.string,
+  /** handles how the modal is closed */
+  onClose: PropTypes.func.isRequired,
 };
 
 export default Modal;

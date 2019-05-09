@@ -43,7 +43,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         ...archiveStatus,
         processing: false,
         isArchived: true,
-        // confirmationMsg: `The ${collectiveType.toLowerCase()} was successfully archived`,
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
@@ -61,7 +60,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         ...archiveStatus,
         processing: false,
         isArchived: false,
-        // confirmationMsg: `The ${collectiveType.toLowerCase()} was successfully unarchived`,
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
@@ -142,7 +140,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         </StyledButton>
       )}
 
-      <Modal show={modal.show} width="570px" height="200px" onClose={() => setModal({ ...modal, show: false })}>
+      <Modal show={modal.show} width="570px" height="230px" onClose={() => setModal({ ...modal, show: false })}>
         <ModalHeader>
           <FormattedMessage
             id="collective.archive.modal.header"
@@ -155,13 +153,13 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             <FormattedMessage
               id="collective.archive.modal.body"
               values={{ type: collectiveType.toLowerCase(), action: modal.type.toLowerCase() }}
-              defaultMessage={'Are you sure you want {action} this {type}?'}
+              defaultMessage={'Are you sure you want to {action} this {type}?'}
             />
           </P>
         </ModalBody>
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
-            <StyledButton margin="0 20px" onClick={() => setModal({ ...modal, show: false })}>
+            <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
               <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton

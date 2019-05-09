@@ -86,7 +86,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           />{' '}
         </P>
       )}
-      <Modal show={showModal} width="570px" height="200px" onClose={() => setShowModal(false)}>
+      <Modal show={showModal} width="570px" height="230px" onClose={() => setShowModal(false)}>
         <ModalHeader>
           <FormattedMessage
             id="collective.delete.modal.header"
@@ -99,13 +99,13 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
             <FormattedMessage
               id="collective.delete.modal.body"
               values={{ type: collectiveType.toLowerCase() }}
-              defaultMessage={'Are you sure you want delete this {type}?'}
+              defaultMessage={'Are you sure you want to delete this {type}?'}
             />
           </P>
         </ModalBody>
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
-            <StyledButton margin="0 20px" onClick={() => setShowModal(false)}>
+            <StyledButton mx={20} onClick={() => setShowModal(false)}>
               <FormattedMessage id="collective.delete.cancel.btn" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton
