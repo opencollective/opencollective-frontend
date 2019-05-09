@@ -63,7 +63,9 @@ export default function(Sequelize, DataTypes) {
 
       amount: {
         type: DataTypes.INTEGER, // In cents
-        min: 0,
+        validate: {
+          min: 0,
+        },
       },
 
       presets: {
