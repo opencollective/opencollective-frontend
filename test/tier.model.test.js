@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { SequelizeValidationError } from 'sequelize';
 import models from '../server/models';
 import * as utils from '../test/utils';
 
@@ -82,4 +83,28 @@ describe('Collective model', () => {
       .then(available => {
         expect(available).to.be.false;
       }));
+
+  describe('amount', () => {
+    it('cannot have a negative value', () => {
+      return expect(
+        models.Tier.create({
+          type: 'TIER',
+          name: 'sponsor',
+          amount: -5,
+          interval: 'year',
+        }),
+      ).to.be.rejectedWith(SequelizeValidationError, 'Validation min on amount failed');
+    });
+
+    it('can have a null value', () => {
+      return expect(
+        models.Tier.create({
+          type: 'TIER',
+          name: 'sponsor',
+          amount: null,
+          interval: 'year',
+        }),
+      ).to.be.fulfilled;
+    });
+  });
 });
