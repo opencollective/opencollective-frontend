@@ -1,154 +1,151 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import { Button } from 'react-bootstrap';
+import { Query, Mutation } from 'react-apollo';
+import { Flex, Box } from '@rebass/grid';
+import { get, update } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../server/pages';
-
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Body from '../components/Body';
-import ErrorPage from '../components/ErrorPage';
-
-import { getCollectiveApplicationsQuery } from '../graphql/queries';
+import { createApplicationMutation, deleteApplicationMutation } from '../graphql/mutations';
+import { getLoggedInUserApplicationsQuery } from '../graphql/queries';
 
 import withData from '../lib/withData';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import Loading from '../components/Loading';
+import AuthenticatedPage from '../components/AuthenticatedPage';
+import Container from '../components/Container';
+import StyledHr from '../components/StyledHr';
+import StyledButton from '../components/StyledButton';
+import StyledLink from '../components/StyledLink';
+import StyledCard from '../components/StyledCard';
+import MessageBox from '../components/MessageBox';
+import withIntl from '../lib/withIntl';
 
 class Apps extends React.Component {
-  static async getInitialProps({ query: { collectiveSlug } }) {
-    return { collectiveSlug, slug: collectiveSlug };
-  }
-
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired,
-    data: PropTypes.object,
-    collectiveSlug: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-
-    const bustCache = new Date().getTime();
-
-    const [LoggedInUser] = await Promise.all([
-      getLoggedInUser(),
-      this.props.data.refetch({ bustCache }), // Force Client side refetch
-    ]);
-
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { data, collectiveSlug } = this.props;
-    const { LoggedInUser, loading } = this.state;
-    const { Collective } = data;
-
-    if (loading) {
-      return <ErrorPage loading={loading} data={data} />;
-    }
-
-    if (!data.Collective) {
-      return <ErrorPage data={data} />;
-    }
-
-    const apiKeys = Collective.applications.filter(app => app.type === 'API_KEY');
-
     return (
-      <div>
-        <style jsx>
-          {`
-            .apps {
-              width: 80%;
-              margin: 40px auto;
-            }
-            .actions {
-              padding: 20px 0;
-            }
-            .app {
-              border: 1px solid #ccc;
-              margin: 20px 0;
-              padding: 10px;
-            }
-            .separator {
-              border-top: 1px solid #ccc;
-              margin-top: 20px;
-              padding-top: 20px;
-            }
-          `}
-        </style>
-        <Header LoggedInUser={LoggedInUser} />
-        <Body>
-          {Collective && (
-            <div className="apps">
-              <h3>API Keys</h3>
+      <AuthenticatedPage title="Applications">
+        {() => (
+          <Query query={getLoggedInUserApplicationsQuery}>
+            {({ data, loading }) => {
+              if (loading) {
+                return (
+                  <Flex justifyContent="center" my={6}>
+                    <Loading />
+                  </Flex>
+                );
+              }
 
-              <p>Use API Keys to interact with the Open Collective GraphQL API with your own account.</p>
+              const applications = get(data, 'LoggedInUser.collective.applications', []);
+              const apiKeys = applications.filter(app => app.type === 'API_KEY');
 
-              {(!apiKeys || apiKeys.length === 0) && (
-                <p style={{ padding: '10px 0' }}>
-                  <i>No API Key registered.</i>
-                </p>
-              )}
+              return (
+                <Container maxWidth="80%" m="40px auto">
+                  <h3>
+                    <FormattedMessage id="applications.ApiKeys" defaultMessage="API Keys" />
+                  </h3>
 
-              {apiKeys && apiKeys.length > 0 && (
-                <Fragment>
-                  {apiKeys.map(application => (
-                    <div className="app" key={application.id}>
-                      <div className="keys">
-                        API Key: <code>{application.apiKey}</code>
-                        &nbsp; - &nbsp;
-                        <Link
-                          route="editApplication"
-                          params={{
-                            collectiveSlug,
-                            applicationId: application.id,
-                          }}
+                  <p>
+                    <FormattedMessage
+                      id="applications.ApiKeys.description"
+                      defaultMessage="Use API Keys to interact with the Open Collective GraphQL API with your own account."
+                    />
+                  </p>
+
+                  {(!apiKeys || apiKeys.length === 0) && (
+                    <MessageBox type="info" withIcon>
+                      <FormattedMessage id="applications.ApiKeys.none" defaultMessage="No API Key registered." />
+                    </MessageBox>
+                  )}
+
+                  {apiKeys && apiKeys.length > 0 && (
+                    <Mutation
+                      mutation={deleteApplicationMutation}
+                      update={(cache, { data: { deleteApplication } }) => {
+                        const { LoggedInUser } = cache.readQuery({ query: getLoggedInUserApplicationsQuery });
+                        cache.writeQuery({
+                          query: getLoggedInUserApplicationsQuery,
+                          data: {
+                            LoggedInUser: update(LoggedInUser, 'collective.applications', applications => {
+                              return applications ? applications.filter(a => a.id !== deleteApplication.id) : [];
+                            }),
+                          },
+                        });
+                      }}
+                    >
+                      {(deleteApplication, { loading, error }) => (
+                        <Box>
+                          {error && (
+                            <MessageBox type="error" withIcon mb={3}>
+                              {error.message}
+                            </MessageBox>
+                          )}
+                          {apiKeys.map(application => (
+                            <StyledCard m="20px 0" p={10} key={application.id}>
+                              <div className="keys">
+                                <FormattedMessage
+                                  id="applications.ApiKeys.code"
+                                  defaultMessage="API Key: {code}"
+                                  values={{ code: <code>{application.apiKey}</code> }}
+                                />
+                                &nbsp; - &nbsp;
+                                <StyledLink
+                                  disabled={loading}
+                                  onClick={() => deleteApplication({ variables: { id: application.id } })}
+                                >
+                                  <FormattedMessage id="actions.delete" defaultMessage="Delete" />
+                                </StyledLink>
+                              </div>
+                            </StyledCard>
+                          ))}
+                        </Box>
+                      )}
+                    </Mutation>
+                  )}
+
+                  <StyledHr my={3} />
+                  <Mutation
+                    mutation={createApplicationMutation}
+                    update={(cache, { data: { createApplication } }) => {
+                      const { LoggedInUser } = cache.readQuery({ query: getLoggedInUserApplicationsQuery });
+                      cache.writeQuery({
+                        query: getLoggedInUserApplicationsQuery,
+                        data: {
+                          LoggedInUser: update(LoggedInUser, 'collective.applications', applications => {
+                            return applications ? [...applications, createApplication] : [createApplication];
+                          }),
+                        },
+                      });
+                    }}
+                  >
+                    {(createApplication, { loading, error }) => (
+                      <Box>
+                        {error && (
+                          <MessageBox type="error" withIcon mb={3}>
+                            {error.message}
+                          </MessageBox>
+                        )}
+                        <StyledButton
+                          buttonStyle="primary"
+                          loading={loading}
+                          onClick={() => createApplication({ variables: { application: { type: 'API_KEY' } } })}
                         >
-                          <a>Delete</a>
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </Fragment>
-              )}
-
-              <div className="actions separator">
-                <Link route="createApplication" params={{ collectiveSlug, type: 'apiKey' }} passHref>
-                  <Button bsStyle="primary">New API Key</Button>
-                </Link>
-              </div>
-
-              {/*
-
-              <h3>oAuth Applications</h3>
-
-              <p>
-                Use oAuth Applications to create applications that let other
-                users authenticate and interact on our API with their Open
-                Collective account.
-              </p>
-
-              <p>
-                <i>Coming next year.</i>
-              </p>
-
-              */}
-            </div>
-          )}
-        </Body>
-        <Footer />
-      </div>
+                          <FormattedMessage id="applications.ApiKeys.new" defaultMessage="New API Key" />
+                        </StyledButton>
+                      </Box>
+                    )}
+                  </Mutation>
+                </Container>
+              );
+            }}
+          </Query>
+        )}
+      </AuthenticatedPage>
     );
   }
 }
 
-export const addCollectiveApplicationsData = graphql(getCollectiveApplicationsQuery);
-
-export default withData(withLoggedInUser(addCollectiveApplicationsData(Apps)));
+export default withData(withIntl(Apps));

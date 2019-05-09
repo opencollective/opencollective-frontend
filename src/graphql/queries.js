@@ -873,20 +873,24 @@ export const searchCollectivesQuery = gql`
   }
 `;
 
-export const getCollectiveApplicationsQuery = gql`
-  query Collective($slug: String) {
-    Collective(slug: $slug) {
+export const getLoggedInUserApplicationsQuery = gql`
+  query LoggedInUserApplications {
+    LoggedInUser {
       id
-      ... on User {
-        applications {
+      collective {
+        id
+        ... on User {
           id
-          type
-          name
-          description
-          callbackUrl
-          apiKey
-          clientId
-          clientSecret
+          applications {
+            id
+            type
+            name
+            description
+            callbackUrl
+            apiKey
+            clientId
+            clientSecret
+          }
         }
       }
     }
