@@ -53,7 +53,7 @@ export async function editWebhooks(args, remoteUser) {
   return Promise.map(toCreate, notification => {
     if (!(values(activities).includes(notification.type) && notification.channel === channels.WEBHOOK)) return;
 
-    notification.CollectiveId = args.id;
+    notification.CollectiveId = args.collectiveId;
     return models.Notification.create(notification);
   });
 }
