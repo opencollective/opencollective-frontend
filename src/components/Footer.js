@@ -116,7 +116,7 @@ class Footer extends React.Component {
                   LANGUAGES
                 </Span>
                 <StyledTooltip
-                  content={
+                  content={() => (
                     <FormattedMessage
                       id="Footer.Languages.JoinEffort"
                       defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
@@ -128,7 +128,7 @@ class Footer extends React.Component {
                         ),
                       }}
                     />
-                  }
+                  )}
                 >
                   <InfoCircle size={16} cursor="pointer" />
                 </StyledTooltip>

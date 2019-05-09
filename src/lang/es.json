@@ -93,7 +93,7 @@
   "collective.delete.button": "Eliminar este {type}",
   "collective.delete.cancel.btn": "Cancelar",
   "collective.delete.confirm.btn": "Eliminar",
-  "collective.delete.description": "This {type} will be deleted along with all related data, such as memberships and payment methods.",
+  "collective.delete.description": "Esto borrará {type} y borrará toda la información como, afiliados, métodos de pago, etc...",
   "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, or paid expenses cannot be deleted. Please archive it instead.",
   "collective.delete.title": "Eliminar este {type}",
   "collective.description.label": "Descripción corta",

@@ -69,7 +69,7 @@ class OpenSourceApplyPage extends Component {
       } else {
         this.setState({
           loadingRepos: false,
-          result: { type: 'info', mesg: 'Info: No Repository found' },
+          result: { type: 'info', mesg: "We couldn't find any repositories (with >= 100 stars) linked to the account" },
         });
       }
     } catch (error) {

@@ -3,7 +3,7 @@ import { transparentize } from 'polished';
 
 export const colors = {
   black: {
-    900: '#141414',
+    900: '#090A0A',
     800: '#313233',
     700: '#4E5052',
     600: '#76777A',
@@ -98,13 +98,16 @@ const theme = {
   fontSizes,
   lineHeights,
   space,
-  breakpoints: ['40em', '52em', '64em'],
+  breakpoints: [
+    '40em', //  640px - mobile
+    '52em', //  832px - tablet
+    '64em', // 1024px - desktop
+    '88em', // 1408px - widescreen
+  ],
   buttons: {
     standard: {
       backgroundColor: 'white',
-      border: '1px solid',
       borderColor: colors.black[300],
-      borderRadius: '100px',
       color: colors.black[600],
 
       '&:hover': {
@@ -133,8 +136,6 @@ const theme = {
 
     primary: {
       backgroundColor: colors.primary[500],
-      border: '1px solid',
-      borderRadius: '100px',
       borderColor: colors.primary[500],
       color: 'white',
 
@@ -160,6 +161,12 @@ const theme = {
         borderColor: colors.primary[50],
         cursor: 'not-allowed',
       },
+    },
+
+    dark: {
+      backgroundColor: colors.black[900],
+      color: colors.white.full,
+      borderColor: colors.black[900],
     },
   },
   buttonSizes: {

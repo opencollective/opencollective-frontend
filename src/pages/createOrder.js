@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick, isNil, min } from 'lodash';
+import { debounce, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -24,6 +24,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Link from '../components/Link';
 import ContributeAs from '../components/ContributeAs';
+import ContributeAsFAQ from '../components/faqs/ContributeAsFAQ';
 import StyledInputField from '../components/StyledInputField';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
@@ -423,8 +424,7 @@ class CreateOrderPage extends React.Component {
       return 0;
     }
 
-    // Return the minimum amongs presets and amount
-    return min(isNil(tier.amount) ? tier.presets : [...(tier.presets || []), tier.amount]);
+    return tier.minimumAmount;
   }
 
   getDefaultAmount() {
@@ -663,26 +663,32 @@ class CreateOrderPage extends React.Component {
 
     if (step.name === 'contributeAs') {
       return (
-        <StyledInputField
-          htmlFor="contributeAs"
-          label={
-            <H5 textAlign="left" mb={3}>
-              <FormattedMessage id="contribute.profile.label" defaultMessage="Contribute As:" />
-            </H5>
-          }
-        >
-          {fieldProps => (
-            <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
-              <ContributeAs
-                {...fieldProps}
-                onProfileChange={this.updateProfile}
-                profiles={profiles}
-                personal={personal}
-                defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
-              />
-            </Container>
-          )}
-        </StyledInputField>
+        <Flex justifyContent="center" width={1}>
+          <Box width={[0, null, null, '24em']} />
+          <Container>
+            <StyledInputField
+              htmlFor="contributeAs"
+              label={
+                <H5 textAlign="left" mb={3}>
+                  <FormattedMessage id="contribute.profile.label" defaultMessage="Contribute As:" />
+                </H5>
+              }
+            >
+              {fieldProps => (
+                <Container as="form" onSubmit={e => e.preventDefault()} ref={this.activeFormRef}>
+                  <ContributeAs
+                    {...fieldProps}
+                    onProfileChange={this.updateProfile}
+                    profiles={profiles}
+                    personal={personal}
+                    defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
+                  />
+                </Container>
+              )}
+            </StyledInputField>
+          </Container>
+          <ContributeAsFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+        </Flex>
       );
     } else if (step.name === 'details') {
       return (
@@ -1003,6 +1009,7 @@ const CollectiveWithTierDataQuery = gql`
       slug
       description
       amount
+      minimumAmount
       currency
       interval
       presets

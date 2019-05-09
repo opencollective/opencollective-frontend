@@ -11,6 +11,7 @@ import {
   fontFamily,
   fontSize,
   fontWeight,
+  height,
   minWidth,
   maxWidth,
   space,
@@ -31,6 +32,8 @@ const StyledButtonContent = styled(tag.button)`
   border: none;
   cursor: pointer;
   outline: 0;
+  border: 1px solid;
+  border-radius: 100px;
 
   ${buttonStyle}
   ${buttonSize}
@@ -63,6 +66,7 @@ const StyledButtonContent = styled(tag.button)`
   ${space}
   ${textAlign}
   ${width}
+  ${height}
 `;
 
 const StyledButton = ({ loading, ...props }) =>
@@ -84,7 +88,7 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'standard']),
+  buttonStyle: PropTypes.oneOf(['primary', 'standard', 'dark']),
   /**
    * From styled-system: accepts any css 'display' value
    */

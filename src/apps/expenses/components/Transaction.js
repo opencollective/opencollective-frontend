@@ -129,6 +129,13 @@ class Transaction extends React.Component {
     }
 
     const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type) ? netAmountInCollectiveCurrency : amount;
+    let precision = 0;
+
+    // Check if the remainder is not 0, this check is important in order to know the amount that needs precision
+    // i.e display $10.21 as $10.21 instead of $10
+    if ((amountToDisplay / 100) % 1 !== 0) {
+      precision = 2;
+    }
 
     return (
       <Flex my={4}>
@@ -152,7 +159,7 @@ class Transaction extends React.Component {
               </P>
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
-            <AmountCurrency amount={amountToDisplay} currency={currency} />
+            <AmountCurrency amount={amountToDisplay} currency={currency} precision={precision} />
           </Flex>
           <Container fontSize="1.2rem" color="#AEB2B8">
             {this.renderPaymentOrigin()}
