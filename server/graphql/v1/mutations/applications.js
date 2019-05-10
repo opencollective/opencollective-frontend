@@ -41,33 +41,16 @@ export async function createApplication(_, args, req) {
   return app;
 }
 
-export async function updateApplication(_, args, req) {
-  const app = await Application.findByPk(args.id);
-  if (!app) {
-    throw new errors.NotFound({
-      message: `Application with id ${args.id} not found`,
-    });
-  }
-
-  if (!req.remoteUser) {
-    throw new errors.Unauthorized('You need to be authenticated to update an application.');
-  } else if (req.remoteUser.id !== app.CreatedByUserId) {
-    throw new errors.Forbidden('Authenticated user is not the application owner.');
-  }
-
-  return await app.update(args.application);
-}
-
 export async function deleteApplication(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized('You need to be authenticated to delete an application.');
+  }
+
   const app = await Application.findByPk(args.id);
   if (!app) {
     throw new errors.NotFound({
       message: `Application with id ${args.id} not found`,
     });
-  }
-
-  if (!req.remoteUser) {
-    throw new errors.Unauthorized('You need to be authenticated to update an application.');
   } else if (req.remoteUser.id !== app.CreatedByUserId) {
     throw new errors.Forbidden('Authenticated user is not the application owner.');
   }

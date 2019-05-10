@@ -538,20 +538,6 @@ const mutations = {
       return applicationMutations.createApplication(_, args, req);
     },
   },
-  updateApplication: {
-    type: ApplicationType,
-    args: {
-      id: {
-        type: new GraphQLNonNull(GraphQLString),
-      },
-      application: {
-        type: new GraphQLNonNull(ApplicationInputType),
-      },
-    },
-    resolve(_, args, req) {
-      return applicationMutations.updateApplication(_, args, req);
-    },
-  },
   deleteApplication: {
     type: ApplicationType,
     args: {
