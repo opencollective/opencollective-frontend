@@ -23,7 +23,7 @@ class EditWebhooks extends React.Component {
   static getDerivedStateFromProps(props, state) {
     const webhooks = {};
 
-    if (isEmpty(state.webhooks) && !isEmpty(props.data.Collective)) {
+    if (!state.isLoaded && !isEmpty(props.data.Collective)) {
       get(props, 'data.Collective.notifications', []).forEach(x => {
         if (!(x.webhookUrl in webhooks)) {
           webhooks[x.webhookUrl] = pick(x, ['webhookUrl']);
@@ -32,10 +32,10 @@ class EditWebhooks extends React.Component {
         webhooks[x.webhookUrl].activities.push(x.type);
       });
 
-      return { ...state, webhooks: Object.values(webhooks) };
+      return { ...state, webhooks: Object.values(webhooks), isLoaded: true };
     }
 
-    return state;
+    return null;
   }
 
   constructor(props) {
@@ -45,6 +45,7 @@ class EditWebhooks extends React.Component {
     this.state = {
       modified: false,
       webhooks: {},
+      isLoaded: false,
       status: null,
     };
 
@@ -143,12 +144,11 @@ class EditWebhooks extends React.Component {
     const { intl } = this.props;
 
     return (
-      <div className="webhook" key={`webhook-${webhook.id}`}>
-        <div className="webhookActions">
-          <a className="removeWebhook" href="#" onClick={() => this.removeWebhook(index)}>
-            {intl.formatMessage(this.messages['webhooks.remove'])}
-          </a>
-        </div>
+      <div className="webhook" key={index}>
+        <Button bsStyle="danger" onClick={() => this.removeWebhook(index)}>
+          {intl.formatMessage(this.messages['webhooks.remove'])}
+        </Button>
+
         <Form horizontal>
           {this.fields.map(
             field =>
