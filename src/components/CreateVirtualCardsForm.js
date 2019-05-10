@@ -148,9 +148,9 @@ class CreateVirtualCardsForm extends Component {
         this.setState(state => ({ ...state, values: { ...state.values, numberOfVirtualCards: 1 } }));
       }
     } else if (fieldName === 'amount') {
-      const intAmount = parseInt(value);
-      if (!isNaN(intAmount)) {
-        this.setState(state => ({ ...state, values: { ...state.values, amount: intAmount } }));
+      const amount = parseFloat(value);
+      if (!isNaN(amount)) {
+        this.setState(state => ({ ...state, values: { ...state.values, amount: amount } }));
       } else if (this.state.values.amount === undefined) {
         this.setState(state => ({ ...state, values: { ...state.values, amount: MIN_AMOUNT } }));
       }
