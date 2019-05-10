@@ -125,7 +125,7 @@ export default class Steps extends React.Component {
     return this.getStepByIndex(this.props.steps.findIndex(s => s.name === stepName));
   }
 
-  validateCurrentStep = async () => {
+  validateCurrentStep = async (action = null) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
     if (!currentStep) {
       return false;
@@ -133,7 +133,7 @@ export default class Steps extends React.Component {
       return false;
     } else if (currentStep.validate) {
       this.setState({ isValidating: true });
-      const result = await currentStep.validate();
+      const result = await currentStep.validate(action);
       this.setState({ isValidating: false });
       if (!result) {
         return false;
@@ -175,7 +175,12 @@ export default class Steps extends React.Component {
    * if `opts.ignoreValidation` is true.
    */
   goToStep = async (step, opts = {}) => {
-    if (!opts.ignoreValidation && !(await this.validateCurrentStep())) {
+    const currentStep = this.getStepByName(this.props.currentStepName);
+    if (currentStep.isLastStep && step.index < currentStep.index) {
+      opts.action = 'prev';
+    }
+
+    if (!opts.ignoreValidation && !(await this.validateCurrentStep(opts.action))) {
       return false;
     }
 

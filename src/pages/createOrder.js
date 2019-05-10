@@ -241,7 +241,7 @@ class CreateOrderPage extends React.Component {
   };
 
   /** Validate step payment, loading data from stripe for new credit cards */
-  validateStepPayment = async () => {
+  validateStepPayment = async action => {
     const { stepPayment } = this.state;
     const isFixedPriceTier = this.isFixedPriceTier();
 
@@ -253,6 +253,8 @@ class CreateOrderPage extends React.Component {
       return false;
     } else if (!stepPayment.isNew) {
       // No need to validate existing payment methods
+      return true;
+    } else if (action === 'prev' && stepPayment.isNew && (stepPayment.error || !stepPayment.data)) {
       return true;
     } else if (!stepPayment.data && get(stepPayment, 'paymentMethod.token')) {
       // New credit card - if no data, stripe token has already been exchanged
