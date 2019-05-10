@@ -426,7 +426,7 @@ class CreateCollectiveForm extends React.Component {
                     <span>
                       I agree with the{' '}
                       <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
-                        terms of service of the host
+                        the terms of fiscal sponsorship of the host
                       </a>{' '}
                       (
                       <a href={`/${host.slug}`} target="_blank" rel="noopener noreferrer">

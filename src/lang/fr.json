@@ -556,7 +556,7 @@
   "host.link": "Sélectionner cet hôte",
   "host.pending-applications.approve": "Approve",
   "host.pending-applications.noPending": "No collective waiting for approval",
-  "host.tos": "Conditions d'utilisation",
+  "host.tos": "Terms of fiscal sponsorship",
   "host.types.label": "Catégorie de l'entité de l'hôte",
   "host.types.organization.description": "L’entité légale (idéalement une organisation non gouvernementale) recevra des fonds et des factures d’emission au nom du collectif. Une solution recommandée si vous envisagez d’animer plusieurs collectifs ou si vous anticipez d’encaisser plus que $10,000/an pour votre collectif.",
   "host.types.organization.label": "une entreprise",

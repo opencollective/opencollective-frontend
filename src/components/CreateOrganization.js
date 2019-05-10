@@ -33,8 +33,16 @@ class CreateOrganization extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    if (!CollectiveInputType.tos || (get(this.props.host, 'settings.tos') && !CollectiveInputType.hostTos)) {
-      this.error('Please accept the terms of service');
+    if (!CollectiveInputType.tos) {
+      this.setState({
+        result: { error: 'Please accept the terms of service' },
+      });
+      return;
+    }
+    if (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos) {
+      this.setState({
+        result: { error: 'Please accept the terms of fiscal sponsorship' },
+      });
       return;
     }
 
