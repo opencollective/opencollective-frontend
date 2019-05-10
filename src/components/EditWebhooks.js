@@ -117,7 +117,7 @@ class EditWebhooks extends React.Component {
     const { webhooks } = this.state;
     const notifications = [];
     for (const notification of webhooks) {
-      if (!notification.webhookUrl) continue;
+      if (!(notification.webhookUrl && notification.activities)) continue;
 
       for (const activity of notification.activities) {
         if (!activity) continue;
@@ -132,7 +132,7 @@ class EditWebhooks extends React.Component {
       }
     }
 
-    await this.props.editNotifications({ id: this.props.data.Collective.id, notifications });
+    await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
 
     this.setState({ modified: false, status: 'saved' });
     setTimeout(() => {
@@ -236,24 +236,24 @@ const getWebhooks = graphql(
   `,
 );
 
-const editNotifications = graphql(
+const editWebhooks = graphql(
   gql`
-    mutation editNotifications($id: Int!, $notifications: [NotificationInputType]) {
-      editNotifications(id: $id, notifications: $notifications) {
+    mutation editWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
+      editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
         id
       }
     }
   `,
   {
     props: ({ mutate }) => ({
-      editNotifications: variables => mutate({ variables }),
+      editWebhooks: variables => mutate({ variables }),
     }),
   },
 );
 
 const addData = compose(
   getWebhooks,
-  editNotifications,
+  editWebhooks,
 );
 
 export default withIntl(addData(EditWebhooks));
