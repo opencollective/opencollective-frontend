@@ -1142,7 +1142,7 @@ const CollectiveFields = () => {
         active: { type: GraphQLBoolean },
       },
       resolve(collective, args) {
-        let where = { CollectiveId: collective.id };
+        const where = { CollectiveId: collective.id };
 
         if (args.channel) {
           where.channel = args.channel;
