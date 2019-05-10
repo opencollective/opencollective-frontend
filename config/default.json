@@ -44,6 +44,7 @@
       "update": 10,
       "confirmToken": 15
     },
+    "maxNumberOfAppsPerUser": 15,
     "maxWebhooksPerUserPerCollective": 50
   },
   "email": {

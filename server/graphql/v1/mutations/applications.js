@@ -1,6 +1,7 @@
 import models from '../../../models';
 import * as errors from '../../errors';
 import { get } from 'lodash';
+import config from 'config';
 
 const { Application } = models;
 
@@ -17,6 +18,18 @@ export async function createApplication(_, args, req) {
 
   if (args.application.type === 'oauth') {
     requireArgs(args, 'application.name');
+  }
+
+  const numberOfAppsForThisUser = await Application.count({
+    where: {
+      CreatedByUserId: req.remoteUser.id,
+    },
+  });
+
+  if (numberOfAppsForThisUser >= config.limits.maxNumberOfAppsPerUser) {
+    throw new errors.RateLimitExceeded({
+      message: 'You have reached the maximum number of applications for this user',
+    });
   }
 
   const app = await Application.create({
