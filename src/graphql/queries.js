@@ -884,12 +884,7 @@ export const getLoggedInUserApplicationsQuery = gql`
           applications {
             id
             type
-            name
-            description
-            callbackUrl
             apiKey
-            clientId
-            clientSecret
           }
         }
       }

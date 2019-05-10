@@ -160,12 +160,7 @@ export const createApplicationMutation = gql`
     createApplication(application: $application) {
       id
       type
-      name
-      description
-      callbackUrl
       apiKey
-      clientId
-      clientSecret
     }
   }
 `;
