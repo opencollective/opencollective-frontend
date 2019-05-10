@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import RefundTransactionBtn from './RefundTransactionBtn';
 
 import Link from '../../../components/Link';
+import ExternalLinkNewTab from '../../../components/ExternalLinkNewTab';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 
 class TransactionDetails extends React.Component {
@@ -20,6 +21,8 @@ class TransactionDetails extends React.Component {
     }),
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
+    /** If the transaction has an attachement attached, it will replace the invoice link */
+    attachment: PropTypes.string,
     canDownloadInvoice: PropTypes.bool,
     canRefund: PropTypes.bool,
     className: PropTypes.string,
@@ -161,6 +164,7 @@ class TransactionDetails extends React.Component {
       paymentMethod,
       isRefund,
       uuid,
+      attachment,
     } = this.props;
 
     const amountDetailsStr = this.formatAmountDetails();
@@ -253,9 +257,15 @@ class TransactionDetails extends React.Component {
               <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
             </label>
             <div>
-              <InvoiceDownloadLink type="transaction" transactionUuid={uuid} viewLoading={() => 'Loading...'}>
-                <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
-              </InvoiceDownloadLink>
+              {attachment ? (
+                <ExternalLinkNewTab href={attachment}>
+                  <FormattedMessage id="actions.download" defaultMessage="Download" />
+                </ExternalLinkNewTab>
+              ) : (
+                <InvoiceDownloadLink type="transaction" transactionUuid={uuid} viewLoading={() => 'Loading...'}>
+                  <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+                </InvoiceDownloadLink>
+              )}
             </div>
           </div>
         )}

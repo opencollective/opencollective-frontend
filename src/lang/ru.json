@@ -2,6 +2,7 @@
   "actions.approveCollective.processing": "Утверждение коллектива",
   "actions.approveExpense.processing": "Утверждение расходов",
   "actions.done": "Готово",
+  "actions.download": "Download",
   "actions.rejectExpense.processing": "Отвержение расхода",
   "addfunds.amount.label": "сумма",
   "addfunds.description.label": "описание",

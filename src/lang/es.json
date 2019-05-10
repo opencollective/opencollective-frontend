@@ -2,6 +2,7 @@
   "actions.approveCollective.processing": "Approving collective",
   "actions.approveExpense.processing": "Aprobación de gastos",
   "actions.done": "Hecho",
+  "actions.download": "Download",
   "actions.rejectExpense.processing": "Rechazar gasto",
   "addfunds.amount.label": "monto",
   "addfunds.description.label": "descripción",
