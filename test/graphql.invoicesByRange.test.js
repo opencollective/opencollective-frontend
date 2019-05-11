@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 import moment from 'moment';
 
-//The tests pass invalid ISO strings to moment and this gives an annoying deprecation warning.
+// The tests pass invalid ISO strings to moment and this gives an annoying deprecation warning.
 moment.suppressDeprecationWarnings = true;
 
 /* Test utilities */

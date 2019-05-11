@@ -9,11 +9,10 @@ import models, { Op } from '../../server/models';
 import activities from '../../server/constants/activities';
 import emailLib from '../../server/lib/email';
 import expenseStatus from '../../server/constants/expense_status';
-import { formatCurrency } from '../../server/lib/utils';
+import { formatCurrency, pluralize } from '../../server/lib/utils';
 import showdown from 'showdown';
 import { reduceArrayToCurrency } from '../../server/lib/currency';
 import fetch from 'isomorphic-fetch';
-import { pluralize } from '../../server/lib/utils';
 
 const markdownConverter = new showdown.Converter();
 
