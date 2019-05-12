@@ -565,14 +565,15 @@ export default function(Sequelize, DataTypes) {
             return Promise.resolve();
           });
         },
-        afterCreate: instance => {
+        afterCreate: async instance => {
           instance.findImage();
 
           // We only create an "opencollective" paymentMethod for collectives and events
           if (instance.type !== 'COLLECTIVE' && instance.type !== 'EVENT') {
             return null;
           }
-          models.PaymentMethod.create({
+
+          await models.PaymentMethod.create({
             CollectiveId: instance.id,
             service: 'opencollective',
             type: 'collective',
@@ -580,6 +581,7 @@ export default function(Sequelize, DataTypes) {
             primary: true,
             currency: instance.currency,
           });
+
           return null;
         },
       },
@@ -1458,6 +1460,7 @@ export default function(Sequelize, DataTypes) {
     }
 
     await Promise.all(promises);
+
     return this;
   };
 
