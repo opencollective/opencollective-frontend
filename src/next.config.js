@@ -1,5 +1,3 @@
-/*  eslint-disable-next-line import/no-unresolved */
-import webpack from 'webpack';
 import withCSS from '@zeit/next-css';
 import { get } from 'lodash';
 
@@ -8,7 +6,7 @@ const nextConfig = {
     // Make sure entries are not getting disposed.
     maxInactiveAge: 1000 * 60 * 60,
   },
-  webpack: config => {
+  webpack: (config, { webpack }) => {
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin(/\/__tests__\//),
