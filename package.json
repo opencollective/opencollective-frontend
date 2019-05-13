@@ -11,7 +11,7 @@
     "npm": "6.5.0"
   },
   "dependencies": {
-    "@babel/runtime": "7.1.2",
+    "@babel/runtime": "7.4.4",
     "@material-ui/core": "3.9.3",
     "@opencollective/taxes": "2.3.0",
     "@rebass/grid": "6.0.0-7",
