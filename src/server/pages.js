@@ -133,6 +133,7 @@ pages.add('new-collective-page', '/:slug/v2');
 
 pages.add('collective', '/:slug');
 pages.add('tiers', '/:collectiveSlug/tiers');
+pages.add('tier', '/:collectiveSlug/tiers/:tierId-:tierSlug');
 
 export default pages;
 
