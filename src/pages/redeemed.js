@@ -50,6 +50,7 @@ const Title = styled(H1)`
 
 const Subtitle = styled(H5)`
   color: white;
+  margin: 0 auto;
   ${fontSize};
   ${maxWidth};
 `;
