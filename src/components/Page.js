@@ -46,6 +46,7 @@ Page.propTypes = {
   data: PropTypes.shape({
     error: PropTypes.shape({}),
   }),
+  children: PropTypes.node,
   description: PropTypes.string,
   image: PropTypes.string,
   loadingLoggedInUser: PropTypes.bool,

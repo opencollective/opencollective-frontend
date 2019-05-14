@@ -159,22 +159,8 @@ export const createApplicationMutation = gql`
   mutation createApplication($application: ApplicationInput!) {
     createApplication(application: $application) {
       id
-      name
-      description
-      callbackUrl
-      clientId
-      clientSecret
-    }
-  }
-`;
-
-export const updateApplicationMutation = gql`
-  mutation updateApplication($id: String!, $application: ApplicationInput!) {
-    updateApplication(id: $id, application: $application) {
-      id
-      name
-      description
-      callbackUrl
+      type
+      apiKey
     }
   }
 `;
