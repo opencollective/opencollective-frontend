@@ -19,6 +19,8 @@ import {
   width,
   themeGet,
 } from 'styled-system';
+
+import { textTransform } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
 import StyledSpinner from './StyledSpinner';
 
@@ -67,6 +69,7 @@ const StyledButtonContent = styled(tag.button)`
   ${textAlign}
   ${width}
   ${height}
+  ${textTransform}
 `;
 
 const StyledButton = ({ loading, ...props }) =>
@@ -127,7 +130,7 @@ StyledButton.propTypes = {
 };
 
 StyledButton.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'asLink'),
+  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'asLink', 'textTransform'),
   buttonSize: 'medium',
   buttonStyle: 'standard',
   loading: false,
