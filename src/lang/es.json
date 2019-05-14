@@ -3,6 +3,7 @@
   "actions.approveExpense.processing": "Aprobación de gastos",
   "actions.delete": "Delete",
   "actions.done": "Hecho",
+  "actions.download": "Download",
   "actions.rejectExpense.processing": "Rechazar gasto",
   "addfunds.amount.label": "monto",
   "addfunds.description.label": "descripción",
