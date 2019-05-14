@@ -20,7 +20,7 @@
         "messagesDir": "./dist/messages/"
       }
     ],
-    "styled-components"
+    "babel-plugin-styled-components"
   ],
   "env": {
     "development": {
