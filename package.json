@@ -98,7 +98,7 @@
     "sequelize-cli": "5.4.0",
     "sequelize-historical": "5.1.0",
     "showdown": "1.9.0",
-    "stripe": "6.34.0",
+    "stripe": "7.0.0",
     "twitter": "1.7.1",
     "uuid": "3.3.2",
     "validator": "10.11.0",
