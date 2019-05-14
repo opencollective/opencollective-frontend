@@ -60,7 +60,7 @@ async function createVirtualPaymentMethod(args, remoteUser) {
 
 /** Add a stripe credit card to given collective */
 async function createStripeCreditCard(args) {
-  const collective = models.Collective.findByPk(args.CollectiveId);
+  const collective = await models.Collective.findByPk(args.CollectiveId);
   if (!collective) {
     throw Error('This collective does not exists');
   }
