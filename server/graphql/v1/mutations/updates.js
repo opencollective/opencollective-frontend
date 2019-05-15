@@ -27,6 +27,7 @@ export async function createUpdate(_, args, req) {
     markdown,
     html: strip_tags(args.update.html),
     CollectiveId,
+    isPrivate: !!args.update.isPrivate,
     TierId: get(args, 'update.tier.id'),
     CreatedByUserId: req.remoteUser.id,
     FromCollectiveId: req.remoteUser.CollectiveId,

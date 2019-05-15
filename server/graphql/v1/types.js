@@ -658,6 +658,12 @@ export const UpdateType = new GraphQLObjectType({
           return update.image;
         },
       },
+      isPrivate: {
+        type: GraphQLBoolean,
+        resolve(update) {
+          return update.isPrivate;
+        },
+      },
       title: {
         type: GraphQLString,
         resolve(update) {
