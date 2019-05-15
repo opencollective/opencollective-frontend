@@ -47,6 +47,7 @@ class EditWebhooks extends React.Component {
       webhooks: {},
       isLoaded: false,
       status: null,
+      error: '',
     };
 
     this.messages = defineMessages({
@@ -132,12 +133,19 @@ class EditWebhooks extends React.Component {
       }
     }
 
-    await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
+    try {
+      await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
 
-    this.setState({ modified: false, status: 'saved' });
-    setTimeout(() => {
-      this.setState({ status: null });
-    }, 3000);
+      this.setState({ modified: false, status: 'saved' });
+      setTimeout(() => {
+        this.setState({ status: null });
+      }, 3000);
+    } catch (e) {
+      if (e && e.graphQLErrors) {
+        const { message } = e.graphQLErrors[0];
+        this.setState({ status: 'error', error: message });
+      }
+    }
   };
 
   renderWebhook = (webhook, index) => {
@@ -176,7 +184,7 @@ class EditWebhooks extends React.Component {
   };
 
   render() {
-    const { webhooks, status } = this.state;
+    const { webhooks, status, error } = this.state;
     const {
       intl,
       data: { loading },
@@ -192,15 +200,26 @@ class EditWebhooks extends React.Component {
       <Loading />
     ) : (
       <div className="EditWebhooks">
+        <style jsx>
+          {`
+            .error {
+              color: red;
+            }
+          `}
+        </style>
+
         <div className="webhooks">
           <h2>{this.props.title}</h2>
           {webhooks.map(this.renderWebhook)}
         </div>
+
         <div className="editWebhooksActions">
           <Button bsStyle="primary" onClick={() => this.addWebhook({})}>
             {intl.formatMessage(this.messages['webhooks.add'])}
           </Button>
         </div>
+
+        {status === 'error' && <div className="error">{error}</div>}
 
         <div className="actions">
           <Button
