@@ -1578,7 +1578,7 @@ export default function(Sequelize, DataTypes) {
       .then(() => {
         return Promise.map(tiers, tier => {
           if (tier.id) {
-            return models.Tier.update(tier, { where: { id: tier.id } });
+            return models.Tier.update(tier, { where: { id: tier.id, CollectiveId: this.id } });
           } else {
             if (!tier.name) return;
             tier.CollectiveId = this.id;
