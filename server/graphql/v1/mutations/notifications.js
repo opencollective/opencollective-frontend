@@ -62,13 +62,17 @@ export async function editWebhooks(args, remoteUser) {
  * Creates a Webhook subscription for a collective given a collective slug.
  */
 export async function createWebhook(args, remoteUser) {
-  if (!(remoteUser && remoteUser.isAdmin(args.collectiveId))) {
-    throw new Unauthorized({ message: 'You need to be logged in as admin to create a webhook.' });
+  if (!remoteUser) {
+    throw new Unauthorized({ message: 'You need to be logged in to create a webhook.' });
   }
 
   const collective = await models.Collective.findOne({ where: { slug: args.collectiveSlug } });
   if (!collective) {
     throw new NotFound({ message: `Collective with slug: ${args.collectiveSlug} not found.` });
+  }
+
+  if (!remoteUser.isAdmin(collective.id)) {
+    throw new Unauthorized({ message: 'You do not have permissions to create webhooks for this collective.' });
   }
 
   const { maxWebhooksPerUserPerCollective } = config.limits;
