@@ -42,62 +42,6 @@ export const getOrCreatePlan = (stripeAccount, plan) => {
 };
 
 /**
- * Create stripe subscription with plan
- */
-export const createSubscription = (stripeAccount, customerId, subscription) => {
-  debug('createSubscription');
-  return appStripe.customers.createSubscription(customerId, subscription, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
- * Retrieve stripe subscription
- */
-export const retrieveSubscription = (stripeAccount, stripeSubsriptionId) => {
-  debug('retrieveSubscription', 'account', stripeAccount.username, 'stripeSubsriptionId', stripeSubsriptionId);
-  return appStripe.subscriptions.retrieve(stripeSubsriptionId, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
- * Get all subscriptions
- */
-export const getSubscriptionsList = (stripeAccount, options = {}) => {
-  const params = {
-    limit: options.limit || 10,
-  };
-
-  if (options.startingAfter) {
-    params.starting_after = options.startingAfter;
-  }
-
-  if (options.endingBefore) {
-    params.ending_before = options.endingBefore;
-  }
-
-  if (options.plan) {
-    params.plan = options.plan;
-  }
-
-  debug('getSubscriptionsList');
-  return appStripe.subscriptions.list(params, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
- * Delete a subscription
- */
-export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
-  debug('cancelSubscription');
-  return appStripe.subscriptions.del(stripeSubscriptionId, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
  * Create stripe customer
  * Returns a customerId (string)
  */
