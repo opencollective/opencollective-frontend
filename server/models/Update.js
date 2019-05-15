@@ -121,6 +121,11 @@ export default function(Sequelize, DataTypes) {
 
       image: DataTypes.STRING,
 
+      isPrivate: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
       tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
