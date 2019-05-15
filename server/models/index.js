@@ -40,8 +40,13 @@ if (config.database.options.logging) {
   }
 }
 
-if (config.database.options.pool && config.database.options.pool.max) {
-  config.database.options.pool.max = parseInt(config.database.options.pool.max, 10);
+if (config.database.options.pool) {
+  if (config.database.options.pool.min) {
+    config.database.options.pool.min = parseInt(config.database.options.pool.min, 10);
+  }
+  if (config.database.options.pool.max) {
+    config.database.options.pool.max = parseInt(config.database.options.pool.max, 10);
+  }
 }
 
 export const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
