@@ -27,7 +27,7 @@ describe('Virtual cards admin', () => {
     cy.get('.FormInputs button[type="submit"]').click();
 
     // Success page
-    cy.contains(`Your ${numberOfVirtualCards} gift cards have been created! Here are your redeem links:`);
+    cy.contains(`Your ${numberOfVirtualCards} gift cards have been created.`);
     cy.get('textarea.result-redeem-links').should($textareas => {
       // Ensure we have all the generated links
       expect($textareas).to.have.length(1);
