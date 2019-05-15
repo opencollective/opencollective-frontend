@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { pick, get } from 'lodash';
+import { Box } from '@rebass/grid';
 
 import InputField from './InputField';
 import Button from './Button';
+import StyledCheckbox from './StyledCheckbox';
 
 import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
@@ -170,6 +172,16 @@ class EditUpdateForm extends React.Component {
                 <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
               )}
             </div>
+          </div>
+
+          <div className="row">
+            <Box mt={4}>
+              <StyledCheckbox name="private" label="Private update" />
+              <FormattedMessage
+                id="update.private.description"
+                defaultMessage="Only contributors will be able to see the content of this update"
+              />
+            </Box>
           </div>
 
           <div className="row actions">
