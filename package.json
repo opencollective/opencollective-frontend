@@ -164,7 +164,7 @@
     "eslint-plugin-react-hooks": "^1.6.0",
     "file-loader": "^3.0.1",
     "html-loader": "^0.5.5",
-    "husky": "^2.2.0",
+    "husky": "^2.3.0",
     "jest": "^24.8.0",
     "jest-styled-components": "^6.3.1",
     "jsdom": "^15.1.0",
