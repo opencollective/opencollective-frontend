@@ -59,18 +59,24 @@ async function createVirtualPaymentMethod(args, remoteUser) {
 }
 
 /** Add a stripe credit card to given collective */
-async function createStripeCreditCard(args) {
+async function createStripeCreditCard(args, remoteUser) {
   const collective = await models.Collective.findByPk(args.CollectiveId);
   if (!collective) {
     throw Error('This collective does not exists');
   }
 
-  const paymentMethod = await models.PaymentMethod.createFromStripeSourceToken({
-    ...args,
-    type: 'creditcard',
-    service: 'stripe',
-    currency: args.currency || collective.currency,
-  });
+  const paymentMethod = await models.PaymentMethod.createFromStripeSourceToken(
+    {
+      ...args,
+      type: 'creditcard',
+      service: 'stripe',
+      currency: args.currency || collective.currency,
+    },
+    {
+      collective,
+      email: remoteUser.email,
+    },
+  );
 
   // We must unset the `primary` flag on all other payment methods
   await models.PaymentMethod.update(
