@@ -483,9 +483,9 @@ export default function(Sequelize, DataTypes) {
   /**
    * Class Methods
    */
-  PaymentMethod.createFromStripeSourceToken = PaymentMethodData => {
+  PaymentMethod.createFromStripeSourceToken = (PaymentMethodData, options) => {
     debug('createFromStripeSourceToken', PaymentMethodData);
-    return stripe.createCustomer(null, PaymentMethodData.token).then(customer => {
+    return stripe.createCustomer(null, PaymentMethodData.token, options).then(customer => {
       PaymentMethodData.customerId = customer.id;
       PaymentMethodData.primary = true;
       return PaymentMethod.create(PaymentMethodData);
