@@ -993,6 +993,7 @@
   "update.paid": "pagado",
   "update.pending": "pendiente",
   "update.private.description": "Only contributors will be able to see the content of this update",
+  "update.private.lock_text": "This update is private",
   "update.publish.backers": "Your update will be sent to {n} backers",
   "update.publish.btn": "publicar",
   "update.publishedAt": "publicado el {date}",

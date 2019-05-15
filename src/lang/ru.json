@@ -993,6 +993,7 @@
   "update.paid": "оплачено",
   "update.pending": "в ожидании",
   "update.private.description": "Only contributors will be able to see the content of this update",
+  "update.private.lock_text": "This update is private",
   "update.publish.backers": "Ваше обновление будет отправлено {n} попечителям",
   "update.publish.btn": "опубликовать",
   "update.publishedAt": "опубликовано {date}",

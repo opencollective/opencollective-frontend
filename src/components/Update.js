@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Lock } from 'styled-icons/fa-solid';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { formatDate } from '../lib/utils';
@@ -13,6 +14,7 @@ import { Router, Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
+import StyledTooltip from './StyledTooltip';
 
 class Update extends React.Component {
   static propTypes = {
@@ -215,6 +217,17 @@ class Update extends React.Component {
                 />
               </div>
             )}
+
+            {update.isPrivate && (
+              <StyledTooltip
+                content={() => (
+                  <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
+                )}
+              >
+                <Lock size={12} cursor="pointer" />
+              </StyledTooltip>
+            )}
+
             {editable && (
               <React.Fragment>
                 <div>
