@@ -11,6 +11,8 @@ import { Printer } from 'styled-icons/feather/Printer';
 import { P } from './Text';
 import StyledInput from './StyledInput';
 import StyledButton from './StyledButton';
+import FileDownloader from './FileDownloader';
+import { giftCardsDownloadUrl } from '../lib/url_helpers';
 
 const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
   width: 95%;
@@ -31,7 +33,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
       PropTypes.shape({
         uuid: PropTypes.string.isRequired,
         currency: PropTypes.string.isRequired,
-        amount: PropTypes.number.isRequired,
+        initialBalance: PropTypes.number.isRequired,
         expiryDate: PropTypes.string,
       }),
     ).isRequired,
@@ -57,7 +59,14 @@ export default class CreateVirtualCardsSuccess extends React.Component {
     }
   };
 
+  buildFetchParams = () => {
+    return {};
+  };
+
   renderManualSuccess() {
+    const filename = `${this.props.collectiveSlug}-giftcards-${Date.now()}.pdf`;
+    const downloadUrl = giftCardsDownloadUrl(filename);
+
     return (
       <React.Fragment>
         <Box mb={3}>
@@ -72,7 +81,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
           <Flex my={3} flexWrap="wrap" justifyContent="center">
             <StyledButton
               m={2}
-              minWidth={260}
+              minWidth={270}
               buttonSize="large"
               buttonStyle="primary"
               onClick={this.copyLinksToClipboard}
@@ -81,11 +90,23 @@ export default class CreateVirtualCardsSuccess extends React.Component {
               &nbsp;
               <FormattedMessage id="CreateVirtualCardsSuccess.RedeemLinks" defaultMessage="Copy the links" />
             </StyledButton>
-            <StyledButton m={2} buttonSize="large" disabled>
-              <Printer size="1em" />
-              &nbsp;
-              <FormattedMessage id="CreateVirtualCardsSuccess.Download" defaultMessage="Download cards" />
-            </StyledButton>
+            <FileDownloader
+              url={downloadUrl}
+              filename={filename}
+              buildFetchParams={() => ({
+                method: 'POST',
+                headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cards: this.props.cards }),
+              })}
+            >
+              {({ loading, downloadFile }) => (
+                <StyledButton minWidth={270} m={2} buttonSize="large" loading={loading} onClick={downloadFile}>
+                  <Printer size="1em" />
+                  &nbsp;
+                  <FormattedMessage id="CreateVirtualCardsSuccess.Download" defaultMessage="Download cards" />
+                </StyledButton>
+              )}
+            </FileDownloader>
           </Flex>
           <RedeemLinksTextarea
             ref={this.redeemLinkTextareaRef}
