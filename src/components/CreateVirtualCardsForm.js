@@ -8,21 +8,22 @@ import { get } from 'lodash';
 import { graphql } from 'react-apollo';
 import moment from 'moment';
 
-import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle';
 import { RadioButtonChecked } from 'styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from 'styled-icons/material/RadioButtonUnchecked';
 
 import { getCollectiveSourcePaymentMethodsQuery } from '../graphql/queries';
 import { createVirtualCardsMutationQuery } from '../graphql/mutations';
+import MessageBox from './MessageBox';
 import StyledInputAmount from './StyledInputAmount';
 import StyledButton from './StyledButton';
 import PaymentMethodSelect from './PaymentMethodSelect';
 import Loading from './Loading';
 import Link from './Link';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
-import { P, H3 } from './Text';
+import { H3 } from './Text';
 import StyledInput from './StyledInput';
 import InputField from './InputField';
+import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
 
 const MIN_AMOUNT = 5;
 const MAX_AMOUNT = 10000;
@@ -43,6 +44,7 @@ const InlineField = ({ name, children, label, isLabelClickable }) => (
 
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
+  align-items: center;
   padding: 1.25em 1em;
   margin-bottom: 2.5em;
   background: white;
@@ -73,7 +75,7 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   return (
     <RadioButtonContainer data-name={name} onClick={onClick}>
       <Box className="radio-btn">{icon}</Box>
-      <H3 textAlign="center" px={2}>
+      <H3 textAlign="center" px={2} style={{ marginTop: 8 }}>
         {children}
       </H3>
     </RadioButtonContainer>
@@ -84,18 +86,6 @@ const FieldLabelDetails = styled.span`
   color: ${themeGet('colors.black.400')};
   font-weight: 400;
 `;
-
-const RedeemLinksTextarea = styled(StyledInput)`
-  width: 95%;
-  max-width: 450px;
-  min-height: 175px;
-  padding: 8px;
-  border-radius: 8px;
-  resize: vertical;
-  overflow-wrap: normal;
-`;
-
-RedeemLinksTextarea.defaultProps = { as: 'textarea' };
 
 class CreateVirtualCardsForm extends Component {
   static propTypes = {
@@ -199,6 +189,7 @@ class CreateVirtualCardsForm extends Component {
         .createVirtualCards(params)
         .then(({ data }) => {
           this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
+          window.scrollTo(0, 0);
         })
         .catch(e => {
           this.setState({ serverError: e.message, submitting: false });
@@ -258,52 +249,6 @@ class CreateVirtualCardsForm extends Component {
     );
   }
 
-  renderSuccess() {
-    const { deliverType, createdVirtualCards } = this.state;
-    return (
-      <Flex flexDirection="column" alignItems="center" justifyContent="center">
-        <P color="green.700">
-          <CheckCircle size="3em" />
-        </P>
-        {deliverType === 'email' && (
-          <FormattedMessage
-            id="virtualCards.create.successSent"
-            defaultMessage="Your {count} gift cards have been sent! Go back to the {link} to see them."
-            values={{
-              count: createdVirtualCards.length,
-              link: (
-                <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards' }}>
-                  <FormattedMessage id="virtualcards.create.listPage" defaultMessage="gift cards list" />
-                </Link>
-              ),
-            }}
-          />
-        )}
-        {deliverType === 'manual' && (
-          <React.Fragment>
-            <Box mb="1em">
-              <FormattedMessage
-                id="virtualCards.create.successCreate"
-                defaultMessage="Your {count} gift cards have been created! Here are your redeem links:"
-                values={{ count: createdVirtualCards.length }}
-              />
-            </Box>
-            <RedeemLinksTextarea
-              className="result-redeem-links"
-              readOnly
-              value={createdVirtualCards
-                .map(vc => {
-                  const code = vc.uuid.split('-')[0];
-                  return `${process.env.WEBSITE_URL}/redeem/${code}`;
-                })
-                .join('\n')}
-            />
-          </React.Fragment>
-        )}
-      </Flex>
-    );
-  }
-
   renderEmailFields() {
     const { submitting, errors, multiEmailsInitialState } = this.state;
     return (
@@ -357,7 +302,7 @@ class CreateVirtualCardsForm extends Component {
 
   renderManualFields() {
     return (
-      <Flex justifyContent="center" mb="2em">
+      <Flex justifyContent="center" mt={4} mb={3}>
         <H3 mr="1em">
           <FormattedMessage id="virtualCards.create.number" defaultMessage="Number of gift cards" />
         </H3>
@@ -378,18 +323,28 @@ class CreateVirtualCardsForm extends Component {
 
   render() {
     const loading = get(this.props, 'data.loading');
+    const error = get(this.props, 'data.error');
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []);
+    const { submitting, values, createdVirtualCards, serverError, deliverType } = this.state;
 
     if (loading) {
       return <Loading />;
+    } else if (error) {
+      return (
+        <MessageBox type="error" withIcon>
+          {error.message}
+        </MessageBox>
+      );
     } else if (paymentMethods.length === 0) {
       return this.renderNoPaymentMethodMessage();
     }
 
-    const { submitting, values, createdVirtualCards, serverError, deliverType } = this.state;
-
     return createdVirtualCards ? (
-      this.renderSuccess()
+      <CreateVirtualCardsSuccess
+        cards={createdVirtualCards}
+        deliverType={deliverType}
+        collectiveSlug={this.props.collectiveSlug}
+      />
     ) : (
       <form ref={this.form} onSubmit={this.onSubmit}>
         <Flex flexDirection="column">
@@ -487,9 +442,13 @@ class CreateVirtualCardsForm extends Component {
           {deliverType === 'email' && this.renderEmailFields()}
           {deliverType === 'manual' && this.renderManualFields()}
 
-          {serverError && <P color="red.700">{serverError}</P>}
+          {serverError && (
+            <MessageBox type="error" withIcon>
+              {serverError}
+            </MessageBox>
+          )}
 
-          <Box mb="1em" alignSelf="center">
+          <Box mb="1em" alignSelf="center" mt={3}>
             {this.renderSubmit()}
           </Box>
         </Flex>
