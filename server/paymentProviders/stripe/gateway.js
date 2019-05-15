@@ -133,7 +133,7 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
     },
     txn,
   );
-  return appStripe.balance.retrieveTransaction(txn, {
+  return appStripe.balanceTransactions.retrieve(txn, {
     stripe_account: stripeAccount.username,
   });
 };
