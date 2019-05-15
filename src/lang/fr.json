@@ -992,6 +992,7 @@
   "update.new.save": "Sauvegarder l'actualité",
   "update.paid": "payé",
   "update.pending": "en attente",
+  "update.private.description": "Only contributors will be able to see the content of this update",
   "update.publish.backers": "Votre actualité sera envoyé à vos {n} contributeurs",
   "update.publish.btn": "publier",
   "update.publishedAt": "publié le {date}",
