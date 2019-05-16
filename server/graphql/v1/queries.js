@@ -503,7 +503,7 @@ const queries = {
         });
       }
 
-      if (!(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
+      if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
         update.stripContent();
       }
       return update;
@@ -585,7 +585,7 @@ const queries = {
         return getCollectiveIds().then(collectiveIds => {
           query.where.CollectiveId = { [Op.in]: collectiveIds };
           return models.Update.findAll(query).map(update => {
-            if (!(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
+            if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
               update.stripContent();
             }
             return update;
