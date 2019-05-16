@@ -13,9 +13,7 @@ describe('create an update', () => {
     cy.wait(1000);
     cy.get('.UpdatePage .title', { timeout: 10000 }).contains('New update');
     cy.get('.UpdatePage .meta').contains('draft');
-    cy.get('.UpdatePage .meta')
-      .get('#privateIcon')
-      .should('not.exist');
+    cy.get('[data-cy="privateIcon"]').should('not.exist');
     cy.get('.UpdatePage .PublishUpdateBtn').contains('Your update will be sent to');
     cy.get('.UpdatePage button.publish').click();
     cy.get('.UpdatePage .meta')
@@ -27,9 +25,7 @@ describe('create an update', () => {
     cy.get('.custom-checkbox').click(); // Make private
     cy.get('.actions button').click();
     cy.wait(1000);
-    cy.get('.UpdatePage .meta')
-      .get('#privateIcon')
-      .should('exist');
+    cy.get('[data-cy="privateIcon"]').should('exist');
   });
 });
 
