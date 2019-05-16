@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { H1, P } from '../Text';
+import { H1, P, Span } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 
@@ -16,6 +16,7 @@ import Container from '../Container';
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
 import BubblesSVG from './Bubbles.svg';
+import Currency from '../Currency';
 
 /** The blured background image displayed under the tier description */
 const TierCover = styled(Container)`
@@ -103,8 +104,21 @@ class TierPage extends Component {
               </Container>
             </Container>
             <Container background="white" height={Dimensions.COVER_HEIGHT} flex="0 1 385px" p="60px 32px">
-              {/** TODO: Placeholder */}
-              <Container background="lightgrey" height="40px" mb={3} borderRadius={16} />
+              {tier.goal && (
+                <P fontSize="H5" color="black.500" lineHeight="H3" mb={3}>
+                  <FormattedMessage
+                    id="TierPage.AmountGoal"
+                    defaultMessage="{amount} goal"
+                    values={{
+                      amount: (
+                        <Span fontWeight="bold" fontSize="H3" color="black.900">
+                          <Currency value={tier.goal} currency={tier.currency} />
+                        </Span>
+                      ),
+                    }}
+                  />
+                </P>
+              )}
               {/** TODO: Placeholder */}
               <Container background="lightgrey" height="80px" mb={4} borderRadius={16} />
               <StyledButton buttonStyle="dark" width={1} mb={4}>
