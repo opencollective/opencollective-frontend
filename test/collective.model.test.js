@@ -540,11 +540,8 @@ describe('Collective model', () => {
           );
           expect(new Date(backer.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
           expect(new Date(backer.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
-          done();
         })
-        .catch(e => {
-          done(e);
-        });
+        .finally(done);
     });
 
     it('add/update/create new tiers', done => {
@@ -564,11 +561,11 @@ describe('Collective model', () => {
         ])
         .then(tiers => {
           expect(tiers.length).to.equal(2);
-          tiers.sort((a, b) => b.slug < a.slug);
+          tiers.sort((a, b) => a.slug.localeCompare(b.slug));
           expect(tiers[0].name).to.equal('new tier');
           expect(tiers[1].name).to.equal('super backer');
-          done();
-        });
+        })
+        .finally(done);
     });
   });
 
