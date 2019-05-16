@@ -132,43 +132,6 @@ export const addParameterUrl = (url, parameters) => {
 };
 
 /**
- * Pagination: from (offset, limit) to (page, per_page).
- */
-const paginatePage = (offset, limit) => {
-  return {
-    page: Math.floor(offset / limit + 1),
-    perPage: limit,
-  };
-};
-
-/**
- * Get links for pagination.
- */
-export const getLinks = (url, options) => {
-  const page = options.page || paginatePage(options.offset, options.limit).page;
-  const perPage = options.perPage || paginatePage(options.offset, options.limit).perPage;
-
-  if (!page && !perPage) return null;
-
-  const links = {
-    next: addParameterUrl(url, { page: page + 1, per_page: perPage }),
-    current: addParameterUrl(url, { page, per_page: perPage }),
-  };
-  if (page > 1) {
-    links.prev = addParameterUrl(url, { page: page - 1, per_page: perPage });
-    links.first = addParameterUrl(url, { page: 1, per_page: perPage });
-  }
-
-  if (options.total) {
-    const lastPage = Math.ceil(options.total / perPage);
-    links.last = addParameterUrl(url, { page: lastPage, per_page: perPage });
-    if (page >= lastPage) delete links.next;
-  }
-
-  return links;
-};
-
-/**
  * We can generate our own plan ids with stripe, we will use a simple one for
  * now until we decide to make more complex plans. We will only take into account
  * the currency, interval and amount. It will have the following format
@@ -399,16 +362,6 @@ export const defaultHostCollective = category => {
     }
   }
   return { id: 1, CollectiveId: 1 };
-};
-
-/**
- * Demo host id, set this for new collectives created through the flow
- */
-export const demoHostId = () => {
-  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-    return 254;
-  }
-  return 1;
 };
 
 export const isValidEmail = email => {
