@@ -126,6 +126,11 @@ export default function(Sequelize, DataTypes) {
         defaultValue: false,
       },
 
+      contentStripped: {
+        type: new DataTypes.VIRTUAL(DataTypes.BOOLEAN),
+        defaultValue: false,
+      },
+
       tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
@@ -246,6 +251,7 @@ export default function(Sequelize, DataTypes) {
   Update.prototype.stripContent = function() {
     this.html = null;
     this.markdown = null;
+    this.contentStripped = true;
   };
 
   // Publish update

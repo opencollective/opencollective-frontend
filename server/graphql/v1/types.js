@@ -664,6 +664,12 @@ export const UpdateType = new GraphQLObjectType({
           return update.isPrivate;
         },
       },
+      contentStripped: {
+        type: GraphQLBoolean,
+        resolve(update) {
+          return update.contentStripped;
+        },
+      },
       title: {
         type: GraphQLString,
         resolve(update) {
