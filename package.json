@@ -74,7 +74,7 @@
     "react-dnd-html5-backend": "3.0.2",
     "react-dom": "16.8.6",
     "react-dropzone": "5.1.1",
-    "react-geosuggest": "2.11.0",
+    "react-geosuggest": "2.12.0",
     "react-gmaps": "1.9.0",
     "react-intl": "2.9.0",
     "react-markdown": "4.0.8",
