@@ -4,7 +4,7 @@ import config from 'config';
 import * as utils from './utils';
 import models from '../server/models';
 import channels from '../server/constants/channels';
-import { activities } from '../server/constants';
+import { activities, roles } from '../server/constants';
 import { randUrl } from './features/support/stores';
 
 describe('graphql.notifications.test', () => {
@@ -20,6 +20,9 @@ describe('graphql.notifications.test', () => {
 
   // Create test collective
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(c => (collective1 = c)));
+
+  // Set `user1` as collective admin
+  beforeEach(() => collective1.addUserWithRole(user1, roles.ADMIN));
 
   // Create test notification
   beforeEach(() =>
@@ -140,7 +143,7 @@ describe('graphql.notifications.test', () => {
       const result = await utils.graphqlQuery(deleteWebhookQuery, { id: notification.id });
 
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal('You need to be logged in to delete a notification.');
+      expect(result.errors[0].message).to.equal('You need to be logged in as admin to delete a notification.');
       return models.Notification.findByPk(notification.id).then(notification => {
         expect(notification).to.not.be.null;
       });
@@ -157,9 +160,7 @@ describe('graphql.notifications.test', () => {
       const result = await utils.graphqlQuery(deleteWebhookQuery, { id: notification.id }, user2);
 
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal(
-        "This notification does not exist or you don't have the permission to edit it.",
-      );
+      expect(result.errors[0].message).to.equal('You need to be logged in as admin to delete this notification.');
       return models.Notification.findByPk(notification.id).then(notification => {
         expect(notification).to.not.be.null;
       });
