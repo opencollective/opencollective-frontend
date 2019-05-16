@@ -26,6 +26,7 @@ import {
   OrderStatusType,
   PaginatedPaymentMethodsType,
   ImageFormatType,
+  NotificationType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -598,6 +599,17 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt },
         },
       },
+      notifications: {
+        type: new GraphQLList(NotificationType),
+        description: 'List of all notifications for this collective',
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          channel: { type: GraphQLString },
+          type: { type: GraphQLString },
+          active: { type: GraphQLBoolean },
+        },
+      },
       maxQuantity: { type: GraphQLInt },
       tiers: {
         type: new GraphQLList(TierType),
@@ -1118,6 +1130,35 @@ const CollectiveFields = () => {
           limit: args.limit,
           offset: args.offset,
         }).then(memberships => memberships.memberCollective);
+      },
+    },
+    notifications: {
+      type: new GraphQLList(NotificationType),
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt },
+        channel: { type: GraphQLString },
+        type: { type: GraphQLString },
+        active: { type: GraphQLBoolean },
+      },
+      resolve(collective, args) {
+        const where = { CollectiveId: collective.id };
+
+        if (args.channel) {
+          where.channel = args.channel;
+        }
+        if (args.type) {
+          where.type = args.type;
+        }
+        if (args.active) {
+          where.active = args.active;
+        }
+
+        return models.Notification.findAll({
+          where: where,
+          limit: args.limit,
+          offset: args.offset,
+        });
       },
     },
     maxQuantity: {

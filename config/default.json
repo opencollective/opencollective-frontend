@@ -43,7 +43,8 @@
     "changeEmailPerHour": {
       "update": 10,
       "confirmToken": 15
-    }
+    },
+    "maxWebhooksPerUserPerCollective": 50
   },
   "email": {
     "from": "Open Collective <info@opencollective.com>"

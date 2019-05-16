@@ -10,6 +10,7 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
 import { Op } from 'sequelize';
+import channels from '../constants/channels';
 
 const debug = debugLib('notification');
 
@@ -40,12 +41,16 @@ export default function(Sequelize, DataTypes) {
     {
       indexes: [
         {
-          fields: ['type', 'CollectiveId', 'UserId'],
+          fields: ['channel', 'type', 'webhookUrl', 'CollectiveId'],
           type: 'unique',
         },
       ],
     },
   );
+
+  Notification.prototype.getUser = function() {
+    return models.User.findByPk(this.UserId);
+  };
 
   Notification.createMany = (notifications, defaultValues) => {
     return Promise.map(notifications, u => Notification.create(_.defaults({}, u, defaultValues))).catch(console.error);
@@ -161,6 +166,16 @@ export default function(Sequelize, DataTypes) {
         return true;
       }
     });
+  };
+
+  /**
+   * Counts registered webhooks for a user, for a collective.
+   * @param {number} UserId
+   * @param {number} CollectiveId
+   * @returns {Promise<number>} count
+   */
+  Notification.countRegisteredWebhooks = (UserId, CollectiveId) => {
+    return models.Notification.count({ where: { UserId, CollectiveId, channel: channels.WEBHOOK } });
   };
 
   return Notification;

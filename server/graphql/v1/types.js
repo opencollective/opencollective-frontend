@@ -869,6 +869,72 @@ export const CommentType = new GraphQLObjectType({
   },
 });
 
+export const NotificationType = new GraphQLObjectType({
+  name: 'NotificationType',
+  description: 'This represents a Notification',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(notification) {
+          return notification.id;
+        },
+      },
+      channel: {
+        description: 'channel to send notification',
+        type: GraphQLString,
+        resolve(notification) {
+          return notification.channel;
+        },
+      },
+      type: {
+        description: 'the notification type',
+        type: GraphQLString,
+        resolve(notification) {
+          return notification.type;
+        },
+      },
+      active: {
+        description: 'whether or not the notification is active',
+        type: GraphQLBoolean,
+        resolve(notification) {
+          return notification.active;
+        },
+      },
+      webhookUrl: {
+        type: GraphQLString,
+        resolve(notification) {
+          return notification.webhookUrl;
+        },
+      },
+      user: {
+        type: UserType,
+        resolve(notification) {
+          return notification.getUser();
+        },
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(notification, args, req) {
+          return req.loaders.collective.findById.load(notification.CollectiveId);
+        },
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(comment) {
+          return comment.createdAt;
+        },
+      },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(comment) {
+          return comment.updatedAt;
+        },
+      },
+    };
+  },
+});
+
 export const TierStatsType = new GraphQLObjectType({
   name: 'TierStatsType',
   description: 'Stats about a tier',

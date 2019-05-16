@@ -24,6 +24,7 @@ import {
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
+import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
 import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
@@ -45,6 +46,7 @@ import {
   ConnectedAccountType,
   PaymentMethodType,
   UserType,
+  NotificationType,
 } from './types';
 
 import { CollectiveInterfaceType } from './CollectiveInterface';
@@ -68,6 +70,7 @@ import {
   PaymentMethodDataVirtualCardInputType,
   UserInputType,
   StripeCreditCardDataInputType,
+  NotificationInputType,
 } from './inputTypes';
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
 import models, { sequelize } from '../../models';
@@ -715,6 +718,53 @@ const mutations = {
     },
     resolve: async (_, args, req) => {
       return paymentMethodsMutation.removePaymentMethod(args.id, req.remoteUser);
+    },
+  },
+  editWebhooks: {
+    type: new GraphQLList(NotificationType),
+    description: 'Edits (by replacing) the admin-level webhooks for a collective.',
+    args: {
+      collectiveId: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the collective whose webhooks are edited.',
+      },
+      notifications: {
+        type: new GraphQLList(NotificationInputType),
+        description: 'New notifications for the collective.',
+      },
+    },
+    resolve(_, args, req) {
+      return editWebhooks(args, req.remoteUser);
+    },
+  },
+  createWebhook: {
+    type: NotificationType,
+    description: 'Register user-level webhooks for a collective.',
+    args: {
+      collectiveSlug: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Slug of the collective the webhook is created for.',
+      },
+      notification: {
+        type: NotificationInputType,
+        description: 'The notification object.',
+      },
+    },
+    resolve(_, args, req) {
+      return createWebhook(args, req.remoteUser);
+    },
+  },
+  deleteNotification: {
+    type: NotificationType,
+    description: 'Deletes a notification by ID.',
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the notification to delete.',
+      },
+    },
+    resolve(_, args, req) {
+      return deleteNotification(args, req.remoteUser);
     },
   },
 };
