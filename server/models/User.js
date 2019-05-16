@@ -381,6 +381,15 @@ export default (Sequelize, DataTypes) => {
     return result;
   };
 
+  // Determines whether a user can see updates for a collective based on their roles.
+  User.prototype.canSeeUpdates = function(CollectiveId) {
+    const result =
+      this.CollectiveId === CollectiveId ||
+      this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER, roles.CONTRIBUTOR, roles.BACKER], CollectiveId);
+    debug('userid:', this.id, 'canSeeUpdates', CollectiveId, '?', result);
+    return result;
+  };
+
   User.prototype.getPersonalDetails = function(remoteUser) {
     if (!remoteUser) return Promise.resolve(this.public);
     return this.populateRoles()
