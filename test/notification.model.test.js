@@ -1,16 +1,11 @@
-import app from '../server/index';
-import { expect } from 'chai';
-import request from 'supertest-as-promised';
-import * as utils from '../test/utils';
-import constants from '../server/constants/activities';
-import models from '../server/models';
-import roles from '../server/constants/roles';
 import Promise from 'bluebird';
 import sinon from 'sinon';
-import emailLib from '../server/lib/email';
+import { expect } from 'chai';
 
-const application = utils.data('application');
-const notificationData = { type: constants.COLLECTIVE_TRANSACTION_CREATED };
+import * as utils from '../test/utils';
+import models from '../server/models';
+import roles from '../server/constants/roles';
+import emailLib from '../server/lib/email';
 
 const { User, Collective, Notification, Tier, Order } = models;
 
@@ -42,24 +37,6 @@ describe('notification.model.test.js', () => {
       return Promise.all([collective.addHost(host), host.addUserWithRole(hostAdmin, 'ADMIN')]);
     });
   });
-
-  it(`disables notification for the ${notificationData.type} email`, () =>
-    request(app)
-      .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
-      .set('Authorization', `Bearer ${hostAdmin.jwt()}`)
-      .send({ api_key: application.api_key })
-      .expect(200)
-      .then(() =>
-        Notification.findAndCountAll({
-          where: {
-            UserId: hostAdmin.id,
-            CollectiveId: collective.id,
-            type: notificationData.type,
-            active: true,
-          },
-        }),
-      )
-      .tap(res => expect(res.count).to.equal(0)));
 
   describe('getSubscribers', () => {
     let users;

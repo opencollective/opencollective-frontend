@@ -1,7 +1,6 @@
-import config from 'config';
 import Promise from 'bluebird';
-
 import { get } from 'lodash';
+import config from 'config';
 
 import models, { Op } from '../models';
 import errors from '../lib/errors';
@@ -9,21 +8,8 @@ import paymentProviders from '../paymentProviders';
 import * as github from '../lib/github';
 
 const { ConnectedAccount, User } = models;
+
 const GITHUB_REPO_MIN_STAR = 100;
-
-export const list = (req, res, next) => {
-  const slug = req.params.slug.toLowerCase();
-
-  models.Collective.findBySlug(slug)
-    .then(collective => {
-      return models.ConnectedAccount.findAll({
-        where: { CollectiveId: collective.id },
-      });
-    })
-    .map(connectedAccount => connectedAccount.info)
-    .tap(connectedAccounts => res.json({ connectedAccounts }))
-    .catch(next);
-};
 
 export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
   const { utm_source, redirect } = req.query;

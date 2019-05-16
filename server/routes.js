@@ -12,23 +12,17 @@ import { get } from 'lodash';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
-import * as transactions from './controllers/transactions';
 import * as collectives from './controllers/collectives';
 import * as RestApi from './graphql/v1/restapi';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
-import * as mw from './controllers/middlewares';
-import * as notifications from './controllers/notifications';
-import { getPaymentMethods, createPaymentMethod } from './controllers/paymentMethods';
+import { createPaymentMethod } from './controllers/paymentMethods';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
-import * as applications from './controllers/applications';
 import stripeWebhook from './controllers/webhooks';
 import * as email from './controllers/services/email';
-import syncMeetup from './controllers/services/meetup';
 
 import required from './middleware/required_param';
-import ifParam from './middleware/if_param';
 import * as aN from './middleware/security/authentication';
 import * as auth from './middleware/security/auth';
 import errorHandler from './middleware/error_handler';
@@ -37,7 +31,6 @@ import sanitizer from './middleware/sanitizer';
 
 import * as paypal from './paymentProviders/paypal/payment';
 
-import errors from './lib/errors';
 import logger from './lib/logger';
 import { sanitizeForLogs } from './lib/utils';
 
@@ -53,11 +46,6 @@ const cacheControlMaxAge = maxAge => {
     next();
   };
 };
-
-/**
- * NotImplemented response.
- */
-const NotImplemented = (req, res, next) => next(new errors.NotImplemented('Not implemented yet.'));
 
 export default app => {
   /**
@@ -135,7 +123,6 @@ export default app => {
    * User reset password or new token flow (no jwt verification)
    */
   app.post('/users/signin', required('user'), users.signin);
-  app.post('/users/token', auth.mustBeLoggedIn, users.token);
   app.post('/users/update-token', auth.mustBeLoggedIn, users.updateToken);
 
   /**
@@ -210,32 +197,10 @@ export default app => {
    */
   app.get('/discover', getDiscoverPage);
 
-  app.get('/fxrate/:fromCurrency/:toCurrency/:date?', transactions.getFxRateController);
-
   /**
    * Users.
    */
-  app.post('/users', required('user'), users.create); // Create a user.
   app.get('/users/exists', required('email'), users.exists); // Checks the existence of a user based on email.
-  app.get('/users/:userid', users.show); // Get a user.
-  app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
-  app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
-
-  // TODO: Why is this a PUT and not a GET?
-  app.put('/users/:userid/images', required('userData'), users.getSocialMediaAvatars); // Return possible images for a user.
-
-  /**
-   * Credit paymentMethod.
-   *
-   *  Let's assume for now a paymentMethod is linked to a user.
-   */
-  // delete this route #postmigration, once frontend is updated
-  app.get('/users/:userid/cards', auth.mustBeLoggedInAsUser, getPaymentMethods); // Get a user's paymentMethods.
-
-  app.get('/users/:userid/payment-methods', auth.mustBeLoggedInAsUser, getPaymentMethods); // Get a user's paymentMethods.
-  app.post('/users/:userid/payment-methods', NotImplemented); // Create a user's paymentMethod.
-  app.put('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Update a user's paymentMethod.
-  app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
 
   /**
    * Create a payment method.
@@ -247,37 +212,8 @@ export default app => {
   /**
    * Collectives.
    */
-  app.post(
-    '/groups',
-    ifParam('flow', 'github'),
-    aN.parseJwtNoExpiryCheck,
-    aN.checkJwtExpiry,
-    required('payload'),
-    collectives.createFromGithub,
-  ); // Create a collective from a github repo
-  app.post('/groups', required('group'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
   app.get('/groups/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
-  app.get('/groups/:collectiveid', collectives.getOne);
   app.get('/groups/:collectiveid/:tierSlug(backers|users)', cacheControlMaxAge(60), collectives.getUsers); // Get collective backers
-  app.get(
-    '/groups/:collectiveid/:tierSlug(backers|users).csv',
-    cacheControlMaxAge(60),
-    mw.format('csv'),
-    collectives.getUsers,
-  );
-  app.put('/groups/:collectiveid', auth.canEditCollective, required('group'), collectives.update); // Update a collective.
-  app.put('/groups/:collectiveid/settings', auth.canEditCollective, required('group'), collectives.updateSettings); // Update collective settings
-  app.delete('/groups/:collectiveid', NotImplemented); // Delete a collective.
-
-  app.get('/groups/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
-
-  /**
-   * Member.
-   *
-   *  Relations between a collective and a user.
-   */
-  app.post('/groups/:collectiveid/users/:userid', auth.canEditCollective, collectives.addUser); // Add a user to a collective.
-
   /**
    * Transactions (financial).
    */
@@ -286,51 +222,23 @@ export default app => {
   app.get('/v1/collectives/:collectiveSlug/transactions', RestApi.getLatestTransactions);
   app.get('/v1/collectives/:collectiveSlug/transactions/:idOrUuid', RestApi.getTransaction);
 
-  // xdamman: Is this route still being used anywhere? If not, we should deprecate this
-  app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
-
-  // xdamman: Is this route still being used anywhere? If not, we should deprecate this
-  app.get(
-    '/groups/:collectiveid/transactions',
-    mw.paginate(),
-    mw.sorting({ key: 'createdAt', dir: 'DESC' }),
-    collectives.getTransactions,
-  ); // Get a group's transactions.
-
-  /**
-   * Notifications.
-   *
-   *  A user can subscribe by email to any type of activity of a Collective.
-   */
-  app.post('/groups/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
-
   /**
    * Separate route for uploading images to S3
-   * TODO: User should be logged in
    */
   app.post('/images', upload.single('file'), uploadImage);
 
   /**
    * Generic OAuth (ConnectedAccounts)
    */
-  app.get('/:slug/connected-accounts', connectedAccounts.list);
   app.get('/connected-accounts/:service(github)', aN.authenticateService); // backward compatibility
   app.get('/connected-accounts/:service(github|twitter|meetup|stripe|paypal)/oauthUrl', aN.authenticateService);
   app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.verify);
-
-  // /**
-  //  * Paypal Preapproval.
-  //  */
-  // app.get('/users/:userid/paypal/preapproval', auth.mustBeLoggedInAsUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
-  // app.post('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.confirmPreapproval); // Confirm a preapproval key.
-  // app.get('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.getDetails); // Get a preapproval key details.
 
   /* PayPal Payment Method Helpers */
   app.post('/services/paypal/create-payment', paypal.createPayment);
 
   /**
    * External services
-   * TODO: we need to consolidate all 3rd party services within the /services/* routes
    */
   app.get('/services/email/approve', email.approve);
   app.get('/services/email/unsubscribe/:email/:slug/:type/:token', email.unsubscribe);
@@ -341,14 +249,6 @@ export default app => {
   app.get('/github-repositories', connectedAccounts.fetchAllRepositories);
   app.get('/github/repo', connectedAccounts.getRepo);
   app.get('/github/orgMemberships', connectedAccounts.getOrgMemberships);
-
-  /**
-   * Application Management
-   */
-  app.post('/applications/create', auth.mustBeLoggedIn, applications.create);
-  app.get('/applications/:id', auth.mustBeLoggedIn, applications.read);
-  app.post('/applications/:id', auth.mustBeLoggedIn, applications.update);
-  app.delete('/applications/:id', auth.mustBeLoggedIn, applications.del);
 
   /**
    * test-api routes

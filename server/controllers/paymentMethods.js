@@ -1,9 +1,8 @@
 import config from 'config';
 import moment from 'moment';
-import models, { Op } from '../models';
-import { extend, get, pick, map } from 'lodash';
+import { get, pick } from 'lodash';
+
 import * as utils from '../graphql/v1/utils';
-const { PaymentMethod } = models;
 
 const createPaymentMethodQuery = `
   mutation createPaymentMethod(
@@ -49,25 +48,6 @@ const createPaymentMethodQuery = `
     }
   }
 `;
-/**
- * Get the paymentMethods of the user.
- *
- * We use the method to know if the user need to confirm her/his paypal
- * account
- */
-export function getPaymentMethods(req, res, next) {
-  const { filter } = req.query;
-  const query = extend({}, filter, {
-    CollectiveId: req.user.CollectiveId,
-    confirmedAt: { [Op.ne]: null },
-  });
-
-  return PaymentMethod.findAll({ where: query })
-    .then(response => {
-      res.send(map(response, 'info'));
-    })
-    .catch(next);
-}
 
 async function createVirtualCardThroughGraphQL(args, user) {
   const gqlResult = await utils.graphqlQuery(createPaymentMethodQuery, args, user);

@@ -106,13 +106,6 @@ String.prototype.trunc = function(n, useWordBoundary) {
 };
 
 /**
- * Get current Url.
- */
-export const getRequestedUrl = req => {
-  return `${req.protocol}://${req.get('Host')}${req.url}`;
-};
-
-/**
  * Add parameters to an url.
  */
 export const addParameterUrl = (url, parameters) => {
@@ -176,21 +169,6 @@ export const getLinks = (url, options) => {
 };
 
 /**
- * Get headers for pagination.
- */
-export const getLinkHeader = (url, options) => {
-  const links = getLinks(url, options);
-  let header = '';
-  let k = 0;
-  for (const i in links) {
-    header += (k !== 0 ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"'; // eslint-disable-line
-    k += 1;
-  }
-
-  return header;
-};
-
-/**
  * We can generate our own plan ids with stripe, we will use a simple one for
  * now until we decide to make more complex plans. We will only take into account
  * the currency, interval and amount. It will have the following format
@@ -199,16 +177,6 @@ export const getLinkHeader = (url, options) => {
  */
 export const planId = plan => {
   return [plan.currency, plan.interval, plan.amount].join('-').toUpperCase();
-};
-
-/**
- * Pagination offset: from (page,per_page) to (offset, limit).
- */
-export const paginateOffset = (page, perPage) => {
-  return {
-    offset: (page - 1) * perPage,
-    limit: perPage,
-  };
 };
 
 /**

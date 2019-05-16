@@ -1,6 +1,3 @@
-/**
- * Dependencies.
- */
 import Historical from 'sequelize-historical';
 import config from 'config';
 import deepmerge from 'deepmerge';
@@ -2060,15 +2057,6 @@ export default function(Sequelize, DataTypes) {
         CollectiveId: this.id,
       });
     }
-  };
-
-  Collective.prototype.getSuperCollectiveData = function() {
-    if (this.isSupercollective && this.settings.superCollectiveTag && this.settings.superCollectiveTag.length > 0) {
-      return Collective.getCollectivesSummaryByTag(this.settings.superCollectiveTag, 10000, [this.id], 0, false).then(
-        ({ collectives }) => collectives,
-      );
-    }
-    return Promise.resolve();
   };
 
   Collective.prototype.getTopBackers = function(since, until, limit) {

@@ -159,24 +159,6 @@ const getTotalAnnualBudget = () => {
 };
 
 /**
- * Get the total of donations across the platform
- */
-const getTotalDonations = () => {
-  return sequelize
-    .query(
-      `
-    SELECT SUM(${generateFXConversionSQL()}) AS "totalDonationsInUSD"
-    FROM "Transactions"
-    WHERE type='CREDIT' AND "PaymentMethodId" IS NOT NULL
-  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
-      {
-        type: sequelize.QueryTypes.SELECT,
-      },
-    )
-    .then(res => Math.round(res[0].totalDonationsInUSD));
-};
-
-/**
  * Returns the total amount of donations made by collective type (USER/ORGANIZATION/COLLECTIVE) (in cents in the currency of the CollectiveId)
  * @param {*} CollectiveId
  */
@@ -903,7 +885,6 @@ const queries = {
   getTopDonorsForCollective,
   getTopVendorsForCollective,
   getTopExpenseCategories,
-  getTotalDonations,
   getTotalAnnualBudget,
   getMembersOfCollectiveWithRole,
   getMembersWithTotalDonations,
