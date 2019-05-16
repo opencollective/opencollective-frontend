@@ -132,17 +132,6 @@ export const addParameterUrl = (url, parameters) => {
 };
 
 /**
- * We can generate our own plan ids with stripe, we will use a simple one for
- * now until we decide to make more complex plans. We will only take into account
- * the currency, interval and amount. It will have the following format
- *
- * 'USD-MONTH-1000'
- */
-export const planId = plan => {
-  return [plan.currency, plan.interval, plan.amount].join('-').toUpperCase();
-};
-
-/**
  * Gives the number of days between two dates
  */
 export const days = (d1, d2 = new Date()) => {

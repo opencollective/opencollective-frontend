@@ -2,100 +2,14 @@
  * All calls to stripe are meant to go through this gateway
  */
 
-import { includes, get } from 'lodash';
+import { get } from 'lodash';
 import Stripe from 'stripe';
 import config from 'config';
 import debugLib from 'debug';
 
-import { planId } from '../../lib/utils';
 const debug = debugLib('stripe');
+
 export const appStripe = Stripe(config.stripe.secret);
-
-/**
- * Create a plan if it doesn not find it
- */
-export const getOrCreatePlan = (stripeAccount, plan) => {
-  debug(
-    '>>> stripe: createCharge using stripeAccount',
-    {
-      username: stripeAccount.username,
-      CollectiveId: stripeAccount.CollectiveId,
-    },
-    'plan:',
-    plan,
-  );
-  const id = planId(plan);
-
-  plan.id = id;
-  plan.name = id;
-
-  return appStripe.plans.retrieve(plan.id, { stripe_account: stripeAccount.username }).catch(err => {
-    if (err.type === 'StripeInvalidRequestError' && includes(err.message.toLowerCase(), 'no such plan')) {
-      return appStripe.plans.create(plan, {
-        stripe_account: stripeAccount.username,
-      });
-    }
-
-    console.error(err);
-    return Promise.reject(err);
-  });
-};
-
-/**
- * Create stripe subscription with plan
- */
-export const createSubscription = (stripeAccount, customerId, subscription) => {
-  debug('createSubscription');
-  return appStripe.customers.createSubscription(customerId, subscription, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
- * Retrieve stripe subscription
- */
-export const retrieveSubscription = (stripeAccount, stripeSubsriptionId) => {
-  debug('retrieveSubscription', 'account', stripeAccount.username, 'stripeSubsriptionId', stripeSubsriptionId);
-  return appStripe.subscriptions.retrieve(stripeSubsriptionId, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
- * Get all subscriptions
- */
-export const getSubscriptionsList = (stripeAccount, options = {}) => {
-  const params = {
-    limit: options.limit || 10,
-  };
-
-  if (options.startingAfter) {
-    params.starting_after = options.startingAfter;
-  }
-
-  if (options.endingBefore) {
-    params.ending_before = options.endingBefore;
-  }
-
-  if (options.plan) {
-    params.plan = options.plan;
-  }
-
-  debug('getSubscriptionsList');
-  return appStripe.subscriptions.list(params, {
-    stripe_account: stripeAccount.username,
-  });
-};
-
-/**
- * Delete a subscription
- */
-export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
-  debug('cancelSubscription');
-  return appStripe.subscriptions.del(stripeSubscriptionId, {
-    stripe_account: stripeAccount.username,
-  });
-};
 
 /**
  * Create stripe customer
@@ -189,7 +103,7 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
     },
     txn,
   );
-  return appStripe.balance.retrieveTransaction(txn, {
+  return appStripe.balanceTransactions.retrieve(txn, {
     stripe_account: stripeAccount.username,
   });
 };

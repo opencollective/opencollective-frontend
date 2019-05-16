@@ -5,8 +5,6 @@ import models from '../../models';
 import * as constants from '../../constants/transactions';
 import * as stripeGateway from './gateway';
 import * as paymentsLib from '../../lib/payments';
-import { planId } from '../../lib/utils';
-import errors from '../../lib/errors';
 
 /**
  * Calculates the 1st of next month
@@ -210,34 +208,8 @@ export default {
     });
   },
 
-  webhook: (requestBody, event) => {
-    const invoice = event.data.object;
-    const invoiceLineItems = invoice.lines.data;
-    const stripeSubscription = _.find(invoiceLineItems, {
-      type: 'subscription',
-    });
-
-    /*
-      If it's an ACH payment (which we don't accept but a host might have others
-      sending it), we need to send back a 200 or Stripe will keep trying
-
-      This assumes that any 'invoice.payment_succeeded' that is not a subscription
-      will be ignored.
-
-      TODO: when we start accepting other payment types, need to update this.
-    */
-    if (!stripeSubscription) {
-      return Promise.resolve();
-    }
-
-    /* Stripe might send pings for lots of reasons, but we're logging
-       this one because it could flag a subscription that wasn't
-       migrated to the new system.  */
-    if (planId(stripeSubscription.plan) === stripeSubscription.plan.id) {
-      return Promise.reject(new errors.BadRequest('Subscription not migrated ${stripeSubscription.id}'));
-    }
-    /* We return 200 because Stripe can keep pinging us if we don't do
-       so for some events. */
+  webhook: (/* requestBody, event */) => {
+    // We don't do anything at the moment
     return Promise.resolve();
   },
 };
