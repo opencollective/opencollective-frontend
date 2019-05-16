@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
 import ReactMarkdown from 'react-markdown';
@@ -11,6 +11,8 @@ import { getWebsiteUrl } from '../../lib/utils';
 import { H1, P, Span } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
+import Link from '../Link';
+import StyledProgressBar from '../StyledProgressBar';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
@@ -127,11 +129,33 @@ class TierPage extends Component {
                   />
                 </P>
               )}
-              {/** TODO: Placeholder */}
-              <Container background="lightgrey" height="80px" mb={4} borderRadius={16} />
-              <StyledButton buttonStyle="dark" width={1} mb={4}>
-                <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
-              </StyledButton>
+              <P fontSize="Paragraph" color="black.400" lineHeight="LeadParagraph" mb={2}>
+                <FormattedMessage
+                  id="TierPage.AmountRaised"
+                  defaultMessage="{amount} raised"
+                  values={{
+                    amount: (
+                      <Span fontWeight="bold" fontSize="LeadParagraph" color="black.700">
+                        <Currency value={tier.stats.totalDonated} currency={tier.currency} />
+                      </Span>
+                    ),
+                  }}
+                />
+                {tier.goal && ` (${Math.round((tier.stats.totalDonated / tier.goal) * 100)}%)`}
+              </P>
+              {tier.goal && (
+                <Box mt={1} mb={2}>
+                  <StyledProgressBar percentage={tier.stats.totalDonated / tier.goal} />
+                </Box>
+              )}
+              <Link
+                route="orderCollectiveTierNew"
+                params={{ verb: 'contribute', tierId: tier.id, tierSlug: tier.slug, collectiveSlug: collective.slug }}
+              >
+                <StyledButton buttonStyle="dark" width={1} my={4}>
+                  <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
+                </StyledButton>
+              </Link>
               <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
                 <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
               </P>

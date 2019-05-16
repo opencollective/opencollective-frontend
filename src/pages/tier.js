@@ -79,6 +79,10 @@ const getCollective = graphql(gql`
       goal
       currency
 
+      stats {
+        totalDonated
+      }
+
       collective {
         id
         slug
