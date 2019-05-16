@@ -42,7 +42,7 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html', 'markdown') : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'isPrivate') : {},
       loading: false,
     };
 
@@ -177,6 +177,7 @@ class EditUpdateForm extends React.Component {
           <div className="row">
             <Box mt={4}>
               <StyledCheckbox
+                defaultChecked={update.isPrivate}
                 name="private"
                 label="Private update"
                 onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
