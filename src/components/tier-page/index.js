@@ -103,7 +103,15 @@ class TierPage extends Component {
                 <ReactMarkdown source={tier.description} />
               </Container>
             </Container>
-            <Container background="white" height={Dimensions.COVER_HEIGHT} flex="0 1 385px" p="60px 32px">
+            <Container
+              display="flex"
+              flexDirection="column"
+              justifyContent="space-evenly"
+              background="white"
+              height={Dimensions.COVER_HEIGHT}
+              flex="0 1 385px"
+              p="60px 32px"
+            >
               {tier.goal && (
                 <P fontSize="H5" color="black.500" lineHeight="H3" mb={3}>
                   <FormattedMessage

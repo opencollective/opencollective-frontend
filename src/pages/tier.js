@@ -9,15 +9,15 @@ import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
-import TierPage from '../components/tier-page';
+import TierPageContent from '../components/tier-page';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
-class NewCollectivePage extends React.Component {
+class TierPage extends React.Component {
   static propTypes = {
-    tierId: PropTypes.number.isRequired,
+    tierId: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
   };
@@ -62,7 +62,7 @@ class NewCollectivePage extends React.Component {
         {data.loading || !data.Tier || !data.Tier.collective ? (
           <Loading />
         ) : (
-          <TierPage collective={data.Tier.collective} tier={data.Tier} LoggedInUser={LoggedInUser} />
+          <TierPageContent collective={data.Tier.collective} tier={data.Tier} LoggedInUser={LoggedInUser} />
         )}
       </Page>
     );
@@ -96,4 +96,4 @@ const getCollective = graphql(gql`
   }
 `);
 
-export default withUser(getCollective(withIntl(NewCollectivePage)));
+export default withUser(getCollective(withIntl(TierPage)));

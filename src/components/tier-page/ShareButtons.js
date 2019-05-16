@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import copy from 'copy-to-clipboard';
@@ -68,9 +68,8 @@ ShareButtons.propTypes = {
   pageUrl: PropTypes.string.isRequired,
   collective: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    twitterHandle: PropTypes.string.isRequired,
+    twitterHandle: PropTypes.string,
   }).isRequired,
-  twitterHandle: PropTypes.string,
   intl: PropTypes.object.isRequired,
 };
 
