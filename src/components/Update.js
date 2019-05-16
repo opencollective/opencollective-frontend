@@ -288,6 +288,7 @@ const editUpdateQuery = gql`
       title
       markdown
       html
+      isPrivate
     }
   }
 `;
