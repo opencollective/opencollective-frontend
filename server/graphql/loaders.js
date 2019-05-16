@@ -290,6 +290,26 @@ export const loaders = req => {
           .then(results => sortResults(ids, results, 'TierId'))
           .map(result => get(result, 'dataValues.count') || 0),
       ),
+      totalDonated: new DataLoader(ids => {
+        return sequelize
+          .query(
+            `
+            SELECT "Order"."TierId" AS "TierId", COALESCE(SUM("Transaction"."netAmountInCollectiveCurrency"), 0) AS "totalDonated"
+            FROM "Transactions" AS "Transaction"
+            INNER JOIN "Orders" AS "Order" ON "Transaction"."OrderId" = "Order"."id" AND ("Order"."deletedAt" IS NULL)
+            WHERE "TierId" IN (?)
+            AND "Transaction"."deletedAt" IS NULL
+            AND "Transaction"."RefundTransactionId" IS NULL
+            AND "Transaction"."type" = 'CREDIT'
+            GROUP BY "TierId";
+          `,
+            {
+              replacements: [ids],
+              type: sequelize.QueryTypes.SELECT,
+            },
+          )
+          .then(results => sortResults(ids, results, 'TierId').map(result => result.totalDonated));
+      }),
     },
     paymentMethods: {
       findById: new DataLoader(ids =>
