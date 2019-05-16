@@ -5,8 +5,6 @@ import models from '../../models';
 import * as constants from '../../constants/transactions';
 import * as stripeGateway from './gateway';
 import * as paymentsLib from '../../lib/payments';
-import { planId } from '../../lib/utils';
-import errors from '../../lib/errors';
 
 /**
  * Calculates the 1st of next month
@@ -230,12 +228,6 @@ export default {
       return Promise.resolve();
     }
 
-    /* Stripe might send pings for lots of reasons, but we're logging
-       this one because it could flag a subscription that wasn't
-       migrated to the new system.  */
-    if (planId(stripeSubscription.plan) === stripeSubscription.plan.id) {
-      return Promise.reject(new errors.BadRequest('Subscription not migrated ${stripeSubscription.id}'));
-    }
     /* We return 200 because Stripe can keep pinging us if we don't do
        so for some events. */
     return Promise.resolve();

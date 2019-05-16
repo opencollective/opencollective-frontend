@@ -104,9 +104,6 @@ describe('graphql.tiers.test', () => {
         type: 'charge',
       });
     });
-    sandbox.stub(stripe, 'getOrCreatePlan').callsFake(() => {
-      return Promise.resolve({ id: 'stripePlanId-111' });
-    });
   });
 
   describe('graphql.tiers.test.js', () => {
