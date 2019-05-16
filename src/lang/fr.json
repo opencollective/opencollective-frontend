@@ -992,6 +992,7 @@
   "update.new.save": "Sauvegarder l'actualité",
   "update.paid": "payé",
   "update.pending": "en attente",
+  "update.private.cannot_view_message": "Become a backer of {collective} to see this update",
   "update.private.description": "Only contributors will be able to see the content of this update",
   "update.private.lock_text": "This update is private",
   "update.publish.backers": "Votre actualité sera envoyé à vos {n} contributeurs",

@@ -992,6 +992,7 @@
   "update.new.save": "Сохранить обновления",
   "update.paid": "оплачено",
   "update.pending": "в ожидании",
+  "update.private.cannot_view_message": "Become a backer of {collective} to see this update",
   "update.private.description": "Only contributors will be able to see the content of this update",
   "update.private.lock_text": "This update is private",
   "update.publish.backers": "Ваше обновление будет отправлено {n} попечителям",

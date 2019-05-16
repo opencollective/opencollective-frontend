@@ -47,8 +47,10 @@ const getUpdateQuery = gql`
       html
       markdown
       isPrivate
+      contentStripped
       collective {
         id
+        name
         slug
         settings
         stats {

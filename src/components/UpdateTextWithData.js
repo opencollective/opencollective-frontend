@@ -41,6 +41,10 @@ const getUpdateQuery = gql`
     Update(id: $id) {
       id
       html
+      contentStripped
+      collective {
+        name
+      }
     }
   }
 `;

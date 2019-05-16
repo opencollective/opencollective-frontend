@@ -992,6 +992,7 @@
   "update.new.save": "アップデートを保存",
   "update.paid": "支払い済み",
   "update.pending": "保留",
+  "update.private.cannot_view_message": "Become a backer of {collective} to see this update",
   "update.private.description": "Only contributors will be able to see the content of this update",
   "update.private.lock_text": "This update is private",
   "update.publish.backers": "あなたのアップデートは {n} 人のバッカーに送られます",

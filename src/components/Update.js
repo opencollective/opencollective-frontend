@@ -15,6 +15,7 @@ import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import StyledTooltip from './StyledTooltip';
+import MessageBox from './MessageBox';
 
 class Update extends React.Component {
   static propTypes = {
@@ -250,6 +251,15 @@ class Update extends React.Component {
             <div>
               {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
               {!update.html && <UpdateTextWithData id={update.id} />}
+              {update.contentStripped && (
+                <MessageBox type="info">
+                  <FormattedMessage
+                    id="update.private.cannot_view_message"
+                    defaultMessage="Become a backer of {collective} to see this update"
+                    values={{ collective: collective.name }}
+                  />
+                </MessageBox>
+              )}
               {update.publishedAt && (
                 <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
                   {intl.formatMessage(this.messages['viewLatestUpdates'])}
