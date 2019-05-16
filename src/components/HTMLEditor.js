@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import 'react-quill/dist/quill.snow.css';
 
 import { upload } from '../lib/api';
-
-import '../../node_modules/react-quill/dist/quill.snow.css'; // eslint-disable-line node/no-unpublished-import
+import LoadingPlaceholder from './LoadingPlaceholder';
 
 /*
  * Simple editor component that takes placeholder text as a prop
@@ -15,6 +15,14 @@ class HTMLEditor extends React.Component {
     defaultValue: PropTypes.string,
     className: PropTypes.string,
     onChange: PropTypes.func,
+    LoadingPlaceholderheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Use `false` instead of a number to disable a title level. eg. [false, 2, 3] */
+    allowedHeaders: PropTypes.arrayOf(PropTypes.number),
+  };
+
+  static defaultProps = {
+    allowedHeaders: [1, 2, false],
+    LoadingPlaceholderheight: 242,
   };
 
   constructor(props) {
@@ -24,7 +32,7 @@ class HTMLEditor extends React.Component {
     this.saveToServer = this.saveToServer.bind(this);
     this.insertToEditor = this.insertToEditor.bind(this);
     if (typeof window !== 'undefined') {
-      this.ReactQuill = require('react-quill');
+      this.importQuill();
     }
 
     /*
@@ -34,7 +42,8 @@ class HTMLEditor extends React.Component {
     this.modules = {
       toolbar: {
         container: [
-          [{ header: '1' }, { header: '2' }],
+          // Add null to the list to allow "Normal" text formatting (no header)
+          [{ header: props.allowedHeaders }],
           [{ size: [] }],
           ['bold', 'italic', 'underline', 'blockquote'],
           [{ list: 'ordered' }, { list: 'bullet' }],
@@ -77,6 +86,12 @@ class HTMLEditor extends React.Component {
     if (this.props.value !== oldProps.value) {
       this.setState({ editorHtml: this.props.value });
     }
+  }
+
+  /** This function should only be called on Frontend (SSR not supported by react-quill) */
+  importQuill() {
+    this.ReactQuill = require('react-quill');
+    // const Font = this.ReactQuill.import('formats/font')
   }
 
   handleChange(html) {
@@ -131,7 +146,7 @@ class HTMLEditor extends React.Component {
 
   render() {
     if (!this.ReactQuill) {
-      return <div />;
+      return <LoadingPlaceholder height={this.props.LoadingPlaceholderheight} />;
     }
 
     return (
@@ -170,10 +185,5 @@ class HTMLEditor extends React.Component {
     );
   }
 }
-
-// // quill editor add image handler
-// HTMLEditor.getModule('toolbar').addHandler('image', () => {
-//   selectLocalImage();
-// });
 
 export default HTMLEditor;

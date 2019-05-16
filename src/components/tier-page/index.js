@@ -1,24 +1,26 @@
 import React, { Component } from 'react';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
+import { themeGet } from 'styled-system';
 import { withRouter } from 'next/router';
-import ReactMarkdown from 'react-markdown';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { H1, P, Span } from '../Text';
+import { P, Span } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
+import Currency from '../Currency';
 import StyledProgressBar from '../StyledProgressBar';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
 import BubblesSVG from './Bubbles.svg';
-import Currency from '../Currency';
+import TierName from './TierName';
+import TierLongDescription from './TierLongDescription';
 
 /** The blured background image displayed under the tier description */
 const TierCover = styled(Container)`
@@ -29,6 +31,22 @@ const TierCover = styled(Container)`
   background-size: cover;
   filter: blur(15px);
   transform: scale(1.1);
+`;
+
+/** The little bubbles displayed above the tier's description */
+const Bubbles = styled.div`
+  background: url(${BubblesSVG}) no-repeat;
+  height: 260px;
+  background-size: 75% auto;
+  background-position-x: right;
+  background-position-y: 90px;
+
+  @media (max-width: ${themeGet('breakpoints.0')}) {
+    height: 130px;
+    background-size: 90% auto;
+    background-position-x: center;
+    background-position-y: 110%;
+  }
 `;
 
 /**
@@ -66,30 +84,33 @@ class TierPage extends Component {
     const pageUrl = `${getWebsiteUrl()}${router.asPath}`;
 
     return (
-      <Container position="relative" borderTop="1px solid #E6E8EB">
-        <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
-          <TierCover backgroundImage={collective.backgroundImage ? `url(${collective.backgroundImage})` : undefined} />
+      <Container borderTop="1px solid #E6E8EB">
+        <Container position="relative">
+          <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
+            <TierCover
+              backgroundImage={collective.backgroundImage ? `url(${collective.backgroundImage})` : undefined}
+            />
+          </Container>
+          <Container
+            position="absolute"
+            background="white"
+            height="100%"
+            width={1}
+            zIndex={-1}
+            top={Dimensions.COVER_HEIGHT}
+          />
         </Container>
-        <Container
-          position="absolute"
-          background="white"
-          height="100%"
-          width={1}
-          zIndex={-1}
-          top={Dimensions.COVER_HEIGHT}
-        />
         <Flex justifyContent="center">
-          <Flex flex="0 1 1920px" px={4} justifyContent="space-evenly" flexWrap="wrap" mb={64}>
+          <Flex flex="0 1 1800px" px={[2, 4]} justifyContent="space-evenly" flexWrap="wrap" mb={64}>
             <Container
               display="flex"
               flexDirection="column"
               justifyContent="flex-end"
               flex="0 1 800px"
-              pt={[3, 4, null, 5]}
               mb={4}
               mx={[0, null, 3]}
             >
-              <img src={BubblesSVG} alt="" />
+              <Bubbles />
               <Container
                 background="white"
                 borderRadius={8}
@@ -99,10 +120,11 @@ class TierPage extends Component {
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
-                <H1 textAlign="left" color="black.900" mb={4}>
-                  {tier.name}
-                </H1>
-                <ReactMarkdown source={tier.description} />
+                <Box mb={4}>
+                  <TierName tierId={tier.id} name={tier.name} canEdit={canEditTier} />
+                </Box>
+
+                <TierLongDescription tierId={tier.id} description={tier.longDescription} canEdit={canEditTier} />
               </Container>
             </Container>
             <Container

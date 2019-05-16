@@ -26,6 +26,10 @@ export const overflow = style({
   prop: 'overflow',
 });
 
+export const resize = style({
+  prop: 'resize',
+});
+
 export const pointerEvents = style({
   prop: 'pointerEvents',
 });

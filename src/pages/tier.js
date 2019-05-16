@@ -75,7 +75,7 @@ const getCollective = graphql(gql`
       id
       name
       slug
-      description
+      longDescription
       goal
       currency
 

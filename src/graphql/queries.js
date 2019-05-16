@@ -247,6 +247,7 @@ export const getCollectiveToEditQueryFields = `
     type
     name
     description
+    longDescription
     amount
     presets
     minimumAmount
