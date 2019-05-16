@@ -356,11 +356,6 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_CREATED:
-      if (get(activity, 'data.host.id')) {
-        notifyAdminsOfCollective(activity.data.host.id, activity, {
-          template: 'collective.apply.for.host',
-        });
-      }
       if ((get(activity, 'data.collective.tags') || []).includes('meetup')) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, {
           template: 'collective.created.meetup',
