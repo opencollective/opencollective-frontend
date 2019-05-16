@@ -8,7 +8,7 @@ describe('create an update', () => {
     cy.fillInputField('title', 'New update');
     cy.get('.ql-editor').type('This is some bold HTML{selectall}');
     cy.get('.ql-bold').click();
-    cy.get('.custom-checkbox').click();
+    cy.get('.custom-checkbox').click(); // Make private
     cy.wait(300);
     cy.get('.actions button').click();
     cy.wait(1000);
@@ -21,6 +21,15 @@ describe('create an update', () => {
     cy.get('.UpdatePage button.publish').click();
     cy.get('.UpdatePage .meta')
       .contains('draft')
+      .should('not.exist');
+
+    cy.get('.UpdatePage .toggleEditUpdate').click();
+    cy.wait(300);
+    cy.get('.custom-checkbox').click(); // Make non-private
+    cy.get('.actions button').click();
+    cy.wait(1000);
+    cy.get('.UpdatePage .meta')
+      .get('#privateIcon')
       .should('not.exist');
   });
 });
