@@ -124,4 +124,5 @@ Modal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
+/** @component */
 export default Modal;
