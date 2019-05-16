@@ -250,6 +250,7 @@ export const getCollectiveToEditQueryFields = `
     amount
     presets
     minimumAmount
+    goal
     interval
     currency
     maxQuantity
