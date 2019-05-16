@@ -738,7 +738,7 @@
   "redeem.card.success.instructions": "Nous avons envoyé un e-mail à {email} avec des instructions pour vérifier votre nouveau compte Open Collective et le créditer avec le montant de votre carte cadeau.",
   "redeem.card.success.title": "Vous n'êtes qu'à un pas de soutenir des initiatives d'Open Collective !",
   "redeem.form.code.label": "Code de carte cadeau",
-  "redeem.form.redeem.btn": "confirmer",
+  "redeem.form.redeem.btn": "redeem",
   "redeem.subtitle.line1": "Open Collective aide des communautés - projets open-source, meetups etc - à collecter de l’argent et à opérer de façon transparente.",
   "redeemed.backyourstack": "ou découvrez les projets open source dont dépend votre entreprise et qui cherchent des dons {link}",
   "redeemed.findCollectives": "Trouver et soutenir de nouveaux collectifs.",

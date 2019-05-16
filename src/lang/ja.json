@@ -738,7 +738,7 @@
   "redeem.card.success.instructions": "We’ve sent an email to {email} with instructions to verify your new Open Collective account and credit it with the amount of your gift card.",
   "redeem.card.success.title": "You are one step away from supporting open collectives.",
   "redeem.form.code.label": "ギフトカードコード",
-  "redeem.form.redeem.btn": "引き換え",
+  "redeem.form.redeem.btn": "redeem",
   "redeem.subtitle.line1": "Open Collective helps communities - like open source projects, meetups and social movements - raise funds spend them transparently.",
   "redeemed.backyourstack": "or discover the open source projects that your organization is depending on and that need funding on {link}",
   "redeemed.findCollectives": "サポートするオープンコレクティブを探す",

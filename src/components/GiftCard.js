@@ -54,7 +54,9 @@ class GiftCard extends React.Component {
   static propTypes = {
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
+    collective: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    }),
     emitter: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
