@@ -249,6 +249,10 @@ export const TierInputType = new GraphQLInputObjectType({
     type: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
+    longDescription: {
+      type: GraphQLString,
+      description: 'A long, markdown-formatted description.',
+    },
     amount: {
       type: GraphQLInt,
       description: 'amount in the lowest unit of the currency of the host (ie. in cents)',

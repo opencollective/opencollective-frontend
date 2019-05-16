@@ -59,6 +59,15 @@ export default function(Sequelize, DataTypes) {
       },
 
       description: DataTypes.STRING,
+
+      longDescription: {
+        type: DataTypes.TEXT,
+        validate: {
+          // Max length for arround 1_000_000 characters ~4MB of text
+          len: [0, 1000000],
+        },
+      },
+
       button: DataTypes.STRING,
 
       amount: {
