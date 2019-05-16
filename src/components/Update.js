@@ -225,7 +225,7 @@ class Update extends React.Component {
                   <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
                 )}
               >
-                <Lock size={12} cursor="pointer" />
+                <Lock id="privateIcon" size={12} cursor="pointer" />
               </StyledTooltip>
             )}
 
