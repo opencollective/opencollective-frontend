@@ -10,10 +10,7 @@ describe('Account Deletion', () => {
         cy.wait(1000);
         cy.contains('a', 'Advanced').click();
         cy.contains('button', 'Delete this collective').click();
-        cy.get('.confirm-deleteCollective').should('exist');
-        cy.get('.confirm-deleteCollective')
-          .contains('button', 'Delete')
-          .click();
+        cy.get('[data-cy=delete]').click();
         cy.wait(1000);
         cy.location().should(location => {
           expect(location.search).to.eq('?type=COLLECTIVE');
@@ -33,10 +30,7 @@ describe('Account Deletion', () => {
       cy.contains('button', 'edit profile').click();
       cy.contains('a', 'Advanced').click();
       cy.contains('button', 'Delete this account').click();
-      cy.get('.confirm-deleteCollective').should('exist');
-      cy.get('.confirm-deleteCollective')
-        .contains('button', 'Delete')
-        .click();
+      cy.get('[data-cy=delete]').click();
       cy.wait(1000);
       cy.location().should(location => {
         expect(location.search).to.eq('?type=USER');
