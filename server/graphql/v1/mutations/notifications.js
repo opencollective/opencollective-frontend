@@ -97,13 +97,15 @@ export async function createWebhook(args, remoteUser) {
  * Deletes a notification by ID.
  */
 export async function deleteNotification(args, remoteUser) {
-  if (!(remoteUser && remoteUser.isAdmin(args.collectiveId))) {
+  if (!remoteUser) {
     throw new Unauthorized({ message: 'You need to be logged in as admin to delete a notification.' });
   }
 
   const notification = await models.Notification.findOne({ where: { id: args.id } });
   if (!notification) {
     throw new NotFound({ message: `Notification with ID ${args.id} not found.` });
+  } else if (!remoteUser.isAdmin(notification.CollectiveId)) {
+    throw new Unauthorized({ message: 'You need to be logged in as admin to delete this notification.' });
   }
 
   if (!(remoteUser.id === notification.UserId || remoteUser.isAdmin(notification.CollectiveId))) {
