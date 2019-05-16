@@ -1,17 +1,14 @@
-/**
- * Dependencies.
- */
-import _ from 'lodash';
-import app from '../server/index';
+import Bluebird from 'bluebird';
 import config from 'config';
-import { expect } from 'chai';
-import request from 'supertest-as-promised';
 import moment from 'moment';
+import nodemailer from 'nodemailer';
+import request from 'supertest-as-promised';
+import sinon from 'sinon';
+import { expect } from 'chai';
+
+import app from '../server/index';
 import * as utils from '../test/utils';
 import userlib from '../server/lib/userlib';
-import sinon from 'sinon';
-import Bluebird from 'bluebird';
-import nodemailer from 'nodemailer';
 import models from '../server/models';
 import mock from './mocks/clearbit';
 import * as auth from '../server/lib/auth.js';
@@ -20,7 +17,6 @@ import * as auth from '../server/lib/auth.js';
  * Variables.
  */
 const application = utils.data('application');
-const userData = utils.data('user1');
 
 /**
  * Tests.
@@ -94,131 +90,6 @@ describe('users.routes.test.js', () => {
           done();
         });
     });
-  });
-
-  /**
-   * Create.
-   */
-  describe('#create', () => {
-    it('fails if invalid api_key', () =>
-      request(app)
-        .post('/users')
-        .send({
-          api_key: '*invalid_api_key*',
-          user: userData,
-        })
-        .expect(401));
-
-    it('fails if no user object', () =>
-      request(app)
-        .post('/users')
-        .send({
-          api_key: application.api_key,
-        })
-        .expect(400));
-
-    it('succeeds even without email', done => {
-      request(app)
-        .post('/users')
-        .send({
-          api_key: application.api_key,
-          user: _.omit(userData, 'email'),
-        })
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('firstName', userData.firstName);
-          done();
-        });
-    });
-
-    it('fails if bad email', done => {
-      request(app)
-        .post('/users')
-        .send({
-          api_key: application.api_key,
-          user: _.extend({}, userData, { email: 'abcdefg' }),
-        })
-        .end((e, res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('validation_failed');
-          done();
-        });
-    });
-
-    it('successfully create a user', done => {
-      request(app)
-        .post('/users')
-        .send({
-          api_key: application.api_key,
-          user: userData,
-        })
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('email', userData.email.toLowerCase());
-          expect(res.body).to.not.have.property('_salt');
-          expect(res.body).to.not.have.property('password');
-          expect(res.body).to.not.have.property('password_hash');
-          done();
-        });
-    });
-
-    describe('duplicate', () => {
-      beforeEach(() => models.User.createUserWithCollective(userData));
-
-      it('fails to create a user with the same email', done => {
-        request(app)
-          .post('/users')
-          .send({
-            api_key: application.api_key,
-            user: _.pick(userData, 'email'),
-          })
-          .end((e, res) => {
-            expect(res.statusCode).to.equal(400);
-            expect(res.body.error.type).to.equal('validation_failed');
-            done();
-          });
-      });
-    });
-  });
-
-  describe('#update paypal email', () => {
-    let user;
-
-    beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user = u)));
-
-    it('should update the paypal email', done => {
-      const email = 'test+paypal@email.com';
-      request(app)
-        .put(`/users/${user.id}/paypalemail?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          paypalEmail: email,
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.paypalEmail).to.equal(email);
-          done();
-        });
-    });
-
-    it('fails if the user is not logged in', () => {
-      const email = 'test+paypal@email.com';
-      return request(app)
-        .put(`/users/${user.id}/paypalemail?api_key=${application.api_key}`)
-        .send({
-          paypalEmail: email,
-        })
-        .expect(401);
-    });
-
-    it('fails if the email is not valid', () =>
-      request(app)
-        .put(`/users/${user.id}/paypalemail?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          paypalEmail: 'abc',
-        })
-        .expect(400));
   });
 
   /**

@@ -10,6 +10,7 @@ import { formatCurrency } from '../../lib/utils';
 import adaptive from './adaptive';
 import payment from './payment';
 import { get } from 'lodash';
+
 const debugPaypal = debug('paypal');
 
 /**
