@@ -695,7 +695,7 @@ export const UpdateType = new GraphQLObjectType({
             // we only keep the first paragraph (up to 255 chars)
             return update.markdown.replace(/\n.*/g, '').trunc(255, true);
           }
-          if (update.html.substr(0, 3) === '<p>') {
+          if (update.html && update.html.substr(0, 3) === '<p>') {
             // we only keep the first paragraph
             return he
               .decode(update.html)
