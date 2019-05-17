@@ -118,7 +118,7 @@ class TierLongDescription extends Component {
                   disabled={loading}
                   onClick={this.closeEditor}
                 >
-                  <FormattedMessage id="form.cancel" defaultMessage="Cancel" />
+                  <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                 </StyledButton>
               </Flex>
             </Box>

@@ -114,7 +114,8 @@ class TierPage extends Component {
               <Container
                 background="white"
                 borderRadius={8}
-                p="32px 48px"
+                px={[3, 4]}
+                py={[4, 5]}
                 boxShadow="0px 10px 15px 3px rgba(0, 0, 0, 0.05)"
               >
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>

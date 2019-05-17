@@ -18,6 +18,10 @@ export const whiteSpace = style({
   prop: 'whiteSpace',
 });
 
+export const wordBreak = style({
+  prop: 'wordBreak',
+});
+
 export const cursor = style({
   prop: 'cursor',
 });

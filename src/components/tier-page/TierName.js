@@ -112,7 +112,7 @@ class TierName extends Component {
                   disabled={loading}
                   onClick={this.closeEditor}
                 >
-                  <FormattedMessage id="form.cancel" defaultMessage="Cancel" />
+                  <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                 </StyledButton>
               </Flex>
               <hr />
@@ -136,7 +136,7 @@ class TierName extends Component {
               <EditIcon size={24} onClick={this.enableEditor} />
             </Container>
           )}
-          <H1 textAlign="left" color="black.900">
+          <H1 textAlign="left" color="black.900" wordBreak="break-word">
             {name}
           </H1>
         </Container>

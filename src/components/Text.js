@@ -13,7 +13,7 @@ import {
 } from 'styled-system';
 import tag from 'clean-tag';
 
-import { textTransform, whiteSpace, cursor } from '../lib/styled_system_custom';
+import { textTransform, whiteSpace, wordBreak, cursor } from '../lib/styled_system_custom';
 
 export const P = styled(tag.p)`
   ${color}
@@ -28,11 +28,12 @@ export const P = styled(tag.p)`
   ${textAlign}
   ${textTransform}
   ${whiteSpace}
+  ${wordBreak}
   ${cursor}
 `;
 
 P.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat(['textTransform', 'whiteSpace', 'cursor']),
+  omitProps: tag.defaultProps.omitProps.concat(['textTransform', 'whiteSpace', 'wordBreak', 'cursor']),
   fontSize: 'Paragraph',
   letterSpacing: '-0.2px',
   lineHeight: 'Paragraph',

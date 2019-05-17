@@ -17,7 +17,7 @@ class HTMLEditor extends React.Component {
     onChange: PropTypes.func,
     LoadingPlaceholderheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Use `false` instead of a number to disable a title level. eg. [false, 2, 3] */
-    allowedHeaders: PropTypes.arrayOf(PropTypes.number),
+    allowedHeaders: PropTypes.arrayOf(PropTypes.oneOfType(PropTypes.number, PropTypes.bool)),
   };
 
   static defaultProps = {
@@ -32,7 +32,7 @@ class HTMLEditor extends React.Component {
     this.saveToServer = this.saveToServer.bind(this);
     this.insertToEditor = this.insertToEditor.bind(this);
     if (typeof window !== 'undefined') {
-      this.importQuill();
+      this.ReactQuill = require('react-quill');
     }
 
     /*
@@ -40,14 +40,13 @@ class HTMLEditor extends React.Component {
      * See https://quilljs.com/docs/modules/ for complete options
      */
     this.modules = {
+      // See https://quilljs.com/docs/modules/toolbar/
       toolbar: {
         container: [
-          // Add null to the list to allow "Normal" text formatting (no header)
           [{ header: props.allowedHeaders }],
-          [{ size: [] }],
           ['bold', 'italic', 'underline', 'blockquote'],
           [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'image', 'video'],
+          ['link', 'image'],
         ],
         handlers: {
           image: () => {
@@ -55,11 +54,13 @@ class HTMLEditor extends React.Component {
           },
         },
       },
+      // See https://quilljs.com/docs/modules/clipboard/
       clipboard: {
         // toggle to add extra line breaks when pasting HTML:
         matchVisual: false,
       },
     };
+
     /*
      * Quill editor formats
      * See https://quilljs.com/docs/formats/
@@ -86,12 +87,6 @@ class HTMLEditor extends React.Component {
     if (this.props.value !== oldProps.value) {
       this.setState({ editorHtml: this.props.value });
     }
-  }
-
-  /** This function should only be called on Frontend (SSR not supported by react-quill) */
-  importQuill() {
-    this.ReactQuill = require('react-quill');
-    // const Font = this.ReactQuill.import('formats/font')
   }
 
   handleChange(html) {
