@@ -341,7 +341,7 @@ const getCollectiveToEditQuery = gql`
 `;
 /* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
-const getCollectiveQuery = gql`
+export const getCollectiveQuery = gql`
   query Collective($slug: String) {
     Collective(slug: $slug) {
       id
@@ -912,29 +912,6 @@ export const getCollectiveSourcePaymentMethodsQuery = gql`
         balance
         currency
         expiryDate
-      }
-    }
-  }
-`;
-
-export const getMutatedCollective = gql`
-  query getMutatedCollective($slug: String) {
-    Collective(slug: $slug) {
-      id
-      slug
-      name
-      orders(status: PENDING) {
-        id
-        interval
-        publicMessage
-        status
-        totalAmount
-        fromCollective {
-          name
-          image
-          slug
-          type
-        }
       }
     }
   }
