@@ -927,7 +927,7 @@
   "transaction.downloadPDF": "Télécharger (pdf)",
   "transaction.fxrate": "taux de change",
   "transaction.host": "hôte",
-  "transaction.hostFeeInHostCurrency": "{percentage} commission de l'hôte",
+  "transaction.hostFeeInHostCurrency": "commission de l'hôte: {percentage}",
   "transaction.invoice": "facture",
   "transaction.netAmountInCollectiveCurrency.description": "montant net ajouté à {collective}",
   "transaction.paymentMethod": "méthode de paiement",
