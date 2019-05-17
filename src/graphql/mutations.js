@@ -2,7 +2,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick, isArray } from 'lodash';
 
-import { getLoggedInUserQuery, getCollectiveToEditQueryFields } from './queries';
+import { getLoggedInUserQuery, getCollectiveToEditQueryFields, getMutatedCollective } from './queries';
 
 const createOrderQuery = gql`
   mutation createOrder($order: OrderInputType!) {
@@ -221,7 +221,24 @@ export const createVirtualCardsMutationQuery = gql`
 
 export const addCreateOrderMutation = graphql(createOrderQuery, {
   props: ({ mutate }) => ({
-    createOrder: order => mutate({ variables: { order } }),
+    createOrder: async order => {
+      return await mutate({
+        variables: { order },
+        update: (cache, { data: { createOrder } }) => {
+          const data = cache.readQuery({
+            query: getMutatedCollective,
+            variables: { slug: createOrder.collective.slug },
+          });
+          data.Collective.orders.push({
+            fromCollective: createOrder.fromCollective,
+            id: createOrder.id,
+            status: createOrder.status,
+            __typename: createOrder.__typename,
+          });
+          cache.writeQuery({ query: getMutatedCollective, data });
+        },
+      });
+    },
   }),
 });
 
