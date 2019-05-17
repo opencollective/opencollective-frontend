@@ -18,10 +18,9 @@ Get the app from [Postgres.app](http://postgresapp.com/). Install it.
 
 Then to enable the CLI tools, follow the steps from: https://postgresapp.com/documentation/cli-tools.html
 
-### Using Docker
+### With Docker
 
-If you don't want to run a local instance of Postgres in your computer, you can run one in Docker.
-Keep in mind that you still need to have the local client tools like `psql`, `dropdb`, `createuser` still locally available.
+If you don't want to run a local instance of PostgreSQL in your computer, you can run one in Docker. Keep in mind that you still need to have the local client tools like `psql`, `dropdb`, `createuser` locally available.
 
 Create and run the container:
 
