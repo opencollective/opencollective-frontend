@@ -65,7 +65,7 @@ class NewCollectivePage extends React.Component {
     return !data || data.error ? (
       <ErrorPage data={data} />
     ) : (
-      <Page {...this.getPageMetaData(data.collective)} withGlobalStyles={false} smoothScroll>
+      <Page {...this.getPageMetaData(data.collective)}>
         {data.loading || !data.Collective ? (
           <Loading />
         ) : (
