@@ -1027,7 +1027,7 @@ export const TierType = new GraphQLObjectType({
       },
       longDescription: {
         type: GraphQLString,
-        description: 'A long, markdown-formatted description.',
+        description: 'A long, html-formatted description.',
       },
       button: {
         type: GraphQLString,

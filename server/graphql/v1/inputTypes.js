@@ -251,7 +251,7 @@ export const TierInputType = new GraphQLInputObjectType({
     description: { type: GraphQLString },
     longDescription: {
       type: GraphQLString,
-      description: 'A long, markdown-formatted description.',
+      description: 'A long, html-formatted description.',
     },
     amount: {
       type: GraphQLInt,
