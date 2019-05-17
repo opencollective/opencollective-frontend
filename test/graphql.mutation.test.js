@@ -375,7 +375,7 @@ describe('Mutation Tests', () => {
           host,
         );
         expect(result.data.editCollective.hostFeePercent).to.equal(11);
-        expect(result.data.editCollective.host.hostFeePercent).to.equal(5);
+        expect(result.data.editCollective.host.hostFeePercent).to.equal(10);
       });
 
       it('updates the hostFeePercent of the host and of the hosted collectives', async () => {
