@@ -19,7 +19,6 @@ const Page = ({
   twitterHandle,
   showSearch,
   withGlobalStyles,
-  smoothScroll,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -36,7 +35,7 @@ const Page = ({
         description={description}
         image={image}
       />
-      <Body withGlobalStyles={withGlobalStyles} smoothScroll={smoothScroll}>
+      <Body withGlobalStyles={withGlobalStyles}>
         {typeof children === 'function' ? children(childProps) : children}
       </Body>
       <Footer />
