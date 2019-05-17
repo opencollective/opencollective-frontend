@@ -21,3 +21,19 @@ export function editTiers(_, args, req) {
     })
     .then(() => collective.editTiers(args.tiers));
 }
+
+/**
+ * Edit a single tier
+ */
+export async function editTier(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized();
+  }
+
+  const tier = await req.loaders.tiers.findById.load(args.tier.id);
+  if (!req.remoteUser.isAdmin(tier.CollectiveId)) {
+    throw new errors.Unauthorized();
+  }
+
+  return tier.update(args.tier);
+}
