@@ -13,14 +13,14 @@
     ]
   ],
   "plugins": [
+    "babel-plugin-styled-components",
     "lodash",
     [
       "react-intl",
       {
         "messagesDir": "./dist/messages/"
       }
-    ],
-    "babel-plugin-styled-components"
+    ]
   ],
   "env": {
     "development": {
