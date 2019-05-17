@@ -8,7 +8,9 @@ const ediableAttributes = ['settings'];
  * Only the author or an admin of the collective can edit a connectedAccount
  */
 function canEditConnectedAccount(remoteUser, connectedAccount) {
-  if (remoteUser.isAdmin(connectedAccount.CollectiveId)) return true;
+  if (remoteUser.isAdmin(connectedAccount.CollectiveId)) {
+    return true;
+  }
   return false;
 }
 

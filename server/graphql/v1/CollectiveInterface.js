@@ -1348,7 +1348,9 @@ const CollectiveFields = () => {
         },
       },
       async resolve(collective, args, req) {
-        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+          return [];
+        }
         let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
         if (args.service) {
           paymentMethods = paymentMethods.filter(pm => pm.service === args.service);

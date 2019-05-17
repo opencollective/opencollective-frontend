@@ -342,8 +342,12 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.prototype.hasRole = function(roles, CollectiveId) {
-    if (!CollectiveId) return false;
-    if (this.CollectiveId === Number(CollectiveId)) return true;
+    if (!CollectiveId) {
+      return false;
+    }
+    if (this.CollectiveId === Number(CollectiveId)) {
+      return true;
+    }
     if (!this.rolesByCollectiveId) {
       logger.info("User.rolesByCollectiveId hasn't been populated.");
       logger.debug(new Error().stack);

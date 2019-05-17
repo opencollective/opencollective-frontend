@@ -6,8 +6,12 @@ export function createMember(_, args, req) {
   let collective;
 
   const checkPermission = () => {
-    if (!req.remoteUser) throw new errors.Unauthorized('You need to be logged in to create a member');
-    if (req.remoteUser.isAdmin(collective.id)) return true;
+    if (!req.remoteUser) {
+      throw new errors.Unauthorized('You need to be logged in to create a member');
+    }
+    if (req.remoteUser.isAdmin(collective.id)) {
+      return true;
+    }
     throw new errors.Unauthorized(
       `You need to be logged in as a core contributor or as a host of the ${collective.slug} collective`,
     );
@@ -55,10 +59,15 @@ export function removeMember(_, args, req) {
   let membership;
 
   const checkPermission = () => {
-    if (!req.remoteUser) throw new errors.Unauthorized('You need to be logged in to remove a member');
-    if (req.remoteUser.id === membership.CreatedByUserId) return true;
-    if (req.remoteUser.isAdmin(membership.CollectiveId)) return true;
-
+    if (!req.remoteUser) {
+      throw new errors.Unauthorized('You need to be logged in to remove a member');
+    }
+    if (req.remoteUser.id === membership.CreatedByUserId) {
+      return true;
+    }
+    if (req.remoteUser.isAdmin(membership.CollectiveId)) {
+      return true;
+    }
     throw new errors.Unauthorized(
       `You need to be logged in as this user or as a core contributor or as a host of the collective id ${
         membership.CollectiveId
