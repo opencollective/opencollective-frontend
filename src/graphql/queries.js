@@ -924,6 +924,29 @@ export const getCollectiveSourcePaymentMethodsQuery = gql`
   }
 `;
 
+export const getMutatedCollective = gql`
+  query getMutatedCollective($slug: String) {
+    Collective(slug: $slug) {
+      id
+      slug
+      name
+      orders(status: PENDING) {
+        id
+        interval
+        publicMessage
+        status
+        totalAmount
+        fromCollective {
+          name
+          image
+          slug
+          type
+        }
+      }
+    }
+  }
+`;
+
 export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = (component, options) => {
   return graphql(getCollectiveCoverQuery, options)(component);
