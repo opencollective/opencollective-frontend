@@ -43,7 +43,7 @@
     "deepmerge": "3.2.0",
     "dotenv": "8.0.0",
     "errorhandler": "1.5.1",
-    "express": "4.16.4",
+    "express": "4.17.0",
     "express-graphql": "0.8.0",
     "express-limiter": "1.6.1",
     "express-server-status": "1.0.3",
