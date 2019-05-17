@@ -54,7 +54,6 @@ Page.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
-  smoothScroll: PropTypes.bool,
   withGlobalStyles: PropTypes.bool,
   title: PropTypes.string,
   twitterHandle: PropTypes.string,
