@@ -498,6 +498,7 @@ export default (Sequelize, DataTypes) => {
           twitterHandle: userData.twitterHandle,
           githubHandle: userData.githubHandle,
           currency: userData.currency,
+          hostFeePercent: userData.hostFeePercent,
           isActive: true,
           CreatedByUserId: userData.CreatedByUserId || user.id,
           data: { UserId: user.id },

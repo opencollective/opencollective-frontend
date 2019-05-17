@@ -4,6 +4,7 @@ export default {
     lastName: '501c3',
     name: 'WWCode',
     username: 'wwcode',
+    hostFeePercent: 10,
     email: 'finance+wwcode@opencollective.com',
     paypalEmail: 'paypal+wwcode@opencollective.com',
     description: 'engineer',
