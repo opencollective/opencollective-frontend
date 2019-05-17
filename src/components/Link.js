@@ -12,6 +12,7 @@ class Link extends React.Component {
     animate: PropTypes.object,
     className: PropTypes.string,
     title: PropTypes.string,
+    onClick: PropTypes.func,
     children: PropTypes.node.isRequired,
   };
 
