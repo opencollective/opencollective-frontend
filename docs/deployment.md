@@ -2,6 +2,14 @@
 
 To deploy to staging or production, you need to be a core member of the Open Collective team.
 
+## Install the Heroku CLI
+
+`npm install -g heroku`
+
+## Login on the Heroku CLI
+
+`heroku login`
+
 ## (Optional) Configure Slack token
 
 Setting a Slack token will post a message on `#engineering` with the changes you're
@@ -15,7 +23,7 @@ about to deploy. It is not required, but you can activate it like this:
 OC_SLACK_USER_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-## Staging (heroku)
+## Deploy on staging
 
 ```bash
 npm run deploy:staging
@@ -23,7 +31,7 @@ npm run deploy:staging
 
 URL: https://api-staging.opencollective.com/
 
-## Production (heroku)
+## Deploy on production
 
 ```bash
 npm run deploy:production

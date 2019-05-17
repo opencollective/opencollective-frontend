@@ -1,4 +1,4 @@
-# OpenCollective API
+# Open Collective API
 
 [![Circle CI](https://circleci.com/gh/opencollective/opencollective-api/tree/master.svg?style=shield)](https://circleci.com/gh/opencollective/opencollective-api/tree/master)
 [![Slack Status](https://slack.opencollective.org/badge.svg)](https://slack.opencollective.org)
@@ -15,7 +15,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 1. Make sure you have Node.js version >= 10.
 
-- We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
+- We recommend using [nvm](https://github.com/creationix/nvm): `nvm install`.
 
 2. Make sure you have a PostgreSQL database available
 
