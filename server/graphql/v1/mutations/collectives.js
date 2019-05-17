@@ -410,10 +410,7 @@ export function editCollective(_, args, req) {
           req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id)
         );
       } else {
-        return (
-          req.remoteUser.id === collective.CreatedByUserId ||
-          req.remoteUser.hasRole(['ADMIN', 'HOST'], newCollectiveData.id)
-        );
+        return req.remoteUser.isAdmin(newCollectiveData.id);
       }
     })
     .then(canEditCollective => {
