@@ -47,7 +47,7 @@ const getUpdateQuery = gql`
       html
       markdown
       isPrivate
-      contentStripped
+      isContentAvailable
       collective {
         id
         name
