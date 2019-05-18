@@ -664,10 +664,10 @@ export const UpdateType = new GraphQLObjectType({
           return update.isPrivate;
         },
       },
-      contentStripped: {
+      isContentAvailable: {
         type: GraphQLBoolean,
         resolve(update, _, req) {
-          return !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId));
+          return req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId);
         },
       },
       title: {

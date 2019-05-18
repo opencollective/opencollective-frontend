@@ -126,11 +126,6 @@ export default function(Sequelize, DataTypes) {
         defaultValue: false,
       },
 
-      contentStripped: {
-        type: new DataTypes.VIRTUAL(DataTypes.BOOLEAN),
-        defaultValue: false,
-      },
-
       tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
