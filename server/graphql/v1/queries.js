@@ -491,22 +491,14 @@ const queries = {
       updateSlug: { type: GraphQLString },
       id: { type: GraphQLInt },
     },
-    async resolve(_, args, req) {
-      let update;
+    async resolve(_, args) {
       if (args.id) {
-        update = await models.Update.findByPk(args.id);
-      } else {
-        const CollectiveId = await fetchCollectiveId(args.collectiveSlug);
-
-        update = await models.Update.findOne({
-          where: { CollectiveId, slug: args.updateSlug },
-        });
+        return models.Update.findByPk(args.id);
       }
-
-      if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
-        update.stripContent();
-      }
-      return update;
+      const CollectiveId = await fetchCollectiveId(args.collectiveSlug);
+      return models.Update.findOne({
+        where: { CollectiveId, slug: args.updateSlug },
+      });
     },
   },
 
@@ -584,12 +576,7 @@ const queries = {
         };
         return getCollectiveIds().then(collectiveIds => {
           query.where.CollectiveId = { [Op.in]: collectiveIds };
-          return models.Update.findAll(query).map(update => {
-            if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
-              update.stripContent();
-            }
-            return update;
-          });
+          return models.Update.findAll(query);
         });
       });
     },

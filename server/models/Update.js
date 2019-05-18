@@ -248,12 +248,6 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
-  Update.prototype.stripContent = function() {
-    this.html = null;
-    this.markdown = null;
-    this.contentStripped = true;
-  };
-
   // Publish update
   Update.prototype.publish = async function(remoteUser) {
     mustHaveRole(remoteUser, 'ADMIN', this.CollectiveId, 'publish this update');

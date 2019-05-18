@@ -666,8 +666,8 @@ export const UpdateType = new GraphQLObjectType({
       },
       contentStripped: {
         type: GraphQLBoolean,
-        resolve(update) {
-          return update.contentStripped;
+        resolve(update, _, req) {
+          return !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId));
         },
       },
       title: {
@@ -696,12 +696,16 @@ export const UpdateType = new GraphQLObjectType({
       },
       summary: {
         type: GraphQLString,
-        resolve(update) {
+        resolve(update, _, req) {
+          if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
+            return null;
+          }
+
           if (update.markdown) {
             // we only keep the first paragraph (up to 255 chars)
             return update.markdown.replace(/\n.*/g, '').trunc(255, true);
           }
-          if (update.html && update.html.substr(0, 3) === '<p>') {
+          if (update.html.substr(0, 3) === '<p>') {
             // we only keep the first paragraph
             return he
               .decode(update.html)
@@ -714,13 +718,21 @@ export const UpdateType = new GraphQLObjectType({
       },
       html: {
         type: GraphQLString,
-        resolve(update) {
+        resolve(update, _, req) {
+          if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
+            return null;
+          }
+
           return strip_tags(update.html || '');
         },
       },
       markdown: {
         type: GraphQLString,
-        resolve(update) {
+        resolve(update, _, req) {
+          if (update.isPrivate && !(req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId))) {
+            return null;
+          }
+
           return strip_tags(update.markdown || '');
         },
       },
