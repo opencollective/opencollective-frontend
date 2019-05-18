@@ -36,6 +36,7 @@ describe('random user cannot see update', () => {
       .first()
       .click(); // The update created in the describe block above.
     cy.wait(500);
-    cy.get('.UpdatePage .body').contains('Become a backer of Test Collective to see this update');
+    cy.get('.UpdatePage .body').contains('Become a backer of');
+    cy.get('.UpdatePage .body').contains('to see this update');
   });
 });
