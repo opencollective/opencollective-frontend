@@ -7,6 +7,7 @@ import { formatDate } from '../lib/utils';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
@@ -14,7 +15,6 @@ import { Router, Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
-import StyledTooltip from './StyledTooltip';
 import MessageBox from './MessageBox';
 
 class Update extends React.Component {
@@ -220,13 +220,12 @@ class Update extends React.Component {
             )}
 
             {update.isPrivate && (
-              <StyledTooltip
-                content={() => (
+              <React.Fragment>
+                <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
+                <ReactTooltip id="privateLockText">
                   <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
-                )}
-              >
-                <Lock data-cy="privateIcon" size={12} cursor="pointer" />
-              </StyledTooltip>
+                </ReactTooltip>
+              </React.Fragment>
             )}
 
             {editable && (
