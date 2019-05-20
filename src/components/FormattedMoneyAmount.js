@@ -11,7 +11,7 @@ import { Span } from './Text';
  */
 const FormattedMoneyAmount = ({ abbreviate, currency, precision, amount, interval, ...spanProps }) => {
   return !interval ? (
-    <Currency value={amount} currency={currency} precision={precision} abbreviate={abbreviate} style={spanProps} />
+    <Currency value={amount} currency={currency} precision={precision} abbreviate={abbreviate} {...spanProps} />
   ) : (
     <Span {...spanProps}>
       <FormattedMessage
