@@ -44,7 +44,7 @@
   "collective.archive.button": "Архивировать этот {type}",
   "collective.archive.cancel.btn": "Отмена",
   "collective.archive.confirm.btn": "{action}",
-  "collective.archive.description": "This will mark this {type} as archived.",
+  "collective.archive.description": "Этот {type} будет добавлен в архив.",
   "collective.archive.modal.body": "Are you sure you want to {action} this {type}?",
   "collective.archive.modal.header": "{action} {name}",
   "collective.archive.subscriptions": "Subscriptions will be automatically canceled.",
