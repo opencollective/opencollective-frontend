@@ -7,7 +7,7 @@ import uuidv4 from 'uuid/v4';
 import { Box, Flex } from '@rebass/grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
-import { getCurrencySymbol, capitalize } from '../lib/utils';
+import { getCurrencySymbol, capitalize, parseToBoolean } from '../lib/utils';
 import InputField from './InputField';
 import InputFieldPresets from './InputFieldPresets';
 import { Span } from './Text';
@@ -210,14 +210,6 @@ class EditTiers extends React.Component {
         when: tier => tier._amountType === 'flexible',
       },
       {
-        name: 'goal',
-        pre: getCurrencySymbol(props.currency),
-        type: 'currency',
-        options: { step: 1 },
-        label: intl.formatMessage(this.messages['goal.label']),
-        description: intl.formatMessage(this.messages['goal.description']),
-      },
-      {
         name: 'interval',
         type: 'select',
         options: getOptions(['onetime', 'month', 'year']),
@@ -232,6 +224,17 @@ class EditTiers extends React.Component {
         when: tier => ['TICKET', 'PRODUCT', 'TIER'].indexOf(tier.type) !== -1,
       },
     ];
+
+    if (parseToBoolean(process.env.ENABLE_TIER_GOALS) || get(props, 'collective.settings.enableTierGoals')) {
+      this.fields.push({
+        name: 'goal',
+        pre: getCurrencySymbol(props.currency),
+        type: 'currency',
+        options: { step: 1 },
+        label: intl.formatMessage(this.messages['goal.label']),
+        description: intl.formatMessage(this.messages['goal.description']),
+      });
+    }
   }
 
   editTier(index, fieldname, value) {
