@@ -78,11 +78,23 @@ class TierPage extends Component {
     router: PropTypes.object,
   };
 
+  renderShareBlock() {
+    const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
+    return (
+      <div>
+        <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
+          <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
+        </P>
+        <ShareButtons pageUrl={pageUrl} collective={this.props.collective} />
+      </div>
+    );
+  }
+
   render() {
-    const { collective, tier, LoggedInUser, router } = this.props;
+    const { collective, tier, LoggedInUser } = this.props;
     const canEditTier = LoggedInUser && LoggedInUser.canEditCollective(collective);
-    const pageUrl = `${getWebsiteUrl()}${router.asPath}`;
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
+    const shareBlock = this.renderShareBlock();
 
     return (
       <Container borderTop="1px solid #E6E8EB">
@@ -102,7 +114,8 @@ class TierPage extends Component {
           />
         </Container>
         <Flex justifyContent="center">
-          <Flex flex="0 1 1800px" px={[2, 4]} justifyContent="space-evenly" flexWrap="wrap" mb={64}>
+          {/** Description */}
+          <Flex flex="0 1 1800px" px={[2, 4]} justifyContent="space-evenly" mb={64}>
             <Container
               display="flex"
               flexDirection="column"
@@ -127,75 +140,104 @@ class TierPage extends Component {
                 </Box>
 
                 <TierLongDescription tierId={tier.id} description={tier.longDescription} canEdit={canEditTier} />
+
+                <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
+                  {shareBlock}
+                </Container>
               </Container>
             </Container>
+
+            {/** Contribute */}
             <Container
+              position={['fixed', null, null, 'relative']}
+              bottom={0}
+              width={1}
               display="flex"
-              flexDirection="column"
-              justifyContent="space-evenly"
+              flexDirection={['row', null, null, 'column']}
+              justifyContent="space-between"
               background="white"
-              height={Dimensions.COVER_HEIGHT}
+              height={[72, null, 82, Dimensions.COVER_HEIGHT]}
+              borderTop={['1px solid #E6E8EB', null, 'none']}
+              zIndex={9}
               flex="0 1 385px"
-              p="60px 32px"
+              p={['0 16px', '0 24px', null, '60px 32px']}
+              boxShadow={['0px -3px 5px rgba(70, 70, 70, 0.15)', null, null, 'none']}
             >
-              {tier.goal && (
-                <P fontSize="H5" color="black.500" lineHeight="H3" mb={3}>
+              {/** Tier progress */}
+              <Flex flex="0 1 50%" flexDirection="column" justifyContent="center">
+                {tier.goal && (
+                  <P
+                    fontSize={['Paragraph', null, null, 'H5']}
+                    color="black.500"
+                    lineHeight={['LeadParagraph', null, null, 'H3']}
+                    mb={[0, null, null, 3]}
+                  >
+                    <FormattedMessage
+                      id="TierPage.AmountGoal"
+                      defaultMessage="{amountWithInterval} goal"
+                      values={{
+                        amountWithInterval: (
+                          <FormattedMoneyAmount
+                            fontWeight="bold"
+                            fontSize={['LeadParagraph', null, null, 'H3']}
+                            color="black.900"
+                            amount={tier.goal}
+                            currency={tier.currency}
+                            interval={tier.interval}
+                          />
+                        ),
+                      }}
+                    />
+                  </P>
+                )}
+                <P
+                  fontSize={['Tiny', null, 'Paragraph']}
+                  color="black.400"
+                  lineHeight={['Caption', null, 'LeadParagraph']}
+                  mb={[0, null, null, 2]}
+                >
                   <FormattedMessage
-                    id="TierPage.AmountGoal"
-                    defaultMessage="{amountWithInterval} goal"
+                    id="TierPage.AmountRaised"
+                    defaultMessage="{amountWithInterval} raised"
                     values={{
                       amountWithInterval: (
                         <FormattedMoneyAmount
                           fontWeight="bold"
-                          fontSize="H3"
-                          color="black.900"
-                          amount={tier.goal}
+                          fontSize={['Caption', null, 'LeadParagraph']}
+                          color="black.700"
+                          amount={amountRaised}
                           currency={tier.currency}
                           interval={tier.interval}
                         />
                       ),
                     }}
                   />
+                  {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
                 </P>
-              )}
-              <P fontSize="Paragraph" color="black.400" lineHeight="LeadParagraph" mb={2}>
-                <FormattedMessage
-                  id="TierPage.AmountRaised"
-                  defaultMessage="{amountWithInterval} raised"
-                  values={{
-                    amountWithInterval: (
-                      <FormattedMoneyAmount
-                        fontWeight="bold"
-                        fontSize="LeadParagraph"
-                        color="black.700"
-                        amount={amountRaised}
-                        currency={tier.currency}
-                        interval={tier.interval}
-                      />
-                    ),
-                  }}
-                />
-                {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
-              </P>
-              {tier.goal && (
-                <Box mt={1} mb={2}>
-                  <StyledProgressBar percentage={amountRaised / tier.goal} />
+                {tier.goal && (
+                  <Box mt={1} mb={2}>
+                    <StyledProgressBar percentage={amountRaised / tier.goal} />
+                  </Box>
+                )}
+              </Flex>
+              <Flex alignItems="center">
+                <Box width={1}>
+                  <Link
+                    route="orderCollectiveTierNew"
+                    params={{
+                      verb: 'contribute',
+                      tierId: tier.id,
+                      tierSlug: tier.slug,
+                      collectiveSlug: collective.slug,
+                    }}
+                  >
+                    <StyledButton buttonStyle="dark" width={1} my={4} minWidth={128}>
+                      <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
+                    </StyledButton>
+                  </Link>
                 </Box>
-              )}
-              <div>
-                <Link
-                  route="orderCollectiveTierNew"
-                  params={{ verb: 'contribute', tierId: tier.id, tierSlug: tier.slug, collectiveSlug: collective.slug }}
-                >
-                  <StyledButton buttonStyle="dark" width={1} my={4}>
-                    <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
-                  </StyledButton>
-                </Link>
-              </div>
-              <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
-                <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
-              </P>
-              <ShareButtons pageUrl={pageUrl} collective={collective} />
+              </Flex>
+              <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
             </Container>
           </Flex>
         </Flex>
