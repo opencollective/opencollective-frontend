@@ -11,6 +11,7 @@ module.exports = {
         return queryInterface.addColumn('UpdateHistories', 'isPrivate', {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
+          allowNull: false,
         });
       });
   },
