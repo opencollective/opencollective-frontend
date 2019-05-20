@@ -98,6 +98,7 @@ class InputField extends React.Component {
     className: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    onBlur: PropTypes.func,
     required: PropTypes.bool,
     style: PropTypes.object,
   };
@@ -155,6 +156,19 @@ class InputField extends React.Component {
 
     this.setState({ value });
     this.props.onChange(value);
+  }
+
+  handleOnBlur(value) {
+    const { type } = this.props;
+    if (type === 'number') {
+      value = parseInt(value) || null;
+    } else if (type === 'currency') {
+      value = this.roundCurrencyValue(value);
+    }
+
+    if (this.props.onBlur) {
+      this.props.onBlur(value);
+    }
   }
 
   render() {
@@ -403,6 +417,9 @@ class InputField extends React.Component {
             className={`currency ${field.className}`}
             onFocus={event => event.target.select()}
             value={value}
+            onBlur={event => {
+              return this.handleOnBlur(event.target.value.length === 0 ? null : Math.round(event.target.value * 100));
+            }}
           />
         );
         break;
@@ -545,6 +562,7 @@ class InputField extends React.Component {
         this.input = (
           <FieldGroup
             onChange={event => this.handleChange(event.target.value)}
+            onBlur={event => this.handleOnBlur(event.target.value)}
             type={field.type}
             pre={field.pre}
             post={field.post}
