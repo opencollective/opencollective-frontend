@@ -285,6 +285,13 @@ class EditCollectiveForm extends React.Component {
     window.state = this.state;
   }
 
+  handleTierChange = tierObj => {
+    this.setState({
+      ...tierObj,
+      modified: tierObj.tierHasError ? false : true,
+    });
+  };
+
   async handleSubmit() {
     const collective = {
       ...this.state.collective,
@@ -712,7 +719,7 @@ class EditCollectiveForm extends React.Component {
                   tiers={this.state.tiers}
                   collective={collective}
                   currency={collective.currency}
-                  onChange={this.handleObjectChange}
+                  onChange={this.handleTierChange}
                   defaultType={this.defaultTierType}
                 />
               )}
