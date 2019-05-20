@@ -27,6 +27,7 @@ import { strip_tags } from '../../lib/utils';
 import status from '../../constants/expense_status';
 import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
+import intervals from '../../constants/intervals';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -959,6 +960,19 @@ export const TierStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier, args, req) {
           return req.loaders.tiers.totalDonated.load(tier.id);
+        },
+      },
+      totalRecurringDonations: {
+        description: 'How much money is given for this tier for each tier.interval (monthly/yearly)',
+        type: GraphQLInt,
+        resolve(tier, args, req) {
+          if (tier.interval === intervals.MONTH) {
+            return req.loaders.tiers.totalMonthlyDonations.load(tier.id);
+          } else if (tier.interval === intervals.YEAR) {
+            return req.loaders.tiers.totalYearlyDonations.load(tier.id);
+          } else {
+            return 0;
+          }
         },
       },
       totalDistinctOrders: {

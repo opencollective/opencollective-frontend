@@ -314,6 +314,52 @@ export const loaders = req => {
             });
           });
       }),
+      totalMonthlyDonations: new DataLoader(ids => {
+        return sequelize
+          .query(
+            `
+            SELECT o."TierId" AS "TierId", COALESCE(SUM(s."amount"), 0) AS "total"
+            FROM "Orders" o
+            INNER JOIN "Subscriptions" s ON o."SubscriptionId" = s.id
+            WHERE "TierId" IN (?)
+            AND s."isActive" = TRUE
+            AND s."interval" = 'month'
+            GROUP BY "TierId";
+          `,
+            {
+              replacements: [ids],
+              type: sequelize.QueryTypes.SELECT,
+            },
+          )
+          .then(results => {
+            return sortResults(ids, results, 'TierId').map(result => {
+              return result ? result.total : 0;
+            });
+          });
+      }),
+      totalYearlyDonations: new DataLoader(ids => {
+        return sequelize
+          .query(
+            `
+            SELECT o."TierId" AS "TierId", COALESCE(SUM(s."amount"), 0) AS "total"
+            FROM "Orders" o
+            INNER JOIN "Subscriptions" s ON o."SubscriptionId" = s.id
+            WHERE "TierId" IN (?)
+            AND s."isActive" = TRUE
+            AND s."interval" = 'year'
+            GROUP BY "TierId";
+          `,
+            {
+              replacements: [ids],
+              type: sequelize.QueryTypes.SELECT,
+            },
+          )
+          .then(results => {
+            return sortResults(ids, results, 'TierId').map(result => {
+              return result ? result.total : 0;
+            });
+          });
+      }),
     },
     paymentMethods: {
       findById: new DataLoader(ids =>
