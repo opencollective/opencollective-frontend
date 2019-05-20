@@ -11,7 +11,7 @@ import { Image } from 'styled-icons/fa-solid/Image';
 import { ListUl } from 'styled-icons/fa-solid/ListUl';
 import { ListOl } from 'styled-icons/fa-solid/ListOl';
 
-import '../../node_modules/react-mde/lib/styles/css/react-mde-all.css';
+import '../../node_modules/react-mde/lib/styles/css/react-mde-all.css'; // eslint-disable-line node/no-unpublished-import
 
 const EditorIconComponents = {
   heading: Heading,

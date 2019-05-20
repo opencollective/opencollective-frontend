@@ -11,8 +11,8 @@ import withData from '../lib/withData';
 
 import theme from '../constants/theme';
 
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import '../../node_modules/nprogress/nprogress.css';
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css'; // eslint-disable-line node/no-unpublished-import
+import '../../node_modules/nprogress/nprogress.css'; // eslint-disable-line node/no-unpublished-import
 import '../styles/app.css';
 
 Router.onRouteChangeStart = () => NProgress.start();

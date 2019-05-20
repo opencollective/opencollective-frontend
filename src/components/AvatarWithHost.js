@@ -26,10 +26,11 @@ const HostLink = styled(LinkCollective)`
  * Same as `Avatar`, except this one also displays the host avatar on
  * the bottom right corner.
  */
-const AvatarWithHost = ({ collective, host, radius }) => {
+const AvatarWithHost = ({ collective, host, radius, animationDuration, onCollectiveClick }) => {
+  const hostAvatarRadius = radius <= 60 ? radius / 2 : radius / 4;
   return (
     <MainContainer>
-      <LinkCollective collective={collective}>
+      <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
         <Avatar
           type={collective.type}
           src={collective.image}
@@ -37,17 +38,19 @@ const AvatarWithHost = ({ collective, host, radius }) => {
           border="1px solid #efefef"
           radius={radius}
           borderRadius={radius / 4}
+          animationDuration={animationDuration}
         />
       </LinkCollective>
       {host && (
-        <HostLink collective={host}>
+        <HostLink collective={host} isNewVersion>
           <Avatar
             type={host.type}
             src={host.image}
             border="1px solid #efefef"
-            radius={radius / 4}
-            borderRadius={radius / 16}
+            radius={hostAvatarRadius}
+            borderRadius={hostAvatarRadius / 4}
             title={host.name}
+            animationDuration={animationDuration}
           />
         </HostLink>
       )}
@@ -70,6 +73,12 @@ AvatarWithHost.propTypes = {
 
   /** Size of the main image in pixels. Should ideally be a multiple of 4. */
   radius: PropTypes.number,
+
+  /** Duration to transition size. Disabled if 0, null or undefined */
+  animationDuration: PropTypes.number,
+
+  /** Called when main collective picture is clicked */
+  onCollectiveClick: PropTypes.func,
 };
 
 export default withFallbackImage(AvatarWithHost);

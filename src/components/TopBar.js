@@ -14,6 +14,7 @@ import styled from 'styled-components';
 
 import { rotateMixin } from '../constants/animations';
 import { withUser } from './UserProvider';
+import theme from '../constants/theme';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',
@@ -80,7 +81,7 @@ class TopBar extends React.Component {
         alignItems="center"
         flexDirection="row"
         justifyContent="space-around"
-        css={{ minHeight: 68 }}
+        css={{ height: theme.sizes.navbarHeight }}
       >
         <Link route="home" passHref>
           <Flex as="a" alignItems="center">

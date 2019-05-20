@@ -114,10 +114,7 @@ pages
 // Application management
 // ----------------------
 
-pages
-  .add('applications', '/:collectiveSlug/applications')
-  .add('createApplication', '/:collectiveSlug/applications/:type(apiKey|oauth)?/new')
-  .add('editApplication', '/:collectiveSlug/applications/:applicationId/edit');
+pages.add('applications', '/applications');
 
 // Marketing Pages
 // ---------------

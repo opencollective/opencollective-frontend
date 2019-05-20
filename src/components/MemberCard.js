@@ -74,14 +74,14 @@ MemberCard.propTypes = {
   /** Role */
   role: PropTypes.oneOf(['ADMIN', 'MEMBER', 'BACKER']),
   /** Member creation date */
-  createdAt: PropTypes.string.required,
+  createdAt: PropTypes.string.isRequired,
   /** Member's collective */
   collective: PropTypes.shape({
-    slug: PropTypes.string.required,
+    slug: PropTypes.string.isRequired,
     name: PropTypes.string,
     image: PropTypes.string,
     company: PropTypes.string,
-  }).required,
+  }).isRequired,
 };
 
 export default MemberCard;

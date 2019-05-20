@@ -75,9 +75,15 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    if (!CollectiveInputType.tos || (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos)) {
+    if (!CollectiveInputType.tos) {
       this.setState({
         result: { error: 'Please accept the terms of service' },
+      });
+      return;
+    }
+    if (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos) {
+      this.setState({
+        result: { error: 'Please accept the terms of fiscal sponsorship' },
       });
       return;
     }

@@ -107,7 +107,9 @@ const theme = {
   buttons: {
     standard: {
       backgroundColor: 'white',
+      border: '1px solid',
       borderColor: colors.black[300],
+      borderRadius: '100px',
       color: colors.black[600],
 
       '&:hover': {
@@ -136,7 +138,9 @@ const theme = {
 
     primary: {
       backgroundColor: colors.primary[500],
+      border: '1px solid',
       borderColor: colors.primary[500],
+      borderRadius: '100px',
       color: 'white',
 
       '&:hover': {
@@ -166,7 +170,9 @@ const theme = {
     dark: {
       backgroundColor: colors.black[900],
       color: colors.white.full,
+      border: '1px solid',
       borderColor: colors.black[900],
+      borderRadius: '100px',
     },
   },
   buttonSizes: {
@@ -227,6 +233,9 @@ const theme = {
       borderColor: colors.red[500],
       color: colors.red[700],
     },
+  },
+  sizes: {
+    navbarHeight: 68,
   },
 };
 

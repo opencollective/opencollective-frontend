@@ -275,7 +275,7 @@ class TopBarProfileMenu extends React.Component {
               </Link>
             </ListItem>
             <ListItem py={1}>
-              <Link route="applications" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+              <Link route="applications" passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                   {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                 </StyledLink>

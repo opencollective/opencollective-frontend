@@ -25,32 +25,10 @@ import { isValidEmail } from '../lib/utils';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
+import StyledButton from '../components/StyledButton';
 
 const Error = styled(P)`
   color: red;
-`;
-
-const BlueButton = styled.button`
-  --webkit-appearance: none;
-  width: 336px;
-  height: 56px;
-  border: none;
-  background: #3385ff;
-  border-radius: 100px;
-  color: white;
-  font-size: 1.6rem;
-  line-height: 5.2rem;
-  text-align: center;
-  margin: 16px;
-  &&:hover {
-    background: #66a3ff;
-  }
-  &&:active {
-    background: #145ecc;
-  }
-  &&:disabled {
-    background: #e0edff;
-  }
 `;
 
 const ShadowBox = styled(Box)`
@@ -64,6 +42,8 @@ const Title = styled(H1)`
 
 const Subtitle = styled(H5)`
   color: white;
+  text-align: center;
+  margin: 0 auto;
   ${fontSize};
   ${maxWidth};
 `;
@@ -206,7 +186,7 @@ class RedeemPage extends React.Component {
 
                 <Box mt={[4, 5]}>
                   <Flex justifyContent="center" flexDirection="column">
-                    <Container background="white" borderRadius="16px" width="400px">
+                    <Container background="white" borderRadius="16px" maxWidth="400px">
                       <ShadowBox py="24px" px="32px">
                         {this.state.view === 'form' && (
                           <RedeemForm
@@ -221,16 +201,25 @@ class RedeemPage extends React.Component {
                       </ShadowBox>
                     </Container>
                     {this.state.view === 'form' && (
-                      <Box my={3} align="center">
-                        <BlueButton onClick={this.handleSubmit} disabled={this.state.loading}>
+                      <Flex my={4} px={2} flexDirection="column" alignItems="center">
+                        <StyledButton
+                          buttonStyle="primary"
+                          buttonSize="large"
+                          onClick={this.handleSubmit}
+                          loading={this.state.loading}
+                          mb={2}
+                          maxWidth={335}
+                          width={1}
+                          textTransform="capitalize"
+                        >
                           {this.state.loading ? (
                             <FormattedMessage id="form.processing" defaultMessage="processing" />
                           ) : (
                             <FormattedMessage id="redeem.form.redeem.btn" defaultMessage="redeem" />
                           )}
-                        </BlueButton>
+                        </StyledButton>
                         {this.state.error && <Error>{this.state.error}</Error>}
-                      </Box>
+                      </Flex>
                     )}
                   </Flex>
                 </Box>

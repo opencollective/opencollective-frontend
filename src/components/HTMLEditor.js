@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import { upload } from '../lib/api';
 
-import '../../node_modules/react-quill/dist/quill.snow.css';
+import '../../node_modules/react-quill/dist/quill.snow.css'; // eslint-disable-line node/no-unpublished-import
 
 /*
  * Simple editor component that takes placeholder text as a prop
