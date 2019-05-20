@@ -19,9 +19,11 @@ const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
   line-height: 24px;
   letter-spacing: -0.2px;
   text-decoration: none;
+  white-space: nowrap;
 
   &:focus {
     color: #090a0a;
+    text-decoration: none;
   }
 
   &:hover {
@@ -69,13 +71,16 @@ const translations = defineMessages({
  */
 const NavBar = ({ sections, selected, onSectionClick, linkBuilder, intl }) => {
   return (
-    <Flex css={{ height: '100%' }}>
+    <Flex data-cy="CollectivePage.NavBar" css={{ height: '100%', overflowX: 'auto' }}>
       {sections.map(section => (
         <MenuLink
           key={section}
           href={linkBuilder(section)}
           isSelected={section === selected}
-          onClick={() => onSectionClick(section)}
+          onClick={e => {
+            onSectionClick(section);
+            e.preventDefault();
+          }}
         >
           {translations[section] ? intl.formatMessage(translations[section]) : section}
         </MenuLink>

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { backgroundImage, backgroundColor, borders, borderColor, size, themeGet } from 'styled-system';
 import tag from 'clean-tag';
 import { Flex } from '@rebass/grid';
@@ -25,6 +25,11 @@ export const StyledAvatar = styled(Flex)`
   overflow: hidden;
   flex-shrink: 0;
   ${size}
+  ${props =>
+    props.animationDuration &&
+    css`
+      transition: width ${props.animationDuration}ms, height ${props.animationDuration}ms;
+    `}
 `;
 
 StyledAvatar.defaultProps = {
@@ -53,6 +58,8 @@ Avatar.propTypes = {
   type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   /** Avatar size */
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** Duration to transition size. Disabled if 0, null or undefined */
+  animationDuration: PropTypes.number,
 };
 
 export default withFallbackImage(Avatar);

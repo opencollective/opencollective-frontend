@@ -2,6 +2,7 @@ import React from 'react';
 import { PropTypes } from 'prop-types';
 import styled from 'styled-components';
 import { backgroundImage } from 'styled-system';
+import { fadeIn } from '../../constants/animations.js';
 
 import HeroBackgroundMask from './HeroBackgroundMask.svg';
 
@@ -13,6 +14,9 @@ const BackgroundContainer = styled.div`
   height: 100%;
   background: #145ecc;
   z-index: -1;
+  animation: ${fadeIn};
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
 
   @supports (mask-size: contain) {
     ${backgroundImage}

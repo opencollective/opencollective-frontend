@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { createGlobalStyle } from 'styled-components';
 
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
@@ -10,6 +11,13 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectivePage from '../components/collective-page';
+
+/** Add global style to enable smooth scroll on the page */
+const GlobalStyles = createGlobalStyle`
+  html {
+    scroll-behavior: smooth;
+  }
+`;
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -61,7 +69,10 @@ class NewCollectivePage extends React.Component {
         {data.loading || !data.Collective ? (
           <Loading />
         ) : (
-          <CollectivePage collective={data.Collective} host={data.Collective.host} LoggedInUser={LoggedInUser} />
+          <React.Fragment>
+            <GlobalStyles />
+            <CollectivePage collective={data.Collective} host={data.Collective.host} LoggedInUser={LoggedInUser} />
+          </React.Fragment>
         )}
       </Page>
     );

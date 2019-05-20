@@ -4,6 +4,14 @@
 export const Dimensions = {
   PADDING_X: [15, 30, null, null, 120],
   MAX_SECTION_WIDTH: 1700,
+  HERO_FIXED_HEIGHT: 120,
+};
+
+/**
+ * Durations for page animations
+ */
+export const AnimationsDurations = {
+  HERO_COLLAPSE: 250,
 };
 
 /**

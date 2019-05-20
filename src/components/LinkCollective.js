@@ -16,9 +16,9 @@ const getEventParentCollectiveSlug = parentCollective => {
  * Create a `Link` to the collective, properly switching between `event` and `collective`
  * routes based on collective type.
  */
-const LinkCollective = ({ collective: { type, slug, name, parentCollective }, children, ...props }) => {
+const LinkCollective = ({ collective: { type, slug, name, parentCollective }, children, isNewVersion, ...props }) => {
   return type !== 'EVENT' ? (
-    <Link route="collective" params={{ slug }} {...props}>
+    <Link route={isNewVersion ? 'new-collective-page' : 'collective'} params={{ slug }} {...props}>
       {children || name || slug}
     </Link>
   ) : (
@@ -44,6 +44,8 @@ LinkCollective.propTypes = {
   }).isRequired,
   /** If not given, will render the name of the collective */
   children: PropTypes.node,
+  /** Link to the new collective page */
+  isNewVersion: PropTypes.bool,
 };
 
 export default LinkCollective;
