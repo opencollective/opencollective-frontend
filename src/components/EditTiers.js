@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import styled from 'styled-components';
+import { get, debounce } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import uuidv4 from 'uuid/v4';
@@ -12,6 +13,14 @@ import InputField from './InputField';
 import InputFieldPresets from './InputFieldPresets';
 import { Span } from './Text';
 import MessageBox from './MessageBox';
+
+const ErrorMessage = styled(Span)`
+  font-size: 1.2rem;
+  margin-left: 130px;
+  color: red;
+  position: relative;
+  top: -18px;
+`;
 
 class EditTiers extends React.Component {
   static propTypes = {
@@ -27,7 +36,10 @@ class EditTiers extends React.Component {
   constructor(props) {
     super(props);
     const { intl } = props;
-    this.state = { tiers: [...props.tiers] || [{}] };
+    this.state = {
+      tiers: [...props.tiers] || [{}],
+      errors: [],
+    };
     this.renderTier = this.renderTier.bind(this);
     this.addTier = this.addTier.bind(this);
     this.removeTier = this.removeTier.bind(this);
@@ -219,7 +231,12 @@ class EditTiers extends React.Component {
   }
 
   editTier(index, fieldname, value) {
-    const tiers = this.state.tiers;
+    const debouncedValidate = debounce(this.validate, 300);
+    debouncedValidate(index, fieldname, value);
+  }
+
+  setTier(index, fieldname, value) {
+    const { tiers } = this.state;
     if (value === 'onetime') {
       value = null;
     }
@@ -228,14 +245,81 @@ class EditTiers extends React.Component {
       type: tiers[index]['type'] || this.defaultType,
       [fieldname]: value,
     };
-    this.setState({ tiers });
-    this.onChange({ tiers });
+    return tiers;
   }
 
   addTier(tier) {
     const tiers = this.state.tiers;
     tiers.push({ ...(tier || {}), __uuid: uuidv4() });
     this.setState({ tiers });
+  }
+
+  validInput(index, fieldname, value) {
+    const tier = this.state.tiers[index];
+    if (fieldname === 'name' && (!value || value.trim().length === 0)) {
+      return { valid: false, message: 'Name is required' };
+    }
+
+    if (fieldname === 'amount') {
+      if (!value) {
+        return { valid: false, message: 'Amount is required' };
+      }
+
+      if (tier._amountType === 'flexible' && tier.presets && tier.presets.length !== 0) {
+        if (tier.presets.indexOf(value) === -1) {
+          return { valid: false, message: 'Default amount must be one of presets' };
+        }
+      }
+    }
+
+    if (fieldname === 'minimumAmount' && value && tier.presets && tier.presets.length !== 0) {
+      const minPresets = Math.min(...tier.presets);
+      if (minPresets < value) {
+        return { valid: false, message: 'Minimum amount cannot be greater than minimum suggested amount' };
+      }
+    }
+
+    return { valid: true, message: '' };
+  }
+
+  validate = (index, fieldname, value) => {
+    const { errors } = this.state;
+    const { valid, message } = this.validInput(index, fieldname, value);
+    if (!valid) {
+      this.setState({
+        errors: [
+          ...this.state.errors,
+          {
+            message,
+            index,
+            fieldName: fieldname,
+          },
+        ],
+      });
+      this.props.onChange({
+        tierHasError: true,
+      });
+    } else {
+      const updatedErrors = errors.filter(error => error.index !== index);
+      const tiers = this.setTier(index, fieldname, value);
+      this.setState({ errors: updatedErrors, tiers });
+      this.onChange({
+        tiers,
+        tierHasError: updatedErrors.length === 0 ? false : true,
+      });
+    }
+  };
+
+  hasError(index, fieldName) {
+    const { errors } = this.state;
+    if (errors.length > 0) {
+      for (const error of errors) {
+        if (error.index === index && error.fieldName === fieldName) {
+          return error;
+        }
+      }
+    }
+    return null;
   }
 
   removeTier(index) {
@@ -283,8 +367,9 @@ class EditTiers extends React.Component {
           </a>
         </div>
         <Form horizontal>
-          {this.fields.map(
-            field =>
+          {this.fields.map(field => {
+            const error = this.hasError(index, field.name);
+            return (
               (!field.when || field.when(defaultValues)) && (
                 <Box key={field.name}>
                   <InputField
@@ -298,8 +383,14 @@ class EditTiers extends React.Component {
                     options={field.options}
                     pre={field.pre}
                     placeholder={field.placeholder}
-                    onChange={value => this.editTier(index, field.name, value)}
+                    onChange={value => {
+                      this.editTier(index, field.name, value);
+                    }}
+                    onBlur={value => {
+                      this.validate(index, field.name, value);
+                    }}
                   />
+                  {error && <ErrorMessage>{error.message}</ErrorMessage>}
                   {field.name === 'type' && vatPercentage > 0 && (
                     <Flex mb={4}>
                       <Box width={0.166} px={15} />
@@ -320,8 +411,9 @@ class EditTiers extends React.Component {
                     </Flex>
                   )}
                 </Box>
-              ),
-          )}
+              )
+            );
+          })}
         </Form>
       </div>
     );
