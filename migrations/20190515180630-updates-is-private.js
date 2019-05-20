@@ -8,7 +8,7 @@ module.exports = {
         defaultValue: false,
       })
       .then(() => {
-        queryInterface.addColumn('UpdateHistories', 'isPrivate', {
+        return queryInterface.addColumn('UpdateHistories', 'isPrivate', {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
         });
