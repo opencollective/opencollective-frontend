@@ -18,12 +18,20 @@ export const whiteSpace = style({
   prop: 'whiteSpace',
 });
 
+export const wordBreak = style({
+  prop: 'wordBreak',
+});
+
 export const cursor = style({
   prop: 'cursor',
 });
 
 export const overflow = style({
   prop: 'overflow',
+});
+
+export const resize = style({
+  prop: 'resize',
 });
 
 export const pointerEvents = style({

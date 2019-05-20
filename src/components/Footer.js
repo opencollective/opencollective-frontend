@@ -94,7 +94,15 @@ const switchLanguage = (e, key) => {
 class Footer extends React.Component {
   render() {
     return (
-      <Container id="footer" bg="white" borderTop="1px solid #aaaaaa" bottom={0} minHeight="7.5rem" p="1rem" width={1}>
+      <Container
+        id="footer"
+        background="white"
+        borderTop="1px solid #aaaaaa"
+        bottom={0}
+        minHeight="7.5rem"
+        p="1rem"
+        width={1}
+      >
         <Flex
           p={2}
           justifyContent="space-between"

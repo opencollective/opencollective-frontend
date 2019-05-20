@@ -21,3 +21,9 @@ export const fadeIn = keyframes`
     opacity: 1;
   }
 `;
+
+export const flicker = ({ minOpacity = 0 }) => keyframes`
+  0%   { opacity: 1; }
+  50%  { opacity: ${minOpacity}; }
+  100% { opacity: 1; }
+`;

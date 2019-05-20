@@ -46,10 +46,10 @@ export const transactionInvoiceURL = transactionUUID => {
  * @param opts {object} With the following attributes:
  *  - text: Tweet text
  *  - url: A URL to share in the tweet
- *  - via: A Twitter username to associate with the Tweet, such as your site’s Twitter account
+ *  - via: A Twitter username to associate with the Tweet, such as your site’s Twitter account (default: opencollect)
  */
 export const tweetURL = opts => {
-  return `https://twitter.com/intent/tweet${objectToQueryString(opts)}`;
+  return `https://twitter.com/intent/tweet${objectToQueryString({ via: 'opencollect', ...opts })}`;
 };
 
 /**
@@ -72,4 +72,27 @@ export const githubProfileUrl = githubHandle => {
  */
 export const facebooKShareURL = opts => {
   return `https://www.facebook.com/sharer/sharer.php${objectToQueryString(opts)}`;
+};
+
+/**
+ * @param opts {object} With the following attributes:
+ *  - url: The URL of the page that you wish to share.
+ *  - title: The title value that you wish you use.
+ *  - summary: The description that you wish you use.
+ *  - source: The source of the content (e.g. your website or application name)
+ *  - mini: A required argument whose value must always be true (default: true)
+ */
+export const linkedInShareURL = opts => {
+  return `https://www.linkedin.com/shareArticle${objectToQueryString({ mini: 'true', ...opts })}`;
+};
+
+/**
+ * @param address {string} the recipien email (default: '')
+ * @param opts {object} With the following attributes:
+ *  - cc
+ *  - subject
+ *  - body
+ */
+export const mailToURL = (address = '', opts) => {
+  return `mailto://${address}${objectToQueryString(opts)}`;
 };

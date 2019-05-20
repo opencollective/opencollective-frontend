@@ -99,6 +99,14 @@ class EditTiers extends React.Component {
         id: 'tier.defaultAmount.label',
         defaultMessage: 'default amount',
       },
+      'goal.label': {
+        id: 'tier.goal.label',
+        defaultMessage: 'Goal',
+      },
+      'goal.description': {
+        id: 'tier.goal.description',
+        defaultMessage: 'The amount that you are trying to raise with this tier',
+      },
       'interval.label': {
         id: 'tier.interval.label',
         defaultMessage: 'interval',
@@ -200,6 +208,14 @@ class EditTiers extends React.Component {
         options: { step: 1 },
         label: intl.formatMessage(this.messages['minimumAmount.label']),
         when: tier => tier._amountType === 'flexible',
+      },
+      {
+        name: 'goal',
+        pre: getCurrencySymbol(props.currency),
+        type: 'currency',
+        options: { step: 1 },
+        label: intl.formatMessage(this.messages['goal.label']),
+        description: intl.formatMessage(this.messages['goal.description']),
       },
       {
         name: 'interval',

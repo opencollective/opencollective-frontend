@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed Apr 24 2019 11:12:13 GMT+0200 (GMT+02:00)
+# timestamp: Fri May 17 2019 22:09:45 GMT+0200 (GMT+02:00)
 
 """Application model"""
 type Application {
@@ -70,7 +70,9 @@ type Collective implements CollectiveInterface {
   hostFeePercent: Int
   currency: String
   image: String
+  imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
   """Defines if a collective is pledged"""
@@ -120,6 +122,7 @@ type Collective implements CollectiveInterface {
   ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
+  notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
@@ -207,6 +210,7 @@ input CollectiveInputType {
   settings: JSON
   data: JSON
   members: [MemberInputType]
+  notifications: [NotificationInputType]
   paymentMethods: [PaymentMethodInputType]
   HostCollectiveId: Int
   hostFeePercent: Int
@@ -242,7 +246,9 @@ interface CollectiveInterface {
   hostFeePercent: Int
   currency: String
   image: String
+  imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
   data: JSON
   slug: String
@@ -291,6 +297,9 @@ interface CollectiveInterface {
 
   """List of all followers of this collective"""
   followers(limit: Int, offset: Int): [CollectiveInterface]
+
+  """List of all notifications for this collective"""
+  notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
@@ -514,7 +523,9 @@ type Event implements CollectiveInterface {
   hostFeePercent: Int
   currency: String
   image: String
+  imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
   """Defines if a collective is pledged"""
@@ -564,6 +575,7 @@ type Event implements CollectiveInterface {
   ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
+  notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
@@ -733,6 +745,14 @@ enum HostCollectiveOrderFieldType {
   updatedAt
 }
 
+enum ImageFormat {
+  txt
+  png
+  jpg
+  gif
+  svg
+}
+
 """Input dates and collectives for Invoice"""
 input InvoiceInputType {
   dateFrom: IsoDateString
@@ -898,6 +918,12 @@ type Mutation {
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
+
+  """Update a single tier"""
+  editTier(
+    """The tier to update"""
+    tier: TierInputType!
+  ): Tier
   editTiers(id: Int!, tiers: [TierInputType]): [Tier]
   createMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
   removeMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
@@ -927,7 +953,6 @@ type Mutation {
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application
-  updateApplication(id: String!, application: ApplicationInput!): Application
   deleteApplication(id: String!): Application
   createPaymentMethod(
     type: String!
@@ -1014,6 +1039,60 @@ type Mutation {
     """ID of the payment method to remove"""
     id: Int!
   ): PaymentMethodType!
+
+  """Edits (by replacing) the admin-level webhooks for a collective."""
+  editWebhooks(
+    """ID of the collective whose webhooks are edited."""
+    collectiveId: Int!
+
+    """New notifications for the collective."""
+    notifications: [NotificationInputType]
+  ): [NotificationType]
+
+  """Register user-level webhooks for a collective."""
+  createWebhook(
+    """Slug of the collective the webhook is created for."""
+    collectiveSlug: String!
+
+    """The notification object."""
+    notification: NotificationInputType
+  ): NotificationType
+
+  """Deletes a notification by ID."""
+  deleteNotification(
+    """ID of the notification to delete."""
+    id: Int!
+  ): NotificationType
+}
+
+"""Input type for NotificationType"""
+input NotificationInputType {
+  id: Int
+  channel: String
+  type: String
+  active: Boolean
+  webhookUrl: String
+  UserId: Int
+  CollectiveId: Int
+}
+
+"""This represents a Notification"""
+type NotificationType {
+  id: Int
+
+  """channel to send notification"""
+  channel: String
+
+  """the notification type"""
+  type: String
+
+  """whether or not the notification is active"""
+  active: Boolean
+  webhookUrl: String
+  user: UserDetails
+  collective: CollectiveInterface
+  createdAt: String
+  updatedAt: String
 }
 
 """Order model"""
@@ -1250,7 +1329,9 @@ type Organization implements CollectiveInterface {
   hostFeePercent: Int
   currency: String
   image: String
+  imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
   """Defines if a collective is pledged"""
@@ -1300,6 +1381,7 @@ type Organization implements CollectiveInterface {
   ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
+  notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
@@ -1661,12 +1743,15 @@ type Tier {
   type: String
   name: String
   description: String
+
+  """A long, html-formatted description."""
+  longDescription: String
   button: String
   amount: Int
+  minimumAmount: Int
   currency: String
   interval: String
   presets: [Int]
-  minimumAmount: Int
   maxQuantity: Int
   maxQuantityPerUser: Int
   goal: Int
@@ -1692,13 +1777,16 @@ input TierInputType {
   name: String
   description: String
 
+  """A long, html-formatted description."""
+  longDescription: String
+
   """amount in the lowest unit of the currency of the host (ie. in cents)"""
   amount: Int
   currency: String
   presets: [Int]
-  minimumAmount: Int
   interval: String
   maxQuantity: Int
+  minimumAmount: Int
   maxQuantityPerUser: Int
 
   """amount that you are trying to raise with this tier"""
@@ -1718,6 +1806,9 @@ type TierStatsType {
 
   """total number of individual orders"""
   totalOrders: Int
+
+  """Total amount donated for this tier, in cents."""
+  totalDonated: Int
 
   """total number of people/organizations in this tier"""
   totalDistinctOrders: Int
@@ -1869,7 +1960,9 @@ type User implements CollectiveInterface {
   hostFeePercent: Int
   currency: String
   image: String
+  imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
   """Defines if a collective is pledged"""
@@ -1919,6 +2012,7 @@ type User implements CollectiveInterface {
   ): [Member]
   collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
+  notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]

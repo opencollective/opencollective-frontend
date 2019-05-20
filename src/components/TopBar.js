@@ -81,7 +81,7 @@ class TopBar extends React.Component {
         alignItems="center"
         flexDirection="row"
         justifyContent="space-around"
-        css={{ height: theme.sizes.navbarHeight }}
+        css={{ height: theme.sizes.navbarHeight, background: 'white' }}
       >
         <Link route="home" passHref>
           <Flex as="a" alignItems="center">
