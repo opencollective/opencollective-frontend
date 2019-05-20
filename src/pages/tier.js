@@ -78,9 +78,11 @@ const getCollective = graphql(gql`
       longDescription
       goal
       currency
+      interval
 
       stats {
         totalDonated
+        totalRecurringDonations
       }
 
       collective {

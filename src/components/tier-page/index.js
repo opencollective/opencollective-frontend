@@ -8,11 +8,11 @@ import { withRouter } from 'next/router';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
-import Currency from '../Currency';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 
 // Local tier page imports
@@ -82,6 +82,7 @@ class TierPage extends Component {
     const { collective, tier, LoggedInUser, router } = this.props;
     const canEditTier = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const pageUrl = `${getWebsiteUrl()}${router.asPath}`;
+    const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
 
     return (
       <Container borderTop="1px solid #E6E8EB">
@@ -141,12 +142,17 @@ class TierPage extends Component {
                 <P fontSize="H5" color="black.500" lineHeight="H3" mb={3}>
                   <FormattedMessage
                     id="TierPage.AmountGoal"
-                    defaultMessage="{amount} goal"
+                    defaultMessage="{amountWithInterval} goal"
                     values={{
-                      amount: (
-                        <Span fontWeight="bold" fontSize="H3" color="black.900">
-                          <Currency value={tier.goal} currency={tier.currency} />
-                        </Span>
+                      amountWithInterval: (
+                        <FormattedMoneyAmount
+                          fontWeight="bold"
+                          fontSize="H3"
+                          color="black.900"
+                          amount={tier.goal}
+                          currency={tier.currency}
+                          interval={tier.interval}
+                        />
                       ),
                     }}
                   />
@@ -155,30 +161,37 @@ class TierPage extends Component {
               <P fontSize="Paragraph" color="black.400" lineHeight="LeadParagraph" mb={2}>
                 <FormattedMessage
                   id="TierPage.AmountRaised"
-                  defaultMessage="{amount} raised"
+                  defaultMessage="{amountWithInterval} raised"
                   values={{
-                    amount: (
-                      <Span fontWeight="bold" fontSize="LeadParagraph" color="black.700">
-                        <Currency value={tier.stats.totalDonated} currency={tier.currency} />
-                      </Span>
+                    amountWithInterval: (
+                      <FormattedMoneyAmount
+                        fontWeight="bold"
+                        fontSize="LeadParagraph"
+                        color="black.700"
+                        amount={amountRaised}
+                        currency={tier.currency}
+                        interval={tier.interval}
+                      />
                     ),
                   }}
                 />
-                {tier.goal && ` (${Math.round((tier.stats.totalDonated / tier.goal) * 100)}%)`}
+                {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
               </P>
               {tier.goal && (
                 <Box mt={1} mb={2}>
-                  <StyledProgressBar percentage={tier.stats.totalDonated / tier.goal} />
+                  <StyledProgressBar percentage={amountRaised / tier.goal} />
                 </Box>
               )}
-              <Link
-                route="orderCollectiveTierNew"
-                params={{ verb: 'contribute', tierId: tier.id, tierSlug: tier.slug, collectiveSlug: collective.slug }}
-              >
-                <StyledButton buttonStyle="dark" width={1} my={4}>
-                  <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
-                </StyledButton>
-              </Link>
+              <div>
+                <Link
+                  route="orderCollectiveTierNew"
+                  params={{ verb: 'contribute', tierId: tier.id, tierSlug: tier.slug, collectiveSlug: collective.slug }}
+                >
+                  <StyledButton buttonStyle="dark" width={1} my={4}>
+                    <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
+                  </StyledButton>
+                </Link>
+              </div>
               <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
                 <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
               </P>

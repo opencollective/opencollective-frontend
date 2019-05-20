@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri May 17 2019 22:09:45 GMT+0200 (GMT+02:00)
+# timestamp: Mon May 20 2019 15:46:31 GMT+0200 (GMT+02:00)
 
 """Application model"""
 type Application {
@@ -1809,6 +1809,11 @@ type TierStatsType {
 
   """Total amount donated for this tier, in cents."""
   totalDonated: Int
+
+  """
+  How much money is given for this tier for each tier.interval (monthly/yearly)
+  """
+  totalRecurringDonations: Int
 
   """total number of people/organizations in this tier"""
   totalDistinctOrders: Int
