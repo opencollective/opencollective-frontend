@@ -308,7 +308,11 @@ export const loaders = req => {
               type: sequelize.QueryTypes.SELECT,
             },
           )
-          .then(results => sortResults(ids, results, 'TierId').map(result => result.totalDonated));
+          .then(results => {
+            return sortResults(ids, results, 'TierId').map(result => {
+              return result ? result.totalDonated : 0;
+            });
+          });
       }),
     },
     paymentMethods: {
