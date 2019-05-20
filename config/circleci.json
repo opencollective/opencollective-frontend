@@ -1,6 +1,6 @@
 {
   "database": {
-    "url": "postgres://ubuntu@localhost:5432/opencollective_dvl",
+    "url": "postgres://opencollective@localhost:5432/opencollective_dvl",
     "options": {
       "logging": false,
       "benchmark": true
