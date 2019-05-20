@@ -195,7 +195,7 @@ class TierPage extends Component {
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
-                <H1 textAlign="left" color="black.900" wordBreak="break-word" mb={4}>
+                <H1 textAlign="left" color="black.900" wordBreak="break-word" mb={4} data-cy="TierName">
                   <InlineEditField
                     mutation={EditTierMutation}
                     canEdit={canEditTier}
@@ -204,7 +204,7 @@ class TierPage extends Component {
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
-                <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line">
+                <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line" data-cy="shortDescription">
                   <InlineEditField
                     mutation={EditTierMutation}
                     canEdit={canEditTier}
@@ -226,7 +226,10 @@ class TierPage extends Component {
                 >
                   {({ isEditing, value, setValue }) =>
                     !isEditing ? (
-                      <LongDescription dangerouslySetInnerHTML={{ __html: tier.longDescription }} />
+                      <LongDescription
+                        dangerouslySetInnerHTML={{ __html: tier.longDescription }}
+                        data-cy="longDescription"
+                      />
                     ) : (
                       <HTMLEditor
                         defaultValue={value}
@@ -326,7 +329,7 @@ class TierPage extends Component {
                       collectiveSlug: collective.slug,
                     }}
                   >
-                    <StyledButton buttonStyle="dark" width={1} my={4} minWidth={128}>
+                    <StyledButton buttonStyle="dark" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                       <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
                     </StyledButton>
                   </Link>

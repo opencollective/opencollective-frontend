@@ -1,5 +1,5 @@
 import { defaultTestUserEmail } from './data';
-import { randomEmail } from './faker';
+import { randomEmail, randomSlug } from './faker';
 import { getLoggedInUserQuery } from '../../src/graphql/queries';
 
 /**
@@ -128,6 +128,40 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
+ * Create a collective hosted by the open source collective.
+ */
+Cypress.Commands.add('createHostedCollective', collectiveParams => {
+  const collective = {
+    slug: randomSlug(),
+    name: 'Test Collective',
+    type: 'COLLECTIVE',
+    ...collectiveParams,
+  };
+
+  return signinRequest({ email: defaultTestUserEmail }, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQuery(token, {
+      operationName: 'CreateCollectiveWithHost',
+      query: `
+        mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
+          createCollectiveFromGithub(collective: $collective) {
+            id
+            slug
+            isActive
+            host {
+              id
+            }
+          }
+        }
+        `,
+      variables: { collective },
+    }).then(({ body }) => {
+      return body.data.createCollectiveFromGithub;
+    });
+  });
+});
+
+/**
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
@@ -200,6 +234,9 @@ Cypress.Commands.add('fillInputField', (fieldname, value) => {
 
 // ---- Private ----
 
+/**
+ * @param {object} user - should have `email` and `id` set
+ */
 function signinRequest(user, redirect) {
   return cy.request({
     url: '/api/users/signin',
