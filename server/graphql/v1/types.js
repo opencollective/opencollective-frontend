@@ -954,6 +954,13 @@ export const TierStatsType = new GraphQLObjectType({
           return req.loaders.tiers.totalOrders.load(tier.id);
         },
       },
+      totalDonated: {
+        description: 'Total amount donated for this tier, in cents.',
+        type: GraphQLInt,
+        resolve(tier, args, req) {
+          return req.loaders.tiers.totalDonated.load(tier.id);
+        },
+      },
       totalDistinctOrders: {
         description: 'total number of people/organizations in this tier',
         type: GraphQLInt,
@@ -1017,6 +1024,10 @@ export const TierType = new GraphQLObjectType({
         resolve(tier) {
           return tier.description;
         },
+      },
+      longDescription: {
+        type: GraphQLString,
+        description: 'A long, html-formatted description.',
       },
       button: {
         type: GraphQLString,

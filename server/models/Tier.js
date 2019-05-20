@@ -6,7 +6,7 @@ import { Op } from 'sequelize';
 
 import CustomDataTypes from './DataTypes';
 import { maxInteger } from '../constants/math';
-import { capitalize, pluralize, days, formatCurrency } from '../lib/utils';
+import { capitalize, pluralize, days, formatCurrency, strip_tags } from '../lib/utils';
 
 const debug = debugLib('tier');
 
@@ -59,6 +59,22 @@ export default function(Sequelize, DataTypes) {
       },
 
       description: DataTypes.STRING,
+
+      longDescription: {
+        type: DataTypes.TEXT,
+        validate: {
+          // Max length for arround 1_000_000 characters ~4MB of text
+          len: [0, 1000000],
+        },
+        set(content) {
+          if (!content) {
+            this.setDataValue('longDescription', null);
+          } else {
+            this.setDataValue('longDescription', strip_tags(content));
+          }
+        },
+      },
+
       button: DataTypes.STRING,
 
       amount: {

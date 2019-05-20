@@ -22,7 +22,7 @@ import {
   updateOrderInfo,
 } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
-import { editTiers } from './mutations/tiers';
+import { editTiers, editTier } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
@@ -324,6 +324,19 @@ const mutations = {
     },
     resolve(_, args, req) {
       return deleteExpense(req.remoteUser, args.id);
+    },
+  },
+  editTier: {
+    type: TierType,
+    description: 'Update a single tier',
+    args: {
+      tier: {
+        type: new GraphQLNonNull(TierInputType),
+        description: 'The tier to update',
+      },
+    },
+    resolve(_, args, req) {
+      return editTier(_, args, req);
     },
   },
   editTiers: {
