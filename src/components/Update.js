@@ -250,7 +250,7 @@ class Update extends React.Component {
             <div>
               {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
               {!update.html && <UpdateTextWithData id={update.id} />}
-              {!update.isContentAvailable && (
+              {!update.userCanSeeUpdate && (
                 <MessageBox type="info">
                   <FormattedMessage
                     id="update.private.cannot_view_message"

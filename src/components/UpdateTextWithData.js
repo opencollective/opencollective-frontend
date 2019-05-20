@@ -41,7 +41,7 @@ const getUpdateQuery = gql`
     Update(id: $id) {
       id
       html
-      isContentAvailable
+      userCanSeeUpdate
       collective {
         name
       }

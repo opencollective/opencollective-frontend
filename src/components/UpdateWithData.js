@@ -47,7 +47,7 @@ const getUpdateQuery = gql`
       html
       markdown
       isPrivate
-      isContentAvailable
+      userCanSeeUpdate
       collective {
         id
         name
