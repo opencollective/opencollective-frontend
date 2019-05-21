@@ -17,7 +17,7 @@ class HTMLEditor extends React.Component {
     onChange: PropTypes.func,
     LoadingPlaceholderheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Use `false` instead of a number to disable a title level. eg. [false, 2, 3] */
-    allowedHeaders: PropTypes.arrayOf(PropTypes.oneOfType(PropTypes.number, PropTypes.bool)),
+    allowedHeaders: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.bool])),
   };
 
   static defaultProps = {
