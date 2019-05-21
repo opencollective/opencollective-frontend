@@ -382,9 +382,14 @@ export function editCollective(_, args, req) {
 
   const tiers = args.collective.tiers;
   forEach(tiers, tier => {
-    const presets = tier.presets || [];
+    const presets = tier.presets;
     const amount = tier.amount;
     const name = tier.name;
+
+    if (!tier.amountType) {
+      tier.amountType = presets ? 'FLEXIBLE' : 'FIXED';
+    }
+
     const amountType = tier.amountType;
     const minPreset = Math.min(...presets);
 
