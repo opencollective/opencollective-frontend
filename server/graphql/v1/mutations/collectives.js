@@ -392,6 +392,10 @@ export function editCollective(_, args, req) {
       throw new Error('Name field is required for all tiers');
     }
 
+    if (amountType === 'FIXED' && !amount) {
+      throw new Error(`In ${name}'s tier, "Amount" is required`);
+    }
+
     if (amountType === 'FLEXIBLE' && !tier.minimumAmount) {
       throw new Error(`In ${name}'s tier, "Minimum amount" is required`);
     }
