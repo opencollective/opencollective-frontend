@@ -397,7 +397,7 @@ export function editCollective(_, args, req) {
       throw new Error('Name field is required for all tiers');
     }
 
-    if (amountType === 'FIXED' && !amount) {
+    if (tier.type !== 'TICKET' && amountType === 'FIXED' && !amount) {
       throw new Error(`In ${name}'s tier, "Amount" is required`);
     }
 
