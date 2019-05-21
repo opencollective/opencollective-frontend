@@ -171,7 +171,7 @@ class EditTiers extends React.Component {
         label: intl.formatMessage(this.messages['description.label']),
       },
       {
-        name: '_amountType',
+        name: 'amountType',
         type: 'select',
         options: getOptions(['FIXED', 'FLEXIBLE']),
         label: intl.formatMessage(this.messages['amountType.label']),
@@ -182,7 +182,7 @@ class EditTiers extends React.Component {
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages['amount.label']),
-        when: tier => tier._amountType === 'FIXED',
+        when: tier => tier.amountType === 'FIXED',
       },
       {
         name: 'presets',
@@ -191,7 +191,7 @@ class EditTiers extends React.Component {
         options: { step: 1 },
         component: InputFieldPresets,
         label: intl.formatMessage(this.messages['presets.label']),
-        when: tier => tier._amountType === 'FLEXIBLE',
+        when: tier => tier.amountType === 'FLEXIBLE',
       },
       {
         name: 'amount',
@@ -199,7 +199,7 @@ class EditTiers extends React.Component {
         type: 'currency',
         options: { step: 1 },
         label: intl.formatMessage(this.messages['defaultAmount.label']),
-        when: tier => tier._amountType === 'FLEXIBLE',
+        when: tier => tier.amountType === 'FLEXIBLE',
       },
       {
         name: 'minimumAmount',
@@ -207,7 +207,7 @@ class EditTiers extends React.Component {
         type: 'currency',
         options: { step: 1 },
         label: intl.formatMessage(this.messages['minimumAmount.label']),
-        when: tier => tier._amountType === 'FLEXIBLE',
+        when: tier => tier.amountType === 'FLEXIBLE',
       },
       {
         name: 'interval',
@@ -291,6 +291,7 @@ class EditTiers extends React.Component {
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
+      amountType: tier.amountType || (tier.presets ? 'FLEXIBLE' : 'FIXED'),
     };
 
     return (

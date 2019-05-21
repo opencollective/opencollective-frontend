@@ -108,10 +108,9 @@ class EditCollective extends React.Component {
       resetAttributes.map(attr => {
         cleanTier[attr] = null;
       });
-      if (tier._amountType === 'fixed') {
+      if (tier.amountType === 'FIXED') {
         cleanTier.presets = null;
       }
-      delete cleanTier._amountType;
       return cleanTier;
     });
   }
