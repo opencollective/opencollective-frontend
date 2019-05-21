@@ -121,6 +121,11 @@ export default function(Sequelize, DataTypes) {
 
       image: DataTypes.STRING,
 
+      isPrivate: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
       tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
@@ -221,7 +226,16 @@ export default function(Sequelize, DataTypes) {
         });
       }
     }
-    const editableAttributes = ['TierId', 'FromCollectiveId', 'title', 'html', 'markdown', 'image', 'tags'];
+    const editableAttributes = [
+      'TierId',
+      'FromCollectiveId',
+      'title',
+      'html',
+      'markdown',
+      'image',
+      'tags',
+      'isPrivate',
+    ];
     sanitizeObject(newUpdateData, ['html', 'markdown']);
     return await this.update({
       ...pick(newUpdateData, editableAttributes),
