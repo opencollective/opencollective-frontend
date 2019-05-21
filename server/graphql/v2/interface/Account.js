@@ -115,6 +115,18 @@ export const AccountFields = {
       return collective.website;
     },
   },
+  twitterHandle: {
+    type: GraphQLString,
+    resolve(collective) {
+      return collective.twitterHandle;
+    },
+  },
+  githubHandle: {
+    type: GraphQLString,
+    resolve(collective) {
+      return collective.githubHandle;
+    },
+  },
   imageUrl: {
     type: GraphQLString,
     args: {
@@ -175,6 +187,12 @@ export const Account = new GraphQLInterfaceType({
         type: GraphQLString,
       },
       website: {
+        type: GraphQLString,
+      },
+      twitterHandle: {
+        type: GraphQLString,
+      },
+      githubHandle: {
         type: GraphQLString,
       },
       imageUrl: {
