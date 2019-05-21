@@ -387,11 +387,11 @@ export function editCollective(_, args, req) {
     const amountType = tier.amountType;
     const minPreset = Math.min(...presets);
     if (amountType === 'FLEXIBLE' && presets.indexOf(amount) === -1) {
-      throw new Error('Default amount must be one of suggested values amounts');
+      throw new Error(`In ${tier.name}'s tier "Default amount" must be one of suggested values amounts`);
     }
 
     if (amountType === 'FLEXIBLE' && minPreset < tier.minimumAmount) {
-      throw new Error('Minimum amount cannot be less than minimum suggested amounts');
+      throw new Error(`In ${tier.name}'s tier minimum amount cannot be less than minimum suggested amounts`);
     }
 
     return tier;
