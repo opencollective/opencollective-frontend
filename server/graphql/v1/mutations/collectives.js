@@ -391,7 +391,7 @@ export function editCollective(_, args, req) {
     }
 
     const amountType = tier.amountType;
-    const minPreset = Math.min(...presets);
+    const minPreset = presets ? Math.min(...presets) : null;
 
     if (!name || name.trim().length === 0) {
       throw new Error('Name field is required for all tiers');
