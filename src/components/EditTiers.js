@@ -111,8 +111,8 @@ class EditTiers extends React.Component {
         id: 'tier.interval.label',
         defaultMessage: 'interval',
       },
-      fixed: { id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' },
-      flexible: {
+      FIXED: { id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' },
+      FLEXIBLE: {
         id: 'tier.amountType.flexible',
         defaultMessage: 'flexible amount',
       },
@@ -173,7 +173,7 @@ class EditTiers extends React.Component {
       {
         name: '_amountType',
         type: 'select',
-        options: getOptions(['fixed', 'flexible']),
+        options: getOptions(['FIXED', 'FLEXIBLE']),
         label: intl.formatMessage(this.messages['amountType.label']),
         when: tier => ['DONATION', 'TIER'].indexOf(tier.type) !== -1,
       },
@@ -182,7 +182,7 @@ class EditTiers extends React.Component {
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages['amount.label']),
-        when: tier => tier._amountType === 'fixed',
+        when: tier => tier._amountType === 'FIXED',
       },
       {
         name: 'presets',
@@ -191,7 +191,7 @@ class EditTiers extends React.Component {
         options: { step: 1 },
         component: InputFieldPresets,
         label: intl.formatMessage(this.messages['presets.label']),
-        when: tier => tier._amountType === 'flexible',
+        when: tier => tier._amountType === 'FLEXIBLE',
       },
       {
         name: 'amount',
@@ -199,7 +199,7 @@ class EditTiers extends React.Component {
         type: 'currency',
         options: { step: 1 },
         label: intl.formatMessage(this.messages['defaultAmount.label']),
-        when: tier => tier._amountType === 'flexible',
+        when: tier => tier._amountType === 'FLEXIBLE',
       },
       {
         name: 'minimumAmount',
@@ -207,7 +207,7 @@ class EditTiers extends React.Component {
         type: 'currency',
         options: { step: 1 },
         label: intl.formatMessage(this.messages['minimumAmount.label']),
-        when: tier => tier._amountType === 'flexible',
+        when: tier => tier._amountType === 'FLEXIBLE',
       },
       {
         name: 'interval',
@@ -291,7 +291,6 @@ class EditTiers extends React.Component {
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
-      _amountType: tier._amountType || (tier.presets ? 'flexible' : 'fixed'),
     };
 
     return (
