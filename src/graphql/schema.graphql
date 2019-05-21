@@ -1748,6 +1748,7 @@ type Tier {
   longDescription: String
   button: String
   amount: Int
+  amountType: String
   minimumAmount: Int
   currency: String
   interval: String
