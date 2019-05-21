@@ -1087,7 +1087,7 @@ export const TierType = new GraphQLObjectType({
         },
       },
       amountType: {
-        type: GraphQLInt,
+        type: GraphQLString,
         resolve(tier) {
           return tier.amountType;
         },
