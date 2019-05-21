@@ -384,14 +384,24 @@ export function editCollective(_, args, req) {
   forEach(tiers, tier => {
     const presets = tier.presets || [];
     const amount = tier.amount;
+    const name = tier.name;
     const amountType = tier.amountType;
     const minPreset = Math.min(...presets);
+
+    if (!name || name.trim().length === 0) {
+      throw new Error('Name field is required for all tiers');
+    }
+
+    if (amountType === 'FLEXIBLE' && !tier.minimumAmount) {
+      throw new Error(`In ${name}'s tier, "Minimum amount" is required`);
+    }
+
     if (amountType === 'FLEXIBLE' && presets.indexOf(amount) === -1) {
-      throw new Error(`In ${tier.name}'s tier "Default amount" must be one of suggested values amounts`);
+      throw new Error(`In ${name}'s tier, "Default amount" must be one of suggested values amounts`);
     }
 
     if (amountType === 'FLEXIBLE' && minPreset < tier.minimumAmount) {
-      throw new Error(`In ${tier.name}'s tier minimum amount cannot be less than minimum suggested amounts`);
+      throw new Error(`In ${name}'s tier, minimum amount cannot be less than minimum suggested amounts`);
     }
 
     return tier;
