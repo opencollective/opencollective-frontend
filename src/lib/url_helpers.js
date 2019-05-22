@@ -1,6 +1,7 @@
 import { pickBy, isEmpty } from 'lodash';
 
 export const invoiceServiceURL = process.env.INVOICES_URL;
+export const giftCardsServiceURL = process.env.GIFTCARDS_GENERATOR_URL;
 
 // ---- Utils ----
 
@@ -38,6 +39,15 @@ export const collectiveInvoiceURL = (collectiveSlug, hostSlug, startDate, endDat
 
 export const transactionInvoiceURL = transactionUUID => {
   return `${invoiceServiceURL}/transactions/${transactionUUID}/invoice.pdf`;
+};
+
+/**
+ * `POST` endpoint to generate printable gift cards.
+ *
+ * @param {string} filename - filename **with** extension
+ */
+export const giftCardsDownloadUrl = filename => {
+  return `${giftCardsServiceURL}/render-many/${filename}`;
 };
 
 // ---- Routes to external services ----
