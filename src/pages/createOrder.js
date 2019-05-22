@@ -666,8 +666,8 @@ class CreateOrderPage extends React.Component {
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
-          <Box width={[0, null, null, '24em']} />
-          <Container>
+          <Box width={[0, null, null, 1 / 4]} />
+          <Container mr={4.9} width={[0.95, null, 3 / 5]} maxWidth="465px">
             <StyledInputField
               htmlFor="contributeAs"
               label={
@@ -689,7 +689,7 @@ class CreateOrderPage extends React.Component {
               )}
             </StyledInputField>
           </Container>
-          <ContributeAsFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          <ContributeAsFAQ mt={4} ml={5} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
         </Flex>
       );
     } else if (step.name === 'details') {
