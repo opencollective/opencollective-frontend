@@ -10,7 +10,10 @@ import { H3 } from '../components/Text';
 import { User } from 'styled-icons/boxicons-regular/User';
 import { createUserSession } from '../lib/blockstack';
 import { checkUserExistence, signin } from '../lib/api';
-import { signInputs } from 'blockstack/lib/operations';
+import { getPublicKeyFromPrivate, decryptContent } from 'blockstack';
+import { Router } from '../server/pages';
+import { createUserQuery } from '../graphql/mutations';
+import { graphql } from 'react-apollo';
 
 const Icon = styled(User)`
   color: ${themeGet('colors.primary.300')};
@@ -37,15 +40,33 @@ class SignInBlockstack extends React.Component {
     exists: false,
   };
 
-  componentWillMount() {
+  async componentWillMount() {
     const userSession = createUserSession();
     userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
       this.setState({ userData });
       checkUserExistence(userData.email).then(exists => {
         this.setState({ exists });
+        const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
         if (exists) {
-          signin({ email: userData.email }).then(c => {
-            console.log({ c });
+          const user = { email: userData.email, publicKey };
+          signin(user).then(async response => {
+            if (response.encryptedRedirect) {
+              const link = decryptContent(response.encryptedRedirect);
+              await Router.replaceRoute(link);
+            } else {
+              this.setState({ error: 'Failed to signin' });
+            }
+          });
+        } else {
+          const firstName = userData.username;
+          const lastName = userData.profile.name;
+          this.propse.createUser({ email: userData.email, firstName, lastName, publicKey }).then(async response => {
+            if (response.encryptedRedirect) {
+              const link = decryptContent(response.encryptedRedirect);
+              await Router.replaceRoute(link);
+            } else {
+              this.setState({ error: 'Failed to create profile' });
+            }
           });
         }
       });
@@ -68,6 +89,12 @@ class SignInBlockstack extends React.Component {
                 You have already a profile
               </>
             )}
+            {exists && (
+              <>
+                <br />
+                ... creating your profile ...
+              </>
+            )}
           </H3>
         </Container>
       </Page>
@@ -77,6 +104,13 @@ class SignInBlockstack extends React.Component {
 
 SignInBlockstack.propTypes = {
   authResponse: PropTypes.string.isRequired,
+  createUser: PropTypes.func,
 };
 
-export default SignInBlockstack;
+const addCreateUserMutation = graphql(createUserQuery, {
+  props: ({ mutate }) => ({
+    createUser: variables => mutate({ variables }),
+  }),
+});
+
+export default addCreateUserMutation(SignInBlockstack);

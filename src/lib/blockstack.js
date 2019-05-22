@@ -4,6 +4,5 @@ export const appConfig = new AppConfig(['email'], 'http://127.0.0.1:3000', null,
 
 export function createUserSession() {
   const userSession = new UserSession({ appConfig });
-  console.log(userSession);
   return userSession;
 }
