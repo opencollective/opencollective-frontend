@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { pick } from 'lodash';
 
 import * as api from '../lib/api';
+import * as blockstack from '../lib/blockstack';
 import { Router } from '../server/pages';
 
 import Link from './Link';
@@ -55,6 +56,15 @@ class SignInOrJoinFree extends React.Component {
   getRedirectURL() {
     return encodeURIComponent(this.props.redirect || window.location.pathname || '/');
   }
+
+  signInBlockstack = async () => {
+    if (this.state.submitting) {
+      return false;
+    }
+
+    this.setState({ submitting: true });
+    blockstack.createUserSession().redirectToSignIn("&next='/'");
+  };
 
   signIn = async email => {
     if (this.state.submitting) {
@@ -126,6 +136,7 @@ class SignInOrJoinFree extends React.Component {
             email={email}
             onEmailChange={email => this.setState({ email })}
             onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+            onBlockstackAction={this.signInBlockstack}
             onSubmit={this.signIn}
             loading={submitting}
             unknownEmail={unknownEmailError}

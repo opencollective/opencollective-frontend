@@ -48,9 +48,9 @@ export default class SignIn extends React.Component {
   }
 
   renderBlockstackAction(message) {
-    const { loading } = this.props;
+    const { loading, onBlockstackAction } = this.props;
     return (
-      <StyledButton asLink fontSize="Paragraph" fontWeight="bold" disabled={loading}>
+      <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onBlockstackAction} disabled={loading}>
         {message}
       </StyledButton>
     );
