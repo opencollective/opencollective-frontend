@@ -63,7 +63,7 @@ class SignInOrJoinFree extends React.Component {
     }
 
     this.setState({ submitting: true });
-    blockstack.createUserSession().redirectToSignIn("&next='/'");
+    blockstack.createUserSession().redirectToSignIn("http://127.0.0.1:3000/signin/blockstack?&next='/'");
   };
 
   signIn = async email => {

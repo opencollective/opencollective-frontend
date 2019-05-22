@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 import PropTypes from 'prop-types';
@@ -7,22 +7,19 @@ import { Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H3 } from '../components/Text';
-import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane';
-import * as blockstack from '../lib/blockstack';
+import { User } from 'styled-icons/boxicons-regular/User';
+import { createUserSession } from '../lib/blockstack';
+import { checkUserExistence, signin } from '../lib/api';
+import { signInputs } from 'blockstack/lib/operations';
 
-const Icon = styled(PaperPlane)`
+const Icon = styled(User)`
   color: ${themeGet('colors.primary.300')};
 `;
 
-class SignInBlockstack extends Component {
+class SignInBlockstack extends React.Component {
   static async getInitialProps({ res, query = {}, router }) {
     if (query.authResponse) {
-      return blockstack
-        .createUserSession()
-        .handlePendingSignIn(query.authResponse)
-        .then(userProfile => {
-          userProfile;
-        });
+      return { authResponse: query.authResponse };
     }
 
     if (res) {
@@ -35,8 +32,28 @@ class SignInBlockstack extends Component {
     return {};
   }
 
+  state = {
+    userData: null,
+    exists: false,
+  };
+
+  componentWillMount() {
+    const userSession = createUserSession();
+    userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
+      this.setState({ userData });
+      checkUserExistence(userData.email).then(exists => {
+        this.setState({ exists });
+        if (exists) {
+          signin({ email: userData.email }).then(c => {
+            console.log({ c });
+          });
+        }
+      });
+    });
+  }
+
   render() {
-    const { userProfile } = this.props;
+    const { userData, exists } = this.state;
     return (
       <Page title="Blockstack Login Successful">
         <Container pt={4} pb={6} px={2} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
@@ -44,7 +61,13 @@ class SignInBlockstack extends Component {
             <Icon size="60" />
           </Flex>
           <H3 as="h1" fontWeight="800">
-            Your Blockstack ID is {userProfile.username}
+            {userData && <>{userData.username}</>}
+            {exists && (
+              <>
+                <br />
+                You have already a profile
+              </>
+            )}
           </H3>
         </Container>
       </Page>
@@ -53,7 +76,7 @@ class SignInBlockstack extends Component {
 }
 
 SignInBlockstack.propTypes = {
-  userProfile: PropTypes.object.isRequired,
+  authResponse: PropTypes.string.isRequired,
 };
 
 export default SignInBlockstack;
