@@ -13,33 +13,17 @@ module.exports = {
       .addColumn('Tiers', colName, colParams)
       .then(() => {
         return queryInterface.sequelize.query(`
-          SELECT * FROM "Tiers"
+          UPDATE "Tiers"
+            SET "amountType" = 'FIXED'
+          WHERE "presets" IS NULL
         `);
       })
-      .then(results => {
-        const tiers = results[0];
-        return map(tiers, tier => {
-          const presets = tier.presets;
-          let amountType;
-          if (presets) {
-            amountType = 'FLEXIBLE';
-          } else {
-            amountType = 'FIXED';
-          }
-          return queryInterface.sequelize.query(
-            `
-              UPDATE "Tiers"
-                SET "amountType" = :amountType
-              WHERE "id" = :tierId
-            `,
-            {
-              replacements: {
-                amountType,
-                tierId: tier.id,
-              },
-            },
-          );
-        });
+      .then(() => {
+        return queryInterface.sequelize.query(`
+          UPDATE "Tiers"
+            SET "amountType" = 'FLEXIBLE'
+          WHERE "presets" IS NOT NULL
+        `);
       })
       .then(() => {
         console.log('>>> Done!');
