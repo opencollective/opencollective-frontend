@@ -401,15 +401,11 @@ export function editCollective(_, args, req) {
       throw new Error(`In ${name}'s tier, "Amount" is required`);
     }
 
-    if (amountType === 'FLEXIBLE' && !tier.minimumAmount) {
-      throw new Error(`In ${name}'s tier, "Minimum amount" is required`);
-    }
-
     if (amountType === 'FLEXIBLE' && presets.indexOf(amount) === -1) {
       throw new Error(`In ${name}'s tier, "Default amount" must be one of suggested values amounts`);
     }
 
-    if (amountType === 'FLEXIBLE' && minPreset < tier.minimumAmount) {
+    if (amountType === 'FLEXIBLE' && tier.minimumAmount && minPreset < tier.minimumAmount) {
       throw new Error(`In ${name}'s tier, minimum amount cannot be less than minimum suggested amounts`);
     }
 
