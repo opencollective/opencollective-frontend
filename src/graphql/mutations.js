@@ -209,6 +209,7 @@ export const createVirtualCardsMutationQuery = gql`
       id
       name
       uuid
+      limitedToHostCollectiveIds
       description
       initialBalance
       monthlyLimitPerMember
