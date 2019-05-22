@@ -23,6 +23,7 @@
     "apollo-link-context": "1.0.17",
     "apollo-link-error": "1.1.10",
     "apollo-link-http": "1.5.14",
+    "blockstack": "^19.1.0",
     "bluebird": "3.5.5",
     "bootstrap": "3.4.1",
     "classnames": "2.2.6",

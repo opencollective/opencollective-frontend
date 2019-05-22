@@ -47,6 +47,15 @@ export default class SignIn extends React.Component {
     );
   }
 
+  renderBlockstackAction(message) {
+    const { loading } = this.props;
+    return (
+      <StyledButton asLink fontSize="Paragraph" fontWeight="bold" disabled={loading}>
+        {message}
+      </StyledButton>
+    );
+  }
+
   render() {
     const { onSubmit, loading, unknownEmail, email, onEmailChange } = this.props;
     const { error, showError } = this.state;
@@ -114,6 +123,12 @@ export default class SignIn extends React.Component {
           )}
         </Box>
 
+        <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="space-between">
+          <P color="black.700">
+            <FormattedMessage id="signin.blockstack" defaultMessage="NEW! Use your Blockstack ID?" />
+          </P>
+          {this.renderBlockstackAction(<FormattedMessage id="signin.signIn" defaultMessage="Sign In" />)}
+        </Container>
         <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="space-between">
           <P color="black.700">
             <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
