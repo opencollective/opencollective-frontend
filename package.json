@@ -133,7 +133,7 @@
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
-    "graphql:get-schema": "npx graphql-cli get-schema -p opencollective -e dev",
+    "graphql:get-schema": "npx graphql-cli get-schema -p opencollective -e dev && prettier src/graphql/schema.graphql --write",
     "styleguide:dev": "styleguidist server",
     "styleguide:build": "styleguidist build",
     "styleguide:deploy": "npm run styleguide:build && npx now styleguide && npx now alias -A styleguide/now.json"
@@ -205,7 +205,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,md}": [
+    "*.{js,json,md,graphql}": [
       "prettier --write",
       "git add"
     ]
