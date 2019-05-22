@@ -39,7 +39,7 @@ This project requires an access to the Open Collective API.
 
 By default, it will try to connect to the Open Collective staging API, **you don't have to change anything**.
 
-If case you want to connect to the Open Collective API running locally:
+In case you want to connect to the Open Collective API running locally:
 
 - clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)
 - in this project, copy [`.env.local`](.env.local) to `.env`.
