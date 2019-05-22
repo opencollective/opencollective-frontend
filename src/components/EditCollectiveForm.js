@@ -636,14 +636,16 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
-            <MenuItem
-              selected={this.state.section === 'webhooks'}
-              route="editCollective"
-              params={{ slug: collective.slug, section: 'webhooks' }}
-              className="MenuItem webhooks"
-            >
-              <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
-            </MenuItem>
+            {get(collective, 'settings.ENABLE_WEBHOOKS') && (
+              <MenuItem
+                selected={this.state.section === 'webhooks'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'webhooks' }}
+                className="MenuItem webhooks"
+              >
+                <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
+              </MenuItem>
+            )}
             {collective.type === 'COLLECTIVE' && (
               <MenuItem
                 selected={this.state.section === 'export'}
