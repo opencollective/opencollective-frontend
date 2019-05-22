@@ -1,11 +1,8 @@
 import { GraphQLString } from 'graphql';
 
 import { Account } from '../interface/Account';
-
 import models from '../../../models';
-
 import { idDecode } from '../identifiers';
-
 import { NotFound } from '../../errors';
 
 const AccountQuery = {
@@ -19,6 +16,10 @@ const AccountQuery = {
       type: GraphQLString,
       description: 'The slug identifying the account (ie: babel for https://opencollective.com/babel)',
     },
+    githubHandle: {
+      type: GraphQLString,
+      description: 'The githubHandle attached to the account (ie: babel for https://opencollective.com/babel)',
+    },
   },
   async resolve(_, args) {
     let collective;
@@ -28,6 +29,14 @@ const AccountQuery = {
     } else if (args.id) {
       const id = idDecode(args.id, 'account');
       collective = await models.Collective.findByPk(id);
+    } else if (args.githubHandle) {
+      // Try with githubHandle, be it organization/user or repository
+      collective = await models.Collective.findOne({ where: { githubHandle: args.githubHandle } });
+      if (!collective && args.githubHandle.includes('/')) {
+        // If it's a repository, try again with organization/user
+        const [githubOrg] = args.githubHandle.split('/');
+        collective = await models.Collective.findOne({ where: { githubHandle: githubOrg } });
+      }
     } else {
       return new Error('Please provide a slug or an id');
     }
