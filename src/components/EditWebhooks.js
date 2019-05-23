@@ -233,24 +233,24 @@ class EditWebhooks extends React.Component {
   }
 }
 
-const getWebhooks = graphql(
-  gql`
-    query Collective($collectiveSlug: String) {
-      Collective(slug: $collectiveSlug) {
+const getCollectiveWithNotifications = gql`
+  query Collective($collectiveSlug: String) {
+    Collective(slug: $collectiveSlug) {
+      id
+      type
+      slug
+      currency
+      notifications(channel: "webhook") {
         id
         type
-        slug
-        currency
-        notifications(channel: "webhook") {
-          id
-          type
-          active
-          webhookUrl
-        }
+        active
+        webhookUrl
       }
     }
-  `,
-);
+  }
+`;
+
+const getWebhooks = graphql(getCollectiveWithNotifications);
 
 const editWebhooks = graphql(
   gql`
@@ -261,8 +261,17 @@ const editWebhooks = graphql(
     }
   `,
   {
-    props: ({ mutate }) => ({
-      editWebhooks: variables => mutate({ variables }),
+    props: ({ mutate, ownProps }) => ({
+      editWebhooks: variables =>
+        mutate({
+          variables,
+          refetchQueries: [
+            {
+              query: getCollectiveWithNotifications,
+              variables: { collectiveSlug: ownProps.collectiveSlug },
+            },
+          ],
+        }),
     }),
   },
 );

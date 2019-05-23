@@ -426,8 +426,7 @@ class InputField extends React.Component {
             placeholder={field.placeholder}
             className={field.className}
             autoFocus={field.focus}
-            defaultValue={field.value || field.defaultValue || firstOptionValue}
-            value={field.value}
+            value={field.value || field.defaultValue || firstOptionValue}
             onChange={event =>
               field.multiple
                 ? this.handleChange(map(filter(event.target.options, 'selected'), 'value'))
