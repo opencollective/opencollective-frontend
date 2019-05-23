@@ -11,7 +11,6 @@ import { formatError } from 'apollo-errors';
 import { get } from 'lodash';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
-import getDiscoverPage from './controllers/discover';
 import * as collectives from './controllers/collectives';
 import * as RestApi from './graphql/v1/restapi';
 import getHomePage from './controllers/homepage';
@@ -193,11 +192,6 @@ export default app => {
   app.get('/homepage', getHomePage); // This query takes 5s to execute!!!
 
   /**
-   * Discover
-   */
-  app.get('/discover', getDiscoverPage);
-
-  /**
    * Users.
    */
   app.get('/users/exists', required('email'), users.exists); // Checks the existence of a user based on email.
@@ -212,8 +206,8 @@ export default app => {
   /**
    * Collectives.
    */
-  app.get('/groups/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
   app.get('/groups/:collectiveid/:tierSlug(backers|users)', cacheControlMaxAge(60), collectives.getUsers); // Get collective backers
+
   /**
    * Transactions (financial).
    */

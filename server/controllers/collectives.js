@@ -64,13 +64,3 @@ export const getUsers = (req, res, next) => {
     .then(users => res.send(users))
     .catch(next);
 };
-
-/**
- * Get array of unique collective tags
- */
-export const getCollectiveTags = (req, res, next) => {
-  return queries
-    .getUniqueCollectiveTags()
-    .then(tags => res.send(tags))
-    .catch(next);
-};
