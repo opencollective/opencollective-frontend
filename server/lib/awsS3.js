@@ -7,8 +7,8 @@ if (config.aws.s3.key) {
   s3 = new S3({
     accessKeyId: config.aws.s3.key,
     secretAccessKey: config.aws.s3.secret,
-    apiVersion: '2006-03-01',
-    region: 'us-west-1',
+    apiVersion: config.aws.s3.apiVersion,
+    region: config.aws.s3.region,
   });
 }
 export default s3;

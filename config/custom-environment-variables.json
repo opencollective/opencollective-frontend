@@ -52,7 +52,9 @@
     "s3": {
       "key": "AWS_KEY",
       "secret": "AWS_SECRET",
-      "bucket": "AWS_S3_BUCKET"
+      "bucket": "AWS_S3_BUCKET",
+      "region": "AWS_REGION",
+      "apiVersion": "AWS_API_VERSION"
     }
   },
   "cloudflare": {
