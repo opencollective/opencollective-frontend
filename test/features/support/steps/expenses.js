@@ -14,7 +14,7 @@ When('{string} expenses {string} for {string} to {string} via {string}', async f
   const user = this.getValue(`${userName}-user`);
   const collective = this.getValue(collectiveName);
   const expense = {
-    amount,
+    amount: Number(amount),
     currency,
     description,
     payoutMethod: payoutMethod.toLowerCase(),
