@@ -70,6 +70,9 @@ export const CollectiveOrderFieldType = new GraphQLEnumType({
     updatedAt: {
       description: 'Order collectives by updated time.',
     },
+    totalDonations: {
+      description: 'Order collectives by total donations.',
+    },
   },
 });
 

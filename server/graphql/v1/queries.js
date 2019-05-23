@@ -899,6 +899,26 @@ const queries = {
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
 
+      if (args.orderBy === 'totalDonations') {
+        query.attributes = {
+          include: [
+            [
+              sequelize.literal(`(
+                SELECT  COALESCE(SUM("netAmountInCollectiveCurrency"), 0) 
+                FROM    "Transactions" t 
+                WHERE   t."type" = 'CREDIT' 
+                AND     t."CollectiveId" = "Collective".id
+              )`),
+              'totalDonations',
+            ],
+          ],
+        };
+
+        query.order = [[sequelize.col('totalDonations'), args.orderDirection]];
+      } else {
+        query.order = [[args.orderBy, args.orderDirection]];
+      }
+
       if (args.minBackerCount) {
         const { total, collectives } = await rawQueries.getCollectivesWithMinBackers({
           ...args,
@@ -906,8 +926,6 @@ const queries = {
         });
         return { total, collectives, limit: args.limit, offset: args.offset };
       }
-
-      query.order = [[args.orderBy, args.orderDirection]];
 
       if (args.offset) query.offset = args.offset;
 
