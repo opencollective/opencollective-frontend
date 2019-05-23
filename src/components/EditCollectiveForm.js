@@ -53,6 +53,7 @@ const MenuItem = styled(Link)`
 const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
 const deleteIsEnabled = parseToBoolean(getEnvVar('SHOW_DELETE_COLLECTIVE'));
 const emptyBalanceIsEnabled = parseToBoolean(getEnvVar('SHOW_EMPTY_BALANCE_COLLECTIVE'));
+const webhooksEnabled = parseToBoolean(getEnvVar('ENABLE_WEBHOOKS'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -636,7 +637,7 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
-            {get(collective, 'settings.ENABLE_WEBHOOKS') && (
+            {(webhooksEnabled || get(collective, 'settings.enableWebhooks')) && (
               <MenuItem
                 selected={this.state.section === 'webhooks'}
                 route="editCollective"
