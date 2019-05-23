@@ -32,7 +32,7 @@ class EditWebhooks extends React.Component {
         webhooks[x.webhookUrl].activities.push(x.type);
       });
 
-      return { ...state, webhooks: Object.values(webhooks), isLoaded: true };
+      return { webhooks: Object.values(webhooks), isLoaded: true };
     }
 
     return null;
@@ -158,26 +158,23 @@ class EditWebhooks extends React.Component {
         </Button>
 
         <Form horizontal>
-          {this.fields.map(
-            field =>
-              (!field.when || field.when(webhook)) && (
-                <InputField
-                  className="horizontal"
-                  key={field.name}
-                  name={field.name}
-                  label={field.label}
-                  type={field.type}
-                  disabled={typeof field.disabled === 'function' ? field.disabled(webhook) : field.disabled}
-                  defaultValue={get(webhook, field.name) || field.defaultValue}
-                  options={field.options}
-                  pre={field.pre}
-                  placeholder={field.placeholder}
-                  multiple={field.multiple || false}
-                  onChange={value => this.editWebhook(index, field.name, value)}
-                  required={field.required}
-                />
-              ),
-          )}
+          {this.fields.map(field => (
+            <InputField
+              className="horizontal"
+              key={field.name}
+              name={field.name}
+              label={field.label}
+              type={field.type}
+              disabled={typeof field.disabled === 'function' ? field.disabled(webhook) : field.disabled}
+              value={get(webhook, field.name) || field.defaultValue}
+              options={field.options}
+              pre={field.pre}
+              placeholder={field.placeholder}
+              multiple={field.multiple || false}
+              onChange={value => this.editWebhook(index, field.name, value)}
+              required={field.required}
+            />
+          ))}
         </Form>
       </div>
     );

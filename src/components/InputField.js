@@ -80,7 +80,7 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
 class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.array]),
     defaultValue: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -563,7 +563,7 @@ class InputField extends React.Component {
             autoFocus={field.focus}
             placeholder={field.placeholder}
             className={field.className}
-            defaultValue={field.defaultValue || ''}
+            value={field.value || field.defaultValue || ''}
             validationState={this.state.validationState}
           />
         );
