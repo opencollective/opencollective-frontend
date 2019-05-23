@@ -2,32 +2,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick, isArray } from 'lodash';
 
-import { getLoggedInUserQuery, getCollectiveToEditQueryFields, getCollectiveQuery } from './queries';
-
-const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType!) {
-    createOrder(order: $order) {
-      id
-      createdAt
-      status
-      createdByUser {
-        id
-      }
-      fromCollective {
-        id
-        slug
-      }
-      collective {
-        id
-        slug
-      }
-      transactions(type: "CREDIT") {
-        id
-        uuid
-      }
-    }
-  }
-`;
+import { getLoggedInUserQuery, getCollectiveToEditQueryFields } from './queries';
 
 export const createUserQuery = gql`
   mutation createUser($user: UserInputType!, $organization: CollectiveInputType, $redirect: String) {
@@ -219,24 +194,6 @@ export const createVirtualCardsMutationQuery = gql`
   }
 `;
 
-export const addCreateOrderMutation = graphql(createOrderQuery, {
-  props: ({ mutate }) => ({
-    createOrder: async order => {
-      return await mutate({
-        variables: { order },
-        update: (cache, { data: { createOrder } }) => {
-          const data = cache.readQuery({
-            query: getCollectiveQuery,
-            variables: { slug: createOrder.collective.slug },
-          });
-          data.Collective.pledges.push({ createOrder });
-          cache.writeQuery({ query: getCollectiveQuery, data });
-        },
-      });
-    },
-  }),
-});
-
 export const addCreateMemberMutation = graphql(createMemberQuery, {
   props: ({ mutate }) => ({
     createMember: (member, collective, role) => mutate({ variables: { member, collective, role } }),
@@ -250,7 +207,6 @@ export const addRemoveMemberMutation = graphql(removeMemberQuery, {
 });
 
 export const addEventMutations = compose(
-  addCreateOrderMutation,
   addCreateMemberMutation,
   addRemoveMemberMutation,
 );
