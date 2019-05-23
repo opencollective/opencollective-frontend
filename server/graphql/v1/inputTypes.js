@@ -12,8 +12,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json';
 import { Kind } from 'graphql/language';
-import { IsoDateString } from './types';
-import { DateString } from './TransactionInterface';
+import { IsoDateString, DateString } from './types';
 
 const EmailType = new GraphQLScalarType({
   name: 'Email',

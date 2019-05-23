@@ -19,7 +19,7 @@ import moment from 'moment';
 
 import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
 
-import { TransactionInterfaceType, OrderDirectionType, DateString } from './TransactionInterface';
+import { TransactionInterfaceType, OrderDirectionType } from './TransactionInterface';
 
 import models, { Op, sequelize } from '../../models';
 import dataloaderSequelize from 'dataloader-sequelize';
@@ -57,6 +57,13 @@ export const paginatedList = (type, typeName, valuesKey) => {
     },
   });
 };
+
+export const DateString = new GraphQLScalarType({
+  name: 'DateString',
+  serialize: value => {
+    return value.toString();
+  },
+});
 
 export const UserType = new GraphQLObjectType({
   name: 'UserDetails',

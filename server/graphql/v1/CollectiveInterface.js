@@ -27,9 +27,10 @@ import {
   PaginatedPaymentMethodsType,
   ImageFormatType,
   NotificationType,
+  DateString,
 } from './types';
 
-import { DateString, OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
+import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
 
 import { ApplicationType } from './Application';
 

@@ -9,19 +9,11 @@ import {
   GraphQLList,
   GraphQLEnumType,
   GraphQLInputObjectType,
-  GraphQLScalarType,
 } from 'graphql';
 
 import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
-import { SubscriptionType, OrderType, PaymentMethodType, UserType } from './types';
-
-export const DateString = new GraphQLScalarType({
-  name: 'DateString',
-  serialize: value => {
-    return value.toString();
-  },
-});
+import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString } from './types';
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: 'Transaction',
