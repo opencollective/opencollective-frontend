@@ -18,7 +18,7 @@
     "@zeit/next-css": "1.0.1",
     "accepts": "1.3.7",
     "apollo-cache-inmemory": "1.6.0",
-    "apollo-client": "2.5.1",
+    "apollo-client": "2.6.0",
     "apollo-link": "1.2.11",
     "apollo-link-context": "1.0.17",
     "apollo-link-error": "1.1.10",
