@@ -1,5 +1,5 @@
 import AccountQuery from './AccountQuery';
-// import CollectiveQuery from './CollectiveQuery';
+import CollectiveQuery from './CollectiveQuery';
 
 // import TransactionQuery from './TransactionQuery';
 // import TransactionsQuery from './TransactionsQuery';
@@ -10,7 +10,7 @@ import models from '../../../models';
 
 const query = {
   account: AccountQuery,
-  // collective: CollectiveQuery,
+  collective: CollectiveQuery,
   // transaction: TransactionQuery,
   // transactions: TransactionsQuery,
   loggedInAccount: {
