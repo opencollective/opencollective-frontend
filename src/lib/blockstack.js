@@ -1,8 +1,7 @@
 import { UserSession, AppConfig } from 'blockstack';
 
-export const appConfig = new AppConfig(['email'], 'http://127.0.0.1:3000', null, '/static/manifest.json');
-
 export function createUserSession() {
+  const appConfig = new AppConfig(['email'], window.location.origin, null, '/static/manifest.json');
   const userSession = new UserSession({ appConfig });
   return userSession;
 }
