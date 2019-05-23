@@ -89,7 +89,7 @@ class SignInBlockstack extends React.Component {
                 You have already a profile
               </>
             )}
-            {exists && (
+            {!exists && (
               <>
                 <br />
                 ... creating your profile ...
