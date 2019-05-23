@@ -1306,7 +1306,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.updateHostFee = async function(hostFeePercent, remoteUser) {
-    if (!hostFeePercent || !remoteUser || hostFeePercent === this.hostFeePercent) {
+    if (typeof hostFeePercent === undefined || !remoteUser || hostFeePercent === this.hostFeePercent) {
       return;
     }
     if (this.type === types.COLLECTIVE || this.type === types.EVENT) {
@@ -1364,6 +1364,7 @@ export default function(Sequelize, DataTypes) {
     }
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
+      hostFeePercent: hostCollective.hostFeePercent,
       currency: hostCollective.currency,
       isActive,
     };

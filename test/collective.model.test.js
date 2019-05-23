@@ -235,6 +235,7 @@ describe('Collective model', () => {
       newHost = await models.Collective.create({
         name: 'BrusselsTogether',
         slug: 'brusselstogether',
+        hostFeePercent: 0,
         type: 'ORGANIZATION',
         currency: 'EUR',
         CreatedByUserId: user1.id,
@@ -289,6 +290,7 @@ describe('Collective model', () => {
       };
       await newCollective.changeHost(newHost.id, user1);
       await assertCollectiveCurrency(newCollective, newHost.currency);
+      expect(newCollective.hostFeePercent).to.equal(newHost.hostFeePercent);
       expect(newCollective.HostCollectiveId).to.equal(newHost.id);
       // if the user making the request is an admin of the host, isActive should turn to true
       expect(newCollective.isActive).to.be.true;

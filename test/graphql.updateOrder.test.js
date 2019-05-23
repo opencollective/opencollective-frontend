@@ -38,6 +38,7 @@ const updateOrderQuery = `
         id
         slug
         currency
+        hostFeePercent
       }
       subscription {
         id
@@ -161,7 +162,9 @@ describe('updateOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(user2.CollectiveId);
     expect(transaction.CollectiveId).to.equal(orderForCollective.id);
     expect(transaction.currency).to.equal(orderForCollective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(-(0.1 * order.totalAmount));
+    expect(transaction.hostFeeInHostCurrency).to.equal(
+      -((orderForCollective.hostFeePercent / 100) * order.totalAmount),
+    );
     expect(transaction.platformFeeInHostCurrency).to.equal(-(0.05 * order.totalAmount));
     expect(transaction.data.charge.currency).to.equal(orderForCollective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
