@@ -2,18 +2,51 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { FixedSizeGrid } from 'react-window';
-import { truncate } from 'lodash';
+import { truncate, omit } from 'lodash';
+import styled from 'styled-components';
 
 import Roles from '../constants/roles';
 import { CollectiveType } from '../constants/collectives';
 import formatMemberRole from '../lib/i18n-member-role';
-
-import Link from '../components/Link';
-import { P } from '../components/Text';
-import StyledCard from '../components/StyledCard';
-import Container from '../components/Container';
-import Avatar from '../components/Avatar';
 import withIntl from '../lib/withIntl';
+
+import Link from './Link';
+import { P } from './Text';
+import StyledCard from './StyledCard';
+import Container from './Container';
+import Avatar from './Avatar';
+import { fadeIn } from './StyledKeyframes';
+
+/**
+ * Override the default grid to disable fixed width. As we use the full screen width
+ * this is not necessary.
+ */
+const GridContainer = React.forwardRef(({ style, ...props }, ref) => {
+  return <div ref={ref} style={omit(style, ['width'])} {...props} />;
+});
+
+GridContainer.displayName = 'GridContainer';
+
+/**
+ * Add margin to the inner container width
+ */
+const GridInnerContainer = ({ style, ...props }) => {
+  return <div style={{ ...style, width: style.width + 32 }} {...props} />;
+};
+
+/** Cards to show individual contributors */
+const ContributorCard = styled(StyledCard)`
+  animation: ${fadeIn} 0.3s;
+  padding: 20px 8px;
+
+  a {
+    text-decoration: none;
+  }
+`;
+
+const getIdx = (columnIndex, rowIndex, NB_COLS) => {
+  return rowIndex * NB_COLS + columnIndex;
+};
 
 /**
  * A grid to show contributors, with horizontal scroll to search them.
@@ -25,29 +58,31 @@ const ContributorsGrid = ({ intl, members, width, nbRows }) => {
   const COLLECTIVE_CARD_HEIGHT = 226;
   const NB_COLS = Math.trunc(members.length / nbRows);
 
-  // TODO itemKey
-
   return (
     <FixedSizeGrid
       columnCount={members.length / nbRows}
       columnWidth={COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X}
-      height={(COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y) * 3 + COLLECTIVE_CARD_MARGIN_Y}
+      height={(COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y) * nbRows + COLLECTIVE_CARD_MARGIN_Y}
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
       width={width}
+      outerElementType={GridContainer}
+      innerElementType={GridInnerContainer}
+      itemKey={({ columnIndex, rowIndex }) => {
+        const idx = getIdx(columnIndex, rowIndex, NB_COLS);
+        return idx <= members.length ? members[idx].id : `empty-${idx}`;
+      }}
     >
       {({ columnIndex, rowIndex, style }) => {
-        const idx = rowIndex * NB_COLS + columnIndex;
+        const idx = getIdx(columnIndex, rowIndex, NB_COLS);
         if (idx > members.length) {
           return null;
         }
 
-        const { id, role, collective } = members[rowIndex * NB_COLS + columnIndex];
+        const { id, role, collective } = members[idx];
         return (
-          <StyledCard
+          <ContributorCard
             key={id}
-            px={2}
-            py={20}
             style={{
               ...style,
               left: style.left + COLLECTIVE_CARD_MARGIN_X,
@@ -71,7 +106,7 @@ const ContributorsGrid = ({ intl, members, width, nbRows }) => {
                 {formatMemberRole(intl, role)}
               </P>
             </Container>
-          </StyledCard>
+          </ContributorCard>
         );
       }}
     </FixedSizeGrid>
@@ -79,7 +114,7 @@ const ContributorsGrid = ({ intl, members, width, nbRows }) => {
 };
 
 ContributorsGrid.propTypes = {
-  /** The members that contribute to this collective */
+  /** The members */
   members: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -107,7 +142,7 @@ ContributorsGrid.propTypes = {
 ContributorsGrid.defaultProps = {
   limit: 30,
   maxHeight: 850,
-  nbRows: 3,
+  nbRows: 1,
 };
 
 export default withIntl(ContributorsGrid);

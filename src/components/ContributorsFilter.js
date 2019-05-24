@@ -2,84 +2,117 @@ import React from 'react';
 import { defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
+import styled, { css } from 'styled-components';
+
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 import roles from '../constants/roles';
 import withIntl from '../lib/withIntl';
 
-const FILTERS = {
+export const CONTRIBUTOR_FILTERS = {
   ALL: 'ALL',
   CORE: 'CORE',
   FINANCIAL: 'FINANCIAL',
   GITHUB: 'GITHUB',
 };
 
-const FILTERS_LIST = Object.values(FILTERS);
+const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
 
 const Translations = defineMessages({
-  [FILTERS.ALL]: {
+  [CONTRIBUTOR_FILTERS.ALL]: {
     id: 'ContributorsFilter.All',
     defaultMessage: 'All contributors',
   },
-  [FILTERS.CORE]: {
+  [CONTRIBUTOR_FILTERS.CORE]: {
     id: 'ContributorsFilter.Core',
     defaultMessage: 'Core contributors',
   },
-  [FILTERS.FINANCIAL]: {
+  [CONTRIBUTOR_FILTERS.FINANCIAL]: {
     id: 'ContributorsFilter.Financial',
     defaultMessage: 'Financial contributors',
   },
-  [FILTERS.GITHUB]: {
+  [CONTRIBUTOR_FILTERS.GITHUB]: {
     id: 'ContributorsFilter.Github',
     defaultMessage: 'Github contributors',
   },
 });
 
-const buttonPropsSelected = {
-  buttonStyle: 'dark',
-};
-
-const buttonPropsUnselected = {
-  buttonStyle: 'standard',
-  backgroundColor: '#F5F7FA',
-  color: '#4E5052',
-  border: '1px solid #F5F7FA',
+/**
+ * For a given list of members, returns all the filters that can be applied
+ * to the list.
+ */
+export const getMembersFilters = members => {
+  const filters = new Set([CONTRIBUTOR_FILTERS.ALL]);
+  for (const m of members) {
+    if (m.role === roles.CONTRIBUTOR) {
+      filters.add(CONTRIBUTOR_FILTERS.GITHUB);
+    } else if (m.role === roles.ADMIN) {
+      filters.add(CONTRIBUTOR_FILTERS.CORE);
+    } else if ([roles.BACKER, roles.FUNDRAISER].includes(m.role)) {
+      filters.add(CONTRIBUTOR_FILTERS.FINANCIAL);
+    }
+  }
+  return Array.from(filters);
 };
 
 /**
- * A helper to filter a members list by member type
+ * A helper to filter a members list by member type.
  */
-export const filterMembers = (members, memberType) => {
+export const filterMembers = (members, filter) => {
   if (!members) {
     return [];
   }
 
-  if (memberType === FILTERS.CODE) {
-    return members.filter(m => [roles.HOST, roles.ADMIN].includes(m.role));
-  } else if (memberType === FILTERS.FINANCIAL) {
+  if (filter === CONTRIBUTOR_FILTERS.FINANCIAL) {
     return members.filter(m => [roles.BACKER, roles.FUNDRAISER].includes(m.role));
+  } else if (filter === CONTRIBUTOR_FILTERS.CORE) {
+    return members.filter(m => m.role === roles.ADMIN);
+  } else if (filter === CONTRIBUTOR_FILTERS.GITHUB) {
+    return members.filter(m => m.role === roles.CONTRIBUTOR);
   } else {
     return members;
   }
 };
 
 /**
- * Filter contributors types
+ * An individual filtering button
  */
-const ContributorsFilter = ({ intl, selected, onChange }) => {
+const FilterBtn = styled(({ filter, isSelected, onChange, ...props }) => {
   return (
-    <Flex>
-      {FILTERS_LIST.map(filter => {
-        const isSelected = filter === selected;
+    <StyledButton
+      onClick={isSelected ? undefined : () => onChange(filter)}
+      buttonStyle={isSelected ? 'dark' : 'standard'}
+      {...props}
+    />
+  );
+})`
+  margin: 0 8px;
+
+  ${props =>
+    !props.isSelected &&
+    css`
+    backgroundColor: '#F5F7FA',
+    color: '#4E5052',
+    border: '1px solid #F5F7FA',
+  `}
+`;
+
+/**
+ * A set of filters for contributors types. This file also exports helper functions
+ * to deal with the filters, incuding:
+ * - `getMembersFilters`: For a given list of members, returns all the filters that can be applied to the list.
+ * - `filterMembers`: A helper to filter a members list by member type.
+ */
+const ContributorsFilter = ({ intl, selected, onChange, filters }) => {
+  return (
+    <Flex css={{ overflowX: 'auto' }}>
+      {filters.map(filter => {
         return (
-          <StyledButton
-            key={filter}
-            mx={2}
-            onClick={() => (isSelected ? undefined : onChange(filter))}
-            {...(isSelected ? buttonPropsSelected : buttonPropsUnselected)}
-          >
-            <Span textTransform="capitalize">{intl.formatMessage(Translations[filter])}</Span>
-          </StyledButton>
+          <FilterBtn key={filter} filter={filter} onChange={onChange} isSelected={filter === selected}>
+            <Span textTransform="capitalize" whiteSpace="nowrap">
+              {intl.formatMessage(Translations[filter])}
+            </Span>
+          </FilterBtn>
         );
       })}
     </Flex>
@@ -87,9 +120,18 @@ const ContributorsFilter = ({ intl, selected, onChange }) => {
 };
 
 ContributorsFilter.propTypes = {
+  /** Selected filter */
   selected: PropTypes.oneOf(FILTERS_LIST).isRequired,
+  /** Called when another filter is selected */
   onChange: PropTypes.func.isRequired,
+  /** An optional list of active filters */
+  filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
+  /** @ignore from withIntl */
   intl: PropTypes.object,
+};
+
+ContributorsFilter.defaultProps = {
+  filters: FILTERS_LIST,
 };
 
 export default withIntl(ContributorsFilter);

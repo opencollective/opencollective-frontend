@@ -7,5 +7,5 @@ This example doesn't have auto-resize, please use a desktop screen to review thi
 
 ```jsx
 import { webpackMembers } from '../mocks/members';
-<ContributorsGrid members={webpackMembers} width={800} />;
+<ContributorsGrid members={webpackMembers} width={800} nbRows={3} />;
 ```

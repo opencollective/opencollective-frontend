@@ -8,7 +8,7 @@ const RolesTranslations = defineMessages({
   },
   [roles.ADMIN]: {
     id: 'Member.Role.ADMIN',
-    defaultMessage: 'Admin',
+    defaultMessage: 'Core contributor',
   },
   [roles.MEMBER]: {
     id: 'Member.Role.MEMBER',

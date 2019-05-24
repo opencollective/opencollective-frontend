@@ -1108,6 +1108,36 @@ input MemberInputType {
 }
 
 """
+Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
+"""
+type MembersStatsType {
+  """
+  We always have to return an id for apollo's caching
+  """
+  id: Int
+
+  """
+  Total number of contributors
+  """
+  all: Int
+
+  """
+  Number of individuals
+  """
+  users: Int
+
+  """
+  Number of organizations
+  """
+  organizations: Int
+
+  """
+  Number of collectives
+  """
+  collectives: Int
+}
+
+"""
 This is the root mutation
 """
 type Mutation {
@@ -2312,6 +2342,16 @@ type Tier {
     isProcessed: Boolean
     limit: Int
   ): [OrderType]
+
+  """
+  Returns a list of all the members that contributed to this tier
+  """
+  members(
+    """
+    Maximum number of entries to return
+    """
+    limit: Int = 5000
+  ): [Member]
   stats: TierStatsType
 }
 
@@ -2363,6 +2403,11 @@ Stats about a tier
 """
 type TierStatsType {
   id: Int
+
+  """
+  Breakdown of all the members that belongs to this tier.
+  """
+  members: MembersStatsType
 
   """
   total number of individual orders
