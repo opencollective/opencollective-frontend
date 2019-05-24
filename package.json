@@ -78,7 +78,7 @@
     "multer": "1.4.1",
     "node-fetch": "2.6.0",
     "node-slack": "0.0.7",
-    "nodemailer": "6.1.1",
+    "nodemailer": "6.2.1",
     "p-queue": "5.0.0",
     "passport": "0.4.0",
     "passport-github": "1.1.0",
