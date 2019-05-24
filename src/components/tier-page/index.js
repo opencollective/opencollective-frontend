@@ -8,12 +8,14 @@ import { withRouter } from 'next/router';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { P } from '../Text';
+import { P, H1 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
+import Avatar from '../Avatar';
+import LinkCollective from '../LinkCollective';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
@@ -60,6 +62,7 @@ class TierPage extends Component {
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
     }).isRequired,
 
@@ -98,6 +101,37 @@ class TierPage extends Component {
 
     return (
       <Container borderTop="1px solid #E6E8EB">
+        <Container
+          display="flex"
+          alignItems="center"
+          position="sticky"
+          top={0}
+          px={[3, 4]}
+          height={[70, 90]}
+          zIndex={999}
+          background="white"
+          borderBottom="1px solid #E6E8EB"
+        >
+          <Container flex="1" maxWidth={1440} m="0 auto">
+            <Flex alignItems="center">
+              <LinkCollective collective={collective}>
+                <Avatar
+                  type={collective.type}
+                  src={collective.image}
+                  backgroundColor="#EBEBEB"
+                  border="1px solid #efefef"
+                  radius={40}
+                  borderRadius={10}
+                />
+              </LinkCollective>
+              <LinkCollective collective={collective}>
+                <H1 color="black.800" fontSize={'H5'} ml={3}>
+                  {collective.name || collective.slug}
+                </H1>
+              </LinkCollective>
+            </Flex>
+          </Container>
+        </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
             <TierCover
