@@ -79,6 +79,7 @@ class EditWebhooks extends React.Component {
         type: 'url',
         label: intl.formatMessage(this.messages['webhooks.url.label']),
         required: true,
+        defaultValue: '',
       },
       {
         name: 'activities',
@@ -100,9 +101,9 @@ class EditWebhooks extends React.Component {
     this.setState({ webhooks, modified: true });
   };
 
-  addWebhook = webhook => {
+  addWebhook = () => {
     const { webhooks } = this.state;
-    webhooks.push(webhook || {});
+    webhooks.push({ webhookUrl: '', activities: [] });
     this.setState({ webhooks, modified: true });
   };
 
@@ -166,7 +167,8 @@ class EditWebhooks extends React.Component {
               label={field.label}
               type={field.type}
               disabled={typeof field.disabled === 'function' ? field.disabled(webhook) : field.disabled}
-              value={get(webhook, field.name) || field.defaultValue}
+              value={get(webhook, field.name)}
+              defaultValue={field.defaultValue}
               options={field.options}
               pre={field.pre}
               placeholder={field.placeholder}
@@ -211,7 +213,7 @@ class EditWebhooks extends React.Component {
         </div>
 
         <div className="editWebhooksActions">
-          <Button bsStyle="primary" onClick={() => this.addWebhook({})}>
+          <Button bsStyle="primary" onClick={() => this.addWebhook()}>
             {intl.formatMessage(this.messages['webhooks.add'])}
           </Button>
         </div>

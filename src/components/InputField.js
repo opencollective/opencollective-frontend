@@ -426,7 +426,7 @@ class InputField extends React.Component {
             placeholder={field.placeholder}
             className={field.className}
             autoFocus={field.focus}
-            defaultValue={field.value || field.defaultValue || firstOptionValue}
+            defaultValue={field.defaultValue || firstOptionValue}
             value={field.value}
             onChange={event =>
               field.multiple
@@ -563,7 +563,8 @@ class InputField extends React.Component {
             autoFocus={field.focus}
             placeholder={field.placeholder}
             className={field.className}
-            value={field.value || field.defaultValue || ''}
+            value={field.value}
+            defaultValue={field.defaultValue || ''}
             validationState={this.state.validationState}
           />
         );
