@@ -21,7 +21,7 @@
     "apollo-errors": "1.9.0",
     "apollo-server-express": "2.5.0",
     "argparse": "1.0.10",
-    "async": "2.6.1",
+    "async": "3.0.1",
     "aws-sdk": "2.462.0",
     "axios": "0.18.0",
     "babel-plugin-add-module-exports": "1.0.2",
