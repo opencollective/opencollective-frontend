@@ -1,7 +1,9 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri May 17 2019 22:09:45 GMT+0200 (GMT+02:00)
+# timestamp: Mon May 20 2019 15:46:31 GMT+0200 (GMT+02:00)
 
-"""Application model"""
+"""
+Application model
+"""
 type Application {
   id: Int
   type: ApplicationType
@@ -13,7 +15,9 @@ type Application {
   callbackUrl: String
 }
 
-"""Input type for Application"""
+"""
+Input type for Application
+"""
 input ApplicationInput {
   type: ApplicationType!
   name: String
@@ -21,30 +25,44 @@ input ApplicationInput {
   callbackUrl: String
 }
 
-"""All application types"""
+"""
+All application types
+"""
 enum ApplicationType {
   API_KEY
   OAUTH
 }
 
-"""Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)"""
+"""
+Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)
+"""
 type BackersStatsType {
   id: Int
 
-  """Total number of backers that have given money to this collective"""
+  """
+  Total number of backers that have given money to this collective
+  """
   all: Int
 
-  """Number of individuals that have given money to this collective"""
+  """
+  Number of individuals that have given money to this collective
+  """
   users: Int
 
-  """Number of organizations that have given money to this collective"""
+  """
+  Number of organizations that have given money to this collective
+  """
   organizations: Int
 
-  """Number of collectives that have given money to this collective"""
+  """
+  Number of collectives that have given money to this collective
+  """
   collectives: Int
 }
 
-"""This represents a Collective"""
+"""
+This represents a Collective
+"""
 type Collective implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
@@ -60,7 +78,9 @@ type Collective implements CollectiveInterface {
   tags: [String]
   countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
-  """Name, address, lat, long of the location."""
+  """
+  Name, address, lat, long of the location.
+  """
   location: LocationType
   createdAt: String
   startsAt: String
@@ -75,7 +95,9 @@ type Collective implements CollectiveInterface {
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
-  """Defines if a collective is pledged"""
+  """
+  Defines if a collective is pledged
+  """
   isPledged: Boolean
   data: JSON
   slug: String
@@ -86,13 +108,19 @@ type Collective implements CollectiveInterface {
   """
   isHost: Boolean
 
-  """Returns whether this host accepts applications for new collectives"""
+  """
+  Returns whether this host accepts applications for new collectives
+  """
   canApply: Boolean
 
-  """Returns whether this collective is archived"""
+  """
+  Returns whether this collective is archived
+  """
   isArchived: Boolean
 
-  """Returns whether this collective is deletable"""
+  """
+  Returns whether this collective is deletable
+  """
   isDeletable: Boolean
 
   """
@@ -100,7 +128,9 @@ type Collective implements CollectiveInterface {
   """
   host: CollectiveInterface
 
-  """A host might have a collective attached to it"""
+  """
+  A host might have a collective attached to it
+  """
   hostCollective: CollectiveInterface
 
   """
@@ -115,12 +145,22 @@ type Collective implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    """
+    Type of collective (COLLECTIVE, EVENT, ORGANIZATION)
+    """
     type: String
     role: String
     roles: [String]
   ): [Member]
-  collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
+  collectives(
+    orderBy: CollectiveOrderField = name
+    orderDirection: OrderDirection = ASC
+    expenseStatus: String = null
+    limit: Int
+    offset: Int
+    isActive: Boolean
+    isArchived: Boolean
+  ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
@@ -128,7 +168,9 @@ type Collective implements CollectiveInterface {
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
-    """type of transaction (DEBIT/CREDIT)"""
+    """
+    type of transaction (DEBIT/CREDIT)
+    """
     type: String
     limit: Int
     offset: Int
@@ -140,7 +182,14 @@ type Collective implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+    isConfirmed: Boolean = true
+    types: [String]
+    orderBy: PaymenMethodOrderField = type
+  ): [PaymentMethodType]
 
   """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
@@ -149,14 +198,18 @@ type Collective implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Wether the virtual card has been claimed or not"""
+    """
+    Wether the virtual card has been claimed or not
+    """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
 
-"""Input type for attributes of CollectiveInputType"""
+"""
+Input type for attributes of CollectiveInputType
+"""
 input CollectiveAttributesInputType {
   id: Int
   slug: String
@@ -183,7 +236,9 @@ input CollectiveAttributesInputType {
   tags: [String]
 }
 
-"""Input type for CollectiveType"""
+"""
+Input type for CollectiveType
+"""
 input CollectiveInputType {
   id: Int
   slug: String
@@ -220,7 +275,9 @@ input CollectiveInputType {
   lastName: String
 }
 
-"""Collective interface"""
+"""
+Collective interface
+"""
 interface CollectiveInterface {
   id: Int
   createdByUser: UserDetails
@@ -236,7 +293,9 @@ interface CollectiveInterface {
   tags: [String]
   countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
-  """Name, address, country, lat, long of the location."""
+  """
+  Name, address, country, lat, long of the location.
+  """
   location: LocationType
   createdAt: String
   startsAt: String
@@ -269,7 +328,9 @@ interface CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Type of User: USER/ORGANIZATION"""
+    """
+    Type of User: USER/ORGANIZATION
+    """
     type: String
     TierId: Int
     tierSlug: String
@@ -286,19 +347,35 @@ interface CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    """
+    Type of collective (COLLECTIVE, EVENT, ORGANIZATION)
+    """
     type: String
     role: String
     roles: [String]
   ): [Member]
 
-  """List of all collectives hosted by this collective"""
-  collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
+  """
+  List of all collectives hosted by this collective
+  """
+  collectives(
+    orderBy: CollectiveOrderField = name
+    orderDirection: OrderDirection = ASC
+    expenseStatus: String = null
+    limit: Int
+    offset: Int
+    isActive: Boolean
+    isArchived: Boolean
+  ): CollectiveSearchResults
 
-  """List of all followers of this collective"""
+  """
+  List of all followers of this collective
+  """
   followers(limit: Int, offset: Int): [CollectiveInterface]
 
-  """List of all notifications for this collective"""
+  """
+  List of all notifications for this collective
+  """
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
@@ -318,49 +395,71 @@ interface CollectiveInterface {
     limit: Int
     hasBalanceAboveZero: Boolean
 
-    """Only return confirmed payment methods"""
+    """
+    Only return confirmed payment methods
+    """
     isConfirmed: Boolean = true
 
-    """Filter on given types (creditcard, virtualcard...)"""
+    """
+    Filter on given types (creditcard, virtualcard...)
+    """
     types: [String]
 
-    """Order entries based on given column. Set to null for no ordering."""
+    """
+    Order entries based on given column. Set to null for no ordering.
+    """
     orderBy: PaymenMethodOrderField
   ): [PaymentMethodType]
   createdVirtualCards(
     limit: Int
     offset: Int
 
-    """Wether the virtual card has been claimed or not"""
+    """
+    Wether the virtual card has been claimed or not
+    """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
 }
 
-"""Properties by which collectives can be ordered."""
+"""
+Properties by which collectives can be ordered.
+"""
 enum CollectiveOrderField {
   """
   Order collectives by their average monthly spending (based on last 90 days)
   """
   monthlySpending
 
-  """Order collectives by total balance."""
+  """
+  Order collectives by total balance.
+  """
   balance
 
-  """Order collectives by creation time."""
+  """
+  Order collectives by creation time.
+  """
   createdAt
 
-  """Order collectives by name."""
+  """
+  Order collectives by name.
+  """
   name
 
-  """Order collectives by slug."""
+  """
+  Order collectives by slug.
+  """
   slug
 
-  """Order collectives by updated time."""
+  """
+  Order collectives by updated time.
+  """
   updatedAt
 }
 
-"""The results from searching for collectives with pagination info"""
+"""
+The results from searching for collectives with pagination info
+"""
 type CollectiveSearchResults {
   collectives: [Collective]
   limit: Int
@@ -375,17 +474,25 @@ type CollectivesStatsType {
   id: Int
   all: Int
 
-  """Returns the collectives hosted by this collective"""
+  """
+  Returns the collectives hosted by this collective
+  """
   hosted: Int
 
-  """Returns the number of collectives that have this collective has parent"""
+  """
+  Returns the number of collectives that have this collective has parent
+  """
   memberOf: Int
 
-  """Returns the number of events that have this collective has parent"""
+  """
+  Returns the number of events that have this collective has parent
+  """
   events: Int
 }
 
-"""Stats for the collective"""
+"""
+Stats for the collective
+"""
 type CollectiveStatsType {
   id: Int
 
@@ -394,16 +501,24 @@ type CollectiveStatsType {
   """
   balance: Int
 
-  """Breakdown of all backers of this collective"""
+  """
+  Breakdown of all backers of this collective
+  """
   backers: BackersStatsType
 
-  """Number of collectives under this collective"""
+  """
+  Number of collectives under this collective
+  """
   collectives: CollectivesStatsType
 
-  """Number of updates published by this collective"""
+  """
+  Number of updates published by this collective
+  """
   updates: Int
 
-  """Number of events under this collective"""
+  """
+  Number of events under this collective
+  """
   events: Int
 
   """
@@ -411,26 +526,38 @@ type CollectiveStatsType {
   """
   expenses: ExpensesStatsType
 
-  """Number of transactions"""
+  """
+  Number of transactions
+  """
   transactions: TransactionsStatsType
 
-  """Average amount spent per month based on the last 90 days"""
+  """
+  Average amount spent per month based on the last 90 days
+  """
   monthlySpending: Int
 
-  """Total amount spent"""
+  """
+  Total amount spent
+  """
   totalAmountSpent: Int
 
-  """Net amount received"""
+  """
+  Net amount received
+  """
   totalAmountReceived: Int
 
-  """Total amount raised through referral"""
+  """
+  Total amount raised through referral
+  """
   totalAmountRaised: Int
   yearlyBudget: Int
   topExpenses: JSON
   topFundingSources: JSON
 }
 
-"""Input type for CommentType"""
+"""
+Input type for CommentType
+"""
 input CommentAttributesInputType {
   id: Int
   markdown: String
@@ -441,7 +568,9 @@ input CommentAttributesInputType {
   UpdateId: Int
 }
 
-"""Input type for CommentType"""
+"""
+Input type for CommentType
+"""
 input CommentInputType {
   id: Int
   markdown: String
@@ -452,7 +581,9 @@ input CommentInputType {
   UpdateId: Int
 }
 
-"""List of comments with pagination info"""
+"""
+List of comments with pagination info
+"""
 type CommentListType {
   comments: [CommentType]
   limit: Int
@@ -460,7 +591,9 @@ type CommentListType {
   total: Int
 }
 
-"""This represents a Comment"""
+"""
+This represents a Comment
+"""
 type CommentType {
   id: Int
   createdAt: String
@@ -474,13 +607,17 @@ type CommentType {
   update: UpdateType
 }
 
-"""Input type for ConnectedAccountInputType"""
+"""
+Input type for ConnectedAccountInputType
+"""
 input ConnectedAccountInputType {
   id: Int
   settings: JSON
 }
 
-"""Sanitized ConnectedAccount Info (ConnectedAccount model)"""
+"""
+Sanitized ConnectedAccount Info (ConnectedAccount model)
+"""
 type ConnectedAccountType {
   id: Int
   service: String
@@ -497,7 +634,9 @@ type CreateUserResult {
 
 scalar Email
 
-"""This represents an Event Collective"""
+"""
+This represents an Event Collective
+"""
 type Event implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
@@ -513,7 +652,9 @@ type Event implements CollectiveInterface {
   tags: [String]
   countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
-  """Name, address, lat, long of the location."""
+  """
+  Name, address, lat, long of the location.
+  """
   location: LocationType
   createdAt: String
   startsAt: String
@@ -528,7 +669,9 @@ type Event implements CollectiveInterface {
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
-  """Defines if a collective is pledged"""
+  """
+  Defines if a collective is pledged
+  """
   isPledged: Boolean
   data: JSON
   slug: String
@@ -539,13 +682,19 @@ type Event implements CollectiveInterface {
   """
   isHost: Boolean
 
-  """Returns whether this host accepts applications for new collectives"""
+  """
+  Returns whether this host accepts applications for new collectives
+  """
   canApply: Boolean
 
-  """Returns whether this collective is archived"""
+  """
+  Returns whether this collective is archived
+  """
   isArchived: Boolean
 
-  """Returns whether this collective is deletable"""
+  """
+  Returns whether this collective is deletable
+  """
   isDeletable: Boolean
 
   """
@@ -553,7 +702,9 @@ type Event implements CollectiveInterface {
   """
   host: CollectiveInterface
 
-  """A host might have a collective attached to it"""
+  """
+  A host might have a collective attached to it
+  """
   hostCollective: CollectiveInterface
 
   """
@@ -568,12 +719,22 @@ type Event implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    """
+    Type of collective (COLLECTIVE, EVENT, ORGANIZATION)
+    """
     type: String
     role: String
     roles: [String]
   ): [Member]
-  collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
+  collectives(
+    orderBy: CollectiveOrderField = name
+    orderDirection: OrderDirection = ASC
+    expenseStatus: String = null
+    limit: Int
+    offset: Int
+    isActive: Boolean
+    isArchived: Boolean
+  ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
@@ -581,7 +742,9 @@ type Event implements CollectiveInterface {
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
-    """type of transaction (DEBIT/CREDIT)"""
+    """
+    type of transaction (DEBIT/CREDIT)
+    """
     type: String
     limit: Int
     offset: Int
@@ -593,7 +756,14 @@ type Event implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+    isConfirmed: Boolean = true
+    types: [String]
+    orderBy: PaymenMethodOrderField = type
+  ): [PaymentMethodType]
 
   """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
@@ -602,14 +772,18 @@ type Event implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Wether the virtual card has been claimed or not"""
+    """
+    Wether the virtual card has been claimed or not
+    """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
 }
 
-"""Expense model"""
+"""
+Expense model
+"""
 type Expense implements Transaction {
   id: Int
   refundTransaction: Transaction
@@ -641,7 +815,9 @@ type Expense implements Transaction {
   """
   paymentProcessorFeeInHostCurrency: Int
 
-  """The amount paid in tax (for example VAT) for this transaction"""
+  """
+  The amount paid in tax (for example VAT) for this transaction
+  """
   taxAmount: Int
 
   """
@@ -662,7 +838,9 @@ type Expense implements Transaction {
   attachment: String
 }
 
-"""Input type for ExpenseType"""
+"""
+Input type for ExpenseType
+"""
 input ExpenseInputType {
   id: Int
   amount: Int
@@ -673,7 +851,9 @@ input ExpenseInputType {
   category: String
   status: String
 
-  """Can be paypal, donation, manual, other"""
+  """
+  Can be paypal, donation, manual, other
+  """
   payoutMethod: String
   privateMessage: String
   attachment: String
@@ -681,25 +861,37 @@ input ExpenseInputType {
   collective: CollectiveAttributesInputType
 }
 
-"""Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)"""
+"""
+Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)
+"""
 type ExpensesStatsType {
   id: Int
   all: Int
 
-  """Returns the number of expenses that are pending"""
+  """
+  Returns the number of expenses that are pending
+  """
   pending: Int
 
-  """Returns the number of expenses that are approved"""
+  """
+  Returns the number of expenses that are approved
+  """
   approved: Int
 
-  """Returns the number of expenses that are rejected"""
+  """
+  Returns the number of expenses that are rejected
+  """
   rejected: Int
 
-  """Returns the number of expenses that are paid"""
+  """
+  Returns the number of expenses that are paid
+  """
   paid: Int
 }
 
-"""Possible statuses for an Expense"""
+"""
+Possible statuses for an Expense
+"""
 enum ExpenseStatus {
   PENDING
   APPROVED
@@ -707,7 +899,9 @@ enum ExpenseStatus {
   PAID
 }
 
-"""This represents an Expense"""
+"""
+This represents an Expense
+"""
 type ExpenseType {
   id: Int
   amount: Int
@@ -726,22 +920,34 @@ type ExpenseType {
   comments(limit: Int, offset: Int): CommentListType
   collective: CollectiveInterface
 
-  """Returns the DEBIT transaction to pay out this expense"""
+  """
+  Returns the DEBIT transaction to pay out this expense
+  """
   transaction: Transaction
 }
 
-"""Properties by which hosts can be ordered."""
+"""
+Properties by which hosts can be ordered.
+"""
 enum HostCollectiveOrderFieldType {
-  """Order hosts by creation time."""
+  """
+  Order hosts by creation time.
+  """
   createdAt
 
-  """Order hosts by name."""
+  """
+  Order hosts by name.
+  """
   name
 
-  """Order hosts by number of collectives it is hosting."""
+  """
+  Order hosts by number of collectives it is hosting.
+  """
   collectives
 
-  """Order hosts by updated time."""
+  """
+  Order hosts by updated time.
+  """
   updatedAt
 }
 
@@ -753,7 +959,9 @@ enum ImageFormat {
   svg
 }
 
-"""Input dates and collectives for Invoice"""
+"""
+Input dates and collectives for Invoice
+"""
 input InvoiceInputType {
   dateFrom: IsoDateString
   dateTo: IsoDateString
@@ -761,7 +969,9 @@ input InvoiceInputType {
   fromCollectiveSlug: String
 }
 
-"""This represents an Invoice"""
+"""
+This represents an Invoice
+"""
 type InvoiceType {
   slug: String
 
@@ -810,43 +1020,69 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON
 
-"""Input type for Location"""
+"""
+Input type for Location
+"""
 input LocationInputType {
-  """A short name for the location (eg. Google Headquarters)"""
+  """
+  A short name for the location (eg. Google Headquarters)
+  """
   name: String
 
-  """Postal address without country (eg. 12 opensource avenue, 7500 Paris)"""
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
   address: String
 
-  """Two letters country code (eg. FR, BE...etc)"""
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
   country: String
 
-  """Latitude"""
+  """
+  Latitude
+  """
   lat: Float
 
-  """Longitude"""
+  """
+  Longitude
+  """
   long: Float
 }
 
-"""Type for Location"""
+"""
+Type for Location
+"""
 type LocationType {
-  """A short name for the location (eg. Google Headquarters)"""
+  """
+  A short name for the location (eg. Google Headquarters)
+  """
   name: String
 
-  """Postal address without country (eg. 12 opensource avenue, 7500 Paris)"""
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
   address: String
 
-  """Two letters country code (eg. FR, BE...etc)"""
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
   country: String
 
-  """Latitude"""
+  """
+  Latitude
+  """
   lat: Float
 
-  """Longitude"""
+  """
+  Longitude
+  """
   long: Float
 }
 
-"""This is a Member"""
+"""
+This is a Member
+"""
 type Member {
   id: Int
   createdAt: String
@@ -860,7 +1096,9 @@ type Member {
   stats: StatsMemberType
 }
 
-"""Input type for MemberType"""
+"""
+Input type for MemberType
+"""
 input MemberInputType {
   id: Int
   member: CollectiveAttributesInputType
@@ -869,7 +1107,9 @@ input MemberInputType {
   description: String
 }
 
-"""This is the root mutation"""
+"""
+This is the root mutation
+"""
 type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
@@ -879,54 +1119,91 @@ type Mutation {
   deleteUserCollective(id: Int!): CollectiveInterface
   claimCollective(id: Int!): CollectiveInterface
 
-  """Approve a collective"""
+  """
+  Approve a collective
+  """
   approveCollective(id: Int!): CollectiveInterface
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
 
-  """Create a user with an optional organization."""
+  """
+  Create a user with an optional organization.
+  """
   createUser(
-    """The user info"""
+    """
+    The user info
+    """
     user: UserInputType!
 
-    """An optional organization to create alongside the user"""
+    """
+    An optional organization to create alongside the user
+    """
     organization: CollectiveInputType
 
-    """The redirect URL for the login email sent to the user"""
+    """
+    The redirect URL for the login email sent to the user
+    """
     redirect: String = "/"
 
-    """The website URL originating the request"""
+    """
+    The website URL originating the request
+    """
     websiteUrl: String
   ): CreateUserResult
 
-  """Update the email address for logged in user"""
+  """
+  Update the email address for logged in user
+  """
   updateUserEmail(
-    """The new email address for user"""
+    """
+    The new email address for user
+    """
     email: String!
   ): UserDetails
 
-  """Confirm the new user email from confirmation token"""
+  """
+  Confirm the new user email from confirmation token
+  """
   confirmUserEmail(
-    """User's emailConfirmationToken"""
+    """
+    User's emailConfirmationToken
+    """
     token: String!
   ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
-  payExpense(id: Int!, paymentProcessorFeeInCollectiveCurrency: Int, hostFeeInCollectiveCurrency: Int, platformFeeInCollectiveCurrency: Int): ExpenseType
+  payExpense(
+    id: Int!
+    paymentProcessorFeeInCollectiveCurrency: Int
+    hostFeeInCollectiveCurrency: Int
+    platformFeeInCollectiveCurrency: Int
+  ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
 
-  """Update a single tier"""
+  """
+  Update a single tier
+  """
   editTier(
-    """The tier to update"""
+    """
+    The tier to update
+    """
     tier: TierInputType!
   ): Tier
   editTiers(id: Int!, tiers: [TierInputType]): [Tier]
-  createMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
-  removeMember(member: CollectiveAttributesInputType!, collective: CollectiveAttributesInputType!, role: String!): Member
+  createMember(
+    member: CollectiveAttributesInputType!
+    collective: CollectiveAttributesInputType!
+    role: String!
+  ): Member
+  removeMember(
+    member: CollectiveAttributesInputType!
+    collective: CollectiveAttributesInputType!
+    role: String!
+  ): Member
   createOrder(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
 
@@ -934,10 +1211,14 @@ type Mutation {
   Update the non-sensitive information of an order, like the public message
   """
   updateOrderInfo(
-    """ID of the order to update"""
+    """
+    ID of the order to update
+    """
     id: Int!
 
-    """Public message to motivate others to contribute"""
+    """
+    Public message to motivate others to contribute
+    """
     publicMessage: String
   ): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
@@ -965,7 +1246,9 @@ type Mutation {
     """
     limitedToTags: [String]
 
-    """Limit this payment method to make donations to those collectives"""
+    """
+    Limit this payment method to make donations to those collectives
+    """
     limitedToCollectiveIds: [Int]
 
     """
@@ -977,15 +1260,27 @@ type Mutation {
     description: String
     expiryDate: String
 
-    """The data attached to this PaymentMethod"""
+    """
+    The data attached to this PaymentMethod
+    """
     data: PaymentMethodDataVirtualCardInputType
   ): PaymentMethodType @deprecated(reason: "Please use createVirtualCards")
 
-  """Update a payment method"""
+  """
+  Update a payment method
+  """
   updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
 
-  """Add a new credit card to the given collective"""
-  createCreditCard(CollectiveId: Int!, name: String!, token: String!, data: StripeCreditCardDataInputType!, monthlyLimitPerMember: Int): PaymentMethodType
+  """
+  Add a new credit card to the given collective
+  """
+  createCreditCard(
+    CollectiveId: Int!
+    name: String!
+    token: String!
+    data: StripeCreditCardDataInputType!
+    monthlyLimitPerMember: Int
+  ): PaymentMethodType
   createVirtualCards(
     CollectiveId: Int!
     PaymentMethodId: Int
@@ -995,7 +1290,9 @@ type Mutation {
     """
     emails: [String]
 
-    """Number of virtual cards to generate (only if emails is not provided)"""
+    """
+    Number of virtual cards to generate (only if emails is not provided)
+    """
     numberOfVirtualCards: Int
 
     """
@@ -1003,7 +1300,9 @@ type Mutation {
     """
     currency: String
 
-    """The amount as an Integer with cents."""
+    """
+    The amount as an Integer with cents.
+    """
     amount: Int
     monthlyLimitPerMember: Int
 
@@ -1012,7 +1311,9 @@ type Mutation {
     """
     limitedToTags: [String]
 
-    """Limit this payment method to make donations to those collectives"""
+    """
+    Limit this payment method to make donations to those collectives
+    """
     limitedToCollectiveIds: [Int]
 
     """
@@ -1020,7 +1321,9 @@ type Mutation {
     """
     limitedToHostCollectiveIds: [Int]
 
-    """Set `limitedToHostCollectiveIds` to open-source collectives only"""
+    """
+    Set `limitedToHostCollectiveIds` to open-source collectives only
+    """
     limitedToOpenSourceCollectives: Boolean
 
     """
@@ -1028,44 +1331,68 @@ type Mutation {
     """
     description: String
 
-    """A custom message that will be sent in the invitation email"""
+    """
+    A custom message that will be sent in the invitation email
+    """
     customMessage: String
     expiryDate: String
   ): [PaymentMethodType]
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
 
-  """Removes the payment method"""
+  """
+  Removes the payment method
+  """
   removePaymentMethod(
-    """ID of the payment method to remove"""
+    """
+    ID of the payment method to remove
+    """
     id: Int!
   ): PaymentMethodType!
 
-  """Edits (by replacing) the admin-level webhooks for a collective."""
+  """
+  Edits (by replacing) the admin-level webhooks for a collective.
+  """
   editWebhooks(
-    """ID of the collective whose webhooks are edited."""
+    """
+    ID of the collective whose webhooks are edited.
+    """
     collectiveId: Int!
 
-    """New notifications for the collective."""
+    """
+    New notifications for the collective.
+    """
     notifications: [NotificationInputType]
   ): [NotificationType]
 
-  """Register user-level webhooks for a collective."""
+  """
+  Register user-level webhooks for a collective.
+  """
   createWebhook(
-    """Slug of the collective the webhook is created for."""
+    """
+    Slug of the collective the webhook is created for.
+    """
     collectiveSlug: String!
 
-    """The notification object."""
+    """
+    The notification object.
+    """
     notification: NotificationInputType
   ): NotificationType
 
-  """Deletes a notification by ID."""
+  """
+  Deletes a notification by ID.
+  """
   deleteNotification(
-    """ID of the notification to delete."""
+    """
+    ID of the notification to delete.
+    """
     id: Int!
   ): NotificationType
 }
 
-"""Input type for NotificationType"""
+"""
+Input type for NotificationType
+"""
 input NotificationInputType {
   id: Int
   channel: String
@@ -1076,17 +1403,25 @@ input NotificationInputType {
   CollectiveId: Int
 }
 
-"""This represents a Notification"""
+"""
+This represents a Notification
+"""
 type NotificationType {
   id: Int
 
-  """channel to send notification"""
+  """
+  channel to send notification
+  """
   channel: String
 
-  """the notification type"""
+  """
+  the notification type
+  """
   type: String
 
-  """whether or not the notification is active"""
+  """
+  whether or not the notification is active
+  """
   active: Boolean
   webhookUrl: String
   user: UserDetails
@@ -1095,7 +1430,9 @@ type NotificationType {
   updatedAt: String
 }
 
-"""Order model"""
+"""
+Order model
+"""
 type Order implements Transaction {
   id: Int
   refundTransaction: Transaction
@@ -1127,7 +1464,9 @@ type Order implements Transaction {
   """
   paymentProcessorFeeInHostCurrency: Int
 
-  """The amount paid in tax (for example VAT) for this transaction"""
+  """
+  The amount paid in tax (for example VAT) for this transaction
+  """
   taxAmount: Int
 
   """
@@ -1149,20 +1488,30 @@ type Order implements Transaction {
   subscription: Subscription
 }
 
-"""Properties by which results can be ordered."""
+"""
+Properties by which results can be ordered.
+"""
 enum OrderByField {
-  """Order result by creation time."""
+  """
+  Order result by creation time.
+  """
   createdAt
 
-  """Order result by updated time."""
+  """
+  Order result by updated time.
+  """
   updatedAt
 }
 
-"""Ordering options"""
+"""
+Ordering options
+"""
 input OrderByType {
   field: OrderByField = createdAt
 
-  """The ordering direction"""
+  """
+  The ordering direction
+  """
   direction: OrderDirection = DESC
 }
 
@@ -1174,7 +1523,9 @@ enum OrderDirection {
   DESC
 }
 
-"""Input type for OrderType"""
+"""
+Input type for OrderType
+"""
 input OrderInputType {
   id: Int
   quantity: Int = 1
@@ -1193,7 +1544,9 @@ input OrderInputType {
   """
   matchingFund: String
 
-  """The referral collective"""
+  """
+  The referral collective
+  """
   referral: CollectiveAttributesInputType
   user: UserInputType
   fromCollective: CollectiveAttributesInputType
@@ -1201,17 +1554,25 @@ input OrderInputType {
   tier: TierInputType
   recaptchaToken: String
 
-  """The amount of taxes that were included in totalAmount"""
+  """
+  The amount of taxes that were included in totalAmount
+  """
   taxAmount: Int = 0
 
-  """User country, to know which tax applies"""
+  """
+  User country, to know which tax applies
+  """
   countryISO: String
 
-  """User tax ID number"""
+  """
+  User tax ID number
+  """
   taxIDNumber: String
 }
 
-"""Possible statuses for an Order"""
+"""
+Possible statuses for an Order
+"""
 enum OrderStatus {
   PENDING
   PAID
@@ -1227,13 +1588,19 @@ This is an order (for donations, buying tickets, subscribing to a Tier, pledging
 type OrderType {
   id: Int
 
-  """quantity of items (defined by Tier)"""
+  """
+  quantity of items (defined by Tier)
+  """
   quantity: Int
 
-  """total amount for this order (doesn't include recurring transactions)"""
+  """
+  total amount for this order (doesn't include recurring transactions)
+  """
   totalAmount: Int
 
-  """The amount paid in tax (for example VAT) for this order"""
+  """
+  The amount paid in tax (for example VAT) for this order
+  """
   taxAmount: Int
 
   """
@@ -1244,7 +1611,9 @@ type OrderType {
   stats: StatsOrderType
   createdByUser: UserDetails
 
-  """Description of the order that will show up in the invoice"""
+  """
+  Description of the order that will show up in the invoice
+  """
   description: String
 
   """
@@ -1253,7 +1622,9 @@ type OrderType {
   """
   publicMessage: String
 
-  """Private message for the admins and the host of the collective"""
+  """
+  Private message for the admins and the host of the collective
+  """
   privateMessage: String
 
   """
@@ -1261,10 +1632,14 @@ type OrderType {
   """
   fromCollective: CollectiveInterface
 
-  """Collective that receives the order"""
+  """
+  Collective that receives the order
+  """
   collective: CollectiveInterface
 
-  """Referral user collective"""
+  """
+  Referral user collective
+  """
   referral: CollectiveInterface
   tier: Tier
 
@@ -1275,35 +1650,51 @@ type OrderType {
   """
   paymentMethod: PaymentMethodType
 
-  """Payment method used if this order was matched by a matching fund."""
+  """
+  Payment method used if this order was matched by a matching fund.
+  """
   matchingFund: PaymentMethodType
 
-  """transactions for this order ordered by createdAt DESC"""
+  """
+  transactions for this order ordered by createdAt DESC
+  """
   transactions(
     limit: Int
     offset: Int
 
-    """type of transaction (DEBIT/CREDIT)"""
+    """
+    type of transaction (DEBIT/CREDIT)
+    """
     type: String
   ): [Transaction]
   currency: String
   createdAt: String
   updatedAt: String
 
-  """Whether this subscription is past due or not"""
+  """
+  Whether this subscription is past due or not
+  """
   isPastDue: Boolean
 
-  """If there is a subscription, is it active?"""
+  """
+  If there is a subscription, is it active?
+  """
   isSubscriptionActive: Boolean
 
-  """Current status for an order"""
+  """
+  Current status for an order
+  """
   status: OrderStatus
 
-  """Additional information on order: tax"""
+  """
+  Additional information on order: tax
+  """
   data: JSON
 }
 
-"""This represents a Organization Collective"""
+"""
+This represents a Organization Collective
+"""
 type Organization implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
@@ -1319,7 +1710,9 @@ type Organization implements CollectiveInterface {
   tags: [String]
   countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
-  """Name, address, lat, long of the location."""
+  """
+  Name, address, lat, long of the location.
+  """
   location: LocationType
   createdAt: String
   startsAt: String
@@ -1334,7 +1727,9 @@ type Organization implements CollectiveInterface {
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
-  """Defines if a collective is pledged"""
+  """
+  Defines if a collective is pledged
+  """
   isPledged: Boolean
   data: JSON
   slug: String
@@ -1345,13 +1740,19 @@ type Organization implements CollectiveInterface {
   """
   isHost: Boolean
 
-  """Returns whether this host accepts applications for new collectives"""
+  """
+  Returns whether this host accepts applications for new collectives
+  """
   canApply: Boolean
 
-  """Returns whether this collective is archived"""
+  """
+  Returns whether this collective is archived
+  """
   isArchived: Boolean
 
-  """Returns whether this collective is deletable"""
+  """
+  Returns whether this collective is deletable
+  """
   isDeletable: Boolean
 
   """
@@ -1359,7 +1760,9 @@ type Organization implements CollectiveInterface {
   """
   host: CollectiveInterface
 
-  """A host might have a collective attached to it"""
+  """
+  A host might have a collective attached to it
+  """
   hostCollective: CollectiveInterface
 
   """
@@ -1374,12 +1777,22 @@ type Organization implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    """
+    Type of collective (COLLECTIVE, EVENT, ORGANIZATION)
+    """
     type: String
     role: String
     roles: [String]
   ): [Member]
-  collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
+  collectives(
+    orderBy: CollectiveOrderField = name
+    orderDirection: OrderDirection = ASC
+    expenseStatus: String = null
+    limit: Int
+    offset: Int
+    isActive: Boolean
+    isArchived: Boolean
+  ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
@@ -1387,7 +1800,9 @@ type Organization implements CollectiveInterface {
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
-    """type of transaction (DEBIT/CREDIT)"""
+    """
+    type of transaction (DEBIT/CREDIT)
+    """
     type: String
     limit: Int
     offset: Int
@@ -1399,7 +1814,14 @@ type Organization implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+    isConfirmed: Boolean = true
+    types: [String]
+    orderBy: PaymenMethodOrderField = type
+  ): [PaymentMethodType]
 
   """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
@@ -1408,7 +1830,9 @@ type Organization implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Wether the virtual card has been claimed or not"""
+    """
+    Wether the virtual card has been claimed or not
+    """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
@@ -1416,7 +1840,9 @@ type Organization implements CollectiveInterface {
   email: String
 }
 
-"""A list of expenses with pagination info"""
+"""
+A list of expenses with pagination info
+"""
 type PaginatedExpenses {
   expenses: [ExpenseType]
   limit: Int
@@ -1424,7 +1850,9 @@ type PaginatedExpenses {
   total: Int
 }
 
-"""A list of PaymentMethod with pagination info"""
+"""
+A list of PaymentMethod with pagination info
+"""
 type PaginatedPaymentMethod {
   paymentMethods: [PaymentMethodType]
   total: Int
@@ -1432,7 +1860,9 @@ type PaginatedPaymentMethod {
   offset: Int
 }
 
-"""List of transactions with pagination data"""
+"""
+List of transactions with pagination data
+"""
 type PaginatedTransactions {
   transactions: [Transaction]
   limit: Int
@@ -1440,26 +1870,38 @@ type PaginatedTransactions {
   total: Int
 }
 
-"""Properties by which PaymenMethods can be ordered"""
+"""
+Properties by which PaymenMethods can be ordered
+"""
 enum PaymenMethodOrderField {
-  """Order payment methods by type (creditcard, virtualcard...)"""
+  """
+  Order payment methods by type (creditcard, virtualcard...)
+  """
   type
 }
 
-"""Input for virtual card (meta)data"""
+"""
+Input for virtual card (meta)data
+"""
 input PaymentMethodDataVirtualCardInputType {
-  """The email virtual card is generated for"""
+  """
+  The email virtual card is generated for
+  """
   email: String
 }
 
-"""Input type for PaymentMethod (paypal/stripe)"""
+"""
+Input type for PaymentMethod (paypal/stripe)
+"""
 input PaymentMethodInputType {
   id: Int
   uuid: String
   token: String
   service: String
 
-  """creditcard, bitcoin, prepaid, manual"""
+  """
+  creditcard, bitcoin, prepaid, manual
+  """
   type: String
   customerId: String
   data: JSON
@@ -1470,7 +1912,9 @@ input PaymentMethodInputType {
   save: Boolean
 }
 
-"""Sanitized PaymentMethod Info (PaymentMethod model)"""
+"""
+Sanitized PaymentMethod Info (PaymentMethod model)
+"""
 type PaymentMethodType {
   id: Int
   uuid: String
@@ -1489,12 +1933,16 @@ type PaymentMethodType {
   description: String
   primary: Boolean
 
-  """Matching factor"""
+  """
+  Matching factor
+  """
   matching: Int
   monthlyLimitPerMember: Int
   initialBalance: Int
 
-  """Returns the balance in the currency of this paymentMethod"""
+  """
+  Returns the balance in the currency of this paymentMethod
+  """
   balance: Int
   collective: CollectiveInterface
   emitter: CollectiveInterface
@@ -1502,7 +1950,9 @@ type PaymentMethodType {
   limitedToCollectiveIds: [Int]
   limitedToHostCollectiveIds: [Int]
   orders(
-    """Only returns orders that have an active subscription (monthly/yearly)"""
+    """
+    Only returns orders that have an active subscription (monthly/yearly)
+    """
     hasActiveSubscription: Boolean
   ): [OrderType]
 
@@ -1515,7 +1965,9 @@ type PaymentMethodType {
   currency: String
 }
 
-"""This is a root query"""
+"""
+This is a root query
+"""
 type Query {
   Collective(slug: String, id: Int): CollectiveInterface
   Tier(id: Int!): Tier
@@ -1541,26 +1993,41 @@ type Query {
     invoiceInputType: InvoiceInputType!
   ): InvoiceType
   TransactionInvoice(
-    """Slug of the transaction."""
+    """
+    Slug of the transaction.
+    """
     transactionUuid: String!
   ): InvoiceType
 
   """
-  
-      Given a collective, returns all its transactions:
-      - Debit transactions made by collective without using a virtual card
-      - Debit transactions made using a virtual card from collective
-      - Credit transactions made to collective
-      
+  Given a collective, returns all its transactions:
+  - Debit transactions made by collective without using a virtual card
+  - Debit transactions made using a virtual card from collective
+  - Credit transactions made to collective
   """
-  allTransactions(CollectiveId: Int, collectiveSlug: String, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String, includeVirtualCards: Boolean, fetchDataFromLedger: Boolean, includeHostedCollectivesTransactions: Boolean): [Transaction]
+  allTransactions(
+    CollectiveId: Int
+    collectiveSlug: String
+    type: String
+    limit: Int
+    offset: Int
+    dateFrom: String
+    dateTo: String
+    includeVirtualCards: Boolean
+    fetchDataFromLedger: Boolean
+    includeHostedCollectivesTransactions: Boolean
+  ): [Transaction]
   transactions(
-    """Defaults to 100"""
+    """
+    Defaults to 100
+    """
     limit: Int = 100
     offset: Int = 0
-    orderBy: TransactionOrder = {field: CREATED_AT, direction: DESC}
+    orderBy: TransactionOrder = { field: CREATED_AT, direction: DESC }
 
-    """CREDIT or DEBIT are accepted values"""
+    """
+    CREDIT or DEBIT are accepted values
+    """
     type: TransactionType
   ): PaginatedTransactions
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
@@ -1572,12 +2039,23 @@ type Query {
     collectiveSlug: String
     includeHostedCollectives: Boolean
 
-    """Filter by status (PAID, PENDING, ERROR, ACTIVE, CANCELLED)"""
+    """
+    Filter by status (PAID, PENDING, ERROR, ACTIVE, CANCELLED)
+    """
     status: String
     limit: Int
     offset: Int
   ): [OrderType]
-  allExpenses(CollectiveId: Int!, includeHostedCollectives: Boolean, status: String, category: String, FromCollectiveId: Int, fromCollectiveSlug: String, limit: Int, offset: Int): [ExpenseType]
+  allExpenses(
+    CollectiveId: Int!
+    includeHostedCollectives: Boolean
+    status: String
+    category: String
+    FromCollectiveId: Int
+    fromCollectiveSlug: String
+    limit: Int
+    offset: Int
+  ): [ExpenseType]
   expenses(
     CollectiveId: Int
     CollectiveSlug: String
@@ -1586,36 +2064,54 @@ type Query {
     FromCollectiveId: Int
     FromCollectiveSlug: String
 
-    """Defaults to 100"""
+    """
+    Defaults to 100
+    """
     limit: Int = 100
     offset: Int = 0
-    orderBy: OrderByType = {field: createdAt, direction: DESC}
+    orderBy: OrderByType = { field: createdAt, direction: DESC }
   ): PaginatedExpenses
   Expense(id: Int!): ExpenseType
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
-    """Fetch all collectives that match at least one of the tags"""
+    """
+    Fetch all collectives that match at least one of the tags
+    """
     tags: [String]
 
-    """COLLECTIVE, USER, ORGANIZATION, EVENT"""
+    """
+    COLLECTIVE, USER, ORGANIZATION, EVENT
+    """
     type: TypeOfCollective
 
-    """Fetch all collectives hosted by HostCollectiveId"""
+    """
+    Fetch all collectives hosted by HostCollectiveId
+    """
     HostCollectiveId: Int
 
-    """Fetch all collectives hosted by hostCollectiveSlug"""
+    """
+    Fetch all collectives hosted by hostCollectiveSlug
+    """
     hostCollectiveSlug: String
 
-    """Only return active collectives"""
+    """
+    Only return active collectives
+    """
     isActive: Boolean
 
-    """Only return pledged or non-pledged collectives"""
+    """
+    Only return pledged or non-pledged collectives
+    """
     isPledged: Boolean
 
-    """Fetch all collectives that `memberOfCollectiveSlug` is a member of"""
+    """
+    Fetch all collectives that `memberOfCollectiveSlug` is a member of
+    """
     memberOfCollectiveSlug: String
 
-    """Filter collectives with this minimum number of backers"""
+    """
+    Filter collectives with this minimum number of backers
+    """
     minBackerCount: Int
 
     """
@@ -1633,12 +2129,18 @@ type Query {
     offset: Int = 0
   ): CollectiveSearchResults
 
-  """Returns all public hosts that are open for applications"""
+  """
+  Returns all public hosts that are open for applications
+  """
   allHosts(
-    """Fetch all collectives that match at least one of the tags"""
+    """
+    Fetch all collectives that match at least one of the tags
+    """
     tags: [String]
 
-    """Filter hosts by currency"""
+    """
+    Filter hosts by currency
+    """
     currency: String
     orderBy: HostCollectiveOrderFieldType = collectives
     orderDirection: OrderDirection = DESC
@@ -1673,22 +2175,37 @@ type Query {
     """
     term: String
 
-    """Limit the amount of results. Defaults to 20"""
+    """
+    Limit the amount of results. Defaults to 20
+    """
     limit: Int = 20
     offset: Int = 0
   ): CollectiveSearchResults
-  allTransactionsFromPaymentMethod(uuid: String!, type: String, limit: Int, offset: Int, dateFrom: String, dateTo: String): [Transaction]
+  allTransactionsFromPaymentMethod(
+    uuid: String!
+    type: String
+    limit: Int
+    offset: Int
+    dateFrom: String
+    dateTo: String
+  ): [Transaction]
   Order(id: Int!): OrderType
 }
 
-"""Stats about a membership"""
+"""
+Stats about a membership
+"""
 type StatsMemberType {
   id: Int
 
-  """total amount donated directly by this member"""
+  """
+  total amount donated directly by this member
+  """
   directDonations: Int
 
-  """total amount donated by this member through gift cards"""
+  """
+  total amount donated by this member through gift cards
+  """
   donationsThroughEmittedVirtualCards: Int
 
   """
@@ -1696,11 +2213,15 @@ type StatsMemberType {
   """
   totalDonations: Int
 
-  """total amount raised by this member"""
+  """
+  total amount raised by this member
+  """
   totalRaised: Int
 }
 
-"""Stats about an order"""
+"""
+Stats about an order
+"""
 type StatsOrderType {
   id: Int
 
@@ -1715,7 +2236,9 @@ type StatsOrderType {
   totalTransactions: Int
 }
 
-"""Input for stripe credit card data"""
+"""
+Input for stripe credit card data
+"""
 input StripeCreditCardDataInputType {
   fullName: String
   expMonth: Int
@@ -1726,7 +2249,9 @@ input StripeCreditCardDataInputType {
   zip: String
 }
 
-"""Subscription model"""
+"""
+Subscription model
+"""
 type Subscription {
   id: Int
   amount: Int
@@ -1736,7 +2261,9 @@ type Subscription {
   isActive: Boolean
 }
 
-"""This represents an Tier"""
+"""
+This represents an Tier
+"""
 type Tier {
   id: Int
   slug: String
@@ -1744,7 +2271,9 @@ type Tier {
   name: String
   description: String
 
-  """A long, html-formatted description."""
+  """
+  A long, html-formatted description.
+  """
   longDescription: String
   button: String
   amount: Int
@@ -1763,24 +2292,32 @@ type Tier {
   orders(
     isActive: Boolean
 
-    """only return orders that have been processed (fulfilled)"""
+    """
+    only return orders that have been processed (fulfilled)
+    """
     isProcessed: Boolean
     limit: Int
   ): [OrderType]
   stats: TierStatsType
 }
 
-"""Input type for TierType"""
+"""
+Input type for TierType
+"""
 input TierInputType {
   id: Int
   type: String
   name: String
   description: String
 
-  """A long, html-formatted description."""
+  """
+  A long, html-formatted description.
+  """
   longDescription: String
 
-  """amount in the lowest unit of the currency of the host (ie. in cents)"""
+  """
+  amount in the lowest unit of the currency of the host (ie. in cents)
+  """
   amount: Int
   currency: String
   presets: [Int]
@@ -1789,36 +2326,59 @@ input TierInputType {
   minimumAmount: Int
   maxQuantityPerUser: Int
 
-  """amount that you are trying to raise with this tier"""
+  """
+  amount that you are trying to raise with this tier
+  """
   goal: Int
   password: String
 
-  """Start of the campaign"""
+  """
+  Start of the campaign
+  """
   startsAt: String
 
-  """End of the campaign"""
+  """
+  End of the campaign
+  """
   endsAt: String
 }
 
-"""Stats about a tier"""
+"""
+Stats about a tier
+"""
 type TierStatsType {
   id: Int
 
-  """total number of individual orders"""
+  """
+  total number of individual orders
+  """
   totalOrders: Int
 
-  """Total amount donated for this tier, in cents."""
+  """
+  Total amount donated for this tier, in cents.
+  """
   totalDonated: Int
 
-  """total number of people/organizations in this tier"""
+  """
+  How much money is given for this tier for each tier.interval (monthly/yearly)
+  """
+  totalRecurringDonations: Int
+
+  """
+  total number of people/organizations in this tier
+  """
   totalDistinctOrders: Int
 
-  """total number of active people/organizations in this tier"""
+  """
+  total number of active people/organizations in this tier
+  """
   totalActiveDistinctOrders: Int
   availableQuantity: Int
 }
 
-"""Transaction interface"""
+"""
+Transaction interface
+"""
 interface Transaction {
   id: Int
   uuid: String
@@ -1845,34 +2405,52 @@ interface Transaction {
   refundTransaction: Transaction
 }
 
-"""Ordering options for transactions"""
+"""
+Ordering options for transactions
+"""
 input TransactionOrder {
-  """The field to order transactions by."""
+  """
+  The field to order transactions by.
+  """
   field: TransactionOrderField = CREATED_AT
 
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection = DESC
 }
 
-"""Properties by which transactions can be ordered."""
+"""
+Properties by which transactions can be ordered.
+"""
 enum TransactionOrderField {
-  """Order transactions by creation time."""
+  """
+  Order transactions by creation time.
+  """
   CREATED_AT
 }
 
-"""Breakdown of transactions per type (ALL/CREDIT/DEBIT)"""
+"""
+Breakdown of transactions per type (ALL/CREDIT/DEBIT)
+"""
 type TransactionsStatsType {
   id: Int
   all: Int
 
-  """Returns the number of CREDIT transactions"""
+  """
+  Returns the number of CREDIT transactions
+  """
   credit: Int
 
-  """Returns the number of DEBIT transactions"""
+  """
+  Returns the number of DEBIT transactions
+  """
   debit: Int
 }
 
-"""Type of transaction in the ledger"""
+"""
+Type of transaction in the ledger
+"""
 enum TransactionType {
   CREDIT
   DEBIT
@@ -1886,7 +2464,9 @@ enum TypeOfCollective {
   BOT
 }
 
-"""Input type for UpdateType"""
+"""
+Input type for UpdateType
+"""
 input UpdateAttributesInputType {
   id: Int
   views: Int
@@ -1899,7 +2479,9 @@ input UpdateAttributesInputType {
   tier: TierInputType
 }
 
-"""Input type for UpdateType"""
+"""
+Input type for UpdateType
+"""
 input UpdateInputType {
   id: Int
   views: Int
@@ -1913,7 +2495,9 @@ input UpdateInputType {
   tier: TierInputType
 }
 
-"""This represents an Update"""
+"""
+This represents an Update
+"""
 type UpdateType {
   id: Int
   views: Int
@@ -1934,7 +2518,9 @@ type UpdateType {
   comments(limit: Int, offset: Int): CommentListType
 }
 
-"""This represents a User Collective"""
+"""
+This represents a User Collective
+"""
 type User implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
@@ -1950,7 +2536,9 @@ type User implements CollectiveInterface {
   tags: [String]
   countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
-  """Name, address, lat, long of the location."""
+  """
+  Name, address, lat, long of the location.
+  """
   location: LocationType
   createdAt: String
   startsAt: String
@@ -1965,7 +2553,9 @@ type User implements CollectiveInterface {
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
 
-  """Defines if a collective is pledged"""
+  """
+  Defines if a collective is pledged
+  """
   isPledged: Boolean
   data: JSON
   slug: String
@@ -1976,13 +2566,19 @@ type User implements CollectiveInterface {
   """
   isHost: Boolean
 
-  """Returns whether this host accepts applications for new collectives"""
+  """
+  Returns whether this host accepts applications for new collectives
+  """
   canApply: Boolean
 
-  """Returns whether this collective is archived"""
+  """
+  Returns whether this collective is archived
+  """
   isArchived: Boolean
 
-  """Returns whether this collective is deletable"""
+  """
+  Returns whether this collective is deletable
+  """
   isDeletable: Boolean
 
   """
@@ -1990,7 +2586,9 @@ type User implements CollectiveInterface {
   """
   host: CollectiveInterface
 
-  """A host might have a collective attached to it"""
+  """
+  A host might have a collective attached to it
+  """
   hostCollective: CollectiveInterface
 
   """
@@ -2005,12 +2603,22 @@ type User implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Type of collective (COLLECTIVE, EVENT, ORGANIZATION)"""
+    """
+    Type of collective (COLLECTIVE, EVENT, ORGANIZATION)
+    """
     type: String
     role: String
     roles: [String]
   ): [Member]
-  collectives(orderBy: CollectiveOrderField = name, orderDirection: OrderDirection = ASC, expenseStatus: String = null, limit: Int, offset: Int, isActive: Boolean, isArchived: Boolean): CollectiveSearchResults
+  collectives(
+    orderBy: CollectiveOrderField = name
+    orderDirection: OrderDirection = ASC
+    expenseStatus: String = null
+    limit: Int
+    offset: Int
+    isActive: Boolean
+    isArchived: Boolean
+  ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   maxQuantity: Int
@@ -2018,7 +2626,9 @@ type User implements CollectiveInterface {
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
-    """type of transaction (DEBIT/CREDIT)"""
+    """
+    type of transaction (DEBIT/CREDIT)
+    """
     type: String
     limit: Int
     offset: Int
@@ -2030,7 +2640,14 @@ type User implements CollectiveInterface {
   website: String
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
-  paymentMethods(service: String, limit: Int, hasBalanceAboveZero: Boolean, isConfirmed: Boolean = true, types: [String], orderBy: PaymenMethodOrderField = type): [PaymentMethodType]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+    isConfirmed: Boolean = true
+    types: [String]
+    orderBy: PaymenMethodOrderField = type
+  ): [PaymentMethodType]
 
   """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
@@ -2039,7 +2656,9 @@ type User implements CollectiveInterface {
     limit: Int
     offset: Int
 
-    """Wether the virtual card has been claimed or not"""
+    """
+    Wether the virtual card has been claimed or not
+    """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
@@ -2050,7 +2669,9 @@ type User implements CollectiveInterface {
   applications: [Application]
 }
 
-"""This represents the details of a User"""
+"""
+This represents the details of a User
+"""
 type UserDetails {
   id: Int
   CollectiveId: Int
@@ -2067,7 +2688,9 @@ type UserDetails {
   paypalEmail: String
 }
 
-"""Input type for UserType"""
+"""
+Input type for UserType
+"""
 input UserInputType {
   id: Int
   email: Email

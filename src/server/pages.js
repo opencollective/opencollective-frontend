@@ -131,9 +131,11 @@ pages.add(
 // New collective page
 pages.add('new-collective-page', '/:slug/v2');
 
-pages.add('collective', '/:slug');
+// Tier page
 pages.add('tiers', '/:collectiveSlug/tiers');
-pages.add('tier', '/:collectiveSlug/tiers/:tierId-:tierSlug');
+pages.add('tier', '/:collectiveSlug/tiers/:tierSlug?-:tierId(\\d+)');
+
+pages.add('collective', '/:slug');
 
 export default pages;
 

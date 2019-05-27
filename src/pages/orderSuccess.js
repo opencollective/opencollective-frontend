@@ -275,11 +275,11 @@ class OrderSuccessPage extends React.Component {
   }
 
   getTwitterMessage() {
-    const { collective, totalAmount } = this.props.data.Order;
+    const { collective, totalAmount, currency } = this.props.data.Order;
     let msgId = 'tweet';
     const values = {
       collective: collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name,
-      amount: formatCurrency(totalAmount, collective.currency, { precision: 0 }),
+      amount: formatCurrency(totalAmount, currency, { precision: 0 }),
     };
     if (collective.type === 'EVENT') {
       msgId = 'tweet.event';
