@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch';
-import { isValidEmail, getWebsiteUrl } from './utils';
+import { isValidEmail, isValidPublicKey, getWebsiteUrl } from './utils';
 
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
@@ -77,9 +77,9 @@ export async function getAccountClientToken(CollectiveId, service) {
   );
 }
 
-export function checkUserExistence(email) {
+export function checkUserExistence(email, publicKey) {
   if (!isValidEmail(email)) return Promise.resolve(false);
-  return fetch(`/api/users/exists?email=${encodeURIComponent(email)}`)
+  return fetch(`/api/users/exists?email=${encodeURIComponent(email)}&publicKey=${encodeURIComponent(publicKey)}`)
     .then(checkResponseStatus)
     .then(json => Boolean(json.exists));
 }

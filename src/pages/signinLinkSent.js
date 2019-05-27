@@ -23,7 +23,7 @@ class SignInLinkSent extends Component {
       res.statusCode = 302;
       res.setHeader('Location', '/signin');
       res.end();
-    } else {
+    } else if (router) {
       router.pushRoute('signin');
     }
     return {};

@@ -108,6 +108,7 @@ const CreateProfile = ({
   onEmailChange,
   onPersonalSubmit,
   onOrgSubmit,
+  onBlockstackSubmit,
   onSecondaryAction,
   ...props
 }) => {
@@ -276,7 +277,7 @@ const CreateProfile = ({
           onSubmit={event => {
             event.preventDefault();
             const data = pick(state, ['firstName', 'lastName']);
-            onPersonalSubmit({ ...data, email });
+            onBlockstackSubmit({ ...data, email });
           }}
           method="POST"
         >
@@ -293,7 +294,6 @@ const CreateProfile = ({
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
                   placeholder="i.e. AirBnb, Women Who Code"
-                  required
                 />
               )}
             </StyledInputField>
@@ -342,6 +342,8 @@ CreateProfile.propTypes = {
   onPersonalSubmit: PropTypes.func.isRequired,
   /** handles submission of organization profile form */
   onOrgSubmit: PropTypes.func.isRequired,
+  /** handles submission via Blockstack */
+  onBlockstackSubmit: PropTypes.func.isRequired,
   /** handles redirect from profile create, i.e. Sign In */
   onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
   /** Disable submit and show a spinner on button when set to true */
