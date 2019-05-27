@@ -360,6 +360,7 @@
   "editCollective.menu.paymentMethods": "Métodos de pago",
   "editCollective.menu.tiers": "categorías",
   "editCollective.menu.virtualCards": "Tarjetas de regalo",
+  "editCollective.menu.webhooks": "Webhooks",
   "editCollective.notFound": "No collective data to edit",
   "EditUserEmailForm.reSend": "Reenviar confirmación",
   "EditUserEmailForm.submit": "Confirm new email",
@@ -1045,6 +1046,10 @@
   "virtualCards.returnToEdit": "Go back to gift cards list",
   "virtualCards.sentTo": "enviado a {email}",
   "virtualCards.viewDetails": "Ver Detalles",
+  "webhooks.add": "add another webhook",
+  "webhooks.remove": "remove webhook",
+  "webhooks.types.label": "Activities",
+  "webhooks.url.label": "URL",
   "widget.becomeBacker": "Become a backer",
   "widget.becomeSponsor": "Conviértete en patrocinador"
 }

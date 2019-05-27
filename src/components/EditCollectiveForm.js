@@ -20,6 +20,7 @@ import EditHost from './EditHost';
 import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
+import EditWebhooks from './EditWebhooks';
 import ExportData from './ExportData';
 import Link from './Link';
 import StyledButton from './StyledButton';
@@ -52,6 +53,7 @@ const MenuItem = styled(Link)`
 const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
 const deleteIsEnabled = parseToBoolean(getEnvVar('SHOW_DELETE_COLLECTIVE'));
 const emptyBalanceIsEnabled = parseToBoolean(getEnvVar('SHOW_EMPTY_BALANCE_COLLECTIVE'));
+const webhooksEnabled = parseToBoolean(getEnvVar('ENABLE_WEBHOOKS'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -635,6 +637,16 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
+            {(webhooksEnabled || get(collective, 'settings.enableWebhooks')) && (
+              <MenuItem
+                selected={this.state.section === 'webhooks'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'webhooks' }}
+                className="MenuItem webhooks"
+              >
+                <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
+              </MenuItem>
+            )}
             {collective.type === 'COLLECTIVE' && (
               <MenuItem
                 selected={this.state.section === 'export'}
@@ -705,6 +717,9 @@ class EditCollectiveForm extends React.Component {
                   onChange={this.handleObjectChange}
                 />
               )}
+              {this.state.section === 'webhooks' && (
+                <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
+              )}
               {this.state.section === 'tiers' && (
                 <EditTiers
                   title="Tiers"
@@ -769,6 +784,7 @@ class EditCollectiveForm extends React.Component {
               'gift-cards-create',
               'gift-cards-send',
               'payment-methods',
+              'webhooks',
             ].indexOf(this.state.section) === -1 && (
               <div className="actions">
                 <Button

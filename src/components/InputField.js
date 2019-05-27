@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
-import { get } from 'lodash';
+import { get, filter, map } from 'lodash';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 
 import InputTypeDropzone from './InputTypeDropzone';
@@ -80,7 +80,7 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
 class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.array]),
     defaultValue: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -100,6 +100,7 @@ class InputField extends React.Component {
     onChange: PropTypes.func.isRequired,
     required: PropTypes.bool,
     style: PropTypes.object,
+    multiple: PropTypes.bool,
   };
 
   constructor(props) {
@@ -425,9 +426,14 @@ class InputField extends React.Component {
             placeholder={field.placeholder}
             className={field.className}
             autoFocus={field.focus}
-            defaultValue={field.value || field.defaultValue || firstOptionValue}
+            defaultValue={field.defaultValue || firstOptionValue}
             value={field.value}
-            onChange={event => this.handleChange(event.target.value)}
+            onChange={event =>
+              field.multiple
+                ? this.handleChange(map(filter(event.target.options, 'selected'), 'value'))
+                : this.handleChange(event.target.value)
+            }
+            multiple={field.multiple}
           >
             {field.options &&
               field.options.map(option => {
@@ -557,6 +563,7 @@ class InputField extends React.Component {
             autoFocus={field.focus}
             placeholder={field.placeholder}
             className={field.className}
+            value={field.value}
             defaultValue={field.defaultValue || ''}
             validationState={this.state.validationState}
           />
