@@ -24,7 +24,23 @@ const Icon = styled(User)`
 class SignInBlockstack extends React.Component {
   static async getInitialProps({ res, query = {}, router }) {
     if (query.authResponse) {
-      return { authResponse: query.authResponse };
+      let organizationData;
+      if (query.org) {
+        organizationData = JSON.parse(query.org);
+      } else {
+        organizationData = null;
+      }
+      if (organizationData) {
+        organizationData.name = organizationData.orgName;
+        delete organizationData.orgName;
+      }
+      let next;
+      if (query.next) {
+        next = query.next.replace(/'/g, '');
+      } else {
+        next = null;
+      }
+      return { authResponse: query.authResponse, next, organizationData };
     }
 
     if (res) {
@@ -45,7 +61,7 @@ class SignInBlockstack extends React.Component {
 
   async componentWillMount() {
     const userSession = createUserSession();
-    const redirect = '/x'; // TODO retrieve from query
+    const redirect = this.props.next || '/';
     if (userSession.isSignInPending()) {
       userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
         this.setState({ userData });
@@ -65,9 +81,11 @@ class SignInBlockstack extends React.Component {
           } else {
             const firstName = userData.username;
             const lastName = userData.profile.name;
+            const organization = this.props.organizationData;
             this.props
-              .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, redirect })
+              .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, organization, redirect })
               .then(async response => {
+                console.log(response);
                 if (response.redirect) {
                   const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
                   await Router.replaceRoute(link);
@@ -126,6 +144,8 @@ class SignInBlockstack extends React.Component {
 
 SignInBlockstack.propTypes = {
   authResponse: PropTypes.string.isRequired,
+  next: PropTypes.string,
+  organizationData: PropTypes.object,
   createUser: PropTypes.func,
 };
 
