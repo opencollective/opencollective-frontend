@@ -928,6 +928,7 @@
   "tier.type.tier.add": "sumar otra categoría",
   "tier.type.tier.remove": "quitar categoría",
   "TierPage.AddDescription": "Añade una descripción a este nivel",
+  "TierPage.AddLongDescription": "Add a rich description",
   "TierPage.AddTitle": "Añade un titulo a este nivel",
   "TierPage.AmountGoal": "{amountWithInterval} goal",
   "TierPage.AmountRaised": "{amountWithInterval} raised",

@@ -5,10 +5,11 @@ import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 import { withRouter } from 'next/router';
+import gql from 'graphql-tag';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { P, H1 } from '../Text';
+import { P, H1, H3 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
@@ -16,13 +17,13 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 import Avatar from '../Avatar';
 import LinkCollective from '../LinkCollective';
+import HTMLEditor from '../HTMLEditor';
+import InlineEditField from '../InlineEditField';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
 import BubblesSVG from './Bubbles.svg';
-import TierName from './TierName';
-import TierLongDescription from './TierLongDescription';
 
 /** The blured background image displayed under the tier description */
 const TierCover = styled(Container)`
@@ -48,6 +49,31 @@ const Bubbles = styled.div`
     background-size: 90% auto;
     background-position-x: center;
     background-position-y: 110%;
+  }
+`;
+
+/** Long description container */
+const LongDescription = styled.div`
+  /** Override global styles to match what we have in the editor */
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+  }
+
+  img {
+    max-width: 100%;
+  }
+`;
+
+const EditTierMutation = gql`
+  mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String) {
+    editTier(tier: { id: $id, description: $description, name: $name, longDescription: $longDescription }) {
+      id
+      name
+      description
+      longDescription
+    }
   }
 `;
 
@@ -169,12 +195,47 @@ class TierPage extends Component {
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
-                <Box mb={4}>
-                  <TierName tierId={tier.id} name={tier.name} canEdit={canEditTier} />
-                </Box>
-
-                <TierLongDescription tierId={tier.id} description={tier.longDescription} canEdit={canEditTier} />
-
+                <H1 textAlign="left" color="black.900" wordBreak="break-word" mb={4}>
+                  <InlineEditField
+                    mutation={EditTierMutation}
+                    canEdit={canEditTier}
+                    values={tier}
+                    field="name"
+                    placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
+                  />
+                </H1>
+                <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line">
+                  <InlineEditField
+                    mutation={EditTierMutation}
+                    canEdit={canEditTier}
+                    values={tier}
+                    field="description"
+                    placeholder={
+                      <FormattedMessage id="TierPage.AddDescription" defaultMessage="Add a short description" />
+                    }
+                  />
+                </H3>
+                <InlineEditField
+                  mutation={EditTierMutation}
+                  values={tier}
+                  field="longDescription"
+                  canEdit={canEditTier}
+                  placeholder={
+                    <FormattedMessage id="TierPage.AddLongDescription" defaultMessage="Add a rich description" />
+                  }
+                >
+                  {({ isEditing, value, setValue }) =>
+                    !isEditing ? (
+                      <LongDescription dangerouslySetInnerHTML={{ __html: tier.longDescription }} />
+                    ) : (
+                      <HTMLEditor
+                        defaultValue={value}
+                        onChange={setValue}
+                        allowedHeaders={[false, 2, 3]} /** Disable H1 */
+                      />
+                    )
+                  }
+                </InlineEditField>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
                   {shareBlock}
                 </Container>
