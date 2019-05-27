@@ -153,7 +153,7 @@
     "cypress": "^3.3.1",
     "cz-conventional-changelog": "^2.1.0",
     "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.13.1",
+    "enzyme-adapter-react-16": "^1.13.2",
     "eslint": "^5.16.0",
     "eslint-config-opencollective": "^2.0.0",
     "eslint-plugin-babel": "^5.3.0",
