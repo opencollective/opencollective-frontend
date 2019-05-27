@@ -264,7 +264,7 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['firstName', 'lastName']);
+            const data = pick(state, ['firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']);
             onBlockstackSubmit({ ...data, email });
           }}
           method="POST"
