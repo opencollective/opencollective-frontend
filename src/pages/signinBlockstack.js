@@ -47,11 +47,12 @@ class SignInBlockstack extends React.Component {
       checkUserExistence(userData.email).then(exists => {
         this.setState({ exists });
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
+        console.log(`user ${publicKey} exists: ${exists}`);
         if (exists) {
           const user = { email: userData.email, publicKey };
           signin(user).then(async response => {
-            if (response.encryptedRedirect) {
-              const link = decryptContent(response.encryptedRedirect);
+            if (response.redirect) {
+              const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
               await Router.replaceRoute(link);
             } else {
               this.setState({ error: 'Failed to signin' });
@@ -60,14 +61,17 @@ class SignInBlockstack extends React.Component {
         } else {
           const firstName = userData.username;
           const lastName = userData.profile.name;
-          this.propse.createUser({ email: userData.email, firstName, lastName, publicKey }).then(async response => {
-            if (response.encryptedRedirect) {
-              const link = decryptContent(response.encryptedRedirect);
-              await Router.replaceRoute(link);
-            } else {
-              this.setState({ error: 'Failed to create profile' });
-            }
-          });
+          this.props
+            .createUser({ user: { email: userData.email, firstName, lastName, publicKey } })
+            .then(async response => {
+              console.log(response);
+              if (response.encryptedRedirect) {
+                const link = decryptContent(response.encryptedRedirect);
+                await Router.replaceRoute(link);
+              } else {
+                this.setState({ error: 'Failed to create profile' });
+              }
+            });
         }
       });
     });
