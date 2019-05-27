@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import Page from '../components/Page';
+import Error from '../components/Error';
+
 import { H3 } from '../components/Text';
 import { User } from 'styled-icons/boxicons-regular/User';
 import { createUserSession } from '../lib/blockstack';
@@ -38,47 +40,56 @@ class SignInBlockstack extends React.Component {
   state = {
     userData: null,
     exists: false,
+    loading: true,
   };
 
   async componentWillMount() {
     const userSession = createUserSession();
-    userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
-      this.setState({ userData });
-      checkUserExistence(userData.email).then(exists => {
-        this.setState({ exists });
+    const redirect = '/x'; // TODO retrieve from query
+    if (userSession.isSignInPending()) {
+      userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
+        this.setState({ userData });
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
-        console.log(`user ${publicKey} exists: ${exists}`);
-        if (exists) {
-          const user = { email: userData.email, publicKey };
-          signin(user).then(async response => {
-            if (response.redirect) {
-              const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
-              await Router.replaceRoute(link);
-            } else {
-              this.setState({ error: 'Failed to signin' });
-            }
-          });
-        } else {
-          const firstName = userData.username;
-          const lastName = userData.profile.name;
-          this.props
-            .createUser({ user: { email: userData.email, firstName, lastName, publicKey } })
-            .then(async response => {
-              console.log(response);
-              if (response.encryptedRedirect) {
-                const link = decryptContent(response.encryptedRedirect);
+        checkUserExistence(userData.email, publicKey).then(exists => {
+          this.setState({ exists, loading: false });
+          if (exists) {
+            const user = { email: userData.email, publicKey };
+            signin(user, redirect).then(async response => {
+              if (response.redirect) {
+                const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
                 await Router.replaceRoute(link);
               } else {
-                this.setState({ error: 'Failed to create profile' });
+                this.setState({ error: 'Failed to signin' });
               }
             });
-        }
+          } else {
+            const firstName = userData.username;
+            const lastName = userData.profile.name;
+            this.props
+              .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, redirect })
+              .then(async response => {
+                if (response.redirect) {
+                  const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
+                  await Router.replaceRoute(link);
+                } else {
+                  this.setState({ error: 'Failed to create profile' });
+                }
+              });
+          }
+        });
       });
-    });
+    } else if (userSession.isUserSignedIn()) {
+      const userData = userSession.loadUserData();
+      this.setState({ userData, loading: false });
+      await Router.replaceRoute(redirect);
+    } else {
+      this.setState({ loading: false });
+      await Router.replaceRoute(`/signin?next='${redirect}'`);
+    }
   }
 
   render() {
-    const { userData, exists } = this.state;
+    const { userData, exists, loading, error } = this.state;
     return (
       <Page title="Blockstack Login Successful">
         <Container pt={4} pb={6} px={2} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
@@ -87,19 +98,26 @@ class SignInBlockstack extends React.Component {
           </Flex>
           <H3 as="h1" fontWeight="800">
             {userData && <>{userData.username}</>}
-            {exists && (
+            {loading && (
               <>
                 <br />
-                You have already a profile
+                ... stacking blocks ...
               </>
             )}
-            {!exists && (
+            {!loading && exists && (
+              <>
+                <br />
+                You have already a profile. Signing in ...
+              </>
+            )}
+            {!loading && !exists && (
               <>
                 <br />
                 ... creating your profile ...
               </>
             )}
           </H3>
+          {error && <Error message={error} />}
         </Container>
       </Page>
     );

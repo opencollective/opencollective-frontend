@@ -57,13 +57,24 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(this.props.redirect || window.location.pathname || '/');
   }
 
-  signInBlockstack = async () => {
+  signInBlockstack = async data => {
     if (this.state.submitting) {
       return false;
     }
 
+    const next = data.redirect || '/';
     this.setState({ submitting: true });
-    const redirectUrl = `${window.location.origin}/signin/blockstack?&next='/'`;
+
+    let redirectUrl;
+    if (data) {
+      const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
+      redirectUrl = `${window.location.origin}/signin/blockstack?&next='${next}'&org=${JSON.stringify(
+        organizationData,
+      )}`;
+    } else {
+      redirectUrl = `${window.location.origin}/signin/blockstack?&next='${next}'`;
+    }
+
     blockstack.createUserSession().redirectToSignIn(redirectUrl);
   };
 
@@ -151,6 +162,7 @@ class SignInOrJoinFree extends React.Component {
                 onEmailChange={email => this.setState({ email })}
                 onPersonalSubmit={this.createProfile}
                 onOrgSubmit={this.createProfile}
+                onBlockstackSubmit={this.signInBlockstack}
                 onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                 submitting={submitting}
                 mx={[2, 4]}

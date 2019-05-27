@@ -18,6 +18,8 @@ export default class SignIn extends React.Component {
   static propTypes = {
     /** handles the email input submission, a.k.a Sign In */
     onSubmit: PropTypes.func.isRequired,
+    /** handles sign in with Blockstack */
+    onBlockstackAction: PropTypes.func.isRequired,
     /** handles the redirect from sign-in, a.k.a Join Free. Accepts URLs (string) or custom action func */
     onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
     /** When set to true, will show a spinner in Sign In button and will disable all actions */
