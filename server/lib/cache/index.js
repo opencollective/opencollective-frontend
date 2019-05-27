@@ -106,8 +106,10 @@ export async function fetchCollectiveId(collectiveSlug) {
     attributes: ['id'],
     where: { slug: collectiveSlug.toLowerCase() },
   });
-  cache.set(cacheKey, collective.id, oneDayInSeconds);
-  return collective.id;
+  if (collective) {
+    cache.set(cacheKey, collective.id, oneDayInSeconds);
+    return collective.id;
+  }
 }
 
 export function memoize(func, { key, maxAge = 0, serialize, unserialize }) {

@@ -1013,10 +1013,16 @@ const queries = {
 
       if (args.collectiveSlug) {
         args.CollectiveId = await fetchCollectiveId(args.collectiveSlug);
+        if (!args.CollectiveId) {
+          throw new Error('Invalid collectiveSlug (not found)');
+        }
       }
 
       if (args.memberCollectiveSlug) {
         args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug);
+        if (!args.MemberCollectiveId) {
+          throw new Error('Invalid memberCollectiveSlug (not found)');
+        }
       }
 
       const memberTable = args.MemberCollectiveId ? 'collective' : 'memberCollective';
