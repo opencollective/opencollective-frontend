@@ -85,7 +85,6 @@ class SignInBlockstack extends React.Component {
             this.props
               .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, organization, redirect })
               .then(async response => {
-                console.log(response);
                 if (response.redirect) {
                   const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
                   await Router.replaceRoute(link);
