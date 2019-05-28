@@ -4,6 +4,7 @@ const addTier = tier => {
   const fields = [
     { type: 'input', name: 'name' },
     { type: 'textarea', name: 'description' },
+    { type: 'select', name: 'amountType' },
     { type: 'input', name: 'maxQuantity' },
     { type: 'input', name: 'amount' },
     { type: 'select', name: 'interval' },
@@ -47,7 +48,7 @@ describe('edit collective', () => {
     cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
     cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
     cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first ._amountType.inputField select').select('flexible');
+    cy.get('.EditTiers .tier:first .amountType.inputField select').select('FLEXIBLE');
     cy.get('.EditTiers .tier:first .currency1.inputField input').type('{selectall}5');
     cy.get('.EditTiers .tier:first .currency2.inputField input').type('{selectall}10');
     cy.get('.EditTiers .tier:first .currency3.inputField input').type('{selectall}20');
@@ -57,6 +58,7 @@ describe('edit collective', () => {
       name: 'Donor (one time donation)',
       type: 'DONATION',
       amount: 500,
+      amountType: 'FIXED',
       interval: 'onetime',
       description: 'New description for donor',
     });
@@ -65,6 +67,7 @@ describe('edit collective', () => {
       name: 'Priority Support',
       description: 'Get priority support from the core contributors',
       amount: 1000,
+      amountType: 'FIXED',
       interval: 'month',
       maxQuantity: 10,
     });
@@ -110,8 +113,8 @@ describe('edit collective', () => {
     cy.visit('/testcollective/edit/tiers');
     cy.get('.EditTiers .tier')
       .first()
-      .find('._amountType select')
-      .select('fixed');
+      .find('.amountType select')
+      .select('FIXED');
     cy.get('.EditTiers .tier')
       .last()
       .find('.removeTier')

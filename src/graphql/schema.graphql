@@ -2277,6 +2277,7 @@ type Tier {
   longDescription: String
   button: String
   amount: Int
+  amountType: String
   minimumAmount: Int
   currency: String
   interval: String
@@ -2319,6 +2320,7 @@ input TierInputType {
   amount in the lowest unit of the currency of the host (ie. in cents)
   """
   amount: Int
+  amountType: String
   currency: String
   presets: [Int]
   interval: String

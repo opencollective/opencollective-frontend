@@ -108,10 +108,9 @@ class EditCollective extends React.Component {
       resetAttributes.map(attr => {
         cleanTier[attr] = null;
       });
-      if (tier._amountType === 'fixed') {
+      if (tier.amountType === 'FIXED') {
         cleanTier.presets = null;
       }
-      delete cleanTier._amountType;
       return cleanTier;
     });
   }
@@ -125,7 +124,7 @@ class EditCollective extends React.Component {
     this.setState({ status: 'loading' });
     try {
       await this.props.editCollective(CollectiveInputType);
-      this.setState({ status: 'saved' });
+      this.setState({ status: 'saved', result: { error: null } });
       setTimeout(() => {
         this.setState({ status: null });
       }, 3000);
@@ -133,7 +132,6 @@ class EditCollective extends React.Component {
       console.error('>>> editCollective error:', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: null, result: { error: errorMsg } });
-      throw new Error(errorMsg);
     }
   }
 

@@ -350,6 +350,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
             'description',
             'longDescription',
             'amount',
+            'amountType',
             'interval',
             'maxQuantity',
             'maxQuantityPerUser',
