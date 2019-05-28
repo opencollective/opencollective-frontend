@@ -44,8 +44,8 @@ export default class TierContributors extends React.Component {
 
     return (
       <Box>
-        <Box px={3} m="0 auto" css={{ maxWidth: 1440 }}>
-          <H2 mb={3}>
+        <Box m="0 auto" css={{ maxWidth: 1440 }}>
+          <H2 mb={3} px={3}>
             <FormattedMessage
               id="TierPage.ContributorsCountGoal"
               defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal"
@@ -57,7 +57,7 @@ export default class TierContributors extends React.Component {
               }}
             />
           </H2>
-          <P color="black.600" mb={4}>
+          <P color="black.600" mb={4} px={3}>
             <FormattedMessage
               id="TierPage.ContributorsDescription"
               defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."

@@ -9,6 +9,7 @@ import Roles from '../constants/roles';
 import { CollectiveType } from '../constants/collectives';
 import formatMemberRole from '../lib/i18n-member-role';
 import withIntl from '../lib/withIntl';
+import withViewport, { VIEWPORTS } from '../lib/withViewport';
 
 import Link from './Link';
 import { P } from './Text';
@@ -16,6 +17,13 @@ import StyledCard from './StyledCard';
 import Container from './Container';
 import Avatar from './Avatar';
 import { fadeIn } from './StyledKeyframes';
+
+// Define static dimensions
+const COLLECTIVE_CARD_MARGIN_X = 32;
+const COLLECTIVE_CARD_MARGIN_Y = 26;
+const COLLECTIVE_CARD_WIDTH = 144;
+const COLLECTIVE_CARD_HEIGHT = 226;
+const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X;
 
 /**
  * Override the default grid to disable fixed width. As we use the full screen width
@@ -44,38 +52,58 @@ const ContributorCard = styled(StyledCard)`
   }
 `;
 
-const getIdx = (columnIndex, rowIndex, NB_COLS) => {
-  return rowIndex * NB_COLS + columnIndex;
+/** Get an index in a single dimension array from a matrix coordinate */
+const getIdx = (colIndex, rowIndex, nbCols) => {
+  return rowIndex * nbCols + colIndex;
+};
+
+/** Get the items repartition, aka the number of columns and rows. */
+const getItemsRepartition = (nbItems, width, maxNbRows) => {
+  const maxVisibleNbCols = Math.trunc(width / COLLECTIVE_CARD_FULL_WIDTH);
+  const maxVisibleItems = maxVisibleNbCols * maxNbRows;
+
+  if (nbItems <= maxVisibleItems) {
+    // If all items can fit in the view without scrolling, we arrange the view
+    // to fit them all by showing fully filled lines
+    const nbCols = maxVisibleNbCols;
+    const nbRows = Math.ceil(nbItems / maxVisibleNbCols);
+    return [nbCols, nbRows];
+  } else {
+    // Otherwise we just place the items equally amongs maxNbRows
+    const nbCols = Math.ceil(nbItems / maxNbRows);
+    const nbRows = maxNbRows;
+    return [nbCols, nbRows];
+  }
 };
 
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
-const ContributorsGrid = ({ intl, members, width, nbRows }) => {
-  const COLLECTIVE_CARD_MARGIN_X = 32;
-  const COLLECTIVE_CARD_MARGIN_Y = 26;
-  const COLLECTIVE_CARD_WIDTH = 144;
-  const COLLECTIVE_CARD_HEIGHT = 226;
-  const NB_COLS = Math.trunc(members.length / nbRows);
+const ContributorsGrid = ({ intl, members, width, maxNbRowsForViewports, viewport }) => {
+  const maxNbRows = maxNbRowsForViewports[viewport];
+  const [nbCols, nbRows] = getItemsRepartition(members.length, width, maxNbRows);
+
+  // Preload more items when viewport width is unknown to avoid displaying blank spaces on SSR
+  const viewWidth = viewport === VIEWPORTS.UNKNOWN ? width * 3 : width;
 
   return (
     <FixedSizeGrid
-      columnCount={members.length / nbRows}
-      columnWidth={COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X}
+      columnCount={nbCols}
+      columnWidth={COLLECTIVE_CARD_FULL_WIDTH}
       height={(COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y) * nbRows + COLLECTIVE_CARD_MARGIN_Y}
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
-      width={width}
+      width={viewWidth}
       outerElementType={GridContainer}
       innerElementType={GridInnerContainer}
       itemKey={({ columnIndex, rowIndex }) => {
-        const idx = getIdx(columnIndex, rowIndex, NB_COLS);
-        return idx <= members.length ? members[idx].id : `empty-${idx}`;
+        const idx = getIdx(columnIndex, rowIndex, nbCols);
+        return idx < members.length ? members[idx].id : `empty-${idx}`;
       }}
     >
       {({ columnIndex, rowIndex, style }) => {
-        const idx = getIdx(columnIndex, rowIndex, NB_COLS);
-        if (idx > members.length) {
+        const idx = getIdx(columnIndex, rowIndex, nbCols);
+        if (idx >= members.length) {
           return null;
         }
 
@@ -129,10 +157,19 @@ ContributorsGrid.propTypes = {
     }),
   ),
 
-  /** Number of rows to display */
-  nbRows: PropTypes.number.isRequired,
+  /** Maximum number of rows for different viewports. Will fallback on `defaultNbRows` if not provided */
+  maxNbRowsForViewports: PropTypes.shape({
+    [VIEWPORTS.UNKNOWN]: PropTypes.number,
+    [VIEWPORTS.MOBILE]: PropTypes.number,
+    [VIEWPORTS.TABLET]: PropTypes.number,
+    [VIEWPORTS.DESKTOP]: PropTypes.number,
+    [VIEWPORTS.WIDESCREEN]: PropTypes.number,
+  }).isRequired,
 
-  /** Width of the viewport */
+  /** @ignore from withViewport */
+  viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
+
+  /** @ignore from withViewport */
   width: PropTypes.number.isRequired,
 
   /** @ignore from withIntl */
@@ -141,8 +178,14 @@ ContributorsGrid.propTypes = {
 
 ContributorsGrid.defaultProps = {
   limit: 30,
-  maxHeight: 850,
-  nbRows: 1,
+  defaultNbRows: 1,
+  maxNbRowsForViewports: {
+    [VIEWPORTS.UNKNOWN]: 1,
+    [VIEWPORTS.MOBILE]: 1,
+    [VIEWPORTS.TABLET]: 2,
+    [VIEWPORTS.DESKTOP]: 3,
+    [VIEWPORTS.WIDESCREEN]: 3,
+  },
 };
 
-export default withIntl(ContributorsGrid);
+export default withIntl(withViewport(ContributorsGrid, { withWidth: true }));
