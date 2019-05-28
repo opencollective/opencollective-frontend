@@ -375,5 +375,13 @@ async function notifyByEmail(activity) {
         notifyAdminsOfCollective(activity.data.collective.id, activity);
       }
       break;
+
+    case activityType.GITHUB_COLLECTIVE_CREATED:
+      if ((get(activity, 'data.collective.tags') || []).includes('open source')) {
+        notifyAdminsOfCollective(activity.data.collective.id, activity, {
+          template: 'collective.created.opensource',
+        });
+      }
+      break;
   }
 }
