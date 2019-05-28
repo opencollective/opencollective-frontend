@@ -154,4 +154,8 @@ LoggedInUser.prototype.hostsUserIsAdminOf = function() {
   );
 };
 
+LoggedInUser.prototype.isHostAdmin = function(collective) {
+  return collective.isHost && intersection(this.roles[collective.slug], ['ADMIN']).length > 0;
+};
+
 export default LoggedInUser;
