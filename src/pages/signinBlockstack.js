@@ -15,7 +15,7 @@ import { checkResponseStatus } from '../lib/api';
 import { isValidEmail, getWebsiteUrl } from '../lib/utils';
 import { getPublicKeyFromPrivate, decryptContent } from 'blockstack';
 import { Router } from '../server/pages';
-import { createUserQuery } from '../graphql/mutations';
+import { createUserByPublicKeyQuery } from '../graphql/mutations';
 import { graphql } from 'react-apollo';
 
 const Icon = styled(User)`
@@ -28,6 +28,9 @@ class SignInBlockstack extends React.Component {
       let organizationData;
       if (query.org) {
         organizationData = JSON.parse(query.org);
+        if (!organizationData.orgName || organizationData.orgName.length === 0) {
+          organizationData = null;
+        }
       } else {
         organizationData = null;
       }
@@ -69,7 +72,6 @@ class SignInBlockstack extends React.Component {
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
         this.checkUserExistence(userData.email, publicKey).then(exists => {
           this.setState({ exists, loading: false });
-
           if (exists) {
             const user = { email: userData.email, publicKey };
             this.signin(user, redirect).then(async response => {
@@ -87,8 +89,14 @@ class SignInBlockstack extends React.Component {
             this.props
               .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, organization, redirect })
               .then(async response => {
-                if (response.redirect) {
-                  const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
+                if (
+                  response.data &&
+                  response.data.createUserByPublicKey &&
+                  response.data.createUserByPublicKey.redirect
+                ) {
+                  const link = decryptContent(response.data.createUserByPublicKey.redirect, {
+                    privateKey: userData.appPrivateKey,
+                  });
                   await Router.replaceRoute(link);
                 } else {
                   this.setState({ error: 'Failed to create profile' });
@@ -181,7 +189,7 @@ SignInBlockstack.propTypes = {
   createUser: PropTypes.func,
 };
 
-const addCreateUserMutation = graphql(createUserQuery, {
+const addCreateUserMutation = graphql(createUserByPublicKeyQuery, {
   props: ({ mutate }) => ({
     createUser: variables => mutate({ variables }),
   }),
