@@ -330,7 +330,7 @@ export async function createCollectiveFromGithub(_, args, req) {
   debugGithub('sending github.signup to', user.email, 'with data', data);
   await emailLib.send('github.signup', user.email, data);
   models.Activity.create({
-    type: activities.COLLECTIVE_CREATED,
+    type: activities.GITHUB_COLLECTIVE_CREATED,
     UserId: user.id,
     CollectiveId: collective.id,
     data: {
