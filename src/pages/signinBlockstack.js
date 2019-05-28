@@ -92,7 +92,9 @@ class SignInBlockstack extends React.Component {
 
   checkUserExistence(email, publicKey) {
     if (!isValidEmail(email)) return Promise.resolve(false);
-    return fetch(`/api/users/exists?email=${encodeURIComponent(email)}&publicKey=${encodeURIComponent(publicKey)}`)
+    return fetch(
+      `/api/users/exists-with-public-key?email=${encodeURIComponent(email)}&publicKey=${encodeURIComponent(publicKey)}`,
+    )
       .then(checkResponseStatus)
       .then(json => Boolean(json.exists));
   }
