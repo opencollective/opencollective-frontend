@@ -77,9 +77,9 @@ export async function getAccountClientToken(CollectiveId, service) {
   );
 }
 
-export function checkUserExistence(email, publicKey) {
+export function checkUserExistence(email) {
   if (!isValidEmail(email)) return Promise.resolve(false);
-  return fetch(`/api/users/exists?email=${encodeURIComponent(email)}&publicKey=${encodeURIComponent(publicKey)}`)
+  return fetch(`/api/users/exists?email=${encodeURIComponent(email)}`)
     .then(checkResponseStatus)
     .then(json => Boolean(json.exists));
 }

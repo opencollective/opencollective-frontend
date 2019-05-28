@@ -67,11 +67,6 @@ export const isValidEmail = email => {
   );
 };
 
-export const isValidPublicKey = publicKey => {
-  if (typeof email !== 'string') return false;
-  return publicKey.length === 66;
-};
-
 function getCurrencySymbolFallback(currency) {
   return Number(0)
     .toLocaleString('en-US', {

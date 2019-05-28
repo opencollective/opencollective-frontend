@@ -61,20 +61,10 @@ class SignInOrJoinFree extends React.Component {
     if (this.state.submitting) {
       return false;
     }
-
-    const next = data.redirect || '/';
     this.setState({ submitting: true });
 
-    let redirectUrl;
-    if (data) {
-      const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
-      redirectUrl = `${window.location.origin}/signin/blockstack?&next='${next}'&org=${JSON.stringify(
-        organizationData,
-      )}`;
-    } else {
-      redirectUrl = `${window.location.origin}/signin/blockstack?&next='${next}'`;
-    }
-
+    const next = data.redirect || '/';
+    const redirectUrl = `${window.location.origin}/signin/blockstack?&next='${next}'`;
     blockstack.createUserSession().redirectToSignIn(redirectUrl);
   };
 
