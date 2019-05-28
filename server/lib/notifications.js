@@ -367,16 +367,12 @@ async function notifyByEmail(activity) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, {
           template: 'collective.created.meetup',
         });
-      } else if ((get(activity, 'data.collective.tags') || []).includes('open source')) {
-        notifyAdminsOfCollective(activity.data.collective.id, activity, {
-          template: 'collective.created.opensource',
-        });
       } else {
         notifyAdminsOfCollective(activity.data.collective.id, activity);
       }
       break;
 
-    case activityType.GITHUB_COLLECTIVE_CREATED:
+    case activityType.COLLECTIVE_CREATED_GITHUB:
       if ((get(activity, 'data.collective.tags') || []).includes('open source')) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, {
           template: 'collective.created.opensource',
