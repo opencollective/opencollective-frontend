@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch';
-import { isValidEmail, isValidPublicKey, getWebsiteUrl } from './utils';
+import { isValidEmail, getWebsiteUrl } from './utils';
 
 // Webpack error: Cannot find module 'webpack/lib/RequestShortener'
 // import queryString from 'query-string';
