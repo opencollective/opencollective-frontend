@@ -968,6 +968,44 @@ export const NotificationType = new GraphQLObjectType({
   },
 });
 
+export const MembersStatsType = new GraphQLObjectType({
+  name: 'MembersStatsType',
+  description: 'Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        description: "We always have to return an id for apollo's caching",
+      },
+      all: {
+        type: GraphQLInt,
+        description: 'Total number of contributors',
+      },
+      users: {
+        type: GraphQLInt,
+        description: 'Number of individuals',
+        resolve(stats) {
+          return stats.USER;
+        },
+      },
+      organizations: {
+        type: GraphQLInt,
+        description: 'Number of organizations',
+        resolve(stats) {
+          return stats.ORGANIZATION;
+        },
+      },
+      collectives: {
+        type: GraphQLInt,
+        description: 'Number of collectives',
+        resolve(stats) {
+          return stats.COLLECTIVE;
+        },
+      },
+    };
+  },
+});
+
 export const TierStatsType = new GraphQLObjectType({
   name: 'TierStatsType',
   description: 'Stats about a tier',
@@ -978,6 +1016,13 @@ export const TierStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier) {
           return tier.id;
+        },
+      },
+      members: {
+        type: MembersStatsType,
+        description: 'Breakdown of all the members that belongs to this tier.',
+        resolve(tier, args, req) {
+          return req.loaders.tiers.membersStats.load(tier.id);
         },
       },
       totalOrders: {
