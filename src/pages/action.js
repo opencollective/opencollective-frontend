@@ -24,13 +24,13 @@ import withIntl from '../lib/withIntl';
  */
 class ActionPage extends React.Component {
   static getInitialProps({ query: { action, table, id } }) {
-    return { action, table, id, ssr: false };
+    return { action, table, id: Number(id), ssr: false };
   }
 
   static propTypes = {
     action: PropTypes.string,
     table: PropTypes.string,
-    id: PropTypes.string,
+    id: PropTypes.number,
     ssr: PropTypes.bool,
     LoggedInUser: PropTypes.object, // from withUser,
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser

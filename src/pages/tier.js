@@ -26,13 +26,13 @@ const GlobalStyles = createGlobalStyle`
  */
 class TierPage extends React.Component {
   static propTypes = {
-    tierId: PropTypes.string.isRequired,
+    tierId: PropTypes.number.isRequired,
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
   };
 
   static getInitialProps({ query: { tierId } }) {
-    return { tierId };
+    return { tierId: Number(tierId) };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
