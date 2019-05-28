@@ -657,6 +657,12 @@ type CreateUserResult {
 
 scalar DateString
 
+type CreateUserByPublicKeyResult {
+  user: UserDetails
+  organization: CollectiveInterface
+  redirect: String
+}
+
 scalar Email
 
 """
@@ -1220,6 +1226,28 @@ type Mutation {
     """
     websiteUrl: String
   ): CreateUserResult
+
+  createUserByPublicKey(
+    """
+    The user info
+    """
+    user: UserInputType!
+
+    """
+    An optional organization to create alongside the user
+    """
+    organization: CollectiveInputType
+
+    """
+    The redirect URL for the login email sent to the user
+    """
+    redirect: String = "/"
+
+    """
+    The website URL originating the request
+    """
+    websiteUrl: String
+  ): CreateUserByPublicKeyResult
 
   """
   Update the email address for logged in user

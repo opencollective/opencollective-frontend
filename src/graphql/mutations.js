@@ -19,6 +19,22 @@ export const createUserQuery = gql`
   }
 `;
 
+export const createUserByPublicKeyQuery = gql`
+  mutation createUserByPublicKey($user: UserInputType!, $organization: CollectiveInputType, $redirect: String) {
+    createUserByPublicKey(user: $user, organization: $organization, redirect: $redirect) {
+      user {
+        id
+        email
+      }
+      organization {
+        id
+        slug
+      }
+      redirect
+    }
+  }
+`;
+
 const createMemberQuery = gql`
   mutation createMember(
     $member: CollectiveAttributesInputType!
