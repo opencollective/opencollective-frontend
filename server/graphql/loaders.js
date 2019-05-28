@@ -424,6 +424,14 @@ export const loaders = req => {
       },
     },
     members: {
+      findByTierId: new DataLoader(tiersIds => {
+        return models.Member.findAll({
+          where: { TierId: { [Op.in]: tiersIds } },
+          order: [['createdAt', 'DESC']],
+        }).then(results => {
+          return sortResults(tiersIds, results, 'TierId', []);
+        });
+      }),
       transactions: new DataLoader(combinedKeys =>
         models.Transaction.findAll({
           where: {

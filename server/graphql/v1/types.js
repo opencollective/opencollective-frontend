@@ -1190,6 +1190,21 @@ export const TierType = new GraphQLObjectType({
           return tier.getOrders(query);
         },
       },
+      members: {
+        type: new GraphQLList(MemberType),
+        description: 'Returns a list of all the members that contributed to this tier',
+        args: {
+          limit: {
+            type: GraphQLInt,
+            description: 'Maximum number of entries to return',
+            defaultValue: 5000,
+          },
+        },
+        async resolve(tier, args, req) {
+          const members = await req.loaders.members.findByTierId.load(tier.id);
+          return members.slice(0, args.limit);
+        },
+      },
       stats: {
         type: TierStatsType,
         resolve(tier) {
