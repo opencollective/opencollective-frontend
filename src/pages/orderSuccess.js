@@ -338,7 +338,7 @@ class OrderSuccessPage extends React.Component {
     const { collective, fromCollective, totalAmount, interval, currency, tier } = order;
     const referralOpts = objectToQueryString({ referral: fromCollective.id });
     const websiteUrl = process.env.WEBSITE_URL || 'https://opencollective.com';
-    const referralURL = `${websiteUrl}/${collective.slug}/${referralOpts}`;
+    const referralURL = `${websiteUrl}${collective.path}/${referralOpts}`;
     const message = this.getTwitterMessage();
     const isFreeTier = get(tier, 'amount') === 0 || (get(tier, 'presets') || []).includes(0);
     const isManualDonation = order.status === 'PENDING' && !order.paymentMethod && !isFreeTier;
@@ -514,8 +514,8 @@ const getOrder = graphql(gql`
       }
       collective {
         name
-        slug
         tags
+        path
       }
       tier {
         type
