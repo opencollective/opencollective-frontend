@@ -766,16 +766,22 @@ export async function refundTransaction(_, args, req) {
   const transaction = await models.Transaction.findByPk(args.id, {
     include: [models.Order, models.PaymentMethod],
   });
+
   if (!transaction) {
     throw new errors.NotFound({ message: 'Transaction not found' });
   }
 
+  const collective = await models.Collective.findByPk(transaction.CollectiveId);
+  const isHost = await collective.isHost();
+  const HostCollectiveId = isHost ? collective.id : await collective.getHostCollectiveId();
+
   // 1. Verify user permission. User must be either
   //   a. User that created transaction (within 24h) -- Not implemented yet
-  //   b. Host Collective receiving the donation -- Not implemented yet
+  //   b. Host Collective receiving the donation
   //   c. Site Admin
-  if (!req.remoteUser.isRoot()) {
-    throw new errors.Unauthorized({ message: 'Not a site admin' });
+
+  if (!req.remoteUser.isAdmin(HostCollectiveId) && !req.remoteUser.isRoot()) {
+    throw new errors.Unauthorized({ message: 'Not a site admin or host collective admin' });
   }
 
   // 2. Refund via payment method
