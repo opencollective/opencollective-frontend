@@ -159,7 +159,7 @@ describe('Refund Transaction', () => {
 
     // Then it should error out with the right error
     const [{ message }] = result.errors;
-    expect(message).to.equal('Not a site admin');
+    expect(message).to.equal('Not a site admin or host collective admin');
   });
 
   describe('Save CreatedByUserId', () => {
