@@ -9,4 +9,5 @@ files:
       - '*.ja.html'
       - '*.ru.html'
       - '*.zh.html'
+      - '*.pt.html'
     translation: /%original_path%/%file_name%.%two_letters_code%.html
