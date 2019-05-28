@@ -211,13 +211,7 @@ class TierPage extends Component {
               mx={[0, null, 3]}
             >
               <Bubbles />
-              <Container
-                background="white"
-                borderRadius={8}
-                px={[3, 4]}
-                py={[4, 5]}
-                boxShadow="0px 10px 15px 3px rgba(0, 0, 0, 0.05)"
-              >
+              <Container background="white" borderRadius={8} px={[3, 4]} py={[4, 5]}>
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
