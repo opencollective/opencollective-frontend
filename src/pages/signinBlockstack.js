@@ -11,7 +11,8 @@ import Error from '../components/Error';
 import { H3 } from '../components/Text';
 import { User } from 'styled-icons/boxicons-regular/User';
 import { createUserSession } from '../lib/blockstack';
-import { checkUserExistence, signin } from '../lib/api';
+import { checkResponseStatus } from '../lib/api';
+import { isValidEmail, getWebsiteUrl } from '../lib/utils';
 import { getPublicKeyFromPrivate, decryptContent } from 'blockstack';
 import { Router } from '../server/pages';
 import { createUserQuery } from '../graphql/mutations';
@@ -66,33 +67,17 @@ class SignInBlockstack extends React.Component {
       userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
         this.setState({ userData });
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
-        checkUserExistence(userData.email, publicKey).then(exists => {
+        this.checkUserExistence(userData.email, publicKey).then(exists => {
           this.setState({ exists, loading: false });
-          if (exists) {
-            const user = { email: userData.email, publicKey };
-            signin(user, redirect).then(async response => {
-              if (response.redirect) {
-                const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
-                await Router.replaceRoute(link);
-              } else {
-                this.setState({ error: 'Failed to signin' });
-              }
-            });
-          } else {
-            const firstName = userData.username;
-            const lastName = userData.profile.name;
-            const organization = this.props.organizationData;
-            this.props
-              .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, organization, redirect })
-              .then(async response => {
-                if (response.redirect) {
-                  const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
-                  await Router.replaceRoute(link);
-                } else {
-                  this.setState({ error: 'Failed to create profile' });
-                }
-              });
-          }
+          const user = { email: userData.email, publicKey };
+          this.signin(user, redirect).then(async response => {
+            if (response.redirect) {
+              const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
+              await Router.replaceRoute(link);
+            } else {
+              this.setState({ error: 'Failed to signin' });
+            }
+          });
         });
       });
     } else if (userSession.isUserSignedIn()) {
@@ -103,6 +88,35 @@ class SignInBlockstack extends React.Component {
       this.setState({ loading: false });
       await Router.replaceRoute(`/signin?next='${redirect}'`);
     }
+  }
+
+  checkUserExistence(email, publicKey) {
+    if (!isValidEmail(email)) return Promise.resolve(false);
+    return fetch(`/api/users/exists?email=${encodeURIComponent(email)}&publicKey=${encodeURIComponent(publicKey)}`)
+      .then(checkResponseStatus)
+      .then(json => Boolean(json.exists));
+  }
+
+  signin(user, redirect) {
+    const websiteUrl = getWebsiteUrl();
+    return fetch('/api/users/signin-public-key', {
+      method: 'POST',
+      headers: {
+        ...this.addAuthTokenToHeader(),
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user, redirect, websiteUrl }),
+    }).then(checkResponseStatus);
+  }
+
+  addAuthTokenToHeader(obj = {}) {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) return obj;
+    return {
+      Authorization: `Bearer ${accessToken}`,
+      ...obj,
+    };
   }
 
   render() {
