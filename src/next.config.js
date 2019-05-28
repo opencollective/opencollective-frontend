@@ -18,6 +18,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: 'https://api.opencollective.com',
         INVOICES_URL: 'https://invoices.opencollective.com',
+        GIFTCARDS_GENERATOR_URL: 'https://giftcards-generator.opencollective.com',
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: 'https://opencollective.com',
       }),

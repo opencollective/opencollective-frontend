@@ -12,6 +12,7 @@ const defaults = {
   IMAGES_URL: 'https://images-staging.opencollective.com',
   WEBSITE_URL: 'http://localhost:3000',
   INVOICES_URL: 'https://invoices-staging.opencollective.com',
+  GIFTCARDS_GENERATOR_URL: 'https://giftcards-generator-staging.opencollective.com',
   PAYPAL_ENVIRONMENT: 'sandbox',
   STRIPE_KEY: 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
   GOOGLE_MAPS_API_KEY: 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',

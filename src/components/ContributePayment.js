@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 import { uniqBy, get } from 'lodash';
 
 import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck';
@@ -53,8 +53,8 @@ const getPaymentMethodIcon = (pm, collective) => {
 
 /** Returns payment method's subtitles */
 const getPaymentMethodMetadata = pm => {
-  const expiryDate = paymentMethodExpiration(pm);
   if (pm.type === 'creditcard') {
+    const expiryDate = paymentMethodExpiration(pm);
     return (
       <FormattedMessage
         id="ContributePayment.expiresOn"
@@ -63,12 +63,15 @@ const getPaymentMethodMetadata = pm => {
       />
     );
   } else if (pm.type === 'virtualcard') {
-    if (expiryDate) {
+    if (pm.expiryDate) {
       return (
         <FormattedMessage
           id="ContributePayment.balanceAndExpiry"
           defaultMessage="{balance} left, expires on {expiryDate}"
-          values={{ expiryDate, balance: formatCurrency(pm.balance, pm.currency) }}
+          values={{
+            expiryDate: <FormattedDate value={pm.expiryDate} day="numeric" month="long" year="numeric" />,
+            balance: formatCurrency(pm.balance, pm.currency),
+          }}
         />
       );
     } else {
