@@ -69,15 +69,32 @@ class SignInBlockstack extends React.Component {
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
         this.checkUserExistence(userData.email, publicKey).then(exists => {
           this.setState({ exists, loading: false });
-          const user = { email: userData.email, publicKey };
-          this.signin(user, redirect).then(async response => {
-            if (response.redirect) {
-              const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
-              await Router.replaceRoute(link);
-            } else {
-              this.setState({ error: 'Failed to signin' });
-            }
-          });
+
+          if (exists) {
+            const user = { email: userData.email, publicKey };
+            this.signin(user, redirect).then(async response => {
+              if (response.redirect) {
+                const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
+                await Router.replaceRoute(link);
+              } else {
+                this.setState({ error: 'Failed to signin' });
+              }
+            });
+          } else {
+            const firstName = userData.username;
+            const lastName = userData.profile.name;
+            const organization = this.props.organizationData;
+            this.props
+              .createUser({ user: { email: userData.email, firstName, lastName, publicKey }, organization, redirect })
+              .then(async response => {
+                if (response.redirect) {
+                  const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
+                  await Router.replaceRoute(link);
+                } else {
+                  this.setState({ error: 'Failed to create profile' });
+                }
+              });
+          }
         });
       });
     } else if (userSession.isUserSignedIn()) {
