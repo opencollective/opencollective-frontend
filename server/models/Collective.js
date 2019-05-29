@@ -217,12 +217,7 @@ export default function(Sequelize, DataTypes) {
       image: {
         type: DataTypes.STRING,
         get() {
-          const image = this.getDataValue('image');
-          if (image) return image;
-          if (this.type === 'ORGANIZATION' && this.website && !this.website.match(/^https:\/\/twitter\.com\//)) {
-            const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
-            return image;
-          }
+          return this.getDataValue('image');
         },
       },
 
@@ -714,7 +709,9 @@ export default function(Sequelize, DataTypes) {
 
   // If no image has been provided, try to find a good image using clearbit/gravatar and save it if it returns 200
   Collective.prototype.findImage = function(user) {
-    if (this.getDataValue('image')) return this.image;
+    if (this.getDataValue('image')) {
+      return;
+    }
 
     const checkAndUpdateImage = image => {
       return fetch(image)
@@ -728,10 +725,9 @@ export default function(Sequelize, DataTypes) {
         });
     };
 
-    if (this.type === 'ORGANIZATION' && this.website) {
+    if (this.type === 'ORGANIZATION' && this.website && !this.website.match(/^https:\/\/twitter\.com\//)) {
       const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
       checkAndUpdateImage(image);
-      return image;
     }
 
     if (this.type === 'USER') {
