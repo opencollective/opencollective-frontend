@@ -373,11 +373,9 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_CREATED_GITHUB:
-      if ((get(activity, 'data.collective.tags') || []).includes('open source')) {
-        notifyAdminsOfCollective(activity.data.collective.id, activity, {
-          template: 'collective.created.opensource',
-        });
-      }
+      notifyAdminsOfCollective(activity.data.collective.id, activity, {
+        template: 'collective.created.opensource',
+      });
       break;
   }
 }
