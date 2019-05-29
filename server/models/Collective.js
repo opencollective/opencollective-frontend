@@ -216,7 +216,11 @@ export default function(Sequelize, DataTypes) {
       image: {
         type: DataTypes.STRING,
         get() {
-          return this.getDataValue('image');
+          const image = this.getDataValue('image');
+          // Warning: some tests really want that value to be undefined and not null
+          if (image) {
+            return image;
+          }
         },
       },
 
