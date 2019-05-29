@@ -3,7 +3,6 @@ import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
 import debugLib from 'debug';
-import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import he from 'he';
@@ -12,7 +11,7 @@ import { isArray, pick, get, merge, includes } from 'lodash';
 import models from '../models';
 import logger from './logger';
 import templates from './emailTemplates';
-import { isEmailInternal } from './utils';
+import { isEmailInternal, md5 } from './utils';
 
 const debug = debugLib('email');
 
@@ -60,10 +59,7 @@ const render = (template, data) => {
 
 const generateUnsubscribeToken = (email, collectiveSlug, type) => {
   const uid = `${email}.${collectiveSlug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
-  const token = crypto
-    .createHash('md5')
-    .update(uid)
-    .digest('hex');
+  const token = md5(uid);
   return token;
 };
 

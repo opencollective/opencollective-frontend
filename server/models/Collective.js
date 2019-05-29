@@ -21,7 +21,7 @@ import emailLib from '../lib/email';
 import queries from '../lib/queries';
 import { convertToCurrency } from '../lib/currency';
 import { isBlacklistedCollectiveSlug, collectiveSlugBlacklist } from '../lib/collectivelib';
-import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags } from '../lib/utils';
+import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5 } from '../lib/utils';
 
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -736,13 +736,9 @@ export default function(Sequelize, DataTypes) {
 
     if (this.type === 'USER') {
       if (user && user.email && user.name && user.name !== 'anonymous') {
-        const md5 = crypto
-          .createHash('md5')
-          .update(user.email.toLowerCase().trim())
-          .digest('hex');
-        const avatar = `https://www.gravatar.com/avatar/${md5}?default=404`;
+        const emailHash = md5(user.email.toLowerCase().trim());
+        const avatar = `https://www.gravatar.com/avatar/${emailHash}?default=404`;
         checkAndUpdateImage(avatar);
-        return avatar;
       }
     }
   };
