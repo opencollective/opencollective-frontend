@@ -12,7 +12,7 @@ import ErrorPage from '../components/ErrorPage';
 import MessageBox from '../components/MessageBox';
 
 import { addCollectiveToEditData } from '../graphql/queries';
-import { addEditCollectiveMutation, addDeleteEventCollectiveMutation } from '../graphql/mutations';
+import { addEditCollectiveMutation } from '../graphql/mutations';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -35,7 +35,6 @@ class EditCollectivePage extends React.Component {
     LoggedInUser: PropTypes.object, // from withLoggedInUser
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withLoggedInUser
     editCollective: PropTypes.func.isRequired, // from addEditCollectiveMutation
-    deleteEventCollective: PropTypes.func.isRequired, // from addDeleteEventCollectiveMutation
   };
 
   constructor(props) {
@@ -60,7 +59,7 @@ class EditCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, editCollective, deleteEventCollective, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data, editCollective, LoggedInUser, loadingLoggedInUser } = this.props;
     const collective = get(data, 'Collective') || this.state.Collective;
 
     if ((data && data.loading) || loadingLoggedInUser) {
@@ -95,7 +94,6 @@ class EditCollectivePage extends React.Component {
           collective={collective}
           LoggedInUser={LoggedInUser}
           editCollective={editCollective}
-          deleteEventCollective={deleteEventCollective}
           loggedInEditDataLoaded
         />
       </div>
@@ -109,7 +107,6 @@ const addGraphQL = compose(
       skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
     }),
   addEditCollectiveMutation,
-  addDeleteEventCollectiveMutation,
 );
 
 export default withUser(withData(withIntl(addGraphQL(EditCollectivePage))));

@@ -11,7 +11,6 @@ import CollectiveCover from './CollectiveCover';
 import NotificationBar from './NotificationBar';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
-import { Router } from '../server/pages';
 import Loading from './Loading';
 
 class EditCollective extends React.Component {
@@ -19,7 +18,6 @@ class EditCollective extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     editCollective: PropTypes.func.isRequired,
-    deleteEventCollective: PropTypes.func.isRequired,
     loggedInEditDataLoaded: PropTypes.bool.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -27,7 +25,6 @@ class EditCollective extends React.Component {
   constructor(props) {
     super(props);
     this.editCollective = this.editCollective.bind(this);
-    this.deleteEventCollective = this.deleteEventCollective.bind(this);
     this.state = { status: null, result: {} };
     this.messages = defineMessages({
       'creditcard.error': {
@@ -135,27 +132,6 @@ class EditCollective extends React.Component {
     }
   }
 
-  async deleteEventCollective() {
-    const { collective } = this.props;
-    if (confirm('😱 Are you really sure you want to delete this collective?')) {
-      this.setState({ status: 'loading' });
-      try {
-        await this.props.deleteEventCollective(collective.id);
-        this.setState({
-          status: null,
-          result: { success: 'Collective deleted successfully' },
-        });
-        const collectiveRoute = `/${collective.parentCollective.slug}`;
-        Router.pushRoute(collectiveRoute);
-      } catch (err) {
-        console.error('>>> deleteEventCollective error: ', JSON.stringify(err));
-        const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-        this.setState({ result: { error: errorMsg } });
-        throw new Error(errorMsg);
-      }
-    }
-  }
-
   render() {
     const { intl, LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
 
@@ -237,7 +213,6 @@ class EditCollective extends React.Component {
                   status={this.state.status}
                 />
                 <div className="actions">
-                  {collective.type === 'EVENT' && <a onClick={this.deleteEventCollective}>delete event</a>}
                   <div className="result">
                     <div className="success">{this.state.result.success}</div>
                     <div className="error">{this.state.result.error}</div>
