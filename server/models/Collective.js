@@ -6,7 +6,6 @@ import slugify from 'limax';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
-import crypto from 'crypto';
 import moment from 'moment';
 import * as ics from 'ics';
 import { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
