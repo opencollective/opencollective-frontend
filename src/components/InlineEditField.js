@@ -61,10 +61,10 @@ class InlineEditField extends Component {
     this.setState({ draft });
   };
 
-  renderContent(canEdit, value, placeholder, children) {
+  renderContent(field, canEdit, value, placeholder, children) {
     if (canEdit && !value && placeholder) {
       return (
-        <StyledButton buttonSize="large" onClick={this.enableEditor}>
+        <StyledButton buttonSize="large" onClick={this.enableEditor} data-cy={`InlineEditField-Add-${field}`}>
           {placeholder}
         </StyledButton>
       );
@@ -86,10 +86,10 @@ class InlineEditField extends Component {
         <Container position="relative">
           {canEdit && (
             <Container position="absolute" top={0} right={0}>
-              <EditIcon size={24} onClick={this.enableEditor} />
+              <EditIcon size={24} onClick={this.enableEditor} data-cy={`InlineEditField-Trigger-${field}`} />
             </Container>
           )}
-          {this.renderContent(canEdit, value, placeholder, children)}
+          {this.renderContent(field, canEdit, value, placeholder, children)}
         </Container>
       );
     } else {
@@ -113,6 +113,7 @@ class InlineEditField extends Component {
                   fontSize="inherit"
                   fontWeight="inherit"
                   lineHeight="inherit"
+                  data-cy={`InlineEditField-Textarea-${field}`}
                 />
               )}
               {error && (
@@ -128,6 +129,7 @@ class InlineEditField extends Component {
                   buttonStyle="primary"
                   loading={loading}
                   disabled={!touched}
+                  data-cy="InlineEditField-Btn-Save"
                   onClick={() => {
                     const variables = set(pick(values, ['id']), field, draft.trim());
                     updateField({ variables }).then(this.closeEditor);
@@ -138,6 +140,7 @@ class InlineEditField extends Component {
                 <StyledButton
                   textTransform="capitalize"
                   mx={2}
+                  data-cy="InlineEditField-Btn-Cancel"
                   buttonSize="large"
                   disabled={loading}
                   onClick={this.closeEditor}

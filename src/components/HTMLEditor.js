@@ -145,7 +145,7 @@ class HTMLEditor extends React.Component {
     }
 
     return (
-      <div className={classNames('HTMLEditor', this.props.className)}>
+      <div className={classNames('HTMLEditor', this.props.className)} data-cy="HTMLEditor">
         <style jsx>
           {`
             .HTMLEditor :global(.quill) {
