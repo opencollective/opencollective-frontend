@@ -105,7 +105,6 @@ class CollectivePickerWithData extends React.Component {
       uuid: pm.uuid,
     };
     try {
-      console.log(order);
       await this.props.addFundsToCollective(order);
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
