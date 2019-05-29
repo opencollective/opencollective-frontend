@@ -1236,6 +1236,7 @@ type Mutation {
   ): Member
   createOrder(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
+  addFundsToCollective(order: OrderInputType!): OrderType
 
   """
   Update the non-sensitive information of an order, like the public message
