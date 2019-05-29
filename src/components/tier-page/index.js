@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
+import dynamic from 'next/dynamic';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
@@ -17,13 +18,20 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 import Avatar from '../Avatar';
 import LinkCollective from '../LinkCollective';
-import HTMLEditor from '../HTMLEditor';
 import InlineEditField from '../InlineEditField';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
 import BubblesSVG from './Bubbles.svg';
+
+// Dynamicly load HTMLEditor to download it only if user can edit the page
+const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
+const HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor'), {
+  loading: HTMLEditorLoadingPlaceholder,
+  ssr: false,
+});
 
 /** The blured background image displayed under the tier description */
 const TierCover = styled(Container)`
