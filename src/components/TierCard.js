@@ -305,6 +305,13 @@ class TierCard extends React.Component {
               />
             </p>
           )}
+          {tier.longDescription && (
+            <Link route="tier" params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug }}>
+              <a>
+                <FormattedMessage id="moreInfo" defaultMessage="More info" />
+              </a>
+            </Link>
+          )}
         </div>
         {totalActiveDistinctOrders > 0 && (
           <div>
