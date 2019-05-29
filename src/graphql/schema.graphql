@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Mon May 20 2019 15:46:31 GMT+0200 (GMT+02:00)
+# timestamp: Wed May 29 2019 16:47:21 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -2166,7 +2166,20 @@ type Query {
     limit: Int
     offset: Int
   ): [Member]
-  allEvents(slug: String, limit: Int, offset: Int): [CollectiveInterface]
+  allEvents(
+    """
+    Slug of the parent collective
+    """
+    slug: String
+    limit: Int
+    offset: Int
+
+    """
+    If null, returns all events, if false returns only events that are not
+    archived, if true only returns events that have been archived
+    """
+    isArchived: Boolean
+  ): [CollectiveInterface]
   ocPaymentMethod(token: String!): PaymentMethodType
   PaymentMethod(id: Int, code: String): PaymentMethodType
   search(
@@ -2473,6 +2486,7 @@ input UpdateAttributesInputType {
   slug: String
   title: String
   image: String
+  isPrivate: Boolean
   markdown: String
   html: String
   fromCollective: CollectiveAttributesInputType
@@ -2488,6 +2502,7 @@ input UpdateInputType {
   slug: String
   title: String
   image: String
+  isPrivate: Boolean
   markdown: String
   html: String
   fromCollective: CollectiveAttributesInputType
@@ -2503,6 +2518,12 @@ type UpdateType {
   views: Int
   slug: String
   image: String
+  isPrivate: Boolean
+
+  """
+  Indicates whether or not the user is allowed to see the content of this update
+  """
+  userCanSeeUpdate: Boolean
   title: String
   createdAt: String
   updatedAt: String
