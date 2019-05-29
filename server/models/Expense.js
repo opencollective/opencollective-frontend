@@ -276,7 +276,10 @@ export default function(Sequelize, DataTypes) {
       if (expense.status === status.PAID) {
         entry.date = expense.updatedAt;
       }
-      arr.push(entry);
+
+      if (expense.status !== status.REJECTED) {
+        arr.push(entry);
+      }
     }
     return reduceArrayToCurrency(arr, baseCurrency);
   };
