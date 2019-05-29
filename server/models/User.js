@@ -519,7 +519,11 @@ export default (Sequelize, DataTypes) => {
         return models.Collective.create(userCollective, sequelizeParams);
       })
       .tap(collective => {
-        collective.findImage(user);
+        // It's difficult to predict when the image will be updated by findImageForUser
+        // So we skip that in test environment to make it more predictable
+        if (config.env !== 'test' && config.env !== 'circleci') {
+          collective.findImageForUser(user);
+        }
         user.CollectiveId = collective.id;
         return user.save(sequelizeParams);
       })

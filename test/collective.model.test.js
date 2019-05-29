@@ -318,18 +318,17 @@ describe('Collective model', () => {
     });
   });
 
-  it('creates an organization and populates logo image', done => {
-    models.Collective.create({
+  it('creates an organization and populates logo image', async () => {
+    let collective = await models.Collective.create({
       name: 'Open Collective',
       type: 'ORGANIZATION',
       website: 'https://opencollective.com',
-    }).then(collective => {
-      expect(collective.image).to.equal('https://logo.clearbit.com/opencollective.com');
-      models.Collective.findByPk(collective.id).then(c => {
-        expect(c.image).to.equal('https://logo.clearbit.com/opencollective.com');
-        done();
-      });
     });
+    // Make sure clearbit image is fetched (done automatically and async in normal conditions)
+    await collective.findImage();
+    // Fetch back the collective from the database
+    collective = await models.Collective.findByPk(collective.id);
+    expect(collective.image).to.equal('https://logo.clearbit.com/opencollective.com');
   });
 
   it('creates an organization with an admin user', async () => {
@@ -346,20 +345,17 @@ describe('Collective model', () => {
     expect(sendEmailSpy.firstCall.args[2]).to.contain('Discover');
   });
 
-  it('creates a user and populates avatar image', done => {
-    models.User.createUserWithCollective({
+  it('creates a user and populates avatar image', async () => {
+    const user = await models.User.createUserWithCollective({
       name: 'Xavier Damman',
       type: 'USER',
       email: 'xavier@tribal.be',
-    }).then(user => {
-      expect(user.collective.image).to.equal(undefined);
-      setTimeout(() => {
-        models.Collective.findByPk(user.collective.id).then(c => {
-          expect(c.image).to.equal('https://www.gravatar.com/avatar/a97d0fcd96579015da610aa284f8d8df?default=404');
-          done();
-        });
-      }, 700);
     });
+    // Make sure gravatar image is fetched (done automatically and async in normal conditions)
+    await user.collective.findImageForUser(user);
+    // Fetch back the collective from the database
+    const collective = await models.Collective.findByPk(user.collective.id);
+    expect(collective.image).to.equal('https://www.gravatar.com/avatar/a97d0fcd96579015da610aa284f8d8df?default=404');
   });
 
   it('computes the balance ', () =>

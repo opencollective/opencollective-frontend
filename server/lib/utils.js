@@ -1,12 +1,14 @@
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import { URL } from 'url';
+
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import pdf from 'html-pdf';
-import fs from 'fs';
-import path from 'path';
 import sanitizeHtml from 'sanitize-html';
 import { get, cloneDeep } from 'lodash';
-import { URL } from 'url';
 
 import handlebars from './handlebars';
 
@@ -532,3 +534,9 @@ export const cleanTags = tags => {
 
   return cleanTagsList.length > 0 ? cleanTagsList : null;
 };
+
+export const md5 = value =>
+  crypto
+    .createHash('md5')
+    .update(value)
+    .digest('hex');
