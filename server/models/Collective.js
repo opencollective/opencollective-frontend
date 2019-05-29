@@ -562,18 +562,16 @@ export default function(Sequelize, DataTypes) {
           instance.findImage();
 
           // We only create an "opencollective" paymentMethod for collectives and events
-          if (instance.type !== 'COLLECTIVE' && instance.type !== 'EVENT') {
-            return null;
+          if (instance.type === 'COLLECTIVE' || instance.type === 'EVENT') {
+            await models.PaymentMethod.create({
+              CollectiveId: instance.id,
+              service: 'opencollective',
+              type: 'collective',
+              name: `${capitalize(instance.name)} ${capitalize(instance.type.toLowerCase())}`,
+              primary: true,
+              currency: instance.currency,
+            });
           }
-
-          await models.PaymentMethod.create({
-            CollectiveId: instance.id,
-            service: 'opencollective',
-            type: 'collective',
-            name: `${capitalize(instance.name)} ${capitalize(instance.type.toLowerCase())}`,
-            primary: true,
-            currency: instance.currency,
-          });
 
           return null;
         },
@@ -706,35 +704,47 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
-  // If no image has been provided, try to find a good image using clearbit/gravatar and save it if it returns 200
-  Collective.prototype.findImage = function(user) {
+  // If no image has been provided, try to find an image using clearbit and save it
+  Collective.prototype.findImage = function() {
     if (this.getDataValue('image')) {
       return;
     }
 
-    const checkAndUpdateImage = image => {
-      return fetch(image)
-        .then(response => {
-          if (response.status === 200) {
-            return this.update({ image });
-          }
-        })
-        .catch(e => {
-          logger.error(`models/Collective: checkAndUpdateImage> Unable to fetch the image ${image}`, e);
-        });
-    };
-
     if (this.type === 'ORGANIZATION' && this.website && !this.website.match(/^https:\/\/twitter\.com\//)) {
       const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
-      checkAndUpdateImage(image);
+      return this.checkAndUpdateImage(image);
+    }
+  };
+
+  // If no image has been provided, try to find an image using gravatar and save it
+  Collective.prototype.findImageForUser = function(user) {
+    if (this.getDataValue('image')) {
+      return;
     }
 
     if (this.type === 'USER') {
       if (user && user.email && user.name && user.name !== 'anonymous') {
         const emailHash = md5(user.email.toLowerCase().trim());
         const avatar = `https://www.gravatar.com/avatar/${emailHash}?default=404`;
-        checkAndUpdateImage(avatar);
+        return this.checkAndUpdateImage(avatar);
       }
+    }
+  };
+
+  // Save image it if it returns 200
+  Collective.prototype.checkAndUpdateImage = async function(image) {
+    try {
+      const response = await fetch(image);
+      if (!response.status === 200) {
+        throw new Error(`status=${response.status}`);
+      }
+      const body = await response.text();
+      if (body.length === 0) {
+        throw new Error(`length=0`);
+      }
+      await this.update({ image });
+    } catch (err) {
+      logger.info(`collective.checkAndUpdateImage: Unable to fetch ${image}: ${err.message}`);
     }
   };
 
