@@ -34,6 +34,15 @@ async function main() {
       }
       continue;
     }
+    if (response.status == 403) {
+      console.log(`Image for ${collective.slug} access denied: ${collective.image}`);
+      try {
+        await collective.update({ image: null });
+      } catch (e) {
+        console.log(e);
+      }
+      continue;
+    }
     const body = await response.text();
     if (body.length === 0) {
       console.log(`Image for ${collective.slug} invalid: ${collective.image}`);

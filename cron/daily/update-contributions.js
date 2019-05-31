@@ -11,7 +11,7 @@ import * as github from '../../server/lib/github';
 
 const { Collective } = models;
 
-const CONCURRENCY = 5;
+const CONCURRENCY = 2;
 
 // TODO: As number of collectives grow, we need to consider fetching 100 at a time,
 // otherwise, we end up fetching a lot of data.
