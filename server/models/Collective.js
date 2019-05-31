@@ -727,7 +727,7 @@ export default function(Sequelize, DataTypes) {
     }
 
     if (this.type === 'USER') {
-      if (user && user.email && user.name && user.name !== 'anonymous') {
+      if (user && user.email && this.name && this.name !== 'anonymous') {
         const emailHash = md5(user.email.toLowerCase().trim());
         const avatar = `https://www.gravatar.com/avatar/${emailHash}?default=404`;
         return this.checkAndUpdateImage(avatar);
