@@ -9,9 +9,9 @@ async function main() {
   for (const collective of collectives) {
     if (collective.type === 'USER') {
       const user = await collective.getUser();
-      collective.findImageForUser(user);
+      await collective.findImageForUser(user);
     } else {
-      collective.findImage();
+      await collective.findImage();
     }
   }
   console.log('Done.');

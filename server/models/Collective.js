@@ -28,6 +28,7 @@ import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
 
 const debug = debugLib('collective');
+const debugcollectiveImage = debugLib('collectiveImage');
 
 export const defaultTiers = (HostCollectiveId, currency) => {
   const tiers = [];
@@ -718,6 +719,8 @@ export default function(Sequelize, DataTypes) {
       const image = `https://logo.clearbit.com/${getDomain(this.website)}`;
       return this.checkAndUpdateImage(image);
     }
+
+    return Promise.resolve();
   };
 
   // If no image has been provided, try to find an image using gravatar and save it
@@ -733,22 +736,28 @@ export default function(Sequelize, DataTypes) {
         return this.checkAndUpdateImage(avatar);
       }
     }
+
+    return Promise.resolve();
   };
 
   // Save image it if it returns 200
   Collective.prototype.checkAndUpdateImage = async function(image) {
+    debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image}`);
     try {
       const response = await fetch(image);
-      if (!response.status === 200) {
+      debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image} response.status: ${response.status}`);
+      if (response.status !== 200) {
         throw new Error(`status=${response.status}`);
       }
       const body = await response.text();
+      debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image} body.length: ${body.length}`);
       if (body.length === 0) {
         throw new Error(`length=0`);
       }
-      await this.update({ image });
+      debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image} updating`);
+      return this.update({ image });
     } catch (err) {
-      logger.info(`collective.checkAndUpdateImage: Unable to fetch ${image}: ${err.message}`);
+      logger.info(`collective.checkAndUpdateImage: Unable to fetch ${image} (${err.message})`);
     }
   };
 
