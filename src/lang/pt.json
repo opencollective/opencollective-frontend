@@ -31,7 +31,7 @@
   "applications.ApiKeys": "API Keys",
   "applications.ApiKeys.code": "API Key: {code}",
   "applications.ApiKeys.description": "Use API Keys to interact with the Open Collective GraphQL API with your own account.",
-  "applications.ApiKeys.new": "New API Key",
+  "applications.ApiKeys.new": "Nova chave de API",
   "applications.ApiKeys.none": "No API Key registered.",
   "authorization.loginRequired": "You need to be logged in to continue.",
   "button.submit": "Submit",
