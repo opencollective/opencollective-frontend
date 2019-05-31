@@ -1152,26 +1152,39 @@ const queries = {
   allEvents: {
     type: new GraphQLList(CollectiveInterfaceType),
     args: {
-      slug: { type: GraphQLString },
+      slug: { type: GraphQLString, description: 'Slug of the parent collective' },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt },
+      isArchived: {
+        type: GraphQLBoolean,
+        description:
+          'If null, returns all events, if false returns only events that are not archived, if true only returns events that have been archived',
+      },
     },
     resolve(_, args) {
+      const where = { type: 'EVENT' };
       if (args.slug) {
+        if (args.isArchived === true) {
+          where.deactivatedAt = { [Op.not]: null };
+        }
+        if (args.isArchived === false) {
+          where.deactivatedAt = null;
+        }
         return models.Collective.findBySlug(args.slug, { attributes: ['id'] })
-          .then(collective =>
-            models.Collective.findAll({
-              where: { ParentCollectiveId: collective.id, type: 'EVENT' },
+          .then(collective => {
+            where.ParentCollectiveId = collective.id;
+            return models.Collective.findAll({
+              where,
               order: [['startsAt', 'DESC'], ['createdAt', 'DESC']],
               limit: args.limit || 10,
               offset: args.offset || 0,
-            }),
-          )
+            });
+          })
           .catch(() => {
             return [];
           });
       } else {
-        return models.Collective.findAll({ where: { type: 'EVENT' } });
+        return models.Collective.findAll({ where });
       }
     },
   },
