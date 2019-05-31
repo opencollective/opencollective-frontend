@@ -5,6 +5,7 @@
 export default {
   ACTIVITY_ALL: 'all',
   CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
+  COLLECTIVE_CREATED_GITHUB: 'collective.created.github',
   COLLECTIVE_APPLY: 'collective.apply',
   COLLECTIVE_APPROVED: 'collective.approved',
   COLLECTIVE_CREATED: 'collective.created',

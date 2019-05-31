@@ -88,6 +88,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
       },
 
+      amountType: {
+        type: DataTypes.ENUM('FLEXIBLE', 'FIXED'),
+      },
+
       minimumAmount: {
         type: DataTypes.INTEGER,
         validate: {

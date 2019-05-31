@@ -1,13 +1,13 @@
 import Promise from 'bluebird';
 import config from 'config';
 import request from 'request-promise';
-import crypto from 'crypto';
 import debug from 'debug';
 import { pick, get } from 'lodash';
 
 import models, { sequelize, Op } from '../../models';
 import errors from '../../lib/errors';
 import emailLib from '../../lib/email';
+import { md5 } from '../../lib/utils';
 
 const debugEmail = debug('email');
 const debugWebhook = debug('webhook');
@@ -16,10 +16,7 @@ export const unsubscribe = (req, res, next) => {
   const { type, email, slug, token } = req.params;
 
   const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
-  const computedToken = crypto
-    .createHash('md5')
-    .update(identifier)
-    .digest('hex');
+  const computedToken = md5(identifier);
   if (token !== computedToken) {
     return next(new errors.BadRequest('Invalid token'));
   }
