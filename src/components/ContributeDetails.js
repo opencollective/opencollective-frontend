@@ -119,7 +119,7 @@ const ContributeDetails = ({
                 {...fieldProps}
                 value={amount / 100}
                 width={1}
-                onChange={({ target }) => dispatchChange({ amount: parseFloat(target.value) * 100 })}
+                onChange={({ target }) => dispatchChange({ amount: Math.round(parseFloat(target.value) * 100) })}
                 containerProps={{ borderRadius: hasOptions ? '0 4px 4px 0' : 3, ml: '-1px' }}
                 prependProps={{ pl: 2, pr: 0, bg: 'white.full', color: 'black.800' }}
                 px="2px"
