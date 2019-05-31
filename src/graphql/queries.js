@@ -409,6 +409,7 @@ const getCollectiveQuery = gql`
         type
         name
         description
+        longDescription
         button
         amount
         amountType
