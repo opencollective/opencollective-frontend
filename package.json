@@ -90,7 +90,7 @@
     "react-window": "1.8.2",
     "regenerator-runtime": "0.13.2",
     "rehype-react": "3.1.0",
-    "rehype-sanitize": "2.0.2",
+    "rehype-sanitize": "2.0.3",
     "remark-parse": "6.0.3",
     "remark-rehype": "4.0.0",
     "sanitize-html": "1.20.1",
