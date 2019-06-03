@@ -15,6 +15,9 @@ class CollectivePickerWithData extends React.Component {
   static propTypes = {
     host: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    LoggedInUser: PropTypes.object,
+    addFundsToCollective: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
