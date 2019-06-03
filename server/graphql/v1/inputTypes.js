@@ -12,7 +12,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json';
 import { Kind } from 'graphql/language';
-import { IsoDateString } from './types';
+import { IsoDateString, DateString } from './types';
 
 const EmailType = new GraphQLScalarType({
   name: 'Email',
@@ -399,8 +399,8 @@ export const ExpenseInputType = new GraphQLInputObjectType({
       id: { type: GraphQLInt },
       amount: { type: GraphQLInt },
       currency: { type: GraphQLString },
-      createdAt: { type: GraphQLString },
-      incurredAt: { type: GraphQLString },
+      createdAt: { type: DateString },
+      incurredAt: { type: DateString },
       description: { type: GraphQLString },
       category: { type: GraphQLString },
       status: { type: GraphQLString },

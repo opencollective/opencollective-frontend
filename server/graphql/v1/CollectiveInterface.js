@@ -27,6 +27,7 @@ import {
   PaginatedPaymentMethodsType,
   ImageFormatType,
   NotificationType,
+  DateString,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -509,9 +510,9 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         type: LocationType,
         description: 'Name, address, country, lat, long of the location.',
       },
-      createdAt: { type: GraphQLString },
-      startsAt: { type: GraphQLString },
-      endsAt: { type: GraphQLString },
+      createdAt: { type: DateString },
+      startsAt: { type: DateString },
+      endsAt: { type: DateString },
       timezone: { type: GraphQLString },
       maxAmount: { type: GraphQLInt },
       hostFeePercent: { type: GraphQLInt },
@@ -794,19 +795,19 @@ const CollectiveFields = () => {
       },
     },
     createdAt: {
-      type: GraphQLString,
+      type: DateString,
       resolve(collective) {
         return collective.createdAt;
       },
     },
     startsAt: {
-      type: GraphQLString,
+      type: DateString,
       resolve(collective) {
         return collective.startsAt;
       },
     },
     endsAt: {
-      type: GraphQLString,
+      type: DateString,
       resolve(collective) {
         return collective.endsAt;
       },

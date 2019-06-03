@@ -13,7 +13,7 @@ import {
 
 import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
-import { SubscriptionType, OrderType, PaymentMethodType, UserType } from './types';
+import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString } from './types';
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: 'Transaction',
@@ -50,8 +50,8 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       type: { type: GraphQLString },
       description: { type: GraphQLString },
       privateMessage: { type: GraphQLString },
-      createdAt: { type: GraphQLString },
-      updatedAt: { type: GraphQLString },
+      createdAt: { type: DateString },
+      updatedAt: { type: DateString },
       refundTransaction: { type: TransactionInterfaceType },
     };
   },
@@ -231,13 +231,13 @@ const TransactionFields = () => {
       },
     },
     createdAt: {
-      type: GraphQLString,
+      type: DateString,
       resolve(transaction) {
         return transaction.createdAt;
       },
     },
     updatedAt: {
-      type: GraphQLString,
+      type: DateString,
       resolve(transaction) {
         return transaction.updatedAt;
       },

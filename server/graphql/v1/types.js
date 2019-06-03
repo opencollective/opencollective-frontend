@@ -58,6 +58,13 @@ export const paginatedList = (type, typeName, valuesKey) => {
   });
 };
 
+export const DateString = new GraphQLScalarType({
+  name: 'DateString',
+  serialize: value => {
+    return value.toString();
+  },
+});
+
 export const UserType = new GraphQLObjectType({
   name: 'UserDetails',
   description: 'This represents the details of a User',
@@ -231,7 +238,7 @@ export const MemberType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(member) {
           return member.createdAt;
         },
@@ -496,19 +503,19 @@ export const ExpenseType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(expense) {
           return expense.createdAt;
         },
       },
       updatedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(expense) {
           return expense.updatedAt;
         },
       },
       incurredAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(expense) {
           return expense.incurredAt;
         },
@@ -679,19 +686,19 @@ export const UpdateType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(update) {
           return update.createdAt;
         },
       },
       updatedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(update) {
           return update.updatedAt;
         },
       },
       publishedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(update) {
           return update.publishedAt;
         },
@@ -838,13 +845,13 @@ export const CommentType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(comment) {
           return comment.createdAt;
         },
       },
       updatedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(comment) {
           return comment.updatedAt;
         },
@@ -946,13 +953,13 @@ export const NotificationType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(comment) {
           return comment.createdAt;
         },
       },
       updatedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(comment) {
           return comment.updatedAt;
         },
@@ -1135,13 +1142,13 @@ export const TierType = new GraphQLObjectType({
         },
       },
       startsAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(tier) {
           return tier.startsAt;
         },
       },
       endsAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(tier) {
           return tier.startsAt;
         },
@@ -1382,13 +1389,13 @@ export const OrderType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(order) {
           return order.createdAt;
         },
       },
       updatedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(order) {
           return order.updatedAt;
         },
@@ -1466,13 +1473,13 @@ export const ConnectedAccountType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(ca) {
           return ca.createdAt;
         },
       },
       updatedAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(ca) {
           return ca.updatedAt;
         },
@@ -1505,7 +1512,7 @@ export const PaymentMethodType = new GraphQLObjectType({
         },
       },
       createdAt: {
-        type: GraphQLString,
+        type: DateString,
         resolve(paymentMethod) {
           return paymentMethod.createdAt;
         },
@@ -1518,7 +1525,7 @@ export const PaymentMethodType = new GraphQLObjectType({
         },
       },
       expiryDate: {
-        type: GraphQLString,
+        type: DateString,
         resolve(paymentMethod) {
           return paymentMethod.expiryDate;
         },
