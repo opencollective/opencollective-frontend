@@ -1456,7 +1456,7 @@ export default function(Sequelize, DataTypes) {
           },
         };
 
-        if (!options || !options.skipApplyActivity) {
+        if (!options || !options.skipCollectiveApplyActivity) {
           promises.push(
             models.Activity.create({
               CollectiveId: this.id,
