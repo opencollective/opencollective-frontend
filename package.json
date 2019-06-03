@@ -19,7 +19,7 @@
     "algoliasearch": "3.33.0",
     "amqplib": "0.5.3",
     "apollo-errors": "1.9.0",
-    "apollo-server-express": "2.5.1",
+    "apollo-server-express": "2.6.1",
     "argparse": "1.0.10",
     "async": "2.6.1",
     "aws-sdk": "2.466.0",
