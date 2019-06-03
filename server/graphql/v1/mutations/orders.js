@@ -872,3 +872,81 @@ export async function markOrderAsPaid(remoteUser, id) {
   await libPayments.executeOrder(remoteUser, order);
   return order;
 }
+
+export async function addFundsToCollective(order, remoteUser) {
+  if (!remoteUser) {
+    throw new Error('You need to be logged in to add fund to collective');
+  }
+
+  if (order.totalAmount < 0) {
+    throw new Error('Total amount cannot be a negative value');
+  }
+
+  const collective = await models.Collective.findByPk(order.collective.id);
+  if (!collective) {
+    throw new Error(`No collective found: ${order.collective.id}`);
+  }
+
+  if (order.fromCollective && order.fromCollective.id === collective.id) {
+    throw new Error('Orders cannot be created for a collective by that same collective.');
+  }
+
+  const HostCollectiveId = await collective.getHostCollectiveId();
+  if (!remoteUser.isAdmin(HostCollectiveId) && !remoteUser.isRoot()) {
+    throw new Error('Only an site admin or collective host admin can add fund');
+  }
+
+  order.collective = collective;
+  let fromCollective, user;
+
+  if (order.user && order.user.email) {
+    user = await models.User.findByEmailOrPaypalEmail(order.user.email);
+    if (!user) {
+      user = await models.User.createUserWithCollective({
+        ...order.user,
+        currency: collective.currency,
+        CreatedByUserId: remoteUser ? remoteUser.id : null,
+      });
+    }
+  } else if (remoteUser) {
+    user = remoteUser;
+  }
+
+  if (order.fromCollective.id) {
+    fromCollective = await models.Collective.findByPk(order.fromCollective.id);
+    if (!fromCollective) {
+      throw new Error(`From collective id ${order.fromCollective.id} not found`);
+    }
+  } else {
+    fromCollective = await models.Collective.createOrganization(order.fromCollective, user, remoteUser);
+  }
+
+  const orderData = {
+    CreatedByUserId: remoteUser.id || user.id,
+    FromCollectiveId: fromCollective.id,
+    CollectiveId: collective.id,
+    totalAmount: order.totalAmount,
+    currency: collective.currency,
+    description: order.description,
+    status: status.PENDING,
+  };
+
+  const orderCreated = await models.Order.create(orderData);
+  await orderCreated.setPaymentMethod(order.paymentMethod);
+
+  try {
+    await libPayments.executeOrder(
+      remoteUser || user,
+      orderCreated,
+      pick(order, ['hostFeePercent', 'platformFeePercent']),
+    );
+  } catch (e) {
+    // Don't save new card for user if order failed
+    if (!order.paymentMethod.id && !order.paymentMethod.uuid) {
+      await orderCreated.paymentMethod.update({ CollectiveId: null });
+    }
+    throw e;
+  }
+
+  return models.Order.findByPk(orderCreated.id);
+}

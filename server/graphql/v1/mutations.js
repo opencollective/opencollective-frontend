@@ -17,6 +17,7 @@ import {
   updateSubscription,
   refundTransaction,
   addFundsToOrg,
+  addFundsToCollective,
   completePledge,
   markOrderAsPaid,
   updateOrderInfo,
@@ -380,6 +381,17 @@ const mutations = {
     },
     resolve(_, args, req) {
       return createOrder(args.order, req.loaders, req.remoteUser, req.ip);
+    },
+  },
+  addFundsToCollective: {
+    type: OrderType,
+    args: {
+      order: {
+        type: new GraphQLNonNull(OrderInputType),
+      },
+    },
+    resolve(_, args, req) {
+      return addFundsToCollective(args.order, req.remoteUser);
     },
   },
   updateOrder: {
