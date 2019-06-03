@@ -117,12 +117,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
             />
           )}
         </div>
-        <Modal
-          show={this.state.showModal}
-          width="570px"
-          height="300px"
-          onClose={() => this.setState({ showModal: false })}
-        >
+        <Modal show={this.state.showModal} width="570px" onClose={() => this.setState({ showModal: false })}>
           <ModalHeader>
             <FormattedMessage
               id="apply.host.tos.modal.header"
