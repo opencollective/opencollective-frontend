@@ -1346,8 +1346,9 @@ export default function(Sequelize, DataTypes) {
    * Add the host in the Members table and updates HostCollectiveId
    * @param {*} hostCollective instanceof models.Collective
    * @param {*} creatorUser { id } (optional, falls back to hostCollective.CreatedByUserId)
+   * @param {object} [options] (optional, to peform specific actions)
    */
-  Collective.prototype.addHost = async function(hostCollective, creatorUser) {
+  Collective.prototype.addHost = async function(hostCollective, creatorUser, options) {
     if (this.HostCollectiveId) {
       throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
     }
@@ -1454,13 +1455,15 @@ export default function(Sequelize, DataTypes) {
             ]),
           },
         };
-        promises.push(
-          models.Activity.create({
-            CollectiveId: this.id,
-            type: activities.COLLECTIVE_APPLY,
-            data,
-          }),
-        );
+        if (options.activity && options.activity !== activities.COLLECTIVE_CREATED_GITHUB) {
+          promises.push(
+            models.Activity.create({
+              CollectiveId: this.id,
+              type: activities.COLLECTIVE_APPLY,
+              data,
+            }),
+          );
+        }
       }
     }
 
