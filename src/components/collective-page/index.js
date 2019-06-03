@@ -2,13 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 
+// OC Frontend imports
+import roles from '../../constants/roles';
+import { CollectiveType } from '../../constants/collectives';
 import theme from '../../constants/theme';
 import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
 
+// Collective page imports
 import { AllSectionsNames, Sections, Dimensions } from './_constants';
 import Hero from './Hero';
 import SectionAbout from './SectionAbout';
+import SectionContributors from './SectionContributors';
 
 /** A mutation used by child components to update the collective */
 const EditCollectiveMutation = gql`
@@ -49,6 +54,21 @@ export default class CollectivePage extends Component {
       slug: PropTypes.string.isRequired,
       image: PropTypes.string,
     }),
+
+    /** Collective members */
+    members: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        role: PropTypes.oneOf(Object.values(roles)).isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+          slug: PropTypes.string.isRequired,
+          name: PropTypes.string,
+          image: PropTypes.string,
+        }).isRequired,
+      }),
+    ),
 
     /** The logged in user */
     LoggedInUser: PropTypes.object,
@@ -124,6 +144,8 @@ export default class CollectivePage extends Component {
           editMutation={EditCollectiveMutation}
         />
       );
+    } else if (section === Sections.CONTRIBUTORS) {
+      return <SectionContributors collectiveName={this.props.collective.name} members={this.props.members} />;
     }
 
     // Placeholder for sections not implemented yet

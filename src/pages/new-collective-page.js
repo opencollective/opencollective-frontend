@@ -71,7 +71,12 @@ class NewCollectivePage extends React.Component {
         ) : (
           <React.Fragment>
             <GlobalStyles />
-            <CollectivePage collective={data.Collective} host={data.Collective.host} LoggedInUser={LoggedInUser} />
+            <CollectivePage
+              collective={data.Collective}
+              host={data.Collective.host}
+              members={data.Collective.members}
+              LoggedInUser={LoggedInUser}
+            />
           </React.Fragment>
         )}
       </Page>
@@ -106,6 +111,17 @@ const getCollective = graphql(gql`
         slug
         image
         type
+      }
+      members {
+        id
+        role
+        collective: member {
+          id
+          type
+          slug
+          name
+          image
+        }
       }
     }
   }
