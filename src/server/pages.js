@@ -52,6 +52,11 @@ pages
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('discover', '/discover');
 
+// Tier page
+// ---------------
+pages.add('tiers', '/:collectiveSlug/:verb(tiers|contribute)');
+pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)');
+
 // Contribute Flow
 // ---------------
 
@@ -130,10 +135,6 @@ pages.add(
 
 // New collective page
 pages.add('new-collective-page', '/:slug/v2');
-
-// Tier page
-pages.add('tiers', '/:collectiveSlug/tiers');
-pages.add('tier', '/:collectiveSlug/tiers/:tierSlug?-:tierId(\\d+)');
 
 pages.add('collective', '/:slug');
 

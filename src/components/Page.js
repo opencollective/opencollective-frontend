@@ -18,6 +18,7 @@ const Page = ({
   title,
   twitterHandle,
   showSearch,
+  canonicalURL,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -33,6 +34,7 @@ const Page = ({
         twitterHandle={twitterHandle}
         description={description}
         image={image}
+        canonicalURL={canonicalURL}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       <Footer />
@@ -48,6 +50,7 @@ Page.propTypes = {
   }),
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   description: PropTypes.string,
+  canonicalURL: PropTypes.string,
   image: PropTypes.string,
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
