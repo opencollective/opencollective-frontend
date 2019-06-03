@@ -22,6 +22,7 @@ import Avatar from '../Avatar';
 import LinkCollective from '../LinkCollective';
 import InlineEditField from '../InlineEditField';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import HTMLContent, { isEmptyValue } from '../HTMLContent';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
@@ -60,20 +61,6 @@ const Bubbles = styled.div`
     background-size: 90% auto;
     background-position-x: center;
     background-position-y: 110%;
-  }
-`;
-
-/** Long description container */
-const LongDescription = styled.div`
-  /** Override global styles to match what we have in the editor */
-  h1,
-  h2,
-  h3 {
-    margin: 0;
-  }
-
-  img {
-    max-width: 100%;
   }
 `;
 
@@ -248,24 +235,28 @@ class TierPage extends Component {
                   values={tier}
                   field="longDescription"
                   canEdit={canEditTier}
-                  placeholder={
-                    <FormattedMessage id="TierPage.AddLongDescription" defaultMessage="Add a rich description" />
-                  }
                 >
-                  {({ isEditing, value, setValue }) =>
-                    !isEditing ? (
-                      <LongDescription
-                        dangerouslySetInnerHTML={{ __html: tier.longDescription }}
-                        data-cy="longDescription"
-                      />
-                    ) : (
-                      <HTMLEditor
-                        defaultValue={value}
-                        onChange={setValue}
-                        allowedHeaders={[false, 2, 3]} /** Disable H1 */
-                      />
-                    )
-                  }
+                  {({ isEditing, value, setValue, enableEditor }) => {
+                    if (isEditing) {
+                      return (
+                        <HTMLContent>
+                          <HTMLEditor
+                            defaultValue={value}
+                            onChange={setValue}
+                            allowedHeaders={[false, 2, 3]} /** Disable H1 */
+                          />
+                        </HTMLContent>
+                      );
+                    } else if (isEmptyValue(tier.longDescription)) {
+                      return !canEditTier ? null : (
+                        <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
+                          <FormattedMessage id="TierPage.AddLongDescription" defaultMessage="Add a rich description" />
+                        </StyledButton>
+                      );
+                    } else {
+                      return <HTMLContent content={tier.longDescription} data-cy="longDescription" />;
+                    }
+                  }}
                 </InlineEditField>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
                   {shareBlock}
