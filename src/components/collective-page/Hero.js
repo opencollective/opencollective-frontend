@@ -27,7 +27,8 @@ import DefinedTerm, { Terms } from '../DefinedTerm';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 
-import { AllSectionsNames, Dimensions, AnimationsDurations } from './_constants';
+import { AllSectionsNames, AnimationsDurations } from './_constants';
+import ContainerSectionContent from './ContainerSectionContent';
 import NavBar from './NavBar';
 import HeroBackground from './HeroBackground';
 
@@ -122,7 +123,7 @@ class Hero extends Component {
         {/* Hero top */}
         <Container position="relative" pb={isFixed ? 0 : 4}>
           {!isFixed && <HeroBackground backgroundImage={collective.backgroundImage} />}
-          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} px={Dimensions.PADDING_X} margin="0 auto">
+          <ContainerSectionContent>
             <Flex pt={isFixed ? 16 : 40} flexWrap="wrap" width={1} justifyContent="center">
               {/* Collective presentation (name, logo, description...) */}
               <Flex
@@ -226,16 +227,13 @@ class Hero extends Component {
                 </Flex>
               )}
             </Flex>
-          </Container>
+          </ContainerSectionContent>
         </Container>
         {/* NavBar */}
-        <Container
+        <ContainerSectionContent
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          maxWidth={Dimensions.MAX_SECTION_WIDTH}
-          px={[0, 15, null, null, 120]}
-          margin="0 auto"
           height={isFixed ? 56 : [56, null, null, 84]}
           flexWrap="wrap"
           width={1}
@@ -253,7 +251,7 @@ class Hero extends Component {
               <FormattedMessage id="Collective.Hero.Donate" defaultMessage="Donate" />
             </StyledButton>
           </Container>
-        </Container>
+        </ContainerSectionContent>
       </MainContainer>
     );
   }

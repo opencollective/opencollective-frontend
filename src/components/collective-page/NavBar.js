@@ -39,13 +39,9 @@ const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
 `;
 
 const translations = defineMessages({
-  [Sections.JOIN_US]: {
-    id: 'CollectivePage.NavBar.JoinUs',
-    defaultMessage: 'Join us',
-  },
-  [Sections.GET_AND_GIVE]: {
-    id: 'CollectivePage.NavBar.GetAndGive',
-    defaultMessage: 'Get & give',
+  [Sections.CONTRIBUTE]: {
+    id: 'CollectivePage.NavBar.Contribute',
+    defaultMessage: 'Contribute',
   },
   [Sections.CONVERSATIONS]: {
     id: 'CollectivePage.NavBar.Conversations',

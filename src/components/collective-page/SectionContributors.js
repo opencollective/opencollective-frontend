@@ -7,6 +7,7 @@ import memoizeOne from 'memoize-one';
 import { P, H2, H3, Span } from '../Text';
 import ContributorsGrid from '../ContributorsGrid';
 import ContributorsFilter, { filterMembers, getMembersFilters, CONTRIBUTOR_FILTERS } from '../ContributorsFilter';
+import ContainerSectionContent from './ContainerSectionContent';
 
 export default class SectionContributors extends React.PureComponent {
   static propTypes = {
@@ -37,7 +38,7 @@ export default class SectionContributors extends React.PureComponent {
 
     return (
       <Box pt={6}>
-        <Box m="0 auto" css={{ maxWidth: 1440 }}>
+        <ContainerSectionContent>
           <H2 mb={4} px={3} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
             <FormattedMessage
               id="CollectivePage.AllOfUs"
@@ -62,7 +63,7 @@ export default class SectionContributors extends React.PureComponent {
           {filters.length > 2 && members.length >= SectionContributors.MIN_MEMBERS_TO_SHOW_FILTERS && (
             <ContributorsFilter selected={filter} onChange={this.setFilter} filters={filters} />
           )}
-        </Box>
+        </ContainerSectionContent>
         <Box mb={4}>
           <ContributorsGrid members={filteredMembers} />
         </Box>
