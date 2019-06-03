@@ -1455,7 +1455,8 @@ export default function(Sequelize, DataTypes) {
             ]),
           },
         };
-        if (options.activity && options.activity !== activities.COLLECTIVE_CREATED_GITHUB) {
+
+        if (!options.skipApplyActivity) {
           promises.push(
             models.Activity.create({
               CollectiveId: this.id,
