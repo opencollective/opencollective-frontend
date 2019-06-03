@@ -36,7 +36,7 @@ export default {
    * Needed to get usernames for github signups
    */
   getUsernameFromGithubURL(url) {
-    const githubUrl = 'images.githubusercontent.com/';
+    const githubUrl = 'avatars.githubusercontent.com/';
     if (url && url.indexOf(githubUrl) !== -1) {
       const tokens = url.split(githubUrl);
       if (tokens.length === 2 && tokens[1] !== '') {

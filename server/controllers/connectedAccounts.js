@@ -20,7 +20,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
     case 'github': {
       let fetchUserPromise, caId, user, userCollective;
       const profile = data.profile._json;
-      const image = `https://images.githubusercontent.com/${data.profile.username}`;
+      const image = `https://avatars.githubusercontent.com/${data.profile.username}`;
 
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
