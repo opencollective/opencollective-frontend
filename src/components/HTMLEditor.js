@@ -45,6 +45,8 @@ class HTMLEditor extends React.Component {
         container: [
           [{ header: props.allowedHeaders }],
           ['bold', 'italic', 'underline', 'blockquote'],
+          [{ color: [] }],
+          [{ align: '' }, { align: 'center' }, { align: 'right' }],
           [{ list: 'ordered' }, { list: 'bullet' }],
           ['link', 'image'],
         ],
@@ -66,6 +68,8 @@ class HTMLEditor extends React.Component {
      * See https://quilljs.com/docs/formats/
      */
     this.formats = [
+      'align',
+      'color',
       'header',
       'font',
       'size',

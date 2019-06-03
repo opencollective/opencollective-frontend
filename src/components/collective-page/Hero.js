@@ -42,6 +42,7 @@ const MainContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   transition: flex;
+  z-index: 999;
 
   ${props =>
     props.isFixed &&
