@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
 
 import Container from './Container';
@@ -22,6 +22,12 @@ const ModalWrapper = styled(Container)`
       width: ${props.width};
       height: ${props.height};
     `}
+`;
+
+const GlobalModalStyle = createGlobalStyle`
+  body {
+    overflow: ${props => (props.show ? 'hidden' : 'auto')};
+  }
 `;
 
 const ModalOverlay = styled.div`
@@ -96,12 +102,9 @@ export const ModalFooter = ({ children }) => (
  */
 const Modal = ({ children, show, width, height, onClose }) => {
   if (show) {
-    // disable scrolling
-    document.documentElement.style.overflow = 'hidden';
-    document.body.scroll = 'no';
-
     return (
       <React.Fragment>
+        <GlobalModalStyle show />
         <ModalWrapper width={width} height={height}>
           {React.Children.map(children, child => {
             if (child.type.displayName === 'Header') {
@@ -114,9 +117,6 @@ const Modal = ({ children, show, width, height, onClose }) => {
       </React.Fragment>
     );
   } else {
-    // enable scrolling
-    document.documentElement.style.overflow = 'scroll';
-    document.body.scroll = 'yes';
     return null;
   }
 };
