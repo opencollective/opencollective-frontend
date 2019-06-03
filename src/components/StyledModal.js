@@ -26,7 +26,7 @@ const ModalWrapper = styled(Container)`
 
 const GlobalModalStyle = createGlobalStyle`
   body {
-    overflow: ${props => (props.show ? 'hidden' : 'auto')};
+    overflow: hidden;
   }
 `;
 
@@ -104,7 +104,7 @@ const Modal = ({ children, show, width, height, onClose }) => {
   if (show) {
     return (
       <React.Fragment>
-        <GlobalModalStyle show />
+        <GlobalModalStyle />
         <ModalWrapper width={width} height={height}>
           {React.Children.map(children, child => {
             if (child.type.displayName === 'Header') {
