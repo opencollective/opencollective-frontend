@@ -163,6 +163,7 @@ const getTiersQuery = gql`
         name
         description
         amount
+        amountType
         minimumAmount
         currency
         interval
@@ -250,6 +251,7 @@ export const getCollectiveToEditQueryFields = `
     longDescription
     amount
     presets
+    amountType
     minimumAmount
     goal
     interval
@@ -407,8 +409,10 @@ const getCollectiveQuery = gql`
         type
         name
         description
+        longDescription
         button
         amount
+        amountType
         minimumAmount
         presets
         interval
@@ -562,6 +566,7 @@ const getEventCollectiveQuery = gql`
         name
         description
         amount
+        amountType
         minimumAmount
         presets
         currency

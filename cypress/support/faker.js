@@ -12,3 +12,7 @@ export const randomEmail = (directSignIn = true) => {
   const randomID = uuidv4().split('-')[0];
   return directSignIn ? `oc-test-${randomID}@opencollective.com` : `oc-noDirectSignIn-${randomID}@opencollective.com`;
 };
+
+export const randomSlug = () => {
+  return uuidv4().split('-')[0];
+};

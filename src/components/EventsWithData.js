@@ -188,7 +188,7 @@ class EventsWithData extends React.Component {
 
 const getEventsQuery = gql`
   query allEvents($collectiveSlug: String) {
-    allEvents(slug: $collectiveSlug) {
+    allEvents(slug: $collectiveSlug, isArchived: false) {
       id
       slug
       name

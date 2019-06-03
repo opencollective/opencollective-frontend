@@ -237,7 +237,11 @@ class HomePage extends React.Component {
       stats: { totalAnnualBudget, totalCollectives, totalDonors },
     } = this.state;
 
-    const filteredTransactions = transactions.filter(({ type, order, category }) => {
+    const filteredTransactions = transactions.filter(({ type, order, category, fromCollective, collective }) => {
+      // Ignore corrupt entries (should not happen)
+      if (!fromCollective || !collective) {
+        return false;
+      }
       if (type === 'CREDIT') {
         return !!order;
       }

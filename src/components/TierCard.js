@@ -257,7 +257,15 @@ class TierCard extends React.Component {
             }
           `}
         </style>
-        <div className="name">{tier.name}</div>
+        <div className="name">
+          {!tier.longDescription ? (
+            tier.name
+          ) : (
+            <Link route="tier" params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug }}>
+              <a>{tier.name}</a>
+            </Link>
+          )}
+        </div>
         {amount > 0 && (
           <div className="amount">
             <Currency value={amount} currency={tier.currency || collective.currency} precision={0} />
@@ -296,6 +304,13 @@ class TierCard extends React.Component {
                 }}
               />
             </p>
+          )}
+          {tier.longDescription && (
+            <Link route="tier" params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug }}>
+              <a>
+                <FormattedMessage id="moreInfo" defaultMessage="More info" />
+              </a>
+            </Link>
           )}
         </div>
         {totalActiveDistinctOrders > 0 && (
