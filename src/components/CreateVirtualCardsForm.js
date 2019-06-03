@@ -172,7 +172,7 @@ class CreateVirtualCardsForm extends Component {
     if (!submitting && this.form.current.reportValidity()) {
       this.setState({ submitting: true });
       const params = {
-        amount: values.amount * 100,
+        amount: Math.round(values.amount * 100),
         PaymentMethodId: values.PaymentMethodId || this.getDefaultPaymentMethod().id,
         limitedToOpenSourceCollectives: values.onlyOpensource,
         expiryDate: values.expiryDate,
