@@ -15,6 +15,9 @@ class CollectivePickerWithData extends React.Component {
   static propTypes = {
     host: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    LoggedInUser: PropTypes.object,
+    addFundsToCollective: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -105,7 +108,7 @@ class CollectivePickerWithData extends React.Component {
       uuid: pm.uuid,
     };
     try {
-      await this.props.createOrder(order);
+      await this.props.addFundsToCollective(order);
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -355,9 +358,9 @@ class CollectivePickerWithData extends React.Component {
   }
 }
 
-const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType!) {
-    createOrder(order: $order) {
+const addFundsToCollectiveQuery = gql`
+  mutation addFundsToCollective($order: OrderInputType!) {
+    addFundsToCollective(order: $order) {
       id
       collective {
         id
@@ -370,9 +373,9 @@ const createOrderQuery = gql`
   }
 `;
 
-const addMutation = graphql(createOrderQuery, {
+const addMutation = graphql(addFundsToCollectiveQuery, {
   props: ({ mutate }) => ({
-    createOrder: async order => {
+    addFundsToCollective: async order => {
       return await mutate({ variables: { order } });
     },
   }),
