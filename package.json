@@ -53,6 +53,7 @@
     "lodash": "4.17.11",
     "lru-cache": "5.1.1",
     "markdown-loader": "5.0.0",
+    "memoize-one": "5.0.4",
     "moment": "2.24.0",
     "moment-timezone": "0.5.25",
     "next": "8.1.0",

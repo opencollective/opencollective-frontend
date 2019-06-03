@@ -130,7 +130,13 @@ StyledButton.propTypes = {
 };
 
 StyledButton.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'asLink', 'textTransform'),
+  omitProps: tag.defaultProps.omitProps.concat(
+    'buttonStyle',
+    'buttonSize',
+    'asLink',
+    'textTransform',
+    'backgroundColor',
+  ),
   buttonSize: 'medium',
   buttonStyle: 'standard',
   loading: false,

@@ -8,6 +8,8 @@ import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
 
 // Open Collective Frontend imports
+import roles from '../../constants/roles';
+import { CollectiveType } from '../../constants/collectives';
 import { getWebsiteUrl } from '../../lib/utils';
 import { P, H1, H3 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -23,6 +25,7 @@ import InlineEditField from '../InlineEditField';
 // Local tier page imports
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
+import TierContributors from './TierContributors';
 import BubblesSVG from './Bubbles.svg';
 
 /** The blured background image displayed under the tier description */
@@ -100,6 +103,29 @@ class TierPage extends Component {
       description: PropTypes.string,
     }).isRequired,
 
+    /** The members that contribute to this tier */
+    members: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        role: PropTypes.oneOf(Object.values(roles)).isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+          slug: PropTypes.string.isRequired,
+          name: PropTypes.string,
+          image: PropTypes.string,
+        }).isRequired,
+      }),
+    ),
+
+    /** Some statistics about this tier */
+    membersStats: PropTypes.shape({
+      all: PropTypes.number.isRequired,
+      collectives: PropTypes.number.isRequired,
+      organizations: PropTypes.number.isRequired,
+      users: PropTypes.number.isRequired,
+    }).isRequired,
+
     /** The logged in user */
     LoggedInUser: PropTypes.object,
 
@@ -120,7 +146,7 @@ class TierPage extends Component {
   }
 
   render() {
-    const { collective, tier, LoggedInUser } = this.props;
+    const { collective, tier, members, membersStats, LoggedInUser } = this.props;
     const canEditTier = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
@@ -185,13 +211,7 @@ class TierPage extends Component {
               mx={[0, null, 3]}
             >
               <Bubbles />
-              <Container
-                background="white"
-                borderRadius={8}
-                px={[3, 4]}
-                py={[4, 5]}
-                boxShadow="0px 10px 15px 3px rgba(0, 0, 0, 0.05)"
-              >
+              <Container background="white" borderRadius={8} px={[3, 4]} py={[4, 5]}>
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
@@ -339,6 +359,7 @@ class TierPage extends Component {
             </Container>
           </Flex>
         </Flex>
+        <TierContributors collectiveName={collective.name} members={members} membersStats={membersStats} />
       </Container>
     );
   }
