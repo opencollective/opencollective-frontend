@@ -2,8 +2,8 @@ import * as utils from './utils';
 import { get, pick } from 'lodash';
 
 const allTransactionsQuery = `
-query allTransactions($collectiveSlug: String!, $limit: Int, $offset: Int, $type: String, $includeVirtualCards: Boolean ) {
-  allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset, type: $type, includeVirtualCards: $includeVirtualCards) {
+query allTransactions($collectiveSlug: String!, $limit: Int, $offset: Int, $type: String) {
+  allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset, type: $type) {
     id
     uuid
     type
@@ -103,9 +103,15 @@ const getTransactionQuery = `
  */
 export const getLatestTransactions = async (req, res) => {
   try {
-    const args = req.query;
+    const args = pick(req.query, ['limit', 'offset', 'type']);
     args.collectiveSlug = get(req, 'params.collectiveSlug');
-    const response = await utils.graphqlQuery(allTransactionsQuery, req.query, req.remoteUser);
+    if (args.limit) {
+      args.limit = Number(args.limit);
+    }
+    if (args.offset) {
+      args.offset = Number(args.offset);
+    }
+    const response = await utils.graphqlQuery(allTransactionsQuery, args, req.remoteUser);
     if (response.errors) {
       throw new Error(response.errors[0]);
     }
