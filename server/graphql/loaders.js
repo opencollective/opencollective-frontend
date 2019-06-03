@@ -360,6 +360,53 @@ export const loaders = req => {
             });
           });
       }),
+      membersStats: new DataLoader(tiersIds => {
+        return models.Member.findAll({
+          attributes: [
+            'TierId',
+            sequelize.col('memberCollective.type'),
+            [sequelize.fn('COUNT', sequelize.col('memberCollective.id')), 'count'],
+          ],
+          where: {
+            TierId: { [Op.in]: tiersIds },
+          },
+          group: ['TierId', sequelize.col('memberCollective.type')],
+          include: [
+            {
+              model: models.Collective,
+              as: 'memberCollective',
+              attributes: [],
+              required: true,
+            },
+          ],
+          raw: true,
+        }).then(results => {
+          // Used to initialize stats or for when there's no entry available
+          const getDefaultStats = TierId => ({
+            id: TierId,
+            all: 0,
+            USER: 0,
+            ORGANIZATION: 0,
+            COLLECTIVE: 0,
+          });
+
+          // Build a map like { 42: { id: 42, users: 12, ... } }
+          const resultsMap = {};
+          results.forEach(({ TierId, type, count }) => {
+            if (!resultsMap[TierId]) {
+              resultsMap[TierId] = getDefaultStats(TierId);
+            }
+
+            resultsMap[TierId][type] = count;
+            resultsMap[TierId].all += count;
+          });
+
+          // Return a sorted list to match dataloader format
+          return tiersIds.map(tierId => {
+            return resultsMap[tierId] || getDefaultStats(tierId);
+          });
+        });
+      }),
     },
     paymentMethods: {
       findById: new DataLoader(ids =>
@@ -424,6 +471,14 @@ export const loaders = req => {
       },
     },
     members: {
+      findByTierId: new DataLoader(tiersIds => {
+        return models.Member.findAll({
+          where: { TierId: { [Op.in]: tiersIds } },
+          order: [['createdAt', 'DESC']],
+        }).then(results => {
+          return sortResults(tiersIds, results, 'TierId', []);
+        });
+      }),
       transactions: new DataLoader(combinedKeys =>
         models.Transaction.findAll({
           where: {
