@@ -742,17 +742,20 @@ export async function updateSubscription(remoteUser, args) {
 
     const newSubscriptionDataValues = Object.assign(omit(order.Subscription.dataValues, ['id', 'deactivatedAt']), {
       amount: amount,
+      createdAt: new Date(),
       updatedAt: new Date(),
       activatedAt: new Date(),
       isActive: true,
     });
 
     const newSubscription = await models.Subscription.create(newSubscriptionDataValues);
-    const newOrderDataValues = Object.assign(omit(order.dataValues, ['id', 'status']), {
+
+    const newOrderDataValues = Object.assign(omit(order.dataValues, ['id']), {
       totalAmount: amount,
       SubscriptionId: newSubscription.id,
+      createdAt: new Date(),
       updatedAt: new Date(),
-      status: status.PENDING,
+      status: status.ACTIVE,
     });
 
     order = await models.Order.create(newOrderDataValues);
