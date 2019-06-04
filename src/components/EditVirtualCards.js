@@ -145,7 +145,7 @@ const getIsConfirmedFromFilter = filter => {
 const getGraphQLVariablesFromProps = props => ({
   CollectiveId: props.collectiveId,
   isConfirmed: getIsConfirmedFromFilter(props.router.query.filter),
-  offset: props.router.query.offset || 0,
+  offset: Number(props.router.query.offset) || 0,
   limit: props.limit || VIRTUALCARDS_PER_PAGE,
 });
 
