@@ -58,7 +58,7 @@ Cypress.Commands.add('openExternalLink', url => {
     link.setAttribute('href', url);
     link.setAttribute('id', linkIdentifier);
     window.document.body.appendChild(link);
-    cy.get(`#${linkIdentifier}`).click();
+    cy.get(`#${linkIdentifier}`).click({ force: true });
   });
 });
 
