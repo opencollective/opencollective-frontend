@@ -170,6 +170,7 @@ describe('graphql.notifications.test', () => {
       const result = await utils.graphqlQuery(deleteWebhookQuery, { id: notification.id }, user1);
 
       expect(result.errors).to.not.exist;
+      expect(result.data.deleteNotification.id).to.equal(notification.id);
       return models.Notification.findByPk(notification.id).then(notification => {
         expect(notification).to.be.null;
       });
