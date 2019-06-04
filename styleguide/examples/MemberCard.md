@@ -1,7 +1,7 @@
 ```js
 <MemberCard
   role="ADMIN"
-  createdAt="Fri Feb 01 1953 15:29:07 GMT+0100 (GMT+01:00)"
+  since="Fri Feb 01 1953 15:29:07 GMT+0100 (GMT+01:00)"
   collective={{
     slug: 'frank-zappa',
     name: 'Frank Zappa',
