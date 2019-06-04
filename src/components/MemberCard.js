@@ -41,7 +41,7 @@ const TruncatedText = styled(Container)`
  * Display a member.
  * Accept all the props from [StyledCard](/#/Atoms?id=styledcard).
  */
-const MemberCard = ({ role, createdAt, collective, ...cardProps }) => (
+const MemberCard = ({ role, since, collective, ...cardProps }) => (
   <MainContainer {...cardProps}>
     <CollectiveLogoContainer mt={52} mb={2}>
       <Box mt={-32}>
@@ -63,7 +63,7 @@ const MemberCard = ({ role, createdAt, collective, ...cardProps }) => (
         <FormattedMessage
           id="membership.description"
           defaultMessage="{role, select, ADMIN {Core Contributor} MEMBER {Contributor} BACKER {Backer}} since {date}"
-          values={{ role, date: formatDate(createdAt) }}
+          values={{ role, date: formatDate(since) }}
         />
       </Span>
     </Flex>
@@ -73,8 +73,8 @@ const MemberCard = ({ role, createdAt, collective, ...cardProps }) => (
 MemberCard.propTypes = {
   /** Role */
   role: PropTypes.oneOf(['ADMIN', 'MEMBER', 'BACKER']),
-  /** Member creation date */
-  createdAt: PropTypes.string.isRequired,
+  /** Member since date */
+  since: PropTypes.string.isRequired,
   /** Member's collective */
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,

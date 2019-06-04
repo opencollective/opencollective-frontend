@@ -998,6 +998,7 @@
   "user.company.label": "company",
   "user.description.description": "Present yourself in 60 characters or less, if you can!",
   "user.description.label": "description",
+  "user.since.label": "since",
   "user.email.description": "* required",
   "user.email.label": "email",
   "user.firstName.label": "first name",
