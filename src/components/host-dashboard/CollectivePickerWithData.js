@@ -92,7 +92,7 @@ class CollectivePickerWithData extends React.Component {
       }
     } else {
       order.fromCollective = {
-        id: form.FromCollectiveId || hostCollective.id,
+        id: Number(form.FromCollectiveId) || hostCollective.id,
       };
     }
 
