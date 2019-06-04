@@ -112,5 +112,6 @@ export async function deleteNotification(args, remoteUser) {
     throw NotificationPermissionError;
   }
 
-  return models.Notification.destroy({ where: { id: args.id } });
+  await notification.destroy();
+  return notification;
 }
