@@ -324,6 +324,12 @@ export const MemberType = new GraphQLObjectType({
           return member;
         },
       },
+      since: {
+        type: DateString,
+        resolve(member) {
+          return member.since;
+        },
+      },
     };
   },
 });

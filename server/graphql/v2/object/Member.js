@@ -52,6 +52,12 @@ const MemberFields = {
       return member.updatedAt;
     },
   },
+  since: {
+    type: GraphQLDateTime,
+    resolve(member) {
+      return member.since;
+    },
+  },
   totalDonations: {
     type: Amount,
     description: 'Total amount donated',

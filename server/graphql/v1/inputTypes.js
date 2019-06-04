@@ -111,6 +111,7 @@ export const MemberInputType = new GraphQLInputObjectType({
     collective: { type: CollectiveAttributesInputType },
     role: { type: GraphQLString },
     description: { type: GraphQLString },
+    since: { type: DateString },
   }),
 });
 

@@ -1543,7 +1543,7 @@ export default function(Sequelize, DataTypes) {
         return Promise.map(members, member => {
           if (member.id) {
             // Edit an existing membership (edit the role/description)
-            const editableAttributes = pick(member, ['role', 'description']);
+            const editableAttributes = pick(member, ['role', 'description', 'since']);
             debug('editMembers', 'update member', member.id, editableAttributes);
             return models.Member.update(editableAttributes, {
               where: { id: member.id },
@@ -1553,6 +1553,7 @@ export default function(Sequelize, DataTypes) {
             const memberAttrs = {
               ...defaultAttributes,
               description: member.description,
+              since: member.since,
             };
 
             member.CollectiveId = this.id;
