@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Mon Jun 03 2019 22:23:57 GMT-0300 (Brasilia Standard Time)
+# timestamp: Tue Jun 04 2019 13:28:54 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -1241,7 +1241,6 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
-  addFundsToCollective(order: OrderInputType!): OrderType
 
   """
   Update the non-sensitive information of an order, like the public message
