@@ -13,6 +13,7 @@ import models from '../models';
 import debugLib from 'debug';
 import { formatCurrency } from './utils';
 import { channels } from '../constants';
+import { sanitizeActivity } from './webhooks';
 
 const debug = debugLib('notification');
 
@@ -72,7 +73,8 @@ function publishToGitter(activity, notifConfig) {
 }
 
 function publishToWebhook(activity, webhookUrl) {
-  return axios.post(webhookUrl, activity);
+  const sanitizedActivity = sanitizeActivity(activity);
+  return axios.post(webhookUrl, sanitizedActivity);
 }
 
 function publishToSlack(activity, webhookUrl, options) {
