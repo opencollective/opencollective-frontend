@@ -48,6 +48,7 @@ class EditMembers extends React.Component {
         defaultMessage: 'description',
       },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
+      'user.since.label': { id: 'user.since.label', defaultMessage: 'since' },
     });
 
     const getOptions = arr => {
@@ -82,6 +83,12 @@ class EditMembers extends React.Component {
         name: 'description',
         maxLength: 255,
         label: intl.formatMessage(this.messages['user.description.label']),
+      },
+      {
+        name: 'since',
+        type: 'date',
+        defaultValue: new Date(),
+        label: intl.formatMessage(this.messages['user.since.label']),
       },
     ];
   }

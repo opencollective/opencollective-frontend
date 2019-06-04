@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed May 29 2019 16:47:21 GMT+0200 (Central European Summer Time)
+# timestamp: Mon Jun 03 2019 22:23:57 GMT-0300 (Brasilia Standard Time)
 
 """
 Application model
@@ -82,9 +82,9 @@ type Collective implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -297,9 +297,9 @@ interface CollectiveInterface {
   Name, address, country, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -596,8 +596,8 @@ This represents a Comment
 """
 type CommentType {
   id: Int
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   html: String
   markdown: String
   createdByUser: UserDetails
@@ -623,14 +623,16 @@ type ConnectedAccountType {
   service: String
   username: String
   settings: JSON
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
 }
 
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
 }
+
+scalar DateString
 
 scalar Email
 
@@ -656,9 +658,9 @@ type Event implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -829,8 +831,8 @@ type Expense implements Transaction {
   fromCollective: CollectiveInterface
   usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
   privateMessage: String
@@ -845,8 +847,8 @@ input ExpenseInputType {
   id: Int
   amount: Int
   currency: String
-  createdAt: String
-  incurredAt: String
+  createdAt: DateString
+  incurredAt: DateString
   description: String
   category: String
   status: String
@@ -906,9 +908,9 @@ type ExpenseType {
   id: Int
   amount: Int
   currency: String
-  createdAt: String
-  updatedAt: String
-  incurredAt: String
+  createdAt: DateString
+  updatedAt: DateString
+  incurredAt: DateString
   description: String
   category: String
   status: String
@@ -1085,7 +1087,7 @@ This is a Member
 """
 type Member {
   id: Int
-  createdAt: String
+  createdAt: DateString
   orders(limit: Int, offset: Int): [OrderType]
   transactions(limit: Int, offset: Int): [Transaction]
   collective: CollectiveInterface
@@ -1094,6 +1096,7 @@ type Member {
   description: String
   tier: Tier
   stats: StatsMemberType
+  since: DateString
 }
 
 """
@@ -1105,6 +1108,7 @@ input MemberInputType {
   collective: CollectiveAttributesInputType
   role: String
   description: String
+  since: DateString
 }
 
 """
@@ -1235,6 +1239,7 @@ type Mutation {
     role: String!
   ): Member
   createOrder(order: OrderInputType!): OrderType
+  addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
 
   """
@@ -1456,8 +1461,8 @@ type NotificationType {
   webhookUrl: String
   user: UserDetails
   collective: CollectiveInterface
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
 }
 
 """
@@ -1508,8 +1513,8 @@ type Order implements Transaction {
   fromCollective: CollectiveInterface
   usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
   privateMessage: String
@@ -1698,8 +1703,8 @@ type OrderType {
     type: String
   ): [Transaction]
   currency: String
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
 
   """
   Whether this subscription is past due or not
@@ -1744,9 +1749,9 @@ type Organization implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -1948,13 +1953,13 @@ Sanitized PaymentMethod Info (PaymentMethod model)
 type PaymentMethodType {
   id: Int
   uuid: String
-  createdAt: String
+  createdAt: DateString
 
   """
   Will be true for virtual card if claimed. Always true for other payment methods.
   """
   isConfirmed: Boolean
-  expiryDate: String
+  expiryDate: DateString
   service: String
   SourcePaymentMethodId: Int
   type: String
@@ -2320,8 +2325,8 @@ type Tier {
   longDescription: String
   button: String
   amount: Int
-  amountType: String
   minimumAmount: Int
+  amountType: String
   currency: String
   interval: String
   presets: [Int]
@@ -2329,8 +2334,8 @@ type Tier {
   maxQuantityPerUser: Int
   goal: Int
   password: String
-  startsAt: String
-  endsAt: String
+  startsAt: DateString
+  endsAt: DateString
   collective: CollectiveInterface
   event: CollectiveInterface
   orders(
@@ -2373,12 +2378,12 @@ input TierInputType {
   amount in the lowest unit of the currency of the host (ie. in cents)
   """
   amount: Int
-  amountType: String
   currency: String
   presets: [Int]
   interval: String
   maxQuantity: Int
   minimumAmount: Int
+  amountType: String
   maxQuantityPerUser: Int
 
   """
@@ -2460,8 +2465,8 @@ interface Transaction {
   type: String
   description: String
   privateMessage: String
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   refundTransaction: Transaction
 }
 
@@ -2572,9 +2577,9 @@ type UpdateType {
   """
   userCanSeeUpdate: Boolean
   title: String
-  createdAt: String
-  updatedAt: String
-  publishedAt: String
+  createdAt: DateString
+  updatedAt: DateString
+  publishedAt: DateString
   summary: String
   html: String
   markdown: String
@@ -2608,9 +2613,9 @@ type User implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int

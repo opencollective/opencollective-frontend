@@ -290,6 +290,7 @@ export const getCollectiveToEditQueryFields = `
   members(roles: ["ADMIN", "MEMBER", "HOST"]) {
     id
     createdAt
+    since
     role
     description
     stats {
@@ -450,6 +451,7 @@ const getCollectiveQuery = gql`
         id
         role
         createdAt
+        since
         description
         member {
           id
