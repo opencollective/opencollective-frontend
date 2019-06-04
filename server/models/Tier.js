@@ -195,7 +195,13 @@ export default function(Sequelize, DataTypes) {
         },
 
         amountStr() {
-          let str = `${formatCurrency(this.minimumAmount || 0, this.currency)}+`;
+          let str;
+          if (this.amountType === 'FLEXIBLE') {
+            str = `${formatCurrency(this.minimumAmount || 0, this.currency)}+`;
+          } else {
+            str = `${formatCurrency(this.amount || 0, this.currency)}`;
+          }
+
           if (this.interval) {
             str += ` per ${this.interval}`;
           }
