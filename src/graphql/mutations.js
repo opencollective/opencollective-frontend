@@ -53,6 +53,7 @@ const createMemberQuery = gql`
     createMember(member: $member, collective: $collective, role: $role) {
       id
       createdAt
+      since
       member {
         id
         name
@@ -366,6 +367,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
             id: member.id,
             role: member.role,
             description: member.description,
+            since: member.since,
             member: {
               name: member.member.name,
               email: member.member.email,
