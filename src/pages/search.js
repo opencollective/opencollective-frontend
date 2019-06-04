@@ -47,8 +47,8 @@ class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
-      limit: query.limit || 20,
-      offset: query.offset || 0,
+      limit: Number(query.limit) || 20,
+      offset: Number(query.offset) || 0,
     };
   }
 
