@@ -23,13 +23,13 @@ module.exports = {
       deletedAt: {
         type: Sequelize.DATE,
       },
-      collective_id: {
+      CollectiveId: {
         type: Sequelize.INTEGER,
         references: { key: 'id', model: 'Collectives' },
         onDelete: 'SET NULL', //TODO check if this is correct (and test).
         onUpdate: 'CASCADE', //TODO check if this is correct (and test).
       },
-      host_collective_id: {
+      HostCollectiveId: {
         type: Sequelize.INTEGER,
         references: { key: 'id', model: 'Collectives' },
         onDelete: 'SET NULL', //TODO check if this is correct (and test).

@@ -76,6 +76,7 @@ export function setupModels(client) {
     'ConnectedAccount',
     'Order',
     'Expense',
+    'LegalDocument',
     'Collective',
     'Comment',
     'Notification',
