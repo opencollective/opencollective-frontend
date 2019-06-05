@@ -86,6 +86,7 @@ const getCollective = graphql(gql`
       slug
       name
       description
+      longDescription
       image
       backgroundImage
       twitterHandle

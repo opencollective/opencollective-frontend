@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 
 import theme from '../../constants/theme';
 import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
 
-import { AllSectionsNames, Dimensions } from './_constants';
+import { AllSectionsNames, Sections, Dimensions } from './_constants';
 import Hero from './Hero';
+import SectionAbout from './SectionAbout';
+
+/** A mutation used by child components to update the collective */
+const EditCollectiveMutation = gql`
+  mutation EditCollective($id: Int!, $longDescription: String) {
+    editCollective(collective: { id: $id, longDescription: $longDescription }) {
+      id
+      longDescription
+    }
+  }
+`;
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -103,6 +115,25 @@ export default class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
+  renderSection(section, canEditCollective) {
+    if (section === Sections.ABOUT) {
+      return (
+        <SectionAbout
+          collective={this.props.collective}
+          canEdit={canEditCollective}
+          editMutation={EditCollectiveMutation}
+        />
+      );
+    }
+
+    // Placeholder for sections not implemented yet
+    return (
+      <Container display="flex" borderBottom="1px solid lightgrey" py={8} justifyContent="center" fontSize={36}>
+        [Section] {section}
+      </Container>
+    );
+  }
+
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
@@ -122,21 +153,10 @@ export default class CollectivePage extends Component {
             onCollectiveClick={this.onCollectiveClick}
           />
         </Container>
-
-        {/* Placeholders for sections not implemented yet */}
         {AllSectionsNames.map(section => (
-          <Container
-            ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
-            key={section}
-            id={`section-${section}`}
-            display="flex"
-            borderBottom="1px solid lightgrey"
-            py={8}
-            justifyContent="center"
-            fontSize={36}
-          >
-            [Section] {section}
-          </Container>
+          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+            {this.renderSection(section, canEditCollective)}
+          </div>
         ))}
       </Container>
     );

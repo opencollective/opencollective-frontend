@@ -38,6 +38,8 @@ class InlineEditField extends Component {
     mutation: PropTypes.object.isRequired,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
+    /** Set to false to disable edit icon even if user is allowed to edit */
+    showEditIcon: PropTypes.bool,
     /** If given, this function will be used to render the field */
     children: PropTypes.func,
     /**
@@ -45,6 +47,10 @@ class InlineEditField extends Component {
      * Highly recommended if field is nullable.
      */
     placeholder: PropTypes.node,
+  };
+
+  static defaultProps = {
+    showEditIcon: true,
   };
 
   state = { isEditing: false, draft: '' };
@@ -69,14 +75,20 @@ class InlineEditField extends Component {
         </StyledButton>
       );
     } else if (children) {
-      return children({ isEditing: false, value });
+      return children({
+        value,
+        isEditing: false,
+        enableEditor: this.enableEditor,
+        closeEditor: this.closeEditor,
+        setValue: this.setDraft,
+      });
     } else {
       return <span>{value}</span>;
     }
   }
 
   render() {
-    const { field, values, mutation, canEdit, placeholder, children } = this.props;
+    const { field, values, mutation, canEdit, showEditIcon, placeholder, children } = this.props;
     const { isEditing, draft } = this.state;
     const value = get(values, field);
     const touched = draft !== value;
@@ -84,7 +96,7 @@ class InlineEditField extends Component {
     if (!isEditing) {
       return (
         <Container position="relative">
-          {canEdit && (
+          {canEdit && showEditIcon && (
             <Container position="absolute" top={0} right={0}>
               <EditIcon size={24} onClick={this.enableEditor} data-cy={`InlineEditField-Trigger-${field}`} />
             </Container>
