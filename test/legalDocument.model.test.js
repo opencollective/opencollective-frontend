@@ -36,7 +36,7 @@ describe('LegalDocument model', () => {
     ],
   };
 
-  beforeEach(() => utils.resetTestDB());
+  beforeEach(async () => await utils.resetTestDB());
   beforeEach(async () => {
     hostCollective = await Collective.create(hostCollectiveData);
     user = await User.createUserWithCollective(userData);
@@ -95,7 +95,8 @@ describe('LegalDocument model', () => {
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
-    await doc.destroy();
+    // Normally docs are soft deleted. This is just checking that worst case we don't accidentally delete collectives.
+    await doc.destroy({ force: true });
 
     await hostCollective.reload();
     await userCollective.reload();
