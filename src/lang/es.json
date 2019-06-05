@@ -304,7 +304,7 @@
   "cover.bar.balance": "Balance actual",
   "cover.bar.yearlyBudget": "Presupuesto anual estimado",
   "cover.budget.text": "Gracias a sus aportes estamos operando con un presupuesto anual estimado de {yearlyBudget}",
-  "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one {and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
+  "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
   "createAccount.alreadyLoggedIn": "Parece que ya está conectado como '{email}'. Si desea crear una nueva cuenta, por favor cierre sesión primero.",
   "createPledge.collectiveDetails": "Detalles del nuevo colectivo:",
   "createPledge.collectiveURL": "URL del Colectivo",
