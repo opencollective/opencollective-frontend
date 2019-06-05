@@ -275,6 +275,7 @@ const editUpdateQuery = gql`
       title
       markdown
       html
+      makePublicOn
     }
   }
 `;

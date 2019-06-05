@@ -46,6 +46,7 @@ const getUpdateQuery = gql`
       publishedAt
       html
       markdown
+      makePublicOn
       collective {
         id
         slug

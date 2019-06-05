@@ -102,6 +102,7 @@ const getUpdatesQuery = gql`
       updatedAt
       tags
       image
+      makePublicOn
       collective {
         id
         slug

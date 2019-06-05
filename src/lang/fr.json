@@ -984,6 +984,7 @@
   "update.createdAt": "créé le {date} (brouillon)",
   "update.delete": "supprimer",
   "update.edit": "éditer",
+  "update.makePublicOn.label": "Automatically make the update public on this date:",
   "update.new.save": "Sauvegarder l'actualité",
   "update.paid": "payé",
   "update.pending": "en attente",

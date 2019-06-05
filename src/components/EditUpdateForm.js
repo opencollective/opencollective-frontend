@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { pick, get } from 'lodash';
+import { Box } from '@rebass/grid';
 
 import InputField from './InputField';
 import Button from './Button';
@@ -40,7 +41,7 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html', 'markdown') : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'makePublicOn') : {},
       loading: false,
     };
 
@@ -170,6 +171,23 @@ class EditUpdateForm extends React.Component {
                 <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
               )}
             </div>
+          </div>
+
+          <div className="row">
+            <Box mt={4}>
+              <label>
+                <FormattedMessage
+                  id="update.makePublicOn"
+                  defaultMessage="Automatically make the update public on this date:"
+                />
+              </label>
+              <InputField
+                type="date"
+                name="makePublicOn"
+                className="makePublicOnField"
+                onChange={makePublicOn => this.handleChange('makePublicOn', makePublicOn)}
+              />
+            </Box>
           </div>
 
           <div className="row actions">

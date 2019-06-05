@@ -984,6 +984,7 @@
   "update.createdAt": "created on {date} (draft)",
   "update.delete": "удалить",
   "update.edit": "редактировать",
+  "update.makePublicOn.label": "Automatically make the update public on this date:",
   "update.new.save": "Сохранить обновления",
   "update.paid": "оплачено",
   "update.pending": "в ожидании",

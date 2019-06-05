@@ -984,6 +984,7 @@
   "update.createdAt": "{date} に作成 (下書き)",
   "update.delete": "削除",
   "update.edit": "編集",
+  "update.makePublicOn.label": "Automatically make the update public on this date:",
   "update.new.save": "アップデートを保存",
   "update.paid": "支払い済み",
   "update.pending": "保留",
