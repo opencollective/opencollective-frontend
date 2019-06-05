@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet, fontSize } from 'styled-system';
+import { fontSize } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
 const IconCheckmark = () => {

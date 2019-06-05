@@ -14,8 +14,8 @@ import {
   space,
   textAlign,
   width,
-  themeGet,
 } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';

@@ -14,11 +14,11 @@ import {
   minWidth,
   space,
   textAlign,
-  themeGet,
   width,
   height,
   lineHeight,
 } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { overflow } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';

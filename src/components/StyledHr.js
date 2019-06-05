@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet, space, minWidth, maxWidth, boxShadow, borderColor } from 'styled-system';
+import { space, minWidth, maxWidth, boxShadow, borderColor } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { borderStyle } from '../lib/styled_system_custom';
 

@@ -17,8 +17,8 @@ import {
   space,
   textAlign,
   width,
-  themeGet,
 } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';

@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { backgroundImage, backgroundColor, borders, borderColor, size, themeGet } from 'styled-system';
+import { backgroundImage, backgroundColor, borders, borderColor, size } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { Flex } from '@rebass/grid';
 import withFallbackImage from '../lib/withFallbackImage';
