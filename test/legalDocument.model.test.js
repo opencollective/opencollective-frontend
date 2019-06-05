@@ -51,13 +51,42 @@ describe('LegalDocument model', () => {
     });
     const doc = await models.LegalDocument.create(legalDoc);
 
-    expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
-
     doc.documentLink = expected;
     await doc.save();
     await doc.reload();
 
     expect(doc.documentLink).to.eq(expected);
+  });
+
+  // I think this is the correct behaviour. We have to keep tax records for 7 years. Maybe this clashes with GDPR? For now it's only on the Open Source Collective which is US based. So I _think_ it's ok.
+  // This assumes collectives will never be force deleted. If they are then the Legal Document model will fail its foreign key constraint when you try and load it.
+  it('it will not be deleted if the host collective is soft deleted', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+    expect(doc.deletedAt).to.eq(null);
+
+    await hostCollective.destroy();
+
+    // This would fail if the doc was deleted
+    expect(doc.reload()).to.be.fulfilled;
+  });
+
+  // See comment above
+  it('it will not be deleted if the user collective is soft deleted', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+    expect(doc.deletedAt).to.eq(null);
+
+    await userCollective.destroy();
+
+    // This would fail if the doc was deleted
+    expect(doc.reload()).to.be.fulfilled;
   });
 
   it('it can be deleted without deleting the collectives it belongs to', async () => {

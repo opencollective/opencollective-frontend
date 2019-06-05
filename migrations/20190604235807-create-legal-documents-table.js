@@ -29,14 +29,14 @@ module.exports = {
       CollectiveId: {
         type: Sequelize.INTEGER,
         references: { key: 'id', model: 'Collectives' },
-        onDelete: 'SET NULL', //TODO check if this is correct (and test).
-        onUpdate: 'CASCADE', //TODO check if this is correct (and test).
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
       HostCollectiveId: {
         type: Sequelize.INTEGER,
         references: { key: 'id', model: 'Collectives' },
-        onDelete: 'SET NULL', //TODO check if this is correct (and test).
-        onUpdate: 'CASCADE', //TODO check if this is correct (and test).
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
     });
   },
