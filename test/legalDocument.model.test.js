@@ -6,20 +6,18 @@ import * as utils from '../test/utils';
 const { LegalDocument, User, Collective } = models;
 
 describe('LegalDocument model', () => {
+  // globals to be set in the before hooks.
+  let hostCollective, user, userCollective;
+
   const documentData = {
     year: '2019',
   };
 
-  const users = [
-    {
-      username: 'xdamman',
-      email: 'xdamman@opencollective.com',
-    },
-    {
-      username: 'piamancini',
-      email: 'pia@opencollective.com',
-    },
-  ];
+  const userData = {
+    username: 'xdamman',
+    email: 'xdamman@opencollective.com',
+  };
+
   const hostCollectiveData = {
     slug: 'myhost',
     name: 'myhost',
@@ -40,8 +38,10 @@ describe('LegalDocument model', () => {
   };
 
   beforeEach(() => utils.resetTestDB());
-  beforeEach(() => {
-    return Promise.all([Collective.create(hostCollectiveData), User.createUserWithCollective(users[0])]);
+  beforeEach(async () => {
+    hostCollective = await Collective.create(hostCollectiveData);
+    user = await User.createUserWithCollective(userData);
+    userCollective = await models.Collective.findByPk(user.CollectiveId);
   });
 
   it('can set and save a new request status');
@@ -60,17 +60,8 @@ describe('LegalDocument model', () => {
   // what's a sensible default for the year? should it be not null? Should it be the same year as is created? Is that safe?
 
   it('can be created and has expected values', async () => {
-    const host = await Collective.findBySlug(hostCollectiveData.slug);
-    const user = await User.findOne({
-      where: {
-        email: users[0].email,
-      },
-    });
-
-    const userCollective = await models.Collective.findByPk(user.CollectiveId);
-
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: host.id,
+      HostCollectiveId: hostCollective.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
