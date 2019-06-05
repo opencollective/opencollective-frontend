@@ -1,6 +1,4 @@
 export default function(Sequelize, DataTypes) {
-  const { models } = Sequelize;
-
   const NOT_REQUESTED = 'NOT_REQUESTED';
   const REQUESTED = 'REQUESTED';
   const RECEIVED = 'RECEIVED';
@@ -81,8 +79,6 @@ export default function(Sequelize, DataTypes) {
   LegalDocument.requestStatus.ERROR = ERROR;
   LegalDocument.documentType = {};
   LegalDocument.documentType.US_TAX_FORM = US_TAX_FORM;
-
-  LegalDocument.prototype.setNewDocumentState = async function(newState) {};
 
   LegalDocument.associate = m => {
     LegalDocument.belongsTo(m.Collective, {
