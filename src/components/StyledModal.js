@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
 
 import Container from './Container';
@@ -13,7 +13,7 @@ const ModalWrapper = styled(Container)`
   background: white;
   max-width: 95%;
   max-height: 100%;
-  z-index: 100;
+  z-index: 3000;
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
   padding: 20px;
@@ -24,14 +24,20 @@ const ModalWrapper = styled(Container)`
     `}
 `;
 
+const GlobalModalStyle = createGlobalStyle`
+  body {
+    overflow: hidden;
+  }
+`;
+
 const ModalOverlay = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  z-index: 90;
+  z-index: 2500;
   display: block;
 `;
 
@@ -40,6 +46,7 @@ const Header = styled(Container)`
   color: #090a0a;
   font-weight: 600;
   display: flex;
+  text-shadow: none;
   justify-content: space-between;
 `;
 
@@ -97,6 +104,7 @@ const Modal = ({ children, show, width, height, onClose }) => {
   if (show) {
     return (
       <React.Fragment>
+        <GlobalModalStyle />
         <ModalWrapper width={width} height={height}>
           {React.Children.map(children, child => {
             if (child.type.displayName === 'Header') {
