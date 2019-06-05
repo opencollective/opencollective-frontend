@@ -55,6 +55,10 @@ const accountOrders = {
     offset: { type: GraphQLInt, defaultValue: 0 },
     status: { type: new GraphQLList(OrderStatus) },
     tierSlug: { type: GraphQLString },
+    orderBy: {
+      type: ChronologicalOrder,
+      defaultValue: ChronologicalOrder.defaultValue,
+    },
   },
   async resolve(collective, args) {
     const where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
@@ -72,7 +76,12 @@ const accountOrders = {
       where.TierId = tier.id;
     }
 
-    const result = await models.Order.findAndCountAll({ where, limit: args.limit, offset: args.offset });
+    const result = await models.Order.findAndCountAll({
+      where,
+      limit: args.limit,
+      offset: args.offset,
+      order: [[args.orderBy.field, args.orderBy.direction]],
+    });
 
     return { limit: args.limit, offset: args.offset, ...result };
   },
@@ -260,6 +269,9 @@ export const Account = new GraphQLInterfaceType({
           offset: { type: GraphQLInt, defaultValue: 0 },
           status: { type: new GraphQLList(OrderStatus) },
           tierSlug: { type: GraphQLString },
+          orderBy: {
+            type: ChronologicalOrder,
+          },
         },
       },
     };
