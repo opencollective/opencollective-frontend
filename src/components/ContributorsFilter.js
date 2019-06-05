@@ -44,6 +44,7 @@ const Translations = defineMessages({
 export const getMembersFilters = members => {
   const filters = new Set([CONTRIBUTOR_FILTERS.ALL]);
   for (const m of members) {
+    // Add role to the set
     if (m.role === roles.CONTRIBUTOR) {
       filters.add(CONTRIBUTOR_FILTERS.GITHUB);
     } else if (m.role === roles.ADMIN) {
@@ -51,8 +52,17 @@ export const getMembersFilters = members => {
     } else if ([roles.BACKER, roles.FUNDRAISER].includes(m.role)) {
       filters.add(CONTRIBUTOR_FILTERS.FINANCIAL);
     }
+
+    // No need to traverse the entire list if we already registered all the types
+    if (filters.length === FILTERS_LIST.length) {
+      break;
+    }
   }
-  return Array.from(filters);
+
+  // Ensure we preserver filters order by sorting them according to the base list
+  return Array.from(filters).sort((filter1, filter2) => {
+    return FILTERS_LIST.indexOf(filter1) > FILTERS_LIST.indexOf(filter2) ? 1 : -1;
+  });
 };
 
 /**
