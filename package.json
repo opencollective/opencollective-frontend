@@ -178,7 +178,7 @@
     "react-styleguidist": "9.0.4",
     "react-test-renderer": "^16.8.6",
     "sinon": "^7.3.2",
-    "url-loader": "^1.1.2",
+    "url-loader": "^2.0.0",
     "webpack-bundle-analyzer": "^3.3.2"
   },
   "jest": {
