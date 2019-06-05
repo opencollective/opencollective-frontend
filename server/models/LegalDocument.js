@@ -21,20 +21,23 @@ export default function(Sequelize, DataTypes) {
       },
       allowNull: false,
     },
-    document_link: {
+    documentLink: {
       type: DataTypes.STRING,
+      field: 'document_link',
     },
-    request_status: {
+    requestStatus: {
       type: DataTypes.ENUM,
       values: [NOT_REQUESTED, REQUESTED, RECEIVED, ERROR],
       allowNull: false,
       defaultValue: NOT_REQUESTED,
+      field: 'request_status',
     },
-    document_type: {
+    documentType: {
       type: DataTypes.ENUM,
       values: [US_TAX_FORM],
       allowNull: false,
       defaultValue: US_TAX_FORM,
+      field: 'document_type',
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -71,13 +74,13 @@ export default function(Sequelize, DataTypes) {
     },
   });
 
-  LegalDocument.request_status = {};
-  LegalDocument.request_status.REQUESTED = REQUESTED;
-  LegalDocument.request_status.NOT_REQUESTED = NOT_REQUESTED;
-  LegalDocument.request_status.RECEIVED = RECEIVED;
-  LegalDocument.request_status.ERROR = ERROR;
-  LegalDocument.document_type = {};
-  LegalDocument.document_type.US_TAX_FORM = US_TAX_FORM;
+  LegalDocument.requestStatus = {};
+  LegalDocument.requestStatus.REQUESTED = REQUESTED;
+  LegalDocument.requestStatus.NOT_REQUESTED = NOT_REQUESTED;
+  LegalDocument.requestStatus.RECEIVED = RECEIVED;
+  LegalDocument.requestStatus.ERROR = ERROR;
+  LegalDocument.documentType = {};
+  LegalDocument.documentType.US_TAX_FORM = US_TAX_FORM;
 
   LegalDocument.prototype.setNewDocumentState = async function(newState) {};
 
@@ -87,7 +90,7 @@ export default function(Sequelize, DataTypes) {
       as: 'collective',
     });
     LegalDocument.belongsTo(m.Collective, {
-      foreignKey: 'CollectiveId',
+      foreignKey: 'HostCollectiveId',
       as: 'hostCollective',
     });
   };

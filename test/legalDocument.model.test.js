@@ -44,15 +44,114 @@ describe('LegalDocument model', () => {
     userCollective = await models.Collective.findByPk(user.CollectiveId);
   });
 
-  it('can set and save a new request status');
-  it('it can set and save a new document_link');
-  it('it can get its associated host collective');
-  it('it can get its associated collective');
-  it('it can be found via its host collective');
-  it('it can be found via its collective');
-  it('it can be deleted without deleting the collectives it belongs to');
+  it('it can set and save a new document_link', async () => {
+    const expected = 'a string';
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
 
-  // what's a sensible default for the year? should it be not null? Should it be the same year as is created? Is that safe?
+    expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
+
+    doc.documentLink = expected;
+    await doc.save();
+    await doc.reload();
+
+    expect(doc.documentLink).to.eq(expected);
+  });
+
+  it('it can be deleted without deleting the collectives it belongs to', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+    await doc.destroy();
+
+    await hostCollective.reload();
+    await userCollective.reload();
+
+    expect(hostCollective.id).to.not.eq(null);
+    expect(userCollective.id).to.not.eq(null);
+  });
+
+  it('can set and save a valid new request status', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+
+    expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
+
+    doc.requestStatus = LegalDocument.requestStatus.RECEIVED;
+    await doc.save();
+    await doc.reload();
+
+    expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.RECEIVED);
+  });
+
+  it('it will fail if attempting to set an invalid request status', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+
+    expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
+
+    doc.requestStatus = 'SCUTTLEBUTT';
+    expect(doc.save()).to.be.rejected;
+  });
+
+  it('it can be found via its host collective', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+
+    const retrievedDocs = await hostCollective.getHostedLegalDocuments();
+
+    expect(retrievedDocs[0].id).to.eq(doc.id);
+  });
+
+  it('it can be found via its collective', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+
+    const retrievedDocs = await userCollective.getLegalDocuments();
+
+    expect(retrievedDocs[0].id).to.eq(doc.id);
+  });
+
+  it('it can get its associated collective', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+
+    const retrievedCollective = await doc.getCollective();
+
+    expect(retrievedCollective.id).to.eq(userCollective.id);
+  });
+
+  it('it can get its associated host collective', async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    const doc = await models.LegalDocument.create(legalDoc);
+
+    const retrievedHost = await doc.getHostCollective();
+
+    expect(retrievedHost.id).to.eq(hostCollective.id);
+  });
 
   it("it can't be created if the year is less than 2015", async () => {
     const legalDoc = Object.assign({}, documentData, {
@@ -94,7 +193,7 @@ describe('LegalDocument model', () => {
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
-    expect(doc.request_status).to.eq(LegalDocument.request_status.NOT_REQUESTED);
-    expect(doc.document_type).to.eq(LegalDocument.document_type.US_TAX_FORM);
+    expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
+    expect(doc.documentType).to.eq(LegalDocument.documentType.US_TAX_FORM);
   });
 });
