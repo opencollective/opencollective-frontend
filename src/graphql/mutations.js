@@ -4,31 +4,6 @@ import { pick, isArray } from 'lodash';
 
 import { getLoggedInUserQuery, getCollectiveToEditQueryFields } from './queries';
 
-const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType!) {
-    createOrder(order: $order) {
-      id
-      createdAt
-      status
-      createdByUser {
-        id
-      }
-      fromCollective {
-        id
-        slug
-      }
-      collective {
-        id
-        slug
-      }
-      transactions(type: "CREDIT") {
-        id
-        uuid
-      }
-    }
-  }
-`;
-
 export const createUserQuery = gql`
   mutation createUser($user: UserInputType!, $organization: CollectiveInputType, $redirect: String) {
     createUser(user: $user, organization: $organization, redirect: $redirect) {
@@ -220,12 +195,6 @@ export const createVirtualCardsMutationQuery = gql`
   }
 `;
 
-export const addCreateOrderMutation = graphql(createOrderQuery, {
-  props: ({ mutate }) => ({
-    createOrder: order => mutate({ variables: { order } }),
-  }),
-});
-
 export const addCreateMemberMutation = graphql(createMemberQuery, {
   props: ({ mutate }) => ({
     createMember: (member, collective, role) => mutate({ variables: { member, collective, role } }),
@@ -239,7 +208,6 @@ export const addRemoveMemberMutation = graphql(removeMemberQuery, {
 });
 
 export const addEventMutations = compose(
-  addCreateOrderMutation,
   addCreateMemberMutation,
   addRemoveMemberMutation,
 );

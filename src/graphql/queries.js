@@ -345,7 +345,7 @@ const getCollectiveToEditQuery = gql`
 `;
 /* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
-const getCollectiveQuery = gql`
+export const getCollectiveQuery = gql`
   query Collective($slug: String) {
     Collective(slug: $slug) {
       id
