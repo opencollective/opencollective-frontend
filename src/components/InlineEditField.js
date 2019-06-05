@@ -68,13 +68,7 @@ class InlineEditField extends Component {
   };
 
   renderContent(field, canEdit, value, placeholder, children) {
-    if (canEdit && !value && placeholder) {
-      return (
-        <StyledButton buttonSize="large" onClick={this.enableEditor} data-cy={`InlineEditField-Add-${field}`}>
-          {placeholder}
-        </StyledButton>
-      );
-    } else if (children) {
+    if (children) {
       return children({
         value,
         isEditing: false,
@@ -82,6 +76,12 @@ class InlineEditField extends Component {
         closeEditor: this.closeEditor,
         setValue: this.setDraft,
       });
+    } else if (!value) {
+      return canEdit && placeholder ? (
+        <StyledButton buttonSize="large" onClick={this.enableEditor} data-cy={`InlineEditField-Add-${field}`}>
+          {placeholder}
+        </StyledButton>
+      ) : null;
     } else {
       return <span>{value}</span>;
     }
@@ -116,7 +116,7 @@ class InlineEditField extends Component {
                   autoSize
                   autoFocus
                   width={1}
-                  value={draft}
+                  value={draft || ''}
                   onChange={e => this.setDraft(e.target.value)}
                   px={0}
                   py={0}
