@@ -39,10 +39,25 @@ describe('LegalDocument model', () => {
     ],
   };
 
-  before(() => utils.resetTestDB());
-  before(() => {
+  beforeEach(() => utils.resetTestDB());
+  beforeEach(() => {
     return Promise.all([Collective.create(hostCollectiveData), User.createUserWithCollective(users[0])]);
   });
+
+  it('can set and save a new request status');
+  it('it can set and save a new document_link');
+  it('it can get its associated host collective');
+  it('it can get its associated collective');
+  it('it can be found via its host collective');
+  it('it can be found via its collective');
+  it('it will fail to be created if the year is null');
+  it('it will throw if trying to set the year to an invalid value');
+  it('it will fail if the year is before 2016');
+  it('it will fail if the HostCollectiveId is null');
+  it('it will fail if the CollectiveId is null');
+  it('it can be deleted without deleting the collectives it belongs to');
+
+  // what's a sensible default for the year? should it be not null? Should it be the same year as is created? Is that safe?
 
   it('can be created and has expected values', async () => {
     const host = await Collective.findBySlug(hostCollectiveData.slug);
