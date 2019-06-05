@@ -5,6 +5,7 @@ export default function(Sequelize, DataTypes) {
   const REQUESTED = 'REQUESTED';
   const RECEIVED = 'RECEIVED';
   const ERROR = 'ERROR';
+  const US_TAX_FORM = 'US_TAX_FORM';
 
   const LegalDocument = Sequelize.define('LegalDocument', {
     id: {
@@ -21,6 +22,14 @@ export default function(Sequelize, DataTypes) {
     request_status: {
       type: DataTypes.ENUM,
       values: [NOT_REQUESTED, REQUESTED, RECEIVED, ERROR],
+      allowNull: false,
+      defaultValue: NOT_REQUESTED,
+    },
+    document_type: {
+      type: DataTypes.ENUM,
+      values: [US_TAX_FORM],
+      allowNull: false,
+      defaultValue: US_TAX_FORM,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -57,10 +66,13 @@ export default function(Sequelize, DataTypes) {
     },
   });
 
-  LegalDocument.REQUESTED = REQUESTED;
-  LegalDocument.NOT_REQUESTED = NOT_REQUESTED;
-  LegalDocument.RECEIVED = RECEIVED;
-  LegalDocument.ERROR = ERROR;
+  LegalDocument.request_status = {};
+  LegalDocument.request_status.REQUESTED = REQUESTED;
+  LegalDocument.request_status.NOT_REQUESTED = NOT_REQUESTED;
+  LegalDocument.request_status.RECEIVED = RECEIVED;
+  LegalDocument.request_status.ERROR = ERROR;
+  LegalDocument.document_type = {};
+  LegalDocument.document_type.US_TAX_FORM = US_TAX_FORM;
 
   LegalDocument.prototype.setNewDocumentState = async function(newState) {};
 

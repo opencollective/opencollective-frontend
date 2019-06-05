@@ -44,7 +44,7 @@ describe('LegalDocument model', () => {
     return Promise.all([Collective.create(hostCollectiveData), User.createUserWithCollective(users[0])]);
   });
 
-  it('can be created', async () => {
+  it('can be created and has expected values', async () => {
     const host = await Collective.findBySlug(hostCollectiveData.slug);
     const user = await User.findOne({
       where: {
@@ -58,6 +58,8 @@ describe('LegalDocument model', () => {
       HostCollectiveId: host.id,
       CollectiveId: userCollective.id,
     });
-    return expect(models.LegalDocument.create(legalDoc)).to.be.fulfilled;
+    const doc = await models.LegalDocument.create(legalDoc);
+    expect(doc.request_status).to.eq(LegalDocument.request_status.NOT_REQUESTED);
+    expect(doc.document_type).to.eq(LegalDocument.document_type.US_TAX_FORM);
   });
 });
