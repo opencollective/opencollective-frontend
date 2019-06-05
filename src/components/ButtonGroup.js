@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import { borders, borderRadius } from 'styled-system';
 import { Flex } from '@rebass/grid';

@@ -8,6 +8,7 @@
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],
     "graphql/no-deprecated-fields": ["error"],
+    "react/react-in-jsx-scope": ["error"],
     "react-hooks/rules-of-hooks": ["error"]
   }
 }
