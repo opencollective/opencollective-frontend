@@ -18,7 +18,7 @@ import { has, get } from 'lodash';
 
 import forest from './forest';
 import cacheMiddleware from '../middleware/cache';
-import { middleware } from '../graphql/loaders';
+import { loadersMiddleware } from '../graphql/loaders';
 import { sanitizeForLogs } from '../lib/utils';
 
 export default function(app) {
@@ -28,7 +28,7 @@ export default function(app) {
 
   // Loaders are attached to the request to batch DB queries per request
   // It also creates in-memory caching (based on request auth);
-  app.use(middleware);
+  app.use(loadersMiddleware);
 
   if (process.env.DEBUG && process.env.DEBUG.match(/response/)) {
     app.use((req, res, next) => {
