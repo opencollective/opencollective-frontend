@@ -10,7 +10,10 @@ module.exports = {
       },
       document_type: Sequelize.ENUM('US_TAX_FORM'),
       request_status: Sequelize.ENUM('NOT_REQUESTED', 'REQUESTED', 'RECEIVED', 'ERROR'),
-      year: Sequelize.STRING,
+      year: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       document_link: Sequelize.STRING,
       createdAt: {
         type: Sequelize.DATE,

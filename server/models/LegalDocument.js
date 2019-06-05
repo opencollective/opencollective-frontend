@@ -14,7 +14,12 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true,
     },
     year: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
+      validate: {
+        min: 2015,
+        notNull: true,
+      },
+      allowNull: false,
     },
     document_link: {
       type: DataTypes.STRING,

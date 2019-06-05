@@ -10,7 +10,7 @@ describe('LegalDocument model', () => {
   let hostCollective, user, userCollective;
 
   const documentData = {
-    year: '2019',
+    year: 2019,
   };
 
   const userData = {
@@ -50,14 +50,43 @@ describe('LegalDocument model', () => {
   it('it can get its associated collective');
   it('it can be found via its host collective');
   it('it can be found via its collective');
-  it('it will fail to be created if the year is null');
-  it('it will throw if trying to set the year to an invalid value');
-  it('it will fail if the year is before 2016');
-  it('it will fail if the HostCollectiveId is null');
-  it('it will fail if the CollectiveId is null');
   it('it can be deleted without deleting the collectives it belongs to');
 
   // what's a sensible default for the year? should it be not null? Should it be the same year as is created? Is that safe?
+
+  it("it can't be created if the year is less than 2015", async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    legalDoc.year = 2014;
+    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+  });
+
+  it("it can't be created if the year is null", async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: userCollective.id,
+    });
+    delete legalDoc.year;
+    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+  });
+
+  it("it can't be created if the HostCollectiveId is null", async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: null,
+      CollectiveId: userCollective.id,
+    });
+    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+  });
+
+  it("it can't be created if the CollectiveId is null", async () => {
+    const legalDoc = Object.assign({}, documentData, {
+      HostCollectiveId: hostCollective.id,
+      CollectiveId: null,
+    });
+    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+  });
 
   it('can be created and has expected values', async () => {
     const legalDoc = Object.assign({}, documentData, {
