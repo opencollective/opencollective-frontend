@@ -36,10 +36,6 @@ aliases:
       - <<: *restore_npm_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
 
-      # # We run npm ci in case node_modules are not persisted
-      # # When it is persisted we don't need it
-      # - run: cd ~/api && npm ci --only-prod
-
       # We run npm ci in case node_modules are not persisted
       # When it is persisted we don't need it
       - run: cd ~/frontend && npm ci --only=prod
