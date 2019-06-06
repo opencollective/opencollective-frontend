@@ -51,6 +51,13 @@ export default function(Sequelize, DataTypes) {
           }
           this.setDataValue('name', name);
         },
+        validate: {
+          isValidName(value) {
+            if (!value || value.trim().length === 0) {
+              throw new Error('Name field is required for all tiers');
+            }
+          },
+        },
       },
 
       type: {
@@ -79,8 +86,19 @@ export default function(Sequelize, DataTypes) {
 
       amount: {
         type: DataTypes.INTEGER, // In cents
+        allowNull: true,
         validate: {
           min: 0,
+          validateFixedAmount(value) {
+            if (this.type !== 'TICKET' && this.amountType === 'FIXED' && !value) {
+              throw new Error(`In ${this.name}'s tier, "Amount" is required`);
+            }
+          },
+          validateFlexibleAmount(value) {
+            if (this.amountType === 'FLEXIBLE' && this.presets && this.presets.indexOf(value) === -1) {
+              throw new Error(`In ${this.name}'s tier, "Default amount" must be one of suggested values amounts`);
+            }
+          },
         },
       },
 
@@ -96,6 +114,12 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         validate: {
           min: 0,
+          isValidMinAmount(value) {
+            const minPreset = this.presets ? Math.min(...this.presets) : null;
+            if (this.amountType === 'FLEXIBLE' && value && minPreset < value) {
+              throw new Error(`In ${this.name}'s tier, minimum amount cannot be less than minimum suggested amounts`);
+            }
+          },
         },
       },
 
