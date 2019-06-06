@@ -17,6 +17,9 @@ const UpdateWrapper = styled(Flex)`
   min-height: 100px;
   border: 1px solid #e6e8eb;
   padding: 20px;
+  @media (max-width: 600px) {
+    max-width: 100%;
+  }
 `;
 
 const AvatarContainer = styled(Container)`
