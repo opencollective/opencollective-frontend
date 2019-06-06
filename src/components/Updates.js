@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Update from './Update';
+import StyledUpdate from './StyledUpdate';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import colors from '../constants/colors';
@@ -34,7 +34,7 @@ class Updates extends React.Component {
   }
 
   render() {
-    const { collective, updates, LoggedInUser, editable, includeHostedCollectives } = this.props;
+    const { collective, updates } = this.props;
 
     if (!updates) {
       return <div />;
@@ -89,14 +89,7 @@ class Updates extends React.Component {
           )}
           {updates.map(update => (
             <div key={update.id} className="update">
-              <Update
-                compact={true}
-                collective={collective}
-                update={update}
-                editable={editable}
-                includeHostedCollectives={includeHostedCollectives}
-                LoggedInUser={LoggedInUser}
-              />
+              <StyledUpdate update={update} collective={collective} />
             </div>
           ))}
           {updates.length === 0 && (
