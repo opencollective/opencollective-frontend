@@ -181,8 +181,7 @@ describe('LegalDocument model', () => {
     });
     const doc = await models.LegalDocument.create(legalDoc);
 
-    const retrievedDocType = await doc.getRequiredLegalDocumentType();
-    const retrievedHost = await retrievedDocType.getHostCollective();
+    const retrievedHost = await doc.getRequiredLegalDocumentType().then(docType => docType.getHostCollective());
 
     expect(retrievedHost.id).to.eq(hostCollective.id);
   });
