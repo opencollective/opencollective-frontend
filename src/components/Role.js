@@ -1,7 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { defineMessages } from 'react-intl';
+
 import withIntl from '../lib/withIntl';
+import Container from './Container';
+
+const RolesWrapper = styled(Container)`
+  box-sizing: border-box;
+  height: 24px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid #f5f7fa;
+  border-radius: 100px;
+  background-color: #f5f7fa;
+  text-align: center;
+`;
+
+const RoleLabel = styled.label`
+  color: #71757a;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 13px;
+  text-align: center;
+  margin: 0;
+`;
 
 class Role extends React.Component {
   static propTypes = {
@@ -30,32 +54,9 @@ class Role extends React.Component {
     }
 
     return (
-      <div className="Role">
-        <style jsx>
-          {`
-            .Role {
-              box-sizing: border-box;
-              height: 22px;
-              padding: 0 1rem;
-              display: flex;
-              align-items: center;
-              border: 1px solid #cacbcc;
-              border-radius: 4px;
-              background-color: #ffffff;
-              text-align: center;
-            }
-            label {
-              color: #666f80;
-              font-size: 11px;
-              font-weight: normal;
-              line-height: 13px;
-              text-align: center;
-              margin: 0;
-            }
-          `}
-        </style>
-        <label>{intl.formatMessage(this.messages[role])}</label>
-      </div>
+      <RolesWrapper>
+        <RoleLabel>{intl.formatMessage(this.messages[role])}</RoleLabel>
+      </RolesWrapper>
     );
   }
 }
