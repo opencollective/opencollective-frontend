@@ -418,7 +418,7 @@ describe('graphql.updateSubscriptions.test.js', () => {
         expect(updatedOrder.totalAmount).to.equal(order.totalAmount);
         expect(updatedOrder.status).to.equal(ORDER_STATUS.CANCELLED);
         expect(activeOrder.totalAmount).to.equal(4000);
-        expect(activeOrder.status).to.equal(order.status);
+        expect(activeOrder.status).to.equal(ORDER_STATUS.ACTIVE);
         expect(activeOrder.Subscription.amount).to.equal(4000);
       });
     });
