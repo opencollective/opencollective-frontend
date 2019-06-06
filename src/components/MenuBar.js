@@ -227,7 +227,7 @@ class MenuBar extends React.Component {
 
     const { collective } = this.props;
     const CollectiveId = collective.id;
-    const HostCollectiveId = form.FromCollectiveId;
+    const HostCollectiveId = Number(form.FromCollectiveId);
     const params = {
       ...pick(form, ['totalAmount', 'description']),
       CollectiveId,

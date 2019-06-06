@@ -187,6 +187,7 @@ class AddFundsForm extends React.Component {
     }
 
     if (attr === 'FromCollectiveId') {
+      value = Number(value);
       if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
       } else {
