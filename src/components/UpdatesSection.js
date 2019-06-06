@@ -22,7 +22,7 @@ class UpdatesSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/updates/new`,
-        label: <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />,
+        label: <FormattedMessage id="sections.update.new" defaultMessage="Post an Update" />,
       };
     }
 

@@ -1,8 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { Box } from '@rebass/grid';
+
 import withIntl from '../lib/withIntl';
 import { defineMessages } from 'react-intl';
 import Link from './Link';
+import Container from './Container';
+import { H1 } from './Text';
+
+const LinkAction = styled(Link)`
+  text-align: center;
+  color: #090a0a;
+`;
+
+const Subtitle = styled(Container)`
+  color: #71757a;
+  margin-top: 0.8rem;
+  font-size: 1.6rem;
+  line-height: 19px;
+  text-align: center;
+`;
 
 class SectionTitle extends React.Component {
   static propTypes = {
@@ -107,7 +125,7 @@ class SectionTitle extends React.Component {
       (this.messages[`${section}.subtitle`] ? intl.formatMessage(this.messages[`${section}.subtitle`], values) : '');
 
     return (
-      <div className="SectionTitle">
+      <Container textAlign="center" className="SectionTitle">
         <style jsx>
           {`
             .SectionTitle {
@@ -123,29 +141,24 @@ class SectionTitle extends React.Component {
               margin: 0;
               text-align: center;
             }
-            .subtitle {
-              margin-top: 0.8rem;
-              color: #4e5052;
-              font-size: 1.6rem;
-              line-height: 19px;
-              text-align: center;
-            }
             .content {
               padding: 0.8rem 0;
             }
           `}
         </style>
 
-        <div className="content">
-          <h1>{title}</h1>
+        <Container className="content">
+          <Box mt={2} mb={3}>
+            <H1>{title}</H1>
+          </Box>
           {action && (
-            <Link route={action.href} className="action" scroll={false}>
+            <LinkAction route={action.href} className="action" scroll={false}>
               {action.label}
-            </Link>
+            </LinkAction>
           )}
-          {subtitle && <div className="subtitle">{subtitle}</div>}
-        </div>
-      </div>
+          {subtitle && <Subtitle>{subtitle}</Subtitle>}
+        </Container>
+      </Container>
     );
   }
 }
