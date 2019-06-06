@@ -170,7 +170,7 @@
     "jest": "^24.8.0",
     "jest-styled-components": "^6.3.1",
     "jsdom": "^15.1.1",
-    "lint-staged": "^8.1.7",
+    "lint-staged": "^8.2.0",
     "mkdirp": "^0.5.1",
     "prettier": "1.17.1",
     "raf": "^3.4.1",
