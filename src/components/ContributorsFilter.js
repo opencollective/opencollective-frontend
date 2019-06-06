@@ -13,7 +13,7 @@ export const CONTRIBUTOR_FILTERS = {
   ALL: 'ALL',
   CORE: 'CORE',
   FINANCIAL: 'FINANCIAL',
-  GITHUB: 'GITHUB',
+  // TODO GITHUB: 'GITHUB',
 };
 
 const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
@@ -45,16 +45,17 @@ export const getMembersFilters = members => {
   const filters = new Set([CONTRIBUTOR_FILTERS.ALL]);
   for (const m of members) {
     // Add role to the set
-    if (m.role === roles.CONTRIBUTOR) {
-      filters.add(CONTRIBUTOR_FILTERS.GITHUB);
-    } else if (m.role === roles.ADMIN) {
+    if (m.role === roles.ADMIN) {
       filters.add(CONTRIBUTOR_FILTERS.CORE);
     } else if ([roles.BACKER, roles.FUNDRAISER].includes(m.role)) {
       filters.add(CONTRIBUTOR_FILTERS.FINANCIAL);
-    }
+    } /* TODO else if (m.role === roles.GITHUB_CONTRIBUTOR) {
+      filters.add(CONTRIBUTOR_FILTERS.GITHUB);
+    } */
 
     // No need to traverse the entire list if we already registered all the types
-    if (filters.length === FILTERS_LIST.length) {
+    // No need to count the first one (ALL) - so we do length - 1
+    if (filters.length === FILTERS_LIST.length - 1) {
       break;
     }
   }
@@ -77,9 +78,9 @@ export const filterMembers = (members, filter) => {
     return members.filter(m => [roles.BACKER, roles.FUNDRAISER].includes(m.role));
   } else if (filter === CONTRIBUTOR_FILTERS.CORE) {
     return members.filter(m => m.role === roles.ADMIN);
-  } else if (filter === CONTRIBUTOR_FILTERS.GITHUB) {
-    return members.filter(m => m.role === roles.CONTRIBUTOR);
-  } else {
+  } /* TODO else if (filter === CONTRIBUTOR_FILTERS.GITHUB) {
+    return members.filter(m => m.role === roles.GITHUB_CONTRIBUTOR);
+  } */ else {
     return members;
   }
 };
