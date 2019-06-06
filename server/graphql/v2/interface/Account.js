@@ -1,3 +1,5 @@
+import { invert } from 'lodash';
+
 import { GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
@@ -11,7 +13,7 @@ import { MemberCollection, MemberOfCollection } from '../collection/MemberCollec
 import { TransactionCollection } from '../collection/TransactionCollection';
 import { OrderCollection } from '../collection/OrderCollection';
 
-import { AccountType, ImageFormat, MemberRole, OrderStatus, TransactionType } from '../enum';
+import { AccountType, AccountTypeToModelMapping, ImageFormat, MemberRole, OrderStatus, TransactionType } from '../enum';
 
 import { ChronologicalOrder } from '../input/ChronologicalOrder';
 
@@ -97,6 +99,12 @@ export const AccountFields = {
       return collective.slug;
     },
   },
+  type: {
+    type: AccountType,
+    resolve(collective) {
+      return invert(AccountTypeToModelMapping)[collective.type];
+    },
+  },
   name: {
     type: GraphQLString,
     resolve(collective) {
@@ -179,6 +187,10 @@ export const Account = new GraphQLInterfaceType({
       slug: {
         type: GraphQLString,
         description: 'The slug identifying the account (ie: babel)',
+      },
+      type: {
+        type: AccountType,
+        description: 'The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
       },
       name: {
         type: GraphQLString,
