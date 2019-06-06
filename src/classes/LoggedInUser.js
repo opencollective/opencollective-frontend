@@ -155,7 +155,7 @@ LoggedInUser.prototype.hostsUserIsAdminOf = function() {
 };
 
 LoggedInUser.prototype.isHostAdmin = function(collective) {
-  return collective.isHost && intersection(this.roles[collective.slug], ['ADMIN']).length > 0;
+  return intersection(this.roles[collective.host.slug], ['ADMIN']).length > 0;
 };
 
 export default LoggedInUser;
