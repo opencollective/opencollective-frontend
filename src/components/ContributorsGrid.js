@@ -13,7 +13,6 @@ import withViewport, { VIEWPORTS } from '../lib/withViewport';
 
 import Link from './Link';
 import { P } from './Text';
-import StyledCard from './StyledCard';
 import Container from './Container';
 import Avatar from './Avatar';
 import { fadeIn } from './StyledKeyframes';
@@ -43,9 +42,18 @@ const GridInnerContainer = ({ style, ...props }) => {
 };
 
 /** Cards to show individual contributors */
-const ContributorCard = styled(StyledCard)`
+const StyledContributorCard = styled.div.attrs(props => ({
+  style: { top: props.top, left: props.left },
+}))`
   animation: ${fadeIn} 0.3s;
   padding: 20px 8px;
+  border: 1px solid #dcdee0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  overflow: hidden;
+  width: 144px;
+  position: absolute;
+  height: 226px;
 
   a {
     text-decoration: none;
@@ -77,6 +85,43 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
 };
 
 /**
+ * A single contributor card, implemented as a PureComponent to improve performances
+ */
+class ContributorCard extends React.PureComponent {
+  static propTypes = {
+    intl: PropTypes.object.isRequired,
+    role: PropTypes.string.isRequired,
+    collective: PropTypes.object.isRequired,
+    left: PropTypes.number.isRequired,
+    top: PropTypes.number.isRequired,
+  };
+
+  render() {
+    const { left, top, collective, intl, role } = this.props;
+
+    return (
+      <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
+        <Flex justifyContent="center" mb={3}>
+          <Link route="collective" params={{ slug: collective.slug }}>
+            <Avatar src={collective.image} radius={56} name={collective.name} />
+          </Link>
+        </Flex>
+        <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
+          <Link route="collective" passHref params={{ slug: collective.slug }} title={collective.name}>
+            <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
+              {truncate(collective.name, { length: 42 })}
+            </P>
+          </Link>
+          <P fontSize="Tiny" lineHeight="Caption" color="black.500">
+            {formatMemberRole(intl, role)}
+          </P>
+        </Container>
+      </StyledContributorCard>
+    );
+  }
+}
+
+/**
  * A grid to show contributors, with horizontal scroll to search them.
  */
 const ContributorsGrid = ({ intl, members, width, maxNbRowsForViewports, viewport }) => {
@@ -103,38 +148,20 @@ const ContributorsGrid = ({ intl, members, width, maxNbRowsForViewports, viewpor
     >
       {({ columnIndex, rowIndex, style }) => {
         const idx = getIdx(columnIndex, rowIndex, nbCols);
-        if (idx >= members.length) {
+        const member = members[idx];
+
+        if (!member) {
           return null;
         }
-
-        const { id, role, collective } = members[idx];
         return (
           <ContributorCard
-            key={id}
-            style={{
-              ...style,
-              left: style.left + COLLECTIVE_CARD_MARGIN_X,
-              top: style.top + COLLECTIVE_CARD_MARGIN_Y,
-              width: style.width - COLLECTIVE_CARD_MARGIN_X,
-              height: style.height - COLLECTIVE_CARD_MARGIN_Y,
-            }}
-          >
-            <Flex justifyContent="center" mb={3}>
-              <Link route="collective" params={{ slug: collective.slug }}>
-                <Avatar src={collective.image} radius={56} name={collective.name} />
-              </Link>
-            </Flex>
-            <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
-              <Link route="collective" passHref params={{ slug: collective.slug }} title={collective.name}>
-                <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
-                  {truncate(collective.name, { length: 42 })}
-                </P>
-              </Link>
-              <P fontSize="Tiny" lineHeight="Caption" color="black.500">
-                {formatMemberRole(intl, role)}
-              </P>
-            </Container>
-          </ContributorCard>
+            key={member.id}
+            collective={member.collective}
+            role={member.role}
+            left={style.left}
+            top={style.top}
+            intl={intl}
+          />
         );
       }}
     </FixedSizeGrid>
