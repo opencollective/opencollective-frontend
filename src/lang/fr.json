@@ -998,6 +998,7 @@
   "update.publish.backers": "Votre actualité sera envoyé à vos {n} contributeurs",
   "update.publish.btn": "publier",
   "update.publishedAt": "publié le {date}",
+  "update.publishedAtBy": "Published on {date} by",
   "update.rejected": "rejeté",
   "update.viewLatestUpdates": "Voir les dernières actualités",
   "updates.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer une nouvelle actualité.",
