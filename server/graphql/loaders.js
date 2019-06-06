@@ -2,8 +2,15 @@ import models, { sequelize, Op } from '../models';
 import { getListOfAccessibleMembers } from '../lib/auth';
 import { TransactionTypes } from '../constants/transactions';
 import DataLoader from 'dataloader';
+import dataloaderSequelize from 'dataloader-sequelize';
 import { get, groupBy } from 'lodash';
 import debugLib from 'debug';
+
+dataloaderSequelize(models.Order);
+dataloaderSequelize(models.Transaction);
+dataloaderSequelize(models.Collective);
+dataloaderSequelize(models.Expense);
+
 const debug = debugLib('loaders');
 
 const sortResults = (keys, results, attribute = 'id', defaultValue) => {
@@ -38,6 +45,7 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
 
 export const loaders = req => {
   const cache = {};
+
   const createDataLoaderWithOptions = (batchFunction, options = {}, cacheKeyPrefix = '') => {
     const cacheKey = `${cacheKeyPrefix}:${JSON.stringify(options)}`;
     cache[cacheKey] = cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
@@ -622,7 +630,7 @@ export const loaders = req => {
   };
 };
 
-export function middleware(req, res, next) {
+export function loadersMiddleware(req, res, next) {
   req.loaders = loaders(req);
   next();
 }

@@ -22,20 +22,11 @@ import { CollectiveInterfaceType, CollectiveSearchResultsType } from './Collecti
 import { TransactionInterfaceType, OrderDirectionType } from './TransactionInterface';
 
 import models, { Op, sequelize } from '../../models';
-import dataloaderSequelize from 'dataloader-sequelize';
 import { strip_tags } from '../../lib/utils';
 import status from '../../constants/expense_status';
 import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
-
-dataloaderSequelize(models.Order);
-dataloaderSequelize(models.Transaction);
-dataloaderSequelize(models.Collective);
-dataloaderSequelize(models.Expense);
-
-// This breaks the tests for some reason (mocha test/Member.routes.test.js -g "successfully add a user to a collective with a role")
-// dataloaderSequelize(models.User);
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
