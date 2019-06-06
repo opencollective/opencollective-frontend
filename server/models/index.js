@@ -82,7 +82,7 @@ export function setupModels(client) {
     'Notification',
     'Order',
     'PaymentMethod',
-    'RequiredLegalDocument',
+    'RequiredLegalDocumentType',
     'Session',
     'Subscription',
     'Tier',

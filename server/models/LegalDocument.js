@@ -3,7 +3,6 @@ export default function(Sequelize, DataTypes) {
   const REQUESTED = 'REQUESTED';
   const RECEIVED = 'RECEIVED';
   const ERROR = 'ERROR';
-  const US_TAX_FORM = 'US_TAX_FORM';
 
   const LegalDocument = Sequelize.define(
     'LegalDocument',
@@ -32,13 +31,6 @@ export default function(Sequelize, DataTypes) {
         defaultValue: NOT_REQUESTED,
         field: 'request_status',
       },
-      documentType: {
-        type: DataTypes.ENUM,
-        values: [US_TAX_FORM],
-        allowNull: false,
-        defaultValue: US_TAX_FORM,
-        field: 'document_type',
-      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,
@@ -60,10 +52,10 @@ export default function(Sequelize, DataTypes) {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
-      HostCollectiveId: {
+      RequiredLegalDocumentTypeId: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'Collectives',
+          model: 'RequiredLegalDocumentTypes',
           key: 'id',
         },
         onDelete: 'SET NULL',
@@ -81,17 +73,15 @@ export default function(Sequelize, DataTypes) {
   LegalDocument.requestStatus.NOT_REQUESTED = NOT_REQUESTED;
   LegalDocument.requestStatus.RECEIVED = RECEIVED;
   LegalDocument.requestStatus.ERROR = ERROR;
-  LegalDocument.documentType = {};
-  LegalDocument.documentType.US_TAX_FORM = US_TAX_FORM;
 
   LegalDocument.associate = m => {
     LegalDocument.belongsTo(m.Collective, {
       foreignKey: 'CollectiveId',
       as: 'collective',
     });
-    LegalDocument.belongsTo(m.Collective, {
-      foreignKey: 'HostCollectiveId',
-      as: 'hostCollective',
+    LegalDocument.belongsTo(m.RequiredLegalDocumentType, {
+      foreignKey: 'RequiredLegalDocumentTypeId',
+      as: 'requiredLegalDocumentType',
     });
   };
 

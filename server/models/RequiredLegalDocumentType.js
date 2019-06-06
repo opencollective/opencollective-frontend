@@ -1,7 +1,7 @@
 export default function(Sequelize, DataTypes) {
   const US_TAX_FORM = 'US_TAX_FORM';
 
-  const RequiredLegalDocument = Sequelize.define('RequiredLegalDocument', {
+  const RequiredLegalDocumentType = Sequelize.define('RequiredLegalDocumentType', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -37,15 +37,16 @@ export default function(Sequelize, DataTypes) {
     },
   });
 
-  RequiredLegalDocument.documentType = {};
-  RequiredLegalDocument.documentType.US_TAX_FORM = US_TAX_FORM;
+  RequiredLegalDocumentType.documentType = {};
+  RequiredLegalDocumentType.documentType.US_TAX_FORM = US_TAX_FORM;
 
-  RequiredLegalDocument.associate = m => {
-    RequiredLegalDocument.belongsTo(m.Collective, {
+  RequiredLegalDocumentType.associate = m => {
+    RequiredLegalDocumentType.belongsTo(m.Collective, {
       foreignKey: 'HostCollectiveId',
       as: 'hostCollective',
     });
+    RequiredLegalDocumentType.hasMany(m.LegalDocument);
   };
 
-  return RequiredLegalDocument;
+  return RequiredLegalDocumentType;
 }

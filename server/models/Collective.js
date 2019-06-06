@@ -2288,8 +2288,7 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Notification);
     Collective.hasMany(m.Tier, { as: 'tiers' });
     Collective.hasMany(m.LegalDocument);
-    Collective.hasMany(m.LegalDocument, { as: 'HostedLegalDocuments', foreignKey: 'HostCollectiveId' });
-    Collective.hasMany(m.RequiredLegalDocument, { foreignKey: 'HostCollectiveId' });
+    Collective.hasMany(m.RequiredLegalDocumentType, { foreignKey: 'HostCollectiveId' });
   };
 
   Historical(Collective, Sequelize);

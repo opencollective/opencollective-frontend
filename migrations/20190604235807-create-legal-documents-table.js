@@ -8,13 +8,12 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      document_type: Sequelize.ENUM('US_TAX_FORM'),
-      request_status: Sequelize.ENUM('NOT_REQUESTED', 'REQUESTED', 'RECEIVED', 'ERROR'),
+      requestStatus: Sequelize.ENUM('NOT_REQUESTED', 'REQUESTED', 'RECEIVED', 'ERROR'),
       year: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      document_link: Sequelize.STRING,
+      documentLink: Sequelize.STRING,
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
@@ -32,9 +31,9 @@ module.exports = {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },
-      HostCollectiveId: {
+      RequiredLegalDocumentId: {
         type: Sequelize.INTEGER,
-        references: { key: 'id', model: 'Collectives' },
+        references: { key: 'id', model: 'RequiredLegalDocuments' },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },

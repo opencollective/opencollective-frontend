@@ -2,11 +2,11 @@ import { expect } from 'chai';
 import models from '../server/models';
 import * as utils from '../test/utils';
 
-const { LegalDocument, User, Collective } = models;
+const { RequiredLegalDocumentType, LegalDocument, User, Collective } = models;
 
 describe('LegalDocument model', () => {
   // globals to be set in the before hooks.
-  let hostCollective, user, userCollective;
+  let hostCollective, user, userCollective, docType;
 
   const documentData = {
     year: 2019,
@@ -41,12 +41,15 @@ describe('LegalDocument model', () => {
     hostCollective = await Collective.create(hostCollectiveData);
     user = await User.createUserWithCollective(userData);
     userCollective = await models.Collective.findByPk(user.CollectiveId);
+    docType = await RequiredLegalDocumentType.create({
+      HostCollectiveId: hostCollective.id,
+    });
   });
 
   it('it can set and save a new document_link', async () => {
     const expected = 'a string';
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -62,7 +65,7 @@ describe('LegalDocument model', () => {
   // This assumes collectives will never be force deleted. If they are then the Legal Document model will fail its foreign key constraint when you try and load it.
   it('it will not be deleted if the host collective is soft deleted', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -77,7 +80,7 @@ describe('LegalDocument model', () => {
   // See comment above
   it('it will not be deleted if the user collective is soft deleted', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -91,7 +94,7 @@ describe('LegalDocument model', () => {
 
   it('it can be deleted without deleting the collectives it belongs to', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -107,7 +110,7 @@ describe('LegalDocument model', () => {
 
   it('can set and save a valid new request status', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -123,7 +126,7 @@ describe('LegalDocument model', () => {
 
   it('it will fail if attempting to set an invalid request status', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -136,19 +139,20 @@ describe('LegalDocument model', () => {
 
   it('it can be found via its host collective', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
 
-    const retrievedDocs = await hostCollective.getHostedLegalDocuments();
+    const retrievedDocTypes = await hostCollective.getRequiredLegalDocumentTypes();
+    const retrievedDocs = await retrievedDocTypes[0].getLegalDocuments();
 
     expect(retrievedDocs[0].id).to.eq(doc.id);
   });
 
   it('it can be found via its collective', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -160,7 +164,7 @@ describe('LegalDocument model', () => {
 
   it('it can get its associated collective', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
@@ -172,19 +176,20 @@ describe('LegalDocument model', () => {
 
   it('it can get its associated host collective', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
 
-    const retrievedHost = await doc.getHostCollective();
+    const retrievedDocType = await doc.getRequiredLegalDocumentType();
+    const retrievedHost = await retrievedDocType.getHostCollective();
 
     expect(retrievedHost.id).to.eq(hostCollective.id);
   });
 
   it("it can't be created if the year is less than 2015", async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     legalDoc.year = 2014;
@@ -193,16 +198,16 @@ describe('LegalDocument model', () => {
 
   it("it can't be created if the year is null", async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     delete legalDoc.year;
     expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
   });
 
-  it("it can't be created if the HostCollectiveId is null", async () => {
+  it("it can't be created if the RequiredLegalDocumentTypeId is null", async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: null,
+      RequiredLegalDocumentTypeId: null,
       CollectiveId: userCollective.id,
     });
     expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
@@ -210,7 +215,7 @@ describe('LegalDocument model', () => {
 
   it("it can't be created if the CollectiveId is null", async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: null,
     });
     expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
@@ -218,11 +223,10 @@ describe('LegalDocument model', () => {
 
   it('can be created and has expected values', async () => {
     const legalDoc = Object.assign({}, documentData, {
-      HostCollectiveId: hostCollective.id,
+      RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
     const doc = await models.LegalDocument.create(legalDoc);
     expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
-    expect(doc.documentType).to.eq(LegalDocument.documentType.US_TAX_FORM);
   });
 });

@@ -2,11 +2,11 @@ import { expect } from 'chai';
 import models from '../server/models';
 import * as utils from '../test/utils';
 
-const { RequiredLegalDocument, User, Collective } = models;
+const { RequiredLegalDocumentType, Collective } = models;
 
-describe('RequiredLegalDocument model', () => {
+describe('RequiredLegalDocumentType model', () => {
   // globals to be set in the before hooks.
-  let hostCollective, user;
+  let hostCollective;
 
   const hostCollectiveData = {
     slug: 'myhost',
@@ -39,9 +39,9 @@ describe('RequiredLegalDocument model', () => {
         HostCollectiveId: hostCollective.id,
       },
     );
-    const doc = await models.RequiredLegalDocument.create(requiredDoc);
+    const doc = await models.RequiredLegalDocumentType.create(requiredDoc);
 
-    const retrievedDocs = await hostCollective.getRequiredLegalDocuments();
+    const retrievedDocs = await hostCollective.getRequiredLegalDocumentTypes();
 
     expect(retrievedDocs[0].id).to.eq(doc.id);
   });
@@ -53,7 +53,7 @@ describe('RequiredLegalDocument model', () => {
         HostCollectiveId: hostCollective.id,
       },
     );
-    const doc = await models.RequiredLegalDocument.create(requiredDoc);
+    const doc = await models.RequiredLegalDocumentType.create(requiredDoc);
 
     const retrievedHost = await doc.getHostCollective();
 
@@ -67,7 +67,7 @@ describe('RequiredLegalDocument model', () => {
         HostCollectiveId: null,
       },
     );
-    expect(models.RequiredLegalDocument.create(requiredDoc)).to.be.rejected;
+    expect(models.RequiredLegalDocumentType.create(requiredDoc)).to.be.rejected;
   });
 
   it('can be created and has expected values', async () => {
@@ -77,7 +77,7 @@ describe('RequiredLegalDocument model', () => {
         HostCollectiveId: hostCollective.id,
       },
     );
-    const doc = await models.RequiredLegalDocument.create(requiredDoc);
-    expect(doc.documentType).to.eq(RequiredLegalDocument.documentType.US_TAX_FORM);
+    const doc = await models.RequiredLegalDocumentType.create(requiredDoc);
+    expect(doc.documentType).to.eq(RequiredLegalDocumentType.documentType.US_TAX_FORM);
   });
 });
