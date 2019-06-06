@@ -5,23 +5,19 @@ import { Times } from 'styled-icons/fa-solid/Times';
 
 import Container from './Container';
 
-const ModalWrapper = styled(Container)`
+const ModalWrapper = styled(Container).attrs(props => ({
+  maxWidth: props.maxWidth || '95%',
+  maxHeight: props.maxHeight || '100%',
+}))`
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  max-width: 95%;
-  max-height: 100%;
   z-index: 3000;
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
   padding: 20px;
-  ${props =>
-    `
-      width: ${props.width};
-      height: ${props.height};
-    `}
 `;
 
 const GlobalModalStyle = createGlobalStyle`
@@ -53,11 +49,6 @@ const Header = styled(Container)`
 const Body = styled(Container)`
   margin-top: 10px;
   margin-bottom: 30px;
-  ${props =>
-    `
-      width: ${props.width};
-      height: ${props.height};
-    `}
 `;
 
 const Divider = styled.div`
@@ -98,14 +89,15 @@ export const ModalFooter = ({ children }) => (
 );
 
 /**
- * Modal component
+ * Modal component. Will pass down additional props to `ModalWrapper`, which is
+ * a styled `Container`.
  */
-const Modal = ({ children, show, width, height, onClose }) => {
+const StyledModal = ({ children, show, onClose, ...props }) => {
   if (show) {
     return (
       <React.Fragment>
         <GlobalModalStyle />
-        <ModalWrapper width={width} height={height}>
+        <ModalWrapper {...props}>
           {React.Children.map(children, child => {
             if (child.type.displayName === 'Header') {
               return React.cloneElement(child, { onClose });
@@ -121,16 +113,24 @@ const Modal = ({ children, show, width, height, onClose }) => {
   }
 };
 
-Modal.propTypes = {
+StyledModal.propTypes = {
   /** a boolean to determin when to show modal */
   show: PropTypes.bool.isRequired,
   /** width of the modal component */
-  width: PropTypes.string,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
-  height: PropTypes.string,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** width of the modal component */
+  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** height of the modal component */
+  maxWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** width of the modal component */
+  minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** height of the modal component */
+  minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
 };
 
 /** @component */
-export default Modal;
+export default StyledModal;
