@@ -1,6 +1,6 @@
 import { invert } from 'lodash';
 
-import { GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
+import { GraphQLBoolean, GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -53,6 +53,8 @@ const accountTransactions = {
 const accountOrders = {
   type: OrderCollection,
   args: {
+    sent: { type: GraphQLBoolean, defaultValue: true },
+    received: { type: GraphQLBoolean, defaultValue: true },
     limit: { type: GraphQLInt, defaultValue: 100 },
     offset: { type: GraphQLInt, defaultValue: 0 },
     status: { type: new GraphQLList(OrderStatus) },
@@ -63,7 +65,16 @@ const accountOrders = {
     },
   },
   async resolve(collective, args) {
-    const where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
+    let where;
+    if (args.sent && args.received) {
+      where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
+    } else if (args.sent) {
+      where = { FromCollectiveId: collective.id };
+    } else if (args.received) {
+      where = { CollectiveId: collective.id };
+    } else {
+      throw new NotFound({ message: 'At least one of `sent` or `received` needs to be true.' });
+    }
 
     if (args.status && args.status.length > 0) {
       where.status = { [Op.in]: args.status };
