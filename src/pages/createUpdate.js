@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
-import { get } from 'lodash';
 import gql from 'graphql-tag';
+import { Flex, Box } from '@rebass/grid';
+import { ArrowBack } from 'styled-icons/boxicons-regular';
 
 import { Router } from '../server/pages';
 
@@ -14,12 +16,22 @@ import CollectiveCover from '../components/CollectiveCover';
 import ErrorPage from '../components/ErrorPage';
 import EditUpdateForm from '../components/EditUpdateForm';
 import Button from '../components/Button';
+import Container from '../components/Container';
+import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import { H1 } from '../components/Text';
+
+const BackButtonWrapper = styled(Container)`
+  position: relative;
+  color: #71757a;
+  margin-right: 62px;
+  margin-left: 20px;
+`;
 
 class CreateUpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -98,34 +110,49 @@ class CreateUpdatePage extends React.Component {
 
         <Body>
           <CollectiveCover
-            key={collective.slug}
+            context="createUpdate"
             collective={collective}
-            href={`/${collective.slug}`}
-            title={<FormattedMessage id="updates.new.title" defaultMessage="New update" />}
-            className="small"
-            style={get(collective, 'settings.style.hero.cover')}
+            LoggedInUser={LoggedInUser}
+            key={collective.slug}
           />
-
-          <div className="content">
-            {!canCreateUpdate && (
-              <div className="login">
-                <p>
-                  <FormattedMessage
-                    id="updates.create.login"
-                    defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update."
-                  />
-                </p>
-                <p>
-                  <Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}>
-                    <FormattedMessage id="login.button" defaultMessage="Sign In" />
-                  </Button>
-                </p>
-              </div>
-            )}
-            {canCreateUpdate && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
-          </div>
+          <Flex className="content" mt={4} alignItems="baseline">
+            <BackButtonWrapper>
+              <Link>
+                <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
+                  <ArrowBack size={18} />
+                  <Box as="span" mx={2}>
+                    Back
+                  </Box>
+                </Container>
+              </Link>
+            </BackButtonWrapper>
+            <Container width={1}>
+              {!canCreateUpdate && (
+                <div className="login">
+                  <p>
+                    <FormattedMessage
+                      id="updates.create.login"
+                      defaultMessage="You need to be logged in as a core contributor of this collective to be able to create an update."
+                    />
+                  </p>
+                  <p>
+                    <Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}>
+                      <FormattedMessage id="login.button" defaultMessage="Sign In" />
+                    </Button>
+                  </p>
+                </div>
+              )}
+              {canCreateUpdate && (
+                <Container my={3}>
+                  <H1 textAlign="left" fontSize="34px">
+                    <FormattedMessage id="updates.new.title" defaultMessage="New update" />
+                  </H1>
+                </Container>
+              )}
+              {canCreateUpdate && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
+            </Container>
+          </Flex>
         </Body>
-
         <Footer />
       </div>
     );
