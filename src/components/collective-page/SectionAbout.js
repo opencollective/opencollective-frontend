@@ -26,7 +26,7 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
 
   return (
     <Flex flexDirection="column" alignItems="center" px={2} py={6}>
-      <H3 fontSize="H2" fontWeight="normal" mb={5}>
+      <H3 fontSize="H2" fontWeight="normal" textAlign="center" mb={5}>
         <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
       </H3>
 

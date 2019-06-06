@@ -38,14 +38,14 @@ export default class SectionContributors extends React.PureComponent {
     return (
       <Box pt={6}>
         <Box m="0 auto" css={{ maxWidth: 1440 }}>
-          <H2 mb={4} px={3} fontSize={80} lineHeight="1em" color="black.900">
+          <H2 mb={4} px={3} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
             <FormattedMessage
               id="CollectivePage.AllOfUs"
               defaultMessage="{collectiveName} is all of us"
               values={{ collectiveName }}
             />
           </H2>
-          <H3 mb={3} px={3} fontSize="H2" fontWeight="normal" color="black.900">
+          <H3 mb={3} px={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
             <FormattedMessage
               id="CollectivePage.OurContributors"
               defaultMessage="Our contributors {count}"
