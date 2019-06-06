@@ -19,6 +19,12 @@ const UpdateFormWrapper = styled(Container)`
   width: 100%;
 `;
 
+const ActionButtonWrapper = styled(Container)`
+  @media (max-width: 600px) {
+    justify-content: center;
+  }
+`;
+
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
 let HTMLEditor, MarkdownEditor;
@@ -153,7 +159,7 @@ class EditUpdateForm extends React.Component {
                     type="text"
                     value={update.title}
                     onChange={e => this.handleChange('title', e.target.value)}
-                    minWidth={500}
+                    maxWidth={500}
                     placeHolder="Normal"
                     data-cy="titleInput"
                     required
@@ -201,7 +207,7 @@ class EditUpdateForm extends React.Component {
               />
             </Container>
           </div>
-          <div className="row actions">
+          <ActionButtonWrapper className="row actions" mx={2} my={3}>
             <StyledButton
               className="bluewhite"
               buttonSize="large"
@@ -212,7 +218,7 @@ class EditUpdateForm extends React.Component {
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
               {!this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Post Update" />}
             </StyledButton>
-          </div>
+          </ActionButtonWrapper>
 
           <div className="row">
             <div className="col large">{this.state.error && <div className="error">{this.state.error}</div>}</div>

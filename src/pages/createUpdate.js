@@ -31,6 +31,15 @@ const BackButtonWrapper = styled(Container)`
   color: #71757a;
   margin-right: 62px;
   margin-left: 20px;
+  @media (max-width: 600px) {
+    margin-left: 0;
+  }
+`;
+
+const CreateUpdateWrapper = styled(Flex)`
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
 `;
 
 class CreateUpdatePage extends React.Component {
@@ -115,7 +124,7 @@ class CreateUpdatePage extends React.Component {
             LoggedInUser={LoggedInUser}
             key={collective.slug}
           />
-          <Flex className="content" mt={4} alignItems="baseline">
+          <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
             <BackButtonWrapper>
               <Link>
                 <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
@@ -151,7 +160,7 @@ class CreateUpdatePage extends React.Component {
               )}
               {canCreateUpdate && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
             </Container>
-          </Flex>
+          </CreateUpdateWrapper>
         </Body>
         <Footer />
       </div>
