@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex } from '@rebass/grid';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
 
@@ -135,7 +135,7 @@ class Hero extends Component {
                 justifyContent={isFixed ? 'left' : ['center', null, null, 'left', 'center']}
                 flexDirection={isFixed ? 'row' : ['column', null, null, 'row', 'column']}
               >
-                <Box mb={isFixed ? 0 : 2} mr={isFixed ? 3 : [0, 4]}>
+                <Container textAlign={['center', 'left']} mb={isFixed ? 0 : 2} mr={isFixed ? 3 : [0, 4]}>
                   <AvatarWithHost
                     collective={collective}
                     host={host}
@@ -143,7 +143,7 @@ class Hero extends Component {
                     animationDuration={AnimationsDurations.HERO_COLLAPSE}
                     onCollectiveClick={onCollectiveClick}
                   />
-                </Box>
+                </Container>
                 <Flex flexDirection="column" flex="1 1">
                   <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
                     <H1
