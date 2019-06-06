@@ -101,6 +101,7 @@ class InputField extends React.Component {
     required: PropTypes.bool,
     style: PropTypes.object,
     multiple: PropTypes.bool,
+    closeOnSelect: PropTypes.bool,
   };
 
   constructor(props) {

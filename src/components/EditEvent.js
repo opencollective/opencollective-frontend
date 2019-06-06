@@ -15,6 +15,7 @@ class EditEvent extends React.Component {
   static propTypes = {
     event: PropTypes.object,
     editCollective: PropTypes.func,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {

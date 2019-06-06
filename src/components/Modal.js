@@ -5,6 +5,9 @@ class Modal extends React.Component {
   static propTypes = {
     onClose: PropTypes.func,
     show: PropTypes.bool,
+    className: PropTypes.string,
+    title: PropTypes.string,
+    children: PropTypes.node,
   };
 
   constructor(props) {

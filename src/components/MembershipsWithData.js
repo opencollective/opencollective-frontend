@@ -17,6 +17,9 @@ class MembershipsWithData extends React.Component {
     limit: PropTypes.number,
     onChange: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    fetchMore: PropTypes.func,
+    refetch: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

@@ -27,6 +27,9 @@ class EditUpdateForm extends React.Component {
     update: PropTypes.object,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func,
+    onChange: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    mode: PropTypes.string,
   };
 
   constructor(props) {

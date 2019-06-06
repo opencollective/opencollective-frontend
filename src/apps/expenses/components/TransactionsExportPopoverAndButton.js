@@ -69,6 +69,7 @@ export const transformResultInCSV = json => {
 class ExportForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    client: PropTypes.object,
   };
 
   constructor(props) {
@@ -170,6 +171,10 @@ class ExportForm extends React.Component {
 const ExportFormWithClient = withApollo(ExportForm);
 
 class PopoverButton extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object,
+  };
+
   render() {
     const form = <ExportFormWithClient collective={this.props.collective} />;
     return (

@@ -21,6 +21,9 @@ class CollectivesWithData extends React.Component {
     tags: PropTypes.arrayOf(PropTypes.string), // only fetch collectives that have those tags
     onChange: PropTypes.func,
     limit: PropTypes.number,
+    fetchMore: PropTypes.func,
+    refetch: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

@@ -10,6 +10,7 @@ class CancelSubscriptionBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     onError: PropTypes.func,
+    cancelSubscription: PropTypes.func,
   };
 
   constructor(props) {

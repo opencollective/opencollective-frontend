@@ -12,6 +12,9 @@ class EditMembers extends React.Component {
     collective: PropTypes.object.isRequired,
     members: PropTypes.arrayOf(PropTypes.object).isRequired,
     onChange: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
+    defaultType: PropTypes.string,
+    title: PropTypes.string,
   };
 
   constructor(props) {

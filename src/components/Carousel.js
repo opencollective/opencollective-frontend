@@ -48,6 +48,13 @@ const Controls = ({ currentSlide, goToSlide, slideCount, slidesToScroll }) => (
   </List>
 );
 
+Controls.propTypes = {
+  currentSlide: PropTypes.number,
+  goToSlide: PropTypes.func,
+  slideCount: PropTypes.number,
+  slidesToScroll: PropTypes.number,
+};
+
 const Carousel = ({ content }) => {
   return (
     <NukaCarousel

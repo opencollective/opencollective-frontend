@@ -18,6 +18,8 @@ class ExpenseDetails extends React.Component {
     LoggedInUser: PropTypes.object,
     onChange: PropTypes.func,
     mode: PropTypes.string, // summary, edit or details
+    intl: PropTypes.object.isRequired,
+    data: PropTypes.object,
   };
 
   constructor(props) {

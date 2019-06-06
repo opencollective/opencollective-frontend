@@ -6,6 +6,8 @@ import withIntl from '../lib/withIntl';
 class MessageModal extends React.Component {
   static propTypes = {
     message: PropTypes.string,
+    className: PropTypes.string,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

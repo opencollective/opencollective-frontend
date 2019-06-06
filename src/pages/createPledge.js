@@ -117,6 +117,10 @@ const AmountField = ({ LoggedInUser }) => {
   );
 };
 
+AmountField.propTypes = {
+  LoggedInUser: PropTypes.object,
+};
+
 class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
     return {
@@ -147,6 +151,13 @@ class CreatePledgePage extends React.Component {
 
   static propTypes = {
     intl: PropTypes.object.isRequired, // from withIntl
+    data: PropTypes.object,
+    name: PropTypes.string,
+    slug: PropTypes.string,
+    githubHandle: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    createPledge: PropTypes.func,
   };
 
   state = {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { Span } from '../../../components/Text';
 import { Box, Flex } from '@rebass/grid';
@@ -19,5 +20,12 @@ const AmountCurrency = ({ abbreviate = false, currency, precision = 0, amount, .
     </Box>
   </Flex>
 );
+
+AmountCurrency.propTypes = {
+  abbreviate: PropTypes.bool,
+  currency: PropTypes.string,
+  precision: PropTypes.number,
+  amount: PropTypes.number,
+};
 
 export default AmountCurrency;

@@ -115,6 +115,12 @@ const BackerAvatar = ({ slug, image, stats: { totalAmountSpent } }) => (
   </Link>
 );
 
+BackerAvatar.propTypes = {
+  slug: PropTypes.string,
+  image: PropTypes.string,
+  stats: PropTypes.object,
+};
+
 class HomePage extends React.Component {
   static getInitialProps({ req, res }) {
     if (res && req && (req.language || req.locale === 'en')) {
@@ -125,6 +131,7 @@ class HomePage extends React.Component {
   static propTypes = {
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from withIntl
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {

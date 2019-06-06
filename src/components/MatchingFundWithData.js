@@ -14,6 +14,8 @@ class MatchingFundWithData extends React.Component {
     uuid: PropTypes.string.isRequired,
     order: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
+    onChange: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

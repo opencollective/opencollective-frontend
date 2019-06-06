@@ -16,7 +16,9 @@ import { Router } from '../server/pages';
 class CreateCollective extends React.Component {
   static propTypes = {
     host: PropTypes.object,
+    LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
+    createCollective: PropTypes.func,
   };
 
   constructor(props) {

@@ -13,7 +13,9 @@ import Loading from './Loading';
 
 class EditWebhooks extends React.Component {
   static propTypes = {
+    title: PropTypes.string,
     collectiveSlug: PropTypes.string.isRequired,
+    editWebhooks: PropTypes.func,
     /** From graphql query */
     data: PropTypes.object.isRequired,
     /** From intl */

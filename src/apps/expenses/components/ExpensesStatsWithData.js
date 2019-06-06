@@ -12,6 +12,7 @@ import Currency from '../../../components/Currency';
 class ExpensesStatsWithData extends React.Component {
   static propTypes = {
     slug: PropTypes.string.isRequired, // update.id
+    data: PropTypes.object.isRequired,
   };
 
   constructor(props) {

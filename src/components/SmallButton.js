@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Button from './Button';
 import colors from '../constants/colors';
 
@@ -91,5 +92,10 @@ class SmallButton extends React.Component {
     );
   }
 }
+
+SmallButton.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
 
 export default SmallButton;

@@ -16,6 +16,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
     fromCollective: PropTypes.object.isRequired,
     toCollective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
+    data: PropTypes.object,
+    createOrder: PropTypes.func,
   };
 
   constructor(props) {

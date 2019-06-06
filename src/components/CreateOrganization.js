@@ -14,6 +14,8 @@ import { get } from 'lodash';
 class CreateOrganization extends React.Component {
   static propTypes = {
     host: PropTypes.object,
+    createCollective: PropTypes.func,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {

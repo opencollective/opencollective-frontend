@@ -13,6 +13,8 @@ class AddFundsSourcePicker extends React.Component {
     paymentMethod: PropTypes.object.isRequired,
     collective: PropTypes.object,
     onChange: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    data: PropTypes.object,
   };
 
   constructor(props) {

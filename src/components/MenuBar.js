@@ -34,6 +34,7 @@ class MenuBar extends React.Component {
     LoggedInUser: PropTypes.object,
     cta: PropTypes.object,
     intl: PropTypes.object,
+    addFundsToOrg: PropTypes.func,
   };
 
   constructor(props) {

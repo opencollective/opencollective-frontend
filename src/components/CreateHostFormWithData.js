@@ -14,6 +14,7 @@ class CreateHostFormWithData extends React.Component {
     collective: PropTypes.object.isRequired,
     data: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    createCollective: PropTypes.func,
   };
 
   constructor(props) {

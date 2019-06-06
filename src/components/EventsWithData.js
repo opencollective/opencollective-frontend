@@ -9,6 +9,7 @@ class EventsWithData extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     onChange: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

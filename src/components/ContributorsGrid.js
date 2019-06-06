@@ -35,11 +35,19 @@ const GridContainer = React.forwardRef(({ style, ...props }, ref) => {
 
 GridContainer.displayName = 'GridContainer';
 
+GridContainer.propTypes = {
+  style: PropTypes.object,
+};
+
 /**
  * Add margin to the inner container width
  */
 const GridInnerContainer = ({ style, ...props }) => {
   return <div style={{ ...style, width: style.width + 32 }} {...props} />;
+};
+
+GridInnerContainer.propTypes = {
+  style: PropTypes.object,
 };
 
 /** Cards to show individual contributors */

@@ -15,6 +15,8 @@ class OrdersWithData extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    data: PropTypes.object.isRequired,
+    fetchMore: PropTypes.func,
   };
 
   constructor(props) {

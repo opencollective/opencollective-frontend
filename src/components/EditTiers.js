@@ -22,6 +22,7 @@ class EditTiers extends React.Component {
     defaultType: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object,
+    title: PropTypes.string,
   };
 
   constructor(props) {

@@ -14,6 +14,8 @@ class EditGoals extends React.Component {
     collective: PropTypes.object,
     currency: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
+    title: PropTypes.string,
   };
 
   constructor(props) {

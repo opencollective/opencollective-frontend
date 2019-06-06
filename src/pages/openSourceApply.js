@@ -37,6 +37,7 @@ class OpenSourceApplyPage extends Component {
     loadingLoggedInUser: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     createCollectiveFromGithub: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

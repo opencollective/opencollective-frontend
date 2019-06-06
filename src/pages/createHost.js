@@ -17,6 +17,7 @@ class CreateHostPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string,
+    getLoggedInUser: PropTypes.func,
   };
 
   constructor(props) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { borders, borderRadius } from 'styled-system';
 import { Flex } from '@rebass/grid';
@@ -43,5 +44,11 @@ const ButtonGroup = ({ onChange = () => {}, values = [], value }) => (
     ))}
   </Flex>
 );
+
+ButtonGroup.propTypes = {
+  onChange: PropTypes.func,
+  values: PropTypes.array,
+  value: PropTypes.object,
+};
 
 export default ButtonGroup;

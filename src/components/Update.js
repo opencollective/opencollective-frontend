@@ -22,6 +22,9 @@ class Update extends React.Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    deleteUpdate: PropTypes.func,
+    editUpdate: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

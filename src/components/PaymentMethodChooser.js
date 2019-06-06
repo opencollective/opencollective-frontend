@@ -16,6 +16,7 @@ class PaymentMethodChooser extends React.Component {
     editMode: PropTypes.bool,
     onSubmit: PropTypes.func,
     onCancel: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

@@ -92,6 +92,11 @@ const defaultChild = ({ value, radio }) => (
   </Box>
 );
 
+defaultChild.propTypes = {
+  value: PropTypes.string,
+  radio: PropTypes.func,
+};
+
 StyledRadioList.defaultProps = {
   children: defaultChild,
   onChange: () => {}, // noop

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { get } from 'lodash';
 
@@ -73,5 +74,9 @@ const EventSponsorCard = ({ sponsor }) => (
     </div>
   </a>
 );
+
+EventSponsorCard.propTypes = {
+  sponsor: PropTypes.object,
+};
 
 export default EventSponsorCard;

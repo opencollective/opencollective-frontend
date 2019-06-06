@@ -16,6 +16,7 @@ class StripeProvider extends React.Component {
   static propTypes = {
     /** If we should automatically load stripe JS on mount (useful for styledguidest) */
     loadOnMount: PropTypes.bool,
+    token: PropTypes.string,
   };
 
   constructor(props) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { Link } from '../server/pages';
 
@@ -54,6 +55,13 @@ const Pagination = ({ router, limit, offset, total }) => {
       )}
     </Flex>
   );
+};
+
+Pagination.propTypes = {
+  router: PropTypes.object,
+  limit: PropTypes.number,
+  offset: PropTypes.number,
+  total: PropTypes.number,
 };
 
 export default withRouter(Pagination);

@@ -11,6 +11,8 @@ class SubscriptionsWithData extends React.Component {
   static propTypes = {
     slug: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object,
+    subscriptions: PropTypes.array,
+    data: PropTypes.object,
   };
 
   constructor(props) {

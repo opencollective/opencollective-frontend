@@ -130,6 +130,7 @@ DeleteCollective.propTypes = {
   deleteCollective: PropTypes.func,
   logout: PropTypes.func,
   deleteUserCollective: PropTypes.func,
+  refetchLoggedInUser: PropTypes.func,
 };
 
 export default withIntl(withUser(addDeleteCollectiveMutation(addDeleteUserCollectiveMutation(DeleteCollective))));

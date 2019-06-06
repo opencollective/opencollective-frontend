@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const SearchIcon = ({ size = 48, fill = '#FFFFFF', ...props }) => (
   <svg width={size} height={size} viewBox="10 10 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -11,5 +12,10 @@ const SearchIcon = ({ size = 48, fill = '#FFFFFF', ...props }) => (
     />
   </svg>
 );
+
+SearchIcon.propTypes = {
+  size: PropTypes.number,
+  fill: PropTypes.string,
+};
 
 export default SearchIcon;

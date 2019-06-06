@@ -14,6 +14,7 @@ class RefundTransactionBtn extends React.Component {
     id: PropTypes.number.isRequired,
     isRefund: PropTypes.bool,
     CollectiveId: PropTypes.number.isRequired,
+    refundTransaction: PropTypes.func,
   };
 
   constructor(props) {
