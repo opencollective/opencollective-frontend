@@ -17,6 +17,26 @@ export const BREAKPOINTS_NAMES = [VIEWPORTS.MOBILE, VIEWPORTS.TABLET, VIEWPORTS.
 export const BREAKPOINTS_WIDTHS = [640, 832, 1024, 1408];
 export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS);
 
+/**
+ * Helper to check if a viewport is superior or equal to another one.
+ * Always returns false for `UNKNOWN`
+ *
+ * @param {VIEWPORTS} viewport
+ * @param {VIEWPORTS} breakpointName
+ */
+export const viewportIsAbove = (viewport, breakpointName) => {
+  return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(breakpointName);
+};
+
+/**
+ * Returns true if viewport is not `UNKNOWN` and is >= desktop.
+ *
+ * @param {VIEWPORTS} viewport
+ */
+export const isDesktopOrAbove = viewport => {
+  return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(VIEWPORTS.DESKTOP);
+};
+
 /** Returns the name of the viewport (see `BREAKPOINTS_NAMES`) */
 export const getViewportFromWidth = width => {
   const breakpointIdx = findLastIndex(BREAKPOINTS_WIDTHS, b => width >= b);
@@ -44,11 +64,10 @@ const getStateBuilder = (withWidth, withHeight) => {
  * @param {object} options
  *  - `withWidth` (default: false) - pass the width of the window
  *  - `withHeight` (default: false) - pass the height of the window
- *  - `debounceInterval` (default: 200) - maximum time to wait before refreshing the props
  *  - `defaultViewport` (default: UNKNOWN) - if detection fails, fallback on this screen size
  */
 const withViewport = (ChildComponent, options) => {
-  const { withWidth, withHeight, debounceInterval, defaultViewport = VIEWPORTS.UNKNOWN } = options || {};
+  const { withWidth, withHeight, defaultViewport = VIEWPORTS.UNKNOWN } = options || {};
   const buildState = getStateBuilder(withWidth || false, withHeight || false);
 
   return class Viewport extends React.PureComponent {
@@ -69,11 +88,15 @@ const withViewport = (ChildComponent, options) => {
     }
 
     /** Must only be called on client side */
-    onResize = debounce(() => {
-      const viewport = getViewportFromWidth(window.innerWidth);
-      const state = buildState(window.innerWidth, window.innerHeight, viewport);
-      this.setState(state);
-    }, debounceInterval || 200);
+    onResize = debounce(
+      () => {
+        const viewport = getViewportFromWidth(window.screen.availWidth);
+        const state = buildState(window.screen.availWidth, window.screen.availHeight, viewport);
+        this.setState(state);
+      },
+      500,
+      { maxWait: 300 },
+    );
 
     render() {
       return <ChildComponent {...this.state} {...this.props} />;

@@ -110,6 +110,7 @@ const getCollective = graphql(gql`
       slug
       description
       longDescription
+      videoUrl
       goal
       currency
       interval

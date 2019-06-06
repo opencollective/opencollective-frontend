@@ -1036,6 +1036,8 @@
   "user.website.description": "If any",
   "user.website.label": "website",
   "usercollective.since": "since {year}",
+  "VideoLinkerBox.AddVideo": "Add a video",
+  "VideoLinkerBox.SetUrl": "Set the video URL above. We support the following platforms: {supportedVideoProviders}",
   "viewYourProfile": "View your profile",
   "virtualCards.balance": "Balance: {balance}",
   "virtualCards.claimedBy": "claimed by {user}",

@@ -28,9 +28,10 @@ import HTMLContent, { isEmptyValue } from '../HTMLContent';
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
 import TierContributors from './TierContributors';
+import TierVideo from './TierVideo';
 import BubblesSVG from './Bubbles.svg';
 
-// Dynamicly load HTMLEditor to download it only if user can edit the page
+// Dynamicly load heavy inputs only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
 const HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor'), {
   loading: HTMLEditorLoadingPlaceholder,
@@ -64,13 +65,17 @@ const Bubbles = styled.div`
   }
 `;
 
+/** A mutation with all the info that user is allowed to edit on this page */
 const EditTierMutation = gql`
-  mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String) {
-    editTier(tier: { id: $id, description: $description, name: $name, longDescription: $longDescription }) {
+  mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
+    editTier(
+      tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
+    ) {
       id
       name
       description
       longDescription
+      videoUrl
     }
   }
 `;
@@ -96,6 +101,8 @@ class TierPage extends Component {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       description: PropTypes.string,
+      longDescription: PropTypes.string,
+      videoUrl: PropTypes.string,
     }).isRequired,
 
     /** The members that contribute to this tier */
@@ -148,6 +155,7 @@ class TierPage extends Component {
 
     return (
       <Container borderTop="1px solid #E6E8EB">
+        {/** ---- Hero / Banner ---- */}
         <Container
           display="flex"
           alignItems="center"
@@ -194,8 +202,8 @@ class TierPage extends Component {
             top={Dimensions.COVER_HEIGHT}
           />
         </Container>
+        {/** ---- Description ---- */}
         <Flex justifyContent="center">
-          {/** Description */}
           <Flex flex="0 1 1800px" px={[2, 4]} justifyContent="space-evenly" mb={64}>
             <Container
               display="flex"
@@ -230,41 +238,54 @@ class TierPage extends Component {
                     }
                   />
                 </H3>
-                <InlineEditField
-                  mutation={EditTierMutation}
-                  values={tier}
-                  field="longDescription"
-                  canEdit={canEditTier}
-                >
-                  {({ isEditing, value, setValue, enableEditor }) => {
-                    if (isEditing) {
-                      return (
-                        <HTMLContent>
-                          <HTMLEditor
-                            defaultValue={value}
-                            onChange={setValue}
-                            allowedHeaders={[false, 2, 3]} /** Disable H1 */
-                          />
-                        </HTMLContent>
-                      );
-                    } else if (isEmptyValue(tier.longDescription)) {
-                      return !canEditTier ? null : (
-                        <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
-                          <FormattedMessage id="TierPage.AddLongDescription" defaultMessage="Add a rich description" />
-                        </StyledButton>
-                      );
-                    } else {
-                      return <HTMLContent content={tier.longDescription} data-cy="longDescription" />;
-                    }
-                  }}
-                </InlineEditField>
+                <Container display="flex" position="relative" flexWrap="wrap">
+                  <InlineEditField
+                    mutation={EditTierMutation}
+                    values={tier}
+                    field="longDescription"
+                    canEdit={canEditTier}
+                  >
+                    {({ isEditing, value, setValue, enableEditor }) => {
+                      if (isEditing) {
+                        return (
+                          <HTMLContent>
+                            <HTMLEditor
+                              defaultValue={value}
+                              onChange={setValue}
+                              allowedHeaders={[false, 2, 3]} /** Disable H1 */
+                            />
+                          </HTMLContent>
+                        );
+                      } else if (isEmptyValue(tier.longDescription)) {
+                        return !canEditTier ? null : (
+                          <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
+                            <FormattedMessage
+                              id="TierPage.AddLongDescription"
+                              defaultMessage="Add a rich description"
+                            />
+                          </StyledButton>
+                        );
+                      } else {
+                        return <HTMLContent content={tier.longDescription} data-cy="longDescription" />;
+                      }
+                    }}
+                  </InlineEditField>
+                  <Container
+                    position={['relative', null, null, 'absolute']}
+                    right={[null, null, null, -485]}
+                    width={['100%', null, null, 472]}
+                    mt={[3, null, null, 0]}
+                  >
+                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEditTier} />
+                  </Container>
+                </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
                   {shareBlock}
                 </Container>
               </Container>
             </Container>
 
-            {/** Contribute */}
+            {/** ---- Contribute ---- */}
             <Container
               position={['fixed', null, null, 'relative']}
               bottom={0}
@@ -337,6 +358,7 @@ class TierPage extends Component {
                   </Box>
                 )}
               </Flex>
+              {/** Contribute button */}
               <Flex alignItems="center">
                 <Box width={1}>
                   <Link
@@ -354,6 +376,7 @@ class TierPage extends Component {
                   </Link>
                 </Box>
               </Flex>
+              {/** Share buttons (desktop only) */}
               <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
             </Container>
           </Flex>
