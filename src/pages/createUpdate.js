@@ -126,7 +126,7 @@ class CreateUpdatePage extends React.Component {
           />
           <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
             <BackButtonWrapper>
-              <Link>
+              <Link href={`/${collective.slug}/updates`}>
                 <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
                   <ArrowBack size={18} />
                   <Box as="span" mx={2}>
