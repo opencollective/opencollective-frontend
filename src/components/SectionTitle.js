@@ -156,7 +156,7 @@ class SectionTitle extends React.Component {
               {action.label}
             </LinkAction>
           )}
-          {subtitle && <Subtitle>{subtitle}</Subtitle>}
+          {subtitle && <Subtitle data-cy="subtitle">{subtitle}</Subtitle>}
         </Container>
       </Container>
     );

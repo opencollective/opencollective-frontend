@@ -10,7 +10,7 @@ describe('collective page', () => {
       .first()
       .find('.totalDonations')
       .contains('$1,700');
-    cy.get('#budget .subtitle').contains('Current balance: $4.71');
+    cy.get('[data-cy=subtitle]').contains('Current balance: $4.71');
     cy.get('#contributors .Members.cardsList .Member').should('have.length', 26);
   });
 

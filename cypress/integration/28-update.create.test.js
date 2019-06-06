@@ -5,7 +5,7 @@ describe('create an update', () => {
 
   it('edit info', () => {
     cy.wait(1000);
-    cy.fillInputField('title', 'New update');
+    cy.get('[data-cy=titleInput]').type('New update');
     cy.get('.ql-editor').type('This is some bold HTML{selectall}');
     cy.get('.ql-bold').click();
     cy.wait(300);
@@ -32,7 +32,7 @@ describe('create an update', () => {
 describe('random user cannot see update', () => {
   it('cannot view private update', () => {
     cy.visit('/testcollective/updates');
-    cy.get('.title a')
+    cy.get('[data-cy=updateTitle]')
       .first()
       .click(); // The update created in the describe block above.
     cy.wait(500);

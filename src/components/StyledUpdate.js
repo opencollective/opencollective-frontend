@@ -43,7 +43,9 @@ class StyledUpdate extends Component {
         <Container display="flex" flexDirection="column">
           <Box mb={1}>
             <Link route={`/${collective.slug}/updates/${update.slug}`}>
-              <H3 color="#090A0A">{update.title}</H3>
+              <H3 data-cy="updateTitle" color="#090A0A">
+                {update.title}
+              </H3>
             </Link>
           </Box>
           {update.summary && (
