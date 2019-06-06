@@ -14,7 +14,7 @@
     "@babel/plugin-proposal-class-properties": "7.4.4",
     "@babel/plugin-transform-async-to-generator": "7.4.4",
     "@babel/preset-env": "7.4.5",
-    "@octokit/rest": "16.27.0",
+    "@octokit/rest": "16.27.3",
     "@opencollective/taxes": "2.3.0",
     "algoliasearch": "3.33.0",
     "amqplib": "0.5.3",
