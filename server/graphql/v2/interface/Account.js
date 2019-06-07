@@ -1,6 +1,6 @@
 import { invert } from 'lodash';
 
-import { GraphQLBoolean, GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
 
 import { GraphQLDateTime } from 'graphql-iso-date';
 
@@ -13,7 +13,15 @@ import { MemberCollection, MemberOfCollection } from '../collection/MemberCollec
 import { TransactionCollection } from '../collection/TransactionCollection';
 import { OrderCollection } from '../collection/OrderCollection';
 
-import { AccountType, AccountTypeToModelMapping, ImageFormat, MemberRole, OrderStatus, TransactionType } from '../enum';
+import {
+  AccountOrdersFilter,
+  AccountType,
+  AccountTypeToModelMapping,
+  ImageFormat,
+  MemberRole,
+  OrderStatus,
+  TransactionType,
+} from '../enum';
 
 import { ChronologicalOrder } from '../input/ChronologicalOrder';
 
@@ -53,10 +61,9 @@ const accountTransactions = {
 const accountOrders = {
   type: OrderCollection,
   args: {
-    sent: { type: GraphQLBoolean, defaultValue: true },
-    received: { type: GraphQLBoolean, defaultValue: true },
     limit: { type: GraphQLInt, defaultValue: 100 },
     offset: { type: GraphQLInt, defaultValue: 0 },
+    filter: { type: AccountOrdersFilter },
     status: { type: new GraphQLList(OrderStatus) },
     tierSlug: { type: GraphQLString },
     orderBy: {
@@ -66,14 +73,12 @@ const accountOrders = {
   },
   async resolve(collective, args) {
     let where;
-    if (args.sent && args.received) {
-      where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
-    } else if (args.sent) {
+    if (args.filter === 'OUTGOING') {
       where = { FromCollectiveId: collective.id };
-    } else if (args.received) {
+    } else if (args.filter === 'INCOMING') {
       where = { CollectiveId: collective.id };
     } else {
-      throw new NotFound({ message: 'At least one of `sent` or `received` needs to be true.' });
+      where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
     }
 
     if (args.status && args.status.length > 0) {
@@ -87,6 +92,13 @@ const accountOrders = {
         throw new NotFound({ message: 'TierSlug Not Found' });
       }
       where.TierId = tier.id;
+    }
+
+    if (args.limit <= 0 || args.limit > 1000) {
+      delete args.limit;
+    }
+    if (args.offset <= 0) {
+      delete args.offset;
     }
 
     const result = await models.Order.findAndCountAll({
@@ -290,6 +302,7 @@ export const Account = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt, defaultValue: 100 },
           offset: { type: GraphQLInt, defaultValue: 0 },
+          filter: { type: AccountOrdersFilter },
           status: { type: new GraphQLList(OrderStatus) },
           tierSlug: { type: GraphQLString },
           orderBy: {

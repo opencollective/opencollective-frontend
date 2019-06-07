@@ -1,3 +1,4 @@
+export { AccountOrdersFilter } from './AccountOrdersFilter';
 export { AccountType, AccountTypeToModelMapping } from './AccountType';
 export { Currency } from './Currency';
 export { DateTimeField } from './DateTimeField';
