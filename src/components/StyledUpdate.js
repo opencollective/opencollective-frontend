@@ -152,7 +152,7 @@ class StyledUpdate extends Component {
         <Role role="ADMIN" />
         {editable && (
           <React.Fragment>
-            <Box data-cy={"toggleEditUpdate"} mr={2} fontSize="12px">
+            <Box data-cy={'toggleEditUpdate'} mr={2} fontSize="12px">
               <ActionLink onClick={this.toggleEdit}>
                 {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
               </ActionLink>
