@@ -1,17 +1,41 @@
 import mockRecaptcha from '../mocks/recaptcha';
 
 /**
- * Test the order flow. We don't test for validations here as it is already done
+ * Test the order flow - AKA the contribution flow with a tier selected.
+ *
+ * We don't test for validations here as it is already done
  * in `12-contributionFlow.donate.test`.
  */
 describe('Contribution Flow: Order', () => {
+  describe('works with legacy routes', () => {
+    // The routes changed in https://github.com/opencollective/opencollective-frontend/pull/1876
+    // This test ensure that we still support the old routes schemes. After some time
+    // and if the logs confirm that these routes are not used anymore, it will be
+    // safe to delete these tests.
+    it('with /apex/contribute/tier/470-sponsors', () => {
+      cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
+      cy.contains("Contribute to 'Sponsors' tier");
+      cy.contains('button', 'Next').click();
+      // Ensure we enforce the new URLs
+      cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/details');
+    });
+
+    it('with /apex/donate/tier/470-sponsors', () => {
+      cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
+      cy.contains("Contribute to 'Sponsors' tier");
+      cy.contains('button', 'Next').click();
+      // Ensure we enforce the new URLs
+      cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/details');
+    });
+  });
+
   it('Can order as new user', () => {
     // Mock clock so we can check next contribution date in a consistent way
     cy.clock(Date.parse('2042/05/25'));
 
     const userParams = { firstName: 'Order', lastName: 'Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
-    cy.signup({ user: userParams, redirect: '/apex/contribute/tier/470-sponsors', visitParams }).then(user => {
+    cy.signup({ user: userParams, redirect: '/apex/contribute/sponsors-470/checkout', visitParams }).then(user => {
       // ---- Step 1: Select profile ----
       // Personnal account must be the first entry, and it must be checked
       cy.contains('#contributeAs > label:first', `${user.firstName} ${user.lastName}`);
@@ -65,7 +89,7 @@ describe('Contribution Flow: Order', () => {
         // Add a paymentMethod to the organization profile
         cy.addCreditCardToCollective({ collectiveSlug });
 
-        cy.visit('/apex/contribute/tier/470-sponsors', visitParams);
+        cy.visit('/apex/contribute/sponsors-470/checkout', visitParams);
         // Check the newly created organization
         cy.get(`[type="radio"][name=contributeAs][value=${collective.id}]`).check();
         cy.tick(1000);

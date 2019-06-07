@@ -67,33 +67,42 @@ pages.add(
   'createOrder',
 );
 
-// New Routes -> New flow
+// Legacy tier route. Deprectated on 2019-06-07
 pages
   .add(
-    'orderCollectiveNew',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/:step(contributeAs|details|payment|summary)?',
-    'createOrder',
-  )
-  .add(
-    'orderCollectiveTierNew',
+    'orderCollectiveTierLegacy',
     '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(contributeAs|details|payment|summary)?',
     'createOrder',
   )
   .add(
-    'orderCollectiveNewSuccess',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/success',
+    'orderCollectiveTierLegacySuccess',
+    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/:step(success)',
     'orderSuccess',
+  );
+
+// New Routes -> New flow
+pages
+  .add(
+    'orderCollectiveNew',
+    '/:collectiveSlug/:verb(donate|pay|order|events)/:step(contributeAs|details|payment|summary)?',
+    'createOrder',
   )
   .add(
+    'orderCollectiveTierNew',
+    '/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId/checkout/:step(contributeAs|details|payment|summary)?',
+    'createOrder',
+  )
+  .add('orderCollectiveNewSuccess', '/:collectiveSlug/:verb(donate|pay|order|events)/:step(success)', 'orderSuccess')
+  .add(
     'orderCollectiveTierNewSuccess',
-    '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/tier/:tierId-:tierSlug?/success',
+    '/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId/checkout/:step(success)',
     'orderSuccess',
   );
 
 // Generic Route
 pages.add(
   'orderCollective',
-  '/:collectiveSlug/:verb(donate|pay|contribute|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
+  '/:collectiveSlug/:verb(donate|pay|order|events)/:amount(\\d+)?/:interval(month|monthly|year|yearly)?/:description?',
   'createOrder',
 );
 
@@ -105,7 +114,11 @@ pages.add(
 );
 
 // Events
-pages.add('orderEventTierSuccess', '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/success', 'orderSuccess');
+pages.add(
+  'orderEventTierSuccess',
+  '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/:step(success)',
+  'orderSuccess',
+);
 
 // Pledges
 // -------

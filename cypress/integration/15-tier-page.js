@@ -1,7 +1,6 @@
 describe('Tier page', () => {
   // Collective created for this test
   let collective = null;
-  let tierId = null;
   let tierUrl = null;
 
   before(() => {
@@ -10,9 +9,8 @@ describe('Tier page', () => {
       cy.visit(`/${collective.slug}/tiers`);
       cy.contains('[data-cy=tiers] a', 'contribute').then($a => {
         const splitUrl = $a.attr('href').split('/');
-        const idRegex = /(\d+)-.+$/;
-        tierId = parseInt(idRegex.exec(splitUrl[splitUrl.length - 1])[1]);
-        tierUrl = `/${collective.slug}/tiers/any-slug-${tierId}`;
+        const tierSlugDashId = splitUrl[splitUrl.length - 2];
+        tierUrl = `/${collective.slug}/contribute/${tierSlugDashId}`;
       });
     });
   });
@@ -45,6 +43,6 @@ describe('Tier page', () => {
   it('Goes to the contribution flow when we click on "Contribute"', () => {
     cy.login({ redirect: tierUrl });
     cy.get('[data-cy="ContributeBtn"]').click();
-    cy.url().should('contain', `/${collective.slug}/contribute/tier/${tierId}-`);
+    cy.location('pathname').should('equal', `${tierUrl}/checkout`);
   });
 });

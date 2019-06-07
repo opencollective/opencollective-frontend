@@ -48,7 +48,12 @@ class TiersPage extends React.Component {
 
     return (
       <div>
-        <Header title={'Tiers'} description="Collective tiers" LoggedInUser={LoggedInUser} />
+        <Header
+          title={'Tiers'}
+          description="Collective tiers"
+          canonicalURL={`/${collective.slug}/contribute`}
+          LoggedInUser={LoggedInUser}
+        />
         <Body>
           {data.loading ? (
             <Loading />
