@@ -9,6 +9,7 @@ import roles from '../constants/roles';
 import formatMemberRole from '../lib/i18n-member-role';
 import withIntl from '../lib/withIntl';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
+import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 
 import Link from './Link';
 import { P } from './Text';
@@ -23,12 +24,17 @@ const COLLECTIVE_CARD_WIDTH = 144;
 const COLLECTIVE_CARD_HEIGHT = 226;
 const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X;
 
+/** Adds custom scrollbar for Chrome */
+const StyledGridContainer = styled.div`
+  ${CustomScrollbarCSS}
+`;
+
 /**
  * Override the default grid to disable fixed width. As we use the full screen width
  * this is not necessary.
  */
 const GridContainer = React.forwardRef(({ style, ...props }, ref) => {
-  return <div ref={ref} style={omit(style, ['width'])} {...props} />;
+  return <StyledGridContainer ref={ref} style={omit(style, ['width'])} {...props} />;
 });
 
 GridContainer.displayName = 'GridContainer';
