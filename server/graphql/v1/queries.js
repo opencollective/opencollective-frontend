@@ -666,14 +666,15 @@ const queries = {
           throw new Error('Collective not found');
         }
         const getCollectiveIds = () => {
-          // if is host, we get all the expenses across all the hosted collectives
+          // if is host, we get all the expenses across all the hosted collectives that are active
           if (args.includeHostedCollectives) {
-            return models.Member.findAll({
+            return models.Collective.findAll({
+              attributes: ['id'],
               where: {
-                MemberCollectiveId: collective.id,
-                role: 'HOST',
+                HostCollectiveId: collective.id,
+                isActive: true,
               },
-            }).map(member => member.CollectiveId);
+            }).map(c => c.id);
           } else {
             return Promise.resolve([args.CollectiveId]);
           }
