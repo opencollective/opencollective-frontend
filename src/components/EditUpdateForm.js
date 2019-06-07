@@ -159,7 +159,7 @@ class EditUpdateForm extends React.Component {
                     type="text"
                     value={update.title}
                     onChange={e => this.handleChange('title', e.target.value)}
-                    maxWidth={500}
+                    width="50%"
                     placeHolder="Normal"
                     data-cy="titleInput"
                     required
