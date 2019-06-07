@@ -13,7 +13,6 @@ export const CONTRIBUTOR_FILTERS = {
   ALL: 'ALL',
   CORE: 'CORE',
   FINANCIAL: 'FINANCIAL',
-  // TODO GITHUB: 'GITHUB',
 };
 
 const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
@@ -49,9 +48,7 @@ export const getMembersFilters = members => {
       filters.add(CONTRIBUTOR_FILTERS.CORE);
     } else if ([roles.BACKER, roles.FUNDRAISER].includes(m.role)) {
       filters.add(CONTRIBUTOR_FILTERS.FINANCIAL);
-    } /* TODO else if (m.role === roles.GITHUB_CONTRIBUTOR) {
-      filters.add(CONTRIBUTOR_FILTERS.GITHUB);
-    } */
+    }
 
     // No need to traverse the entire list if we already registered all the types
     // No need to count the first one (ALL) - so we do length - 1
@@ -66,23 +63,59 @@ export const getMembersFilters = members => {
   });
 };
 
+// Members roles weights
+const ROLES_WEIGHT = {
+  [roles.FUNDRAISER]: 1,
+  [roles.MEMBER]: 2,
+  [roles.BACKER]: 3,
+  [roles.CONTRIBUTOR]: 4,
+  [roles.ADMIN]: 5,
+};
+
+const getRoleWeight = role => {
+  return ROLES_WEIGHT[role] || 0;
+};
+
 /**
- * A helper to filter a members list by member type.
+ * A helper to filter a members list by member type that returns only unique
+ * members (based on the collective id).
+ *
+ * Please ensure you memoize this one properly is the cost can be pretty depending
+ * on the number of members.
  */
 export const filterMembers = (members, filter) => {
   if (!members) {
     return [];
   }
 
+  // Set filterFunc
+  let filterFunc = null;
   if (filter === CONTRIBUTOR_FILTERS.FINANCIAL) {
-    return members.filter(m => [roles.BACKER, roles.FUNDRAISER].includes(m.role));
+    filterFunc = m => [roles.BACKER, roles.FUNDRAISER].includes(m.role);
   } else if (filter === CONTRIBUTOR_FILTERS.CORE) {
-    return members.filter(m => m.role === roles.ADMIN);
-  } /* TODO else if (filter === CONTRIBUTOR_FILTERS.GITHUB) {
-    return members.filter(m => m.role === roles.GITHUB_CONTRIBUTOR);
-  } */ else {
-    return members;
+    filterFunc = m => m.role === roles.ADMIN;
   }
+
+  const membersMap = {};
+  members.forEach(member => {
+    // Apply the function to filter by type
+    if (filterFunc && !filterFunc(member)) {
+      return;
+    }
+
+    // Ensure uniqueness
+    const collectiveId = member.collective.id;
+    if (membersMap[collectiveId]) {
+      // Conflict on roles! Take ADMIN > CONTRIBUTOR > BACKER > FUNDRAISER > FOLLOWER
+      if (getRoleWeight(member.role) > getRoleWeight(membersMap[collectiveId].role)) {
+        membersMap[collectiveId] = member;
+      }
+    } else {
+      membersMap[collectiveId] = member;
+    }
+  });
+
+  return Object.values(membersMap);
 };
 
 /**
