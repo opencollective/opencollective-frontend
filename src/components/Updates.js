@@ -89,7 +89,7 @@ class Updates extends React.Component {
           )}
           {updates.map(update => (
             <div key={update.id} className="update">
-              <StyledUpdate update={update} collective={collective} />
+              <StyledUpdate update={update} collective={collective} compact={true} />
             </div>
           ))}
           {updates.length === 0 && (

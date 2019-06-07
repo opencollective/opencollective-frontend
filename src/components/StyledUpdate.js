@@ -113,7 +113,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
 
     return (
-      <Container display="flex" alignItems="Baseline" color="#969BA3">
+      <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta">
         {update.isPrivate && (
           <Box mr={2}>
             <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
@@ -152,7 +152,7 @@ class StyledUpdate extends Component {
         <Role role="ADMIN" />
         {editable && (
           <React.Fragment>
-            <Box mr={2} fontSize="12px">
+            <Box data-cy={"toggleEditUpdate"} mr={2} fontSize="12px">
               <ActionLink onClick={this.toggleEdit}>
                 {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
               </ActionLink>
