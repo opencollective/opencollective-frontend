@@ -13,7 +13,15 @@ import { MemberCollection, MemberOfCollection } from '../collection/MemberCollec
 import { TransactionCollection } from '../collection/TransactionCollection';
 import { OrderCollection } from '../collection/OrderCollection';
 
-import { AccountType, AccountTypeToModelMapping, ImageFormat, MemberRole, OrderStatus, TransactionType } from '../enum';
+import {
+  AccountOrdersFilter,
+  AccountType,
+  AccountTypeToModelMapping,
+  ImageFormat,
+  MemberRole,
+  OrderStatus,
+  TransactionType,
+} from '../enum';
 
 import { ChronologicalOrder } from '../input/ChronologicalOrder';
 
@@ -55,6 +63,7 @@ const accountOrders = {
   args: {
     limit: { type: GraphQLInt, defaultValue: 100 },
     offset: { type: GraphQLInt, defaultValue: 0 },
+    filter: { type: AccountOrdersFilter },
     status: { type: new GraphQLList(OrderStatus) },
     tierSlug: { type: GraphQLString },
     orderBy: {
@@ -63,7 +72,14 @@ const accountOrders = {
     },
   },
   async resolve(collective, args) {
-    const where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
+    let where;
+    if (args.filter === 'OUTGOING') {
+      where = { FromCollectiveId: collective.id };
+    } else if (args.filter === 'INCOMING') {
+      where = { CollectiveId: collective.id };
+    } else {
+      where = { [Op.or]: { CollectiveId: collective.id, FromCollectiveId: collective.id } };
+    }
 
     if (args.status && args.status.length > 0) {
       where.status = { [Op.in]: args.status };
@@ -76,6 +92,13 @@ const accountOrders = {
         throw new NotFound({ message: 'TierSlug Not Found' });
       }
       where.TierId = tier.id;
+    }
+
+    if (args.limit <= 0 || args.limit > 1000) {
+      delete args.limit;
+    }
+    if (args.offset <= 0) {
+      delete args.offset;
     }
 
     const result = await models.Order.findAndCountAll({
@@ -279,6 +302,7 @@ export const Account = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt, defaultValue: 100 },
           offset: { type: GraphQLInt, defaultValue: 0 },
+          filter: { type: AccountOrdersFilter },
           status: { type: new GraphQLList(OrderStatus) },
           tierSlug: { type: GraphQLString },
           orderBy: {
