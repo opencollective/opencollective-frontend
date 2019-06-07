@@ -68,7 +68,7 @@ class StyledUpdate extends Component {
       paid: { id: 'update.paid', defaultMessage: 'paid' },
       approved: { id: 'update.approved', defaultMessage: 'approved' },
       rejected: { id: 'update.rejected', defaultMessage: 'rejected' },
-      edit: { id: 'update.edit', defaultMessage: 'Edit' },
+      edit: { id: 'update.edit', defaultMessage: 'edit' },
       cancelEdit: { id: 'update.cancelEdit', defaultMessage: 'cancel edit' },
       viewLatestUpdates: {
         id: 'update.viewLatestUpdates',
@@ -159,7 +159,7 @@ class StyledUpdate extends Component {
             </Box>
             <Box mr={2} fontSize="12px">
               <ActionLink onClick={this.deleteUpdate}>
-                <FormattedMessage id="update.delete" defaultMessage="Delete" />
+                <FormattedMessage id="update.delete" defaultMessage="delete" />
               </ActionLink>
             </Box>
           </React.Fragment>
