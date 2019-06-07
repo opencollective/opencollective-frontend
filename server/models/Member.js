@@ -87,6 +87,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,
       },
+      since: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
     },
     {
       paranoid: true,
@@ -108,6 +112,7 @@ export default function(Sequelize, DataTypes) {
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             deletedAt: this.deletedAt,
+            since: this.since,
           };
         },
       },

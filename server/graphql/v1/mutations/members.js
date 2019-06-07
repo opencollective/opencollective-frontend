@@ -50,6 +50,7 @@ export function createMember(_, args, req) {
           MemberCollectiveId: user.CollectiveId,
           CollectiveId: collective.id,
           role: args.role.toUpperCase() || roles.FOLLOWER,
+          since: args.since,
         }),
       )
   );
