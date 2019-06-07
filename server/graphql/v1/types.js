@@ -1111,6 +1111,10 @@ export const TierType = new GraphQLObjectType({
         type: GraphQLString,
         description: 'A long, html-formatted description.',
       },
+      videoUrl: {
+        type: GraphQLString,
+        description: 'Link to a video (YouTube, Vimeo).',
+      },
       button: {
         type: GraphQLString,
         resolve(tier) {

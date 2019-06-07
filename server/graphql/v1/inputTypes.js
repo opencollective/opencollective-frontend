@@ -253,6 +253,10 @@ export const TierInputType = new GraphQLInputObjectType({
       type: GraphQLString,
       description: 'A long, html-formatted description.',
     },
+    videoUrl: {
+      type: GraphQLString,
+      description: 'Link to a video (YouTube, Vimeo).',
+    },
     amount: {
       type: GraphQLInt,
       description: 'amount in the lowest unit of the currency of the host (ie. in cents)',
