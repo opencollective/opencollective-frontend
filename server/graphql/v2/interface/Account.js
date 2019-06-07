@@ -95,10 +95,10 @@ const accountOrders = {
     }
 
     if (args.limit <= 0 || args.limit > 1000) {
-      delete args.limit;
+      args.limit = 100;
     }
     if (args.offset <= 0) {
-      delete args.offset;
+      args.offset = 0;
     }
 
     const result = await models.Order.findAndCountAll({
