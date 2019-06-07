@@ -238,43 +238,46 @@ class TierPage extends Component {
                     }
                   />
                 </H3>
-                <Container display="flex" position="relative" flexWrap="wrap">
-                  <InlineEditField
-                    mutation={EditTierMutation}
-                    values={tier}
-                    field="longDescription"
-                    canEdit={canEditTier}
-                  >
-                    {({ isEditing, value, setValue, enableEditor }) => {
-                      if (isEditing) {
-                        return (
-                          <HTMLContent>
-                            <HTMLEditor
-                              defaultValue={value}
-                              onChange={setValue}
-                              allowedHeaders={[false, 2, 3]} /** Disable H1 */
-                            />
-                          </HTMLContent>
-                        );
-                      } else if (isEmptyValue(tier.longDescription)) {
-                        return !canEditTier ? null : (
-                          <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
-                            <FormattedMessage
-                              id="TierPage.AddLongDescription"
-                              defaultMessage="Add a rich description"
-                            />
-                          </StyledButton>
-                        );
-                      } else {
-                        return <HTMLContent content={tier.longDescription} data-cy="longDescription" />;
-                      }
-                    }}
-                  </InlineEditField>
+                <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
+                  <div>
+                    <InlineEditField
+                      mutation={EditTierMutation}
+                      values={tier}
+                      field="longDescription"
+                      canEdit={canEditTier}
+                    >
+                      {({ isEditing, value, setValue, enableEditor }) => {
+                        if (isEditing) {
+                          return (
+                            <HTMLContent>
+                              <HTMLEditor
+                                defaultValue={value}
+                                onChange={setValue}
+                                allowedHeaders={[false, 2, 3]} /** Disable H1 */
+                              />
+                            </HTMLContent>
+                          );
+                        } else if (isEmptyValue(tier.longDescription)) {
+                          return !canEditTier ? null : (
+                            <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
+                              <FormattedMessage
+                                id="TierPage.AddLongDescription"
+                                defaultMessage="Add a rich description"
+                              />
+                            </StyledButton>
+                          );
+                        } else {
+                          return <HTMLContent content={tier.longDescription} data-cy="longDescription" />;
+                        }
+                      }}
+                    </InlineEditField>
+                  </div>
                   <Container
                     position={['relative', null, null, 'absolute']}
-                    right={[null, null, null, -485]}
-                    width={['100%', null, null, 472]}
-                    mt={[3, null, null, 0]}
+                    right={[null, null, null, -390, -490]}
+                    width={['100%', null, null, 380, 472]}
+                    mb={[4, 5]}
+                    top={0}
                   >
                     <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEditTier} />
                   </Container>

@@ -33,6 +33,7 @@ const FormButton = styled(StyledButton).attrs({
   buttonSize: 'large',
 })`
   width: 35%;
+  font-weight: normal;
   min-width: 185px;
   text-transform: capitalize;
   margin: 0 8px;
