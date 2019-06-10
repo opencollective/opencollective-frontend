@@ -54,9 +54,7 @@ const fetchUserSubscribers = async (notificationType, backerCollective) => {
   });
   const unsubscribedUserIds = unsubscriptions.map(n => n.UserId);
   console.log(
-    `${unsubscribedUserIds.length} users have unsubscribed from the ${notificationType} report for ${
-      backerCollective.type
-    } ${backerCollective.slug}`,
+    `${unsubscribedUserIds.length} users have unsubscribed from the ${notificationType} report for ${backerCollective.type} ${backerCollective.slug}`,
   );
 
   const admins = await backerCollective.getAdminUsers();

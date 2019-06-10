@@ -418,9 +418,7 @@ export function editCollective(_, args, req) {
         let errorMsg;
         switch (newCollectiveData.type) {
           case types.EVENT:
-            errorMsg = `You must be logged in as the creator of this Event or as an admin of the ${
-              parentCollective.slug
-            } collective to edit this Event Collective`;
+            errorMsg = `You must be logged in as the creator of this Event or as an admin of the ${parentCollective.slug} collective to edit this Event Collective`;
             break;
 
           case types.USER:

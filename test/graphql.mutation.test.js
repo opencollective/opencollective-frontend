@@ -662,9 +662,7 @@ describe('Mutation Tests', () => {
           user2,
         );
         expect(error3.errors[0].message).to.equal(
-          `You need to be logged in as this user or as a core contributor or as a host of the collective id ${
-            event1.id
-          }`,
+          `You need to be logged in as this user or as a core contributor or as a host of the collective id ${event1.id}`,
         );
 
         const membersBefore = await models.Member.count();

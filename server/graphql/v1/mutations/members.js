@@ -70,9 +70,7 @@ export function removeMember(_, args, req) {
       return true;
     }
     throw new errors.Unauthorized(
-      `You need to be logged in as this user or as a core contributor or as a host of the collective id ${
-        membership.CollectiveId
-      }`,
+      `You need to be logged in as this user or as a core contributor or as a host of the collective id ${membership.CollectiveId}`,
     );
   };
 

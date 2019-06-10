@@ -513,9 +513,7 @@ export default (Sequelize, DataTypes) => {
         })
         .catch(err =>
           console.error(
-            `Error creating activity of type ${activities.COLLECTIVE_TRANSACTION_CREATED} for transaction ID ${
-              transaction.id
-            }`,
+            `Error creating activity of type ${activities.COLLECTIVE_TRANSACTION_CREATED} for transaction ID ${transaction.id}`,
             err,
           ),
         )

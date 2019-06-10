@@ -76,12 +76,8 @@ export default {
               currencyCode: 'USD', // collective.currency, // we should use the currency of the host collective but still waiting on PayPal to resolve that issue.
               startingDate: new Date().toISOString(),
               endingDate: expiryDate.toISOString(),
-              returnUrl: `${
-                config.host.api
-              }/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
-              cancelUrl: `${
-                config.host.api
-              }/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
+              returnUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
+              cancelUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
               displayMaxTotalAmount: false,
               feesPayer: 'SENDER',
               maxAmountPerPayment: 2000.0, // lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
@@ -130,9 +126,7 @@ export default {
 
           if (req.query.paypalApprovalStatus !== 'success') {
             pm.destroy();
-            const redirect = `${
-              paymentMethod.data.redirect
-            }?status=error&service=paypal&error=User%20cancelled%20the%20request`;
+            const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=User%20cancelled%20the%20request`;
             return res.redirect(redirect);
           }
 

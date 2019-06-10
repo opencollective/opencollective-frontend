@@ -99,17 +99,13 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     // we check if the payment method belongs to the Host of the Order.collective (aka add funds)
     if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
       throw new Error(
-        `You need to use the payment method of the host (${
-          order.collective.HostCollectiveId
-        }) to add funds to this collective`,
+        `You need to use the payment method of the host (${order.collective.HostCollectiveId}) to add funds to this collective`,
       );
     }
   } else if (fromCollectiveHost.id !== collectiveHost.id) {
     // NOTE: this used to be supported, check git history if you want to understand why and how
     throw new Error(
-      `Cannot use the opencollective payment method to make a payment between different hosts: ${
-        fromCollectiveHost.name
-      } -> ${collectiveHost.name}`,
+      `Cannot use the opencollective payment method to make a payment between different hosts: ${fromCollectiveHost.name} -> ${collectiveHost.name}`,
     );
   }
 

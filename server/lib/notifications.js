@@ -320,9 +320,7 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_EXPENSE_APPROVED:
       activity.data.actions = {
-        viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${
-          activity.data.expense.id
-        }`,
+        viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`,
       };
       if (get(activity, 'data.expense.payoutMethod') === 'paypal') {
         activity.data.expense.payoutMethod = `PayPal (${activity.data.user.paypalEmail})`;
@@ -338,9 +336,7 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_EXPENSE_PAID:
       activity.data.actions = {
-        viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${
-          activity.data.expense.id
-        }`,
+        viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`,
       };
       notifyUserId(activity.data.expense.UserId, activity);
       if (get(activity, 'data.host.id')) {
