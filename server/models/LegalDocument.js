@@ -68,11 +68,31 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
-  LegalDocument.requestStatus = {};
-  LegalDocument.requestStatus.REQUESTED = REQUESTED;
-  LegalDocument.requestStatus.NOT_REQUESTED = NOT_REQUESTED;
-  LegalDocument.requestStatus.RECEIVED = RECEIVED;
-  LegalDocument.requestStatus.ERROR = ERROR;
+  LegalDocument.doesUserNeedToBeSentDocument = async ({ documentType, year, user }) => {
+    const doc = await LegalDocument.findOne({
+      where: {
+        year,
+        CollectiveId: user.collective.id,
+      },
+      include: [
+        {
+          association: 'requiredLegalDocumentType',
+          where: {
+            documentType,
+          },
+        },
+      ],
+    });
+
+    return doc == null || doc.requestStatus == NOT_REQUESTED || doc.requestStatus == ERROR;
+  };
+
+  LegalDocument.requestStatus = {
+    REQUESTED,
+    NOT_REQUESTED,
+    RECEIVED,
+    ERROR,
+  };
 
   LegalDocument.associate = m => {
     LegalDocument.belongsTo(m.Collective, {

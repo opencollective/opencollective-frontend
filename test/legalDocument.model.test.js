@@ -3,6 +3,7 @@ import models from '../server/models';
 import * as utils from '../test/utils';
 
 const { RequiredLegalDocumentType, LegalDocument, User, Collective } = models;
+const { US_TAX_FORM } = RequiredLegalDocumentType.documentType;
 
 describe('LegalDocument model', () => {
   // globals to be set in the before hooks.
@@ -40,7 +41,7 @@ describe('LegalDocument model', () => {
   beforeEach(async () => {
     hostCollective = await Collective.create(hostCollectiveData);
     user = await User.createUserWithCollective(userData);
-    userCollective = await models.Collective.findByPk(user.CollectiveId);
+    userCollective = await Collective.findByPk(user.CollectiveId);
     docType = await RequiredLegalDocumentType.create({
       HostCollectiveId: hostCollective.id,
     });
@@ -55,7 +56,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     doc.documentLink = expected;
     await doc.save();
@@ -71,7 +72,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
     expect(doc.deletedAt).to.eq(null);
 
     await hostCollective.destroy();
@@ -86,7 +87,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
     expect(doc.deletedAt).to.eq(null);
 
     await userCollective.destroy();
@@ -100,7 +101,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
     // Normally docs are soft deleted. This is just checking that worst case we don't accidentally delete collectives.
     await doc.destroy({ force: true });
 
@@ -116,7 +117,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
 
@@ -132,7 +133,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
 
@@ -145,7 +146,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     const retrievedDocTypes = await hostCollective.getRequiredLegalDocumentTypes();
     const retrievedDocs = await retrievedDocTypes[0].getLegalDocuments();
@@ -158,7 +159,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     const retrievedDocs = await userCollective.getLegalDocuments();
 
@@ -170,7 +171,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     const retrievedCollective = await doc.getCollective();
 
@@ -182,7 +183,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
 
     const retrievedHost = await doc.getRequiredLegalDocumentType().then(docType => docType.getHostCollective());
 
@@ -195,7 +196,7 @@ describe('LegalDocument model', () => {
       CollectiveId: userCollective.id,
     });
     legalDoc.year = 2014;
-    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+    expect(LegalDocument.create(legalDoc)).to.be.rejected;
   });
 
   it("it can't be created if the year is null", async () => {
@@ -204,7 +205,7 @@ describe('LegalDocument model', () => {
       CollectiveId: userCollective.id,
     });
     delete legalDoc.year;
-    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+    expect(LegalDocument.create(legalDoc)).to.be.rejected;
   });
 
   it("it can't be created if the RequiredLegalDocumentTypeId is null", async () => {
@@ -212,7 +213,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: null,
       CollectiveId: userCollective.id,
     });
-    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+    expect(LegalDocument.create(legalDoc)).to.be.rejected;
   });
 
   it("it can't be created if the CollectiveId is null", async () => {
@@ -220,7 +221,7 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: null,
     });
-    expect(models.LegalDocument.create(legalDoc)).to.be.rejected;
+    expect(LegalDocument.create(legalDoc)).to.be.rejected;
   });
 
   it('can be created and has expected values', async () => {
@@ -228,7 +229,53 @@ describe('LegalDocument model', () => {
       RequiredLegalDocumentTypeId: docType.id,
       CollectiveId: userCollective.id,
     });
-    const doc = await models.LegalDocument.create(legalDoc);
+    const doc = await LegalDocument.create(legalDoc);
     expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
+  });
+
+  describe('doesUserNeedToBeSentDocument', async () => {
+    it('it returns true when a user has not supplied the document', async () => {
+      const legalDoc = Object.assign({}, documentData, {
+        RequiredLegalDocumentTypeId: docType.id,
+        CollectiveId: userCollective.id,
+      });
+
+      await LegalDocument.create(legalDoc);
+
+      const result = await LegalDocument.doesUserNeedToBeSentDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year,
+        user,
+      });
+      expect(result).to.be.true;
+    });
+
+    it('it returns false when the document status is RECEIVED or REQUESTED for the correct year and of the correct type', async () => {
+      const legalDoc = Object.assign({}, documentData, {
+        RequiredLegalDocumentTypeId: docType.id,
+        CollectiveId: userCollective.id,
+      });
+      const doc = await LegalDocument.create(legalDoc);
+
+      doc.requestStatus = LegalDocument.requestStatus.RECEIVED;
+      await doc.save();
+
+      const result = await LegalDocument.doesUserNeedToBeSentDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year,
+        user,
+      });
+      expect(result).to.be.false;
+
+      doc.requestStatus = LegalDocument.requestStatus.REQUESTED;
+      await doc.save();
+
+      const result2 = await LegalDocument.doesUserNeedToBeSentDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year,
+        user,
+      });
+      expect(result2).to.be.false;
+    });
   });
 });
