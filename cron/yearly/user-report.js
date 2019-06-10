@@ -250,9 +250,7 @@ const getUsers = collective => {
     const unsubscribedUserIds = unsubscriptions.map(u => u.UserId);
     if (unsubscribedUserIds.length > 0) {
       console.log(
-        `${unsubscribedUserIds.length} users have unsubscribed from the user.yearlyreport report for collective ${
-          collective.slug
-        }`,
+        `${unsubscribedUserIds.length} users have unsubscribed from the user.yearlyreport report for collective ${collective.slug}`,
       );
     }
 

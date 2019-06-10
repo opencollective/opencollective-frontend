@@ -61,9 +61,7 @@ const notifyCollective = async (CollectiveId, milestone, collective) => {
   }
   if (!get(twitterAccount, `settings.${milestone}.active`)) {
     debug(
-      `${
-        collective.slug
-      }: the collective id ${CollectiveId} hasn't activated the ${milestone} milestone notification, skipping`,
+      `${collective.slug}: the collective id ${CollectiveId} hasn't activated the ${milestone} milestone notification, skipping`,
     );
     await postToSlack(tweet, slackAccount);
     return;

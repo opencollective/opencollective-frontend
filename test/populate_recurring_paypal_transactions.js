@@ -175,9 +175,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
   it('fails if it has more than 1 completed event', () =>
     runScript([paypalTransaction.created, paypalTransaction.completed, paypalTransaction.completed]).then(message => {
       expect(message).to.be.equal(
-        `Invalid subscription ${
-          subscription.id
-        } with billingAgreement ${billingAgreementId}, it should be activated already`,
+        `Invalid subscription ${subscription.id} with billingAgreement ${billingAgreementId}, it should be activated already`,
       );
     }));
 });

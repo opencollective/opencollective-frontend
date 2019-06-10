@@ -131,9 +131,7 @@ export default {
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${collective}!`;
 
       case activities.SUBSCRIPTION_CANCELED:
-        return `Subscription ${
-          activity.data.subscription.id
-        } canceled: ${currency} ${recurringAmount} from ${userString} to ${collective}`;
+        return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${collective}`;
 
       case activities.COLLECTIVE_CREATED:
         return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
@@ -281,9 +279,7 @@ export default {
         return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
 
       case activities.ORDERS_SUSPICIOUS:
-        return `Suspicious Order: ${userString} gave ${currency} ${amount} to ${collective}. Score: ${
-          activity.data.recaptchaResponse.score
-        }`;
+        return `Suspicious Order: ${userString} gave ${currency} ${amount} to ${collective}. Score: ${activity.data.recaptchaResponse.score}`;
 
       default:
         return '';

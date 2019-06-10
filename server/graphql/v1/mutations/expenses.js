@@ -99,9 +99,7 @@ export async function createExpense(remoteUser, expenseData) {
 
   if (expenseData.currency && expenseData.currency !== collective.currency) {
     throw new errors.ValidationFailed(
-      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${
-        expenseData.collective.currency
-      })`,
+      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expenseData.collective.currency})`,
     );
   }
 
@@ -111,9 +109,7 @@ export async function createExpense(remoteUser, expenseData) {
 
   if (expenseData.currency && expenseData.currency !== collective.currency) {
     throw new errors.ValidationFailed(
-      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${
-        collective.currency
-      })`,
+      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${collective.currency})`,
     );
   }
 
@@ -158,9 +154,7 @@ export async function editExpense(remoteUser, expenseData) {
 
   if (expenseData.currency && expenseData.currency !== expense.collective.currency) {
     throw new errors.ValidationFailed(
-      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${
-        expense.collective.currency
-      })`,
+      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expense.collective.currency})`,
     );
   }
 

@@ -41,9 +41,7 @@ async function run(options) {
   const orders = options.limit ? allOrders.slice(0, options.limit) : allOrders;
   vprint(
     options,
-    `${allOrders.length} subscriptions pending charges. Charging ${orders.length} subscriptions right now. dryRun: ${
-      options.dryRun
-    }`,
+    `${allOrders.length} subscriptions pending charges. Charging ${orders.length} subscriptions right now. dryRun: ${options.dryRun}`,
   );
   const data = [];
   await promiseSeq(

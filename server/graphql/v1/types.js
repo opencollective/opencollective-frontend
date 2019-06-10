@@ -588,9 +588,7 @@ export const ExpenseType = new GraphQLObjectType({
           return expense.getUser().then(u => {
             if (!u) {
               return console.error(
-                `Cannot fetch the UserId ${expense.UserId} referenced in ExpenseId ${
-                  expense.id
-                } -- has the user been deleted?`,
+                `Cannot fetch the UserId ${expense.UserId} referenced in ExpenseId ${expense.id} -- has the user been deleted?`,
               );
             }
             return models.Collective.findByPk(u.CollectiveId);
