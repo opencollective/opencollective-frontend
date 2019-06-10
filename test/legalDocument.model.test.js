@@ -7,7 +7,7 @@ const { US_TAX_FORM } = RequiredLegalDocumentType.documentType;
 
 describe('LegalDocument model', () => {
   // globals to be set in the before hooks.
-  let hostCollective, user, userCollective, docType;
+  let hostCollective, user, userCollective, docType, otherHostCollective, otherDocType;
 
   const documentData = {
     year: 2019,
@@ -44,6 +44,11 @@ describe('LegalDocument model', () => {
     userCollective = await Collective.findByPk(user.CollectiveId);
     docType = await RequiredLegalDocumentType.create({
       HostCollectiveId: hostCollective.id,
+    });
+
+    otherHostCollective = await Collective.create({ slug: 'otherHost', nam: 'otherHost' });
+    otherDocType = await RequiredLegalDocumentType.create({
+      HostCollectiveId: otherHostCollective.id,
     });
   });
 
@@ -276,6 +281,38 @@ describe('LegalDocument model', () => {
         user,
       });
       expect(result2).to.be.false;
+
+      const result3 = await LegalDocument.doesUserNeedToBeSentDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year + 1,
+        user,
+      });
+      expect(result3).to.be.true;
+    });
+
+    it('it returns false when the document has been filled out for a different host but of the correct type and year', async () => {
+      const legalDoc = Object.assign({}, documentData, {
+        RequiredLegalDocumentTypeId: docType.id,
+        CollectiveId: userCollective.id,
+      });
+
+      await LegalDocument.create(legalDoc);
+
+      const otherLegalDoc = Object.assign({}, documentData, {
+        RequiredLegalDocumentTypeId: otherDocType.id,
+        CollectiveId: userCollective.id,
+      });
+      const otherDoc = await LegalDocument.create(otherLegalDoc);
+
+      otherDoc.requestStatus = LegalDocument.requestStatus.RECEIVED;
+      await otherDoc.save();
+
+      const result = await LegalDocument.doesUserNeedToBeSentDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year,
+        user,
+      });
+      expect(result).to.be.false;
     });
   });
 });

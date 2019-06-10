@@ -68,8 +68,8 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
-  LegalDocument.doesUserNeedToBeSentDocument = async ({ documentType, year, user }) => {
-    const doc = await LegalDocument.findOne({
+  LegalDocument.findByTypeYearUser = ({ documentType, year, user }) => {
+    return LegalDocument.findOne({
       where: {
         year,
         CollectiveId: user.collective.id,
@@ -83,6 +83,10 @@ export default function(Sequelize, DataTypes) {
         },
       ],
     });
+  };
+
+  LegalDocument.doesUserNeedToBeSentDocument = async ({ documentType, year, user }) => {
+    const doc = await LegalDocument.findByTypeYearUser({ documentType, year, user });
 
     return doc == null || doc.requestStatus == NOT_REQUESTED || doc.requestStatus == ERROR;
   };
