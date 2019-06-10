@@ -53,9 +53,7 @@ class CreateOrganization extends React.Component {
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
-      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${
-        collective.slug
-      }?status=collectiveCreated&CollectiveId=${collective.id}`;
+      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}?status=collectiveCreated&CollectiveId=${collective.id}`;
       this.setState({
         status: 'idle',
         result: {
