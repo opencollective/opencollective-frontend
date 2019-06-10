@@ -46,6 +46,9 @@ describe('LegalDocument model', () => {
     });
   });
 
+  it("it can't be created if the host collective id is not valid");
+  it("it can't be created if the user collective id is not valid");
+
   it('it can set and save a new document_link', async () => {
     const expected = 'a string';
     const legalDoc = Object.assign({}, documentData, {
