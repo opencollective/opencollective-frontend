@@ -153,6 +153,18 @@ describe('Collective model', () => {
         }),
       )
       .then(() =>
+        models.Expense.create({
+          description: 'community gardening',
+          amount: 60100,
+          currency: 'USD',
+          UserId: user2.id,
+          lastEditedById: user2.id,
+          incurredAt: transactions[1].createdAt,
+          createdAt: transactions[1].createdAt,
+          CollectiveId: opensourceCollective.id,
+        }),
+      )
+      .then(() =>
         Transaction.createManyDoubleEntry([transactions[2]], {
           CollectiveId: opensourceCollective.id,
           HostCollectiveId: hostUser.CollectiveId,
@@ -691,6 +703,22 @@ describe('Collective model', () => {
       }).tap(collective => {
         expect(collective.githubHandle).to.equal('test');
       });
+    });
+  });
+
+  describe('getUsersWhoHaveTotalExpensesOverThreshold', () => {
+    it('it gets the correct Users', async () => {
+      const startOfYear = new Date('2016-01-01');
+      const endOfYear = new Date('2016-12-31');
+
+      const usersOverThreshold = await opensourceCollective.getUsersWhoHaveTotalExpensesOverThreshold(
+        600e2,
+        startOfYear,
+        endOfYear,
+      );
+
+      expect(usersOverThreshold.length).to.eq(1);
+      expect(usersOverThreshold[0].email).to.eq(users[1].email);
     });
   });
 });

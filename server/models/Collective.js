@@ -8,7 +8,7 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import moment from 'moment';
 import * as ics from 'ics';
-import { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
+import _, { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 
@@ -26,6 +26,7 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
+import { PENDING, APPROVED, PAID } from '../constants/expense_status';
 
 const debug = debugLib('collective');
 const debugcollectiveImage = debugLib('collectiveImage');
@@ -2145,6 +2146,34 @@ export default function(Sequelize, DataTypes) {
     return queries
       .getTopBackers(since || 0, until || new Date(), tags, limit || 5)
       .tap(backers => debug('getTopBackers', backers.map(b => b.dataValues)));
+  };
+
+  Collective.prototype.getUsersWhoHaveTotalExpensesOverThreshold = async function(
+    threshold,
+    since,
+    until = new Date(),
+  ) {
+    const status = [PENDING, APPROVED, PAID];
+    const expenses = await this.getExpenses(status, since, until);
+
+    const userTotals = expenses.reduce((totals, expense) => {
+      const { UserId } = expense;
+
+      totals[UserId] = totals[UserId] || 0;
+      totals[UserId] += expense.amount;
+
+      return totals;
+    }, {});
+
+    const userAmountsThatCrossThreshold = _.pickBy(userTotals, total => total >= threshold);
+
+    const userIdsThatCrossThreshold = _.keys(userAmountsThatCrossThreshold).map(Number);
+
+    return models.User.findAll({
+      where: {
+        id: userIdsThatCrossThreshold,
+      },
+    });
   };
 
   Collective.getHostCollectiveId = async CollectiveId => {
