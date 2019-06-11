@@ -108,5 +108,11 @@
   "recaptcha": {
     "siteKey": "6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK",
     "secretKey": "6LcyeXoUAAAAACqNaR6EZJ_LG0V0N35uNkab3ibj"
+  },
+  "helloworks": {
+    "key": "RO7aWNLJx6CzhRix",
+    "secret": "FanG4FjeV3aGHjpS2A1YckyWuhvxfKHoZN5Q5bHO",
+    "workflowId": "qdUbX5nw8sMZzykz",
+    "callbackPath": "/helloworks/callback"
   }
 }

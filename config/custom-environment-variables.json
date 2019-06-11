@@ -135,5 +135,9 @@
   "ledgerQueue": {
     "url": "LEDGER_QUEUE_URL",
     "transactionQueue": "TRANSACTION_QUEUE_NAME"
+  },
+  "helloworks": {
+    "key": "HELLO_WORKS_SECRET",
+    "secret": "HELLO_WORKS_SECRET"
   }
 }

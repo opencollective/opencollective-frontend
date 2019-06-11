@@ -58,6 +58,7 @@
     "handlebars": "4.1.2",
     "hashids": "1.2.2",
     "he": "1.2.0",
+    "helloworks-sdk": "^1.0.3",
     "helmet": "3.18.0",
     "html-pdf": "2.2.0",
     "ics": "2.13.2",
