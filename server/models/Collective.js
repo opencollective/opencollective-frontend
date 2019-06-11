@@ -8,7 +8,7 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import moment from 'moment';
 import * as ics from 'ics';
-import _, { get, difference, uniqBy, pick, omit, defaults, includes, isNull } from 'lodash';
+import { get, difference, uniqBy, pick, pickBy, keys, omit, defaults, includes, isNull } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 
@@ -2167,9 +2167,9 @@ export default function(Sequelize, DataTypes) {
       return totals;
     }, {});
 
-    const userAmountsThatCrossThreshold = _.pickBy(userTotals, total => total >= threshold);
+    const userAmountsThatCrossThreshold = pickBy(userTotals, total => total >= threshold);
 
-    const userIdsThatCrossThreshold = _.keys(userAmountsThatCrossThreshold).map(Number);
+    const userIdsThatCrossThreshold = keys(userAmountsThatCrossThreshold).map(Number);
 
     return models.User.findAll({
       where: {
