@@ -154,6 +154,9 @@ describe('GraphQL Expenses API', () => {
       // Given that we have two collectives within a host
       const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost('apex', 'USD', 'USD', 10);
       const anotherCollective = (await store.newCollectiveInHost('brusselstogether', 'USD', hostCollective)).collective;
+      const inactiveCollective = (await store.newCollectiveInHost('womer-inactive', 'USD', hostCollective)).collective;
+      inactiveCollective.isActive = false;
+      await inactiveCollective.save();
       // And given that the first collective created above have two expenses
       const data = {
         currency: 'USD',
@@ -181,6 +184,14 @@ describe('GraphQL Expenses API', () => {
       await store.createExpense(hostAdmin, {
         amount: 4000,
         description: 'Stickers',
+        ...data,
+      });
+      // And given that the inactive collective created above also has
+      // one expense
+      data.collective = { id: inactiveCollective.id };
+      await store.createExpense(hostAdmin, {
+        amount: 3500,
+        description: 'Banner inactive',
         ...data,
       });
       // When we retrieve all the expenses of the host
