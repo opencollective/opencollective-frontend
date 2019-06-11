@@ -12,12 +12,11 @@ const HELLO_WORKS_CALLBACK_PATH = config.get('helloworks.callbackPath');
 
 const HELLO_WORKS_CALLBACK_URL = `${config.get('host.api')}/${HELLO_WORKS_CALLBACK_PATH}`;
 
-const { US_TAX_FORM } = RequiredLegalDocumentType;
-
 const startOfYear = new Date(); // TODO
 const endOfYear = new Date(); // TODO
 
-const { RequiredLegalDocumentType, LegalDocument } = models;
+const { RequiredLegalDocument, LegalDocument } = models;
+const { US_TAX_FORM } = RequiredLegalDocument;
 
 const client = new HelloWorks({
   apiKeyId: HELLO_WORKS_KEY,
@@ -25,7 +24,7 @@ const client = new HelloWorks({
 });
 
 const init = async () => {
-  const usersWhoNeedFormSent = await RequiredLegalDocumentType.findAll({
+  const usersWhoNeedFormSent = await RequiredLegalDocument.findAll({
     where: { documentType: US_TAX_FORM },
   })
     .map(requiredUsTaxDocType => requiredUsTaxDocType.getHostCollective())

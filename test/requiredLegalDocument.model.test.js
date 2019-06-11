@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import models from '../server/models';
 import * as utils from '../test/utils';
 
-const { RequiredLegalDocumentType, Collective } = models;
+const { RequiredLegalDocument, Collective } = models;
 
-describe('RequiredLegalDocumentType model', () => {
+describe('RequiredLegalDocument model', () => {
   // globals to be set in the before hooks.
   let hostCollective;
 
@@ -39,9 +39,9 @@ describe('RequiredLegalDocumentType model', () => {
         HostCollectiveId: hostCollective.id,
       },
     );
-    const doc = await models.RequiredLegalDocumentType.create(requiredDoc);
+    const doc = await models.RequiredLegalDocument.create(requiredDoc);
 
-    const retrievedDocs = await hostCollective.getRequiredLegalDocumentTypes();
+    const retrievedDocs = await hostCollective.getRequiredLegalDocuments();
 
     expect(retrievedDocs[0].id).to.eq(doc.id);
   });
@@ -53,7 +53,7 @@ describe('RequiredLegalDocumentType model', () => {
         HostCollectiveId: hostCollective.id,
       },
     );
-    const doc = await models.RequiredLegalDocumentType.create(requiredDoc);
+    const doc = await models.RequiredLegalDocument.create(requiredDoc);
 
     const retrievedHost = await doc.getHostCollective();
 
@@ -67,7 +67,7 @@ describe('RequiredLegalDocumentType model', () => {
         HostCollectiveId: null,
       },
     );
-    expect(models.RequiredLegalDocumentType.create(requiredDoc)).to.be.rejected;
+    expect(models.RequiredLegalDocument.create(requiredDoc)).to.be.rejected;
   });
 
   it('can be created and has expected values', async () => {
@@ -77,7 +77,7 @@ describe('RequiredLegalDocumentType model', () => {
         HostCollectiveId: hostCollective.id,
       },
     );
-    const doc = await models.RequiredLegalDocumentType.create(requiredDoc);
-    expect(doc.documentType).to.eq(RequiredLegalDocumentType.documentType.US_TAX_FORM);
+    const doc = await models.RequiredLegalDocument.create(requiredDoc);
+    expect(doc.documentType).to.eq(RequiredLegalDocument.documentType.US_TAX_FORM);
   });
 });

@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import models from '../server/models';
 import * as utils from '../test/utils';
 
-const { RequiredLegalDocumentType, LegalDocument, User, Collective } = models;
-const { US_TAX_FORM } = RequiredLegalDocumentType.documentType;
+const { RequiredLegalDocument, LegalDocument, User, Collective } = models;
+const { US_TAX_FORM } = RequiredLegalDocument.documentType;
 
 describe('LegalDocument model', () => {
   // globals to be set in the before hooks.
