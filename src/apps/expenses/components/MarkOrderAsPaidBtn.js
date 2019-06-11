@@ -12,6 +12,7 @@ class MarkOrderAsPaidBtn extends React.Component {
     order: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
     disabled: PropTypes.bool,
+    markOrderAsPaid: PropTypes.func.isRequired,
   };
 
   constructor(props) {

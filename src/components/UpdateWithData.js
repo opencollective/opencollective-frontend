@@ -10,6 +10,8 @@ class UpdateWithData extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired, // update.id
     editable: PropTypes.bool,
+    data: PropTypes.object,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {

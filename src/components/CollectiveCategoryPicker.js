@@ -9,6 +9,7 @@ class CollectiveCategoryPicker extends React.Component {
     categories: PropTypes.arrayOf(PropTypes.string),
     defaultValue: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

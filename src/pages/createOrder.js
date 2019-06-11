@@ -120,6 +120,8 @@ class CreateOrderPage extends React.Component {
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
     LoggedInUser: PropTypes.object, // from withUser
     loadingLoggedInUser: PropTypes.bool, // from withUser
+    createCollective: PropTypes.func,
+    refetchLoggedInUser: PropTypes.func,
   };
 
   static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";

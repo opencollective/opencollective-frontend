@@ -17,6 +17,8 @@ class SignInUp extends React.Component {
     showLabels: PropTypes.bool,
     requireCreditCard: PropTypes.bool,
     className: PropTypes.string,
+    intl: PropTypes.object.isRequired,
+    description: PropTypes.string,
   };
 
   constructor(props) {

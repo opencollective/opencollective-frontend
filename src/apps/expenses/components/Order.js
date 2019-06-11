@@ -21,6 +21,7 @@ class Order extends React.Component {
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

@@ -42,6 +42,13 @@ const InlineField = ({ name, children, label, isLabelClickable }) => (
   </Flex>
 );
 
+InlineField.propTypes = {
+  name: PropTypes.object,
+  children: PropTypes.node,
+  label: PropTypes.object,
+  isLabelClickable: PropTypes.bool,
+};
+
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
   align-items: center;
@@ -80,6 +87,13 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
       </H3>
     </RadioButtonContainer>
   );
+};
+
+RadioButtonWithLabel.propTypes = {
+  checked: PropTypes.bool,
+  onClick: PropTypes.func,
+  name: PropTypes.object,
+  children: PropTypes.node,
 };
 
 const FieldLabelDetails = styled.span`

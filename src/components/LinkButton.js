@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Link from './Link';
 
 class LinkButton extends React.Component {
@@ -52,5 +53,11 @@ class LinkButton extends React.Component {
     );
   }
 }
+
+LinkButton.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+  disabled: PropTypes.bool,
+};
 
 export default LinkButton;

@@ -14,6 +14,9 @@ class InputTypeDropzone extends React.Component {
     className: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     options: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    placeholder: PropTypes.string,
+    name: PropTypes.string,
   };
 
   constructor(props) {

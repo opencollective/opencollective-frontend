@@ -16,6 +16,7 @@ class CreateCollectiveForm extends React.Component {
     collective: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

@@ -46,6 +46,8 @@ export default class StyledMultiEmailInput extends Component {
     onClose: PropTypes.func,
     /** On array of invalid emails */
     invalids: PropTypes.arrayOf(PropTypes.string),
+    /** disabled */
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {

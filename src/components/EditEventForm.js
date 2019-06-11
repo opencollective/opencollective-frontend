@@ -11,6 +11,7 @@ class EditEventForm extends React.Component {
     event: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

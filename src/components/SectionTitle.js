@@ -11,6 +11,7 @@ class SectionTitle extends React.Component {
     subtitle: PropTypes.node,
     values: PropTypes.object,
     action: PropTypes.object, // { label, href }
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

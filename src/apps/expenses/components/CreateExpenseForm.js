@@ -20,6 +20,9 @@ class CreateExpenseForm extends React.Component {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    onChange: PropTypes.func,
+    mode: PropTypes.string,
   };
 
   constructor(props) {

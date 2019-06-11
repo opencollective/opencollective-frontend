@@ -20,6 +20,7 @@ class Button extends React.Component {
     className: PropTypes.string,
     icon: PropTypes.string,
     style: PropTypes.object,
+    children: PropTypes.node,
   };
 
   constructor(props) {

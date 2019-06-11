@@ -21,6 +21,8 @@ class TopBarProfileMenu extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
+    logout: PropTypes.func,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {

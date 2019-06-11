@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
@@ -22,6 +23,12 @@ class CompletePledgePage extends React.Component {
       id: query.id,
     };
   }
+
+  static propTypes = {
+    getLoggedInUser: PropTypes.func,
+    completePledge: PropTypes.func,
+    data: PropTypes.object,
+  };
 
   state = {
     error: null,

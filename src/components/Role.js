@@ -6,6 +6,7 @@ import withIntl from '../lib/withIntl';
 class Role extends React.Component {
   static propTypes = {
     role: PropTypes.string, // ADMIN | MEMBER | BACKER | FUNDRAISER | ATTENDEE
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

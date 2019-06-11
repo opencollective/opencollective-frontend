@@ -29,6 +29,9 @@ class Event extends React.Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
+    removeMember: PropTypes.func,
+    createMember: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   static getDerivedStateFromProps(props) {

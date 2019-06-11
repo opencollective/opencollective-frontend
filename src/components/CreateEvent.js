@@ -17,6 +17,8 @@ import { addCreateCollectiveMutation } from '../graphql/mutations';
 class CreateEvent extends React.Component {
   static propTypes = {
     parentCollective: PropTypes.object,
+    createCollective: PropTypes.func,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {

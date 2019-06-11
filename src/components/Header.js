@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Head from 'next/head';
 import TopBar from './TopBar';
 
@@ -6,6 +7,16 @@ import { truncate, getQueryParams } from '../lib/utils';
 import storage from '../lib/storage';
 
 class Header extends React.Component {
+  static propTypes = {
+    description: PropTypes.string,
+    image: PropTypes.string,
+    twitterHandle: PropTypes.string,
+    css: PropTypes.string,
+    className: PropTypes.string,
+    title: PropTypes.string,
+    showSearch: PropTypes.bool,
+  };
+
   constructor(props) {
     super(props);
     const { description, image, twitterHandle } = props;

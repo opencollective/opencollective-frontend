@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Button from './Button';
 
@@ -34,6 +35,10 @@ const NotFound = ({ slug }) => {
       )}
     </div>
   );
+};
+
+NotFound.propTypes = {
+  slug: PropTypes.string,
 };
 
 export default NotFound;

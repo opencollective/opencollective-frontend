@@ -33,7 +33,7 @@ class EditCollectivePage extends React.Component {
     ssr: PropTypes.bool,
     data: PropTypes.object, // from withData
     LoggedInUser: PropTypes.object, // from withLoggedInUser
-    loadingLoggedInUser: PropTypes.bool.isRequired, // from withLoggedInUser
+    loadingLoggedInUser: PropTypes.bool, // from withLoggedInUser
     editCollective: PropTypes.func.isRequired, // from addEditCollectiveMutation
   };
 

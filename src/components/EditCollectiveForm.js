@@ -63,6 +63,7 @@ class EditCollectiveForm extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     /** Provided by withRouter */
     router: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

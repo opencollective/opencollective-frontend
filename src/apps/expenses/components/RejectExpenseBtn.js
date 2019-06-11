@@ -10,6 +10,7 @@ import SmallButton from '../../../components/SmallButton';
 class RejectExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
+    rejectExpense: PropTypes.func.isRequired,
   };
 
   constructor(props) {

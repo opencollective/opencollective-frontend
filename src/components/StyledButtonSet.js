@@ -93,6 +93,9 @@ StyledButtonSet.propTypes = {
   disabled: PropTypes.bool,
   /** Similar to `buttonProps` but allow props to be added dynamically based on item */
   buttonPropsBuilder: PropTypes.func,
+  /** Button Props */
+
+  buttonProps: PropTypes.object,
 };
 
 StyledButtonSet.defaultProps = {

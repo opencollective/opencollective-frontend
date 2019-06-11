@@ -21,6 +21,7 @@ class Transactions extends React.Component {
     fetchMore: PropTypes.func,
     LoggedInUser: PropTypes.object,
     dateDisplayType: PropTypes.oneOf(['date', 'interval']),
+    showCSVlink: PropTypes.bool,
   };
 
   constructor(props) {

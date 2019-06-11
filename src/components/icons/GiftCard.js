@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { lighten } from 'polished';
 import CustomStyledIcon from './CustomStyledIcon';
 
@@ -41,6 +42,11 @@ const GiftCard = props => {
 
 GiftCard.defaultProps = {
   color: '#145ECC',
+};
+
+GiftCard.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.number,
 };
 
 export default GiftCard;

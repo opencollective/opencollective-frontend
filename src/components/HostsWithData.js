@@ -16,6 +16,9 @@ class HostsWithData extends React.Component {
     onChange: PropTypes.func,
     limit: PropTypes.number,
     empty: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
+    fetchMore: PropTypes.func,
+    refetch: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

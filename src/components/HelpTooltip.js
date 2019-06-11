@@ -23,7 +23,7 @@ const IconQuestion = styled(Question)`
 
 class HelpTooltip extends React.Component {
   static propTypes = {
-    children: PropTypes.array.isRequired,
+    children: PropTypes.node,
     className: PropTypes.string, // dark or light (default)
   };
 

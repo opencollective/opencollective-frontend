@@ -107,6 +107,7 @@ class GoalsCover extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     interpolation: PropTypes.oneOf(['linear', 'logarithm', 'auto']),
+    intl: PropTypes.object.isRequired,
   };
 
   static defaultProps = {

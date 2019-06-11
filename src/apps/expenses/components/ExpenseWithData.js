@@ -21,6 +21,7 @@ class ExpenseWithData extends React.Component {
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
     unlockPayAction: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

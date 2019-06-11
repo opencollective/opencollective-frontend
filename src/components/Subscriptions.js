@@ -13,6 +13,7 @@ class Subscriptions extends React.Component {
     subscriptions: PropTypes.array,
     refetch: PropTypes.func,
     loading: PropTypes.bool,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

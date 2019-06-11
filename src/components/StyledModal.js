@@ -73,6 +73,13 @@ export const ModalHeader = ({ children, onClose }) => (
   </Header>
 );
 
+ModalHeader.propTypes = {
+  /** handles how the modal is closed */
+  onClose: PropTypes.func.isRequired,
+  /** children */
+  children: PropTypes.node,
+};
+
 ModalHeader.displayName = 'Header';
 
 export const ModalBody = ({ children, width, height }) => (
@@ -81,12 +88,25 @@ export const ModalBody = ({ children, width, height }) => (
   </Body>
 );
 
+ModalBody.propTypes = {
+  /** width of the modal component */
+  width: PropTypes.string,
+  /** height of the modal component */
+  height: PropTypes.string,
+  /** children */
+  children: PropTypes.node,
+};
+
 export const ModalFooter = ({ children }) => (
   <Container>
     <Divider />
     {children}
   </Container>
 );
+
+ModalFooter.propTypes = {
+  children: PropTypes.node,
+};
 
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
@@ -130,6 +150,8 @@ StyledModal.propTypes = {
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
+  /** children */
+  children: PropTypes.node,
 };
 
 /** @component */

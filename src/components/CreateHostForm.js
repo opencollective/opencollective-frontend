@@ -18,6 +18,7 @@ class CreateHostForm extends React.Component {
     userCollective: PropTypes.object.isRequired,
     createOrganization: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired, // when selecting the host to use
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

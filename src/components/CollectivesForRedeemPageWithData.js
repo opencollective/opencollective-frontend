@@ -15,6 +15,9 @@ class CollectivesForRedeemPageWithData extends React.Component {
     HostCollectiveId: PropTypes.number,
     ParentCollectiveId: PropTypes.number,
     limit: PropTypes.number,
+    fetchMore: PropTypes.func,
+    refetch: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {
