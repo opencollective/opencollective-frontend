@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import CustomDataTypes from './DataTypes';
 import { maxInteger } from '../constants/math';
 import { capitalize, pluralize, days, formatCurrency, strip_tags } from '../lib/utils';
+import { isSupportedVideoProvider, supportedVideoProviders } from '../lib/validators';
 
 const debug = debugLib('tier');
 
@@ -79,6 +80,27 @@ export default function(Sequelize, DataTypes) {
           } else {
             this.setDataValue('longDescription', strip_tags(content));
           }
+        },
+      },
+
+      videoUrl: {
+        type: DataTypes.STRING,
+        validate: {
+          isUrl: true,
+          /** Ensure that the URL points toward a supported video provider */
+          isSupportedProvider(url) {
+            if (!url) {
+              return;
+            } else if (!isSupportedVideoProvider(url)) {
+              throw new Error(
+                `Only the following video providers are supported: ${supportedVideoProviders.join(', ')}`,
+              );
+            }
+          },
+        },
+        set(url) {
+          // Store null if URL is empty
+          this.setDataValue('videoUrl', url || null);
         },
       },
 
