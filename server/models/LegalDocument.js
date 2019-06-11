@@ -4,6 +4,8 @@ export default function(Sequelize, DataTypes) {
   const RECEIVED = 'RECEIVED';
   const ERROR = 'ERROR';
 
+  const US_TAX_FORM = 'US_TAX_FORM';
+
   const LegalDocument = Sequelize.define(
     'LegalDocument',
     {
@@ -19,17 +21,23 @@ export default function(Sequelize, DataTypes) {
           notNull: true,
         },
         allowNull: false,
+        unique: 'yearTypeCollective',
+      },
+      documentType: {
+        type: DataTypes.ENUM,
+        values: [US_TAX_FORM],
+        allowNull: false,
+        defaultValue: US_TAX_FORM,
+        unique: 'yearTypeCollective',
       },
       documentLink: {
         type: DataTypes.STRING,
-        field: 'document_link',
       },
       requestStatus: {
         type: DataTypes.ENUM,
         values: [NOT_REQUESTED, REQUESTED, RECEIVED, ERROR],
         allowNull: false,
         defaultValue: NOT_REQUESTED,
-        field: 'request_status',
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -51,16 +59,7 @@ export default function(Sequelize, DataTypes) {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
         allowNull: false,
-      },
-      RequiredLegalDocumentTypeId: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: 'RequiredLegalDocumentTypes',
-          key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
-        allowNull: false,
+        unique: 'yearTypeCollective',
       },
     },
     {
@@ -73,15 +72,8 @@ export default function(Sequelize, DataTypes) {
       where: {
         year,
         CollectiveId: user.collective.id,
+        documentType,
       },
-      include: [
-        {
-          association: 'requiredLegalDocumentType',
-          where: {
-            documentType,
-          },
-        },
-      ],
     });
   };
 
@@ -102,10 +94,6 @@ export default function(Sequelize, DataTypes) {
     LegalDocument.belongsTo(m.Collective, {
       foreignKey: 'CollectiveId',
       as: 'collective',
-    });
-    LegalDocument.belongsTo(m.RequiredLegalDocumentType, {
-      foreignKey: 'RequiredLegalDocumentTypeId',
-      as: 'requiredLegalDocumentType',
     });
   };
 

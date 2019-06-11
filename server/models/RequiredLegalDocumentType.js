@@ -45,7 +45,6 @@ export default function(Sequelize, DataTypes) {
       foreignKey: 'HostCollectiveId',
       as: 'hostCollective',
     });
-    RequiredLegalDocumentType.hasMany(m.LegalDocument);
   };
 
   return RequiredLegalDocumentType;
