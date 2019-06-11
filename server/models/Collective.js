@@ -26,7 +26,9 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
-import { PENDING, APPROVED, PAID } from '../constants/expense_status';
+import status from '../constants/expense_status';
+
+const { PENDING, APPROVED, PAID } = status;
 
 const debug = debugLib('collective');
 const debugcollectiveImage = debugLib('collectiveImage');
