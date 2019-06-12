@@ -206,7 +206,7 @@ class EditUpdateForm extends React.Component {
               />
             </Container>
           </div>
-          <ActionButtonWrapper className="row actions" mx={2} my={5}>
+          <ActionButtonWrapper className="row actions" mx={2} my={4}>
             <StyledButton
               className="bluewhite"
               buttonSize="large"
