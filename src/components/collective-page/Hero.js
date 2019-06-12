@@ -36,19 +36,15 @@ import HeroBackground from './HeroBackground';
  */
 const MainContainer = styled.div`
   position: relative;
+  width: 100%;
   top: 0;
   border-bottom: 1px solid #e6e8eb;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: flex;
   z-index: 999;
 
   ${props =>
     props.isFixed &&
     css`
       position: fixed;
-      width: 100%;
       background: white;
     `}
 `;

@@ -77,7 +77,6 @@ export default class CollectivePage extends Component {
   constructor(props) {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
-    this.heroRef = React.createRef();
     this.state = {
       isFixed: false,
       selectedSection: AllSectionsNames[0],
@@ -95,7 +94,7 @@ export default class CollectivePage extends Component {
 
   onScroll = debounceScroll(() => {
     // Fixes the Hero when a certain scroll threshold is reached
-    if (window.scrollY >= theme.sizes.navbarHeight) {
+    if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
       if (!this.state.isFixed) {
         this.setState({ isFixed: true });
       }
@@ -105,11 +104,11 @@ export default class CollectivePage extends Component {
 
     // Update selected section
     const distanceThreshold = 200;
+    const currentViewBottom = window.scrollY + window.innerHeight;
     for (let i = AllSectionsNames.length - 1; i >= 0; i--) {
       const sectionName = AllSectionsNames[i];
       const sectionRef = this.sectionsRefs[sectionName];
-      const currentViewBottom = window.scrollY + window.innerHeight;
-      if (currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
+      if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
         if (this.state.selectedSection !== sectionName) {
           this.setState({ selectedSection: sectionName });
         }
@@ -121,14 +120,7 @@ export default class CollectivePage extends Component {
   onSectionClick = sectionName => {
     window.location.hash = `section-${sectionName}`;
     const sectionTop = this.sectionsRefs[sectionName].offsetTop;
-    if (this.state.isFixed) {
-      window.scrollTo(0, sectionTop);
-    } else {
-      // If not fixed, we have to acknowledge the fact that Hero is going to shrink, thus
-      // reducting the size of the navbar
-      const heroRect = this.heroRef.current.getBoundingClientRect();
-      window.scrollTo(0, sectionTop - heroRect.height + Dimensions.HERO_FIXED_HEIGHT);
-    }
+    window.scrollTo(0, sectionTop - Dimensions.HERO_FIXED_HEIGHT);
   };
 
   onCollectiveClick = () => {
@@ -162,8 +154,8 @@ export default class CollectivePage extends Component {
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
-      <Container position="relative" borderTop="1px solid #E6E8EB">
-        <Container ref={this.heroRef} height={isFixed ? Dimensions.HERO_FIXED_HEIGHT : 'auto'}>
+      <Container borderTop="1px solid #E6E8EB">
+        <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
           <Hero
             collective={collective}
             host={host}

@@ -10,7 +10,7 @@ import { debounce } from 'lodash';
  */
 export const debounceScroll = func => {
   return debounce(func, 200, {
-    maxWait: 100,
+    maxWait: 50,
     leading: true,
     trailing: true,
   });
