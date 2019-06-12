@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Tue Jun 04 2019 13:28:54 GMT+0200 (GMT+02:00)
+# timestamp: Fri Jun 07 2019 12:22:19 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -309,6 +309,11 @@ interface CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
+
+  """
+  Defines if a collective is pledged
+  """
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -455,6 +460,11 @@ enum CollectiveOrderField {
   Order collectives by updated time.
   """
   updatedAt
+
+  """
+  Order collectives by total donations.
+  """
+  totalDonations
 }
 
 """
@@ -2323,6 +2333,11 @@ type Tier {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
   button: String
   amount: Int
   minimumAmount: Int
@@ -2373,6 +2388,11 @@ input TierInputType {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
 
   """
   amount in the lowest unit of the currency of the host (ie. in cents)

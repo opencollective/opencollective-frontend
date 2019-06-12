@@ -1036,6 +1036,8 @@
   "user.website.description": "あれば",
   "user.website.label": "ウェブサイト",
   "usercollective.since": "{year}年から",
+  "VideoLinkerBox.AddVideo": "Add a video",
+  "VideoLinkerBox.SetUrl": "Set the video URL above. We support the following platforms: {supportedVideoProviders}",
   "viewYourProfile": "プロフィールを表示",
   "virtualCards.balance": "残高: {balance}",
   "virtualCards.claimedBy": "{user} が請求",

@@ -37,6 +37,8 @@ const HTMLContent = styled(({ content, ...props }) => {
   return content ? <div dangerouslySetInnerHTML={{ __html: content }} {...props} /> : <div {...props} />;
 })`
   /** Override global styles to match what we have in the editor */
+  width: 100%;
+
   h1,
   h2,
   h3 {
