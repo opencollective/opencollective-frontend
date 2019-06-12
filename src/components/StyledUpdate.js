@@ -25,7 +25,7 @@ import { Router } from '../server/pages';
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
   min-height: 100px;
-  border: ${props => (props.showBorder ? '1px solid #e6e8eb' : 'none')};
+  border: 1px solid #e6e8eb;
   padding: 20px;
   @media (max-width: 600px) {
     max-width: 100%;
@@ -228,7 +228,7 @@ class StyledUpdate extends Component {
   }
 
   renderFullContent() {
-    const { update, collective, intl, LoggedInUser } = this.props;
+    const { update, collective, LoggedInUser } = this.props;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
     const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
     const editable = !this.props.compact && this.props.editable && canEditUpdate;
@@ -248,13 +248,6 @@ class StyledUpdate extends Component {
               />
             </PrivateUpdateMesgBox>
           )}
-          {update.publishedAt && (
-            <Container mt={4}>
-              <ViewUpdatesLink route={`/${collective.slug}/updates`}>
-                {intl.formatMessage(this.messages['viewLatestUpdates'])}
-              </ViewUpdatesLink>
-            </Container>
-          )}
           {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
         </Container>
       </React.Fragment>
@@ -272,32 +265,41 @@ class StyledUpdate extends Component {
   }
 
   render() {
-    const { update } = this.props;
+    const { update, intl, collective } = this.props;
     const { mode } = this.state;
 
     return (
-      <UpdateWrapper showBorder={true}>
-        <AvatarContainer>
-          <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
-            <Avatar
-              src={update.fromCollective.image}
-              type={update.fromCollective.type}
-              name={update.fromCollective.name}
-              key={update.fromCollective.id}
-              radius={40}
-            />
-          </a>
-        </AvatarContainer>
-        {mode !== 'edit' && (
-          <Container display="flex" flexDirection="column">
-            <Box>{this.renderUpdateTitle()}</Box>
-            {mode === 'summary' && this.renderSummary(update)}
-            {mode === 'details' && this.renderFullContent()}
+      <React.Fragment>
+        <UpdateWrapper>
+          <AvatarContainer>
+            <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
+              <Avatar
+                src={update.fromCollective.image}
+                type={update.fromCollective.type}
+                name={update.fromCollective.name}
+                key={update.fromCollective.id}
+                radius={40}
+              />
+            </a>
+          </AvatarContainer>
+          {mode !== 'edit' && (
+            <Container display="flex" flexDirection="column">
+              <Box>{this.renderUpdateTitle()}</Box>
+              {mode === 'summary' && this.renderSummary(update)}
+              {mode === 'details' && this.renderFullContent()}
+            </Container>
+          )}
+
+          {mode === 'edit' && this.renderEditUpdateForm()}
+        </UpdateWrapper>
+        {update.publishedAt && mode === 'details' && (
+          <Container my={4}>
+            <ViewUpdatesLink route={`/${collective.slug}/updates`}>
+              {intl.formatMessage(this.messages['viewLatestUpdates'])}
+            </ViewUpdatesLink>
           </Container>
         )}
-
-        {mode === 'edit' && this.renderEditUpdateForm()}
-      </UpdateWrapper>
+      </React.Fragment>
     );
   }
 }
