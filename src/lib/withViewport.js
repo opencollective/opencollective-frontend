@@ -90,8 +90,8 @@ const withViewport = (ChildComponent, options) => {
     /** Must only be called on client side */
     onResize = debounce(
       () => {
-        const viewport = getViewportFromWidth(window.screen.availWidth);
-        const state = buildState(window.screen.availWidth, window.screen.availHeight, viewport);
+        const viewport = getViewportFromWidth(window.innerWidth);
+        const state = buildState(window.innerWidth, window.innerHeight, viewport);
         this.setState(state);
       },
       500,
