@@ -989,7 +989,7 @@
   "update.createdAt": "{date} に作成 (下書き)",
   "update.delete": "削除",
   "update.edit": "編集",
-  "update.new.save": "アップデートを保存",
+  "update.new.post": "Post Update",
   "update.paid": "支払い済み",
   "update.pending": "保留",
   "update.private.cannot_view_message": "Become a backer of {collective} to see this update",

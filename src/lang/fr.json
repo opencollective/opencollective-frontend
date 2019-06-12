@@ -989,7 +989,7 @@
   "update.createdAt": "créé le {date} (brouillon)",
   "update.delete": "supprimer",
   "update.edit": "éditer",
-  "update.new.save": "Sauvegarder l'actualité",
+  "update.new.post": "Post Update",
   "update.paid": "payé",
   "update.pending": "en attente",
   "update.private.cannot_view_message": "Become a backer of {collective} to see this update",
