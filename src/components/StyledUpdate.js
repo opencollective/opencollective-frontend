@@ -23,9 +23,9 @@ import { formatDate } from '../lib/utils';
 import { Router } from '../server/pages';
 
 const UpdateWrapper = styled(Flex)`
-  max-width: 80%;
+  max-width: 100%;
   min-height: 100px;
-  border: ${props => (props.compact ? '1px solid #e6e8eb' : 'none')};
+  border: ${props => (props.showBorder ? '1px solid #e6e8eb' : 'none')};
   padding: 20px;
   @media (max-width: 600px) {
     max-width: 100%;
@@ -41,6 +41,25 @@ const ActionButton = styled.button`
   outline: none;
   border: none;
   background: none;
+`;
+
+const PrivateUpdateMesgBox = styled(MessageBox)`
+  height: 40px;
+  background: #f0f8ff;
+  border: 1px solid #b8deff;
+  box-sizing: border-box;
+  border-radius: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 12px;
+  color: #71757a;
+  display: flex;
+  align-items: center;
+`;
+
+const ViewUpdatesLink = styled(Link)`
+  margin-top: 20px;
+  color: #71757a;
 `;
 
 class StyledUpdate extends Component {
@@ -187,10 +206,23 @@ class StyledUpdate extends Component {
   }
 
   renderSummary(update) {
+    const { collective } = this.props;
+
     return (
       <React.Fragment>
-        <Container my={1} fontsize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
+        {update.userCanSeeUpdate && (
+          <Container mb={2} fontsize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
+        )}
         {this.renderUpdateMeta(update)}
+        {!update.userCanSeeUpdate && (
+          <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
+            <FormattedMessage
+              id="update.private.cannot_view_message"
+              defaultMessage="Become a backer of {collective} to see this update"
+              values={{ collective: collective.name }}
+            />
+          </PrivateUpdateMesgBox>
+        )}
       </React.Fragment>
     );
   }
@@ -208,18 +240,20 @@ class StyledUpdate extends Component {
           {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
           {!update.html && <UpdateTextWithData id={update.id} />}
           {!update.userCanSeeUpdate && (
-            <MessageBox type="info" data-cy="mesgBox">
+            <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
               <FormattedMessage
                 id="update.private.cannot_view_message"
                 defaultMessage="Become a backer of {collective} to see this update"
                 values={{ collective: collective.name }}
               />
-            </MessageBox>
+            </PrivateUpdateMesgBox>
           )}
           {update.publishedAt && (
-            <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
-              {intl.formatMessage(this.messages['viewLatestUpdates'])}
-            </Link>
+            <Container mt={4}>
+              <ViewUpdatesLink route={`/${collective.slug}/updates`}>
+                {intl.formatMessage(this.messages['viewLatestUpdates'])}
+              </ViewUpdatesLink>
+            </Container>
           )}
           {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
         </Container>
@@ -242,7 +276,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
 
     return (
-      <UpdateWrapper compact={this.props.compact}>
+      <UpdateWrapper showBorder={true}>
         <AvatarContainer>
           <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
             <Avatar
@@ -256,7 +290,7 @@ class StyledUpdate extends Component {
         </AvatarContainer>
         {mode !== 'edit' && (
           <Container display="flex" flexDirection="column">
-            <Box mb={1}>{this.renderUpdateTitle()}</Box>
+            <Box>{this.renderUpdateTitle()}</Box>
             {mode === 'summary' && this.renderSummary(update)}
             {mode === 'details' && this.renderFullContent()}
           </Container>
