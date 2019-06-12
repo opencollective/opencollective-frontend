@@ -41,6 +41,26 @@ export const sanitizeActivity = activity => {
       'expense.amount',
       'expense.currency',
     ]);
+  } else if (type === activities.COLLECTIVE_MEMBER_CREATED) {
+    cleanActivity.data = pick(activity.data, [
+      'member.role',
+      'member.description',
+      'member.since',
+      'member.memberCollective.id',
+      'member.memberCollective.type',
+      'member.memberCollective.slug',
+      'member.memberCollective.name',
+      'member.memberCollective.company',
+      'member.memberCollective.website',
+      'member.memberCollective.twitterHandle',
+      'member.memberCollective.githubHandle',
+      'member.memberCollective.description',
+      'member.memberCollective.previewImage',
+      'member.order.id',
+      'member.order.totalAmount',
+      'member.order.currency',
+      'member.order.description',
+    ]);
   }
 
   return cleanActivity;
