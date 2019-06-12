@@ -83,7 +83,10 @@ class TiersPage extends React.Component {
                 {collective.isActive && collective.host && (
                   <Container display="flex" justifyContent="center" width={1} my={4}>
                     <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
-                      <FormattedMessage id="collective.tiers.donate" defaultMessage="Or make a one time donation" />
+                      <FormattedMessage
+                        id="collective.tiers.donate"
+                        defaultMessage="Or make a custom financial contribution"
+                      />
                     </Link>
                   </Container>
                 )}

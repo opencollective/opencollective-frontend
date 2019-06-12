@@ -172,7 +172,7 @@
   "collective.tags.description": "タグはあなたのコレクティブをほかの人が探すのを助けます",
   "collective.tags.edit.description": "あなたのコレクティブを検索や Discover で見付けられるようにする (コンマ区切り)",
   "collective.tags.label": "タグ",
-  "collective.tiers.donate": "もしくは一回だけ寄付する",
+  "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Link to the terms by which this host will collect money on behalf of their collectives",
   "collective.tos.label": "利用規約",
   "collective.transactions.title": "{n, plural, one {最近の取引} other {最近の取引}}",

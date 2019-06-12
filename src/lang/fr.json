@@ -172,7 +172,7 @@
   "collective.tags.description": "Les tags aident la communauté à découvrir votre collectif",
   "collective.tags.edit.description": "Pour rendre votre collectif plus facilement trouvable dans la recherche et les suggestions (séparés par des virgules)",
   "collective.tags.label": "Tags",
-  "collective.tiers.donate": "Ou faites un don ponctuel",
+  "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Lien vers les conditions d'utilisation que les collectifs qui souhaitent être hébergés doivent accepter",
   "collective.tos.label": "Conditions d'utilisation",
   "collective.transactions.title": "{n, plural, one {Dernière transaction} other {Dernières transactions}}",
