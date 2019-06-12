@@ -191,16 +191,14 @@ class EditUpdateForm extends React.Component {
                 <StyledCheckbox
                   defaultChecked={update.isPrivate}
                   name="private"
+                  label="Private update"
                   onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
                 />
               </Box>
-              <Container ml={3} fontSize="16px" fontWeight="500">
-                Private update
-              </Container>
             </Container>
           </div>
           <div className="row">
-            <Container marginLeft="25px" color="#71757A">
+            <Container marginLeft="20px" fontSize="15px" color="#71757A">
               <FormattedMessage
                 id="update.private.description"
                 defaultMessage="Only contributors will be able to see the content of this update"
