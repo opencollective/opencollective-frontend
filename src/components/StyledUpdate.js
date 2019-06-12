@@ -25,24 +25,22 @@ import { Router } from '../server/pages';
 const UpdateWrapper = styled(Flex)`
   max-width: 80%;
   min-height: 100px;
-  border: 1px solid #e6e8eb;
+  border: ${props => (props.compact ? '1px solid #e6e8eb' : 'none')};
   padding: 20px;
   @media (max-width: 600px) {
     max-width: 100%;
   }
-  ${({ compact }) =>
-    !compact &&
-    `
-    border: none;
-  `}
 `;
 
 const AvatarContainer = styled(Container)`
   margin-right: 20px;
 `;
 
-const ActionLink = styled(Link)`
+const ActionButton = styled.button`
   color: #71757a;
+  outline: none;
+  border: none;
+  background: none;
 `;
 
 class StyledUpdate extends Component {
@@ -152,15 +150,15 @@ class StyledUpdate extends Component {
         <Role role="ADMIN" />
         {editable && (
           <React.Fragment>
-            <Box data-cy={'toggleEditUpdate'} mr={2} fontSize="12px">
-              <ActionLink onClick={this.toggleEdit}>
+            <Box mr={2} fontSize="12px">
+              <ActionButton onClick={this.toggleEdit} data-cy="toggleEditUpdate">
                 {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
-              </ActionLink>
+              </ActionButton>
             </Box>
             <Box mr={2} fontSize="12px">
-              <ActionLink onClick={this.deleteUpdate}>
+              <ActionButton onClick={this.deleteUpdate}>
                 <FormattedMessage id="update.delete" defaultMessage="delete" />
-              </ActionLink>
+              </ActionButton>
             </Box>
           </React.Fragment>
         )}
@@ -210,7 +208,7 @@ class StyledUpdate extends Component {
           {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
           {!update.html && <UpdateTextWithData id={update.id} />}
           {!update.userCanSeeUpdate && (
-            <MessageBox type="info">
+            <MessageBox type="info" data-cy="mesgBox">
               <FormattedMessage
                 id="update.private.cannot_view_message"
                 defaultMessage="Become a backer of {collective} to see this update"
@@ -244,7 +242,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
 
     return (
-      <UpdateWrapper>
+      <UpdateWrapper compact={this.props.compact}>
         <AvatarContainer>
           <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
             <Avatar
