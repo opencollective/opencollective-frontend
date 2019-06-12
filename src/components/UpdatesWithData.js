@@ -100,6 +100,7 @@ const getUpdatesQuery = gql`
       createdAt
       publishedAt
       updatedAt
+      userCanSeeUpdate
       tags
       image
       isPrivate
