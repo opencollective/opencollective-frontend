@@ -28,12 +28,14 @@ const GlobalStyles = createGlobalStyle`
 class TierPage extends React.Component {
   static propTypes = {
     tierId: PropTypes.number.isRequired,
+    collectiveSlug: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
+    tierSlug: PropTypes.string,
   };
 
-  static getInitialProps({ query: { tierId } }) {
-    return { tierId: Number(tierId) };
+  static getInitialProps({ query: { tierId, tierSlug } }) {
+    return { tierId: Number(tierId), tierSlug };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -53,11 +55,13 @@ class TierPage extends React.Component {
         description: tier.description || collective.description || collective.longDescription,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
         image: collective.image || get(collective, 'parentCollective.image'),
+        canonicalURL: `/${tier.collective.slug}/contribute/${tier.slug}-${tier.id}`,
       };
     } else {
       return {
         title: 'Tier',
         image: '/static/images/defaultBackgroundImage.png',
+        canonicalURL: `/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`,
       };
     }
   }

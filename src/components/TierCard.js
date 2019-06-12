@@ -261,7 +261,10 @@ class TierCard extends React.Component {
           {!tier.longDescription ? (
             tier.name
           ) : (
-            <Link route="tier" params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug }}>
+            <Link
+              route="tier"
+              params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' }}
+            >
               <a>{tier.name}</a>
             </Link>
           )}
@@ -306,7 +309,10 @@ class TierCard extends React.Component {
             </p>
           )}
           {tier.longDescription && (
-            <Link route="tier" params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug }}>
+            <Link
+              route="tier"
+              params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' }}
+            >
               <a>
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
