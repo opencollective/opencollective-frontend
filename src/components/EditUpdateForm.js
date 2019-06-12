@@ -186,11 +186,12 @@ class EditUpdateForm extends React.Component {
           </div>
 
           <div className="row">
-            <Container mt={4} space={2} display="flex" alignItems="baseline">
+            <Container mt={4} mb={2} display="flex" alignItems="baseline">
               <Box mr={2}>
                 <StyledCheckbox
                   defaultChecked={update.isPrivate}
                   name="private"
+                  size="16px"
                   label="Private update"
                   onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
                 />
@@ -198,14 +199,14 @@ class EditUpdateForm extends React.Component {
             </Container>
           </div>
           <div className="row">
-            <Container marginLeft="20px" fontSize="15px" color="#71757A">
+            <Container marginLeft="25px" fontSize="12px" color="#71757A">
               <FormattedMessage
                 id="update.private.description"
                 defaultMessage="Only contributors will be able to see the content of this update"
               />
             </Container>
           </div>
-          <ActionButtonWrapper className="row actions" mx={2} my={3}>
+          <ActionButtonWrapper className="row actions" mx={2} my={5}>
             <StyledButton
               className="bluewhite"
               buttonSize="large"
@@ -214,7 +215,7 @@ class EditUpdateForm extends React.Component {
               disabled={this.state.loading}
             >
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-              {!this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Save Update" />}
+              {!this.state.loading && <FormattedMessage id="update.new.post" defaultMessage="Post Update" />}
             </StyledButton>
           </ActionButtonWrapper>
 
