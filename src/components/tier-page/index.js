@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import dynamic from 'next/dynamic';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
@@ -21,22 +20,14 @@ import StyledProgressBar from '../StyledProgressBar';
 import Avatar from '../Avatar';
 import LinkCollective from '../LinkCollective';
 import InlineEditField from '../InlineEditField';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import HTMLContent, { isEmptyValue } from '../HTMLContent';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
 import TierContributors from './TierContributors';
+import TierLongDescription from './TierLongDescription';
 import TierVideo from './TierVideo';
 import BubblesSVG from './Bubbles.svg';
-
-// Dynamicly load heavy inputs only if user can edit the page
-const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor'), {
-  loading: HTMLEditorLoadingPlaceholder,
-  ssr: false,
-});
 
 /** The blured background image displayed under the tier description */
 const TierCover = styled(Container)`
@@ -149,7 +140,7 @@ class TierPage extends Component {
 
   render() {
     const { collective, tier, members, membersStats, LoggedInUser } = this.props;
-    const canEditTier = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
 
@@ -221,7 +212,7 @@ class TierPage extends Component {
                 <H1 textAlign="left" color="black.900" wordBreak="break-word" mb={4} data-cy="TierName">
                   <InlineEditField
                     mutation={EditTierMutation}
-                    canEdit={canEditTier}
+                    canEdit={canEdit}
                     values={tier}
                     field="name"
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
@@ -230,7 +221,7 @@ class TierPage extends Component {
                 <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line" data-cy="shortDescription">
                   <InlineEditField
                     mutation={EditTierMutation}
-                    canEdit={canEditTier}
+                    canEdit={canEdit}
                     values={tier}
                     field="description"
                     placeholder={
@@ -240,37 +231,7 @@ class TierPage extends Component {
                 </H3>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
-                    <InlineEditField
-                      mutation={EditTierMutation}
-                      values={tier}
-                      field="longDescription"
-                      canEdit={canEditTier}
-                    >
-                      {({ isEditing, value, setValue, enableEditor }) => {
-                        if (isEditing) {
-                          return (
-                            <HTMLContent>
-                              <HTMLEditor
-                                defaultValue={value}
-                                onChange={setValue}
-                                allowedHeaders={[false, 2, 3]} /** Disable H1 */
-                              />
-                            </HTMLContent>
-                          );
-                        } else if (isEmptyValue(tier.longDescription)) {
-                          return !canEditTier ? null : (
-                            <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
-                              <FormattedMessage
-                                id="TierPage.AddLongDescription"
-                                defaultMessage="Add a rich description"
-                              />
-                            </StyledButton>
-                          );
-                        } else {
-                          return <HTMLContent content={tier.longDescription} data-cy="longDescription" />;
-                        }
-                      }}
-                    </InlineEditField>
+                    <TierLongDescription tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
                   </div>
                   <Container
                     position={['relative', null, null, 'absolute']}
@@ -279,7 +240,7 @@ class TierPage extends Component {
                     mb={[4, 5]}
                     top={0}
                   >
-                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEditTier} />
+                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
                   </Container>
                 </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
