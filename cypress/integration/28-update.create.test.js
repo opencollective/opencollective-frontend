@@ -20,7 +20,7 @@ describe('create an update', () => {
       .contains('draft')
       .should('not.exist');
 
-    cy.get('[data-cy="toggleEditUpdate"]').click();
+    cy.get('[data-cy=toggleEditUpdate').click();
     cy.wait(300);
     cy.get('.custom-checkbox').click(); // Make private
     cy.get('.actions button').click();
@@ -36,7 +36,7 @@ describe('random user cannot see update', () => {
       .first()
       .click(); // The update created in the describe block above.
     cy.wait(500);
-    cy.get('.UpdatePage .body').contains('Become a backer of');
-    cy.get('.UpdatePage .body').contains('to see this update');
+    cy.get('[data-cy=mesgBox]').contains('Become a backer of');
+    cy.get('[data-cy=mesgBox]').contains('to see this update');
   });
 });
