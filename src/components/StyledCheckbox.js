@@ -61,8 +61,8 @@ const CheckboxContainer = styled(Flex)`
   /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
   @media (hover:hover) {
     &:hover input:not(:disabled):not(:checked) ~ .custom-checkbox {
-      background: ${themeGet('colors.primary.400')};
-      border-color: ${themeGet('colors.primary.400')};
+      background: ${themeGet('colors.primary.300')};
+      border-color: ${themeGet('colors.primary.300')};
       svg {
         opacity: 1;
       }
