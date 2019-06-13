@@ -172,7 +172,7 @@
   "collective.tags.description": "I tag aiutano le persone a scoprire il tuo collettivo",
   "collective.tags.edit.description": "Rendi trovabile il tuo collettivo nella ricerca e collettivi correlati (separati da una virgola)",
   "collective.tags.label": "Tags",
-  "collective.tiers.donate": "O fai una singola donazione",
+  "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Link ai termini in base ai quali questo organizzatore raccoglierà denaro per conto dei loro collettivi",
   "collective.tos.label": "Termini di servizio",
   "collective.transactions.title": "{n, plural, one {Latest transaction} other {Latest transactions}}",
