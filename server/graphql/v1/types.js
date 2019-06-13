@@ -1115,6 +1115,13 @@ export const TierType = new GraphQLObjectType({
         type: GraphQLString,
         description: 'A long, html-formatted description.',
       },
+      hasLongDescription: {
+        type: GraphQLBoolean,
+        description: 'Returns true if the tier has a long description',
+        resolve(tier) {
+          return Boolean(tier.longDescription);
+        },
+      },
       videoUrl: {
         type: GraphQLString,
         description: 'Link to a video (YouTube, Vimeo).',
