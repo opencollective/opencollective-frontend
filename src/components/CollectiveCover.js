@@ -51,6 +51,7 @@ class CollectiveCover extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
     cta: PropTypes.object, // { href, label }
+    context: PropTypes.string,
   };
 
   constructor(props) {
