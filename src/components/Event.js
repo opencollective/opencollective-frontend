@@ -7,10 +7,9 @@ import CollectiveCover from './CollectiveCover';
 import Location from './Location';
 import Tier from './Tier';
 import NotificationBar from './NotificationBar';
-import InterestedForm from './InterestedForm';
 import Sponsors from './Sponsors';
 import Responses from './Responses';
-import { capitalize, filterCollection, trimObject } from '../lib/utils';
+import { filterCollection, trimObject } from '../lib/utils';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
@@ -41,14 +40,11 @@ class Event extends React.Component {
   constructor(props) {
     super(props);
 
-    this.setInterested = this.setInterested.bind(this);
-    this.removeInterested = this.removeInterested.bind(this);
     this.updateOrder = this.updateOrder.bind(this);
     this.resetResponse = this.resetResponse.bind(this);
     this.handleOrderTier = this.handleOrderTier.bind(this);
 
     this.state = {
-      showInterestedForm: false,
       order: { tier: {} },
       tierInfo: {},
       api: { status: 'idle' },
@@ -73,55 +69,6 @@ class Event extends React.Component {
         defaultMessage: 'Edit tickets',
       },
     });
-  }
-
-  async removeInterested() {
-    const { LoggedInUser } = this.props;
-    const memberCollectiveId = this.state.interestedUserCollectiveId || (LoggedInUser && LoggedInUser.CollectiveId);
-    const res = await this.props.removeMember({ id: memberCollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
-    const memberRemoved = res.data.removeMember;
-    const event = { ...this.state.event };
-    event.members = event.members.filter(member => member.id !== memberRemoved.id);
-    this.setState({ showInterestedForm: false, event });
-  }
-
-  /**
-   * If user is logged in, we directly create a response
-   * Otherwise, we show the form to enter an email address
-   */
-  async setInterested(member) {
-    member = member || (this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId });
-    if (member) {
-      const parts = member.email && member.email.substr(0, member.email.indexOf('@')).split('.');
-      if (parts && parts.length > 1) {
-        member.firstName = capitalize(parts[0] || '');
-        member.lastName = capitalize(parts[1] || '');
-      }
-      try {
-        const res = await this.props.createMember(member, { id: this.state.event.id }, 'FOLLOWER');
-        const memberCreated = res.data.createMember;
-        const interestedUserCollectiveId = memberCreated.member.id;
-        const event = { ...this.state.event };
-        event.members = [...event.members, memberCreated];
-        this.setState({
-          showInterestedForm: false,
-          event,
-          interestedUserCollectiveId,
-        });
-        this.setState({ showInterestedForm: false });
-      } catch (e) {
-        console.error(e);
-        let message = '';
-        if (e && e.graphQLErrors) {
-          message = ` (error: ${e.graphQLErrors[0].message})`;
-        }
-        this.error(`An error occured 😳. We couldn't register you as interested. Please try again in a few.${message}`);
-      }
-      return;
-    } else {
-      this.setState({ showInterestedForm: !this.state.showInterestedForm });
-      return;
-    }
   }
 
   error(msg) {
@@ -307,8 +254,6 @@ class Event extends React.Component {
                   get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')
                 }
               />
-
-              {this.state.showInterestedForm && <InterestedForm onSubmit={this.setInterested} />}
 
               <div>
                 <div className="content">
