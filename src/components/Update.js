@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Lock } from 'styled-icons/fa-solid';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { formatDate } from '../lib/utils';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
@@ -13,6 +15,7 @@ import { Router, Link } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
+import MessageBox from './MessageBox';
 
 class Update extends React.Component {
   static propTypes = {
@@ -218,6 +221,16 @@ class Update extends React.Component {
                 />
               </div>
             )}
+
+            {update.isPrivate && (
+              <React.Fragment>
+                <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
+                <ReactTooltip id="privateLockText">
+                  <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
+                </ReactTooltip>
+              </React.Fragment>
+            )}
+
             {editable && (
               <React.Fragment>
                 <div>
@@ -240,6 +253,15 @@ class Update extends React.Component {
             <div>
               {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
               {!update.html && <UpdateTextWithData id={update.id} />}
+              {!update.userCanSeeUpdate && (
+                <MessageBox type="info">
+                  <FormattedMessage
+                    id="update.private.cannot_view_message"
+                    defaultMessage="Become a backer of {collective} to see this update"
+                    values={{ collective: collective.name }}
+                  />
+                </MessageBox>
+              )}
               {update.publishedAt && (
                 <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
                   {intl.formatMessage(this.messages['viewLatestUpdates'])}
@@ -278,6 +300,7 @@ const editUpdateQuery = gql`
       title
       markdown
       html
+      isPrivate
     }
   }
 `;

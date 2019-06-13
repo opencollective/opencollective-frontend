@@ -43,6 +43,10 @@ const getUpdateQuery = gql`
     Update(id: $id) {
       id
       html
+      userCanSeeUpdate
+      collective {
+        name
+      }
     }
   }
 `;
