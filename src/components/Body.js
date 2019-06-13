@@ -89,7 +89,7 @@ export default class Body extends React.Component {
             }
 
             .content code:first-child:last-child {
-              display: inline-block;
+              display: inline;
               padding: 1rem;
             }
 
