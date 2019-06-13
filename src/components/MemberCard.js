@@ -46,7 +46,7 @@ const MemberCard = ({ role, since, collective, ...cardProps }) => (
     <CollectiveLogoContainer mt={52} mb={2}>
       <Box mt={-32}>
         <Link route="collective" params={{ slug: collective.slug }}>
-          <Avatar src={collective.image} radius={64} name={collective.name} />
+          <Avatar collective={collective} radius={64} />
         </Link>
       </Box>
     </CollectiveLogoContainer>

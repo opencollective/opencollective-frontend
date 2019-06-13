@@ -144,15 +144,7 @@ class VirtualCardDetails extends React.Component {
           {isConfirmed ? (
             <Link route="collective" params={{ slug: collective.slug }} title={collective.name} passHref>
               <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
-              <Avatar
-                radius={24}
-                mt="-1em"
-                ml="1em"
-                css={{ position: 'absolute' }}
-                src={collective.image}
-                type={collective.type}
-                name={collective.name}
-              />
+              <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
             </Link>
           ) : (
             <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />

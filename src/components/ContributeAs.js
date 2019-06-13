@@ -185,9 +185,9 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
               {radio}
             </Box>
             {value.type === 'USER' ? (
-              <Avatar src={value.image} type={value.type} size="3.6rem" name={value.name} />
+              <Avatar collective={value} size="3.6rem" />
             ) : (
-              <Logo src={value.image} type={value.type} height="3.6rem" name={value.name} />
+              <Logo collective={value} height="3.6rem" />
             )}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>

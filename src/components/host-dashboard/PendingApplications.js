@@ -94,7 +94,7 @@ class HostPendingApplications extends React.Component {
             boxShadow="rgba(144, 144, 144, 0.25) 4px 4px 16px"
           >
             <Flex>
-              <Avatar mr={2} radius={42} name={c.name} src={c.image} type={c.type} />
+              <Avatar collective={c} mr={2} radius={42} />
               <Container pl={2} flex="1 1" borderLeft="1px solid #e8e8e8">
                 <div>
                   <LinkCollective collective={c}>
