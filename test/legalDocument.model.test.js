@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import models from '../server/models';
 import * as utils from '../test/utils';
+import moment from 'moment';
 
 const { RequiredLegalDocument, LegalDocument, User, Collective } = models;
 const { US_TAX_FORM } = RequiredLegalDocument.documentType;
@@ -10,7 +11,7 @@ describe('LegalDocument model', () => {
   let hostCollective, user, userCollective;
 
   const documentData = {
-    year: 2019,
+    year: moment().year(),
   };
 
   const userData = {

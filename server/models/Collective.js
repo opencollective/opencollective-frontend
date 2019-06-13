@@ -2150,11 +2150,9 @@ export default function(Sequelize, DataTypes) {
       .tap(backers => debug('getTopBackers', backers.map(b => b.dataValues)));
   };
 
-  Collective.prototype.getUsersWhoHaveTotalExpensesOverThreshold = async function(
-    threshold,
-    since,
-    until = new Date(),
-  ) {
+  Collective.prototype.getUsersWhoHaveTotalExpensesOverThreshold = async function(threshold, year) {
+    const since = moment({ year });
+    const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
     const expenses = await this.getExpenses(status, since, until);
 
