@@ -1,6 +1,6 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
 import { Flex } from '@rebass/grid';
@@ -38,7 +38,7 @@ const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
     `}
 `;
 
-const translations = defineMessages({
+const i18nSection = defineMessages({
   [Sections.CONTRIBUTE]: {
     id: 'CollectivePage.NavBar.Contribute',
     defaultMessage: 'Contribute',
@@ -65,7 +65,7 @@ const translations = defineMessages({
  * The NavBar that displays all the invidual sections. The component will take the
  * entire height available, so parent is responsible for its size.
  */
-const NavBar = ({ sections, selected, onSectionClick, linkBuilder, intl }) => {
+const NavBar = ({ sections, selected, collectiveSlug, onSectionClick, linkBuilder, intl }) => {
   return (
     <Flex data-cy="CollectivePage.NavBar" css={{ height: '100%', overflowX: 'auto' }}>
       {sections.map(section => (
@@ -78,9 +78,12 @@ const NavBar = ({ sections, selected, onSectionClick, linkBuilder, intl }) => {
             e.preventDefault();
           }}
         >
-          {translations[section] ? intl.formatMessage(translations[section]) : section}
+          {i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
         </MenuLink>
       ))}
+      <MenuLink href={`mailto:hello@${collectiveSlug}.opencollective.com`}>
+        <FormattedMessage id="NavBar.Contact" defaultMessage="Contact" />
+      </MenuLink>
     </Flex>
   );
 };
@@ -90,6 +93,8 @@ NavBar.propTypes = {
   onSectionClick: PropTypes.func.isRequired,
   /** An optionnal function to build links URLs. Usefull to override behaviour in test/styleguide envs. */
   linkBuilder: PropTypes.func.isRequired,
+  /** Collective slug, to build the contact URL. */
+  collectiveSlug: PropTypes.string.isRequired,
   /** The list of sections to be displayed by the NavBar */
   sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
   /** Currently selected section */
