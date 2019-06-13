@@ -277,7 +277,7 @@ class Collective extends React.Component {
                           <a>
                             <FormattedMessage
                               id="collective.tiers.donate"
-                              defaultMessage="Or make a one time donation"
+                              defaultMessage="Or make a custom financial contribution"
                             />
                           </a>
                         </Link>

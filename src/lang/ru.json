@@ -172,7 +172,7 @@
   "collective.tags.description": "Tags helps people discover your collective",
   "collective.tags.edit.description": "Make your collective discoverable in search and related collectives (comma separated)",
   "collective.tags.label": "Теги",
-  "collective.tiers.donate": "Или пожертвовать один раз",
+  "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Link to the terms by which this host will collect money on behalf of their collectives",
   "collective.tos.label": "Условия предоставления услуг",
   "collective.transactions.title": "{n, plural, one {Последняя транзакция} other {Последние транзакции}}",
