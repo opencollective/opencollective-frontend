@@ -87,6 +87,12 @@ class CreateExpenseForm extends React.Component {
     };
   }
 
+  UNSAFE_componentWillReceiveProps(newProps) {
+    if (!this.props.LoggedInUser && newProps.LoggedInUser && !this.state.expense.paypalEmail) {
+      this.handleChange('paypalEmail', newProps.LoggedInUser.paypalEmail);
+    }
+  }
+
   getOptions(arr, intlVars) {
     return arr.map(key => {
       const obj = {};
@@ -143,12 +149,6 @@ class CreateExpenseForm extends React.Component {
     };
     this.setState(newState);
     this.props.onChange && this.props.onChange(expense);
-  }
-
-  UNSAFE_componentWillReceiveProps(newProps) {
-    if (!this.props.LoggedInUser && newProps.LoggedInUser && !this.state.expense.paypalEmail) {
-      this.handleChange('paypalEmail', newProps.LoggedInUser.paypalEmail);
-    }
   }
 
   async onSubmit(e) {

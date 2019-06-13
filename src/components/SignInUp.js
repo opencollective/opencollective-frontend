@@ -74,6 +74,10 @@ class SignInUp extends React.Component {
     ];
   }
 
+  componentDidMount() {
+    this.nodes.email && this.nodes.email.focus();
+  }
+
   handleChange(fieldname, value) {
     const user = this.state.user;
     user[fieldname] = value;
@@ -113,10 +117,6 @@ class SignInUp extends React.Component {
     this.state.user.email = this.state.user.email.trim().toLowerCase();
     await this.props.onSubmit(this.state.user);
     this.setState({ loading: false });
-  }
-
-  componentDidMount() {
-    this.nodes.email && this.nodes.email.focus();
   }
 
   render() {
