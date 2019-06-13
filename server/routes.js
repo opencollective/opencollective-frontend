@@ -36,6 +36,8 @@ import { sanitizeForLogs } from './lib/utils';
 import graphqlSchemaV1 from './graphql/v1/schema';
 import graphqlSchemaV2 from './graphql/v2/schema';
 
+import helloworks from '../controllers/helloworks';
+
 const upload = multer();
 
 const cacheControlMaxAge = maxAge => {
@@ -243,6 +245,11 @@ export default app => {
   app.get('/github-repositories', connectedAccounts.fetchAllRepositories);
   app.get('/github/repo', connectedAccounts.getRepo);
   app.get('/github/orgMemberships', connectedAccounts.getOrgMemberships);
+
+  /**
+   * Hello Works API - Helloworks hits this endpoint when a document has been completed.
+   */
+  app.post('/helloworks/callback', helloworks.callback);
 
   /**
    * test-api routes
