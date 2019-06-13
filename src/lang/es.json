@@ -172,7 +172,7 @@
   "collective.tags.description": "Las etiquetas ayudan a la gente a encontrar tu colecta",
   "collective.tags.edit.description": "Haz que tu colecta pueda ser encontrada en el buscador y en las colectas relacionadas (separadas por comas)",
   "collective.tags.label": "Tags",
-  "collective.tiers.donate": "O hacer una donación de tiempo",
+  "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Enlace a los términos y condiciones por los cuales este anfitrión realiza la colecta de dinero en nombre de sus colectas",
   "collective.tos.label": "Términos de servicio",
   "collective.transactions.title": "{n, plural, one {Latest transaction} other {Latest transactions}}",
