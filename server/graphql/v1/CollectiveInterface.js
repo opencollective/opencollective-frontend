@@ -1339,7 +1339,7 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt },
       },
       resolve(collective, args) {
-        const query = { type: 'EVENT', ParentCollectiveId: collective.id };
+        const query = { where: { type: 'EVENT', ParentCollectiveId: collective.id } };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         return models.Collective.findAll(query);
