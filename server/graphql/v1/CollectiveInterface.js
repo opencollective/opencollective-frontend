@@ -674,6 +674,16 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          includePastEvents: {
+            type: GraphQLBoolean,
+            defaultValue: false,
+            description: 'Include past events',
+          },
+          includeInactive: {
+            type: GraphQLBoolean,
+            defaultValue: false,
+            description: 'Include inactive events',
+          },
         },
       },
       paymentMethods: {
@@ -1337,11 +1347,43 @@ const CollectiveFields = () => {
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        includePastEvents: {
+          type: GraphQLBoolean,
+          defaultValue: false,
+          description: 'Include past events',
+        },
+        includeInactive: {
+          type: GraphQLBoolean,
+          defaultValue: false,
+          description: 'Include inactive events',
+        },
       },
       resolve(collective, args) {
         const query = { where: { type: 'EVENT', ParentCollectiveId: collective.id } };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
+        if (!args.includeInactive) query.where.isActive = true;
+        if (!args.includePastEvents) {
+          // Use midnight so we only mark events as passed the day after
+          const today = new Date().setHours(0, 0, 0, 0);
+          query.where = {
+            [Op.and]: [
+              // Include all previous conditions
+              query.where,
+              // An event is not passed if end date is in the future OR if end date
+              // is not set but start date is in the past OR if there's no start date
+              // nor end date
+              {
+                [Op.or]: [
+                  { startsAt: null, endsAt: null },
+                  { endsAt: { [Op.gte]: Date.now() } },
+                  { endsAt: null, startsAt: { [Op.gte]: today } },
+                ],
+              },
+            ],
+          };
+        }
+
         return models.Collective.findAll(query);
       },
     },
