@@ -48,40 +48,6 @@ export async function createCollective(_, args, req) {
     }
   }
 
-  if (args.collective.HostCollectiveId) {
-    if (args.collective.HostCollectiveId === 858) {
-      // opencollective.com/meetups
-      // we assign them to a host based on their location
-      // the host will have to approve them
-      collectiveData.tags.push('Tech meetups');
-      collectiveData.ParentCollectiveId = collectiveData.ParentCollectiveId || 858;
-      if (collectiveData.timezone) {
-        if (collectiveData.timezone.match(/Europe/)) {
-          collectiveData.currency = 'EUR';
-          args.collective.HostCollectiveId = 9807; // Open Collective Europe ASBL Host
-        }
-        if (collectiveData.timezone.match(/Paris/)) {
-          collectiveData.currency = 'EUR';
-          args.collective.HostCollectiveId = 11284; // Open Collective Paris Host
-        }
-        if (collectiveData.timezone.match(/Brussels/)) {
-          collectiveData.currency = 'EUR';
-          args.collective.HostCollectiveId = 9802; // BrusselsTogether ASBL Host
-        }
-        if (collectiveData.timezone.match(/London/)) {
-          collectiveData.currency = 'GBP';
-          args.collective.HostCollectiveId = 9806; // Open Collective UK Host
-        }
-        if (collectiveData.timezone.match(/^US/)) {
-          collectiveData.currency = 'USD';
-          args.collective.HostCollectiveId = 8674; // Open Collective Inc Host
-        }
-      } else {
-        args.collective.HostCollectiveId = null;
-      }
-    }
-  }
-
   collectiveData.isActive = false;
   if (args.collective.ParentCollectiveId) {
     parentCollective = await req.loaders.collective.findById.load(args.collective.ParentCollectiveId);
@@ -231,7 +197,6 @@ export async function createCollectiveFromGithub(_, args, req) {
     if (existingCollective) {
       collectiveData.slug = `${collectiveData.slug}-${Math.floor(Math.random() * 1000 + 1)}`;
     }
-    collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
     collectiveData.currency = 'USD';
     collectiveData.CreatedByUserId = user.id;
     collectiveData.LastEditedByUserId = user.id;
@@ -301,7 +266,6 @@ export async function createCollectiveFromGithub(_, args, req) {
     // TODO: we sometime still wants to store the main repository
   }
 
-  collectiveData.ParentCollectiveId = defaultHostCollective('opensource').ParentCollectiveId;
   collectiveData.currency = 'USD';
   collectiveData.CreatedByUserId = user.id;
   collectiveData.LastEditedByUserId = user.id;
