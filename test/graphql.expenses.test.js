@@ -556,11 +556,13 @@ describe('GraphQL Expenses API', () => {
       // another one to the user. This call to the function
       // `waitForCondition()` is required because notifications are
       // sent asynchronously.
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1);
-      expect(emailSendMessageSpy.callCount).to.equal(1);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 2);
+      expect(emailSendMessageSpy.callCount).to.equal(2);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('Your expense');
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('has been approved');
+      expect(emailSendMessageSpy.secondCall.args[0]).to.equal(hostAdmin.email);
+      expect(emailSendMessageSpy.secondCall.args[1]).to.contain('New expense approved');
     }); /* End of "successfully approve expense and send notification email to author of expense" */
     it('successfully approve expense and send notification email to admin of host', async () => {
       // Given a user that will file an expense and that is an admin of the collective
@@ -936,7 +938,16 @@ describe('GraphQL Expenses API', () => {
         });
         expect(creditTransaction.netAmountInCollectiveCurrency).to.equal(expense.amount);
         expect(creditTransaction.amount).to.equal(expensePlusFees);
-        expect(emailSendMessageSpy.callCount).to.equal(3);
+        expect(emailSendMessageSpy.callCount).to.equal(4);
+        expect(emailSendMessageSpy.args[0][0]).to.equal(user.email);
+        expect(emailSendMessageSpy.args[0][1]).to.contain('Your expense to WWCode Berlin');
+        expect(emailSendMessageSpy.args[0][1]).to.contain('has been approved');
+        expect(emailSendMessageSpy.args[1][0]).to.equal(hostAdmin.email);
+        expect(emailSendMessageSpy.args[1][1]).to.contain('New expense approved on WWCode Berlin');
+        expect(emailSendMessageSpy.args[2][0]).to.equal(user.email);
+        expect(emailSendMessageSpy.args[2][1]).to.contain('from WWCode Berlin for Pizza');
+        expect(emailSendMessageSpy.args[3][0]).to.equal(hostAdmin.email);
+        expect(emailSendMessageSpy.args[3][1]).to.contain('Expense paid on WWCode Berlin');
       }); /* End of "pays the expense manually and reduces the balance of the collective" */
 
       it('Pay expense in kind', async () => {
@@ -1005,7 +1016,7 @@ describe('GraphQL Expenses API', () => {
         await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, {
           delay: 500,
         });
-        expect(emailSendMessageSpy.callCount).to.equal(3);
+        expect(emailSendMessageSpy.callCount).to.equal(4);
       });
     });
   }); /* End of #payExpense */
