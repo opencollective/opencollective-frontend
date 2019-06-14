@@ -232,7 +232,7 @@ async function HostReport(year, month, hostId) {
     return getHostedCollectives(host.id, endDate)
       .tap(collectives => {
         collectivesById = _.keyBy(collectives, 'id');
-        data.stats.totalCollectives = Object.keys(collectivesById).length;
+        data.stats.totalCollectives = collectives.filter(c => c.type === 'COLLECTIVE').length;
         summary.totalCollectives += data.stats.totalCollectives;
         console.log(`>>> processing ${data.stats.totalCollectives} collectives`);
       })
