@@ -37,6 +37,9 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
         workflowId,
         documentDelivery: true,
         participants,
+        metadata: {
+          userSlug: user.slug,
+        },
       })
       .then(() => LegalDocument.findByTypeYearUser({ documentType: US_TAX_FORM, year, user }))
       .then(doc => {
