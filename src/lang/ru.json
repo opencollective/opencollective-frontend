@@ -594,6 +594,8 @@
   "host.types.organization.label": "организация",
   "host.types.user.description": "ou will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income.",
   "host.types.user.label": "частное лицо",
+  "hostCollective.host.collectives.subtitle": "{n, plural, one {this collective is} other {{n} collectives are}} hosted by the linked organization",
+  "hostCollective.host.collectives.title": "Hosted by the organization",
   "hosts.description": "Представители являются юридическими лицами, которые собирают деньги от лица открытых коллективов, чтобы им не пришлом думать об учёте, налогах, и т. д. Некоторые представители также предоставляют дополнительные услуги. {findOutMoreLink}",
   "hosts.description.findOutMoreLink": "Узнайте больше о том, как стать Представителем Open Collective.",
   "hosts.title": "Представители Open Collective",
