@@ -6,6 +6,10 @@ import Container from './Container';
 import StyledCard from './StyledCard';
 
 class Popup extends Component {
+  static propTypes = {
+    children: PropTypes.node,
+  };
+
   constructor(props) {
     super(props);
     this.ref = createRef();

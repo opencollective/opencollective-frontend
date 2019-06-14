@@ -5,21 +5,21 @@ export const Dimensions = {
   PADDING_X: [15, 30, null, null, 120],
   MAX_SECTION_WIDTH: 1700,
   HERO_FIXED_HEIGHT: 120,
+  HERO_PLACEHOLDER_HEIGHT: [550, 500, 500, 350, 450],
 };
 
 /**
  * Durations for page animations
  */
 export const AnimationsDurations = {
-  HERO_COLLAPSE: 250,
+  HERO_COLLAPSE: 150,
 };
 
 /**
  * A map of unique identifiers for the sections of the page
  */
 export const Sections = {
-  JOIN_US: 'join-us',
-  GET_AND_GIVE: 'get-and-give',
+  CONTRIBUTE: 'contribute',
   CONVERSATIONS: 'conversations',
   BUDGET: 'budget',
   CONTRIBUTORS: 'contributors',
@@ -28,3 +28,11 @@ export const Sections = {
 
 /** A list of all section names */
 export const AllSectionsNames = Object.values(Sections);
+
+/** Defines contributions types */
+export const ContributionTypes = {
+  FINANCIAL_ONE_TIME: 'FINANCIAL_ONE_TIME',
+  FINANCIAL_RECURRING: 'FINANCIAL_RECURRING',
+  FINANCIAL_GOAL: 'FINANCIAL_GOAL',
+  EVENT_PARTICIPATE: 'EVENT_PARTICIPATE',
+};

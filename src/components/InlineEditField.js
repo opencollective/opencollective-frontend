@@ -5,22 +5,39 @@ import { Flex, Box } from '@rebass/grid';
 import { Mutation } from 'react-apollo';
 import { get, set, pick } from 'lodash';
 import styled from 'styled-components';
-import { themeGet } from 'styled-system';
 
-import { Edit } from 'styled-icons/feather/Edit';
+import { PencilAlt } from 'styled-icons/fa-solid/PencilAlt';
 
 import StyledButton from './StyledButton';
 import Container from './Container';
 import MessageBox from './MessageBox';
 import StyledTextarea from './StyledTextarea';
+import { fadeIn } from './StyledKeyframes';
 
 /** Container used to show the description to users than can edit it */
-const EditIcon = styled(Edit)`
+const EditIcon = styled(PencilAlt)`
   cursor: pointer;
-  color: ${themeGet('colors.black.300')};
+  background-color: white;
+  border: 1px solid #aaaeb3;
+  border-radius: 25%;
+  padding: 15%;
+  color: #aaaeb3;
+
   &:hover {
-    color: ${themeGet('colors.primary.700')};
+    color: #8697ad;
   }
+`;
+
+/** Component used for cancel / submit buttons */
+const FormButton = styled(StyledButton).attrs({
+  buttonSize: 'large',
+})`
+  width: 35%;
+  font-weight: normal;
+  min-width: 185px;
+  text-transform: capitalize;
+  margin: 0 8px;
+  animation: ${fadeIn} 0.3s;
 `;
 
 /**
@@ -38,6 +55,8 @@ class InlineEditField extends Component {
     mutation: PropTypes.object.isRequired,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
+    /** Set to false to disable edit icon even if user is allowed to edit */
+    showEditIcon: PropTypes.bool,
     /** If given, this function will be used to render the field */
     children: PropTypes.func,
     /**
@@ -47,13 +66,17 @@ class InlineEditField extends Component {
     placeholder: PropTypes.node,
   };
 
+  static defaultProps = {
+    showEditIcon: true,
+  };
+
   state = { isEditing: false, draft: '' };
 
   enableEditor = () => {
     this.setState({ isEditing: true, draft: get(this.props.values, this.props.field) });
   };
 
-  closeEditor = () => {
+  disableEditor = () => {
     this.setState({ isEditing: false });
   };
 
@@ -62,21 +85,27 @@ class InlineEditField extends Component {
   };
 
   renderContent(field, canEdit, value, placeholder, children) {
-    if (canEdit && !value && placeholder) {
-      return (
+    if (children) {
+      return children({
+        value,
+        isEditing: false,
+        enableEditor: this.enableEditor,
+        disableEditor: this.disableEditor,
+        setValue: this.setDraft,
+      });
+    } else if (!value) {
+      return canEdit && placeholder ? (
         <StyledButton buttonSize="large" onClick={this.enableEditor} data-cy={`InlineEditField-Add-${field}`}>
           {placeholder}
         </StyledButton>
-      );
-    } else if (children) {
-      return children({ isEditing: false, value });
+      ) : null;
     } else {
       return <span>{value}</span>;
     }
   }
 
   render() {
-    const { field, values, mutation, canEdit, placeholder, children } = this.props;
+    const { field, values, mutation, canEdit, showEditIcon, placeholder, children } = this.props;
     const { isEditing, draft } = this.state;
     const value = get(values, field);
     const touched = draft !== value;
@@ -84,8 +113,8 @@ class InlineEditField extends Component {
     if (!isEditing) {
       return (
         <Container position="relative">
-          {canEdit && (
-            <Container position="absolute" top={0} right={0}>
+          {canEdit && showEditIcon && (
+            <Container position="absolute" top={-5} right={-5} zIndex={2}>
               <EditIcon size={24} onClick={this.enableEditor} data-cy={`InlineEditField-Trigger-${field}`} />
             </Container>
           )}
@@ -96,15 +125,21 @@ class InlineEditField extends Component {
       return (
         <Mutation mutation={mutation}>
           {(updateField, { loading, error }) => (
-            <Box>
+            <React.Fragment>
               {children ? (
-                children({ isEditing: true, value: draft, setValue: this.setDraft })
+                children({
+                  isEditing: true,
+                  value: draft,
+                  setValue: this.setDraft,
+                  enableEditor: this.enableEditor,
+                  disableEditor: this.disableEditor,
+                })
               ) : (
                 <StyledTextarea
                   autoSize
                   autoFocus
                   width={1}
-                  value={draft}
+                  value={draft || ''}
                   onChange={e => this.setDraft(e.target.value)}
                   px={0}
                   py={0}
@@ -116,40 +151,31 @@ class InlineEditField extends Component {
                   data-cy={`InlineEditField-Textarea-${field}`}
                 />
               )}
-              {error && (
-                <MessageBox type="error" my={2} withIcon>
-                  {error.message}
-                </MessageBox>
-              )}
-              <Flex flexWrap="wrap" justifyContent="center" mt={2}>
-                <StyledButton
-                  textTransform="capitalize"
-                  mx={2}
-                  buttonSize="large"
-                  buttonStyle="primary"
-                  loading={loading}
-                  disabled={!touched}
-                  data-cy="InlineEditField-Btn-Save"
-                  onClick={() => {
-                    const variables = set(pick(values, ['id']), field, draft.trim());
-                    updateField({ variables }).then(this.closeEditor);
-                  }}
-                >
-                  <FormattedMessage id="save" defaultMessage="save" />
-                </StyledButton>
-                <StyledButton
-                  textTransform="capitalize"
-                  mx={2}
-                  data-cy="InlineEditField-Btn-Cancel"
-                  buttonSize="large"
-                  disabled={loading}
-                  onClick={this.closeEditor}
-                >
-                  <FormattedMessage id="form.cancel" defaultMessage="cancel" />
-                </StyledButton>
-              </Flex>
-              <hr />
-            </Box>
+              <Box width={1}>
+                {error && (
+                  <MessageBox type="error" my={2} withIcon>
+                    {error.message.replace('GraphQL error: ', '')}
+                  </MessageBox>
+                )}
+                <Flex flexWrap="wrap" justifyContent="space-evenly" mt={2}>
+                  <FormButton data-cy="InlineEditField-Btn-Cancel" disabled={loading} onClick={this.disableEditor}>
+                    <FormattedMessage id="form.cancel" defaultMessage="cancel" />
+                  </FormButton>
+                  <FormButton
+                    buttonStyle="primary"
+                    loading={loading}
+                    disabled={!touched}
+                    data-cy="InlineEditField-Btn-Save"
+                    onClick={() => {
+                      const variables = set(pick(values, ['id']), field, draft.trim());
+                      updateField({ variables }).then(this.disableEditor);
+                    }}
+                  >
+                    <FormattedMessage id="save" defaultMessage="save" />
+                  </FormButton>
+                </Flex>
+              </Box>
+            </React.Fragment>
           )}
         </Mutation>
       );

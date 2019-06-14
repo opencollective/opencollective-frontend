@@ -14,6 +14,7 @@ class OrderCreated extends React.Component {
     status: PropTypes.string, // PAID || PENDING || ERROR
     collectiveType: PropTypes.string, // COLLECTIVE || EVENT
     paymentMethodType: PropTypes.string, // manual || creditcard || ...
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

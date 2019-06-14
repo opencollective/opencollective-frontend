@@ -31,6 +31,12 @@ const Tab = ({ active, children, setActive }) => (
   </Container>
 );
 
+Tab.propTypes = {
+  active: PropTypes.object,
+  children: PropTypes.node,
+  setActive: PropTypes.func,
+};
+
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
     <Link route={onSecondaryAction} passHref>
@@ -43,6 +49,12 @@ const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
       {children}
     </StyledButton>
   );
+};
+
+SecondaryAction.propTypes = {
+  children: PropTypes.node,
+  loading: PropTypes.object,
+  onSecondaryAction: PropTypes.func,
 };
 
 const useForm = ({ onEmailChange, errors }) => {

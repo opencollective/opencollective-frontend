@@ -17,6 +17,7 @@ class InputTypeTags extends React.Component {
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.string),
     onChange: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

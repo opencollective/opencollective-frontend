@@ -44,6 +44,7 @@ class TransactionDetails extends React.Component {
     isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
     intl: PropTypes.object.isRequired,
     mode: PropTypes.string, // open or closed
+    fromCollective: PropTypes.object,
   };
 
   constructor(props) {

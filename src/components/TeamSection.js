@@ -37,8 +37,8 @@ class TeamSection extends React.Component {
         </style>
         <SectionTitle section="team" action={action} />
         <Flex justifyContent="space-evenly" flexWrap="wrap">
-          {members.map(({ id, role, createdAt, member }) => (
-            <MemberCard key={id} role={role} createdAt={createdAt} collective={member} m={3} />
+          {members.map(({ id, role, since, member }) => (
+            <MemberCard key={id} role={role} since={since} collective={member} m={3} />
           ))}
         </Flex>
       </section>

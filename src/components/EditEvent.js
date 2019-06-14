@@ -7,20 +7,20 @@ import EditEventForm from './EditEventForm';
 import CollectiveCover from './CollectiveCover';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
-import { addEditCollectiveMutation, addDeleteEventCollectiveMutation } from '../graphql/mutations';
+import { addEditCollectiveMutation } from '../graphql/mutations';
 import { Router } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
 
 class EditEvent extends React.Component {
   static propTypes = {
     event: PropTypes.object,
-    deleteEventCollective: PropTypes.func,
+    editCollective: PropTypes.func,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
     this.editEvent = this.editEvent.bind(this);
-    this.deleteEvent = this.deleteEvent.bind(this);
     this.state = { status: 'idle', result: {} };
   }
 
@@ -39,26 +39,6 @@ class EditEvent extends React.Component {
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
-    }
-  }
-
-  async deleteEvent() {
-    if (confirm('😱 Are you really sure you want to delete this event?')) {
-      this.setState({ status: 'loading' });
-      try {
-        await this.props.deleteEventCollective(this.props.event.id);
-        this.setState({
-          status: 'idle',
-          result: { success: 'Event deleted successfully' },
-        });
-        const collectiveRoute = `/${this.props.event.parentCollective.slug}`;
-        Router.pushRoute(collectiveRoute);
-      } catch (err) {
-        console.error('>>> deleteEvent error: ', JSON.stringify(err));
-        const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-        this.setState({ result: { error: errorMsg } });
-        throw new Error(errorMsg);
-      }
     }
   }
 
@@ -128,7 +108,6 @@ class EditEvent extends React.Component {
               <div>
                 <EditEventForm event={event} onSubmit={this.editEvent} loading={this.state.status === 'loading'} />
                 <div className="actions">
-                  (<a onClick={this.deleteEvent}>delete event</a>)
                   <div className="result">
                     <div className="success">{this.state.result.success}</div>
                     <div className="error">{this.state.result.error}</div>
@@ -144,4 +123,4 @@ class EditEvent extends React.Component {
   }
 }
 
-export default addEditCollectiveMutation(addDeleteEventCollectiveMutation(EditEvent));
+export default addEditCollectiveMutation(EditEvent);

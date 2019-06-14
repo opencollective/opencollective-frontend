@@ -14,6 +14,7 @@ class OrderWithData extends React.Component {
     limit: PropTypes.number,
     view: PropTypes.string, // "compact" for homepage (can't edit order, don't show header), "summary" for list view, "details" for details view
     LoggedInUser: PropTypes.object,
+    data: PropTypes.object,
   };
 
   constructor(props) {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex } from '@rebass/grid';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get } from 'lodash';
 
@@ -27,7 +27,8 @@ import DefinedTerm, { Terms } from '../DefinedTerm';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 
-import { AllSectionsNames, Dimensions, AnimationsDurations } from './_constants';
+import { AllSectionsNames, AnimationsDurations } from './_constants';
+import ContainerSectionContent from './ContainerSectionContent';
 import NavBar from './NavBar';
 import HeroBackground from './HeroBackground';
 
@@ -36,18 +37,15 @@ import HeroBackground from './HeroBackground';
  */
 const MainContainer = styled.div`
   position: relative;
+  width: 100%;
   top: 0;
   border-bottom: 1px solid #e6e8eb;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: flex;
+  z-index: 999;
 
   ${props =>
     props.isFixed &&
     css`
       position: fixed;
-      width: 100%;
       background: white;
     `}
 `;
@@ -125,7 +123,7 @@ class Hero extends Component {
         {/* Hero top */}
         <Container position="relative" pb={isFixed ? 0 : 4}>
           {!isFixed && <HeroBackground backgroundImage={collective.backgroundImage} />}
-          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} px={Dimensions.PADDING_X} margin="0 auto">
+          <ContainerSectionContent>
             <Flex pt={isFixed ? 16 : 40} flexWrap="wrap" width={1} justifyContent="center">
               {/* Collective presentation (name, logo, description...) */}
               <Flex
@@ -134,7 +132,7 @@ class Hero extends Component {
                 justifyContent={isFixed ? 'left' : ['center', null, null, 'left', 'center']}
                 flexDirection={isFixed ? 'row' : ['column', null, null, 'row', 'column']}
               >
-                <Box mb={isFixed ? 0 : 2} mr={isFixed ? 3 : [0, 4]}>
+                <Container textAlign={['center', 'left']} mb={isFixed ? 0 : 2} mr={isFixed ? 3 : [0, 4]}>
                   <AvatarWithHost
                     collective={collective}
                     host={host}
@@ -142,7 +140,7 @@ class Hero extends Component {
                     animationDuration={AnimationsDurations.HERO_COLLAPSE}
                     onCollectiveClick={onCollectiveClick}
                   />
-                </Box>
+                </Container>
                 <Flex flexDirection="column" flex="1 1">
                   <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
                     <H1
@@ -229,16 +227,13 @@ class Hero extends Component {
                 </Flex>
               )}
             </Flex>
-          </Container>
+          </ContainerSectionContent>
         </Container>
         {/* NavBar */}
-        <Container
+        <ContainerSectionContent
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          maxWidth={Dimensions.MAX_SECTION_WIDTH}
-          px={[0, 15, null, null, 120]}
-          margin="0 auto"
           height={isFixed ? 56 : [56, null, null, 84]}
           flexWrap="wrap"
           width={1}
@@ -256,7 +251,7 @@ class Hero extends Component {
               <FormattedMessage id="Collective.Hero.Donate" defaultMessage="Donate" />
             </StyledButton>
           </Container>
-        </Container>
+        </ContainerSectionContent>
       </MainContainer>
     );
   }

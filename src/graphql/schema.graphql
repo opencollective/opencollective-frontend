@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Wed May 29 2019 16:47:21 GMT+0200 (Central European Summer Time)
+# timestamp: Thu Jun 13 2019 17:47:32 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -82,9 +82,9 @@ type Collective implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -181,7 +181,20 @@ type Collective implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -297,9 +310,9 @@ interface CollectiveInterface {
   Name, address, country, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -309,6 +322,11 @@ interface CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
+
+  """
+  Defines if a collective is pledged
+  """
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -455,6 +473,11 @@ enum CollectiveOrderField {
   Order collectives by updated time.
   """
   updatedAt
+
+  """
+  Order collectives by total donations.
+  """
+  totalDonations
 }
 
 """
@@ -596,8 +619,8 @@ This represents a Comment
 """
 type CommentType {
   id: Int
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   html: String
   markdown: String
   createdByUser: UserDetails
@@ -623,14 +646,16 @@ type ConnectedAccountType {
   service: String
   username: String
   settings: JSON
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
 }
 
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
 }
+
+scalar DateString
 
 scalar Email
 
@@ -656,9 +681,9 @@ type Event implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -755,7 +780,20 @@ type Event implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -829,8 +867,8 @@ type Expense implements Transaction {
   fromCollective: CollectiveInterface
   usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
   privateMessage: String
@@ -845,8 +883,8 @@ input ExpenseInputType {
   id: Int
   amount: Int
   currency: String
-  createdAt: String
-  incurredAt: String
+  createdAt: DateString
+  incurredAt: DateString
   description: String
   category: String
   status: String
@@ -906,9 +944,9 @@ type ExpenseType {
   id: Int
   amount: Int
   currency: String
-  createdAt: String
-  updatedAt: String
-  incurredAt: String
+  createdAt: DateString
+  updatedAt: DateString
+  incurredAt: DateString
   description: String
   category: String
   status: String
@@ -1085,7 +1123,7 @@ This is a Member
 """
 type Member {
   id: Int
-  createdAt: String
+  createdAt: DateString
   orders(limit: Int, offset: Int): [OrderType]
   transactions(limit: Int, offset: Int): [Transaction]
   collective: CollectiveInterface
@@ -1094,6 +1132,7 @@ type Member {
   description: String
   tier: Tier
   stats: StatsMemberType
+  since: DateString
 }
 
 """
@@ -1105,6 +1144,37 @@ input MemberInputType {
   collective: CollectiveAttributesInputType
   role: String
   description: String
+  since: DateString
+}
+
+"""
+Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
+"""
+type MembersStatsType {
+  """
+  We always have to return an id for apollo's caching
+  """
+  id: Int
+
+  """
+  Total number of contributors
+  """
+  all: Int
+
+  """
+  Number of individuals
+  """
+  users: Int
+
+  """
+  Number of organizations
+  """
+  organizations: Int
+
+  """
+  Number of collectives
+  """
+  collectives: Int
 }
 
 """
@@ -1205,6 +1275,7 @@ type Mutation {
     role: String!
   ): Member
   createOrder(order: OrderInputType!): OrderType
+  addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
 
   """
@@ -1426,8 +1497,8 @@ type NotificationType {
   webhookUrl: String
   user: UserDetails
   collective: CollectiveInterface
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
 }
 
 """
@@ -1478,8 +1549,8 @@ type Order implements Transaction {
   fromCollective: CollectiveInterface
   usingVirtualCardFromCollective: CollectiveInterface
   collective: CollectiveInterface
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
   privateMessage: String
@@ -1668,8 +1739,8 @@ type OrderType {
     type: String
   ): [Transaction]
   currency: String
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
 
   """
   Whether this subscription is past due or not
@@ -1714,9 +1785,9 @@ type Organization implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -1813,7 +1884,20 @@ type Organization implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -1918,13 +2002,13 @@ Sanitized PaymentMethod Info (PaymentMethod model)
 type PaymentMethodType {
   id: Int
   uuid: String
-  createdAt: String
+  createdAt: DateString
 
   """
   Will be true for virtual card if claimed. Always true for other payment methods.
   """
   isConfirmed: Boolean
-  expiryDate: String
+  expiryDate: DateString
   service: String
   SourcePaymentMethodId: Int
   type: String
@@ -2288,10 +2372,20 @@ type Tier {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Returns true if the tier has a long description
+  """
+  hasLongDescription: Boolean
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
   button: String
   amount: Int
-  amountType: String
   minimumAmount: Int
+  amountType: String
   currency: String
   interval: String
   presets: [Int]
@@ -2299,8 +2393,8 @@ type Tier {
   maxQuantityPerUser: Int
   goal: Int
   password: String
-  startsAt: String
-  endsAt: String
+  startsAt: DateString
+  endsAt: DateString
   collective: CollectiveInterface
   event: CollectiveInterface
   orders(
@@ -2312,6 +2406,16 @@ type Tier {
     isProcessed: Boolean
     limit: Int
   ): [OrderType]
+
+  """
+  Returns a list of all the members that contributed to this tier
+  """
+  members(
+    """
+    Maximum number of entries to return
+    """
+    limit: Int = 5000
+  ): [Member]
   stats: TierStatsType
 }
 
@@ -2330,15 +2434,20 @@ input TierInputType {
   longDescription: String
 
   """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
+
+  """
   amount in the lowest unit of the currency of the host (ie. in cents)
   """
   amount: Int
-  amountType: String
   currency: String
   presets: [Int]
   interval: String
   maxQuantity: Int
   minimumAmount: Int
+  amountType: String
   maxQuantityPerUser: Int
 
   """
@@ -2363,6 +2472,11 @@ Stats about a tier
 """
 type TierStatsType {
   id: Int
+
+  """
+  Breakdown of all the members that belongs to this tier.
+  """
+  members: MembersStatsType
 
   """
   total number of individual orders
@@ -2415,8 +2529,8 @@ interface Transaction {
   type: String
   description: String
   privateMessage: String
-  createdAt: String
-  updatedAt: String
+  createdAt: DateString
+  updatedAt: DateString
   refundTransaction: Transaction
 }
 
@@ -2527,9 +2641,9 @@ type UpdateType {
   """
   userCanSeeUpdate: Boolean
   title: String
-  createdAt: String
-  updatedAt: String
-  publishedAt: String
+  createdAt: DateString
+  updatedAt: DateString
+  publishedAt: DateString
   summary: String
   html: String
   markdown: String
@@ -2563,9 +2677,9 @@ type User implements CollectiveInterface {
   Name, address, lat, long of the location.
   """
   location: LocationType
-  createdAt: String
-  startsAt: String
-  endsAt: String
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
@@ -2662,7 +2776,20 @@ type User implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int

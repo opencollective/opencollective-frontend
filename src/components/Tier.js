@@ -19,6 +19,7 @@ class Tier extends React.Component {
     values: PropTypes.object, // overriding values {quantity, amount, interval}
     onChange: PropTypes.func, // onChange({ id, quantity, amount, interval })
     onClick: PropTypes.func, // onClick({ id, quantity, amount, interval })
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

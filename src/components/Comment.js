@@ -15,6 +15,9 @@ class Comment extends React.Component {
     collective: PropTypes.object,
     comment: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    editComment: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    editable: PropTypes.bool,
   };
 
   constructor(props) {

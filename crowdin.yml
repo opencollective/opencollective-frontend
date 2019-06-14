@@ -10,4 +10,5 @@ files:
       - '*.ru.html'
       - '*.zh.html'
       - '*.pt.html'
+      - '*.it.html'
     translation: /%original_path%/%file_name%.%two_letters_code%.html

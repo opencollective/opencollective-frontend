@@ -99,6 +99,14 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
   );
 };
 
+FeesBreakdown.propTypes = {
+  amount: PropTypes.object,
+  platformFeePercent: PropTypes.object,
+  hostFeePercent: PropTypes.object,
+  paymentMethod: PropTypes.object,
+  currency: PropTypes.object,
+};
+
 const ClickableLabel = styled(Container)``;
 ClickableLabel.defaultProps = {
   display: 'inline-block',

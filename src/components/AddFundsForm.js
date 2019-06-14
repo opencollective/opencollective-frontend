@@ -18,6 +18,9 @@ class AddFundsForm extends React.Component {
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     loading: PropTypes.bool,
+    intl: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
+    client: PropTypes.object,
   };
 
   constructor(props) {
@@ -187,6 +190,7 @@ class AddFundsForm extends React.Component {
     }
 
     if (attr === 'FromCollectiveId') {
+      value = Number(value);
       if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
       } else {

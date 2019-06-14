@@ -10,6 +10,7 @@ class EditConnectedAccounts extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     connectedAccounts: PropTypes.arrayOf(PropTypes.object),
+    editMode: PropTypes.bool,
   };
 
   constructor(props) {

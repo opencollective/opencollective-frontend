@@ -1,6 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export class CustomToggle extends React.Component {
+  static propTypes = {
+    onClick: PropTypes.func,
+    children: PropTypes.node,
+  };
+
   constructor(props, context) {
     super(props, context);
 

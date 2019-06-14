@@ -42,6 +42,13 @@ const InlineField = ({ name, children, label, isLabelClickable }) => (
   </Flex>
 );
 
+InlineField.propTypes = {
+  name: PropTypes.object,
+  children: PropTypes.node,
+  label: PropTypes.object,
+  isLabelClickable: PropTypes.bool,
+};
+
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
   align-items: center;
@@ -80,6 +87,13 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
       </H3>
     </RadioButtonContainer>
   );
+};
+
+RadioButtonWithLabel.propTypes = {
+  checked: PropTypes.bool,
+  onClick: PropTypes.func,
+  name: PropTypes.object,
+  children: PropTypes.node,
 };
 
 const FieldLabelDetails = styled.span`
@@ -172,7 +186,7 @@ class CreateVirtualCardsForm extends Component {
     if (!submitting && this.form.current.reportValidity()) {
       this.setState({ submitting: true });
       const params = {
-        amount: values.amount * 100,
+        amount: Math.round(values.amount * 100),
         PaymentMethodId: values.PaymentMethodId || this.getDefaultPaymentMethod().id,
         limitedToOpenSourceCollectives: values.onlyOpensource,
         expiryDate: values.expiryDate,

@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import Update from './Update';
+import StyledUpdate from './StyledUpdate';
 import NotFound from './NotFound';
 
 class UpdateWithData extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired, // update.id
     editable: PropTypes.bool,
+    data: PropTypes.object,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -24,7 +26,7 @@ class UpdateWithData extends React.Component {
 
     return (
       <div className={'UpdateWithData'}>
-        <Update
+        <StyledUpdate
           key={update.id}
           collective={update.collective}
           update={update}
@@ -46,8 +48,11 @@ const getUpdateQuery = gql`
       publishedAt
       html
       markdown
+      isPrivate
+      userCanSeeUpdate
       collective {
         id
+        name
         slug
         settings
         stats {

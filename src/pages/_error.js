@@ -15,6 +15,7 @@ class Error extends React.Component {
     statusCode: PropTypes.number.isRequired,
     url: PropTypes.string,
     err: PropTypes.object,
+    getLoggedInUser: PropTypes.func,
   };
 
   static getInitialProps({ res, err, req }) {

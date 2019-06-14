@@ -18,6 +18,7 @@ class HTMLEditor extends React.Component {
     LoadingPlaceholderheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Use `false` instead of a number to disable a title level. eg. [false, 2, 3] */
     allowedHeaders: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.bool])),
+    value: PropTypes.string,
   };
 
   static defaultProps = {
@@ -45,6 +46,8 @@ class HTMLEditor extends React.Component {
         container: [
           [{ header: props.allowedHeaders }],
           ['bold', 'italic', 'underline', 'blockquote'],
+          [{ color: [] }],
+          [{ align: '' }, { align: 'center' }, { align: 'right' }],
           [{ list: 'ordered' }, { list: 'bullet' }],
           ['link', 'image'],
         ],
@@ -66,6 +69,8 @@ class HTMLEditor extends React.Component {
      * See https://quilljs.com/docs/formats/
      */
     this.formats = [
+      'align',
+      'color',
       'header',
       'font',
       'size',
@@ -151,10 +156,19 @@ class HTMLEditor extends React.Component {
             .HTMLEditor :global(.quill) {
               height: auto;
             }
+            .HTMLEditor :global(.quill) {
+              height: auto;
+            }
             .HTMLEditor :global(.ql-container) {
               min-height: 20rem;
               max-height: 35rem;
               overflow-y: auto;
+              border: 1px solid #dcdee0;
+              border-radius: 4px;
+            }
+            .HTMLEditor :global(.ql-toolbar) {
+              border: 1px solid #dcdee0;
+              border-radius: 4px;
             }
             .HTMLEditor.small :global(.quill) {
               height: auto;

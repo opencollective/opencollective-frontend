@@ -120,6 +120,8 @@ class CreateOrderPage extends React.Component {
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
     LoggedInUser: PropTypes.object, // from withUser
     loadingLoggedInUser: PropTypes.bool, // from withUser
+    createCollective: PropTypes.func,
+    refetchLoggedInUser: PropTypes.func,
   };
 
   static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";
@@ -204,14 +206,21 @@ class CreateOrderPage extends React.Component {
     } = this.props;
 
     let route = 'orderCollectiveNew';
+    let verb = this.props.verb || 'donate';
     if (Tier) {
-      route = Tier.type === 'TICKET' ? 'orderEventTier' : 'orderCollectiveTierNew';
+      if (Tier.type === 'TICKET') {
+        route = 'orderEventTier';
+      } else {
+        route = 'orderCollectiveTierNew';
+        verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
+      }
     }
 
     const params = {
       collectiveSlug,
+      verb,
       step: stepName === 'contributeAs' ? undefined : stepName,
-      ...pick(this.props, ['verb', 'tierId', 'tierSlug', 'amount', 'interval', 'description', 'redirect', 'eventSlug']),
+      ...pick(this.props, ['tierId', 'tierSlug', 'amount', 'interval', 'description', 'redirect', 'eventSlug']),
       ...routeParams,
     };
 

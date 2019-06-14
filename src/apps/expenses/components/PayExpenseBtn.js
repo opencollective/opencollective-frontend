@@ -21,6 +21,8 @@ class PayExpenseBtn extends React.Component {
     platformFeeInCollectiveCurrency: PropTypes.number,
     lock: PropTypes.func,
     unlock: PropTypes.func,
+    payExpense: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

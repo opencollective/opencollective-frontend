@@ -155,7 +155,7 @@ class Collective extends React.Component {
       notification.status = 'collectiveArchived';
     }
     const cta =
-      collective.isActive && collective.host ? { href: `/${collective.slug}/tiers`, label: 'contribute' } : null;
+      collective.isActive && collective.host ? { href: `/${collective.slug}/contribute`, label: 'contribute' } : null;
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
@@ -277,7 +277,7 @@ class Collective extends React.Component {
                           <a>
                             <FormattedMessage
                               id="collective.tiers.donate"
-                              defaultMessage="Or make a one time donation"
+                              defaultMessage="Or make a custom financial contribution"
                             />
                           </a>
                         </Link>

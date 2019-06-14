@@ -16,6 +16,8 @@ class UpdatesWithData extends React.Component {
     defaultAction: PropTypes.string, // "new" to open the new update form by default
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    data: PropTypes.object,
+    fetchMore: PropTypes.func,
   };
 
   constructor(props) {
@@ -100,8 +102,10 @@ const getUpdatesQuery = gql`
       createdAt
       publishedAt
       updatedAt
+      userCanSeeUpdate
       tags
       image
+      isPrivate
       collective {
         id
         slug

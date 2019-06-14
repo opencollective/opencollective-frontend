@@ -8,9 +8,9 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
 
+import { getCollectiveQuery } from '../graphql/queries';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
-import { addCreateOrderMutation } from '../graphql/mutations';
 import { Link, Router } from '../server/pages';
 import { imagePreview } from '../lib/utils';
 import { defaultImage } from '../constants/collectives';
@@ -117,6 +117,10 @@ const AmountField = ({ LoggedInUser }) => {
   );
 };
 
+AmountField.propTypes = {
+  LoggedInUser: PropTypes.object,
+};
+
 class CreatePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
     return {
@@ -147,6 +151,13 @@ class CreatePledgePage extends React.Component {
 
   static propTypes = {
     intl: PropTypes.object.isRequired, // from withIntl
+    data: PropTypes.object,
+    name: PropTypes.string,
+    slug: PropTypes.string,
+    githubHandle: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    createPledge: PropTypes.func,
   };
 
   state = {
@@ -156,7 +167,7 @@ class CreatePledgePage extends React.Component {
     submitting: false,
   };
 
-  async createOrder(event) {
+  async createPledge(event) {
     event.preventDefault();
     const {
       target: {
@@ -194,12 +205,9 @@ class CreatePledgePage extends React.Component {
     try {
       const {
         data: { createOrder: result },
-      } = await this.props.createOrder(order);
+      } = await this.props.createPledge(order, this.props.slug);
       if (result.collective.slug) {
         const params = { slug: result.collective.slug };
-        if (data && data.Collective) {
-          params.refetch = true;
-        }
         Router.pushRoute('collective', params);
       }
     } catch (error) {
@@ -330,7 +338,7 @@ class CreatePledgePage extends React.Component {
               )}
 
               {!loadingLoggedInUser && LoggedInUser && (
-                <form onSubmit={this.createOrder.bind(this)}>
+                <form onSubmit={this.createPledge.bind(this)}>
                   {!slug && (
                     <Box mb={3}>
                       <H5 textAlign="left" mb={4}>
@@ -674,9 +682,46 @@ const addCollectiveData = graphql(
   },
 );
 
+export const addCreatePledgeMutation = graphql(
+  gql`
+    mutation createOrder($order: OrderInputType!) {
+      createOrder(order: $order) {
+        id
+        createdAt
+        status
+        createdByUser {
+          id
+        }
+        fromCollective {
+          id
+          slug
+        }
+        collective {
+          id
+          slug
+        }
+        transactions(type: "CREDIT") {
+          id
+          uuid
+        }
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      createPledge: async (order, collectiveSlug) => {
+        return await mutate({
+          variables: { order },
+          refetchQueries: !collectiveSlug ? [] : [{ query: getCollectiveQuery, variables: { slug: collectiveSlug } }],
+        });
+      },
+    }),
+  },
+);
+
 const addGraphQL = compose(
   addCollectiveData,
-  addCreateOrderMutation,
+  addCreatePledgeMutation,
 );
 
 export { CreatePledgePage as MockCreatePledgePage };

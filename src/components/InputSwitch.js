@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 
@@ -26,6 +27,10 @@ const InputSwitch = ({ classes, ...props }) => {
       {...props}
     />
   );
+};
+
+InputSwitch.propTypes = {
+  classes: PropTypes.object,
 };
 
 export default withStyles(styles)(InputSwitch);

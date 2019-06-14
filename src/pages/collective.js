@@ -28,6 +28,7 @@ class CollectivePage extends React.Component {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveData
     query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {

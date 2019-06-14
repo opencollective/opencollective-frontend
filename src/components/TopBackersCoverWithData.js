@@ -17,6 +17,7 @@ class TopBackersCoverWithData extends React.Component {
     limit: PropTypes.number,
     onChange: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    data: PropTypes.object,
   };
 
   constructor(props) {

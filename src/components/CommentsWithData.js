@@ -17,6 +17,10 @@ class CommentsWithData extends React.Component {
     UpdateId: PropTypes.number,
     limit: PropTypes.number,
     LoggedInUser: PropTypes.object,
+    createComment: PropTypes.func,
+    data: PropTypes.object,
+    view: PropTypes.object,
+    fetchMore: PropTypes.func,
   };
 
   constructor(props) {

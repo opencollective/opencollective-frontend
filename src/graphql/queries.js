@@ -290,6 +290,7 @@ export const getCollectiveToEditQueryFields = `
   members(roles: ["ADMIN", "MEMBER", "HOST"]) {
     id
     createdAt
+    since
     role
     description
     stats {
@@ -345,7 +346,7 @@ const getCollectiveToEditQuery = gql`
 `;
 /* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
-const getCollectiveQuery = gql`
+export const getCollectiveQuery = gql`
   query Collective($slug: String) {
     Collective(slug: $slug) {
       id
@@ -450,6 +451,7 @@ const getCollectiveQuery = gql`
         id
         role
         createdAt
+        since
         description
         member {
           id

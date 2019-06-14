@@ -10,6 +10,7 @@ const star = '/static/images/icons/star.svg';
 class Response extends React.Component {
   static propTypes = {
     response: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

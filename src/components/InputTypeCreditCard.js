@@ -21,11 +21,6 @@ class InputTypeCreditCard extends React.Component {
     this.state = { loading: true };
   }
 
-  handleChange(fieldname, value) {
-    this.setState({ [fieldname]: value });
-    this.props.onChange({ [fieldname]: value });
-  }
-
   async componentDidMount() {
     const stripe = await getStripe();
 
@@ -66,6 +61,11 @@ class InputTypeCreditCard extends React.Component {
         this.handleChange('uuid', nextProps.options[0].uuid);
       }
     }
+  }
+
+  handleChange(fieldname, value) {
+    this.setState({ [fieldname]: value });
+    this.props.onChange({ [fieldname]: value });
   }
 
   render() {

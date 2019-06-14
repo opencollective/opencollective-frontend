@@ -12,6 +12,9 @@ import { Form, Row, Col } from 'react-bootstrap';
 class EditTwitterAccount extends React.Component {
   static propTypes = {
     connectedAccount: PropTypes.object.isRequired,
+    collective: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    editConnectedAccount: PropTypes.func,
   };
 
   constructor(props) {

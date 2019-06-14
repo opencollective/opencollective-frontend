@@ -8,6 +8,8 @@ class EventTemplatePicker extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string,
     onChange: PropTypes.func,
+    data: PropTypes.object,
+    label: PropTypes.string,
   };
 
   static getInitialProps({ query: { collectiveSlug } }) {

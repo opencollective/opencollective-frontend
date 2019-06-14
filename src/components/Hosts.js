@@ -11,6 +11,8 @@ import withIntl from '../lib/withIntl';
 class Hosts extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

@@ -17,6 +17,9 @@ class MembershipsWithData extends React.Component {
     limit: PropTypes.number,
     onChange: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    fetchMore: PropTypes.func,
+    refetch: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {
@@ -30,13 +33,13 @@ class MembershipsWithData extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.onChange();
+  }
+
   onChange() {
     const { onChange } = this.props;
     onChange && this.node && onChange({ height: this.node.offsetHeight });
-  }
-
-  componentDidMount() {
-    this.onChange();
   }
 
   fetchMore(e) {

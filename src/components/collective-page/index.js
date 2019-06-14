@@ -1,12 +1,30 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 
+// OC Frontend imports
+import roles from '../../constants/roles';
+import { CollectiveType } from '../../constants/collectives';
 import theme from '../../constants/theme';
 import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
 
-import { AllSectionsNames, Dimensions } from './_constants';
+// Collective page imports
+import { AllSectionsNames, Sections, Dimensions } from './_constants';
 import Hero from './Hero';
+import SectionAbout from './SectionAbout';
+import SectionContribute from './SectionContribute';
+import SectionContributors from './SectionContributors';
+
+/** A mutation used by child components to update the collective */
+const EditCollectiveMutation = gql`
+  mutation EditCollective($id: Int!, $longDescription: String) {
+    editCollective(collective: { id: $id, longDescription: $longDescription }) {
+      id
+      longDescription
+    }
+  }
+`;
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -38,6 +56,34 @@ export default class CollectivePage extends Component {
       image: PropTypes.string,
     }),
 
+    /** Collective members */
+    members: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        role: PropTypes.oneOf(Object.values(roles)).isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+          slug: PropTypes.string.isRequired,
+          name: PropTypes.string,
+          image: PropTypes.string,
+        }).isRequired,
+      }),
+    ),
+
+    /** Collective tiers */
+    tiers: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        description: PropTypes.string,
+      }),
+    ),
+
+    /** Collective events */
+    events: PropTypes.arrayOf(PropTypes.object),
+
     /** The logged in user */
     LoggedInUser: PropTypes.object,
   };
@@ -45,7 +91,6 @@ export default class CollectivePage extends Component {
   constructor(props) {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
-    this.heroRef = React.createRef();
     this.state = {
       isFixed: false,
       selectedSection: AllSectionsNames[0],
@@ -63,7 +108,7 @@ export default class CollectivePage extends Component {
 
   onScroll = debounceScroll(() => {
     // Fixes the Hero when a certain scroll threshold is reached
-    if (window.scrollY >= theme.sizes.navbarHeight) {
+    if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
       if (!this.state.isFixed) {
         this.setState({ isFixed: true });
       }
@@ -73,11 +118,11 @@ export default class CollectivePage extends Component {
 
     // Update selected section
     const distanceThreshold = 200;
+    const currentViewBottom = window.scrollY + window.innerHeight;
     for (let i = AllSectionsNames.length - 1; i >= 0; i--) {
       const sectionName = AllSectionsNames[i];
       const sectionRef = this.sectionsRefs[sectionName];
-      const currentViewBottom = window.scrollY + window.innerHeight;
-      if (currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
+      if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
         if (this.state.selectedSection !== sectionName) {
           this.setState({ selectedSection: sectionName });
         }
@@ -89,19 +134,31 @@ export default class CollectivePage extends Component {
   onSectionClick = sectionName => {
     window.location.hash = `section-${sectionName}`;
     const sectionTop = this.sectionsRefs[sectionName].offsetTop;
-    if (this.state.isFixed) {
-      window.scrollTo(0, sectionTop);
-    } else {
-      // If not fixed, we have to acknowledge the fact that Hero is going to shrink, thus
-      // reducting the size of the navbar
-      const heroRect = this.heroRef.current.getBoundingClientRect();
-      window.scrollTo(0, sectionTop - heroRect.height + Dimensions.HERO_FIXED_HEIGHT);
-    }
+    window.scrollTo(0, sectionTop - Dimensions.HERO_FIXED_HEIGHT);
   };
 
   onCollectiveClick = () => {
     window.scrollTo(0, 0);
   };
+
+  renderSection(section, canEditCollective) {
+    const { collective, members, tiers, events } = this.props;
+
+    if (section === Sections.ABOUT) {
+      return <SectionAbout collective={collective} canEdit={canEditCollective} editMutation={EditCollectiveMutation} />;
+    } else if (section === Sections.CONTRIBUTORS) {
+      return <SectionContributors collectiveName={collective.name} members={members} />;
+    } else if (section === Sections.CONTRIBUTE) {
+      return <SectionContribute collective={collective} tiers={tiers} events={events} />;
+    }
+
+    // Placeholder for sections not implemented yet
+    return (
+      <Container display="flex" borderBottom="1px solid lightgrey" py={8} justifyContent="center" fontSize={36}>
+        [Section] {section}
+      </Container>
+    );
+  }
 
   render() {
     const { collective, host, LoggedInUser } = this.props;
@@ -109,8 +166,8 @@ export default class CollectivePage extends Component {
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
-      <Container position="relative" borderTop="1px solid #E6E8EB">
-        <Container ref={this.heroRef} height={isFixed ? Dimensions.HERO_FIXED_HEIGHT : 'auto'}>
+      <Container borderTop="1px solid #E6E8EB">
+        <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
           <Hero
             collective={collective}
             host={host}
@@ -122,21 +179,10 @@ export default class CollectivePage extends Component {
             onCollectiveClick={this.onCollectiveClick}
           />
         </Container>
-
-        {/* Placeholders for sections not implemented yet */}
         {AllSectionsNames.map(section => (
-          <Container
-            ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
-            key={section}
-            id={`section-${section}`}
-            display="flex"
-            borderBottom="1px solid lightgrey"
-            py={8}
-            justifyContent="center"
-            fontSize={36}
-          >
-            [Section] {section}
-          </Container>
+          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+            {this.renderSection(section, canEditCollective)}
+          </div>
         ))}
       </Container>
     );

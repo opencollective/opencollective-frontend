@@ -31,6 +31,8 @@ class Expense extends React.Component {
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
     unlockPayAction: PropTypes.func,
+    editExpense: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {

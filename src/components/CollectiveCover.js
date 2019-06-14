@@ -51,6 +51,7 @@ class CollectiveCover extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
     cta: PropTypes.object, // { href, label }
+    context: PropTypes.string,
   };
 
   constructor(props) {
@@ -127,7 +128,7 @@ ${description}`;
   }
 
   render() {
-    const { collective, className, LoggedInUser, intl } = this.props;
+    const { collective, context, className, LoggedInUser, intl } = this.props;
 
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
 
@@ -492,7 +493,7 @@ ${description}`;
               </div>
             )}
 
-          {collective.type === 'COLLECTIVE' && collective.isActive && collective.host && (
+          {collective.type === 'COLLECTIVE' && context !== 'createUpdate' && collective.isActive && collective.host && (
             <div className={`statsContainer ${showGoalsCover ? 'goals' : ''}`}>
               {className !== 'small' && collective.type === 'COLLECTIVE' && (
                 <div className="topContributors">

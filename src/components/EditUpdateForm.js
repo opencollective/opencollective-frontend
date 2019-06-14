@@ -1,14 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { pick, get } from 'lodash';
+import { Box } from '@rebass/grid';
 
-import InputField from './InputField';
-import Button from './Button';
+import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
+import StyledButton from './StyledButton';
+import Container from './Container';
+import StyledCheckbox from './StyledCheckbox';
 
 import storage from '../lib/storage';
 import withIntl from '../lib/withIntl';
+
+const UpdateFormWrapper = styled(Container)`
+  width: 100%;
+`;
+
+const ActionButtonWrapper = styled(Container)`
+  @media (max-width: 600px) {
+    justify-content: center;
+  }
+`;
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
@@ -27,6 +42,9 @@ class EditUpdateForm extends React.Component {
     update: PropTypes.object,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func,
+    onChange: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    mode: PropTypes.string,
   };
 
   constructor(props) {
@@ -40,7 +58,7 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html', 'markdown') : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'isPrivate') : {},
       loading: false,
     };
 
@@ -85,7 +103,7 @@ class EditUpdateForm extends React.Component {
   }
 
   render() {
-    const { intl, collective, LoggedInUser } = this.props;
+    const { collective, LoggedInUser } = this.props;
     const { update } = this.state;
     if (!this._isMounted) return <div />;
 
@@ -96,13 +114,9 @@ class EditUpdateForm extends React.Component {
         : 'html';
 
     return (
-      <div className={`EditUpdateForm ${this.props.mode}`}>
+      <UpdateFormWrapper className={`EditUpdateForm ${this.props.mode}`}>
         <style jsx>
           {`
-            .EditUpdateForm {
-              font-size: 1.2rem;
-              margin: 0 1rem 5rem 1rem;
-            }
             .col {
               float: left;
               display: flex;
@@ -135,31 +149,33 @@ class EditUpdateForm extends React.Component {
             }
           `}
         </style>
-        <style global jsx>
-          {`
-            .EditUpdateForm .inputField {
-              margin: 0;
-            }
-
-            .EditUpdateForm .inputField.title {
-              width: 50%;
-            }
-          `}
-        </style>
-
         <form onSubmit={this.onSubmit}>
           <div className="row">
             <div className="col large">
-              <InputField
-                name="title"
-                defaultValue={update.title}
-                label={intl.formatMessage(this.messages['title.label'])}
-                onChange={title => this.handleChange('title', title)}
-              />
+              <Container mb={2} fontWeight="500" fontSize="1.6rem" lineHeight="1.7">
+                <Box as="span">Title</Box>
+              </Container>
+              <StyledInputField htmlFor="title">
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    type="text"
+                    value={update.title}
+                    onChange={e => this.handleChange('title', e.target.value)}
+                    width="50%"
+                    placeHolder="Normal"
+                    data-cy="titleInput"
+                    required
+                  />
+                )}
+              </StyledInputField>
             </div>
           </div>
           <div className="row">
-            <div className="col large">
+            <Container className="col large" width={1}>
+              <Container fontWeight="500" mb={2} mt={3} fontSize="1.6rem" lineHeight="1.7">
+                <Box as="span">Message</Box>
+              </Container>
               {editor === 'markdown' && (
                 <MarkdownEditor
                   onChange={markdown => this.handleChange('markdown', markdown)}
@@ -169,21 +185,48 @@ class EditUpdateForm extends React.Component {
               {editor === 'html' && (
                 <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
               )}
-            </div>
+            </Container>
           </div>
 
-          <div className="row actions">
-            <Button className="bluewhite" type="submit" disabled={this.state.loading}>
-              {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-              {!this.state.loading && <FormattedMessage id="update.new.save" defaultMessage="Save Update" />}
-            </Button>
+          <div className="row">
+            <Container mt={4} mb={2} display="flex" alignItems="baseline">
+              <Box mr={2}>
+                <StyledCheckbox
+                  defaultChecked={update.isPrivate}
+                  name="private"
+                  size="16px"
+                  label="Private update"
+                  onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
+                />
+              </Box>
+            </Container>
           </div>
+          <div className="row">
+            <Container marginLeft="25px" fontSize="12px" color="#71757A">
+              <FormattedMessage
+                id="update.private.description"
+                defaultMessage="Only contributors will be able to see the content of this update"
+              />
+            </Container>
+          </div>
+          <ActionButtonWrapper className="row actions" mx={2} my={4}>
+            <StyledButton
+              className="bluewhite"
+              buttonSize="large"
+              buttonStyle="primary"
+              type="submit"
+              disabled={this.state.loading}
+            >
+              {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+              {!this.state.loading && <FormattedMessage id="update.new.post" defaultMessage="Post Update" />}
+            </StyledButton>
+          </ActionButtonWrapper>
 
           <div className="row">
             <div className="col large">{this.state.error && <div className="error">{this.state.error}</div>}</div>
           </div>
         </form>
-      </div>
+      </UpdateFormWrapper>
     );
   }
 }

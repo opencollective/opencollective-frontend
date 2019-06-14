@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const ErrorComponent = ({ message }) => {
   return (
@@ -14,6 +15,10 @@ const ErrorComponent = ({ message }) => {
       <h1>{message || 'unknown error'}</h1>
     </div>
   );
+};
+
+ErrorComponent.propTypes = {
+  message: PropTypes.string,
 };
 
 export default ErrorComponent;

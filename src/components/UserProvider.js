@@ -22,6 +22,7 @@ class UserProvider extends React.Component {
     token: PropTypes.string,
     client: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    children: PropTypes.node,
   };
 
   state = {

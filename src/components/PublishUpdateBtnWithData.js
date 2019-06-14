@@ -10,6 +10,8 @@ import { get } from 'lodash';
 class PublishUpdateBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
+    publishUpdate: PropTypes.func,
+    data: PropTypes.object,
   };
 
   constructor(props) {

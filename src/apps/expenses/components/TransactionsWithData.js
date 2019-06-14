@@ -15,6 +15,9 @@ class TransactionsWithData extends React.Component {
     filters: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     dateDisplayType: PropTypes.oneOf(['date', 'interval']),
+    data: PropTypes.object,
+    fetchMore: PropTypes.func.isRequired,
+    showCSVlink: PropTypes.bool,
   };
 
   constructor(props) {

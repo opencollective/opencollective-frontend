@@ -8,6 +8,8 @@ import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
 
 // Open Collective Frontend imports
+import roles from '../../constants/roles';
+import { CollectiveType } from '../../constants/collectives';
 import { getWebsiteUrl } from '../../lib/utils';
 import { P, H1, H3 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -17,12 +19,14 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 import Avatar from '../Avatar';
 import LinkCollective from '../LinkCollective';
-import HTMLEditor from '../HTMLEditor';
 import InlineEditField from '../InlineEditField';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
 import ShareButtons from './ShareButtons';
+import TierContributors from './TierContributors';
+import TierLongDescription from './TierLongDescription';
+import TierVideo from './TierVideo';
 import BubblesSVG from './Bubbles.svg';
 
 /** The blured background image displayed under the tier description */
@@ -52,27 +56,17 @@ const Bubbles = styled.div`
   }
 `;
 
-/** Long description container */
-const LongDescription = styled.div`
-  /** Override global styles to match what we have in the editor */
-  h1,
-  h2,
-  h3 {
-    margin: 0;
-  }
-
-  img {
-    max-width: 100%;
-  }
-`;
-
+/** A mutation with all the info that user is allowed to edit on this page */
 const EditTierMutation = gql`
-  mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String) {
-    editTier(tier: { id: $id, description: $description, name: $name, longDescription: $longDescription }) {
+  mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
+    editTier(
+      tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
+    ) {
       id
       name
       description
       longDescription
+      videoUrl
     }
   }
 `;
@@ -98,6 +92,31 @@ class TierPage extends Component {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       description: PropTypes.string,
+      longDescription: PropTypes.string,
+      videoUrl: PropTypes.string,
+    }).isRequired,
+
+    /** The members that contribute to this tier */
+    members: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        role: PropTypes.oneOf(Object.values(roles)).isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+          slug: PropTypes.string.isRequired,
+          name: PropTypes.string,
+          image: PropTypes.string,
+        }).isRequired,
+      }),
+    ),
+
+    /** Some statistics about this tier */
+    membersStats: PropTypes.shape({
+      all: PropTypes.number.isRequired,
+      collectives: PropTypes.number.isRequired,
+      organizations: PropTypes.number.isRequired,
+      users: PropTypes.number.isRequired,
     }).isRequired,
 
     /** The logged in user */
@@ -120,13 +139,14 @@ class TierPage extends Component {
   }
 
   render() {
-    const { collective, tier, LoggedInUser } = this.props;
-    const canEditTier = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const { collective, tier, members, membersStats, LoggedInUser } = this.props;
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
 
     return (
       <Container borderTop="1px solid #E6E8EB">
+        {/** ---- Hero / Banner ---- */}
         <Container
           display="flex"
           alignItems="center"
@@ -173,8 +193,8 @@ class TierPage extends Component {
             top={Dimensions.COVER_HEIGHT}
           />
         </Container>
+        {/** ---- Description ---- */}
         <Flex justifyContent="center">
-          {/** Description */}
           <Flex flex="0 1 1800px" px={[2, 4]} justifyContent="space-evenly" mb={64}>
             <Container
               display="flex"
@@ -185,20 +205,14 @@ class TierPage extends Component {
               mx={[0, null, 3]}
             >
               <Bubbles />
-              <Container
-                background="white"
-                borderRadius={8}
-                px={[3, 4]}
-                py={[4, 5]}
-                boxShadow="0px 10px 15px 3px rgba(0, 0, 0, 0.05)"
-              >
+              <Container background="white" borderRadius={8} px={[3, 4]} py={[4, 5]}>
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
                 <H1 textAlign="left" color="black.900" wordBreak="break-word" mb={4} data-cy="TierName">
                   <InlineEditField
                     mutation={EditTierMutation}
-                    canEdit={canEditTier}
+                    canEdit={canEdit}
                     values={tier}
                     field="name"
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
@@ -207,7 +221,7 @@ class TierPage extends Component {
                 <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line" data-cy="shortDescription">
                   <InlineEditField
                     mutation={EditTierMutation}
-                    canEdit={canEditTier}
+                    canEdit={canEdit}
                     values={tier}
                     field="description"
                     placeholder={
@@ -215,37 +229,27 @@ class TierPage extends Component {
                     }
                   />
                 </H3>
-                <InlineEditField
-                  mutation={EditTierMutation}
-                  values={tier}
-                  field="longDescription"
-                  canEdit={canEditTier}
-                  placeholder={
-                    <FormattedMessage id="TierPage.AddLongDescription" defaultMessage="Add a rich description" />
-                  }
-                >
-                  {({ isEditing, value, setValue }) =>
-                    !isEditing ? (
-                      <LongDescription
-                        dangerouslySetInnerHTML={{ __html: tier.longDescription }}
-                        data-cy="longDescription"
-                      />
-                    ) : (
-                      <HTMLEditor
-                        defaultValue={value}
-                        onChange={setValue}
-                        allowedHeaders={[false, 2, 3]} /** Disable H1 */
-                      />
-                    )
-                  }
-                </InlineEditField>
+                <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
+                  <div>
+                    <TierLongDescription tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                  </div>
+                  <Container
+                    position={['relative', null, null, 'absolute']}
+                    right={[null, null, null, -390, -490]}
+                    width={['100%', null, null, 380, 472]}
+                    mb={[4, 5]}
+                    top={0}
+                  >
+                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                  </Container>
+                </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>
                   {shareBlock}
                 </Container>
               </Container>
             </Container>
 
-            {/** Contribute */}
+            {/** ---- Contribute ---- */}
             <Container
               position={['fixed', null, null, 'relative']}
               bottom={0}
@@ -318,6 +322,7 @@ class TierPage extends Component {
                   </Box>
                 )}
               </Flex>
+              {/** Contribute button */}
               <Flex alignItems="center">
                 <Box width={1}>
                   <Link
@@ -335,10 +340,12 @@ class TierPage extends Component {
                   </Link>
                 </Box>
               </Flex>
+              {/** Share buttons (desktop only) */}
               <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
             </Container>
           </Flex>
         </Flex>
+        <TierContributors collectiveName={collective.name} members={members} membersStats={membersStats} />
       </Container>
     );
   }

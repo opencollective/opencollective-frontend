@@ -8,6 +8,8 @@ import { get } from 'lodash';
 class UpdateText extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired, // update.id
+    data: PropTypes.object,
+    mode: PropTypes.string,
   };
 
   constructor(props) {
@@ -41,6 +43,10 @@ const getUpdateQuery = gql`
     Update(id: $id) {
       id
       html
+      userCanSeeUpdate
+      collective {
+        name
+      }
     }
   }
 `;

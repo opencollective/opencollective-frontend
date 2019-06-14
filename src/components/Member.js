@@ -15,6 +15,8 @@ class Member extends React.Component {
     member: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
     viewMode: PropTypes.string,
+    intl: PropTypes.object.isRequired,
+    className: PropTypes.string,
   };
 
   constructor(props) {

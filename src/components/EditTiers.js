@@ -22,6 +22,7 @@ class EditTiers extends React.Component {
     defaultType: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object,
+    title: PropTypes.string,
   };
 
   constructor(props) {
@@ -287,11 +288,19 @@ class EditTiers extends React.Component {
       get(collective, 'location.country') || get(collective, 'parentCollective.location.country');
     const vatOriginCountry = getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
     const vatPercentage = getStandardVatRate(tier.type, vatOriginCountry);
+    if (!tier.amountType) {
+      tier.amountType = tier.presets ? 'FLEXIBLE' : 'FIXED';
+    }
+
+    // Set the default value of preset
+    if (tier.amountType === 'FLEXIBLE' && !tier.presets) {
+      tier.presets = [1000];
+    }
 
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
-      amountType: tier.amountType || (tier.presets ? 'FLEXIBLE' : 'FIXED'),
+      amountType: tier.amountType,
     };
 
     return (

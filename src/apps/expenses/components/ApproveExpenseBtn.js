@@ -50,4 +50,8 @@ const addMutation = graphql(approveExpenseQuery, {
   }),
 });
 
+ApproveExpenseBtn.propTypes = {
+  approveExpense: PropTypes.bool,
+};
+
 export default addMutation(withIntl(ApproveExpenseBtn));

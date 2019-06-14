@@ -1,37 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
 
 import Container from './Container';
 
-const ModalWrapper = styled(Container)`
+const ModalWrapper = styled(Container).attrs(props => ({
+  maxWidth: props.maxWidth || '95%',
+  maxHeight: props.maxHeight || '100%',
+}))`
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  max-width: 95%;
-  max-height: 100%;
-  z-index: 100;
+  z-index: 3000;
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
   padding: 20px;
-  ${props =>
-    `
-      width: ${props.width};
-      height: ${props.height};
-    `}
+`;
+
+const GlobalModalStyle = createGlobalStyle`
+  body {
+    overflow: hidden;
+  }
 `;
 
 const ModalOverlay = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  z-index: 90;
+  z-index: 2500;
   display: block;
 `;
 
@@ -40,17 +42,13 @@ const Header = styled(Container)`
   color: #090a0a;
   font-weight: 600;
   display: flex;
+  text-shadow: none;
   justify-content: space-between;
 `;
 
 const Body = styled(Container)`
   margin-top: 10px;
   margin-bottom: 30px;
-  ${props =>
-    `
-      width: ${props.width};
-      height: ${props.height};
-    `}
 `;
 
 const Divider = styled.div`
@@ -75,6 +73,13 @@ export const ModalHeader = ({ children, onClose }) => (
   </Header>
 );
 
+ModalHeader.propTypes = {
+  /** handles how the modal is closed */
+  onClose: PropTypes.func.isRequired,
+  /** children */
+  children: PropTypes.node,
+};
+
 ModalHeader.displayName = 'Header';
 
 export const ModalBody = ({ children, width, height }) => (
@@ -83,6 +88,15 @@ export const ModalBody = ({ children, width, height }) => (
   </Body>
 );
 
+ModalBody.propTypes = {
+  /** width of the modal component */
+  width: PropTypes.string,
+  /** height of the modal component */
+  height: PropTypes.string,
+  /** children */
+  children: PropTypes.node,
+};
+
 export const ModalFooter = ({ children }) => (
   <Container>
     <Divider />
@@ -90,14 +104,20 @@ export const ModalFooter = ({ children }) => (
   </Container>
 );
 
+ModalFooter.propTypes = {
+  children: PropTypes.node,
+};
+
 /**
- * Modal component
+ * Modal component. Will pass down additional props to `ModalWrapper`, which is
+ * a styled `Container`.
  */
-const Modal = ({ children, show, width, height, onClose }) => {
+const StyledModal = ({ children, show, onClose, ...props }) => {
   if (show) {
     return (
       <React.Fragment>
-        <ModalWrapper width={width} height={height}>
+        <GlobalModalStyle />
+        <ModalWrapper {...props}>
           {React.Children.map(children, child => {
             if (child.type.displayName === 'Header') {
               return React.cloneElement(child, { onClose });
@@ -113,16 +133,26 @@ const Modal = ({ children, show, width, height, onClose }) => {
   }
 };
 
-Modal.propTypes = {
+StyledModal.propTypes = {
   /** a boolean to determin when to show modal */
   show: PropTypes.bool.isRequired,
   /** width of the modal component */
-  width: PropTypes.string,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
-  height: PropTypes.string,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** width of the modal component */
+  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** height of the modal component */
+  maxWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** width of the modal component */
+  minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** height of the modal component */
+  minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
+  /** children */
+  children: PropTypes.node,
 };
 
 /** @component */
-export default Modal;
+export default StyledModal;
