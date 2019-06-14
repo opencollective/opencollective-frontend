@@ -258,7 +258,7 @@ class TierCard extends React.Component {
           `}
         </style>
         <div className="name">
-          {!tier.longDescription ? (
+          {!tier.hasLongDescription ? (
             tier.name
           ) : (
             <Link
@@ -308,7 +308,7 @@ class TierCard extends React.Component {
               />
             </p>
           )}
-          {tier.longDescription && (
+          {tier.hasLongDescription && (
             <Link
               route="tier"
               params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' }}
