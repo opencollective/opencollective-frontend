@@ -31,8 +31,12 @@ class ExportImages extends React.Component {
         images: [
           {
             name: 'badge',
-            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${tier.name}&color=brightgreen`,
-            code: `<img src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${tier.name}&color=brightgreen" />`,
+            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${
+              tier.name
+            }&color=brightgreen`,
+            code: `<img src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${
+              tier.name
+            }&color=brightgreen" />`,
             options: [
               {
                 name: 'label',
@@ -50,7 +54,9 @@ class ExportImages extends React.Component {
           {
             name: 'members',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
-            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
+            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${
+              tier.slug
+            }.svg?avatarHeight=36&width=600"></object>`,
             options: [
               {
                 name: 'width',
