@@ -287,7 +287,41 @@ class Collective extends React.Component {
                 </div>
               </div>
 
-              {get(collective, 'stats.collectives.memberOf') > 0 && (
+              {get(collective, 'settings.isHostCollective') && (
+                <section id="members" className="clear">
+                  <div className="content">
+                    <SectionTitle
+                      title={
+                        <FormattedMessage
+                          id="hostCollective.host.collectives.title"
+                          defaultMessage={'Hosted by the organization'}
+                        />
+                      }
+                      subtitle={
+                        <FormattedMessage
+                          id="hostCollective.host.collectives.subtitle"
+                          values={{ n: collective.stats.collectives.memberOf }}
+                          defaultMessage={
+                            '{n, plural, one {this collective is} other {{n} collectives are}} hosted by the linked organization'
+                          }
+                        />
+                      }
+                    />
+
+                    <div className="cardsList">
+                      <CollectivesWithData
+                        HostCollectiveId={collective.host.id}
+                        orderBy="balance"
+                        type="COLLECTIVE"
+                        orderDirection="DESC"
+                        limit={20}
+                      />
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {!get(collective, 'settings.isHostCollective') && get(collective, 'stats.collectives.memberOf') > 0 && (
                 <section id="members" className="clear">
                   <div className="content">
                     <SectionTitle
