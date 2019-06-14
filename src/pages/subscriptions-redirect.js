@@ -10,46 +10,49 @@ import Link from '../components/Link';
 import colors from '../constants/colors';
 
 import withIntl from '../lib/withIntl';
-import withData from '../lib/withData';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class SubscriptionsRedirectPage extends React.Component {
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
+  async componentDidMount() {
+    this.checkLoggedInUser();
   }
 
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
+  async componentDidUpdate() {
+    this.checkLoggedInUser();
+  }
 
-    if (!LoggedInUser) {
-      Router.push('/signin', '/signin?next=/subscriptions');
-    } else {
-      setTimeout(
-        () =>
-          Router.push(
-            `/subscriptions?collectiveSlug=${LoggedInUser.collective.slug}`,
-            `/${LoggedInUser.collective.slug}/subscriptions`,
-          ),
-        4000,
-      );
+  checkLoggedInUser() {
+    const { LoggedInUser, loadingLoggedInUser } = this.props;
+
+    if (!loadingLoggedInUser) {
+      if (!LoggedInUser) {
+        Router.push('/signin', '/signin?next=/subscriptions');
+      } else {
+        setTimeout(
+          () =>
+            Router.push(
+              `/subscriptions?collectiveSlug=${LoggedInUser.collective.slug}`,
+              `/${LoggedInUser.collective.slug}/subscriptions`,
+            ),
+          4000,
+        );
+      }
     }
   }
 
   render() {
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
     return (
       <div className="SubscriptionsPage">
         <Header
           title={'Subscriptions'}
           description="All the collectives that you are giving money to"
-          LoggedInUser={this.state.LoggedInUser}
+          LoggedInUser={LoggedInUser}
         />
         <style jsx>
           {`
@@ -101,7 +104,7 @@ class SubscriptionsRedirectPage extends React.Component {
             <div className="content">
               <div className="Subscriptions-header">
                 <div className="Subscriptions-title">
-                  {this.state.LoggedInUser && (
+                  {LoggedInUser && (
                     <div>
                       This page has moved. Your subscriptions are now at
                       <Link
@@ -130,4 +133,4 @@ class SubscriptionsRedirectPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(SubscriptionsRedirectPage)));
+export default withIntl(withUser(SubscriptionsRedirectPage));

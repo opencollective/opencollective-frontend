@@ -6,9 +6,8 @@ import ErrorPage from '../components/ErrorPage';
 
 import { addCollectiveData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class CreateEventPage extends React.Component {
   static getInitialProps({ query: { parentCollectiveSlug } }) {
@@ -20,29 +19,23 @@ class CreateEventPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveData
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
-    this.state = { loading: true };
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser, loading: false });
   }
 
   render() {
-    const { data } = this.props;
+    const { data, LoggedInUser, loadingLoggedInUser } = this.props;
 
-    if (this.state.loading || !data.Collective) {
-      return <ErrorPage loading={this.state.loading} data={data} />;
+    if (loadingLoggedInUser || !data.Collective) {
+      return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
-    return <CreateEvent parentCollective={data.Collective} LoggedInUser={this.state.LoggedInUser} />;
+    return <CreateEvent parentCollective={data.Collective} LoggedInUser={LoggedInUser} />;
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveData(CreateEventPage))));
+export default withIntl(withUser(addCollectiveData(CreateEventPage)));

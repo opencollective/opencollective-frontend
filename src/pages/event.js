@@ -6,9 +6,8 @@ import Event from '../components/Event';
 
 import { addEventCollectiveData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class EventPage extends React.Component {
   static getInitialProps({ req, res, query }) {
@@ -27,31 +26,46 @@ class EventPage extends React.Component {
     parentCollectiveSlug: PropTypes.string, // not used atm
     eventSlug: PropTypes.string, // for addEventCollectiveData
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      alreadyRefetch: false,
+    };
   }
 
   async componentDidMount() {
-    const { getLoggedInUser, data } = this.props;
+    this.checkForRefetch();
+  }
+
+  async componentDidUpdate() {
+    this.checkForRefetch();
+  }
+
+  checkForRefetch() {
+    const { alreadyRefetch } = this.state;
+    if (alreadyRefetch) return;
+
+    const { loadingLoggedInUser, LoggedInUser, data } = this.props;
     const event = data.Collective;
 
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-
-    if (LoggedInUser && LoggedInUser.canEditEvent(event)) {
+    if (!loadingLoggedInUser && LoggedInUser && LoggedInUser.canEditEvent(event)) {
       // We refetch the data to get the email addresses of the participants
       // We need to bypass the cache otherwise it won't update the list of participants with the email addresses
       data.refetch({ options: { fetchPolicy: 'network-only' } });
+
+      this.setState({
+        alreadyRefetch: true,
+      });
     }
   }
 
   render() {
     const { data } = this.props;
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -65,4 +79,4 @@ class EventPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addEventCollectiveData(EventPage))));
+export default withIntl(withUser(addEventCollectiveData(EventPage)));

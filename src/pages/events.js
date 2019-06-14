@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import EventsWithData from '../components/EventsWithData';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class EventsPage extends React.Component {
@@ -21,4 +20,4 @@ class EventsPage extends React.Component {
   }
 }
 
-export default withData(withIntl(EventsPage));
+export default withIntl(EventsPage);

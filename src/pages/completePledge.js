@@ -5,8 +5,6 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import { Router } from '../server/pages';
-import withData from '../lib/withData';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -16,6 +14,7 @@ import OrderForm from '../components/OrderForm';
 import SignInForm from '../components/SignInForm';
 import { H1, P } from '../components/Text';
 import Container from '../components/Container';
+import { withUser } from '../components/UserProvider';
 
 class CompletePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
@@ -25,25 +24,15 @@ class CompletePledgePage extends React.Component {
   }
 
   static propTypes = {
-    getLoggedInUser: PropTypes.func,
+    LoggedInUser: PropTypes.object,
     completePledge: PropTypes.func,
     data: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   state = {
     error: null,
-    loadingUserLogin: true,
-    LoggedInUser: null,
   };
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
-    this.setState({
-      LoggedInUser,
-      loadingUserLogin: false,
-    });
-  }
 
   async submitForm(order) {
     const { completePledge, data } = this.props;
@@ -66,8 +55,8 @@ class CompletePledgePage extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
-    const { error, LoggedInUser, loadingUserLogin } = this.state;
+    const { data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { error } = this.state;
 
     const { loading, Order } = data;
 
@@ -76,7 +65,7 @@ class CompletePledgePage extends React.Component {
         data.error = data.error || error;
       }
 
-      return <ErrorPage loading={loading || loadingUserLogin} data={data} message={error && error.message} />;
+      return <ErrorPage loading={loading || loadingLoggedInUser} data={data} message={error && error.message} />;
     }
 
     if (Order) {
@@ -97,12 +86,12 @@ class CompletePledgePage extends React.Component {
 
     return (
       <Fragment>
-        <Header className={loadingUserLogin ? 'loading' : ''} LoggedInUser={LoggedInUser} title="Complete Pledge" />
+        <Header className={loadingLoggedInUser ? 'loading' : ''} LoggedInUser={LoggedInUser} title="Complete Pledge" />
         <Body>
           <Container maxWidth={1200} px={4} py={5}>
             <H1>Complete Your Pledge</H1>
 
-            {!loadingUserLogin && !LoggedInUser && (
+            {!loadingLoggedInUser && !LoggedInUser && (
               <Fragment>
                 <p>You must be signed in to complete your pledge</p>
                 <SignInForm />
@@ -196,4 +185,4 @@ const addGraphQL = compose(
 );
 
 export { CompletePledgePage as MockCompletePledgePage };
-export default withData(withLoggedInUser(addGraphQL(CompletePledgePage)));
+export default withUser(addGraphQL(CompletePledgePage));

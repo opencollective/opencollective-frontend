@@ -10,9 +10,8 @@ import UpdatesWithData from '../components/UpdatesWithData';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class UpdatesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -23,23 +22,11 @@ class UpdatesPage extends React.Component {
     slug: PropTypes.string, // for addCollectiveCoverData
     action: PropTypes.string, // not clear whre it's coming from, not in the route
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { data, action } = this.props;
-    const { LoggedInUser } = this.state;
+    const { data, action, LoggedInUser } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -72,7 +59,7 @@ class UpdatesPage extends React.Component {
               collective={collective}
               includeHostedCollectives={collective.isHost}
               defaultAction={action}
-              LoggedInUser={this.state.LoggedInUser}
+              LoggedInUser={LoggedInUser}
             />
           </div>
         </Body>
@@ -83,4 +70,4 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatesPage))));
+export default withIntl(withUser(addCollectiveCoverData(UpdatesPage)));

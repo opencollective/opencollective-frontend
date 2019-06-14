@@ -13,9 +13,8 @@ import SectionTitle from '../components/SectionTitle';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -27,23 +26,11 @@ class OrdersPage extends React.Component {
     filter: PropTypes.string,
     value: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { data } = this.props;
-    const { LoggedInUser } = this.state;
+    const { data, LoggedInUser } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -129,7 +116,7 @@ class OrdersPage extends React.Component {
 
             <div className=" columns">
               <div className="col large">
-                <OrdersWithData collective={collective} LoggedInUser={this.state.LoggedInUser} filter={filter} />
+                <OrdersWithData collective={collective} LoggedInUser={LoggedInUser} filter={filter} />
               </div>
             </div>
           </div>
@@ -141,4 +128,4 @@ class OrdersPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(OrdersPage))));
+export default withIntl(withUser(addCollectiveCoverData(OrdersPage)));

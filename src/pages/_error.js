@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import withData from '../lib/withData';
-import withLoggedInUser from '../lib/withLoggedInUser';
 import withIntl from '../lib/withIntl';
 import ErrorPage from '../components/ErrorPage';
+import { withUser } from '../components/UserProvider';
 
 /**
  * This page is shown when NextJS triggers a critical error during server-side
@@ -15,7 +14,7 @@ class Error extends React.Component {
     statusCode: PropTypes.number.isRequired,
     url: PropTypes.string,
     err: PropTypes.object,
-    getLoggedInUser: PropTypes.func,
+    LoggedInUser: PropTypes.object,
   };
 
   static getInitialProps({ res, err, req }) {
@@ -23,20 +22,9 @@ class Error extends React.Component {
     return { statusCode, err, url: req && req.originalUrl };
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   render() {
     const { statusCode, url } = this.props;
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
 
     if (statusCode === 404 && url) {
       const slugRegex = /^\/([^/?]+)/;
@@ -52,4 +40,4 @@ class Error extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(Error)));
+export default withIntl(withUser(Error));
