@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Jun 07 2019 12:22:19 GMT+0200 (GMT+02:00)
+# timestamp: Thu Jun 13 2019 17:47:32 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -181,7 +181,20 @@ type Collective implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -767,7 +780,20 @@ type Event implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -1858,7 +1884,20 @@ type Organization implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -2335,6 +2374,11 @@ type Tier {
   longDescription: String
 
   """
+  Returns true if the tier has a long description
+  """
+  hasLongDescription: Boolean
+
+  """
   Link to a video (YouTube, Vimeo).
   """
   videoUrl: String
@@ -2732,7 +2776,20 @@ type User implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int

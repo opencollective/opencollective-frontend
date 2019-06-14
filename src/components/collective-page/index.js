@@ -13,6 +13,7 @@ import Container from '../Container';
 import { AllSectionsNames, Sections, Dimensions } from './_constants';
 import Hero from './Hero';
 import SectionAbout from './SectionAbout';
+import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
 
 /** A mutation used by child components to update the collective */
@@ -69,6 +70,19 @@ export default class CollectivePage extends Component {
         }).isRequired,
       }),
     ),
+
+    /** Collective tiers */
+    tiers: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        description: PropTypes.string,
+      }),
+    ),
+
+    /** Collective events */
+    events: PropTypes.arrayOf(PropTypes.object),
 
     /** The logged in user */
     LoggedInUser: PropTypes.object,
@@ -128,16 +142,14 @@ export default class CollectivePage extends Component {
   };
 
   renderSection(section, canEditCollective) {
+    const { collective, members, tiers, events } = this.props;
+
     if (section === Sections.ABOUT) {
-      return (
-        <SectionAbout
-          collective={this.props.collective}
-          canEdit={canEditCollective}
-          editMutation={EditCollectiveMutation}
-        />
-      );
+      return <SectionAbout collective={collective} canEdit={canEditCollective} editMutation={EditCollectiveMutation} />;
     } else if (section === Sections.CONTRIBUTORS) {
-      return <SectionContributors collectiveName={this.props.collective.name} members={this.props.members} />;
+      return <SectionContributors collectiveName={collective.name} members={members} />;
+    } else if (section === Sections.CONTRIBUTE) {
+      return <SectionContribute collective={collective} tiers={tiers} events={events} />;
     }
 
     // Placeholder for sections not implemented yet

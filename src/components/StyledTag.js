@@ -1,8 +1,18 @@
 import tag from 'clean-tag';
 import styled from 'styled-components';
-import { background, backgroundColor, borderRadius, color, space } from 'styled-system';
+import {
+  background,
+  backgroundColor,
+  borderRadius,
+  color,
+  space,
+  border,
+  fontSize,
+  fontWeight,
+  lineHeight,
+} from 'styled-system';
 
-/** A loading spinner using SVG + css animation. */
+/** Simple tag to display a short string */
 const StyledTag = styled(tag.span)`
   border-radius: 4px;
   padding: 8px 6px;
@@ -18,6 +28,10 @@ const StyledTag = styled(tag.span)`
   ${borderRadius}
   ${color}
   ${space}
+  ${border}
+  ${fontSize}
+  ${fontWeight}
+  ${lineHeight}
 `;
 
 /** @component */
