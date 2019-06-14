@@ -609,7 +609,7 @@
   "login.failed": "Registro fallido: {message}.",
   "Member.Role.ADMIN": "Core contributor",
   "Member.Role.ATTENDEE": "Attendee",
-  "Member.Role.BACKER": "Backer",
+  "Member.Role.BACKER": "Financial contributor",
   "Member.Role.CONTRIBUTOR": "Contributor",
   "Member.Role.FOLLOWER": "Follower",
   "Member.Role.FUNDRAISER": "Fundraiser",

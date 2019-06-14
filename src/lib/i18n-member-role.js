@@ -20,7 +20,7 @@ const RolesTranslations = defineMessages({
   },
   [roles.BACKER]: {
     id: 'Member.Role.BACKER',
-    defaultMessage: 'Backer',
+    defaultMessage: 'Financial contributor',
   },
   [roles.FUNDRAISER]: {
     id: 'Member.Role.FUNDRAISER',
