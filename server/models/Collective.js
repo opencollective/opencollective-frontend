@@ -149,6 +149,11 @@ export default function(Sequelize, DataTypes) {
             args: [collectiveSlugBlacklist],
             msg: 'The slug given for this collective is a reserved keyword',
           },
+          isValid(value) {
+            if (!/^[\w-]+$/.test(value)) {
+              throw new Error('Slug may only contain alphanumeric characters or hyphens.');
+            }
+          },
         },
       },
 
@@ -2054,7 +2059,9 @@ export default function(Sequelize, DataTypes) {
         if (!stripeAccount || !stripeAccount.token) {
           return Promise.reject(
             new Error(
-              `The host for the ${this.name} collective has no Stripe account set up (HostCollectiveId: ${HostCollectiveId})`,
+              `The host for the ${
+                this.name
+              } collective has no Stripe account set up (HostCollectiveId: ${HostCollectiveId})`,
             ),
           );
         } else if (process.env.NODE_ENV !== 'production' && includes(stripeAccount.token, 'live')) {
