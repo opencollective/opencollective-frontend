@@ -7,11 +7,15 @@ import withIntl from '../lib/withIntl';
 import { defineMessages } from 'react-intl';
 import Link from './Link';
 import Container from './Container';
-import { H1 } from './Text';
+import { H2 } from './Text';
 
 const LinkAction = styled(Link)`
   text-align: center;
   color: #090a0a;
+`;
+
+const Title = styled(H2)`
+  font-size: 4rem !important;
 `;
 
 const Subtitle = styled(Container)`
@@ -150,7 +154,7 @@ class SectionTitle extends React.Component {
 
         <Container className="content">
           <Box mt={2} mb={3}>
-            <H1>{title}</H1>
+            <Title>{title}</Title>
           </Box>
           {action && (
             <LinkAction route={action.href} className="action" scroll={false}>
