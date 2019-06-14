@@ -194,7 +194,7 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.collective.id,
       data: {
         host: get(host, 'minimal'),
-        collective: this.collective.minimal,
+        collective: { ...this.collective.minimal, isActive: this.collective.isActive },
         user: user.minimal,
         fromCollective: userCollective.minimal,
         expense: this.info,

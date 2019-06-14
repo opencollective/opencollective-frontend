@@ -326,7 +326,8 @@ async function notifyByEmail(activity) {
         activity.data.expense.payoutMethod = `PayPal (${activity.data.user.paypalEmail})`;
       }
       notifyUserId(activity.data.expense.UserId, activity);
-      if (get(activity, 'data.host.id')) {
+      // We only notify the admins of the host if the collective is active (ie. has been approved by the host)
+      if (get(activity, 'data.host.id') && get(activity, 'data.collective.isActive')) {
         notifyAdminsOfCollective(activity.data.host.id, activity, {
           template: 'collective.expense.approved.for.host',
           collective: activity.data.host,

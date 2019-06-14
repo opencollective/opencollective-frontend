@@ -549,14 +549,14 @@ describe('w9.bot.test.js', () => {
       expect(result.data.approveExpense.status).to.be.equal('APPROVED');
 
       // Approved expense triggers one email as well
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
 
       // When the expense is paid
       const parameters = { id: expense2.id };
       await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Pay expense triggers one email as well
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
 
       // Refetching host data again after expense is approved
       const hostAfterPaidExpense = await models.Collective.findByPk(collective.HostCollectiveId);
@@ -633,14 +633,14 @@ describe('w9.bot.test.js', () => {
       expect(result.data.approveExpense.status).to.be.equal('APPROVED');
 
       // Approved expense triggers one email as well
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
 
       // When the expense is paid
       let parameters = { id: expense2.id };
       await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
 
       // Pay expense triggers one email as well
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 3);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
 
       // Refetching host data again after expense is approved
       const hostAfterPaidExpense = await models.Collective.findByPk(collective.HostCollectiveId);
