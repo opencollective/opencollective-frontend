@@ -671,6 +671,9 @@ export const UpdateType = new GraphQLObjectType({
         description: 'Indicates whether or not the user is allowed to see the content of this update',
         type: GraphQLBoolean,
         resolve(update, _, req) {
+          if (!update.isPrivate) {
+            return true;
+          }
           return req.remoteUser && req.remoteUser.canSeeUpdates(update.CollectiveId);
         },
       },
