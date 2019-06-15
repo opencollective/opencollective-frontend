@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { borders } from 'styled-system';
 import ReactTooltip from 'react-tooltip';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -27,6 +28,9 @@ const UpdateWrapper = styled(Flex)`
   min-height: 100px;
   border: 1px solid #e6e8eb;
   padding: 20px;
+
+  ${borders}
+
   @media (max-width: 600px) {
     max-width: 100%;
   }
@@ -268,12 +272,12 @@ class StyledUpdate extends Component {
   }
 
   render() {
-    const { update, intl, collective } = this.props;
+    const { update, intl, collective, ...props } = this.props;
     const { mode } = this.state;
 
     return (
       <React.Fragment>
-        <UpdateWrapper>
+        <UpdateWrapper {...props}>
           <AvatarContainer>
             <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
               <Avatar
