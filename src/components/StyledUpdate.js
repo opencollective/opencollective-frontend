@@ -218,7 +218,7 @@ class StyledUpdate extends Component {
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
-          <Container mb={2} fontsize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
+          <Container mb={2} fontSize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
         )}
         {this.renderUpdateMeta(update)}
         {!update.userCanSeeUpdate && (

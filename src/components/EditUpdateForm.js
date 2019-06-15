@@ -203,7 +203,7 @@ class EditUpdateForm extends React.Component {
             </Container>
           </div>
           <div className="row">
-            <Container marginLeft="25px" fontSize="12px" color="#71757A">
+            <Container ml="25px" fontSize="12px" color="#71757A">
               <FormattedMessage
                 id="update.private.description"
                 defaultMessage="Only contributors will be able to see the content of this update"
