@@ -44,9 +44,6 @@ class Updates extends React.Component {
       <div className="Updates">
         <style jsx>
           {`
-            .Updates {
-              min-width: 40rem;
-            }
             :global(.loadMoreBtn) {
               margin: 1rem;
               text-align: center;

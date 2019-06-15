@@ -137,7 +137,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
 
     return (
-      <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta">
+      <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta" flexWrap="wrap">
         {update.isPrivate && (
           <Box mr={2}>
             <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
@@ -264,7 +264,7 @@ class StyledUpdate extends Component {
   renderEditUpdateForm() {
     const { collective, update } = this.props;
     return (
-      <Container display="flex" flexDirection="column">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="55em" flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>
