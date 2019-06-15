@@ -189,10 +189,10 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         defaults: order.collective,
       }))[0];
     } else if (order.collective.githubHandle) {
-      collective = (await models.Collective.findOrCreate({
-        where: { githubHandle: order.collective.githubHandle },
-        defaults: { ...order.collective, isPledged: true },
-      }))[0];
+      collective = await models.Collective.findOne({ where: { githubHandle: order.collective.githubHandle } });
+      if (!collective) {
+        collective = await models.Collective.create({ ...order.collective, isPledged: true });
+      }
     }
 
     if (!collective) {
