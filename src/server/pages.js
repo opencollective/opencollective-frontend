@@ -11,6 +11,7 @@ pages
   .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
   .add('confirmEmail', '/confirm/email/:token')
+  .add('unsubscribeEmail', '/email/unsubscribe')
   .add('create-account', '/:form(create-account)', 'signin')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
