@@ -300,10 +300,7 @@ class Collective extends React.Component {
                       subtitle={
                         <FormattedMessage
                           id="hostCollective.host.collectives.subtitle"
-                          values={{ n: collective.stats.collectives.memberOf }}
-                          defaultMessage={
-                            '{n, plural, one {this collective is} other {{n} collectives are}} hosted by the linked organization'
-                          }
+                          defaultMessage={'Collectives hosted by the linked organization'}
                         />
                       }
                     />
