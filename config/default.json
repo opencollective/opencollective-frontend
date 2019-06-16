@@ -113,6 +113,13 @@
     "key": "RO7aWNLJx6CzhRix",
     "secret": "FanG4FjeV3aGHjpS2A1YckyWuhvxfKHoZN5Q5bHO",
     "workflowId": "qdUbX5nw8sMZzykz",
-    "callbackPath": "/helloworks/callback"
+    "callbackPath": "/helloworks/callback",
+    "aws": {
+      "s3": {
+        "bucket": "opencollective-helloworks-documents",
+        "region": "us-west-1",
+        "apiVersion": "2006-03-01"
+      }
+    }
   }
 }
