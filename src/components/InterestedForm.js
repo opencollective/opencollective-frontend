@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SignInUp from './SignInUp';
+import SignInOrJoinFree from './SignInOrJoinFree';
 import { FormattedMessage } from 'react-intl';
 
 class InterestedForm extends React.Component {
@@ -42,11 +42,10 @@ class InterestedForm extends React.Component {
           `}
         </style>
         <div className="InterestedForm">
-          <SignInUp
-            label={<FormattedMessage id="InterestedForm.RemindMe" defaultMessage="remind me" />}
-            emailOnly={true}
-            showLabels={false}
-            onSubmit={this.handleSubmit}
+          <SignInOrJoinFree redirect={Router.asPath} />
+          emailOnly={true}
+          showLabels={false}
+          onSubmit={this.handleSubmit}
           />
         </div>
       </div>

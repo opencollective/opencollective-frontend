@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 
 import CreateHostForm from '../components/CreateHostForm';
 import Loading from '../components/Loading';
-import SignInForm from '../components/SignInForm';
+import { Router } from '../server/pages';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -48,7 +49,7 @@ class CreateHostPage extends React.Component {
                 defaultMessage="You need to be logged in to continue."
               />
             </p>
-            <SignInForm next={`/${this.props.slug}/edit`} />
+            <SignInOrJoinFree redirect={Router.asPath} />
           </div>
         )}
       </div>

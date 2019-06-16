@@ -13,7 +13,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 import OrderForm from '../components/OrderForm';
-import SignInForm from '../components/SignInForm';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { H1, P } from '../components/Text';
 import Container from '../components/Container';
 
@@ -104,8 +104,7 @@ class CompletePledgePage extends React.Component {
 
             {!loadingUserLogin && !LoggedInUser && (
               <Fragment>
-                <p>You must be signed in to complete your pledge</p>
-                <SignInForm />
+                <SignInOrJoinFree redirect={Router.asPath} />
               </Fragment>
             )}
 

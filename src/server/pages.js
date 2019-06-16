@@ -42,7 +42,7 @@ pages
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
-  .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
+  .add('createExpenseForm', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
   .add('expense', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)')
   .add(
     'expenses',

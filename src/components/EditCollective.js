@@ -5,7 +5,7 @@ import { defineMessages } from 'react-intl';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
-import SignInForm from './SignInForm';
+import SignInOrJoinFree from './SignInOrJoinFree';
 import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveCover from './CollectiveCover';
 import NotificationBar from './NotificationBar';
@@ -200,7 +200,7 @@ class EditCollective extends React.Component {
                   <br />
                   or as a core contributor of the {collective.name} collective.
                 </p>
-                <SignInForm next={`/${collective.slug}/edit`} />
+                <SignInOrJoinFree redirect={Router.asPath} />
               </div>
             )}
             {canEditCollective && !loggedInEditDataLoaded && <Loading />}

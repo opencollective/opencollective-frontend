@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 import Markdown from 'react-markdown';
+import { Router } from '../../../server/pages';
 
 import withIntl from '../../../lib/withIntl';
 import { getCurrencySymbol } from '../../../lib/utils';
 import { Link } from '../../../server/pages';
 
 import InputField from '../../../components/InputField';
-import SignInForm from '../../../components/SignInForm';
+import SignInOrJoinFree from '../../../components/SignInOrJoinFree';
 import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
 import { P } from '../../../components/Text';
@@ -509,10 +510,7 @@ class CreateExpenseForm extends React.Component {
     if (!LoggedInUser) {
       return (
         <div className="CreateExpenseForm">
-          <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
-            <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
-          </P>
-          <SignInForm next={`/${collective.slug}/expenses/new`} />
+          <SignInOrJoinFree redirect={Router.asPath} />
         </div>
       );
     } else {
