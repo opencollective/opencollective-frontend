@@ -31,7 +31,7 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, dis
       id={id}
     >
       {items.map(({ value, key }, index) => (
-        <Container as="label" htmlFor={id && key + id} key={key} width={1} m={0}>
+        <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0}>
           {children({
             checked: selected && key === selected,
             index,

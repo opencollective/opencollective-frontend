@@ -46,10 +46,6 @@ export const clear = style({
   prop: 'clear',
 });
 
-export const borderStyle = style({
-  prop: 'borderStyle',
-});
-
 export const listStyle = style({
   prop: 'listStyle',
 });

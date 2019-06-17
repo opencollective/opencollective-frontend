@@ -1,19 +1,6 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {
-  border,
-  borderColor,
-  borderRadius,
-  color,
-  display,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  maxWidth,
-  space,
-  textAlign,
-  width,
-} from 'styled-system';
+import { border, color, layout, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
@@ -26,19 +13,12 @@ import { buttonSize, buttonStyle } from '../constants/theme';
  */
 const StyledLink = styled(tag.a)`
   ${border}
-  ${borderColor}
-  ${borderRadius}
   ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontWeight}
-  ${maxWidth}
+  ${layout}
   ${space}
-  ${textAlign}
+  ${typography}
   ${textDecoration}
   ${whiteSpace}
-  ${width}
 
   ${buttonStyle}
   ${buttonSize}

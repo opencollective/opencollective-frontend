@@ -2,21 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import tag from 'clean-tag';
-import {
-  border,
-  borderRadius,
-  color,
-  display,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  height,
-  minWidth,
-  maxWidth,
-  space,
-  textAlign,
-  width,
-} from 'styled-system';
+import { border, color, layout, typography, space } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
@@ -55,18 +41,10 @@ const StyledButtonContent = styled(tag.button)`
     `}
 
   ${border}
-  ${borderRadius}
   ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontWeight}
-  ${minWidth}
-  ${maxWidth}
   ${space}
-  ${textAlign}
-  ${width}
-  ${height}
+  ${layout}
+  ${typography}
   ${textTransform}
 `;
 

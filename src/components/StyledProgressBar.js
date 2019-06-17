@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { color, borderRadius, width, height } from 'styled-system';
+import { color, border, layout } from 'styled-system';
 import { clamp } from 'lodash';
 
 const BackgroundBar = styled.div`
   position: relative;
 
-  ${height}
+  ${layout}
   ${color}
-  ${borderRadius}
+  ${border}
 `;
 
 const ProgressBar = styled.div`
   position: absolute;
 
-  ${width}
-  ${height}
+  ${layout}
   ${color}
-  ${borderRadius}
+  ${border}
 `;
 
 /**

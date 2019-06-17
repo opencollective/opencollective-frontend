@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import * as styledSystem from 'styled-system';
+import { space, layout, border, color, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { omit } from 'lodash';
 
@@ -9,28 +9,17 @@ import { overflow, resize } from '../lib/styled_system_custom';
 
 const TextArea = styled.textarea`
   /** Size */
-  ${styledSystem.space}
-  ${styledSystem.width}
-  ${styledSystem.height}
-  ${styledSystem.minWidth}
-  ${styledSystem.maxWidth}
-  ${styledSystem.minHeight}
-  ${styledSystem.maxHeight}
+  ${space}
+  ${layout}
   ${resize}
   ${overflow}
 
   /** Borders */
-  ${styledSystem.borders}
-  ${styledSystem.borderRadius}
-  ${styledSystem.borderColor}
+  ${border}
 
   /** Text */
-  ${styledSystem.color}
-  ${styledSystem.fontSize}
-  ${styledSystem.fontWeight}
-  ${styledSystem.letterSpacing}
-  ${styledSystem.lineHeight}
-  ${styledSystem.textAlign}
+  ${color}
+  ${typography}
 
   outline: none;
 
