@@ -20,7 +20,7 @@ export const AnimationsDurations = {
  */
 export const Sections = {
   CONTRIBUTE: 'contribute',
-  CONVERSATIONS: 'conversations',
+  // CONVERSATIONS: 'conversations',
   BUDGET: 'budget',
   CONTRIBUTORS: 'contributors',
   ABOUT: 'about',

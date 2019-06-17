@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { borders } from 'styled-system';
 import ReactTooltip from 'react-tooltip';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -27,6 +28,9 @@ const UpdateWrapper = styled(Flex)`
   min-height: 100px;
   border: 1px solid #e6e8eb;
   padding: 20px;
+
+  ${borders}
+
   @media (max-width: 600px) {
     max-width: 100%;
   }
@@ -133,7 +137,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
 
     return (
-      <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta">
+      <Container display="flex" alignItems="Baseline" color="#969BA3" data-cy="meta" flexWrap="wrap">
         {update.isPrivate && (
           <Box mr={2}>
             <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
@@ -214,7 +218,7 @@ class StyledUpdate extends Component {
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
-          <Container mb={2} fontsize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
+          <Container mb={2} fontSize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
         )}
         {this.renderUpdateMeta(update)}
         {!update.userCanSeeUpdate && (
@@ -260,7 +264,7 @@ class StyledUpdate extends Component {
   renderEditUpdateForm() {
     const { collective, update } = this.props;
     return (
-      <Container display="flex" flexDirection="column">
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth="55em" flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} />
       </Container>
@@ -268,12 +272,12 @@ class StyledUpdate extends Component {
   }
 
   render() {
-    const { update, intl, collective } = this.props;
+    const { update, intl, collective, ...props } = this.props;
     const { mode } = this.state;
 
     return (
       <React.Fragment>
-        <UpdateWrapper>
+        <UpdateWrapper {...props}>
           <AvatarContainer>
             <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
               <Avatar

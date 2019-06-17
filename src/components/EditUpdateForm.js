@@ -162,7 +162,8 @@ class EditUpdateForm extends React.Component {
                     type="text"
                     value={update.title}
                     onChange={e => this.handleChange('title', e.target.value)}
-                    width="50%"
+                    width="100%"
+                    maxWidth="40em"
                     placeHolder="Normal"
                     data-cy="titleInput"
                     required
@@ -202,7 +203,7 @@ class EditUpdateForm extends React.Component {
             </Container>
           </div>
           <div className="row">
-            <Container marginLeft="25px" fontSize="12px" color="#71757A">
+            <Container ml="25px" fontSize="12px" color="#71757A">
               <FormattedMessage
                 id="update.private.description"
                 defaultMessage="Only contributors will be able to see the content of this update"

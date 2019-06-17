@@ -44,9 +44,6 @@ class Updates extends React.Component {
       <div className="Updates">
         <style jsx>
           {`
-            .Updates {
-              min-width: 40rem;
-            }
             :global(.loadMoreBtn) {
               margin: 1rem;
               text-align: center;
@@ -87,9 +84,14 @@ class Updates extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           )}
-          {updates.map(update => (
+          {updates.map((update, index) => (
             <div key={update.id} className="update">
-              <StyledUpdate update={update} collective={collective} compact={true} />
+              <StyledUpdate
+                update={update}
+                collective={collective}
+                compact={true}
+                borderTop={index === 0 ? undefined : 'none'}
+              />
             </div>
           ))}
           {updates.length === 0 && (
