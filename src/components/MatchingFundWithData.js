@@ -25,14 +25,13 @@ class MatchingFundWithData extends React.Component {
     this.props.onChange(this.uuid);
   }
 
-  // Whenever this.props.order.totalAmount changes, we update the status
-  async UNSAFE_componentWillReceiveProps(newProps) {
+  async componentDidUpdate(prevProps) {
     const {
       data: { loading, MatchingFund },
       collective,
       order,
       uuid,
-    } = newProps;
+    } = this.props;
     if (loading) return;
 
     // if the matching fund id doesn't return any matching fund, we notify the OrderForm
@@ -42,7 +41,7 @@ class MatchingFundWithData extends React.Component {
       return;
     }
 
-    if (order.totalAmount === this.props.order.totalAmount) return;
+    if (order.totalAmount === prevProps.order.totalAmount) return;
     const currency = get(MatchingFund, 'currency');
     if (currency && currency !== collective.currency) {
       this.fxrate = await getFxRate(collective.currency, currency);
