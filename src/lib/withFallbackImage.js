@@ -4,7 +4,7 @@ import { defaultImage } from '../constants/collectives';
 import { getDomain, imagePreview } from './utils';
 
 const withFallbackImage = ChildComponent => {
-  const wrapped = ({ type = 'USER', radius, height, website, name, ...props }) => {
+  const wrapped = ({ type = 'USER', radius, size, height, website, name, ...props }) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [src, setSrc] = useState(props.src);
     if (name === 'anonymous') {
@@ -40,8 +40,8 @@ const withFallbackImage = ChildComponent => {
     const childProps = {
       ...props,
       src: image,
-      height,
-      radius,
+      height: height || radius || size,
+      radius: radius || size,
       type,
       name,
     };
@@ -53,6 +53,7 @@ const withFallbackImage = ChildComponent => {
     src: PropTypes.string,
     type: PropTypes.string,
     radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     website: PropTypes.string,
     name: PropTypes.string,
