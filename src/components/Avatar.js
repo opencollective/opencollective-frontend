@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { backgroundImage, backgroundColor, borders, borderColor, size } from 'styled-system';
+import { backgroundImage, color, borders, borderColor, size } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { Flex } from '@rebass/grid';
@@ -12,7 +12,7 @@ const getInitials = name => name.split(' ').reduce((result, value) => (result +=
 export const StyledAvatar = styled(Flex)`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
-  ${backgroundColor}
+  ${color}
   ${backgroundImage}
   background-position: center center;
   background-repeat: no-repeat;

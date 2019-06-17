@@ -164,7 +164,7 @@ class TierPage extends Component {
                 <Avatar
                   type={collective.type}
                   src={collective.image}
-                  backgroundColor="#EBEBEB"
+                  bg="#EBEBEB"
                   border="1px solid #efefef"
                   radius={40}
                   borderRadius={10}

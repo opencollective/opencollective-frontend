@@ -139,7 +139,7 @@ const ContributeCard = ({ intl, contribution }) => {
           )}
         </div>
         <Link route={contributeRoute}>
-          <StyledButton width={1} mb={2}>
+          <StyledButton width={1} mb={2} mt={3}>
             {goal ? (
               <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />
             ) : (

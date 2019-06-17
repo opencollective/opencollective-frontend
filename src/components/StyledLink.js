@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {
-  backgroundColor,
   border,
   borderColor,
   borderRadius,
@@ -26,7 +25,6 @@ import { buttonSize, buttonStyle } from '../constants/theme';
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledLink = styled(tag.a)`
-  ${backgroundColor}
   ${border}
   ${borderColor}
   ${borderRadius}
