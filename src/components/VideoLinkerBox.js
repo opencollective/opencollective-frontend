@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Box } from '@rebass/grid';
 
 import { VideoPlus } from 'styled-icons/boxicons-regular/VideoPlus';
