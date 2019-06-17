@@ -31,7 +31,7 @@ class UnsubscribeEmail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      state: 'white',
+      state: 'unsubscribing',
     };
   }
   async componentDidMount() {
@@ -60,12 +60,8 @@ class UnsubscribeEmail extends React.Component {
       return '#CC1836';
     }
   }
-  getFormattedMessageAttrs(state) {
-    if (state === 'success') {
-      return { id: 'unsubscribe.sucess', defaultMessage: "You've unsubscribed successfully !" };
-    } else if (state === 'white') {
-      return { id: 'unsubscribe.white', defaultMessage: 'Unsubscribing your email...' };
-    } else {
+  getErrorMessageAttrs(state) {
+    if (state === 'error') {
       return { id: 'unsubscribe.error', defaultMessage: this.state.errorMessage };
     }
   }
@@ -83,9 +79,21 @@ class UnsubscribeEmail extends React.Component {
           <Box my={3}>
             <Email size={42} color={this.getIconColor(this.state.state)} />
           </Box>
-          <MessageBox mb={3} type={this.state.state} withIcon>
-            <FormattedMessage {...this.getFormattedMessageAttrs(this.state.state)} />
-          </MessageBox>
+          {this.state.state === 'success' && (
+            <MessageBox mb={3} type="success" withIcon>
+              <FormattedMessage id="unsubscribe.success" defaultMessage="You've unsubscribed successfully !" />
+            </MessageBox>
+          )}
+          {this.state.state === 'unsubscribing' && (
+            <MessageBox mb={3} type="white" withIcon>
+              <FormattedMessage id="unsubscribe.unsubscribing" defaultMessage="Unsubscribing your email..." />
+            </MessageBox>
+          )}
+          {this.state.state === 'error' && (
+            <MessageBox mb={3} type="error" withIcon>
+              <FormattedMessage {...this.getErrorMessageAttrs(this.state.state)} />
+            </MessageBox>
+          )}
         </Container>
       </Page>
     );
