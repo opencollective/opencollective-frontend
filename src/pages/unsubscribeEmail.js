@@ -11,8 +11,7 @@ import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
 
 /**
- * Main contribution flow entrypoint. Render all the steps from contributeAs
- * to payment.
+ * Email Unsubscription page.
  */
 class UnsubscribeEmail extends React.Component {
   static getInitialProps({ query }) {
@@ -21,9 +20,9 @@ class UnsubscribeEmail extends React.Component {
   static propTypes = {
     /** Unsubscription email, given in URL */
     email: PropTypes.string.isRequired,
-    /** Unsubscription slug, given in URL */
+    /** Collective slug, given in URL */
     slug: PropTypes.string.isRequired,
-    /** Unsubscription type, given in URL */
+    /** Emails type to unsubscribe ex:collective.monthlyReport, given in URL */
     type: PropTypes.string.isRequired,
     /** Unsubscription token, given in URL */
     token: PropTypes.string.isRequired,
