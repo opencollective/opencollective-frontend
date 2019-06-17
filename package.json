@@ -21,7 +21,7 @@
     "apollo-client": "2.6.2",
     "apollo-link": "1.2.11",
     "apollo-link-context": "1.0.18",
-    "apollo-link-error": "1.1.10",
+    "apollo-link-error": "1.1.11",
     "apollo-link-http": "1.5.14",
     "bluebird": "3.5.5",
     "bootstrap": "3.4.1",
