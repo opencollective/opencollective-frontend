@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { background, color, border, borderColor, space, layout } from 'styled-system';
+import { background, color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 import withFallbackImage from '../lib/withFallbackImage';
@@ -18,7 +18,6 @@ export const StyledAvatar = styled(Flex)`
   background-size: cover;
   border-radius: ${({ type }) => (type === 'USER' ? '100px' : '25%')};
   ${border}
-  ${borderColor}
   color: ${themeGet('colors.black.400')};
   font-weight: bold;
   justify-content: center;
@@ -33,7 +32,7 @@ export const StyledAvatar = styled(Flex)`
     `}
 `;
 
-const Avatar = ({ src, type = 'USER', radius, size, name, ...styleProps }) => {
+const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
   // Avoid setting null/undefined background images
   const backgroundImage = src ? `url(${src})` : undefined;
   return (
