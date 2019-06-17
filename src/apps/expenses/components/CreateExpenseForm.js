@@ -13,7 +13,6 @@ import InputField from '../../../components/InputField';
 import SignInOrJoinFree from '../../../components/SignInOrJoinFree';
 import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
-import { P } from '../../../components/Text';
 import Container from '../../../components/Container';
 
 class CreateExpenseForm extends React.Component {
@@ -505,7 +504,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser } = this.props;
 
     if (!LoggedInUser) {
       return (

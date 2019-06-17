@@ -12,6 +12,7 @@ import NotificationBar from './NotificationBar';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import Loading from './Loading';
+import { Router } from '../server/pages';
 
 class EditCollective extends React.Component {
   static propTypes = {
