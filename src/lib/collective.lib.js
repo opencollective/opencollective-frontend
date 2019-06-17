@@ -7,14 +7,8 @@ const image4 = '/static/images/avatar-04.svg';
 
 const avatars = [image1, image2, image3, image4];
 
-const logos = ['/static/images/code.svg', '/static/images/rocket.svg', '/static/images/repo.svg'];
-
 export function pickAvatar(NameOrId) {
   return pickRandomImage(avatars, NameOrId);
-}
-
-export function pickLogo(NameOrId) {
-  return pickRandomImage(logos, NameOrId);
 }
 
 export function pickRandomImage(images, NameOrId = 0) {
