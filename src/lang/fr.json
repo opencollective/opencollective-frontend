@@ -996,6 +996,8 @@
   "transactions.emptysearch": "Il n'y a pas de transactions pour cette période.",
   "transactions.viewAll": "Voir toutes les transactions",
   "tweetIt": "Tweeter",
+  "unsubscribe.sucess": "You've unsubscribed successfully !",
+  "unsubscribe.white": "Unsubscribing your email...",
   "update.approved": "approuvé",
   "update.cancelEdit": "annuler les changements",
   "update.createdAt": "créé le {date} (brouillon)",
