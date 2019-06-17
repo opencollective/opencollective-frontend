@@ -4,6 +4,7 @@ import config from 'config';
 import HelloWorks from 'helloworks-sdk';
 import moment from 'moment';
 import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../../server/lib/taxForms';
+import { sequelize } from '../../server/models';
 
 const US_TAX_FORM_THRESHOLD = 600e2;
 const HELLO_WORKS_KEY = config.get('helloworks.key');
@@ -11,7 +12,7 @@ const HELLO_WORKS_SECRET = config.get('helloworks.secret');
 const HELLO_WORKS_WORKFLOW_ID = config.get('helloworks.workflowId');
 const HELLO_WORKS_CALLBACK_PATH = config.get('helloworks.callbackPath');
 
-const HELLO_WORKS_CALLBACK_URL = `${config.get('host.api')}/${HELLO_WORKS_CALLBACK_PATH}`;
+const HELLO_WORKS_CALLBACK_URL = `${config.get('host.api')}${HELLO_WORKS_CALLBACK_PATH}`;
 
 const year = moment().year();
 
@@ -28,13 +29,16 @@ const sendHelloWorksUsTaxForm = SendHelloWorksTaxForm({
 });
 
 const init = async () => {
+  console.log('>>>> Running tax form job');
   // Filter unique users
-  const users = await findUsersThatNeedToBeSentTaxForm({
+  await findUsersThatNeedToBeSentTaxForm({
     invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
     year,
-  });
-
-  users.forEach(sendHelloWorksUsTaxForm);
+  }).map(sendHelloWorksUsTaxForm);
 };
 
-init();
+init()
+  .catch(console.log)
+  .finally(() => {
+    sequelize.close();
+  });

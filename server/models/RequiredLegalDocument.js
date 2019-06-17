@@ -12,7 +12,6 @@ export default function(Sequelize, DataTypes) {
       values: [US_TAX_FORM],
       allowNull: false,
       defaultValue: US_TAX_FORM,
-      field: 'document_type',
     },
     createdAt: {
       type: DataTypes.DATE,

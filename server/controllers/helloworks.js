@@ -31,13 +31,13 @@ async function callback(req, res) {
   } = req;
 
   if (status && status === 'completed' && workflowId == HELLO_WORKS_WORKFLOW_ID) {
-    const { userSlug, year } = metadata;
+    const { email, year } = metadata;
     const documentId = Object.keys(data)[0];
     console.log(`workflowId: ${workflowId}, documentId: ${documentId}`);
 
     const user = await User.findOne({
       where: {
-        slug: userSlug,
+        email,
       },
     });
     const doc = await LegalDocument.findByTypeYearUser({ year, documentType: US_TAX_FORM, user });
@@ -47,13 +47,13 @@ async function callback(req, res) {
         instanceId: id,
         documentId,
       })
-      .then(UploadToS3({ slug: userSlug, year, documentType: US_TAX_FORM }))
+      .then(UploadToS3({ id: user.id, year, documentType: US_TAX_FORM }))
       .then(({ Location: location }) => {
         doc.requestStatus = RECEIVED;
         doc.documentLink = location;
         return doc.save();
       })
-      .then(() => res.sendCode(200))
+      .then(() => res.sendStatus(200))
       .catch(err => {
         doc.requestStatus = ERROR;
         doc.save();
@@ -65,16 +65,16 @@ async function callback(req, res) {
   }
 }
 
-function UploadToS3({ slug, year, documentType }) {
+function UploadToS3({ id, year, documentType }) {
   return function uploadToS3(buffer) {
     const bucket = HELLO_WORKS_S3_BUCKET;
-    const key = createTaxFormFilename({ slug, year, documentType });
+    const key = createTaxFormFilename({ id, year, documentType });
 
     if (!s3) {
       // s3 may not be set in a dev env
       console.error('s3 is not set, saving file to temp folder. This should only be done in development');
       saveFileToTempStorage({ filename: key, buffer });
-      return Promise.resolve();
+      return Promise.resolve({ Location: key });
     }
 
     // TODO: encrypt the form here.
@@ -96,8 +96,8 @@ function saveFileToTempStorage({ buffer, filename }) {
   fs.writeFile(`/tmp/${filename}`, buffer, console.log);
 }
 
-function createTaxFormFilename({ slug, year, documentType }) {
-  return `${documentType}_${year}_${slug}.pdf`;
+function createTaxFormFilename({ id, year, documentType }) {
+  return `${documentType}_${year}_${id}.pdf`;
 }
 
 export default {

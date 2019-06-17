@@ -9,7 +9,7 @@ export async function findUsersThatNeedToBeSentTaxForm({ invoiceTotalThreshold, 
   const users = await RequiredLegalDocument.findAll({
     where: { documentType: US_TAX_FORM },
   })
-    .map(requiredUsTaxDocType => requiredUsTaxDocType.getHostCollective())
+    .map(requiredUsTaxDoc => requiredUsTaxDoc.getHostCollective())
     .map(host => host.getUsersWhoHaveTotalExpensesOverThreshold(invoiceTotalThreshold, year))
     .reduce((acc, item) => {
       return [...acc, ...item];
@@ -22,7 +22,7 @@ export async function findUsersThatNeedToBeSentTaxForm({ invoiceTotalThreshold, 
 }
 
 export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year }) {
-  return function sendHelloWorksUsTaxForm(user) {
+  return async function sendHelloWorksUsTaxForm(user) {
     const participants = {
       participant_swVuvW: {
         type: 'email',
@@ -31,26 +31,37 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
       },
     };
 
-    return client.workflowInstances
-      .createInstance({
-        callbackUrl,
-        workflowId,
-        documentDelivery: true,
-        participants,
-        metadata: {
-          userSlug: user.slug,
-          year,
-        },
-      })
-      .then(() => LegalDocument.findByTypeYearUser({ documentType: US_TAX_FORM, year, user }))
-      .then(doc => {
-        doc.requestStatus = LegalDocument.requestStatus.REQUESTED;
-        return doc.save();
-      })
-      .catch(async () => {
-        const doc = await LegalDocument.findByTypeYearUser({ documentType: US_TAX_FORM, year, user });
-        doc.requestStatus = LegalDocument.requestStatus.ERROR;
-        await doc.save();
-      });
+    const userCollective = await user.getCollective();
+    console.log(user.email);
+
+    return (
+      client.workflowInstances
+        .createInstance({
+          callbackUrl,
+          workflowId,
+          documentDelivery: true,
+          participants,
+          metadata: {
+            email: user.email,
+            year,
+          },
+        })
+        .then(() =>
+          LegalDocument.findOrCreate({ where: { documentType: US_TAX_FORM, year, CollectiveId: userCollective.id } }),
+        )
+        // .then(() => LegalDocument.findByTypeYearUser({ documentType: US_TAX_FORM, year, user }))
+        .then(([doc]) => {
+          doc.requestStatus = LegalDocument.requestStatus.REQUESTED;
+          return doc.save();
+        })
+        .catch(async err => {
+          console.log('err sending tax form: ', err);
+          const [doc] = await LegalDocument.findOrCreate({
+            where: { documentType: US_TAX_FORM, year, CollectiveId: userCollective.id },
+          });
+          doc.requestStatus = LegalDocument.requestStatus.ERROR;
+          await doc.save();
+        })
+    );
   };
 }
