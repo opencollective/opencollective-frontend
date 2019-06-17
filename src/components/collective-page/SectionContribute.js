@@ -12,6 +12,7 @@ import Link from '../Link';
 import { ContributionTypes } from './_constants';
 import ContributeRow from './ContributeRow';
 import ContainerSectionContent from './ContainerSectionContent';
+import TopContributors from './TopContributors';
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -47,6 +48,8 @@ class SectionContribute extends React.PureComponent {
         image: PropTypes.string,
       }),
     ),
+    topOrganizations: PropTypes.arrayOf(PropTypes.object),
+    topIndividuals: PropTypes.arrayOf(PropTypes.object),
     intl: PropTypes.object,
   };
 
@@ -127,7 +130,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { intl, collective, tiers, events } = this.props;
+    const { intl, collective, tiers, events, topOrganizations, topIndividuals } = this.props;
     const [financialContributions, otherWaysToContribute] = this.getWaysToContribute(collective, tiers, events);
 
     return (
@@ -165,6 +168,11 @@ class SectionContribute extends React.PureComponent {
             </StyledButton>
           </Link>
         </ContainerSectionContent>
+        <TopContributors
+          topOrganizations={topOrganizations}
+          topIndividuals={topIndividuals}
+          currency={collective.currency}
+        />
       </Box>
     );
   }

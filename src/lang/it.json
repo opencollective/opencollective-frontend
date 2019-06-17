@@ -819,6 +819,7 @@
   "SectionAbout.MissingDescription": "{collectiveName} didn't write a presentation yet",
   "SectionAbout.Title": "Why we do what we do",
   "SectionContribute.All": "View all the ways to contribute",
+  "SectionContribute.TopContributors": "Top Contributors",
   "sections.events.new": "Create an Event",
   "sections.team.edit": "Edit team members",
   "sections.update.new": "Create an Update",

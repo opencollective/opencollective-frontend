@@ -56,6 +56,8 @@ export default class CollectivePage extends Component {
 
     /** Collective contributors */
     contributors: PropTypes.arrayOf(PropTypes.object),
+    topOrganizations: PropTypes.arrayOf(PropTypes.object),
+    topIndividuals: PropTypes.arrayOf(PropTypes.object),
 
     /** Collective tiers */
     tiers: PropTypes.arrayOf(
@@ -135,7 +137,15 @@ export default class CollectivePage extends Component {
     } else if (section === Sections.CONTRIBUTORS) {
       return <SectionContributors collectiveName={collective.name} contributors={contributors} />;
     } else if (section === Sections.CONTRIBUTE) {
-      return <SectionContribute collective={collective} tiers={tiers} events={events} />;
+      return (
+        <SectionContribute
+          collective={collective}
+          tiers={tiers}
+          events={events}
+          topOrganizations={this.props.topOrganizations}
+          topIndividuals={this.props.topIndividuals}
+        />
+      );
     }
 
     // Placeholder for sections not implemented yet
