@@ -59,11 +59,6 @@ class UnsubscribeEmail extends React.Component {
       return '#CC1836';
     }
   }
-  getErrorMessageAttrs(state) {
-    if (state === 'error') {
-      return { id: 'unsubscribe.error', defaultMessage: this.state.errorMessage };
-    }
-  }
   render() {
     return (
       <Page title="Unsubscribe Email">
@@ -90,7 +85,7 @@ class UnsubscribeEmail extends React.Component {
           )}
           {this.state.state === 'error' && (
             <MessageBox mb={3} type="error" withIcon>
-              <FormattedMessage {...this.getErrorMessageAttrs(this.state.state)} />
+              <span>{this.state.errorMessage}</span>
             </MessageBox>
           )}
         </Container>
