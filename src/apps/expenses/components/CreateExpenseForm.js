@@ -80,7 +80,7 @@ class CreateExpenseForm extends React.Component {
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
         payoutMethod: 'paypal',
-        paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || null,
+        paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || undefined,
       },
       isExpenseValid: false,
       loading: false,
@@ -463,7 +463,7 @@ class CreateExpenseForm extends React.Component {
                   type="email"
                   name="paypalEmail"
                   key={`paypalEmail-${get(LoggedInUser, 'id')}`}
-                  defaultValue={this.state.expense.paypalEmail}
+                  value={this.state.expense.paypalEmail}
                   onChange={paypalEmail => this.handleChange('paypalEmail', paypalEmail)}
                 />
               </div>
