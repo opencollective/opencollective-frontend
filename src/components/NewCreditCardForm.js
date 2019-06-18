@@ -28,6 +28,7 @@ StyledCardElement.defaultProps = {
 
 class NewCreditCardFormWithoutStripe extends React.Component {
   static propTypes = {
+    intl: PropTypes.object.isRequired,
     name: PropTypes.string,
     profileType: PropTypes.string, // USER or ORGANIZATION
     error: PropTypes.string,
