@@ -71,11 +71,13 @@ class Expense extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.toggleDetails = this.toggleDetails.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    console.log('tax form required: ', props.expense.userTaxFormRequiredBeforePayment);
     this.messages = defineMessages({
       pending: { id: 'expense.pending', defaultMessage: 'pending' },
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
       approved: { id: 'expense.approved', defaultMessage: 'approved' },
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
+      taxFormRequired: { id: 'expense.userTaxFormRequiredBeforePayment', defaultMessage: 'tax form required' },
       closeDetails: {
         id: 'expense.closeDetails',
         defaultMessage: 'Close Details',
@@ -229,6 +231,10 @@ class Expense extends React.Component {
             .rejected .status {
               color: #e21a60;
             }
+            .taxFormRequired {
+              background: #e21a60;
+              color: white;
+            }
             .approved .status {
               color: #72ce00;
             }
@@ -328,6 +334,12 @@ class Expense extends React.Component {
               )}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
+              {this.props.expense.userTaxFormRequiredBeforePayment && (
+                <span>
+                  <span className="status taxFormRequired">{intl.formatMessage(this.messages.taxFormRequired)}</span>
+                  {' | '}
+                </span>
+              )}
               <span className="metaItem">
                 <Link
                   route="expenses"

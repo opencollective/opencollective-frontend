@@ -1332,6 +1332,66 @@ input MemberInputType {
 }
 
 """
+Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
+"""
+type MembersStatsType {
+  """
+  We always have to return an id for apollo's caching
+  """
+  id: Int
+
+  """
+  Total number of contributors
+  """
+  all: Int
+
+  """
+  Number of individuals
+  """
+  users: Int
+
+  """
+  Number of organizations
+  """
+  organizations: Int
+
+  """
+  Number of collectives
+  """
+  collectives: Int
+}
+
+"""
+Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
+"""
+type MembersStatsType {
+  """
+  We always have to return an id for apollo's caching
+  """
+  id: Int
+
+  """
+  Total number of contributors
+  """
+  all: Int
+
+  """
+  Number of individuals
+  """
+  users: Int
+
+  """
+  Number of organizations
+  """
+  organizations: Int
+
+  """
+  Number of collectives
+  """
+  collectives: Int
+}
+
+"""
 This is the root mutation
 """
 type Mutation {
