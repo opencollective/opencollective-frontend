@@ -29,6 +29,11 @@ class OrdersPage extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     const { data, LoggedInUser } = this.props;
 

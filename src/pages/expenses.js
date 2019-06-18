@@ -30,6 +30,11 @@ class ExpensesPage extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.props;

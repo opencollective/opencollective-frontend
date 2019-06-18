@@ -25,6 +25,11 @@ class UpdatesPage extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     const { data, action, LoggedInUser } = this.props;
 
