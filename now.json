@@ -1,15 +1,26 @@
 {
-  "version": 2,
+  "version": 1,
   "name": "opencollective-frontend",
   "type": "docker",
-  "routes": [
-    {
-      "src": "/static/manifest.json",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, DELETE, PUT"
+  "static": {
+    "headers": [
+      {
+        "source": "/static/manifest.json",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Access-Control-Allow-Headers",
+            "value": "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding"
+          },
+          {
+            "key": "Access-Control-Allow-Methods",
+            "value": "POST, GET, OPTIONS, DELETE, PUT"
+          }
+        ]
       }
-    }
-  ]
+    ]
+  }
 }
