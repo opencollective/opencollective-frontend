@@ -978,6 +978,7 @@
   "transaction.refund.btn": "refund",
   "transaction.refund.no.btn": "no",
   "transaction.refund.yes.btn": "Yes, refund!",
+  "transaction.taxAmount": "VAT",
   "transaction.usingGiftCardFrom": "using a gift card from {collectiveLink}",
   "transaction.viewDetails": "View Details",
   "transactions.all": "all",
