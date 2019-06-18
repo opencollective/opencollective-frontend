@@ -76,7 +76,10 @@ async function HostReport(year, month, hostId) {
   }
 
   const getHostStats = (host, collectiveids) => {
-    const where = { CollectiveId: { [Op.in]: collectiveids } };
+    // Since collectives can change host,
+    // we don't fetch transactions based on the CollectiveId but based on the HostCollectiveId
+    // at the time of the transaction
+    const where = { HostCollectiveId: host.id };
     const whereWithDateRange = { ...where, ...dateRange };
 
     const payoutProcessorFeesQuery = service => {
