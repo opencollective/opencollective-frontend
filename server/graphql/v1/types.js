@@ -1195,6 +1195,12 @@ export const TierType = new GraphQLObjectType({
           return tier.password;
         },
       },
+      settings: {
+        type: GraphQLJSON,
+        resolve(tier) {
+          return tier.settings;
+        },
+      },
       startsAt: {
         type: DateString,
         resolve(tier) {

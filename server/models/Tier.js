@@ -185,6 +185,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.STRING,
       },
 
+      settings: {
+        type: DataTypes.JSON,
+      },
+
       startsAt: {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,

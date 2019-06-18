@@ -274,6 +274,7 @@ export const TierInputType = new GraphQLInputObjectType({
       description: 'amount that you are trying to raise with this tier',
     },
     password: { type: GraphQLString },
+    settings: { type: GraphQLJSON },
     startsAt: {
       type: GraphQLString,
       description: 'Start of the campaign',
