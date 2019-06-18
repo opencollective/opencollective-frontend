@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { capitalize, omit, uniqBy } from 'lodash';
 import styled from 'styled-components';
 import { themeGet } from 'styled-system';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 
 import { Search } from 'styled-icons/octicons/Search';
@@ -19,6 +19,7 @@ import StyledRadioList from './StyledRadioList';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
+import withIntl from '../lib/withIntl';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
@@ -30,6 +31,14 @@ const ContributeAsEntryContainer = styled(Container)`
     background: ${themeGet('colors.black.50')};
   }
 `;
+
+const messages = defineMessages({
+  'org.new': { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
+  'org.name': { id: 'contributeAs.org.name', defaultMessage: 'Organization Name' },
+  'org.website': { id: 'contributeAs.org.website', defaultMessage: 'Website' },
+  'org.twitter': { id: 'contributeAs.org.twitter', defaultMessage: 'Twitter (optional)' },
+  'org.github': { id: 'contributeAs.org.github', defaultMessage: 'GitHub (optional)' },
+});
 
 const useForm = ({ onProfileChange }) => {
   const [state, setState] = useState({ errors: {} });
@@ -119,8 +128,8 @@ const useForm = ({ onProfileChange }) => {
 /**
  * Search is displayed if 5 or more profiles are passed in.
  */
-const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
-  const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ onProfileChange });
+const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
+  const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ intl, onProfileChange });
   if (state.search) {
     const test = new RegExp(escapeInput(state.search), 'i');
     profiles = profiles.filter(profile => profile.name.match(test));
@@ -130,7 +139,7 @@ const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProf
     [
       personal,
       ...profiles,
-      { id: 'new-org', name: 'A new organization' },
+      { id: 'new-org', name: intl.formatMessage(messages['org.new']) },
       // { id: 'anonymous', name: 'Anonymously' }
     ],
     'id',
@@ -202,7 +211,11 @@ const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProf
             {key === 'new-org' && checked && (
               <Container as="fieldset" border="none" width={1} py={3} onChange={onFieldChange}>
                 <Box mb={3}>
-                  <StyledInputField label="Organization Name" htmlFor="name" error={getFieldError('name')}>
+                  <StyledInputField
+                    label={intl.formatMessage(messages['org.name'])}
+                    htmlFor="name"
+                    error={getFieldError('name')}
+                  >
                     {inputProps => (
                       <StyledInput
                         {...inputProps}
@@ -215,7 +228,11 @@ const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProf
                 </Box>
 
                 <Box mb={3}>
-                  <StyledInputField label="Website" htmlFor="website" error={getFieldError('website')}>
+                  <StyledInputField
+                    label={intl.formatMessage(messages['org.website'])}
+                    htmlFor="website"
+                    error={getFieldError('website')}
+                  >
                     {inputProps => (
                       <StyledInput
                         {...inputProps}
@@ -230,7 +247,7 @@ const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProf
 
                 <Box mb={3}>
                   <StyledInputField
-                    label="GitHub (optional)"
+                    label={intl.formatMessage(messages['org.github'])}
                     htmlFor="githubHandle"
                     error={getFieldError('githubHandle')}
                   >
@@ -242,7 +259,7 @@ const ContributeAs = ({ onProfileChange, personal, profiles, defaultSelectedProf
 
                 <Box>
                   <StyledInputField
-                    label="Twitter (optional)"
+                    label={intl.formatMessage(messages['org.twitter'])}
                     htmlFor="twitterHandle"
                     error={getFieldError('twitterHandle')}
                   >
@@ -273,6 +290,7 @@ ContributeAs.propTypes = {
    *  - if 'A new organization' is selected, the latest data from that form is returned
    *  - else the data passed to `profiles` or `personal` is returned
    */
+  intl: PropTypes.object.isRequired,
   onProfileChange: PropTypes.func,
   defaultSelectedProfile: PropTypes.shape({
     id: PropTypes.number,
@@ -299,4 +317,4 @@ ContributeAs.defaultProps = {
   onProfileChange: () => {}, // noop
 };
 
-export default ContributeAs;
+export default withIntl(ContributeAs);
