@@ -71,7 +71,6 @@ class Expense extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.toggleDetails = this.toggleDetails.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
-    console.log('tax form required: ', props.expense.userTaxFormRequiredBeforePayment);
     this.messages = defineMessages({
       pending: { id: 'expense.pending', defaultMessage: 'pending' },
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
@@ -234,6 +233,7 @@ class Expense extends React.Component {
             .taxFormRequired {
               background: #e21a60;
               color: white;
+              text-transform: uppercase;
             }
             .approved .status {
               color: #72ce00;
@@ -334,12 +334,15 @@ class Expense extends React.Component {
               )}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
-              {this.props.expense.userTaxFormRequiredBeforePayment && (
-                <span>
-                  <span className="status taxFormRequired">{intl.formatMessage(this.messages.taxFormRequired)}</span>
-                  {' | '}
-                </span>
-              )}
+              {editable &&
+                LoggedInUser &&
+                LoggedInUser.canEditExpense(expense) &&
+                this.props.expense.userTaxFormRequiredBeforePayment && (
+                  <span>
+                    <span className="taxFormRequired">{intl.formatMessage(this.messages.taxFormRequired)}</span>
+                    {' | '}
+                  </span>
+                )}
               <span className="metaItem">
                 <Link
                   route="expenses"
