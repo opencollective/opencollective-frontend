@@ -146,7 +146,11 @@ async function HostReport(year, month, hostId) {
         host.currency,
       ),
       backers: getBackersStats(startDate, endDate, collectiveids),
-      platformFees: sumTransactions('platformFeeInHostCurrency', { where: whereWithDateRange }, host.currency),
+      platformFees: sumTransactions(
+        'platformFeeInHostCurrency',
+        { where: { ...whereWithDateRange, type: 'CREDIT' } },
+        host.currency,
+      ),
       paymentProcessorFees: sumTransactions(
         'paymentProcessorFeeInHostCurrency',
         { where: { ...whereWithDateRange, type: 'CREDIT' } },
