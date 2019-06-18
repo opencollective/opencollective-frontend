@@ -31,6 +31,7 @@ class TransactionDetails extends React.Component {
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
+    taxAmount: PropTypes.number,
     hostCurrency: PropTypes.string,
     hostCurrencyFxRate: PropTypes.number,
     paymentMethod: PropTypes.shape({
@@ -50,6 +51,10 @@ class TransactionDetails extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
+      taxAmount: {
+        id: 'transaction.taxAmount',
+        defaultMessage: 'VAT',
+      },
       hostFeeInHostCurrency: {
         id: 'transaction.hostFeeInHostCurrency',
         defaultMessage: '{percentage} host fee',
@@ -137,7 +142,7 @@ class TransactionDetails extends React.Component {
       });
     };
 
-    addFees(['hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
+    addFees(['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
     let amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : '';
 
