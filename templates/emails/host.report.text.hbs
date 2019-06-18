@@ -20,6 +20,10 @@ currency=host.currency precision=2}}}
 Total amount received:                 {{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency precision=2}}}
 (Total amount transferred to your {{host.name}} bank account)
 
+{{#if stats.totalTaxAmountCollected.totalInHostCurrency}}
+Taxes collected:                       {{{currency stats.totalTaxAmountCollected.totalInHostCurrency currency=host.currency precision=2}}}
+(VAT received)
+{{/if}}
 Host fees:                             {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency precision=2}}}
 (Commission for {{host.name}})
 

@@ -124,7 +124,24 @@ async function HostReport(year, month, hostId) {
         { where: { ...whereWithDateRange, type: 'DEBIT' } },
         host.currency,
       ), // total net amount paid out last month
-      totalHostFees: sumTransactions('hostFeeInHostCurrency', { where: whereWithDateRange }, host.currency),
+      totalTaxAmountCollected: sumTransactions(
+        'taxAmount',
+        { where: whereWithDateRange, type: 'CREDIT' },
+        host.currency,
+      ), // total tax collected
+      totalTaxAmountPaid: sumTransactions('taxAmount', { where: whereWithDateRange, type: 'DEBIT' }, host.currency), // total tax paid
+      // We only count HostFees on CREDIT transactions with an Order and on DEBIT transactions with an Expense
+      // (because the host fee of the destination host is recorded in the DEBIT transaction when making a donation to another host)
+      totalHostFees: sumTransactions(
+        'hostFeeInHostCurrency',
+        {
+          where: {
+            ...whereWithDateRange,
+            [Op.or]: [{ type: 'CREDIT', OrderId: { [Op.ne]: null } }, { type: 'DEBIT', ExpenseId: { [Op.ne]: null } }],
+          },
+        },
+        host.currency,
+      ),
       backers: getBackersStats(startDate, endDate, collectiveids),
       platformFees: sumTransactions('platformFeeInHostCurrency', { where: whereWithDateRange }, host.currency),
       paymentProcessorFees: sumTransactions(
@@ -284,9 +301,12 @@ async function HostReport(year, month, hostId) {
         stats.totalHostRevenue = {
           totalInHostCurrency: stats.totalHostFees.totalInHostCurrency,
         };
+        // Total net amount received on the host's bank account = total amount - payment processor fees and platform fees
         stats.totalNetAmountReceived = {
           totalInHostCurrency:
-            stats.totalNetAmountReceivedForCollectives.totalInHostCurrency - stats.totalHostFees.totalInHostCurrency, // totalHostFees is negative
+            stats.totalAmountDonations.totalInHostCurrency +
+            stats.paymentProcessorFees.totalInHostCurrency +
+            stats.platformFees.totalInHostCurrency,
         };
 
         data.stats = {
