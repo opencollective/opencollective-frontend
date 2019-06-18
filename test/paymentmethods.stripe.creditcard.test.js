@@ -103,7 +103,7 @@ describe('stripe.creditcard', () => {
       const taxAmount = 100;
       const { order } = await createOrderWithPaymentMethod('name', { taxAmount });
       const transaction = await creditcard.processOrder(order);
-      expect(transaction.taxAmount).to.be.equal(taxAmount);
+      expect(transaction.taxAmount).to.be.equal(-taxAmount);
     });
   });
 });

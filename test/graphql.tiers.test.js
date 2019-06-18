@@ -314,7 +314,7 @@ describe('graphql.tiers.test', () => {
           percentage: 21,
         });
         createdOrder.transactions.map(transaction => {
-          expect(transaction.taxAmount).to.equal(taxAmount);
+          expect(transaction.taxAmount).to.equal(-taxAmount);
         });
       });
 
@@ -354,7 +354,7 @@ describe('graphql.tiers.test', () => {
         const createdOrder = queryResult.data.createOrder;
         expect(createdOrder.taxAmount).to.equal(taxAmount);
         createdOrder.transactions.map(transaction => {
-          expect(transaction.taxAmount).to.equal(taxAmount);
+          expect(transaction.taxAmount).to.equal(-taxAmount);
         });
       });
 
