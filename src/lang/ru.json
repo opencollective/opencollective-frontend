@@ -989,6 +989,8 @@
   "transactions.emptysearch": "There are no transactions in this date range.",
   "transactions.viewAll": "Посмотреть все транзакции",
   "tweetIt": "Твитнуть",
+  "unsubscribe.success": "You've unsubscribed successfully !",
+  "unsubscribe.unsubscribing": "Unsubscribing your email...",
   "update.approved": "одобрено",
   "update.cancelEdit": "отменить редактирование",
   "update.createdAt": "created on {date} (draft)",
