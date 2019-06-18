@@ -709,8 +709,12 @@ describe('Collective model', () => {
   describe('getUsersWhoHaveTotalExpensesOverThreshold', () => {
     it('it gets the correct Users', async () => {
       const year = 2016;
+      const threshold = 600e2;
 
-      const usersOverThreshold = await opensourceCollective.getUsersWhoHaveTotalExpensesOverThreshold(600e2, year);
+      const usersOverThreshold = await opensourceCollective.getUsersWhoHaveTotalExpensesOverThreshold({
+        threshold,
+        year,
+      });
 
       expect(usersOverThreshold.length).to.eq(1);
       expect(usersOverThreshold[0].email).to.eq(users[1].email);

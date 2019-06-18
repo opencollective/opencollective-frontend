@@ -4,7 +4,12 @@ import * as utils from '../test/utils';
 import moment from 'moment';
 
 const { RequiredLegalDocument, LegalDocument, User, Collective } = models;
-const { US_TAX_FORM } = RequiredLegalDocument.documentType;
+const {
+  documentType: { US_TAX_FORM },
+} = RequiredLegalDocument;
+const {
+  requestStatus: { RECEIVED },
+} = LegalDocument;
 
 describe('LegalDocument model', () => {
   // globals to be set in the before hooks.
@@ -190,6 +195,39 @@ describe('LegalDocument model', () => {
     });
     const doc = await LegalDocument.create(legalDoc);
     expect(doc.requestStatus).to.eq(LegalDocument.requestStatus.NOT_REQUESTED);
+  });
+
+  describe('hasUserCompletedDocument', async () => {
+    it('it returns true when the doc is RECEIVED', async () => {
+      const legalDoc = Object.assign({}, documentData, {
+        CollectiveId: userCollective.id,
+        requestStatus: RECEIVED,
+      });
+
+      await LegalDocument.create(legalDoc);
+
+      const result = await LegalDocument.hasUserCompletedDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year,
+        user,
+      });
+      expect(result).to.be.true;
+    });
+
+    it('it returns false when the doc is not RECEIVED', async () => {
+      const legalDoc = Object.assign({}, documentData, {
+        CollectiveId: userCollective.id,
+      });
+
+      await LegalDocument.create(legalDoc);
+
+      const result = await LegalDocument.hasUserCompletedDocument({
+        documentType: US_TAX_FORM,
+        year: documentData.year,
+        user,
+      });
+      expect(result).to.be.false;
+    });
   });
 
   describe('doesUserNeedToBeSentDocument', async () => {

@@ -8,7 +8,7 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import moment from 'moment';
 import * as ics from 'ics';
-import { get, difference, uniqBy, pick, pickBy, keys, omit, defaults, includes, isNull } from 'lodash';
+import { get, difference, uniqBy, pick, pickBy, sumBy, keys, omit, defaults, includes, isNull } from 'lodash';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 
@@ -1662,13 +1662,14 @@ export default function(Sequelize, DataTypes) {
       });
   };
 
-  Collective.prototype.getExpenses = function(status, startDate, endDate = new Date()) {
+  Collective.prototype.getExpenses = function(status, startDate, endDate = new Date(), createdByUserId) {
     const where = {
       createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id,
     };
     if (status) where.status = status;
     if (startDate) where.createdAt[Op.gte] = startDate;
+    if (createdByUserId) where.UserId = createdByUserId;
 
     return models.Expense.findAll({
       where,
@@ -2150,7 +2151,18 @@ export default function(Sequelize, DataTypes) {
       .tap(backers => debug('getTopBackers', backers.map(b => b.dataValues)));
   };
 
-  Collective.prototype.getUsersWhoHaveTotalExpensesOverThreshold = async function(threshold, year) {
+  Collective.prototype.doesUserHaveTotalExpensesOverThreshold = async function({ threshold, year, UserId }) {
+    const since = moment({ year });
+    const until = moment({ year }).add(1, 'y');
+    const status = [PENDING, APPROVED, PAID];
+    const expenses = await this.getExpenses(status, since, until, UserId);
+
+    const userTotal = sumBy(expenses, 'amount');
+
+    return userTotal >= threshold;
+  };
+
+  Collective.prototype.getUsersWhoHaveTotalExpensesOverThreshold = async function({ threshold, year }) {
     const since = moment({ year });
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];

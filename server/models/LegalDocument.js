@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 export default function(Sequelize, DataTypes) {
   const NOT_REQUESTED = 'NOT_REQUESTED';
   const REQUESTED = 'REQUESTED';
@@ -81,9 +79,14 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  LegalDocument.hasUserCompletedDocument = async ({ documentType, year, user }) => {
+    const doc = await LegalDocument.findByTypeYearUser({ documentType, year, user });
+
+    return doc !== null && doc.requestStatus == RECEIVED;
+  };
+
   LegalDocument.doesUserNeedToBeSentDocument = async ({ documentType, year, user }) => {
-    const yearNum = typeof year === 'number' ? year : moment(year).year();
-    const doc = await LegalDocument.findByTypeYearUser({ documentType, year: yearNum, user });
+    const doc = await LegalDocument.findByTypeYearUser({ documentType, year, user });
 
     return doc == null || doc.requestStatus == NOT_REQUESTED || doc.requestStatus == ERROR;
   };

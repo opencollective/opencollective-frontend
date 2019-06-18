@@ -1,6 +1,6 @@
 import models from '../models';
 import { uniqBy } from 'lodash';
-const { RequiredLegalDocument, LegalDocument } = models;
+const { RequiredLegalDocument, LegalDocument, Collective, User } = models;
 const {
   documentType: { US_TAX_FORM },
 } = RequiredLegalDocument;
@@ -10,7 +10,7 @@ export async function findUsersThatNeedToBeSentTaxForm({ invoiceTotalThreshold, 
     where: { documentType: US_TAX_FORM },
   })
     .map(requiredUsTaxDoc => requiredUsTaxDoc.getHostCollective())
-    .map(host => host.getUsersWhoHaveTotalExpensesOverThreshold(invoiceTotalThreshold, year))
+    .map(host => host.getUsersWhoHaveTotalExpensesOverThreshold({ threshold: invoiceTotalThreshold, year }))
     .reduce((acc, item) => {
       return [...acc, ...item];
     }, [])
@@ -19,6 +19,29 @@ export async function findUsersThatNeedToBeSentTaxForm({ invoiceTotalThreshold, 
     });
 
   return uniqBy(users, 'id');
+}
+
+export async function isUserTaxFormRequiredBeforePayment({ invoiceTotalThreshold, year, HostCollectiveId, UserId }) {
+  const host = await Collective.findByPk(HostCollectiveId);
+  const user = await User.findByPk(UserId);
+  const requiredDocuments = await host.getRequiredLegalDocuments({
+    where: {
+      documentType: US_TAX_FORM,
+    },
+  });
+
+  const isOverThreshold = await host.doesUserHaveTotalExpensesOverThreshold({
+    threshold: invoiceTotalThreshold,
+    year,
+    UserId,
+  });
+  const hasUserCompletedDocument = await LegalDocument.hasUserCompletedDocument({
+    documentType: US_TAX_FORM,
+    year,
+    user,
+  });
+
+  return requiredDocuments.length > 0 && isOverThreshold && !hasUserCompletedDocument;
 }
 
 export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year }) {
@@ -32,7 +55,6 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
     };
 
     const userCollective = await user.getCollective();
-    console.log(user.email);
 
     return (
       client.workflowInstances
@@ -54,8 +76,7 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
           doc.requestStatus = LegalDocument.requestStatus.REQUESTED;
           return doc.save();
         })
-        .catch(async err => {
-          console.log('err sending tax form: ', err);
+        .catch(async () => {
           const [doc] = await LegalDocument.findOrCreate({
             where: { documentType: US_TAX_FORM, year, CollectiveId: userCollective.id },
           });

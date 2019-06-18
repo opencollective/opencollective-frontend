@@ -5,14 +5,18 @@ import models from '../server/models';
 import * as utils from './utils';
 import moment from 'moment';
 
-import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../server/lib/taxForms';
+import {
+  findUsersThatNeedToBeSentTaxForm,
+  SendHelloWorksTaxForm,
+  isUserTaxFormRequiredBeforePayment,
+} from '../server/lib/taxForms';
 
 const { RequiredLegalDocument, LegalDocument, Collective, User, Expense } = models;
 const {
   documentType: { US_TAX_FORM },
 } = RequiredLegalDocument;
 const {
-  requestStatus: { REQUESTED, ERROR },
+  requestStatus: { REQUESTED, ERROR, RECEIVED },
 } = LegalDocument;
 
 const US_TAX_FORM_THRESHOLD = 600e2;
@@ -36,7 +40,7 @@ describe('lib.taxForms', () => {
   // - some users who are over the threshold for this year _and_ that belong to multiple collectives that need a US_TAX_FORM
   // - multiple host collectives that need legal docs
   // - a user that has a document with Error status
-  let user, userCollective;
+  let user, userCollective, hostCollectives;
 
   const documentData = {
     year: moment().year(),
@@ -122,9 +126,7 @@ describe('lib.taxForms', () => {
     const users = await Promise.all(usersData.map(userData => User.createUserWithCollective(userData)));
     user = users[0];
     userCollective = await Collective.findByPk(user.CollectiveId);
-    const hostCollectives = await Promise.all(
-      hostCollectivesData.map(collectiveData => Collective.create(collectiveData)),
-    );
+    hostCollectives = await Promise.all(hostCollectivesData.map(collectiveData => Collective.create(collectiveData)));
 
     const mixCollective = await Collective.findByPk(users[3].CollectiveId);
 
@@ -205,6 +207,55 @@ describe('lib.taxForms', () => {
       });
       expect(users.length).to.be.eq(3);
       expect(users.every(async user => (await user.name) !== 'Piet Geursen')).to.be.true;
+    });
+  });
+
+  describe('isUserTaxFormRequiredBeforePayment', () => {
+    it('it returns true when the user is over the threshold but has not returned their form ', async () => {
+      const result = await isUserTaxFormRequiredBeforePayment({
+        invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
+        year: moment().year(),
+        HostCollectiveId: hostCollectives[0].id,
+        UserId: user.id,
+      });
+      expect(result).to.be.true;
+    });
+    it('it returns false when all the other conditions are met except the document status is received', async () => {
+      const legalDoc = Object.assign({}, documentData, {
+        CollectiveId: userCollective.id,
+        requestStatus: RECEIVED,
+      });
+      await LegalDocument.create(legalDoc);
+
+      const result = await isUserTaxFormRequiredBeforePayment({
+        invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
+        year: moment().year(),
+        HostCollectiveId: hostCollectives[0].id,
+        UserId: user.id,
+      });
+      expect(result).to.be.false;
+    });
+    it('it returns false when all the other conditions are met except the host does not require a legal document', async () => {
+      const requiredDoc = await hostCollectives[0].getRequiredLegalDocuments();
+      requiredDoc[0].destroy();
+      const result = await isUserTaxFormRequiredBeforePayment({
+        invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
+        year: moment().year(),
+        HostCollectiveId: hostCollectives[0].id,
+        UserId: user.id,
+      });
+      expect(result).to.be.false;
+    });
+    it('it returns false when all the other conditions are met except the user does not cross the threshold', async () => {
+      await Expense.destroy({ where: { UserId: user.id } });
+
+      const result = await isUserTaxFormRequiredBeforePayment({
+        invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
+        year: moment().year(),
+        HostCollectiveId: hostCollectives[0].id,
+        UserId: user.id,
+      });
+      expect(result).to.be.false;
     });
   });
 
