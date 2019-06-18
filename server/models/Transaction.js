@@ -334,28 +334,30 @@ export default (Sequelize, DataTypes) => {
       return value;
     };
 
-    return exportToCSV(
-      transactions,
-      [
-        'id',
-        'createdAt',
-        'type',
-        'CollectiveId',
-        'amount',
-        'currency',
-        'description',
-        'netAmountInCollectiveCurrency',
-        'hostCurrency',
-        'hostCurrencyFxRate',
-        'paymentProcessorFeeInHostCurrency',
-        'hostFeeInHostCurrency',
-        'platformFeeInHostCurrency',
-        'netAmountInHostCurrency',
-        'Expense.privateMessage',
-      ],
-      getColumnName,
-      processValue,
-    );
+    const attributes = [
+      'id',
+      'createdAt',
+      'type',
+      'CollectiveId',
+      'amount',
+      'currency',
+      'description',
+      'netAmountInCollectiveCurrency',
+      'hostCurrency',
+      'hostCurrencyFxRate',
+      'paymentProcessorFeeInHostCurrency',
+      'hostFeeInHostCurrency',
+      'platformFeeInHostCurrency',
+      'netAmountInHostCurrency',
+      'Expense.privateMessage',
+    ];
+
+    // We only add tax amount for european hosts
+    if (transactions[0].hostCurrency === 'EUR') {
+      attributes.splice(5, 0, 'taxAmount');
+    }
+
+    return exportToCSV(transactions, attributes, getColumnName, processValue);
   };
 
   /**
