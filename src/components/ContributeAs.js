@@ -129,7 +129,7 @@ const useForm = ({ onProfileChange }) => {
  * Search is displayed if 5 or more profiles are passed in.
  */
 const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
-  const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ intl, onProfileChange });
+  const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ onProfileChange });
   if (state.search) {
     const test = new RegExp(escapeInput(state.search), 'i');
     profiles = profiles.filter(profile => profile.name.match(test));
