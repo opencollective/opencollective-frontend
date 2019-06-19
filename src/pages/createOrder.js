@@ -43,6 +43,7 @@ import ContributionFlowStepsProgress from '../components/ContributionFlowStepsPr
 import EventDetails from '../components/EventDetails';
 
 import { addCreateCollectiveMutation } from '../graphql/mutations';
+import base62 from 'base62-random';
 
 // Styles for the previous, next and submit buttons
 const PrevNextButton = styled(StyledButton)`
@@ -312,16 +313,21 @@ class CreateOrderPage extends React.Component {
       return false;
     }
 
-    // Check if we're creating a new organization
+    // Check if we're creating a new profile
     if (!this.state.stepProfile.id) {
       this.setState({ submitting: true });
+      if (this.state.stepProfile.name.match(/^anonym/)) {
+        // we should find something better to check for anonymous in multiple langs
+        // also this could arguably move to the backend
+        this.state.stepProfile.slug = `anonymous-${base62(6)}`;
+      }
 
       try {
         const { data: result } = await this.props.createCollective(this.state.stepProfile);
-        const createdOrg = result.createCollective;
+        const createdProfile = result.createCollective;
 
         await this.props.refetchLoggedInUser();
-        this.setState({ stepProfile: createdOrg, submitting: false });
+        this.setState({ stepProfile: createdProfile, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
         window.scrollTo(0, 0);
@@ -934,7 +940,7 @@ class CreateOrderPage extends React.Component {
         image={collective.image || collective.backgroundImage}
         title={eventSlug ? `Order tickets - ${collective.name}` : `Contribute - ${collective.name}`}
       >
-        <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4} mb={4}>
+        <Flex alignItems="center" flexDirection="column" mx="auto" width={320} pt={4} mb={4}>
           <Link className="goBack" {...this.getCollectiveLinkParams(collectiveSlug, eventSlug)}>
             <Logo collective={collective} className="logo" height="10rem" style={{ margin: '0 auto' }} />
             <H2 as="h1" color="black.900" textAlign="center">
