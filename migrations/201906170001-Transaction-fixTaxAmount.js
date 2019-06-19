@@ -5,9 +5,6 @@ import Promise from 'bluebird';
 
 const fetchTransactions = async () => {
   const query = { where: { taxAmount: { [Op.gt]: 0 } } };
-  if (process.env.LIMIT) {
-    query.limit = process.env.LIMIT;
-  }
   return await models.Transaction.findAll(query);
 };
 
@@ -66,9 +63,6 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const transactions = await fetchTransactions();
     await Promise.map(transactions, processTransaction);
-    if (process.env.LIMIT) {
-      throw new Error();
-    }
   },
 
   down: async queryInterface => {},
