@@ -60,7 +60,7 @@ export default class TierContributors extends React.Component {
           <P color="black.600" mb={4} px={3}>
             <FormattedMessage
               id="TierPage.ContributorsDescription"
-              defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
+              defaultMessage="Join us in contributing to this tier!"
               values={{ collectiveName }}
             />
           </P>

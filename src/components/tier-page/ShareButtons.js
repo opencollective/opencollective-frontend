@@ -22,7 +22,7 @@ import StyledRoundButton from '../StyledRoundButton';
 const messages = defineMessages({
   shareTitle: {
     id: 'TierPage.Share.title',
-    defaultMessage: 'Help {collective} to reach their goal!',
+    defaultMessage: 'Help {collective} reach their goal!',
   },
 });
 
