@@ -95,7 +95,7 @@ class CreateOrderPage extends React.Component {
       redeem: query.redeem,
       redirect: query.redirect,
       referral: query.referral,
-      customFieldsDefaultValues: query.data,
+      jsonUrl: query.jsonUrl,
     };
   }
 
@@ -111,7 +111,7 @@ class CreateOrderPage extends React.Component {
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
-    customFieldsDefaultValues: PropTypes.object,
+    jsonUrl: PropTypes.string,
     redirect: PropTypes.string,
     referral: PropTypes.string,
     redeem: PropTypes.bool,
@@ -487,22 +487,12 @@ class CreateOrderPage extends React.Component {
 
   getDefaultCustomFields() {
     const { customFields } = this.state;
-    let { customFieldsDefaultValues } = this.props;
+    const { jsonUrl } = this.props;
 
-    try {
-      // `customFieldsDefaultValues` is from the url data querystring
-      // it is needed as an object hence the need to parse
-      customFieldsDefaultValues = JSON.parse(customFieldsDefaultValues);
-    } catch (err) {
-      console.error(err);
-    }
-
-    if (customFieldsDefaultValues) {
+    if (jsonUrl) {
       forEach(customFields, field => {
-        // if customFieldsDefaultValues from the url has a property whose key
-        // is a name in the customFields, set it's value as field value.
-        if (customFieldsDefaultValues[field.name]) {
-          field.value = customFieldsDefaultValues[field.name];
+        if (field.name === 'jsonUrl') {
+          field.value = jsonUrl;
         }
       });
     }
