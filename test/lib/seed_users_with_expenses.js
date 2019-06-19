@@ -1,27 +1,14 @@
-import models from '../server/models';
+import models from '../../server/models';
 import moment from 'moment';
 
-import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../server/lib/taxForms';
-
-const { RequiredLegalDocument, LegalDocument, Collective, User, Expense } = models;
+const { RequiredLegalDocument, User, Expense } = models;
 const {
   documentType: { US_TAX_FORM },
 } = RequiredLegalDocument;
-const {
-  requestStatus: { REQUESTED, ERROR },
-} = LegalDocument;
 
 const US_TAX_FORM_THRESHOLD = 600e2;
-const HELLO_WORKS_KEY = '123';
-const HELLO_WORKS_SECRET = 'ABC';
 
 const OPEN_SOURCE_COLLECTIVE_ID = 83;
-
-let user, userCollective;
-
-const documentData = {
-  year: moment().year(),
-};
 
 function ExpenseOverThreshold({ incurredAt, UserId, CollectiveId, amount }) {
   return {
@@ -45,8 +32,6 @@ async function run() {
     },
   ];
   const users = await Promise.all(usersData.map(userData => User.createUserWithCollective(userData)));
-  user = users[0];
-  userCollective = await Collective.findByPk(user.CollectiveId);
 
   // An expense from this year over the threshold
   await Expense.create(
