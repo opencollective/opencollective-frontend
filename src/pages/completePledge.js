@@ -19,7 +19,7 @@ import { withUser } from '../components/UserProvider';
 class CompletePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
     return {
-      id: query.id,
+      id: Number(query.id),
     };
   }
 
