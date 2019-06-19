@@ -111,11 +111,22 @@ export async function createCollective(_, args, req) {
   }
 
   const promises = [
-    collective.editTiers(collectiveData.tiers),
     collective.addUserWithRole(req.remoteUser, roles.ADMIN, {
       CreatedByUserId: req.remoteUser.id,
     }),
   ];
+
+  if (collectiveData.tiers) {
+    promises.push(collective.editTiers(collectiveData.tiers));
+  }
+
+  if (collectiveData.paymentMethods) {
+    promises.push(
+      collective.editPaymentMethods(args.collective.paymentMethods, {
+        CreatedByUserId: req.remoteUser.id,
+      }),
+    );
+  }
 
   if (collectiveData.HostCollectiveId) {
     promises.push(collective.addHost(hostCollective, req.remoteUser));
