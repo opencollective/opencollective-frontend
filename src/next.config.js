@@ -67,7 +67,7 @@ const nextConfig = {
         },
       },
       {
-        test: /static\/.*\.(css|json)$/,
+        test: /static\/.*\.(css)$/,
         use: {
           loader: 'raw-loader',
         },
