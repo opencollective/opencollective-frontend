@@ -67,6 +67,18 @@ export const PaymentMethodDataVirtualCardInputType = new GraphQLInputObjectType(
   }),
 });
 
+export const CustomFieldsInputType = new GraphQLInputObjectType({
+  name: 'CustomFieldsInputType',
+  description: 'Input for custom fields for order',
+  fields: () => ({
+    type: { type: GraphQLString },
+    name: { type: GraphQLString },
+    value: { type: GraphQLString },
+    label: { type: GraphQLString },
+    required: { type: GraphQLBoolean },
+  }),
+});
+
 export const StripeCreditCardDataInputType = new GraphQLInputObjectType({
   name: 'StripeCreditCardDataInputType',
   description: 'Input for stripe credit card data',
@@ -316,7 +328,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType },
-    customFields: { type: GraphQLJSON },
+    customFields: { type: new GraphQLList(CustomFieldsInputType) },
     recaptchaToken: { type: GraphQLString },
     // For taxes
     taxAmount: {
