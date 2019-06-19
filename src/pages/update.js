@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -23,23 +22,11 @@ class UpdatePage extends React.Component {
     slug: PropTypes.string, // for addCollectiveCoverData
     updateSlug: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object.isRequired, // from withIntl
-    LoggedInUser: PropTypes.object,
+    LoggedInUser: PropTypes.object, // from withUser
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.messages = defineMessages({
-      'collective.contribute': {
-        id: 'collective.contribute',
-        defaultMessage: 'contribute',
-      },
-    });
-  }
-
   render() {
-    const { intl, data, updateSlug, LoggedInUser } = this.props;
+    const { data, updateSlug, LoggedInUser } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
@@ -54,7 +41,6 @@ class UpdatePage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -62,11 +48,8 @@ class UpdatePage extends React.Component {
           <CollectiveCover
             collective={collective}
             key={collective.slug}
-            cta={{
-              href: '#contribute',
-              label: intl.formatMessage(this.messages['collective.contribute']),
-            }}
             href={`/${collective.slug}`}
+            displayContributeLink={collective.isActive && collective.host ? true : false}
           />
 
           <div className="content">

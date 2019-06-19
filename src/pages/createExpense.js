@@ -78,7 +78,6 @@ class CreateExpensePage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -87,11 +86,8 @@ class CreateExpensePage extends React.Component {
             key={collective.slug}
             collective={collective}
             href={`/${collective.slug}`}
-            cta={{
-              href: `/${collective.slug}#contribute`,
-              label: 'contribute',
-            }}
             LoggedInUser={LoggedInUser}
+            displayContributeLink={collective.isActive && collective.host ? true : false}
           />
 
           <Flex flexDirection={['column', null, 'row']}>

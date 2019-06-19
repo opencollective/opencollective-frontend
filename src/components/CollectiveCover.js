@@ -52,6 +52,7 @@ class CollectiveCover extends React.Component {
     intl: PropTypes.object.isRequired,
     cta: PropTypes.object, // { href, label }
     context: PropTypes.string,
+    displayContributeLink: PropTypes.bool,
   };
 
   constructor(props) {
@@ -150,6 +151,7 @@ ${description}`;
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');
+
     let cta;
     if (this.props.cta) {
       if (this.props.cta.href) {
@@ -162,6 +164,12 @@ ${description}`;
       } else {
         cta = this.props.cta;
       }
+    } else if (this.props.displayContributeLink) {
+      cta = (
+        <ContributeLink href={`/${collective.slug}/contribute`}>
+          {intl.formatMessage(this.messages['contribute'])}
+        </ContributeLink>
+      );
     }
 
     const showGoalsCover =
