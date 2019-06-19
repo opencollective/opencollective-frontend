@@ -82,7 +82,7 @@ export default function(Sequelize, DataTypes) {
   LegalDocument.hasUserCompletedDocument = async ({ documentType, year, user }) => {
     const doc = await LegalDocument.findByTypeYearUser({ documentType, year, user });
 
-    return doc.requestStatus == RECEIVED;
+    return doc !== null && doc.requestStatus == RECEIVED;
   };
 
   LegalDocument.doesUserNeedToBeSentDocument = async ({ documentType, year, user }) => {
