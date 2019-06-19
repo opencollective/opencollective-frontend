@@ -5,9 +5,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 import { loadScriptAsync } from '../lib/utils';
 
@@ -29,6 +27,7 @@ import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesh
 import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
 import giftCardPageStyle from '!css-loader!../static/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
 import becomeAFiscalHostStyle from '!css-loader!../static/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
+import { withUser } from '../components/UserProvider';
 
 class MarketingPage extends React.Component {
   static async getInitialProps({ req, query: { pageSlug } }) {
@@ -38,7 +37,7 @@ class MarketingPage extends React.Component {
   }
 
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
     pageSlug: PropTypes.string.isRequired,
     confirmationPage: PropTypes.bool,
     intl: PropTypes.object.isRequired,
@@ -50,10 +49,6 @@ class MarketingPage extends React.Component {
   }
 
   async componentDidMount() {
-    this.props.getLoggedInUser().then(LoggedInUser => {
-      this.setState({ LoggedInUser });
-    });
-
     this.loadScripts();
   }
 
@@ -75,7 +70,7 @@ class MarketingPage extends React.Component {
 
   render() {
     const { pageSlug, intl } = this.props;
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
 
     let html, style, className;
 
@@ -124,4 +119,4 @@ class MarketingPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(MarketingPage)));
+export default withIntl(withUser(MarketingPage));

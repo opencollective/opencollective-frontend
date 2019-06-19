@@ -4,37 +4,32 @@ import PropTypes from 'prop-types';
 import CreateOrganization from '../components/CreateOrganization';
 import ErrorPage from '../components/ErrorPage';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class CreateOrganizationPage extends React.Component {
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
-    this.state = { loading: true };
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser, loading: false });
   }
 
   render() {
-    if (this.state.loading) {
+    const { LoggedInUser, loadingLoggedInUser } = this.props;
+
+    if (loadingLoggedInUser) {
       return <ErrorPage loading />;
     }
 
     return (
       <div>
-        <CreateOrganization LoggedInUser={this.state.LoggedInUser} />
+        <CreateOrganization LoggedInUser={LoggedInUser} />
       </div>
     );
   }
 }
 
-export default withData(withIntl(withLoggedInUser(CreateOrganizationPage)));
+export default withIntl(withUser(CreateOrganizationPage));

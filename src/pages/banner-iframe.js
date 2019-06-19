@@ -8,7 +8,6 @@ import gql from 'graphql-tag';
 
 import MembersWithData from '../components/MembersWithData';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class BannerIframe extends React.Component {
@@ -353,4 +352,4 @@ const getMembersQuery = gql`
 
 export const addCollectiveData = graphql(getMembersQuery);
 
-export default withData(withIntl(addCollectiveData(BannerIframe)));
+export default withIntl(addCollectiveData(BannerIframe));

@@ -3,28 +3,16 @@ import PropTypes from 'prop-types';
 
 import Hosts from '../components/Hosts';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class HostsPage extends React.Component {
   static propTypes = {
-    getLoggedInUser: PropTypes.func,
+    LoggedInUser: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
 
     return (
       <div>
@@ -34,4 +22,4 @@ class HostsPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(HostsPage)));
+export default withIntl(withUser(HostsPage));

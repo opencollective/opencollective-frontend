@@ -11,9 +11,8 @@ import UpdateWithData from '../components/UpdateWithData';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class UpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, updateSlug } }) {
@@ -25,7 +24,7 @@ class UpdatePage extends React.Component {
     updateSlug: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from withIntl
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -39,15 +38,8 @@ class UpdatePage extends React.Component {
     });
   }
 
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { intl, data, updateSlug } = this.props;
-    const { LoggedInUser } = this.state;
+    const { intl, data, updateSlug, LoggedInUser } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
@@ -93,4 +85,4 @@ class UpdatePage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(UpdatePage))));
+export default withIntl(withUser(addCollectiveCoverData(UpdatePage)));

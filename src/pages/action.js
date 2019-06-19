@@ -16,7 +16,6 @@ import { withUser } from '../components/UserProvider';
 
 import { capitalize } from '../lib/utils';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 /**
@@ -144,4 +143,4 @@ const addMutationForAction = action =>
 const actions = ['approveCollective', 'approveExpense', 'rejectExpense'];
 const addMutations = compose.apply(this, actions.map(action => addMutationForAction(action)));
 
-export default withData(withIntl(withUser(addMutations(ActionPage))));
+export default withIntl(withUser(addMutations(ActionPage)));

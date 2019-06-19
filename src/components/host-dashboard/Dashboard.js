@@ -10,10 +10,10 @@ import OrdersWithData from '../../apps/expenses/components/OrdersWithData';
 import ExpensesStatsWithData from '../../apps/expenses/components/ExpensesStatsWithData';
 
 import withIntl from '../../lib/withIntl';
-import withLoggedInUser from '../../lib/withLoggedInUser';
 import MessageBox from '../MessageBox';
 import Loading from '../Loading';
 import CollectivePicker from './CollectivePickerWithData';
+import { withUser } from '../UserProvider';
 
 class HostDashboard extends React.Component {
   static propTypes = {
@@ -245,4 +245,4 @@ export const addData = graphql(getDataQuery, {
   }),
 });
 
-export default withIntl(withLoggedInUser(addData(HostDashboard)));
+export default withIntl(withUser(addData(HostDashboard)));

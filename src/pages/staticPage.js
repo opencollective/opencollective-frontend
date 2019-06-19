@@ -8,11 +8,10 @@ import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
 import Link from '../components/Link';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 import staticPages from './static';
+import { withUser } from '../components/UserProvider';
 
 const getContent = (path, pageSlug) => {
   if (path) {
@@ -44,24 +43,13 @@ class StaticPage extends React.Component {
   };
 
   static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired,
+    LoggedInUser: PropTypes.object,
     data: PropTypes.object,
     query: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && (await getLoggedInUser());
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { path, pageSlug, title } = this.props;
+    const { path, pageSlug, title, LoggedInUser } = this.props;
 
     return (
       <div className="staticPage">
@@ -125,7 +113,7 @@ class StaticPage extends React.Component {
             }
           `}
         </style>
-        <Header title={title} LoggedInUser={this.state.LoggedInUser} />
+        <Header title={title} LoggedInUser={LoggedInUser} />
         <Body>
           <div className="content">
             {path && pageSlug && (
@@ -143,4 +131,4 @@ class StaticPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(StaticPage)));
+export default withIntl(withUser(StaticPage));
