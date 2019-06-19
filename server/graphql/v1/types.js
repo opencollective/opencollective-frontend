@@ -9,6 +9,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLScalarType,
+  GraphQLNonNull,
 } from 'graphql';
 
 import { Kind } from 'graphql/language';
@@ -27,6 +28,7 @@ import status from '../../constants/expense_status';
 import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
+import roles from '../../constants/roles';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
@@ -53,6 +55,27 @@ export const DateString = new GraphQLScalarType({
   name: 'DateString',
   serialize: value => {
     return value.toString();
+  },
+});
+
+export const IsoDateString = new GraphQLScalarType({
+  name: 'IsoDateString',
+  serialize: value => {
+    return value;
+  },
+  parseValue: value => {
+    return value;
+  },
+  parseLiteral: ast => {
+    if (ast.kind !== Kind.STRING) {
+      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
+    }
+
+    const date = moment.parseZone(ast.value);
+    if (!date.isValid()) {
+      throw new GraphQLError('Query error: unable to pass date string. Expected a valid ISO-8601 date string.');
+    }
+    return date;
   },
 });
 
@@ -325,6 +348,62 @@ export const MemberType = new GraphQLObjectType({
   },
 });
 
+export const ContributorRoleEnum = new GraphQLEnumType({
+  name: 'ContributorRole',
+  description: 'Possible roles for a contributor. Extends `Member.Role`.',
+  values: Object.values(roles).reduce((values, key) => {
+    return { ...values, [key]: {} };
+  }, {}),
+});
+
+export const ContributorType = new GraphQLObjectType({
+  name: 'Contributor',
+  description: `
+    A person or an entity that contributes financially or by any other mean to the mission
+    of the collective. While "Member" is dedicated to permissions, this type is meant
+    to surface all the public contributors.
+  `,
+  fields: {
+    id: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'A unique identifier for this member',
+    },
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'Name of the contributor',
+    },
+    roles: {
+      type: new GraphQLList(ContributorRoleEnum),
+      description: 'All the roles for a given contributor',
+      defaultValue: [roles.CONTRIBUTOR],
+    },
+    since: {
+      type: new GraphQLNonNull(IsoDateString),
+      description: 'Member join date',
+    },
+    totalAmountDonated: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'How much money the user has contributed for this (in cents, using collective currency)',
+    },
+    description: {
+      type: GraphQLString,
+      description: 'Description of how the member contribute. Will usually be a tier name, or "design" or "code".',
+    },
+    collectiveSlug: {
+      type: GraphQLString,
+      description: 'If the contributor has a page on Open Collective, this is the slug to link to it',
+    },
+    image: {
+      type: GraphQLString,
+      description: 'Contributor avatar or logo',
+    },
+    publicMessage: {
+      type: GraphQLString,
+      description: 'A public message from contributors to describe their contributions',
+    },
+  },
+});
+
 export const LocationType = new GraphQLObjectType({
   name: 'LocationType',
   description: 'Type for Location',
@@ -350,27 +429,6 @@ export const LocationType = new GraphQLObjectType({
       description: 'Longitude',
     },
   }),
-});
-
-export const IsoDateString = new GraphQLScalarType({
-  name: 'IsoDateString',
-  serialize: value => {
-    return value;
-  },
-  parseValue: value => {
-    return value;
-  },
-  parseLiteral: ast => {
-    if (ast.kind !== Kind.STRING) {
-      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
-    }
-
-    const date = moment.parseZone(ast.value);
-    if (!date.isValid()) {
-      throw new GraphQLError('Query error: unable to pass date string. Expected a valid ISO-8601 date string.');
-    }
-    return date;
-  },
 });
 
 export const InvoiceType = new GraphQLObjectType({
