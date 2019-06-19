@@ -57,6 +57,7 @@ const ContributeDetails = ({
   maxQuantity,
   showQuantity,
   showInterval,
+  customFields,
   onChange,
 }) => {
   const hasOptions = get(amountOptions, 'length', 0) > 0;
@@ -186,6 +187,23 @@ const ContributeDetails = ({
           )}
         </StyledInputField>
       )}
+      {customFields &&
+        customFields.length > 0 &&
+        customFields.map(customField => {
+          return (
+            <StyledInputField mt={2} key={customField.name} htmlFor={customField.name} label={customField.label}>
+              {fieldProps => (
+                <StyledInput
+                  type={customField.type}
+                  {...fieldProps}
+                  value={customField.value}
+                  width={1}
+                  diabled={true}
+                />
+              )}
+            </StyledInputField>
+          );
+        })}
     </Flex>
   );
 };
@@ -218,6 +236,8 @@ ContributeDetails.propTypes = {
   showQuantity: PropTypes.bool,
   /** Enable the interval input */
   showInterval: PropTypes.bool,
+  /** Enable the customFields inputs */
+  customFields: PropTypes.array,
 };
 
 ContributeDetails.defaultProps = {
