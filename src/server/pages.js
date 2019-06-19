@@ -8,7 +8,7 @@ pages
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
-  .add('signinBlockstack', '/signin/blockstack')
+  .add('blockstack', '/blockstack', 'signinBlockstack')
   .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
   .add('confirmEmail', '/confirm/email/:token')

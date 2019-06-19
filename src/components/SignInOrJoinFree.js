@@ -57,14 +57,14 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(this.props.redirect || window.location.pathname || '/');
   }
 
-  signInBlockstack = async data => {
+  signInBlockstack = async () => {
     if (this.state.submitting) {
       return false;
     }
     this.setState({ submitting: true });
 
-    const next = data.redirect || '/';
-    const redirectUrl = `${window.location.origin}/signin/blockstack?&next='${next}'`;
+    const next = this.getRedirectURL();
+    const redirectUrl = `${window.location.origin}/blockstack?&next='${next}'`;
     blockstack.createUserSession().redirectToSignIn(redirectUrl);
   };
 
@@ -152,7 +152,6 @@ class SignInOrJoinFree extends React.Component {
                 onEmailChange={email => this.setState({ email })}
                 onPersonalSubmit={this.createProfile}
                 onOrgSubmit={this.createProfile}
-                onBlockstackSubmit={this.signInBlockstack}
                 onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                 submitting={submitting}
                 mx={[2, 4]}
