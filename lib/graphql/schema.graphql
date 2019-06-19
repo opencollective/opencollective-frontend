@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jul 25 2019 12:22:34 GMT+0200 (GMT+02:00)
+# timestamp: Thu Jun 20 2019 10:02:15 GMT+1200 (New Zealand Standard Time)
 
 """
 Application model
@@ -419,7 +419,7 @@ interface CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+  updates(limit: Int, offset: Int): [Event]
   events(
     limit: Int
     offset: Int
@@ -1131,7 +1131,6 @@ type ExpenseType {
   payoutMethod: String
   privateMessage: String
   attachment: String
-  userTaxFormRequiredBeforePayment: Boolean
   user: UserDetails
   fromCollective: CollectiveInterface
   comments(limit: Int, offset: Int): CommentListType
@@ -1329,36 +1328,6 @@ input MemberInputType {
   role: String
   description: String
   since: DateString
-}
-
-"""
-Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
-"""
-type MembersStatsType {
-  """
-  We always have to return an id for apollo's caching
-  """
-  id: Int
-
-  """
-  Total number of contributors
-  """
-  all: Int
-
-  """
-  Number of individuals
-  """
-  users: Int
-
-  """
-  Number of organizations
-  """
-  organizations: Int
-
-  """
-  Number of collectives
-  """
-  collectives: Int
 }
 
 """
