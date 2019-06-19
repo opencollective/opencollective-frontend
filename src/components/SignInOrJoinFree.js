@@ -36,7 +36,7 @@ class SignInOrJoinFree extends React.Component {
   };
 
   state = {
-    form: 'signin',
+    form: 'create-account',
     error: null,
     submitting: false,
     unknownEmailError: false,
