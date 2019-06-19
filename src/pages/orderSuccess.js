@@ -252,7 +252,7 @@ class OrderSuccessPage extends React.Component {
           )}
           {!LoggedInUser && this.renderUserProfileBtn(true)}
           {LoggedInUser && !loggedInUserLoading && (
-            <Link route="collective" params={{ slug: get(LoggedInUser, 'collective.slug', '') }} passHref>
+            <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
               {this.renderUserProfileBtn()}
             </Link>
           )}
