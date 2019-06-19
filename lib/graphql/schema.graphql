@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jun 20 2019 10:11:35 GMT+1200 (New Zealand Standard Time)
+# timestamp: Thu Jun 20 2019 10:18:57 GMT+1200 (New Zealand Standard Time)
 
 """
 Application model
@@ -190,7 +190,20 @@ type Collective implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -316,6 +329,11 @@ interface CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON
+
+  """
+  Defines if a collective is pledged
+  """
+  isPledged: Boolean
   data: JSON
   slug: String
   path: String
@@ -402,7 +420,20 @@ interface CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -927,7 +958,20 @@ type Event implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -1272,6 +1316,7 @@ type Member {
   publicMessage: String
   tier: Tier
   stats: StatsMemberType
+  since: DateString
 }
 
 """
@@ -1283,6 +1328,7 @@ input MemberInputType {
   collective: CollectiveAttributesInputType
   role: String
   description: String
+  since: DateString
 }
 
 """
@@ -2018,7 +2064,20 @@ type Organization implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -2493,6 +2552,16 @@ type Tier {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Returns true if the tier has a long description
+  """
+  hasLongDescription: Boolean
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
   button: String
   amount: Int
   minimumAmount: Int
@@ -2544,6 +2613,11 @@ input TierInputType {
   A long, html-formatted description.
   """
   longDescription: String
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
 
   """
   amount in the lowest unit of the currency of the host (ie. in cents)
@@ -2912,10 +2986,22 @@ type User implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
-=======
   updates(limit: Int, offset: Int): [Event]
   events(limit: Int, offset: Int): [Event]
->>>>>>> Use correct gql schema.:src/graphql/schema.graphql
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
