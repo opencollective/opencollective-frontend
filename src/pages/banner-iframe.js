@@ -31,10 +31,6 @@ class BannerIframe extends React.Component {
     this.onChange();
   }
 
-  UNSAFE_componentWillReceiveProps() {
-    this.onChange();
-  }
-
   componentDidUpdate() {
     this.onChange();
   }

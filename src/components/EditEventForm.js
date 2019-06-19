@@ -52,9 +52,9 @@ class EditEventForm extends React.Component {
     });
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.event && (!this.props.event || nextProps.event.name != this.props.event.name)) {
-      this.setState({ event: nextProps.event, tiers: nextProps.event.tiers });
+  componentDidUpdate(prevProps) {
+    if (this.props.event && (!prevProps.event || this.props.event.name !== prevProps.event.name)) {
+      this.setState({ event: this.props.event, tiers: this.props.event.tiers });
     }
   }
 

@@ -67,29 +67,31 @@ class PaymentMethodChooser extends React.Component {
     });
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
+  componentDidUpdate(prevProps) {
     // TODO: Remove these hacky fixes
     // Most likely means need to rework the logic split between this and SubscriptionCard component
 
-    const { paymentMethodInUse, paymentMethodsList, editMode } = newProps;
+    const { paymentMethodInUse, paymentMethodsList, editMode } = this.props;
 
-    if (!paymentMethodInUse.name) {
-      // set state to modified
-      this.setState({ modified: true });
-      // If there was an existing card, select that
-      if (paymentMethodsList.length > 0) {
-        this.handleChange({ uuid: paymentMethodsList[0].uuid });
+    if (!prevProps.paymentMethodsList && paymentMethodsList) {
+      if (!paymentMethodInUse.name) {
+        // set state to modified
+        this.setState({ modified: true });
+        // If there was an existing card, select that
+        if (paymentMethodsList.length > 0) {
+          this.handleChange({ uuid: paymentMethodsList[0].uuid });
+        }
       }
-    }
 
-    // hack to revert back to cc selector
-    if (!this.props.editMode && editMode) {
-      this.setState({ showNewCreditCardForm: false });
-    }
+      // hack to revert back to cc selector
+      if (!prevProps.editMode && editMode) {
+        this.setState({ showNewCreditCardForm: false });
+      }
 
-    // handles the case where there are no existing credit cards
-    if (paymentMethodsList.length === 0 && editMode) {
-      this.setState({ showNewCreditCardForm: true });
+      // handles the case where there are no existing credit cards
+      if (paymentMethodsList.length === 0 && editMode) {
+        this.setState({ showNewCreditCardForm: true });
+      }
     }
   }
 
