@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick, isNil } from 'lodash';
+import { debounce, get, pick, isNil, forEach } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -95,7 +95,7 @@ class CreateOrderPage extends React.Component {
       redeem: query.redeem,
       redirect: query.redirect,
       referral: query.referral,
-      customFields: query.data,
+      customFieldsDefaultValues: query.data,
     };
   }
 
@@ -111,7 +111,7 @@ class CreateOrderPage extends React.Component {
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
-    customFields: PropTypes.string,
+    customFieldsDefaultValues: PropTypes.object,
     redirect: PropTypes.string,
     referral: PropTypes.string,
     redeem: PropTypes.bool,
@@ -142,6 +142,15 @@ class CreateOrderPage extends React.Component {
       stepSummary: null,
       error: null,
       stripe: null,
+      customFields: [
+        {
+          type: 'url',
+          label: 'URL of the JSON dependency file',
+          name: 'jsonUrl',
+          required: true,
+          value: '',
+        },
+      ], // customFields is currently set here because tier has no settings set yet, this will be changed later.
     };
   }
 
@@ -190,6 +199,7 @@ class CreateOrderPage extends React.Component {
       stepDetails: get(state.stepDetails, 'totalAmount')
         ? state.stepDetails
         : this.getDefaultStepDetails(this.props.data.Tier),
+      customFields: this.getDefaultCustomFields(),
     }));
   }
 
@@ -324,7 +334,7 @@ class CreateOrderPage extends React.Component {
 
   submitOrder = async (paymentMethodOverride = null) => {
     this.setState({ submitting: true, error: null });
-    const { stepProfile, stepDetails, stepPayment, stepSummary } = this.state;
+    const { stepProfile, stepDetails, stepPayment, stepSummary, customFields } = this.state;
 
     // Prepare payment method
     let paymentMethod = paymentMethodOverride;
@@ -345,7 +355,6 @@ class CreateOrderPage extends React.Component {
     }
 
     const tier = this.props.data.Tier;
-    const customFields = get(stepDetails, 'customFields');
 
     const order = {
       paymentMethod,
@@ -362,7 +371,7 @@ class CreateOrderPage extends React.Component {
       collective: pick(this.props.data.Collective, ['id']),
       tier: tier ? pick(tier, ['id', 'amount']) : undefined,
       description: decodeURIComponent(this.props.description || ''),
-      customFields: customFields[0] ? customFields[0] : {},
+      customFields: customFields,
     };
 
     try {
@@ -467,33 +476,34 @@ class CreateOrderPage extends React.Component {
     const amount = this.getDefaultAmount();
     const quantity = get(stepDetails, 'quantity') || this.props.quantity || 1;
     const interval = get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval;
-    const customFields =
-      get(stepDetails, 'customFields') || this.setDefaultValuesOfCustomFields(this.props.customFields);
 
     return {
       amount,
       quantity,
       interval,
       totalAmount: amount * quantity,
-      customFields,
     };
   }
 
-  setDefaultValuesOfCustomFields(customFieldsDefaultValues) {
-    const customFields = [];
+  getDefaultCustomFields() {
+    const { customFields } = this.state;
+    let { customFieldsDefaultValues } = this.props;
+
     try {
+      // `customFieldsDefaultValues` is from the url data querystring
+      // it is needed as an object hence the need to parse
       customFieldsDefaultValues = JSON.parse(customFieldsDefaultValues);
     } catch (err) {
       console.error(err);
     }
 
-    if (customFieldsDefaultValues && customFieldsDefaultValues.jsonUrl) {
-      customFields.push({
-        name: 'jsonUrl',
-        label: 'URL of the JSON dependency file',
-        type: 'url',
-        required: true,
-        value: customFieldsDefaultValues.jsonUrl,
+    if (customFieldsDefaultValues) {
+      forEach(customFields, field => {
+        // if customFieldsDefaultValues from the url has a property whose key
+        // is a name in the customFields, set it's value as field value.
+        if (customFieldsDefaultValues[field.name]) {
+          field.value = customFieldsDefaultValues[field.name];
+        }
       });
     }
     return customFields;
@@ -616,6 +626,15 @@ class CreateOrderPage extends React.Component {
   updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
   updateDetails = stepDetails => this.setState({ stepDetails });
 
+  handleCustomFieldsChange = (index, value) => {
+    const { customFields } = this.state;
+    customFields[index].value = value;
+
+    this.setState({
+      customFields,
+    });
+  };
+
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
     return get(this.props.data, 'Collective.host.id') === 11004 && !get(this.state, 'stepDetails.interval');
@@ -693,12 +712,11 @@ class CreateOrderPage extends React.Component {
 
   renderStep(step) {
     const { data } = this.props;
-    const { stepDetails, stepPayment } = this.state;
+    const { stepDetails, stepPayment, customFields } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
-    const customFields = get(stepDetails, 'customFields');
 
     if (step.name === 'contributeAs') {
       return (
@@ -758,6 +776,7 @@ class CreateOrderPage extends React.Component {
               showQuantity={tier && tier.type === 'TICKET'}
               showInterval={tier && tier.type !== 'TICKET'}
               customFields={customFields}
+              onCustomFieldsChange={this.handleCustomFieldsChange}
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
           </Container>
