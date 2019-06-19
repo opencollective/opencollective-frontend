@@ -95,6 +95,7 @@ class CreateOrderPage extends React.Component {
       redeem: query.redeem,
       redirect: query.redirect,
       referral: query.referral,
+      customFields: query.data,
     };
   }
 
@@ -110,6 +111,7 @@ class CreateOrderPage extends React.Component {
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
+    customFields: PropTypes.string,
     redirect: PropTypes.string,
     referral: PropTypes.string,
     redeem: PropTypes.bool,
@@ -145,7 +147,6 @@ class CreateOrderPage extends React.Component {
 
   async componentDidMount() {
     this.loadInitialData();
-
     // Load payment providers scripts in the background
     this.props.loadStripe();
     if (this.hasPaypal()) {
@@ -344,6 +345,8 @@ class CreateOrderPage extends React.Component {
     }
 
     const tier = this.props.data.Tier;
+    const customFields = get(stepDetails, 'customFields');
+
     const order = {
       paymentMethod,
       recaptchaToken,
@@ -359,6 +362,7 @@ class CreateOrderPage extends React.Component {
       collective: pick(this.props.data.Collective, ['id']),
       tier: tier ? pick(tier, ['id', 'amount']) : undefined,
       description: decodeURIComponent(this.props.description || ''),
+      customFields: customFields[0] ? customFields[0] : {},
     };
 
     try {
@@ -463,13 +467,36 @@ class CreateOrderPage extends React.Component {
     const amount = this.getDefaultAmount();
     const quantity = get(stepDetails, 'quantity') || this.props.quantity || 1;
     const interval = get(stepDetails, 'interval') || get(tier, 'interval') || this.props.interval;
+    const customFields =
+      get(stepDetails, 'customFields') || this.setDefaultValuesOfCustomFields(this.props.customFields);
 
     return {
       amount,
       quantity,
       interval,
       totalAmount: amount * quantity,
+      customFields,
     };
+  }
+
+  setDefaultValuesOfCustomFields(customFieldsDefaultValues) {
+    const customFields = [];
+    try {
+      customFieldsDefaultValues = JSON.parse(customFieldsDefaultValues);
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (customFieldsDefaultValues && customFieldsDefaultValues.jsonUrl) {
+      customFields.push({
+        name: 'jsonUrl',
+        label: 'URL of the JSON dependency file',
+        type: 'url',
+        required: true,
+        value: customFieldsDefaultValues.jsonUrl,
+      });
+    }
+    return customFields;
   }
 
   /** Get total amount based on stepDetails with taxes from step summary applied */
@@ -671,6 +698,7 @@ class CreateOrderPage extends React.Component {
     const tier = this.props.data.Tier;
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
+    const customFields = get(stepDetails, 'customFields');
 
     if (step.name === 'contributeAs') {
       return (
@@ -729,6 +757,7 @@ class CreateOrderPage extends React.Component {
               maxQuantity={get(tier, 'stats.availableQuantity') || get(tier, 'maxQuantity')}
               showQuantity={tier && tier.type === 'TICKET'}
               showInterval={tier && tier.type !== 'TICKET'}
+              customFields={customFields}
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
           </Container>
