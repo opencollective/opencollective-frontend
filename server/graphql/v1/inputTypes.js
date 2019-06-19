@@ -316,6 +316,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType },
+    customFields: { type: GraphQLJSON },
     recaptchaToken: { type: GraphQLString },
     // For taxes
     taxAmount: {
