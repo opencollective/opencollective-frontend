@@ -4,11 +4,6 @@ describe('Contribution Flow: Create profile', () => {
   it('Personal profile', () => {
     cy.visit('/apex/donate');
 
-    // Go to CreateProfile
-    cy.get('#content button')
-      .contains('Join Free')
-      .click();
-
     // Test frontend validations
     cy.get('#content input[name=email]').type('Incorrect value');
     cy.get('#content button[type=submit]').click();
@@ -29,11 +24,6 @@ describe('Contribution Flow: Create profile', () => {
 
   it('Organization profile', () => {
     cy.visit('/apex/donate');
-
-    // Go to CreateProfile
-    cy.get('#content button')
-      .contains('Join Free')
-      .click();
 
     // Select "Create oganization"
     cy.get('#content')
