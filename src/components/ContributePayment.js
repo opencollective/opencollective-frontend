@@ -273,7 +273,7 @@ class ContributePayment extends React.Component {
                 <Box my={3}>
                   <NewCreditCardForm
                     name="newCreditCardInfo"
-                    profileType={this.props.collective.type}
+                    profileType={get(this.props.collective), 'type')}
                     error={errors.newCreditCardInfo}
                     onChange={this.onChange}
                     onReady={this.props.onNewCardFormReady}
