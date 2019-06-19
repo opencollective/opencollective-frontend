@@ -509,7 +509,7 @@ class CreateExpenseForm extends React.Component {
     if (!LoggedInUser) {
       return (
         <div className="CreateExpenseForm">
-          <SignInOrJoinFree redirect={Router.asPath} />
+          <SignInOrJoinFree />
         </div>
       );
     } else {
