@@ -55,19 +55,87 @@ describe('transaction model', () => {
     });
   });
 
-  it('createFromPayload creates a double entry transaction', () => {
+  it('createFromPayload creates a double entry transaction for a Stripe payment in EUR with VAT', () => {
+    const transaction = {
+      description: '€121 for Vegan Burgers including €21 VAT',
+      amount: 12100,
+      amountInHostCurrency: 12100,
+      currency: 'EUR',
+      hostCurrency: 'EUR',
+      hostCurrencyFxRate: 1,
+      platformFeeInHostCurrency: 500,
+      hostFeeInHostCurrency: 500,
+      paymentProcessorFeeInHostCurrency: 300,
+      taxAmount: 2100,
+      type: 'CREDIT',
+      createdAt: '2015-05-29T07:00:00.000Z',
+      PaymentMethodId: 1,
+    };
+
     return Transaction.createFromPayload({
-      transaction: transactionsData[7],
+      transaction,
       CreatedByUserId: user.id,
       FromCollectiveId: user.CollectiveId,
       CollectiveId: collective.id,
     }).then(() => {
       return Transaction.findAll().then(transactions => {
         expect(transactions.length).to.equal(2);
+        expect(transactions[0].type).to.equal('DEBIT');
+        expect(transactions[0].netAmountInCollectiveCurrency).to.equal(-12100);
+        expect(transactions[0].currency).to.equal('EUR');
+        expect(transactions[0].HostCollectiveId).to.be.null;
+
+        expect(transactions[1].type).to.equal('CREDIT');
+        expect(transactions[1].amount).to.equal(12100);
+        expect(transactions[1].platformFeeInHostCurrency).to.equal(-500);
+        expect(transactions[1].paymentProcessorFeeInHostCurrency).to.equal(-300);
+        expect(transactions[1].taxAmount).to.equal(-2100);
+        expect(transactions[1].amount).to.equal(12100);
+        expect(transactions[1].netAmountInCollectiveCurrency).to.equal(8700);
         expect(transactions[0] instanceof models.Transaction).to.be.true;
-        expect(transactions[0].description).to.equal(transactionsData[7].description);
-        expect(transactions[0].amount).to.equal(-transactionsData[7].netAmountInCollectiveCurrency);
-        expect(transactions[1].amount).to.equal(-transactions[0].netAmountInCollectiveCurrency);
+        expect(transactions[0].description).to.equal(transaction.description);
+      });
+    });
+  });
+
+  it('createFromPayload creates a double entry transaction for a Stripe donation in EUR on a USD host', () => {
+    const transaction = {
+      description: '€100 donation to WWCode Berlin',
+      amount: 10000,
+      amountInHostCurrency: 11000,
+      currency: 'EUR',
+      hostCurrency: 'USD',
+      hostCurrencyFxRate: 1.1,
+      platformFeeInHostCurrency: 550,
+      hostFeeInHostCurrency: 550,
+      paymentProcessorFeeInHostCurrency: 330,
+      type: 'CREDIT',
+      createdAt: '2015-05-29T07:00:00.000Z',
+      PaymentMethodId: 1,
+    };
+
+    return Transaction.createFromPayload({
+      transaction,
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      CollectiveId: collective.id,
+    }).then(() => {
+      return Transaction.findAll().then(transactions => {
+        expect(transactions.length).to.equal(2);
+        expect(transactions[0].type).to.equal('DEBIT');
+        expect(transactions[0].netAmountInCollectiveCurrency).to.equal(-10000);
+        expect(transactions[0].currency).to.equal('EUR');
+        expect(transactions[0].HostCollectiveId).to.be.null;
+
+        expect(transactions[1].type).to.equal('CREDIT');
+        expect(transactions[1].amount).to.equal(10000);
+        expect(transactions[1].platformFeeInHostCurrency).to.equal(-550);
+        expect(transactions[1].paymentProcessorFeeInHostCurrency).to.equal(-330);
+        expect(transactions[1].taxAmount).to.be.null;
+        expect(transactions[1].amount).to.equal(10000);
+        expect(transactions[1].netAmountInCollectiveCurrency).to.equal(8700);
+        expect(transactions[0] instanceof models.Transaction).to.be.true;
+        expect(transactions[0].description).to.equal(transaction.description);
       });
     });
   });

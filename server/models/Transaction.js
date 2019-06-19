@@ -334,28 +334,30 @@ export default (Sequelize, DataTypes) => {
       return value;
     };
 
-    return exportToCSV(
-      transactions,
-      [
-        'id',
-        'createdAt',
-        'type',
-        'CollectiveId',
-        'amount',
-        'currency',
-        'description',
-        'netAmountInCollectiveCurrency',
-        'hostCurrency',
-        'hostCurrencyFxRate',
-        'paymentProcessorFeeInHostCurrency',
-        'hostFeeInHostCurrency',
-        'platformFeeInHostCurrency',
-        'netAmountInHostCurrency',
-        'Expense.privateMessage',
-      ],
-      getColumnName,
-      processValue,
-    );
+    const attributes = [
+      'id',
+      'createdAt',
+      'type',
+      'CollectiveId',
+      'amount',
+      'currency',
+      'description',
+      'netAmountInCollectiveCurrency',
+      'hostCurrency',
+      'hostCurrencyFxRate',
+      'paymentProcessorFeeInHostCurrency',
+      'hostFeeInHostCurrency',
+      'platformFeeInHostCurrency',
+      'netAmountInHostCurrency',
+      'Expense.privateMessage',
+    ];
+
+    // We only add tax amount for european hosts
+    if (transactions[0].hostCurrency === 'EUR') {
+      attributes.splice(5, 0, 'taxAmount');
+    }
+
+    return exportToCSV(transactions, attributes, getColumnName, processValue);
   };
 
   /**
@@ -460,17 +462,22 @@ export default (Sequelize, DataTypes) => {
         transaction.type = transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
         transaction.platformFeeInHostCurrency = toNegative(transaction.platformFeeInHostCurrency);
         transaction.hostFeeInHostCurrency = toNegative(transaction.hostFeeInHostCurrency);
+        transaction.taxAmount = toNegative(transaction.taxAmount);
         transaction.paymentProcessorFeeInHostCurrency = toNegative(transaction.paymentProcessorFeeInHostCurrency);
 
-        if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
+        if (transaction.amount > 0) {
           // populate netAmountInCollectiveCurrency for donations
           const fees =
+            (transaction.taxAmount || 0) +
             transaction.platformFeeInHostCurrency +
             transaction.hostFeeInHostCurrency +
             transaction.paymentProcessorFeeInHostCurrency;
-          transaction.netAmountInCollectiveCurrency = Math.round(
-            (transaction.amountInHostCurrency + fees) / transaction.hostCurrencyFxRate,
-          );
+          transaction.netAmountInCollectiveCurrency = transaction.amountInHostCurrency + fees; // `fees` is a negative number
+          if (transaction.hostCurrencyFxRate) {
+            transaction.netAmountInCollectiveCurrency = Math.round(
+              transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
+            );
+          }
         }
         return Transaction.createDoubleEntry(transaction);
       });
