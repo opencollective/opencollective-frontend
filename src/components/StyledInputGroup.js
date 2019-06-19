@@ -169,7 +169,7 @@ StyledInputGroup.propTypes = {
   /** Props passed to the prepend `Container` */
   prependProps: PropTypes.object,
   /** Max Width */
-  maxWidth: PropTypes.number,
+  maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default StyledInputGroup;

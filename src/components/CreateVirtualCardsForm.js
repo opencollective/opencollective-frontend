@@ -43,9 +43,9 @@ const InlineField = ({ name, children, label, isLabelClickable }) => (
 );
 
 InlineField.propTypes = {
-  name: PropTypes.object,
+  name: PropTypes.string,
   children: PropTypes.node,
-  label: PropTypes.object,
+  label: PropTypes.string,
   isLabelClickable: PropTypes.bool,
 };
 
