@@ -149,6 +149,11 @@ export default function(Sequelize, DataTypes) {
             args: [collectiveSlugBlacklist],
             msg: 'The slug given for this collective is a reserved keyword',
           },
+          isValid(value) {
+            if (!/^[\w-]+$/.test(value)) {
+              throw new Error('Slug may only contain alphanumeric characters or hyphens.');
+            }
+          },
         },
       },
 
