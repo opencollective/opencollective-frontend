@@ -83,6 +83,7 @@ const defaultFontSizes = {
   H6: 9,
   LeadParagraph: 16,
   Paragraph: 14,
+  Faq: 13,
   Caption: 12,
   Tiny: 10,
 };

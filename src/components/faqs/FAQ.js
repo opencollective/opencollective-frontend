@@ -27,7 +27,7 @@ const Entry = styled.details`
   summary {
     margin-top: ${themeGet('space.2')}px;
     margin-bottom: ${themeGet('space.2')}px;
-    font-size: ${themeGet('fontSizes.Caption')}px;
+    font-size: ${themeGet('fontSizes.Faq')}px;
     font-weight: 500;
     color: ${themeGet('colors.black.800')};
     /* Remove arrow on Firefox */
@@ -47,7 +47,7 @@ const Entry = styled.details`
     content: '+';
     display: inline-block;
     padding-left: ${themeGet('space.2')}px;
-    color: ${themeGet('colors.black.500')};
+    color: ${themeGet('colors.black.600')};
     font-weight: bold;
   }
 
@@ -64,8 +64,8 @@ const Title = styled.summary``;
 const Content = styled(Box)``;
 Content.defaultProps = {
   mb: 1,
-  fontSize: 'Caption',
-  color: 'black.500',
+  fontSize: 'Faq',
+  color: 'black.600',
 };
 
 const Separator = styled.hr`
