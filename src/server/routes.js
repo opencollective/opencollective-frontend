@@ -10,7 +10,7 @@ import { URL, URLSearchParams } from 'universal-url';
 import pages from './pages';
 import email from './lib/email';
 import { languages } from './intl';
-import { maxAge } from './middlewares';
+import { maxAge, corsEnabled } from './middlewares';
 import { logger } from './logger';
 import { getBaseApiUrl } from '../lib/utils';
 
@@ -43,6 +43,10 @@ export default (server, app) => {
 
   // Support older assets from website
   server.use('/public/images', express.static(path.join(__dirname, '../static/images')));
+
+  server.get('/manifest.json', maxAge(7200), corsEnabled(), (req, res) => {
+    return res.sendFile(path.join(__dirname, '../static/manifest.json'));
+  });
 
   server.get('/static/*', maxAge(7200));
 

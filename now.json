@@ -1,26 +1,5 @@
 {
   "version": 1,
   "name": "opencollective-frontend",
-  "type": "docker",
-  "static": {
-    "headers": [
-      {
-        "source": "/static/manifest.json",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "*"
-          },
-          {
-            "key": "Access-Control-Allow-Headers",
-            "value": "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding"
-          },
-          {
-            "key": "Access-Control-Allow-Methods",
-            "value": "POST, GET, OPTIONS, DELETE, PUT"
-          }
-        ]
-      }
-    ]
-  }
+  "type": "docker"
 }
