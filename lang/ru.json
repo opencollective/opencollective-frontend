@@ -510,6 +510,7 @@
   "expense.reject.btn": "отказать",
   "expense.rejected": "отказано",
   "expense.save": "сохранить",
+  "expense.userTaxFormRequiredBeforePayment": "tax form required",
   "expense.viewDetails": "Показать детали",
   "expenses.all": "все",
   "expenses.allCollectives": "Все коллективы",

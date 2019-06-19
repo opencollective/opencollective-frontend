@@ -510,6 +510,7 @@
   "expense.reject.btn": "reject",
   "expense.rejected": "rejected",
   "expense.save": "save",
+  "expense.userTaxFormRequiredBeforePayment": "tax form required",
   "expense.viewDetails": "View Details",
   "expenses.all": "all",
   "expenses.allCollectives": "All Collectives",

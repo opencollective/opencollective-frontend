@@ -510,6 +510,7 @@
   "expense.reject.btn": "リジェクト",
   "expense.rejected": "拒否されました",
   "expense.save": "保存",
+  "expense.userTaxFormRequiredBeforePayment": "tax form required",
   "expense.viewDetails": "詳細を見る",
   "expenses.all": "全て",
   "expenses.allCollectives": "全てのコレクティブ",
