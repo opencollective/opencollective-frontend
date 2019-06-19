@@ -817,7 +817,6 @@
   "pledge.ownerDetails": "You can claim this collective! You will be able to start raising funds and manage your expenses\n                  transparently. We will contact the organizations and individuals who made commitment for them to\n                  fulfill their pledge.",
   "pledge.ownerQuestion": "Do you own {collective}?",
   "pledge.stats": "{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}",
-  "pledgedCollective": "Pledged Collective",
   "privacyPolicy": "Privacy Policy",
   "profile.incognito": "Incognito",
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
