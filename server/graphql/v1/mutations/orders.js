@@ -441,6 +441,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       status: status.PENDING, // default status, will get updated after the order is processed
     };
 
+    // Handle status for "free" orders
+    if (orderData.totalAmount === 0) {
+      orderData.status = order.interval ? status.ACTIVE : status.PAID;
+    }
+
     if (order.referral && get(order, 'referral.id') !== orderData.FromCollectiveId) {
       orderData.ReferralCollectiveId = order.referral.id;
     }
