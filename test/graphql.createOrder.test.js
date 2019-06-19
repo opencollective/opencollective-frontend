@@ -695,7 +695,7 @@ describe('createOrder', () => {
     let res = await utils.graphqlQuery(createOrderQuery, { order }, duc);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal(
-      "You don't have sufficient permissions to create an order on behalf of the newco organization",
+      "You don't have enough permissions to use this payment method (you need to be a member or an admin of the collective that owns this payment method)",
     );
 
     await models.Member.create({
