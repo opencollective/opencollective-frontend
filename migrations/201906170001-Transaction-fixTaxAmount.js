@@ -4,7 +4,39 @@ import models, { sequelize, Op } from '../server/models';
 import Promise from 'bluebird';
 
 const fetchTransactions = async () => {
-  const query = { where: { taxAmount: { [Op.gt]: 0 } } };
+  const query = {
+    attributes: [
+      'id',
+      'type',
+      'description',
+      'amount',
+      'currency',
+      'createdAt',
+      'updatedAt',
+      'CollectiveId',
+      'CreatedByUserId',
+      'PaymentMethodId',
+      'deletedAt',
+      'data',
+      'OrderId',
+      'platformFeeInHostCurrency',
+      'hostFeeInHostCurrency',
+      'paymentProcessorFeeInHostCurrency',
+      'hostCurrency',
+      'hostCurrencyFxRate',
+      'amountInHostCurrency',
+      'netAmountInCollectiveCurrency',
+      'ExpenseId',
+      'uuid',
+      'FromCollectiveId',
+      'HostCollectiveId',
+      'TransactionGroup',
+      'RefundTransactionId',
+      'UsingVirtualCardFromCollectiveId',
+      'taxAmount',
+    ],
+    where: { taxAmount: { [Op.gt]: 0 } },
+  };
   return await models.Transaction.findAll(query);
 };
 
