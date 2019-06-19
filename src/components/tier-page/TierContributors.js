@@ -61,7 +61,6 @@ export default class TierContributors extends React.Component {
             <FormattedMessage
               id="TierPage.ContributorsDescription"
               defaultMessage="Join us in contributing to this tier!"
-              values={{ collectiveName }}
             />
           </P>
           {filters.length > 2 && members.length >= TierContributors.MIN_MEMBERS_TO_SHOW_FILTERS && (
