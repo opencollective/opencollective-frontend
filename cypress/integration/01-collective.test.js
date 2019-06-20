@@ -35,8 +35,8 @@ describe('collective page', () => {
   });
 
   it('loads the latest transactions', () => {
-    cy.get('#transactions .itemsList .transaction').should('have.length', 5);
-    cy.get('#transactions .itemsList .transaction:first .AmountCurrency').contains('$10');
+    cy.get('#transactions .itemsList .transaction').should('have.length');
+    cy.get('#transactions .itemsList .transaction:first .AmountCurrency').contains('$2');
     cy.get('#transactions .itemsList .transaction:first .AmountCurrency .currency').contains('USD');
   });
 
@@ -48,7 +48,7 @@ describe('collective page', () => {
     cy.get('.TransactionsPage .filterBtnGroup button')
       .last()
       .click();
-    cy.get('.TransactionsPage .itemsList .transaction').should('have.length', 8);
+    cy.get('.TransactionsPage .itemsList .transaction').should('have.length', 6);
     cy.get('.TransactionsPage .desktopOnly .menu .item.about').click();
   });
 });

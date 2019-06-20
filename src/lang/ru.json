@@ -474,6 +474,7 @@
   "expenses.byRecipient": "Расходы по {recipient}",
   "expenses.collectivePicker.subtitle": "для {n} {n, plural, one {коллектива} other {коллективов}}",
   "expenses.collectivePicker.title": "Финансы",
+  "expenses.create.login": "Sign up or login to submit an expense",
   "expenses.empty": "Нет расходов",
   "expenses.paid": "оплачено",
   "expenses.pending": "ожидает",

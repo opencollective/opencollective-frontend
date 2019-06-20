@@ -474,6 +474,7 @@
   "expenses.byRecipient": "Dépenses par {recipient}",
   "expenses.collectivePicker.subtitle": "pour {n} {n, plural, one {collectif} other {collectifs}}",
   "expenses.collectivePicker.title": "Finances",
+  "expenses.create.login": "Sign up or login to submit an expense",
   "expenses.empty": "Pas de dépenses",
   "expenses.paid": "payé",
   "expenses.pending": "en attente",
