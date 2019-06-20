@@ -368,7 +368,7 @@ export const loaders = req => {
             });
           });
       }),
-      membersStats: new DataLoader(tiersIds => {
+      contributorsStats: new DataLoader(tiersIds => {
         return models.Member.findAll({
           attributes: [
             'TierId',
