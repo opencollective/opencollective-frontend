@@ -122,7 +122,7 @@ export async function createCollective(_, args, req) {
 
   if (collectiveData.paymentMethods) {
     promises.push(
-      collective.editPaymentMethods(args.collective.paymentMethods, {
+      collective.editPaymentMethods(collectiveData.paymentMethods, {
         CreatedByUserId: req.remoteUser.id,
       }),
     );
