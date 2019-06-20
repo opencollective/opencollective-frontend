@@ -377,6 +377,27 @@ export const ContributorType = new GraphQLObjectType({
       description: 'All the roles for a given contributor',
       defaultValue: [roles.CONTRIBUTOR],
     },
+    isCore: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a core contributor (admin)',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.ADMIN);
+      },
+    },
+    isBacker: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a financial contributor',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.BACKER);
+      },
+    },
+    isFundraiser: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a core contributor (admin)',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.FUNDRAISER);
+      },
+    },
     since: {
       type: new GraphQLNonNull(IsoDateString),
       description: 'Member join date',
