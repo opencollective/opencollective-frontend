@@ -13,6 +13,7 @@ import SignInOrJoinFree from '../../../components/SignInOrJoinFree';
 import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
 import Container from '../../../components/Container';
+import { P } from '../../../components/Text';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -508,6 +509,9 @@ class CreateExpenseForm extends React.Component {
     if (!LoggedInUser) {
       return (
         <div className="CreateExpenseForm">
+          <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph" marginbottom="40">
+            <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense" />
+          </P>
           <SignInOrJoinFree />
         </div>
       );
