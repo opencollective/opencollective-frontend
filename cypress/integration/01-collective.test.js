@@ -35,7 +35,7 @@ describe('collective page', () => {
   });
 
   it('loads the latest transactions', () => {
-    cy.get('#transactions .itemsList .transaction').should('have.length');
+    cy.get('#transactions .itemsList .transaction').should('have.length', 5);
     cy.get('#transactions .itemsList .transaction:first .AmountCurrency').contains('$2');
     cy.get('#transactions .itemsList .transaction:first .AmountCurrency .currency').contains('USD');
   });
