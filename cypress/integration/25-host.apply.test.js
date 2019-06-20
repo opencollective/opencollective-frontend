@@ -5,9 +5,9 @@ describe('apply to host', () => {
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
       .click();
-    cy.fillInputField('email', 'testuser@opencollective.com');
+    cy.get('#email').fillInputField('email', 'testuser@opencollective.com');
     cy.wait(500);
-    cy.contains('.LoginForm button', 'Sign In').click();
+    cy.contains('.SignInOrJoinFree button', 'Sign In').click();
     cy.fillInputField('name', 'New collective');
     cy.fillInputField('description', 'short description for new collective');
     cy.fillInputField('website', 'https://xdamman.com');
