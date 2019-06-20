@@ -114,6 +114,7 @@
     "secret": "FanG4FjeV3aGHjpS2A1YckyWuhvxfKHoZN5Q5bHO",
     "workflowId": "qdUbX5nw8sMZzykz",
     "callbackPath": "/helloworks/callback",
+    "documentEncryptionKey": "Pz/LnMPzhxQqsbXZ0SCb3sP0uhw8dCxspoAXLXO4CV8=",
     "aws": {
       "s3": {
         "bucket": "opencollective-helloworks-documents",
