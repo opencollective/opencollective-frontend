@@ -10,7 +10,6 @@ import ContributorsFilter, { filterMembers, getMembersFilters, CONTRIBUTOR_FILTE
 
 export default class TierContributors extends React.Component {
   static propTypes = {
-    collectiveName: PropTypes.string.isRequired,
     members: PropTypes.arrayOf(PropTypes.object),
     /** Some statistics about this tier */
     membersStats: PropTypes.shape({
@@ -37,7 +36,7 @@ export default class TierContributors extends React.Component {
   filterMembers = memoizeOne(filterMembers);
 
   render() {
-    const { collectiveName, members, membersStats } = this.props;
+    const { members, membersStats } = this.props;
     const { filter } = this.state;
     const filters = this.getMembersFilters(members);
     const filteredMembers = this.filterMembers(members, filter);
