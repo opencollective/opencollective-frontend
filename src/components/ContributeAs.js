@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { capitalize, omit, uniqBy } from 'lodash';
 import styled from 'styled-components';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 

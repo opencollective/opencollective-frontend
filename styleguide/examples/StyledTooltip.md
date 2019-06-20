@@ -8,7 +8,7 @@ import { Info } from 'styled-icons/feather/Info';
 ```js
 import { P } from 'components/Text';
 
-const content = <P>Hello, I&apos;m a tooltip!</P>;
+const content = () => <P>Hello, I&apos;m a tooltip!</P>;
 
 <StyledTooltip content={content}>
   <P display="inline">Hover, focus, or click on me</P>
@@ -19,7 +19,7 @@ const content = <P>Hello, I&apos;m a tooltip!</P>;
 import { P } from 'components/Text';
 import { Info } from 'styled-icons/feather/Info';
 
-const content = (
+const content = () => (
   <div>
     <P fontWeight="bold" mb={2}>
       Example heading

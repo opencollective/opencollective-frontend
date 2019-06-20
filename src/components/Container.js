@@ -1,89 +1,26 @@
 import styled from 'styled-components';
 import tag from 'clean-tag';
-import {
-  alignItems,
-  alignSelf,
-  background,
-  backgroundImage,
-  backgroundPosition,
-  backgroundRepeat,
-  backgroundSize,
-  borders,
-  borderColor,
-  borderRadius,
-  bottom,
-  boxShadow,
-  color,
-  display,
-  flex,
-  flexDirection,
-  flexWrap,
-  fontSize,
-  fontWeight,
-  height,
-  justifyContent,
-  left,
-  lineHeight,
-  maxHeight,
-  maxWidth,
-  minHeight,
-  minWidth,
-  order,
-  position,
-  right,
-  size,
-  space,
-  textAlign,
-  top,
-  width,
-  zIndex,
-} from 'styled-system';
+import { background, border, flexbox, shadow, color, position, layout, space, typography } from 'styled-system';
 import { cursor, clear, float, overflow, pointerEvents } from '../lib/styled_system_custom';
+import propTypes from '@styled-system/prop-types';
 
 const Container = styled(tag)`
   box-sizing: border-box;
 
-  ${alignItems}
-  ${alignSelf}
+  ${flexbox}
   ${background}
-  ${backgroundImage}
-  ${backgroundPosition}
-  ${backgroundRepeat}
-  ${backgroundSize}
-  ${borders}
-  ${borderColor}
-  ${borderRadius}
-  ${bottom}
-  ${boxShadow}
+  ${border}
+  ${shadow}
   ${clear}
   ${color}
   ${cursor}
-  ${display}
-  ${flex}
-  ${flexDirection}
-  ${flexWrap}
-  ${fontWeight}
   ${float}
-  ${fontSize}
-  ${height}
-  ${justifyContent}
-  ${left}
-  ${lineHeight}
-  ${maxHeight}
-  ${maxWidth}
-  ${minHeight}
-  ${minWidth}
-  ${order}
   ${overflow}
   ${pointerEvents}
   ${position}
-  ${right}
-  ${size}
+  ${layout}
   ${space}
-  ${top}
-  ${textAlign}
-  ${width}
-  ${zIndex}
+  ${typography}
   ${props =>
     props.clearfix &&
     `
@@ -95,8 +32,16 @@ const Container = styled(tag)`
     `}
 `;
 
-Container.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('float', 'clear', 'clearfix', 'overflow'),
+Container.propTypes = {
+  ...propTypes.background,
+  ...propTypes.border,
+  ...propTypes.color,
+  ...propTypes.flexbox,
+  ...propTypes.layout,
+  ...propTypes.position,
+  ...propTypes.shadow,
+  ...propTypes.space,
+  ...propTypes.typography,
 };
 
 export default Container;

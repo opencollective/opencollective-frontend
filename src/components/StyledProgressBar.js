@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { backgroundColor, borderRadius, width, height } from 'styled-system';
+import { color, border, layout } from 'styled-system';
 import { clamp } from 'lodash';
 
 const BackgroundBar = styled.div`
   position: relative;
 
-  ${height}
-  ${backgroundColor}
-  ${borderRadius}
+  ${layout}
+  ${color}
+  ${border}
 `;
 
 const ProgressBar = styled.div`
   position: absolute;
 
-  ${width}
-  ${height}
-  ${backgroundColor}
-  ${borderRadius}
+  ${layout}
+  ${color}
+  ${border}
 `;
 
 /**
@@ -26,13 +25,8 @@ const ProgressBar = styled.div`
  */
 const StyledProgressBar = ({ percentage, color, backgroundColor, height, borderRadius }) => {
   return (
-    <BackgroundBar backgroundColor={backgroundColor} height={height} borderRadius={borderRadius}>
-      <ProgressBar
-        width={`${clamp(percentage, 0, 1) * 100}%`}
-        backgroundColor={color}
-        height={height}
-        borderRadius={borderRadius}
-      />
+    <BackgroundBar bg={backgroundColor} height={height} borderRadius={borderRadius}>
+      <ProgressBar width={`${clamp(percentage, 0, 1) * 100}%`} bg={color} height={height} borderRadius={borderRadius} />
     </BackgroundBar>
   );
 };

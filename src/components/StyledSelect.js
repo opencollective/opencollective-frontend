@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Downshift from 'downshift';
 import styled, { css } from 'styled-components';
+import themeGet from '@styled-system/theme-get';
 import { CaretDown } from 'styled-icons/fa-solid/CaretDown';
-import { themeGet } from 'styled-system';
 import { Box } from '@rebass/grid';
 import tag from 'clean-tag';
 

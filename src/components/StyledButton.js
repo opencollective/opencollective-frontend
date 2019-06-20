@@ -2,23 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import tag from 'clean-tag';
-import {
-  backgroundColor,
-  border,
-  borderRadius,
-  color,
-  display,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  height,
-  minWidth,
-  maxWidth,
-  space,
-  textAlign,
-  width,
-  themeGet,
-} from 'styled-system';
+import { border, color, layout, typography, space } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
@@ -55,20 +40,11 @@ const StyledButtonContent = styled(tag.button)`
       }
     `}
 
-  ${backgroundColor}
   ${border}
-  ${borderRadius}
   ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontWeight}
-  ${minWidth}
-  ${maxWidth}
   ${space}
-  ${textAlign}
-  ${width}
-  ${height}
+  ${layout}
+  ${typography}
   ${textTransform}
 `;
 
@@ -130,13 +106,7 @@ StyledButton.propTypes = {
 };
 
 StyledButton.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat(
-    'buttonStyle',
-    'buttonSize',
-    'asLink',
-    'textTransform',
-    'backgroundColor',
-  ),
+  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'asLink', 'textTransform'),
   buttonSize: 'medium',
   buttonStyle: 'standard',
   loading: false,

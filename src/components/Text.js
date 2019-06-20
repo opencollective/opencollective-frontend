@@ -1,31 +1,18 @@
 import styled from 'styled-components';
-import {
-  color,
-  display,
-  fontFamily,
-  fontSize,
-  fontStyle,
-  fontWeight,
-  lineHeight,
-  letterSpacing,
-  space,
-  textAlign,
-} from 'styled-system';
+import { color, display, space, typography } from 'styled-system';
 import tag from 'clean-tag';
 
 import { textTransform, whiteSpace, wordBreak, cursor } from '../lib/styled_system_custom';
 
-export const P = styled(tag.p)`
+export const P = styled(tag.p).attrs(props => ({
+  // Overrides default margin Y to avoid global styles
+  mb: props.mb || props.my || props.m || 0,
+  mt: props.mt || props.my || props.m || 0,
+}))`
   ${color}
   ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontStyle}
-  ${fontWeight}
-  ${lineHeight}
-  ${letterSpacing}
   ${space}
-  ${textAlign}
+  ${typography}
   ${textTransform}
   ${whiteSpace}
   ${wordBreak}
@@ -37,7 +24,6 @@ P.defaultProps = {
   fontSize: 'Paragraph',
   letterSpacing: '-0.2px',
   lineHeight: 'Paragraph',
-  m: 0,
 };
 
 export const Span = P.withComponent(tag.span);

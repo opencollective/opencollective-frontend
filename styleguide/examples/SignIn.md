@@ -25,5 +25,5 @@ initialState = { action: null };
 ### With an unknown email
 
 ```js
-<SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unkownEmail />
+<SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unknownEmail />
 ```

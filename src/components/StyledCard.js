@@ -1,21 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {
-  textAlign,
-  background,
-  borderColor,
-  borders,
-  borderRadius,
-  boxShadow,
-  color,
-  display,
-  height,
-  maxHeight,
-  maxWidth,
-  minHeight,
-  minWidth,
-} from 'styled-system';
-import { Box } from '@rebass/grid';
+import { compose, background, border, shadow, color, layout, space, typography } from 'styled-system';
+import styledPropTypes from '@styled-system/prop-types';
 import { overflow } from '../lib/styled_system_custom';
 
 /**
@@ -23,57 +9,29 @@ import { overflow } from '../lib/styled_system_custom';
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledCard = styled(Box)`
-  ${background}
-  ${borders}
-  ${borderColor}
-  ${borderRadius}
-  ${boxShadow}
-  ${color}
-  ${display}
-  ${height}
-  ${maxHeight}
-  ${maxWidth}
-  ${minHeight}
-  ${minWidth}
-  ${overflow}
-  ${textAlign}
-`;
+const StyledCard = styled.div(
+  compose(
+    typography,
+    background,
+    border,
+    shadow,
+    color,
+    layout,
+    space,
+    overflow,
+  ),
+);
 
 StyledCard.propTypes = {
-  /** styled-system prop: accepts any css 'background' value or theme color */
-  bg: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'border-color' value or theme color */
-  borderColor: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'border' value */
-  borders: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'border-radius' value */
-  borderRadius: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'box-shadow' value */
-  boxShadow: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'color' value */
-  color: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'display' value */
-  display: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'height' value */
-  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'max-height' value */
-  maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'max-width' value */
-  maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'min-height' value */
-  minHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'min-width' value */
-  minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  ...styledPropTypes.typography,
+  ...styledPropTypes.background,
+  ...styledPropTypes.border,
+  ...styledPropTypes.shadow,
+  ...styledPropTypes.color,
+  ...styledPropTypes.layout,
+  ...styledPropTypes.space,
   /** styled-system prop: accepts any css 'overflow' value */
   overflow: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * styled-system prop: adds margin & padding props
-   * see: https://github.com/jxnblk/styled-system/blob/master/docs/api.md#space
-   */
-  space: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** styled-system prop: accepts any css 'text-align' value */
-  textAlign: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
 };
 
 StyledCard.defaultProps = {

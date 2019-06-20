@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled, { css } from 'styled-components';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Flex, Box } from '@rebass/grid';
 import { transparentize } from 'polished';
 import { Check } from 'styled-icons/fa-solid/Check';
