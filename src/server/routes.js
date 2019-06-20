@@ -6,11 +6,12 @@ import express from 'express';
 import proxy from 'express-http-proxy';
 import { template } from 'lodash';
 import { URL, URLSearchParams } from 'universal-url';
+import cors from 'cors';
 
 import pages from './pages';
 import email from './lib/email';
 import { languages } from './intl';
-import { maxAge, corsEnabled } from './middlewares';
+import { maxAge } from './middlewares';
 import { logger } from './logger';
 import { getBaseApiUrl } from '../lib/utils';
 
@@ -44,7 +45,7 @@ export default (server, app) => {
   // Support older assets from website
   server.use('/public/images', express.static(path.join(__dirname, '../static/images')));
 
-  server.get('/manifest.json', maxAge(7200), corsEnabled(), (req, res) => {
+  server.get('/static/manifest.json', maxAge(7200), cors(), (req, res) => {
     return res.sendFile(path.join(__dirname, '../static/manifest.json'));
   });
 

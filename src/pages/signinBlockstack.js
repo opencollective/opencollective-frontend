@@ -17,8 +17,9 @@ import { getPublicKeyFromPrivate, decryptContent } from 'blockstack';
 import { Router } from '../server/pages';
 import { createUserByPublicKeyQuery } from '../graphql/mutations';
 import { graphql } from 'react-apollo';
-import withLoggedInUser from '../lib/withLoggedInUser';
-import withData from '../lib/withData';
+import { FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
+import { withUser } from '../components/UserProvider';
 
 const Icon = styled(User)`
   color: ${themeGet('colors.primary.300')};
@@ -64,75 +65,78 @@ class SignInBlockstack extends React.Component {
     const userSession = createUserSession();
     const redirect = this.props.next || '/';
     if (userSession.isSignInPending()) {
-      userSession.handlePendingSignIn(this.props.authResponse).then(userData => {
-        this.setState({ userData });
-        const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
-        this.checkUserExistence(userData.email, publicKey).then(exists => {
-          if (exists) {
-            this.setState({ exists, loading: false });
-            this.signinPublicKey(userData, publicKey, redirect);
-          } else {
-            checkEmailExistence(userData.email).then(existsEmail => {
-              this.setState({ exists, existsEmail, loading: false });
-              if (existsEmail) {
-                this.signinEmail(userData, publicKey, redirect);
-              } else {
-                this.createUser(userData, publicKey, redirect);
-              }
-            });
-          }
-        });
-      });
+      const userData = await userSession.handlePendingSignIn(this.props.authResponse);
+      this.setState({ userData });
+      const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
+      const exists = await this.checkUserExistence(userData.email, publicKey);
+      if (exists) {
+        this.setState({ exists, loading: false });
+        this.signinPublicKey(userData, publicKey, redirect);
+      } else {
+        const existsEmail = await checkEmailExistence(userData.email);
+        this.setState({ exists, existsEmail, loading: false });
+        if (existsEmail) {
+          this.signinEmail(userData, publicKey, redirect);
+        } else {
+          this.createUser(userData, publicKey, redirect);
+        }
+      }
     } else if (userSession.isUserSignedIn()) {
-      this.props.getLoggedInUser().then(async () => {
+      if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
         // TODO connect public key with logged in profile if user logged in
         await Router.replaceRoute(redirect);
-      });
+      }
     } else {
       this.setState({ loading: false });
       await Router.replaceRoute(`/signin?next='${redirect}'`);
     }
   }
 
-  createUser(userData, publicKey, redirect) {
+  async UNSAFE_componentWillReceiveProps(nextProps) {
+    const redirect = nextProps.next || this.props.next || '/';
+    if (!nextProps.loadingLoggedInUser && nextProps.LoggedInUser) {
+      // TODO connect public key with logged in profile if user logged in
+      await Router.replaceRoute(redirect);
+    }
+  }
+
+  async createUser(userData, publicKey, redirect) {
     const firstName = userData.username;
     const lastName = userData.profile.name;
     const organization = this.props.organizationData;
-    this.props
-      .createUser({
+    try {
+      const response = await this.props.createUser({
         user: { email: userData.email, firstName, lastName, publicKey },
         organization,
         redirect,
-      })
-      .then(async response => {
-        if (response.data && response.data.createUserByPublicKey && response.data.createUserByPublicKey.redirect) {
-          const link = decryptContent(response.data.createUserByPublicKey.redirect, {
-            privateKey: userData.appPrivateKey,
-          });
-          await Router.replaceRoute(link);
-        } else {
-          this.setState({ error: 'Failed to create profile' });
-        }
-      })
-      .catch(() => {
-        this.setState({ error: 'Failed to create profile' });
       });
+      if (response.data && response.data.createUserByPublicKey && response.data.createUserByPublicKey.redirect) {
+        const link = decryptContent(response.data.createUserByPublicKey.redirect, {
+          privateKey: userData.appPrivateKey,
+        });
+        await Router.replaceRoute(link);
+      } else {
+        this.setState({ error: 'Failed to create profile' });
+      }
+    } catch (error) {
+      this.setState({ error: 'Failed to create profile' });
+    }
   }
 
-  signinPublicKey(userData, publicKey, redirect) {
+  async signinPublicKey(userData, publicKey, redirect) {
     const user = { email: userData.email, publicKey };
-    this.signinPublicKeyPost(user, redirect)
-      .then(async response => {
-        if (response.redirect) {
-          const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
-          await Router.replaceRoute(link);
-        } else {
-          this.setState({ error: 'Failed to signin' });
-        }
-      })
-      .catch(error => {
-        this.setState({ error: `Failed to signin, ${error}` });
-      });
+    try {
+      const response = await this.signinPublicKeyPost(user, redirect);
+
+      if (response.redirect) {
+        const link = decryptContent(response.redirect, { privateKey: userData.appPrivateKey });
+        await Router.replaceRoute(link);
+      } else {
+        this.setState({ error: 'Failed to signin' });
+      }
+    } catch (error) {
+      this.setState({ error: `Failed to signin, ${error}` });
+    }
   }
 
   signinEmail(userData, publicKey, redirect) {
@@ -199,39 +203,53 @@ class SignInBlockstack extends React.Component {
             {loading && (
               <>
                 <br />
-                ... stacking blocks ...
+                ...
+                <FormattedMessage id="blockstack.loading" defaultMessage="stacking blocks" />
+                ...
               </>
             )}
             {!loading && exists && (
               <>
                 <br />
-                You have already a profile. Signing in ...
+                <FormattedMessage
+                  id="blockstack.profileExistsSignIn"
+                  defaultMessage="You have already a profile. Signing in ..."
+                />
               </>
             )}
             {!loading && !exists && existsEmail && (
               <>
                 <br />
-                You have already a profile.
+                <FormattedMessage id="blockstack.profileExists" defaultMessage="You have already a profile." />
                 <br />
               </>
             )}
             {!loading && !exists && !existsEmail && (
               <>
                 <br />
-                ... creating your profile ...
+                ... <FormattedMessage id="blockstack.creatingProfile" defaultMessage="creating your profile" />
+                ...
               </>
             )}
           </H3>
           {!loading && !exists && existsEmail && (
             <>
               <br />
-              Please sign in with the magic link to connect your blockstack id to your profile.
+              <FormattedMessage
+                id="blockstack.signinToConnect"
+                defaultMessage="Please sign in with the magic link to connect your blockstack id to your profile."
+              />
               <br />
               <H3 as="h1" fontWeight="800">
-                Your magic link is on its way!
+                <FormattedMessage id="signin.magicLinkSent" defaultMessage="Your magic link is on its way!" />
               </H3>
               <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
-                We&apos;ve sent it to <strong>{userData.email}</strong>.
+                <FormattedMessage
+                  id="signin.linkSentToEmail"
+                  defaultMessage="We've sent it to {email}"
+                  values={{ email: <strong>{userData.email}</strong> }}
+                />
+                .
               </P>
             </>
           )}
@@ -247,7 +265,8 @@ SignInBlockstack.propTypes = {
   next: PropTypes.string,
   organizationData: PropTypes.object,
   createUser: PropTypes.func,
-  getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+  LoggedInUser: PropTypes.object, // from withUser
+  loadingLoggedInUser: PropTypes.bool, // from withUser
 };
 
 const addCreateUserMutation = graphql(createUserByPublicKeyQuery, {
@@ -256,4 +275,4 @@ const addCreateUserMutation = graphql(createUserByPublicKeyQuery, {
   }),
 });
 
-export default addCreateUserMutation(withData(withLoggedInUser(SignInBlockstack)));
+export default addCreateUserMutation(withIntl(withUser(SignInBlockstack)));
