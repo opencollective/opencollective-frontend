@@ -45,8 +45,23 @@ export default (server, app) => {
   // Support older assets from website
   server.use('/public/images', express.static(path.join(__dirname, '../static/images')));
 
-  server.get('/static/manifest.json', maxAge(7200), cors(), (req, res) => {
-    return res.sendFile(path.join(__dirname, '../static/manifest.json'));
+  server.get('/manifest.json', maxAge(7200), cors(), (req, res) => {
+    const manifest = {
+      short_name: 'Open Collective',
+      name: 'Open Collective',
+      icons: [
+        {
+          src: 'https://opencollective.com/favicon.icon',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+      ],
+      start_url: '/',
+      display: 'standalone',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
+    };
+    return res.send(manifest);
   });
 
   server.get('/static/*', maxAge(7200));
