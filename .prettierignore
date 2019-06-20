@@ -1,2 +1,3 @@
 src/static/*
 src/.next/*
+!src/static/*.json
