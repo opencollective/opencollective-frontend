@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components';
 
 import StyledButton from './StyledButton';
 import { Span } from './Text';
-import roles from '../constants/roles';
 import withIntl from '../lib/withIntl';
 
 export const CONTRIBUTOR_FILTERS = {
@@ -37,23 +36,29 @@ const Translations = defineMessages({
 });
 
 /**
- * For a given list of members, returns all the filters that can be applied
+ * For a given list of contributors, returns all the filters that can be applied
  * to the list.
  */
-export const getMembersFilters = members => {
+export const getContributorsFilters = contributors => {
   const filters = new Set([CONTRIBUTOR_FILTERS.ALL]);
-  for (const m of members) {
-    // Add role to the set
-    if (m.role === roles.ADMIN) {
-      filters.add(CONTRIBUTOR_FILTERS.CORE);
-    } else if ([roles.BACKER, roles.FUNDRAISER].includes(m.role)) {
-      filters.add(CONTRIBUTOR_FILTERS.FINANCIAL);
-    }
 
-    // No need to traverse the entire list if we already registered all the types
-    // No need to count the first one (ALL) - so we do length - 1
-    if (filters.length === FILTERS_LIST.length - 1) {
-      break;
+  // Helper to add a filter, returns true if the filters list is full because there's
+  // no need to traverse the entire list if we already registered all the types
+  const addFilter = filter => {
+    filters.add(filter);
+    return filters.length === FILTERS_LIST.length - 1;
+  };
+
+  // Add filters to the set based on contributors roles
+  for (const c of contributors) {
+    if (c.isCore) {
+      if (addFilter(CONTRIBUTOR_FILTERS.CORE)) {
+        break;
+      }
+    } else if (c.isBacker || c.isFundraiser) {
+      if (addFilter(CONTRIBUTOR_FILTERS.FINANCIAL)) {
+        break;
+      }
     }
   }
 
@@ -63,59 +68,25 @@ export const getMembersFilters = members => {
   });
 };
 
-// Members roles weights
-const ROLES_WEIGHT = {
-  [roles.FUNDRAISER]: 1,
-  [roles.MEMBER]: 2,
-  [roles.BACKER]: 3,
-  [roles.CONTRIBUTOR]: 4,
-  [roles.ADMIN]: 5,
-};
-
-const getRoleWeight = role => {
-  return ROLES_WEIGHT[role] || 0;
-};
-
 /**
- * A helper to filter a members list by member type that returns only unique
- * members (based on the collective id).
+ * A helper to filter a contributors list by contributor roles.
  *
  * Please ensure you memoize this one properly is the cost can be pretty depending
- * on the number of members.
+ * on the number of contributors.
  */
-export const filterMembers = (members, filter) => {
-  if (!members) {
+export const filterContributors = (contributors, filter) => {
+  if (!contributors) {
     return [];
   }
 
-  // Set filterFunc
-  let filterFunc = null;
   if (filter === CONTRIBUTOR_FILTERS.FINANCIAL) {
-    filterFunc = m => [roles.BACKER, roles.FUNDRAISER].includes(m.role);
+    return contributors.filter(c => c.isBacker || c.isFundraiser);
   } else if (filter === CONTRIBUTOR_FILTERS.CORE) {
-    filterFunc = m => m.role === roles.ADMIN;
+    return contributors.filter(c => c.isCore);
+  } else {
+    // For filters not implemented yet and `ALL`, just return the contributors list
+    return contributors;
   }
-
-  const membersMap = {};
-  members.forEach(member => {
-    // Apply the function to filter by type
-    if (filterFunc && !filterFunc(member)) {
-      return;
-    }
-
-    // Ensure uniqueness
-    const collectiveId = member.collective.id;
-    if (membersMap[collectiveId]) {
-      // Conflict on roles! Take ADMIN > CONTRIBUTOR > BACKER > FUNDRAISER > FOLLOWER
-      if (getRoleWeight(member.role) > getRoleWeight(membersMap[collectiveId].role)) {
-        membersMap[collectiveId] = member;
-      }
-    } else {
-      membersMap[collectiveId] = member;
-    }
-  });
-
-  return Object.values(membersMap);
 };
 
 /**
@@ -144,15 +115,16 @@ const FilterBtn = styled(({ filter, isSelected, onChange, ...props }) => {
 /**
  * A set of filters for contributors types. This file also exports helper functions
  * to deal with the filters, incuding:
- * - `getMembersFilters`: For a given list of members, returns all the filters that can be applied to the list.
- * - `filterMembers`: A helper to filter a members list by member type.
+ * - `getContributorsFilters`: For a given list of Contributors, returns all the filters that can be applied to the list.
+ * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */
 const ContributorsFilter = ({ intl, selected, onChange, filters }) => {
+  const activeFilter = selected || CONTRIBUTOR_FILTERS.ALL;
   return (
     <Flex css={{ overflowX: 'auto' }}>
       {filters.map(filter => {
         return (
-          <FilterBtn key={filter} filter={filter} onChange={onChange} isSelected={filter === selected}>
+          <FilterBtn key={filter} filter={filter} onChange={onChange} isSelected={filter === activeFilter}>
             <Span textTransform="capitalize" whiteSpace="nowrap">
               {intl.formatMessage(Translations[filter])}
             </Span>
@@ -164,8 +136,8 @@ const ContributorsFilter = ({ intl, selected, onChange, filters }) => {
 };
 
 ContributorsFilter.propTypes = {
-  /** Selected filter */
-  selected: PropTypes.oneOf(FILTERS_LIST).isRequired,
+  /** Selected filter. Defaults to `ALL` */
+  selected: PropTypes.oneOf(FILTERS_LIST),
   /** Called when another filter is selected */
   onChange: PropTypes.func.isRequired,
   /** An optional list of active filters */

@@ -7,7 +7,7 @@ import memoizeOne from 'memoize-one';
 
 import { P, H2, H3, Span } from '../Text';
 import ContributorsGrid from '../ContributorsGrid';
-import ContributorsFilter, { filterMembers, getMembersFilters, CONTRIBUTOR_FILTERS } from '../ContributorsFilter';
+import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
 import ContainerSectionContent from './ContainerSectionContent';
 import ContributorsGridBackgroundSVG from './ContributorsGridBackground.svg';
 
@@ -31,29 +31,38 @@ const MainContainer = styled.div`
 export default class SectionContributors extends React.PureComponent {
   static propTypes = {
     collectiveName: PropTypes.string.isRequired,
-    members: PropTypes.arrayOf(PropTypes.object),
+    contributors: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+        isCore: PropTypes.bool.isRequired,
+        isBacker: PropTypes.bool.isRequired,
+        isFundraiser: PropTypes.bool.isRequired,
+      }),
+    ),
   };
 
-  static MIN_MEMBERS_TO_SHOW_FILTERS = 2;
+  static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
   constructor(props) {
     super(props);
-    this.state = { filter: CONTRIBUTOR_FILTERS.ALL };
+    this.state = { filter: null };
   }
 
   setFilter = filter => {
     this.setState({ filter });
   };
 
-  // Memoize filtering functions as they can get expensive if there are a lot of members
-  getMembersFilters = memoizeOne(getMembersFilters);
-  filterMembers = memoizeOne(filterMembers);
+  // Memoize filtering functions as they can get expensive if there are a lot of contributors
+  getContributorsFilters = memoizeOne(getContributorsFilters);
+  filterContributors = memoizeOne(filterContributors);
 
   render() {
-    const { collectiveName, members } = this.props;
+    const { collectiveName, contributors } = this.props;
     const { filter } = this.state;
-    const filters = this.getMembersFilters(members);
-    const filteredMembers = this.filterMembers(members, filter);
+    const hasFilters = contributors.length >= SectionContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
+    const filters = hasFilters && this.getContributorsFilters(contributors);
+    const filteredContributors = hasFilters ? this.filterContributors(contributors, filter) : contributors;
 
     return (
       <MainContainer>
@@ -69,7 +78,7 @@ export default class SectionContributors extends React.PureComponent {
             <FormattedMessage
               id="CollectivePage.OurContributors"
               defaultMessage="Our contributors {count}"
-              values={{ count: <Span color="black.400">{members.length}</Span> }}
+              values={{ count: <Span color="black.400">{contributors.length}</Span> }}
             />
           </H3>
           <P color="black.600" mb={4} px={3}>
@@ -79,12 +88,12 @@ export default class SectionContributors extends React.PureComponent {
               values={{ collectiveName }}
             />
           </P>
-          {filters.length > 2 && members.length >= SectionContributors.MIN_MEMBERS_TO_SHOW_FILTERS && (
+          {hasFilters && filters.length > 2 && (
             <ContributorsFilter selected={filter} onChange={this.setFilter} filters={filters} />
           )}
         </ContainerSectionContent>
         <Box mb={4}>
-          <ContributorsGrid members={filteredMembers} />
+          <ContributorsGrid contributors={filteredContributors} />
         </Box>
       </MainContainer>
     );

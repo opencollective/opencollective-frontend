@@ -8,8 +8,6 @@ import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
 
 // Open Collective Frontend imports
-import roles from '../../constants/roles';
-import { CollectiveType } from '../../constants/collectives';
 import { getWebsiteUrl } from '../../lib/utils';
 import { P, H1, H3 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -96,23 +94,11 @@ class TierPage extends Component {
       videoUrl: PropTypes.string,
     }).isRequired,
 
-    /** The members that contribute to this tier */
-    members: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        role: PropTypes.oneOf(Object.values(roles)).isRequired,
-        collective: PropTypes.shape({
-          id: PropTypes.number.isRequired,
-          type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-          slug: PropTypes.string.isRequired,
-          name: PropTypes.string,
-          image: PropTypes.string,
-        }).isRequired,
-      }),
-    ),
+    /** The contributors for this tier */
+    contributors: PropTypes.arrayOf(PropTypes.object),
 
     /** Some statistics about this tier */
-    membersStats: PropTypes.shape({
+    contributorsStats: PropTypes.shape({
       all: PropTypes.number.isRequired,
       collectives: PropTypes.number.isRequired,
       organizations: PropTypes.number.isRequired,
@@ -139,7 +125,7 @@ class TierPage extends Component {
   }
 
   render() {
-    const { collective, tier, members, membersStats, LoggedInUser } = this.props;
+    const { collective, tier, contributors, contributorsStats, LoggedInUser } = this.props;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
@@ -345,7 +331,13 @@ class TierPage extends Component {
             </Container>
           </Flex>
         </Flex>
-        <TierContributors collectiveName={collective.name} members={members} membersStats={membersStats} />
+        {contributors && contributors.length > 0 && (
+          <TierContributors
+            collectiveName={collective.name}
+            contributors={contributors}
+            contributorsStats={contributorsStats}
+          />
+        )}
       </Container>
     );
   }

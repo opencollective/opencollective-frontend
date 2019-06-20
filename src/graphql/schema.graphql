@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jun 13 2019 17:47:32 GMT+0200 (GMT+02:00)
+# timestamp: Thu Jun 20 2019 14:54:01 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -152,6 +152,11 @@ type Collective implements CollectiveInterface {
     role: String
     roles: [String]
   ): [Member]
+
+  """
+  All the persons and entities that contribute to this organization
+  """
+  contributors(limit: Int = 1000): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
@@ -374,6 +379,11 @@ interface CollectiveInterface {
   ): [Member]
 
   """
+  All the persons and entities that contribute to this organization
+  """
+  contributors(limit: Int = 1000): [Contributor]
+
+  """
   List of all collectives hosted by this collective
   """
   collectives(
@@ -407,7 +417,20 @@ interface CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
   paymentMethods(
     service: String
     limit: Int
@@ -650,6 +673,117 @@ type ConnectedAccountType {
   updatedAt: DateString
 }
 
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
+type Contributor {
+  """
+  A unique identifier for this member
+  """
+  id: String!
+
+  """
+  Name of the contributor
+  """
+  name: String!
+
+  """
+  All the roles for a given contributor
+  """
+  roles: [ContributorRole]
+
+  """
+  True if the contributor is a core contributor (admin)
+  """
+  isCore: Boolean!
+
+  """
+  True if the contributor is a financial contributor
+  """
+  isBacker: Boolean!
+
+  """
+  True if the contributor is a core contributor (admin)
+  """
+  isFundraiser: Boolean!
+
+  """
+  Member join date
+  """
+  since: IsoDateString!
+
+  """
+  How much money the user has contributed for this (in cents, using collective currency)
+  """
+  totalAmountDonated: Int!
+
+  """
+  Description of how the member contribute. Will usually be a tier name, or "design" or "code".
+  """
+  description: String
+
+  """
+  If the contributor has a page on Open Collective, this is the slug to link to it
+  """
+  collectiveSlug: String
+
+  """
+  Contributor avatar or logo
+  """
+  image: String
+
+  """
+  A public message from contributors to describe their contributions
+  """
+  publicMessage: String
+}
+
+"""
+Possible roles for a contributor. Extends `Member.Role`.
+"""
+enum ContributorRole {
+  HOST
+  ADMIN
+  MEMBER
+  CONTRIBUTOR
+  BACKER
+  FUNDRAISER
+  ATTENDEE
+  FOLLOWER
+}
+
+"""
+Breakdown of contributors per type (ANY/USER/ORGANIZATION/COLLECTIVE)
+"""
+type ContributorsStats {
+  """
+  We always have to return an id for apollo's caching
+  """
+  id: String!
+
+  """
+  Total number of contributors
+  """
+  all: Int
+
+  """
+  Number of individuals
+  """
+  users: Int
+
+  """
+  Number of organizations
+  """
+  organizations: Int
+
+  """
+  Number of collectives
+  """
+  collectives: Int
+}
+
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
@@ -751,6 +885,11 @@ type Event implements CollectiveInterface {
     role: String
     roles: [String]
   ): [Member]
+
+  """
+  All the persons and entities that contribute to this organization
+  """
+  contributors(limit: Int = 1000): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
@@ -1855,6 +1994,11 @@ type Organization implements CollectiveInterface {
     role: String
     roles: [String]
   ): [Member]
+
+  """
+  All the persons and entities that contribute to this organization
+  """
+  contributors(limit: Int = 1000): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
@@ -2416,6 +2560,19 @@ type Tier {
     """
     limit: Int = 5000
   ): [Member]
+    @deprecated(
+      reason: "\n          2019/06/20 - This endpoint was used for the new tier page and has been replaced\n          by \"contributors\". It can be deleted as soon as the migration's completed\n          as well as the \"members.findByTierId\" loader.\n        "
+    )
+
+  """
+  Returns a list of all the contributors for this tier
+  """
+  contributors(
+    """
+    Maximum number of entries to return
+    """
+    limit: Int = 3000
+  ): [Contributor]
   stats: TierStatsType
 }
 
@@ -2477,6 +2634,14 @@ type TierStatsType {
   Breakdown of all the members that belongs to this tier.
   """
   members: MembersStatsType
+    @deprecated(
+      reason: "\n          2019/06/20 - This endpoint was used for the new tier page and has been replaced\n          by \"contributors\". It can be deleted as soon as the migration's completed\n          as well as the \"members.findByTierId\" loader.\n        "
+    )
+
+  """
+  Breakdown of all the contributors that belongs to this tier.
+  """
+  contributors: ContributorsStats
 
   """
   total number of individual orders
@@ -2747,6 +2912,11 @@ type User implements CollectiveInterface {
     role: String
     roles: [String]
   ): [Member]
+
+  """
+  All the persons and entities that contribute to this organization
+  """
+  contributors(limit: Int = 1000): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC

@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 
 // OC Frontend imports
-import roles from '../../constants/roles';
-import { CollectiveType } from '../../constants/collectives';
 import theme from '../../constants/theme';
 import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
@@ -56,20 +54,8 @@ export default class CollectivePage extends Component {
       image: PropTypes.string,
     }),
 
-    /** Collective members */
-    members: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        role: PropTypes.oneOf(Object.values(roles)).isRequired,
-        collective: PropTypes.shape({
-          id: PropTypes.number.isRequired,
-          type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-          slug: PropTypes.string.isRequired,
-          name: PropTypes.string,
-          image: PropTypes.string,
-        }).isRequired,
-      }),
-    ),
+    /** Collective contributors */
+    contributors: PropTypes.arrayOf(PropTypes.object),
 
     /** Collective tiers */
     tiers: PropTypes.arrayOf(
@@ -142,12 +128,12 @@ export default class CollectivePage extends Component {
   };
 
   renderSection(section, canEdit) {
-    const { collective, members, tiers, events } = this.props;
+    const { collective, contributors, tiers, events } = this.props;
 
     if (section === Sections.ABOUT) {
       return <SectionAbout collective={collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />;
     } else if (section === Sections.CONTRIBUTORS) {
-      return <SectionContributors collectiveName={collective.name} members={members} />;
+      return <SectionContributors collectiveName={collective.name} contributors={contributors} />;
     } else if (section === Sections.CONTRIBUTE) {
       return <SectionContribute collective={collective} tiers={tiers} events={events} />;
     }
