@@ -14,6 +14,7 @@ export const transactionFields = `
   netAmountInCollectiveCurrency
   hostFeeInHostCurrency
   platformFeeInHostCurrency
+  taxAmount
   paymentProcessorFeeInHostCurrency
   paymentMethod {
     service

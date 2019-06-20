@@ -984,6 +984,7 @@
   "transaction.refund.btn": "возместить",
   "transaction.refund.no.btn": "нет",
   "transaction.refund.yes.btn": "Да, возместить!",
+  "transaction.taxAmount": "VAT",
   "transaction.usingGiftCardFrom": "using a gift card from {collectiveLink}",
   "transaction.viewDetails": "View Details",
   "transactions.all": "все",

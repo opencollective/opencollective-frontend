@@ -984,6 +984,7 @@
   "transaction.refund.btn": "返金",
   "transaction.refund.no.btn": "いいえ",
   "transaction.refund.yes.btn": "はい、返金します!",
+  "transaction.taxAmount": "VAT",
   "transaction.usingGiftCardFrom": "{collectiveLink} からのギフトカードを使う",
   "transaction.viewDetails": "詳細を表示する",
   "transactions.all": "全て",
