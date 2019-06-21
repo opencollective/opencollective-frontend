@@ -332,7 +332,7 @@
   "createPledge.collectiveURL": "URL du collectif",
   "createPledge.conditions": "Vous ne pouvez pour l'instant faire de promesse de dons qu'aux projets qui disposent d'un dépôt ou d'un profil d'organisation sur GitHub. Le projet doit avoir au moins 100 étoiles !",
   "createPledge.faq.howToClaim": "You’ll need to authenticate with the github profile that owns / admins that project. Just click on the\n                Claim Collective button in the pledged collective. We will be rolling out other forms of authentication\n                in the future.",
-  "createPledge.faq.howToClaimSummary": "How do I claim a pledged collective?",
+  "createPledge.faq.howToClaimSummary": "Comment revendiquer un collectif ?",
   "createPledge.faq.pay": "Once that pledged collective is claimed, we will email you to fulfill your pledge.",
   "createPledge.faq.paySummary": "Quand dois-je payer ?",
   "createPledge.faq.what": "A pledge allows supporters (companies and individuals) to pledge\n                funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to\n                support, pledge to it!",
