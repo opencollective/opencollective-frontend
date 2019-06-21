@@ -14,7 +14,6 @@ import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
 import Container from '../../../components/Container';
 import { P } from '../../../components/Text';
-import { space } from 'styled-system';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {

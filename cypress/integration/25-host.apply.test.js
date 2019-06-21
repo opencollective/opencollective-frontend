@@ -1,7 +1,7 @@
 describe('apply to host', () => {
   it('as a new collective', () => {
-    cy.visit('/brussels');
-    cy.get('#hosting h1').contains('We are hosting 64 collectives');
+    cy.visit('/brusselstogetherasbl');
+    cy.get('#hosting h1').contains('We are hosting 2 collectives');
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
       .click();
