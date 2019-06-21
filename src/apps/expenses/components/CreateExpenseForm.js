@@ -492,9 +492,7 @@ class CreateExpenseForm extends React.Component {
               <div>
                 <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
                   {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-                  {!this.state.loading && (
-                    <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense12" />
-                  )}
+                  {!this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />}
                 </Button>
               </div>
 
@@ -513,7 +511,7 @@ class CreateExpenseForm extends React.Component {
       return (
         <div className="CreateExpenseForm">
           <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
-            <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
+            <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense" />
           </P>
           <SignInOrJoinFree redirect={Router.asPath} />
         </div>
