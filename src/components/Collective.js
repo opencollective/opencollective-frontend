@@ -154,8 +154,7 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
     }
-    const cta =
-      collective.isActive && collective.host ? { href: `/${collective.slug}/contribute`, label: 'contribute' } : null;
+
     const contributorsStats = { ...get(collective, 'stats.backers') };
     contributorsStats.organizations += contributorsStats.collectives || 0;
 
@@ -228,7 +227,6 @@ class Collective extends React.Component {
           description={collective.description || collective.longDescription}
           twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
           image={collective.image || get(collective.parentCollective, 'image') || backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
           href={`/${collective.slug}`}
         />
@@ -242,7 +240,12 @@ class Collective extends React.Component {
               error={this.state.error}
             />
 
-            <CollectiveCover collective={collective} cta={cta} LoggedInUser={LoggedInUser} key={collective.slug} />
+            <CollectiveCover
+              collective={collective}
+              LoggedInUser={LoggedInUser}
+              key={collective.slug}
+              displayContributeLink={collective.isActive && collective.host ? true : false}
+            />
 
             <div>
               <div>

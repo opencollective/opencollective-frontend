@@ -64,11 +64,6 @@ class TransactionsPage extends React.Component {
       return <ErrorPage data={this.props.data} />;
     }
 
-    const cta = ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1 && {
-      href: `/${collective.slug}#contribute`,
-      label: 'contribute',
-    };
-
     return (
       <div className="TransactionsPage">
         <Header
@@ -76,7 +71,6 @@ class TransactionsPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -84,9 +78,11 @@ class TransactionsPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            cta={cta}
             LoggedInUser={LoggedInUser}
             key={collective.slug}
+            displayContributeLink={
+              collective.isActive && collective.host && ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1
+            }
           />
 
           <div className="content">
