@@ -25,7 +25,6 @@ describe('new expense when logged out', () => {
     cy.get('#email').type('testuser+admin@opencollective.com');
     cy.get('[data-cy="signin-btn"]').click();
     cy.wait(300);
-    cy.get('.inputField.description', { timeout: 5000 });
   });
 });
 
