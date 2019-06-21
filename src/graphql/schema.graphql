@@ -1268,6 +1268,17 @@ type Mutation {
     """
     token: String!
   ): UserDetails
+
+  """
+  Update the public key for logged in user
+  """
+  updateUserPublicKey(
+    """
+    The new public key for user
+    """
+    publicKey: String!
+  ): UserDetails
+
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
@@ -2861,6 +2872,7 @@ type UserDetails {
   image: String
   email: String
   emailWaitingForValidation: String
+  publicKey: String
   memberOf: [Member]
   billingAddress: String
   paypalEmail: String

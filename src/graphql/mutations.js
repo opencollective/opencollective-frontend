@@ -427,3 +427,25 @@ export const addUpdateUserEmailMutation = graphql(
     }),
   },
 );
+
+export const addUpdateUserPublicKeyMutation = graphql(
+  gql`
+    mutation updateUserPublicKey($publicKey: String!) {
+      updateUserPublicKey(publicKey: $publicKey) {
+        id
+        email
+        publicKey
+        paypalEmail
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      updateUserPublicKey: publicKey => {
+        // eslint-disable-next-line no-console
+        console.log('mutate', { publicKey });
+        return mutate({ variables: { publicKey } });
+      },
+    }),
+  },
+);

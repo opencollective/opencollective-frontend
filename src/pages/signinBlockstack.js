@@ -15,11 +15,12 @@ import { checkResponseStatus, checkUserExistence as checkEmailExistence } from '
 import { isValidEmail, getWebsiteUrl } from '../lib/utils';
 import { getPublicKeyFromPrivate, decryptContent } from 'blockstack';
 import { Router } from '../server/pages';
-import { createUserByPublicKeyQuery } from '../graphql/mutations';
+import { createUserByPublicKeyQuery, addUpdateUserPublicKeyMutation } from '../graphql/mutations';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
+import StyledButton from '../components/StyledButton';
 
 const Icon = styled(User)`
   color: ${themeGet('colors.primary.300')};
@@ -58,10 +59,29 @@ class SignInBlockstack extends React.Component {
   state = {
     userData: null,
     exists: false,
+    existsEmail: false,
     loading: true,
+    newPublicKey: null,
+    isUpdatingPublicKey: false,
+    wasPublicKeyUpdated: false,
   };
 
   async componentDidMount() {
+    this.loadInitialState();
+  }
+
+  componentDidUpdate(oldProps) {
+    if (
+      oldProps.LoggedInUser !== this.props.LoggedInUser ||
+      oldProps.loadingLoggedInUser !== this.props.loadingLoggedInUser
+    ) {
+      this.loadInitialState();
+    }
+  }
+
+  async loadInitialState() {
+    // eslint-disable-next-line no-console
+    console.log('loadInitialState');
     const userSession = createUserSession();
     const redirect = this.props.next || '/';
     if (userSession.isSignInPending()) {
@@ -83,20 +103,23 @@ class SignInBlockstack extends React.Component {
       }
     } else if (userSession.isUserSignedIn()) {
       if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-        // TODO connect public key with logged in profile if user logged in
-        await Router.replaceRoute(redirect);
+        await this.props.updateUserPublicKey('x');
+
+        const userData = userSession.loadUserData();
+        const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
+        if (this.props.LoggedInUser.publicKey !== publicKey) {
+          this.setState({ newPublicKey: publicKey, userData, loading: false });
+        } else {
+          await Router.replaceRoute(redirect);
+        }
+      } else if (!this.props.loadingLoggedInUser && !this.props.LoggedInUser) {
+        // login did not work
+        this.setState({ redirectingToSignIn: true, loading: false });
+        await Router.replaceRoute(`/signin?next='${redirect}'`);
       }
     } else {
-      this.setState({ loading: false });
+      this.setState({ redirectingToSignIn: true, loading: false });
       await Router.replaceRoute(`/signin?next='${redirect}'`);
-    }
-  }
-
-  async UNSAFE_componentWillReceiveProps(nextProps) {
-    const redirect = nextProps.next || this.props.next || '/';
-    if (!nextProps.loadingLoggedInUser && nextProps.LoggedInUser) {
-      // TODO connect public key with logged in profile if user logged in
-      await Router.replaceRoute(redirect);
     }
   }
 
@@ -190,8 +213,34 @@ class SignInBlockstack extends React.Component {
     };
   }
 
+  async connectBlockstackWithProfile() {
+    const { newPublicKey } = this.state;
+    const { updateUserPublicKey, next } = this.props;
+    this.setState({ isUpdatingPublicKey: true });
+    try {
+      const { data } = await updateUserPublicKey(newPublicKey);
+      const wasPublicKeyUpdated = data.updateUserPublicKey.publicKey === newPublicKey;
+      this.setState({ isUpdatingPublicKey: false, wasPublicKeyUpdated });
+      if (wasPublicKeyUpdated) {
+        await Router.replaceRoute(next || '/');
+      }
+    } catch (e) {
+      this.setState({ error: e.message.replace('GraphQL error: ', ''), isUpdatingPublicKey: false });
+    }
+  }
+
   render() {
-    const { userData, exists, existsEmail, loading, error } = this.state;
+    const {
+      userData,
+      exists,
+      existsEmail,
+      newPublicKey,
+      loading,
+      error,
+      redirectingToSignIn,
+      isUpdatingPublicKey,
+      wasPublicKeyUpdated,
+    } = this.state;
     return (
       <Page title="Blockstack Login Successful">
         <Container pt={4} pb={6} px={2} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
@@ -224,7 +273,7 @@ class SignInBlockstack extends React.Component {
                 <br />
               </>
             )}
-            {!loading && !exists && !existsEmail && (
+            {!loading && !exists && !existsEmail && !newPublicKey && !redirectingToSignIn && (
               <>
                 <br />
                 ... <FormattedMessage id="blockstack.creatingProfile" defaultMessage="creating your profile" />
@@ -253,6 +302,23 @@ class SignInBlockstack extends React.Component {
               </P>
             </>
           )}
+
+          {newPublicKey && (
+            <StyledButton
+              minWidth={180}
+              loading={isUpdatingPublicKey}
+              disabled={wasPublicKeyUpdated}
+              mr={2}
+              onClick={async () => {
+                this.connectBlockstackWithProfile();
+              }}
+            >
+              <FormattedMessage
+                id="ConnectBlockstack.connect"
+                defaultMessage="Use this Blockstack ID with your Open Collective profile"
+              />
+            </StyledButton>
+          )}
           {error && <Error message={error} />}
         </Container>
       </Page>
@@ -267,6 +333,7 @@ SignInBlockstack.propTypes = {
   createUser: PropTypes.func,
   LoggedInUser: PropTypes.object, // from withUser
   loadingLoggedInUser: PropTypes.bool, // from withUser
+  updateUserPublicKey: PropTypes.func, // from addUpdateUserPublicKeyMutation
 };
 
 const addCreateUserMutation = graphql(createUserByPublicKeyQuery, {
@@ -275,4 +342,4 @@ const addCreateUserMutation = graphql(createUserByPublicKeyQuery, {
   }),
 });
 
-export default addCreateUserMutation(withIntl(withUser(SignInBlockstack)));
+export default addUpdateUserPublicKeyMutation(addCreateUserMutation(withIntl(withUser(SignInBlockstack))));
