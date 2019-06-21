@@ -151,28 +151,37 @@ class StyledUpdate extends Component {
           <Box as="span" mr={1} fontSize="12px">
             <FormattedMessage
               id="update.publishedAtBy"
-              defaultMessage={'Published on {date} by'}
+              defaultMessage="Published on {date} by {author}"
               values={{
                 date: formatDate(update.publishedAt, {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
                 }),
+                author: (
+                  <Box as="span" mr={2} fontSize="12px">
+                    {update.fromCollective.name}
+                  </Box>
+                ),
               }}
             />
           </Box>
         ) : (
           <Box as="span" mr={1} fontSize="12px">
             <FormattedMessage
-              id="update.createdAt"
-              defaultMessage={'created on {date} (draft)'}
-              values={{ date: formatDate(update.createdAt) }}
+              id="update.createdAtBy"
+              defaultMessage={'Created on {date} (draft) by {author}'}
+              values={{
+                date: formatDate(update.createdAt),
+                author: (
+                  <Box as="span" mr={2} fontSize="12px">
+                    {update.fromCollective.name}
+                  </Box>
+                ),
+              }}
             />
           </Box>
         )}
-        <Box as="span" mr={2} fontSize="12px">
-          {update.fromCollective.name}
-        </Box>
         <Role role="ADMIN" />
         {editable && (
           <React.Fragment>
