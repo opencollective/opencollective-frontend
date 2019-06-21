@@ -430,7 +430,7 @@ export const addUpdateUserEmailMutation = graphql(
 
 export const addUpdateUserPublicKeyMutation = graphql(
   gql`
-    mutation updateUserPublicKey($publicKey: String!) {
+    mutation updateUserPublicKey($publicKey: String) {
       updateUserPublicKey(publicKey: $publicKey) {
         id
         email

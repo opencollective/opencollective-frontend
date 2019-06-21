@@ -1274,9 +1274,9 @@ type Mutation {
   """
   updateUserPublicKey(
     """
-    The new public key for user
+    The new public key for user or null
     """
-    publicKey: String!
+    publicKey: String
   ): UserDetails
 
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType

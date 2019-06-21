@@ -50,7 +50,9 @@ class SignInBlockstack extends React.Component {
       } else {
         next = null;
       }
-      return { next };
+
+      const disconnect = query.disconnect === 'true';
+      return { next, disconnect };
     }
   }
 
@@ -62,6 +64,7 @@ class SignInBlockstack extends React.Component {
     newPublicKey: null,
     isUpdatingPublicKey: false,
     wasPublicKeyUpdated: false,
+    disconnect: false,
   };
 
   async componentDidMount() {
@@ -99,9 +102,12 @@ class SignInBlockstack extends React.Component {
       }
     } else if (userSession.isUserSignedIn()) {
       if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
+        const disconnect = this.props.disconnect;
         const userData = userSession.loadUserData();
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
-        if (this.props.LoggedInUser.publicKey !== publicKey) {
+        if (disconnect) {
+          this.setState({ userData, loading: false, disconnect });
+        } else if (this.props.LoggedInUser.publicKey !== publicKey) {
           this.setState({ newPublicKey: publicKey, userData, loading: false });
         } else {
           await Router.replaceRoute(redirect);
@@ -223,6 +229,21 @@ class SignInBlockstack extends React.Component {
     }
   }
 
+  async disconnectBlockstack() {
+    const { updateUserPublicKey, next } = this.props;
+    this.setState({ isUpdatingPublicKey: true });
+    try {
+      const { data } = await updateUserPublicKey(null);
+      const wasPublicKeyUpdated = !data.updateUserPublicKey.publicKey;
+      this.setState({ isUpdatingPublicKey: false, wasPublicKeyUpdated });
+      if (wasPublicKeyUpdated) {
+        await Router.replaceRoute(next || '/');
+      }
+    } catch (e) {
+      this.setState({ error: e.message.replace('GraphQL error: ', ''), isUpdatingPublicKey: false });
+    }
+  }
+
   render() {
     const {
       userData,
@@ -234,6 +255,7 @@ class SignInBlockstack extends React.Component {
       redirectingToSignIn,
       isUpdatingPublicKey,
       wasPublicKeyUpdated,
+      disconnect,
     } = this.state;
     return (
       <Page title="Blockstack Login Successful">
@@ -267,7 +289,7 @@ class SignInBlockstack extends React.Component {
                 <br />
               </>
             )}
-            {!loading && !exists && !existsEmail && !newPublicKey && !redirectingToSignIn && (
+            {!loading && !exists && !existsEmail && !newPublicKey && !redirectingToSignIn && !disconnect && (
               <>
                 <br />
                 ... <FormattedMessage id="blockstack.creatingProfile" defaultMessage="creating your profile" />
@@ -313,6 +335,20 @@ class SignInBlockstack extends React.Component {
               />
             </StyledButton>
           )}
+
+          {disconnect && (
+            <StyledButton
+              minWidth={180}
+              loading={isUpdatingPublicKey}
+              disabled={wasPublicKeyUpdated}
+              mr={2}
+              onClick={async () => {
+                this.disconnectBlockstack();
+              }}
+            >
+              <FormattedMessage id="blockstack.disconnect" defaultMessage="Remove this Blockstack ID from profile" />
+            </StyledButton>
+          )}
           {error && <Error message={error} />}
         </Container>
       </Page>
@@ -325,6 +361,7 @@ SignInBlockstack.propTypes = {
   next: PropTypes.string,
   organizationData: PropTypes.object,
   createUser: PropTypes.func,
+  disconnect: PropTypes.bool,
   LoggedInUser: PropTypes.object, // from withUser
   loadingLoggedInUser: PropTypes.bool, // from withUser
   updateUserPublicKey: PropTypes.func, // from addUpdateUserPublicKeyMutation
