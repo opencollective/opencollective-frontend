@@ -1,13 +1,13 @@
 describe('apply to host', () => {
   it('as a new collective', () => {
-    cy.visit('/brusselstogetherasbl');
-    cy.get('#hosting h1').contains('We are hosting 2 collectives');
+    cy.visit('/brussels');
+    cy.get('#hosting h1').contains('We are hosting 64 collectives');
     cy.get('.CollectiveCover button')
       .contains('Apply to create a collective')
       .click();
-    cy.get('#email').type('testuser@opencollective.com');
+    cy.get('#email').type('tripti12shukla1280@gmail.com');
     cy.wait(500);
-    cy.get('#signin').click();
+    cy.get('[data-cy="signin-btn"]').click();
     cy.fillInputField('name', 'New collective');
     cy.fillInputField('description', 'short description for new collective');
     cy.fillInputField('website', 'https://xdamman.com');

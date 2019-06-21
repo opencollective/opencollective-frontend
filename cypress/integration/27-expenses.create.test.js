@@ -23,7 +23,7 @@ describe('new expense when logged out', () => {
     cy.visit('/testcollective/expenses/new');
     cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
     cy.get('#email').type('testuser+admin@opencollective.com');
-    cy.get('#signin').click();
+    cy.get('[data-cy="signin-btn"]').click();
     cy.wait(300);
   });
 });
