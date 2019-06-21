@@ -75,7 +75,7 @@ class UnsubscribeEmail extends React.Component {
           </Box>
           {this.state.state === 'success' && (
             <MessageBox mb={3} type="success" withIcon>
-              <FormattedMessage id="unsubscribe.success" defaultMessage="You've unsubscribed successfully !" />
+              <FormattedMessage id="unsubscribe.success" defaultMessage="You've unsubscribed successfully!" />
             </MessageBox>
           )}
           {this.state.state === 'unsubscribing' && (

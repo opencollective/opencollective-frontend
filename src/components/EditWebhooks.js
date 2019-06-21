@@ -63,11 +63,11 @@ class EditWebhooks extends React.Component {
       },
       'webhooks.add': {
         id: 'webhooks.add',
-        defaultMessage: 'add another webhook',
+        defaultMessage: 'Add another webhook',
       },
       'webhooks.remove': {
         id: 'webhooks.remove',
-        defaultMessage: 'remove webhook',
+        defaultMessage: 'Remove webhook',
       },
       loading: { id: 'loading', defaultMessage: 'loading' },
       save: { id: 'save', defaultMessage: 'save' },
