@@ -232,6 +232,7 @@
   "confirmEmail.error.InvalidToken": "El link de confirmación es invalido o ha expirado",
   "confirmEmail.sucess": "Your email has been changed to {newEmail}",
   "confirmEmail.validating": "Validando tu nuevo email",
+  "ConnectBlockstack.connect": "Use this Blockstack ID with your Open Collective profile",
   "connectedAccounts.twitter.monthlyStats.toggle.description": "Cada 1ero del mes, automáticamente enviaremos un tweet desde tu cuenta conectada con las últimas estadísticas, los nuevos backers y los backers principales",
   "connectedAccounts.twitter.monthlyStats.toggle.label": "Backers principales",
   "connectedAccounts.twitter.newBacker.toggle.description": "Cuando obtengas un nuevo backer que haya incluido su cuenta de twitter, un tweet será enviado desde la cuenta que hayas conectado",

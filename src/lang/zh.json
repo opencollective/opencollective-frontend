@@ -232,6 +232,7 @@
   "confirmEmail.error.InvalidToken": "确认链接无效或已过期",
   "confirmEmail.sucess": "您的电子邮件已更改",
   "confirmEmail.validating": "验证您的新电子邮件",
+  "ConnectBlockstack.connect": "Use this Blockstack ID with your Open Collective profile",
   "connectedAccounts.twitter.monthlyStats.toggle.description": "每个月的第一天, 都会自动发送一条公开的推特, 上面有最新的统计数据、新的支持者和一直以来的顶级支持者",
   "connectedAccounts.twitter.monthlyStats.toggle.label": "每月统计",
   "connectedAccounts.twitter.newBacker.toggle.description": "每当你有一个新的支持者提供了推特用户名, 你连接的账号将会发出一个推文",

@@ -232,6 +232,7 @@
   "confirmEmail.error.InvalidToken": "The confirmation link is invalid or has expired",
   "confirmEmail.sucess": "メールアドレスが変更されました",
   "confirmEmail.validating": "Validating your new email",
+  "ConnectBlockstack.connect": "Use this Blockstack ID with your Open Collective profile",
   "connectedAccounts.twitter.monthlyStats.toggle.description": "Every first of the month, automatically send a public tweet with the latest stats, the new backers and the all time top backers",
   "connectedAccounts.twitter.monthlyStats.toggle.label": "月ごとの統計情報",
   "connectedAccounts.twitter.newBacker.toggle.description": "Whenever you have a new backer that has provided a twitter username, a tweet will be sent from your connected account",
