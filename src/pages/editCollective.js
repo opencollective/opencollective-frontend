@@ -14,7 +14,6 @@ import MessageBox from '../components/MessageBox';
 import { addCollectiveToEditData } from '../graphql/queries';
 import { addEditCollectiveMutation } from '../graphql/mutations';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import Loading from '../components/Loading';
 
@@ -109,4 +108,4 @@ const addGraphQL = compose(
   addEditCollectiveMutation,
 );
 
-export default withUser(withData(withIntl(addGraphQL(EditCollectivePage))));
+export default withUser(withIntl(addGraphQL(EditCollectivePage)));

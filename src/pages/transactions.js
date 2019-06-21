@@ -12,11 +12,10 @@ import TransactionsWithData from '../apps/expenses/components/TransactionsWithDa
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
+import { withUser } from '../components/UserProvider';
 
 class TransactionsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
@@ -26,7 +25,7 @@ class TransactionsPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveCoverData
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -35,10 +34,9 @@ class TransactionsPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser, data } = this.props;
-    const LoggedInUser = await getLoggedInUser();
+    const { data } = this.props;
     const Collective = (data && data.Collective) || this.state.collective;
-    this.setState({ LoggedInUser, Collective });
+    this.setState({ Collective });
   }
 
   componentDidUpdate(oldProps) {
@@ -53,7 +51,7 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
     const collective = get(this.props, 'data.Collective') || this.state.Collective;
 
     if (!collective && this.props.data.loading) {
@@ -66,11 +64,6 @@ class TransactionsPage extends React.Component {
       return <ErrorPage data={this.props.data} />;
     }
 
-    const cta = ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1 && {
-      href: `/${collective.slug}#contribute`,
-      label: 'contribute',
-    };
-
     return (
       <div className="TransactionsPage">
         <Header
@@ -78,7 +71,6 @@ class TransactionsPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -86,15 +78,17 @@ class TransactionsPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            cta={cta}
             LoggedInUser={LoggedInUser}
             key={collective.slug}
+            displayContributeLink={
+              collective.isActive && collective.host && ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1
+            }
           />
 
           <div className="content">
             <TransactionsWithData
               collective={collective}
-              LoggedInUser={this.state.LoggedInUser}
+              LoggedInUser={LoggedInUser}
               showCSVlink={true}
               filters={true}
               dateDisplayType="date"
@@ -108,4 +102,4 @@ class TransactionsPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(TransactionsPage))));
+export default withIntl(withUser(addCollectiveCoverData(TransactionsPage)));

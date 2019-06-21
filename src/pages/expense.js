@@ -13,9 +13,8 @@ import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
@@ -26,7 +25,7 @@ class ExpensePage extends React.Component {
     slug: PropTypes.string, // for addCollectiveCoverData
     ExpenseId: PropTypes.number,
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -36,15 +35,8 @@ class ExpensePage extends React.Component {
     };
   }
 
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   render() {
-    const { data, ExpenseId } = this.props;
-    const { LoggedInUser } = this.state;
+    const { data, ExpenseId, LoggedInUser } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -84,7 +76,6 @@ class ExpensePage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -92,11 +83,8 @@ class ExpensePage extends React.Component {
           <CollectiveCover
             key={collective.slug}
             collective={collective}
-            cta={{
-              href: `/${collective.slug}#contribute`,
-              label: 'contribute',
-            }}
             LoggedInUser={LoggedInUser}
+            displayContributeLink={collective.isActive && collective.host ? true : false}
           />
 
           <div className="content">
@@ -112,7 +100,7 @@ class ExpensePage extends React.Component {
                   id={ExpenseId}
                   collective={collective}
                   view="details"
-                  LoggedInUser={this.state.LoggedInUser}
+                  LoggedInUser={LoggedInUser}
                   allowPayAction={!this.state.isPayActionLocked}
                   lockPayAction={() => this.setState({ isPayActionLocked: true })}
                   unlockPayAction={() => this.setState({ isPayActionLocked: false })}
@@ -128,4 +116,4 @@ class ExpensePage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensePage))));
+export default withIntl(withUser(addCollectiveCoverData(ExpensePage)));

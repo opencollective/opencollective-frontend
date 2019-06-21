@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -100,4 +99,4 @@ class TiersPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withUser(addCollectiveData(TiersPage))));
+export default withIntl(withUser(addCollectiveData(TiersPage)));

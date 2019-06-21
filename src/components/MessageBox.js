@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as styledSystem from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { Box } from '@rebass/grid';
 
@@ -17,7 +18,7 @@ import StyledSpinner from './StyledSpinner';
 const Message = styled(Box)`
   border: 1px solid;
   border-radius: 8px;
-  padding: ${styledSystem.themeGet('space.3')}px;
+  padding: ${themeGet('space.3')}px;
 
   ${styledSystem.display}
   ${styledSystem.height}

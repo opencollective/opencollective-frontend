@@ -4,7 +4,6 @@ import Head from 'next/head';
 
 import EventsWithData from '../components/EventsWithData';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class EventsIframe extends React.Component {
@@ -188,4 +187,4 @@ class EventsIframe extends React.Component {
   }
 }
 
-export default withData(withIntl(EventsIframe));
+export default withIntl(EventsIframe);

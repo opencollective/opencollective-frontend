@@ -144,7 +144,7 @@ class Hero extends Component {
                   {canEdit && !isFixed && (
                     <Container position="absolute" right={-10} bottom={-10}>
                       <Link route="editCollective" params={{ slug }}>
-                        <StyledRoundButton size={40} backgroundColor="#F0F2F5">
+                        <StyledRoundButton size={40} bg="#F0F2F5">
                           <Cog size={24} color="#4B4E52" />
                         </StyledRoundButton>
                       </Link>

@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 
 import { Facebook } from 'styled-icons/fa-brands/Facebook';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';

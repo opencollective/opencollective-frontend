@@ -132,7 +132,7 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
           </Flex>,
         ]
       ) : (
-        <Link route={`/${slug}#contribute`} passHref>
+        <Link route={`/${slug}/contribute`} passHref>
           <StyledLink fontSize="1.2rem" width="100%" textAlign="center">
             <FormattedMessage id="collectiveStats.beFirstContribute" defaultMessage="Be the first to contribute!" />
           </StyledLink>

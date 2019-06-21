@@ -17,9 +17,8 @@ import { P, H1, H5 } from '../components/Text';
 import GiftCard from '../components/GiftCard';
 import SearchForm from '../components/SearchForm';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 const paymentMethodQuery = gql`
   query PaymentMethod($code: String) {
@@ -92,7 +91,7 @@ class RedeemedPage extends React.Component {
 
   static propTypes = {
     client: PropTypes.object.isRequired,
-    getLoggedInUser: PropTypes.func.isRequired,
+    LoggedInUser: PropTypes.object,
     code: PropTypes.string,
     name: PropTypes.string,
     emitterSlug: PropTypes.string,
@@ -120,11 +119,7 @@ class RedeemedPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser, client, code } = this.props;
-
-    getLoggedInUser().then(LoggedInUser => {
-      this.setState({ LoggedInUser });
-    });
+    const { client, code } = this.props;
 
     if (code) {
       client.query({ query: paymentMethodQuery, variables: { code } }).then(result => {
@@ -144,7 +139,8 @@ class RedeemedPage extends React.Component {
   }
 
   render() {
-    const { amount, emitter, collective, currency, LoggedInUser, loading } = this.state;
+    const { LoggedInUser } = this.props;
+    const { amount, emitter, collective, currency, loading } = this.state;
 
     let error;
     if (get(LoggedInUser, 'collective.id') !== get(collective, 'id')) {
@@ -258,4 +254,4 @@ class RedeemedPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(RedeemedPage)));
+export default withIntl(withUser(RedeemedPage));

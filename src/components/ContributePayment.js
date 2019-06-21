@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { uniqBy, get } from 'lodash';
@@ -273,6 +273,7 @@ class ContributePayment extends React.Component {
                 <Box my={3}>
                   <NewCreditCardForm
                     name="newCreditCardInfo"
+                    profileType={get(this.props.collective, 'type')}
                     error={errors.newCreditCardInfo}
                     onChange={this.onChange}
                     onReady={this.props.onNewCardFormReady}

@@ -6,9 +6,8 @@ import ErrorPage from '../components/ErrorPage';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class CreateCollectivePage extends React.Component {
   static getInitialProps({ query: { hostCollectiveSlug } }) {
@@ -19,37 +18,29 @@ class CreateCollectivePage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveCoverData
     data: PropTypes.object, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
-    this.state = { loading: true };
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser, loading: false });
   }
 
   render() {
-    const { data = {} } = this.props;
+    const { data = {}, LoggedInUser, loadingLoggedInUser } = this.props;
 
-    if (this.state.loading || data.error) {
-      return <ErrorPage loading={this.state.loading} data={data} />;
+    if (loadingLoggedInUser || data.error) {
+      return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
-    return <CreateCollective host={data.Collective} LoggedInUser={this.state.LoggedInUser} />;
+    return <CreateCollective host={data.Collective} LoggedInUser={LoggedInUser} />;
   }
 }
 
-export default withData(
-  withIntl(
-    withLoggedInUser(
-      addCollectiveCoverData(CreateCollectivePage, {
-        skip: props => !props.slug,
-      }),
-    ),
+export default withIntl(
+  withUser(
+    addCollectiveCoverData(CreateCollectivePage, {
+      skip: props => !props.slug,
+    }),
   ),
 );

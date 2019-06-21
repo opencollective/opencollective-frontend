@@ -10,7 +10,6 @@ import ContributorsFilter, { filterMembers, getMembersFilters, CONTRIBUTOR_FILTE
 
 export default class TierContributors extends React.Component {
   static propTypes = {
-    collectiveName: PropTypes.string.isRequired,
     members: PropTypes.arrayOf(PropTypes.object),
     /** Some statistics about this tier */
     membersStats: PropTypes.shape({
@@ -37,7 +36,7 @@ export default class TierContributors extends React.Component {
   filterMembers = memoizeOne(filterMembers);
 
   render() {
-    const { collectiveName, members, membersStats } = this.props;
+    const { members, membersStats } = this.props;
     const { filter } = this.state;
     const filters = this.getMembersFilters(members);
     const filteredMembers = this.filterMembers(members, filter);
@@ -60,8 +59,7 @@ export default class TierContributors extends React.Component {
           <P color="black.600" mb={4} px={3}>
             <FormattedMessage
               id="TierPage.ContributorsDescription"
-              defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
-              values={{ collectiveName }}
+              defaultMessage="Join us in contributing to this tier!"
             />
           </P>
           {filters.length > 2 && members.length >= TierContributors.MIN_MEMBERS_TO_SHOW_FILTERS && (

@@ -25,6 +25,7 @@ class Transaction extends React.Component {
     uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
+    taxAmount: PropTypes.number,
     paymentProcessorFeeInHostCurrency: PropTypes.number,
     hostCurrency: PropTypes.string,
     hostCurrencyFxRate: PropTypes.number,

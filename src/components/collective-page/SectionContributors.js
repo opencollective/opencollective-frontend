@@ -74,7 +74,7 @@ export default class SectionContributors extends React.PureComponent {
           </H3>
           <P color="black.600" mb={4} px={3}>
             <FormattedMessage
-              id="TierPage.ContributorsDescription"
+              id="CollectivePage.ContributorsDescription"
               defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
               values={{ collectiveName }}
             />

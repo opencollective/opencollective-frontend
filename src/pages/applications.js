@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import { createApplicationMutation, deleteApplicationMutation } from '../graphql/mutations';
 import { getLoggedInUserApplicationsQuery } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import Loading from '../components/Loading';
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
@@ -148,4 +147,4 @@ class Apps extends React.Component {
   }
 }
 
-export default withData(withIntl(Apps));
+export default withIntl(Apps);

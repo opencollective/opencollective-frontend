@@ -8,7 +8,6 @@ import colors from '../constants/colors';
 
 import { firstSentence } from '../lib/utils';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class NametagsPage extends React.Component {
@@ -333,4 +332,4 @@ const getAttendeesQuery = gql`
 
 export const addAttendeesData = graphql(getAttendeesQuery);
 
-export default withData(withIntl(addAttendeesData(NametagsPage)));
+export default withIntl(addAttendeesData(NametagsPage));

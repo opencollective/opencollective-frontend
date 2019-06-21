@@ -14,9 +14,8 @@ import SectionTitle from '../components/SectionTitle';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class ExpensesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -28,23 +27,12 @@ class ExpensesPage extends React.Component {
     filter: PropTypes.string,
     value: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
 
   render() {
     const { data } = this.props;
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -110,7 +98,6 @@ class ExpensesPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -118,11 +105,8 @@ class ExpensesPage extends React.Component {
           <CollectiveCover
             key={collective.slug}
             collective={collective}
-            cta={{
-              href: `/${collective.slug}#contribute`,
-              label: 'contribute',
-            }}
             LoggedInUser={LoggedInUser}
+            displayContributeLink={collective.isActive && collective.host ? true : false}
           />
 
           <div className="content">
@@ -130,7 +114,7 @@ class ExpensesPage extends React.Component {
 
             <div className=" columns">
               <div className="col large">
-                <ExpensesWithData collective={collective} LoggedInUser={this.state.LoggedInUser} filters={filter} />
+                <ExpensesWithData collective={collective} LoggedInUser={LoggedInUser} filters={filter} />
               </div>
 
               <div className="col side">
@@ -146,4 +130,4 @@ class ExpensesPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withLoggedInUser(addCollectiveCoverData(ExpensesPage))));
+export default withIntl(withUser(addCollectiveCoverData(ExpensesPage)));

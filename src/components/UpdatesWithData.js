@@ -27,10 +27,10 @@ class UpdatesWithData extends React.Component {
     };
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
+  componentDidUpdate(prevProps) {
     const { data, collective } = this.props;
-    const { LoggedInUser } = newProps;
-    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
+    const { LoggedInUser } = this.props;
+    if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' } });
     }

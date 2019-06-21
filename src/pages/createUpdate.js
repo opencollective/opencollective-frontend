@@ -21,10 +21,9 @@ import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
 import { H1 } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
@@ -52,18 +51,12 @@ class CreateUpdatePage extends React.Component {
     action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createUpdate: PropTypes.func, // from addMutation/createUpdateQuery
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
     this.state = { update: {} };
-  }
-
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
   }
 
   createUpdate = async update => {
@@ -90,7 +83,7 @@ class CreateUpdatePage extends React.Component {
 
   render() {
     const { data } = this.props;
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
 
     if (!data.Collective) {
       return <ErrorPage data={data} />;
@@ -113,7 +106,6 @@ class CreateUpdatePage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -210,4 +202,4 @@ const addGraphQL = compose(
   addMutation,
 );
 
-export default withData(withIntl(withLoggedInUser(addGraphQL(CreateUpdatePage))));
+export default withIntl(withUser(addGraphQL(CreateUpdatePage)));

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 
 import Container from './Container';
@@ -169,7 +169,7 @@ StyledInputGroup.propTypes = {
   /** Props passed to the prepend `Container` */
   prependProps: PropTypes.object,
   /** Max Width */
-  maxWidth: PropTypes.number,
+  maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default StyledInputGroup;

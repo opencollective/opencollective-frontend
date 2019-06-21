@@ -1,16 +1,6 @@
 import tag from 'clean-tag';
 import styled from 'styled-components';
-import {
-  background,
-  backgroundColor,
-  borderRadius,
-  color,
-  space,
-  border,
-  fontSize,
-  fontWeight,
-  lineHeight,
-} from 'styled-system';
+import { background, borderRadius, color, space, border, fontSize, fontWeight, lineHeight } from 'styled-system';
 
 /** Simple tag to display a short string */
 const StyledTag = styled(tag.span)`
@@ -24,7 +14,6 @@ const StyledTag = styled(tag.span)`
   color: #71757A;
 
   ${background}
-  ${backgroundColor}
   ${borderRadius}
   ${color}
   ${space}

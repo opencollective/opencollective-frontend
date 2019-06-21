@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet, fontSize } from 'styled-system';
+import { typography } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
 const IconCheckmark = () => {
@@ -16,7 +17,7 @@ const IconCheckmark = () => {
 };
 
 const CheckboxContainer = styled(Flex)`
-  ${fontSize}
+  ${typography}
   height: ${props => props.size};
   align-items: center;
 

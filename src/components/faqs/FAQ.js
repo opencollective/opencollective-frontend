@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet, display, minWidth } from 'styled-system';
+import { display, minWidth } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Box } from '@rebass/grid';
 
 import { P } from '../Text';

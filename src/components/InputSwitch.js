@@ -1,36 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 
-const styles = () => ({
-  colorSwitchBase: {
-    '&$colorChecked': {
+export default withStyles({
+  switchBase: {
+    '&$checked': {
       color: '#3385ff',
-      '& + $colorBar': {
-        backgroundColor: '#3385ff',
-      },
+    },
+    '&$checked + $track': {
+      backgroundColor: '#3385ff',
     },
   },
-  colorBar: {},
-  colorChecked: {},
+  checked: {},
+  track: {},
+})(props => {
+  return <Switch color="default" {...props} />;
 });
-
-const InputSwitch = ({ classes, ...props }) => {
-  return (
-    <Switch
-      classes={{
-        switchBase: classes.colorSwitchBase,
-        checked: classes.colorChecked,
-        bar: classes.colorBar,
-      }}
-      {...props}
-    />
-  );
-};
-
-InputSwitch.propTypes = {
-  classes: PropTypes.object,
-};
-
-export default withStyles(styles)(InputSwitch);
