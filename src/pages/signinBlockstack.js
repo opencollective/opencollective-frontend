@@ -1,6 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
-import { themeGet } from 'styled-system';
 import PropTypes from 'prop-types';
 
 import { Flex } from '@rebass/grid';
@@ -21,10 +19,6 @@ import { FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import StyledButton from '../components/StyledButton';
-
-const Icon = styled(User)`
-  color: ${themeGet('colors.primary.300')};
-`;
 
 class SignInBlockstack extends React.Component {
   static async getInitialProps({ query = {} }) {
@@ -50,8 +44,12 @@ class SignInBlockstack extends React.Component {
       }
       return { authResponse: query.authResponse, next, organizationData };
     } else {
-      // TODO hanlde redirect after signin with magic link
-      const next = '/';
+      let next;
+      if (query.next) {
+        next = query.next.replace(/'/g, '');
+      } else {
+        next = null;
+      }
       return { next };
     }
   }
@@ -80,8 +78,6 @@ class SignInBlockstack extends React.Component {
   }
 
   async loadInitialState() {
-    // eslint-disable-next-line no-console
-    console.log('loadInitialState');
     const userSession = createUserSession();
     const redirect = this.props.next || '/';
     if (userSession.isSignInPending()) {
@@ -103,8 +99,6 @@ class SignInBlockstack extends React.Component {
       }
     } else if (userSession.isUserSignedIn()) {
       if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-        await this.props.updateUserPublicKey('x');
-
         const userData = userSession.loadUserData();
         const publicKey = getPublicKeyFromPrivate(userData.appPrivateKey);
         if (this.props.LoggedInUser.publicKey !== publicKey) {
@@ -164,7 +158,7 @@ class SignInBlockstack extends React.Component {
 
   signinEmail(userData, publicKey, redirect) {
     const user = { email: userData.email, publicKey };
-    this.signinEmailPost(user, `/blockstack/${encodeURIComponent(redirect)}`).catch(error => {
+    this.signinEmailPost(user, `/blockstack?next='${redirect}'`).catch(error => {
       this.setState({ error: `Failed to signin, ${error}` });
     });
   }
@@ -245,7 +239,7 @@ class SignInBlockstack extends React.Component {
       <Page title="Blockstack Login Successful">
         <Container pt={4} pb={6} px={2} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
           <Flex justifyContent="center" mb={4}>
-            <Icon size="60" />
+            <User size="60" />
           </Flex>
           <H3 as="h1" fontWeight="800">
             {userData && <>{userData.username}</>}
@@ -286,7 +280,7 @@ class SignInBlockstack extends React.Component {
               <br />
               <FormattedMessage
                 id="blockstack.signinToConnect"
-                defaultMessage="Please sign in with the magic link to connect your blockstack id to your profile."
+                defaultMessage="Please sign in with the magic link to connect your blockstack id to your."
               />
               <br />
               <H3 as="h1" fontWeight="800">
@@ -314,7 +308,7 @@ class SignInBlockstack extends React.Component {
               }}
             >
               <FormattedMessage
-                id="ConnectBlockstack.connect"
+                id="blockstack.connect"
                 defaultMessage="Use this Blockstack ID with your Open Collective profile"
               />
             </StyledButton>
