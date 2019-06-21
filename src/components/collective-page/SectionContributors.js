@@ -2,13 +2,32 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
+import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
 
 import { P, H2, H3, Span } from '../Text';
 import ContributorsGrid from '../ContributorsGrid';
 import ContributorsFilter, { filterMembers, getMembersFilters, CONTRIBUTOR_FILTERS } from '../ContributorsFilter';
 import ContainerSectionContent from './ContainerSectionContent';
+import ContributorsGridBackgroundSVG from './ContributorsGridBackground.svg';
 
+/** Main contributors container with the bubbles background */
+const MainContainer = styled.div`
+  padding: 128px 0;
+  background: url(${ContributorsGridBackgroundSVG});
+
+  @media (max-width: 52em) {
+    background-size: cover;
+  }
+
+  @media (min-width: 52em) {
+    background-position-y: -200%;
+  }
+`;
+
+/**
+ * Section that displays all the contributors to the collective (financial, admins...etc)
+ */
 export default class SectionContributors extends React.PureComponent {
   static propTypes = {
     collectiveName: PropTypes.string.isRequired,
@@ -37,7 +56,7 @@ export default class SectionContributors extends React.PureComponent {
     const filteredMembers = this.filterMembers(members, filter);
 
     return (
-      <Box pt={6}>
+      <MainContainer>
         <ContainerSectionContent>
           <H2 mb={4} px={3} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
             <FormattedMessage
@@ -55,7 +74,7 @@ export default class SectionContributors extends React.PureComponent {
           </H3>
           <P color="black.600" mb={4} px={3}>
             <FormattedMessage
-              id="TierPage.ContributorsDescription"
+              id="CollectivePage.ContributorsDescription"
               defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
               values={{ collectiveName }}
             />
@@ -67,7 +86,7 @@ export default class SectionContributors extends React.PureComponent {
         <Box mb={4}>
           <ContributorsGrid members={filteredMembers} />
         </Box>
-      </Box>
+      </MainContainer>
     );
   }
 }

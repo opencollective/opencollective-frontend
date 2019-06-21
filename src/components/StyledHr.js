@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { themeGet, space, minWidth, maxWidth, boxShadow, borderColor } from 'styled-system';
+import { space, layout, shadow, border } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
-import { borderStyle } from '../lib/styled_system_custom';
 
 const StyledHr = styled(tag.hr)`
   border: 0;
@@ -11,12 +11,9 @@ const StyledHr = styled(tag.hr)`
   height: 1px;
 
   ${space}
-  ${minWidth}
-  ${maxWidth}
-  ${boxShadow}
-  ${borderColor}
-
-  ${borderStyle}
+  ${layout}
+  ${shadow}
+  ${border}
 `;
 
 StyledHr.propTypes = {

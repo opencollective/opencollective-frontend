@@ -141,11 +141,11 @@ export default class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
-  renderSection(section, canEditCollective) {
+  renderSection(section, canEdit) {
     const { collective, members, tiers, events } = this.props;
 
     if (section === Sections.ABOUT) {
-      return <SectionAbout collective={collective} canEdit={canEditCollective} editMutation={EditCollectiveMutation} />;
+      return <SectionAbout collective={collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />;
     } else if (section === Sections.CONTRIBUTORS) {
       return <SectionContributors collectiveName={collective.name} members={members} />;
     } else if (section === Sections.CONTRIBUTE) {
@@ -163,7 +163,7 @@ export default class CollectivePage extends Component {
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <Container borderTop="1px solid #E6E8EB">
@@ -172,7 +172,7 @@ export default class CollectivePage extends Component {
             collective={collective}
             host={host}
             sections={AllSectionsNames}
-            canEditCollective={canEditCollective}
+            canEdit={canEdit}
             isFixed={isFixed}
             selectedSection={selectedSection}
             onSectionClick={this.onSectionClick}
@@ -181,7 +181,7 @@ export default class CollectivePage extends Component {
         </Container>
         {AllSectionsNames.map(section => (
           <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-            {this.renderSection(section, canEditCollective)}
+            {this.renderSection(section, canEdit)}
           </div>
         ))}
       </Container>

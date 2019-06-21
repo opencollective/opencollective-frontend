@@ -5,7 +5,7 @@ import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import moment from 'moment';
 import styled, { withTheme } from 'styled-components';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 
 import GiftCard from './icons/GiftCard';
 import Link from './Link';

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { backgroundImage, backgroundColor, borders, borderColor, size, themeGet } from 'styled-system';
-import tag from 'clean-tag';
+import { background, color, border, space, layout } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 import withFallbackImage from '../lib/withFallbackImage';
 
@@ -11,20 +11,20 @@ const getInitials = name => name.split(' ').reduce((result, value) => (result +=
 export const StyledAvatar = styled(Flex)`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
-  ${backgroundColor}
-  ${backgroundImage}
+  ${color}
+  ${background}
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: ${({ type }) => (type === 'USER' ? '100px' : '25%')};
-  ${borders}
-  ${borderColor}
+  ${border}
   color: ${themeGet('colors.black.400')};
   font-weight: bold;
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  ${size}
+  ${space}
+  ${layout}
   ${props =>
     props.animationDuration &&
     css`
@@ -32,18 +32,11 @@ export const StyledAvatar = styled(Flex)`
     `}
 `;
 
-StyledAvatar.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('backgroundImage'),
-};
-
 const Avatar = ({ src, type = 'USER', radius, name, ...styleProps }) => {
-  const style = {};
   // Avoid setting null/undefined background images
-  if (src) {
-    style.backgroundImage = `url(${src})`;
-  }
+  const backgroundImage = src ? `url(${src})` : undefined;
   return (
-    <StyledAvatar size={radius} type={type} style={style} {...styleProps}>
+    <StyledAvatar size={radius} type={type} background={backgroundImage} {...styleProps}>
       {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
     </StyledAvatar>
   );

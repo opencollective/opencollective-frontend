@@ -55,10 +55,10 @@ class InputTypeCreditCard extends React.Component {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.options && nextProps.options.length > 0) {
+  componentDidUpdate() {
+    if (this.props.options && this.props.options.length > 0) {
       if (typeof this.state.uuid !== 'string') {
-        this.handleChange('uuid', nextProps.options[0].uuid);
+        this.handleChange('uuid', this.props.options[0].uuid);
       }
     }
   }
@@ -105,9 +105,7 @@ class InputTypeCreditCard extends React.Component {
           >
             {options.map(option => {
               const value = option.uuid;
-              const label = `${option.data.brand} ${option.data.funding} ${option.data.identifier} ${
-                option.data.expMonth
-              }/${option.data.expYear}`;
+              const label = `${option.data.brand} ${option.data.funding} ${option.data.identifier} ${option.data.expMonth}/${option.data.expYear}`;
               return <option value={value} key={value}>{`💳 ${label}`}</option>;
             })}
             <option value="">other</option>

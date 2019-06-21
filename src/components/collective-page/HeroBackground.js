@@ -27,6 +27,10 @@ const BackgroundContainer = styled.div`
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: top right;
+
+    @media (min-width: 1440px) {
+      mask-size: 75% 100%;
+    }
   }
 `;
 

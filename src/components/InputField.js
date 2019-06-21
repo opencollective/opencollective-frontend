@@ -110,9 +110,9 @@ class InputField extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.value != this.props.value) {
-      this.setState({ value: nextProps.value });
+  componentDidUpdate(prevProps) {
+    if (this.props.value !== prevProps.value) {
+      this.setState({ value: this.props.value });
     }
   }
 

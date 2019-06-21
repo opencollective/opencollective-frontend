@@ -101,7 +101,10 @@ diff.updated.forEach(key => console.info(`📥  [UPDATE] "${key}"`));
 // Save translations
 mkdirpSync(LANG_DIR);
 fs.writeFileSync(DEFAULT_TRANSLATIONS_FILE, convertToJSON(defaultMessages));
-translate('fr', defaultMessages, diff.updated);
 translate('es', defaultMessages, diff.updated);
+translate('fr', defaultMessages, diff.updated);
+translate('it', defaultMessages, diff.updated);
 translate('ja', defaultMessages, diff.updated);
+translate('pt', defaultMessages, diff.updated);
 translate('ru', defaultMessages, diff.updated);
+translate('zh', defaultMessages, diff.updated);

@@ -3,9 +3,9 @@ import { isEqual } from 'lodash';
 import PropTypes from 'prop-types';
 
 import { withApollo } from 'react-apollo';
-import withLoggedInUser from '../lib/withLoggedInUser';
 import UserClass from '../classes/LoggedInUser';
 import { Router } from '../server/pages';
+import withLoggedInUser from '../lib/withLoggedInUser';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,

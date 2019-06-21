@@ -1,24 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {
-  background,
-  borders,
-  borderColor,
-  borderRadius,
-  color,
-  display,
-  flex,
-  fontSize,
-  fontWeight,
-  maxWidth,
-  minWidth,
-  space,
-  textAlign,
-  themeGet,
-  width,
-  height,
-  lineHeight,
-} from 'styled-system';
+import { background, border, color, layout, flexbox, space, typography } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { overflow } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
@@ -42,22 +25,13 @@ const getBorderColor = ({ error, success }) => {
  */
 const StyledInput = styled(tag.input)`
   ${background}
-  ${borders}
-  ${borderColor}
-  ${borderRadius}
+  ${border}
   ${color}
-  ${display}
-  ${flex}
-  ${fontSize}
-  ${fontWeight}
-  ${lineHeight}
-  ${maxWidth}
-  ${minWidth}
+  ${layout}
+  ${flexbox}
+  ${typography}
   ${overflow}
   ${space}
-  ${textAlign}
-  ${width}
-  ${height}
 
   border-color: ${getBorderColor};
   border-style: ${props => (props.bare ? 'none' : 'solid')};

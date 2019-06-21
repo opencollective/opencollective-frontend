@@ -79,7 +79,7 @@ initialState = { buttonSize: 'medium' };
 ### Advanced customization
 
 ```js
-<StyledButton buttonStyle="primary" backgroundColor="green.700">
+<StyledButton buttonStyle="primary" bg="green.700">
   A green button
 </StyledButton>
 ```

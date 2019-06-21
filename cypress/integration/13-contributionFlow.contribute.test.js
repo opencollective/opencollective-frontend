@@ -29,6 +29,15 @@ describe('Contribution Flow: Order', () => {
     });
   });
 
+  describe('route resiliance', () => {
+    it('with a multipart slug', () => {
+      cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
+      cy.contains("Contribute to 'Sponsors' tier");
+      cy.contains('button', 'Next').click();
+      cy.location('pathname').should('eq', '/apex/contribute/a-multipart-420-470/checkout/details');
+    });
+  });
+
   it('Can order as new user', () => {
     // Mock clock so we can check next contribution date in a consistent way
     cy.clock(Date.parse('2042/05/25'));

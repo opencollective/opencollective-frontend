@@ -16,9 +16,8 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import withLoggedInUser from '../lib/withLoggedInUser';
+import { withUser } from '../components/UserProvider';
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -30,7 +29,7 @@ class CreateExpensePage extends React.Component {
     action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createExpense: PropTypes.func.isRequired, // from addMutation
     data: PropTypes.object.isRequired, // from withData
-    getLoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -38,14 +37,8 @@ class CreateExpensePage extends React.Component {
     this.state = { expenseCreated: false };
   }
 
-  async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser();
-    this.setState({ LoggedInUser });
-  }
-
   createExpense = async expense => {
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
     const collective = this.props.data.Collective;
 
     try {
@@ -70,8 +63,8 @@ class CreateExpensePage extends React.Component {
   };
 
   render() {
-    const { data } = this.props;
-    const { LoggedInUser, expenseCreated } = this.state;
+    const { data, LoggedInUser } = this.props;
+    const { expenseCreated } = this.state;
 
     if (!data.Collective) return <ErrorPage data={data} />;
 
@@ -284,4 +277,4 @@ const addData = compose(
   addMutation,
 );
 
-export default withData(withIntl(withLoggedInUser(addData(CreateExpensePage))));
+export default withIntl(withUser(addData(CreateExpensePage)));

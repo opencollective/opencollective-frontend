@@ -14,6 +14,7 @@ export const transactionFields = `
   netAmountInCollectiveCurrency
   hostFeeInHostCurrency
   platformFeeInHostCurrency
+  taxAmount
   paymentProcessorFeeInHostCurrency
   paymentMethod {
     service
@@ -410,7 +411,7 @@ export const getCollectiveQuery = gql`
         type
         name
         description
-        longDescription
+        hasLongDescription
         button
         amount
         amountType

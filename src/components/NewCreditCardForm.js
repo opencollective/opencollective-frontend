@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Elements, CardElement, injectStripe } from 'react-stripe-elements';
 import { Flex } from '@rebass/grid';
+import { defineMessages } from 'react-intl';
 
 import { Span } from './Text';
 import StyledCheckbox from './StyledCheckbox';
+import withIntl from '../lib/withIntl';
 
 const StyledCardElement = styled(CardElement)`
   min-width: 200px;
@@ -26,7 +28,9 @@ StyledCardElement.defaultProps = {
 
 class NewCreditCardFormWithoutStripe extends React.Component {
   static propTypes = {
+    intl: PropTypes.object.isRequired,
     name: PropTypes.string,
+    profileType: PropTypes.string, // USER or ORGANIZATION
     error: PropTypes.string,
     hasSaveCheckBox: PropTypes.bool,
     hidePostalCode: PropTypes.bool,
@@ -39,6 +43,16 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     hasSaveCheckBox: true,
     hidePostalCode: false,
   };
+
+  constructor(props) {
+    super(props);
+    this.messages = defineMessages({
+      'creditcard.save': {
+        id: 'creditcard.save',
+        defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}',
+      },
+    });
+  }
 
   componentDidMount() {
     if (this.props.onReady && this.props.stripe) {
@@ -53,7 +67,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   }
 
   render() {
-    const { name, onChange, error, hasSaveCheckBox, hidePostalCode } = this.props;
+    const { intl, name, profileType, onChange, error, hasSaveCheckBox, hidePostalCode } = this.props;
     return (
       <Flex flexDirection="column">
         <StyledCardElement
@@ -67,7 +81,12 @@ class NewCreditCardFormWithoutStripe extends React.Component {
         )}
         {hasSaveCheckBox && (
           <Flex mt={3} alignItems="center">
-            <StyledCheckbox defaultChecked name="save" label="Save this card to my account" onChange={onChange} />
+            <StyledCheckbox
+              defaultChecked
+              name="save"
+              label={intl.formatMessage(this.messages['creditcard.save'], { type: (profileType || '').toLowerCase() })}
+              onChange={onChange}
+            />
           </Flex>
         )}
       </Flex>
@@ -83,4 +102,4 @@ const NewCreditCardForm = props => (
   </Elements>
 );
 
-export default NewCreditCardForm;
+export default withIntl(NewCreditCardForm);

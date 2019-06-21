@@ -103,8 +103,8 @@ class SectionContribute extends React.PureComponent {
   getWaysToContribute = memoizeOne((collective, tiers, events) => {
     const { intl } = this.props;
 
-    // Static ways to contribute (common to all collectives)
     const financialContributions = [
+      // Static way to contribute: /donate
       {
         key: 'donate',
         type: ContributionTypes.FINANCIAL_ONE_TIME,
@@ -112,28 +112,16 @@ class SectionContribute extends React.PureComponent {
         description: intl.formatMessage(SectionContribute.messages.oneTimeDescription),
         contributeRoute: `/${collective.slug}/donate`,
       },
+      // Add tiers as ways to contribute
+      ...(tiers || []).map(tier => {
+        return SectionContribute.getWayToContributeFromTier(collective, tier);
+      }),
     ];
 
-    const moreWaysToContribute = [];
-
-    // Add tiers in appropriate categories as ways to contribute
-    if (tiers) {
-      tiers.forEach(tier => {
-        const wayToContribute = SectionContribute.getWayToContributeFromTier(collective, tier);
-        if (tier.goal) {
-          moreWaysToContribute.push(wayToContribute);
-        } else {
-          financialContributions.push(wayToContribute);
-        }
-      });
-    }
-
     // Add events as ways to contribute
-    if (events) {
-      events.forEach(event => {
-        moreWaysToContribute.push(SectionContribute.getWayToContributeFromEvent(collective, event));
-      });
-    }
+    const moreWaysToContribute = (events || []).map(event => {
+      return SectionContribute.getWayToContributeFromEvent(collective, event);
+    });
 
     return [financialContributions, moreWaysToContribute];
   });

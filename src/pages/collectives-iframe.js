@@ -4,7 +4,6 @@ import Head from 'next/head';
 
 import MembershipsWithData from '../components/MembershipsWithData';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 
 class CollectivesIframe extends React.Component {
@@ -127,4 +126,4 @@ class CollectivesIframe extends React.Component {
   }
 }
 
-export default withData(withIntl(CollectivesIframe));
+export default withIntl(CollectivesIframe);

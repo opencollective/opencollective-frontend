@@ -135,7 +135,7 @@ const FilterBtn = styled(({ filter, isSelected, onChange, ...props }) => {
   ${props =>
     !props.isSelected &&
     css`
-    backgroundColor: '#F5F7FA',
+    bg: '#F5F7FA',
     color: '#4E5052',
     border: '1px solid #F5F7FA',
   `}

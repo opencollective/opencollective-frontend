@@ -23,7 +23,6 @@ import { P, H1, H5 } from '../components/Text';
 import { getLoggedInUserQuery } from '../graphql/queries';
 import { isValidEmail } from '../lib/utils';
 
-import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import StyledButton from '../components/StyledButton';
 
@@ -256,4 +255,4 @@ const addMutation = graphql(redeemMutation, {
   }),
 });
 
-export default withData(withIntl(withUser(addMutation(RedeemPage))));
+export default withIntl(withUser(addMutation(RedeemPage)));

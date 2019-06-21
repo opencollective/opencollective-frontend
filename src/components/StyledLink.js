@@ -1,21 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {
-  backgroundColor,
-  border,
-  borderColor,
-  borderRadius,
-  color,
-  display,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  maxWidth,
-  space,
-  textAlign,
-  width,
-  themeGet,
-} from 'styled-system';
+import { border, color, layout, space, typography } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../constants/theme';
@@ -26,21 +12,13 @@ import { buttonSize, buttonStyle } from '../constants/theme';
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledLink = styled(tag.a)`
-  ${backgroundColor}
   ${border}
-  ${borderColor}
-  ${borderRadius}
   ${color}
-  ${display}
-  ${fontFamily}
-  ${fontSize}
-  ${fontWeight}
-  ${maxWidth}
+  ${layout}
   ${space}
-  ${textAlign}
+  ${typography}
   ${textDecoration}
   ${whiteSpace}
-  ${width}
 
   ${buttonStyle}
   ${buttonSize}

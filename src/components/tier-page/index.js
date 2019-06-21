@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
-import { themeGet } from 'styled-system';
+import themeGet from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
 
@@ -164,7 +164,7 @@ class TierPage extends Component {
                 <Avatar
                   type={collective.type}
                   src={collective.image}
-                  backgroundColor="#EBEBEB"
+                  bg="#EBEBEB"
                   border="1px solid #efefef"
                   radius={40}
                   borderRadius={10}
