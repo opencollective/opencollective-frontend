@@ -79,6 +79,9 @@ class NewCollectivePage extends React.Component {
               events={data.Collective.events}
               topOrganizations={data.Collective.topOrganizations}
               topIndividuals={data.Collective.topIndividuals}
+              transactions={data.Collective.transactions}
+              expenses={data.Collective.expenses}
+              stats={data.Collective.stats}
               LoggedInUser={LoggedInUser}
             />
           </React.Fragment>
@@ -118,6 +121,10 @@ const getCollective = graphql(gql`
       tags
       type
       currency
+      stats {
+        balance
+        yearlyBudget
+      }
       parentCollective {
         id
         image
@@ -171,6 +178,40 @@ const getCollective = graphql(gql`
         name
         description
         image
+      }
+      transactions(limit: 3) {
+        id
+        netAmountInCollectiveCurrency
+        description
+        type
+        createdAt
+        fromCollective {
+          id
+          slug
+          name
+          image
+        }
+        usingVirtualCardFromCollective {
+          id
+          slug
+          name
+        }
+      }
+      expenses(limit: 3) {
+        id
+        amount
+        description
+        createdAt
+        category
+        transaction {
+          id
+        }
+        fromCollective {
+          id
+          slug
+          name
+          image
+        }
       }
     }
   }
