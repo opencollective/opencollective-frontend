@@ -22,10 +22,9 @@ describe('new expense when logged out', () => {
   it('requires to login to submit an expense', () => {
     cy.visit('/testcollective/expenses/new');
     cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
-    cy.get('.inputField.email input').type('testuser+admin@opencollective.com');
-    cy.get('.login').click();
+    cy.get('#email').type('testuser+admin@opencollective.com');
+    cy.get('#signin').click();
     cy.wait(300);
-    cy.get('.inputField.description', { timeout: 5000 });
   });
 });
 
