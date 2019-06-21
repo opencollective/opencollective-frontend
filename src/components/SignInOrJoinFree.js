@@ -145,7 +145,7 @@ class SignInOrJoinFree extends React.Component {
               />
               <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
             </Flex>
-            <P mt={4} color="black.500" fontSize="Caption">
+            <P mt={4} color="black.500" fontSize="Caption" mb={3}>
               <FormattedMessage
                 id="contributeFlow.createProfile.legal"
                 defaultMessage="By joining, you agree to our {tosLink} and {privacyPolicyLink}."
