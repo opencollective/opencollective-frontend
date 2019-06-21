@@ -7,6 +7,7 @@ import Markdown from 'react-markdown';
 import withIntl from '../../../lib/withIntl';
 import { getCurrencySymbol } from '../../../lib/utils';
 import { Link } from '../../../server/pages';
+import { Router } from '../../../server/pages';
 
 import InputField from '../../../components/InputField';
 import SignInOrJoinFree from '../../../components/SignInOrJoinFree';
@@ -491,7 +492,9 @@ class CreateExpenseForm extends React.Component {
               <div>
                 <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
                   {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-                  {!this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />}
+                  {!this.state.loading && (
+                    <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense12" />
+                  )}
                 </Button>
               </div>
 
@@ -512,7 +515,7 @@ class CreateExpenseForm extends React.Component {
           <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
             <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
           </P>
-          <SignInOrJoinFree />
+          <SignInOrJoinFree redirect={Router.asPath} />
         </div>
       );
     } else {
