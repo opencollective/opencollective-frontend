@@ -182,8 +182,8 @@ class HomePage extends React.Component {
 
   async componentDidMount() {
     // separate request to not block showing LoggedInUser
-    const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
-    this.setState({ stats });
+    const { stats, sponsors } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
+    this.setState({ stats, sponsors });
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -237,11 +237,11 @@ class HomePage extends React.Component {
         },
       },
       recent: { collectives },
-      sponsors: { collectives: sponsors },
       transactions: { transactions },
     } = this.props.data;
     const {
       stats: { totalAnnualBudget, totalCollectives, totalDonors },
+      sponsors,
     } = this.state;
 
     const filteredTransactions = transactions.filter(({ type, order, category, fromCollective, collective }) => {
@@ -549,11 +549,12 @@ class HomePage extends React.Component {
                 justifyContent="space-between"
                 px={[1, null, 4]}
               >
-                {sponsors.map(c => (
-                  <Container width={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}>
-                    <HomepageSponsorCard {...c} />
-                  </Container>
-                ))}
+                {sponsors &&
+                  sponsors.map(c => (
+                    <Container width={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}>
+                      <HomepageSponsorCard {...c} />
+                    </Container>
+                  ))}
               </Container>
             </Container>
 
@@ -1021,19 +1022,6 @@ const query = gql`
           backers {
             all
           }
-        }
-      }
-    }
-    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
-      collectives {
-        id
-        currency
-        type
-        slug
-        name
-        image
-        stats {
-          totalAmountSpent
         }
       }
     }
