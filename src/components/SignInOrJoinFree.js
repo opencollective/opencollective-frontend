@@ -35,10 +35,6 @@ class SignInOrJoinFree extends React.Component {
     }),
   };
 
-  static defaultProps = {
-    redirect: '/',
-  };
-
   state = {
     form: 'signin',
     error: null,
