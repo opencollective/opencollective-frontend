@@ -257,7 +257,10 @@ class HomePage extends React.Component {
 
     return (
       <Fragment>
-        <Header title="Home" LoggedInUser={LoggedInUser} />
+        <Header
+          description="The Internet generation needs organizations that reflect who we are; where anybody can contribute to a shared mission; where leaders can easily change; and where money flows in full transparency. Create an Open Collective for your community."
+          LoggedInUser={LoggedInUser}
+        />
         <Body>
           <Container
             alignItems="center"
