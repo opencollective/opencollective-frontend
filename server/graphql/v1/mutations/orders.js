@@ -285,10 +285,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         possibleRoles.push(roles.MEMBER);
       }
 
-      if (
-        !remoteUser.hasRole(possibleRoles, order.fromCollective.id) &&
-        fromCollective.CreatedByUserId !== remoteUser.id
-      ) {
+      if (!remoteUser.hasRole(possibleRoles, order.fromCollective.id)) {
         // We only allow to add funds on behalf of a collective if the user is an admin of that collective or an admin of the host of the collective that receives the money
         const HostId = await collective.getHostCollectiveId();
         if (!remoteUser.isAdmin(HostId)) {
