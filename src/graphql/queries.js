@@ -117,6 +117,7 @@ export const getLoggedInUserQuery = gql`
           id
           slug
           type
+          isAnonymous
           name
           currency
           isHost

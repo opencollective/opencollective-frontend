@@ -315,10 +315,7 @@ class CreateOrderPage extends React.Component {
     // Check if we're creating a new profile
     if (!this.state.stepProfile.id) {
       this.setState({ submitting: true });
-      if (this.state.stepProfile.name.match(/^anonym/)) {
-        // we should find something better to check for anonymous in multiple langs
-        // also this could arguably move to the backend
-        this.state.stepProfile.slug = `anonymous-${base62(6)}`;
+      if (this.state.stepProfile.isAnonymous) {
         this.state.stepProfile.slug = `anonymous-${uuid().split('-')[0]}`;
       }
 

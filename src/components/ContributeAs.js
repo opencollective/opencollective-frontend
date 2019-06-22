@@ -147,6 +147,13 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
     ],
     'id',
   );
+
+  // if the user doesn't have an anonymous profile yet, we offer to create one
+  const anonymousProfile = options.find(p => p.type === 'USER' && p.isAnonymous);
+  if (!anonymousProfile) {
+    options.push({ id: 'anonymous', name: intl.formatMessage(messages['anonymous']) });
+  }
+
   const lastIndex = Object.keys(options).length - 1;
   const showSearch = Object.keys(profiles).length >= 5 || state.search;
 
