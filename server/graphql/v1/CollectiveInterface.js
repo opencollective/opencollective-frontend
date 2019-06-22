@@ -552,6 +552,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       slug: { type: GraphQLString },
       path: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
+      isAnonymous: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
       isArchived: { type: GraphQLBoolean },
       isDeletable: { type: GraphQLBoolean },
@@ -745,6 +746,7 @@ const CollectiveFields = () => {
     createdByUser: {
       type: UserType,
       resolve(collective) {
+        if (collective.isAnonymous) return {};
         return models.User.findByPk(collective.CreatedByUserId);
       },
     },
@@ -943,6 +945,13 @@ const CollectiveFields = () => {
       type: GraphQLBoolean,
       resolve(collective) {
         return Boolean(collective.settings && collective.settings.apply);
+      },
+    },
+    isAnonymous: {
+      description: 'Returns whether this collective is anonymous',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return collective.isAnonymous;
       },
     },
     isArchived: {

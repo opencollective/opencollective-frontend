@@ -324,6 +324,11 @@ export default function(Sequelize, DataTypes) {
         defaultValue: false,
       },
 
+      isAnonymous: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
       twitterHandle: {
         type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
         set(twitterHandle) {

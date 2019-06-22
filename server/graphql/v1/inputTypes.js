@@ -235,6 +235,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     maxAmount: { type: GraphQLInt },
     currency: { type: GraphQLString },
     settings: { type: GraphQLJSON },
+    isAnonymous: { type: GraphQLBoolean },
     tags: { type: new GraphQLList(GraphQLString) },
   }),
 });
