@@ -43,7 +43,6 @@ import ContributionFlowStepsProgress from '../components/ContributionFlowStepsPr
 import EventDetails from '../components/EventDetails';
 
 import { addCreateCollectiveMutation } from '../graphql/mutations';
-import base62 from 'base62-random';
 
 // Styles for the previous, next and submit buttons
 const PrevNextButton = styled(StyledButton)`
@@ -320,6 +319,7 @@ class CreateOrderPage extends React.Component {
         // we should find something better to check for anonymous in multiple langs
         // also this could arguably move to the backend
         this.state.stepProfile.slug = `anonymous-${base62(6)}`;
+        this.state.stepProfile.slug = `anonymous-${uuid().split('-')[0]}`;
       }
 
       try {
