@@ -9,14 +9,15 @@ import Currency from './Currency';
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import { P } from './Text';
+import { firstSentence } from '../lib/utils';
 
-const SponsorCard = ({ currency, image, name, slug, totalDonations, type }) => (
+const SponsorCard = ({ currency, image, name, description, slug, totalDonations, type }) => (
   <Container bg="white.full" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
       <Container bg="black.200" height="1px" width={0.25} />
 
       <Link route="collective" params={{ slug }} passHref>
-        <a>
+        <a title={`${name}\n${firstSentence(description, 80)}`}>
           <Container
             backgroundImage={`url(${imagePreview(image, defaultImage[type], {
               width: 76,
@@ -35,13 +36,18 @@ const SponsorCard = ({ currency, image, name, slug, totalDonations, type }) => (
       <Container bg="black.200" height="1px" width={0.25} />
     </Container>
 
-    <P textAlign="center" fontWeight="bold" mt={3} px={2}>
-      <Link route="collective" params={{ slug }} passHref>
-        <StyledLink color="black.800">{name}</StyledLink>
-      </Link>
-    </P>
-
-    <P textAlign="center" mt={2} px={2} pb={3}>
+    <Container height={90}>
+      <P textAlign="center" mt={2} px={2} pb={3} color="black.800" fontSize="1.2rem">
+        <Link route="collective" params={{ slug }} passHref>
+          <StyledLink color="black.800" fontWeight="bold" fontSize="1.4rem">
+            {name}
+          </StyledLink>
+        </Link>
+        <br />
+        {firstSentence(description, 80)}
+      </P>
+    </Container>
+    <P textAlign="center" px={2} pb={3}>
       Total donated: <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
     </P>
   </Container>
