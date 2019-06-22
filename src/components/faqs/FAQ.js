@@ -27,7 +27,7 @@ const Entry = styled.details`
   summary {
     margin-top: ${themeGet('space.2')}px;
     margin-bottom: ${themeGet('space.2')}px;
-    font-size: ${themeGet('fontSizes.Faq')}px;
+    font-size: 13px;
     font-weight: 500;
     color: ${themeGet('colors.black.800')};
     /* Remove arrow on Firefox */
@@ -64,7 +64,7 @@ const Title = styled.summary``;
 const Content = styled(Box)``;
 Content.defaultProps = {
   mb: 1,
-  fontSize: 'Faq',
+  fontSize: '13px',
   color: 'black.600',
 };
 

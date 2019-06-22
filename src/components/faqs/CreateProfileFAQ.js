@@ -32,7 +32,7 @@ const CreateProfileFAQ = props => (
           <Content>
             <FormattedMessage
               id="createProfile.faq.email.content"
-              defaultMessage="For legal reasons, your email is shared with the administrators of the collective and of the fiscal sponsor that is hosting the collective. We don't share it with any other partner. We don't use it for any type of marketing. We hate spam as much as you do."
+              defaultMessage="For legal reasons, your email is shared with the administrators of the fiscal sponsor that is hosting the collective. We don't share it with any other partner. We don't use it for any type of marketing. We hate spam as much as you do."
             />
           </Content>
         </Entry>

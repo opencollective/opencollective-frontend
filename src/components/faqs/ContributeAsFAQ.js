@@ -19,7 +19,7 @@ const ContributeAsFAQ = props => (
           <Content>
             <FormattedMessage
               id="contributeAs.faq.anonymous.content"
-              defaultMessage="Yes you can! However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal sponsor and the administrators of the collective need to know where the money is coming from. However, we give you full control on how your information is being shown publicly. That's why you can create an anonymous or pseudonymous profile linked to your Open Collective account."
+              defaultMessage="Yes you can! However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal sponsor need to know where the money is coming from. However, we give you full control on how your information is being shown publicly. That's why you can create an anonymous or pseudonymous profile linked to your Open Collective account."
             />
           </Content>
         </Entry>
