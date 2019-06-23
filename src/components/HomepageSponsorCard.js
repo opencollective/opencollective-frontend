@@ -56,6 +56,7 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
 SponsorCard.propTypes = {
   currency: PropTypes.string.isRequired,
   image: PropTypes.string,
+  description: PropTypes.string,
   name: PropTypes.string.isRequired,
   slug: PropTypes.string.isRequired,
   totalDonations: PropTypes.number.isRequired,
