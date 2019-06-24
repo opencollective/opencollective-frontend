@@ -90,6 +90,7 @@ export default class SignIn extends React.Component {
               width={1}
             />
             <StyledButton
+              data-cy="signin-btn"
               buttonStyle="primary"
               fontWeight="600"
               disabled={!email || error}

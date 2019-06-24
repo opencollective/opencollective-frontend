@@ -7,13 +7,14 @@ import Markdown from 'react-markdown';
 import withIntl from '../../../lib/withIntl';
 import { getCurrencySymbol } from '../../../lib/utils';
 import { Link } from '../../../server/pages';
+import { Router } from '../../../server/pages';
 
 import InputField from '../../../components/InputField';
-import SignInForm from '../../../components/SignInForm';
+import SignInOrJoinFree from '../../../components/SignInOrJoinFree';
 import categories from '../../../constants/categories';
 import Button from '../../../components/Button';
-import { P } from '../../../components/Text';
 import Container from '../../../components/Container';
+import { P } from '../../../components/Text';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -504,7 +505,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser } = this.props;
 
     if (!LoggedInUser) {
       return (
@@ -512,7 +513,7 @@ class CreateExpenseForm extends React.Component {
           <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
             <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
           </P>
-          <SignInForm next={`/${collective.slug}/expenses/new`} />
+          <SignInOrJoinFree redirect={Router.asPath} />
         </div>
       );
     } else {

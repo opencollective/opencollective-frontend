@@ -6,7 +6,7 @@ import Footer from './Footer';
 import { addCreateCollectiveMutation } from '../graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
 import CollectiveCover from './CollectiveCover';
-import SignInForm from './SignInForm';
+import SignInOrJoinFree from './SignInOrJoinFree';
 import { FormattedMessage } from 'react-intl';
 import { Router } from '../server/pages';
 import { get } from 'lodash';
@@ -128,13 +128,7 @@ class CreateOrganization extends React.Component {
           <div className="content">
             {!LoggedInUser && (
               <div className="signin">
-                <h2>
-                  <FormattedMessage
-                    id="collectives.create.signin"
-                    defaultMessage="Sign in or create an Open Collective account"
-                  />
-                </h2>
-                <SignInForm next={'/organizations/new'} />
+                <SignInOrJoinFree redirect={Router.asPath} />
               </div>
             )}
             {LoggedInUser && (
