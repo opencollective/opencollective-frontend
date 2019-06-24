@@ -36,8 +36,8 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
       <Container bg="black.200" height="1px" width={0.25} />
     </Container>
 
-    <Container height={90}>
-      <P textAlign="center" mt={2} px={2} pb={3} color="black.800" fontSize="1.2rem">
+    <Container height={90} overflow="hidden">
+      <P textAlign="center" mt={2} px={2} pb={3} color="black.800" fontSize="1.2rem" lineHeight="1.5">
         <Link route="collective" params={{ slug }} passHref>
           <StyledLink color="black.800" fontWeight="bold" fontSize="1.4rem">
             {name}
@@ -47,7 +47,7 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
         {firstSentence(description, 80)}
       </P>
     </Container>
-    <P textAlign="center" px={2} pb={3}>
+    <P textAlign="center" px={2} pb={3} fontSize={['1.3rem', '1.3rem', '1.4rem']}>
       Total donated: <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
     </P>
   </Container>
