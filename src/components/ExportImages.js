@@ -48,7 +48,7 @@ class ExportImages extends React.Component {
             ],
           },
           {
-            name: 'members',
+            name: 'financial contributors',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
             code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
             options: [
@@ -62,7 +62,7 @@ class ExportImages extends React.Component {
               },
               {
                 name: 'limit',
-                description: 'max number of members to show',
+                description: 'max number of financial contributors to show',
                 defaultValue: '(unlimited)',
               },
               {
@@ -126,7 +126,7 @@ class ExportImages extends React.Component {
         <h1>
           <FormattedMessage id="export.images.title" defaultMessage="Export images" />
         </h1>
-        <p>You can export images of each tier with the logo/avatar of the contributors.</p>
+        <p>You can export images showing the financial contributors to each tier.</p>
         <div>
           <InputField
             name="tiers"

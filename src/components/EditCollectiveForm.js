@@ -120,7 +120,7 @@ class EditCollectiveForm extends React.Component {
       },
       'tags.description': {
         id: 'collective.tags.edit.description',
-        defaultMessage: 'Make your collective discoverable in search and related collectives (comma separated)',
+        defaultMessage: 'Make your Collective more discoverable (comma separated)',
       },
       'company.label': {
         id: 'collective.company.label',
@@ -144,17 +144,17 @@ class EditCollectiveForm extends React.Component {
       },
       'expensePolicy.label': {
         id: 'collective.expensePolicy.label',
-        defaultMessage: 'Expense policy',
+        defaultMessage: 'Collective expense policy',
       },
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
         defaultMessage:
-          'It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense.',
+          "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
       },
       'expensePolicy.placeholder': {
         id: 'collective.expensePolicy.placeholder',
         defaultMessage:
-          'E.g. Feel free to expense your public transport or Uber/Lyft drive for up to XX. You can also expense drinks and food for meetups for up to XX. For other types of expenses, feel free to ask us.',
+          'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
       },
       'startsAt.label': {
         id: 'collective.startsAt.label',
@@ -567,7 +567,7 @@ class EditCollectiveForm extends React.Component {
                 params={{ slug: collective.slug, section: 'members' }}
                 className="MenuItem members"
               >
-                <FormattedMessage id="editCollective.menu.members" defaultMessage="Members" />
+                <FormattedMessage id="editCollective.menu.members" defaultMessage="Core Contributors" />
               </MenuItem>
             )}
             {this.showEditGoals && (
@@ -607,7 +607,7 @@ class EditCollectiveForm extends React.Component {
                 params={{ slug: collective.slug, section: 'expenses' }}
                 className="MenuItem expenses"
               >
-                <FormattedMessage id="editCollective.menu.expenses" defaultMessage="Expenses" />
+                <FormattedMessage id="editCollective.menu.expenses" defaultMessage="Expenses Policy" />
               </MenuItem>
             )}
             {this.showPaymentMethods && (
@@ -712,7 +712,7 @@ class EditCollectiveForm extends React.Component {
               )}
               {this.state.section === 'members' && (
                 <EditMembers
-                  title="Edit members"
+                  title="Edit Core Contributors"
                   members={this.members}
                   collective={collective}
                   onChange={this.handleObjectChange}

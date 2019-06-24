@@ -313,12 +313,12 @@ class CreateExpenseForm extends React.Component {
           {!collective.expensePolicy && LoggedInUser && LoggedInUser.canEditCollective(collective) && (
             <div className="expensePolicy">
               <h2>
-                <FormattedMessage id="collective.expensePolicy.label" defaultMessage="Expense policy" />
+                <FormattedMessage id="collective.expensePolicy.label" defaultMessage="Collective expense policy" />
               </h2>
               <p>
                 <FormattedMessage
                   id="collective.expensePolicy.description"
-                  defaultMessage="It can be daunting for the community to file an expense. Help them by providing a clear expense policy to explain what they can expense."
+                  defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
                 />
               </p>
               <Button className="blue" href={`/${collective.slug}/edit/expenses`}>
@@ -329,7 +329,7 @@ class CreateExpenseForm extends React.Component {
           {(collective.expensePolicy || get(collective, 'host.expensePolicy')) && (
             <div className="expensePolicy">
               <h2>
-                <FormattedMessage id="expense.expensePolicy" defaultMessage="Expense policy" />
+                <FormattedMessage id="expense.expensePolicy" defaultMessage="Fiscal Host expense policy" />
               </h2>
               {collective.expensePolicy && <Markdown source={collective.expensePolicy} />}
               {get(collective, 'host.expensePolicy') && <Markdown source={get(collective, 'host.expensePolicy')} />}
@@ -338,14 +338,8 @@ class CreateExpenseForm extends React.Component {
           <div className="disclaimer">
             <FormattedMessage
               id="expense.disclaimer"
-              defaultMessage="You must upload a valid receipt or invoice. We should be able to see clearly on the picture (or PDF) the total amount paid, the date, the items purchased and the legal address."
+              defaultMessage="You must upload a valid receipt or invoice clearly showing the total amount, date, legal address, and what the payment is for."
             />
-            &nbsp;
-            <Link route="faq" params={{ path: 'faq', pageSlug: 'expenses' }}>
-              <a>
-                <FormattedMessage id="needHelp" defaultMessage="Need help?" />
-              </a>
-            </Link>
           </div>
 
           <div className="leftColumn">
