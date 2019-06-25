@@ -13,10 +13,32 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor'), {
+const HTMLEditor = dynamic({
   loading: HTMLEditorLoadingPlaceholder,
+  modules: () => {
+    return {
+      Showdown: () => import('showdown'),
+      HTMLEditor: () => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor').then(mod => mod.default),
+    };
+  },
+  // Having a convertion with Showdown here will ensure a smooth migration
+  // from old collective page that used an (unofficial) markdown description.
+  // Once the new collective page becomes the default, we should remove all
+  // markdow-related code from the new collective page.
+  // eslint-disable-next-line react/display-name
+  render: (props, { HTMLEditor, Showdown }) => {
+    // eslint-disable-next-line react/prop-types
+    const defaultValue = props.defaultValue;
+    const isMarkdown = defaultValue && defaultValue[0] !== '<';
+    const htmlValue = isMarkdown ? new Showdown.Converter().makeHtml(defaultValue) : defaultValue;
+    return <HTMLEditor {...props} defaultValue={htmlValue} />;
+  },
   ssr: false,
 });
+
+// Some collectives have a legacy markdown description. We load the markdown renderer only
+// if this is the case.
+const Markdown = dynamic(() => import('react-markdown'));
 
 /**
  * Display the inline editable description section for the collective
@@ -69,8 +91,10 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
                   )}
                 </Flex>
               );
+            } else if (value[0] !== '<') {
+              return <Markdown source={value} data-cy="longDescription" />;
             } else {
-              return <HTMLContent content={collective.longDescription} data-cy="longDescription" />;
+              return <HTMLContent content={value} data-cy="longDescription" />;
             }
           }}
         </InlineEditField>

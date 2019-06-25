@@ -20,11 +20,14 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
 
 describe('new expense when logged out', () => {
   it('requires to login to submit an expense', () => {
-    cy.visit('/testcollective/expenses/new');
+    cy.visit('/testcollective/expenses');
+    cy.get('.Button.submitExpense.darkBackground')
+      .contains('Submit Expense')
+      .click({ force: true });
     cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
-    cy.get('.inputField.email input').type('testuser+admin@opencollective.com');
-    cy.get('.login').click();
-    cy.wait(300);
+    cy.get('#email').type('testuser+admin@opencollective.com');
+    cy.get('[data-cy="signin-btn"]').click();
+    cy.wait(2000);
     cy.get('.inputField.description', { timeout: 5000 });
   });
 });

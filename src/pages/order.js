@@ -84,7 +84,6 @@ class OrderPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -92,11 +91,8 @@ class OrderPage extends React.Component {
           <CollectiveCover
             key={collective.slug}
             collective={collective}
-            cta={{
-              href: `/${collective.slug}#contribute`,
-              label: 'contribute',
-            }}
             LoggedInUser={LoggedInUser}
+            displayContributeLink={collective.isActive && collective.host ? true : false}
           />
 
           <div className="content">

@@ -63,7 +63,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.description"
           defaultMessage={
-            'This {type} will be deleted along with all related data, such as memberships and payment methods.'
+            'This {type} will be deleted, along with all related data like Core Contributor roles and payment methods.'
           }
         />
       </P>

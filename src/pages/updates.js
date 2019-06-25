@@ -22,13 +22,8 @@ class UpdatesPage extends React.Component {
     slug: PropTypes.string, // for addCollectiveCoverData
     action: PropTypes.string, // not clear whre it's coming from, not in the route
     data: PropTypes.object.isRequired, // from withData
-    LoggedInUser: PropTypes.object,
+    LoggedInUser: PropTypes.object, // from withUser
   };
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
 
   render() {
     const { data, action, LoggedInUser } = this.props;
@@ -44,7 +39,6 @@ class UpdatesPage extends React.Component {
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
           LoggedInUser={LoggedInUser}
         />
 
@@ -52,11 +46,8 @@ class UpdatesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            cta={{
-              href: `/${collective.slug}#contribute`,
-              label: 'contribute',
-            }}
             key={collective.slug}
+            displayContributeLink={collective.isActive && collective.host ? true : false}
           />
 
           <div className="content">

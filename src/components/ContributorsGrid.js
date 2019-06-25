@@ -5,8 +5,7 @@ import { FixedSizeGrid } from 'react-window';
 import { truncate, omit } from 'lodash';
 import styled from 'styled-components';
 
-import Roles from '../constants/roles';
-import { CollectiveType } from '../constants/collectives';
+import roles from '../constants/roles';
 import formatMemberRole from '../lib/i18n-member-role';
 import withIntl from '../lib/withIntl';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
@@ -92,36 +91,75 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
   }
 };
 
+/** Returns the main role for contributor as a string */
+const getRole = (contributor, intl) => {
+  // Order of the if / else if makes the priority to decide which role we want to
+  // show first. The priority order should be:
+  // ADMIN > BACKER > FUNDRAISER > *
+  // Everything that comes after follower is considered same priority so we just
+  // take the first role in the list.
+  if (contributor.isCore) {
+    return formatMemberRole(intl, roles.ADMIN);
+  } else if (contributor.isBacker) {
+    return formatMemberRole(intl, roles.BACKER);
+  } else if (contributor.isFundraiser) {
+    return formatMemberRole(intl, roles.FUNDRAISER);
+  } else {
+    return formatMemberRole(intl, contributor.roles[0]);
+  }
+};
+
 /**
  * A single contributor card, implemented as a PureComponent to improve performances
  */
 class ContributorCard extends React.PureComponent {
   static propTypes = {
     intl: PropTypes.object.isRequired,
-    role: PropTypes.string.isRequired,
-    collective: PropTypes.object.isRequired,
+    contributor: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+      isCore: PropTypes.bool.isRequired,
+      isBacker: PropTypes.bool.isRequired,
+      isFundraiser: PropTypes.bool.isRequired,
+      description: PropTypes.string,
+      collectiveSlug: PropTypes.string,
+      image: PropTypes.string,
+    }).isRequired,
     left: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
   };
 
   render() {
-    const { left, top, collective, intl, role } = this.props;
+    const { left, top, contributor, intl } = this.props;
+    const { collectiveSlug, name, image, description } = contributor;
+
+    // Collective slug is optional, for example Github contributors won't have
+    // a collective slug. This helper renders the link only if needed
+    const withCollectiveLink = !collectiveSlug
+      ? children => children
+      : children => (
+          <Link route="collective" params={{ slug: collectiveSlug }}>
+            {children}
+          </Link>
+        );
 
     return (
       <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
         <Flex justifyContent="center" mb={3}>
-          <Link route="collective" params={{ slug: collective.slug }}>
-            <Avatar src={collective.image} radius={56} name={collective.name} />
-          </Link>
+          {withCollectiveLink(<Avatar src={image} radius={56} name={name} />)}
         </Flex>
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
-          <Link route="collective" passHref params={{ slug: collective.slug }} title={collective.name}>
+          {withCollectiveLink(
             <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
-              {truncate(collective.name, { length: 42 })}
-            </P>
-          </Link>
+              {truncate(name, { length: 42 })}
+            </P>,
+          )}
           <P fontSize="Tiny" lineHeight="Caption" color="black.500">
-            {formatMemberRole(intl, role)}
+            {getRole(contributor, intl)}
+          </P>
+          <P fontSize="Caption" fontWeight="bold">
+            {description}
           </P>
         </Container>
       </StyledContributorCard>
@@ -132,9 +170,9 @@ class ContributorCard extends React.PureComponent {
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
-const ContributorsGrid = ({ intl, members, width, maxNbRowsForViewports, viewport }) => {
+const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, viewport }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
-  const [nbCols, nbRows] = getItemsRepartition(members.length, width, maxNbRows);
+  const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
 
   // Preload more items when viewport width is unknown to avoid displaying blank spaces on SSR
   const viewWidth = viewport === VIEWPORTS.UNKNOWN ? width * 3 : width;
@@ -151,21 +189,20 @@ const ContributorsGrid = ({ intl, members, width, maxNbRowsForViewports, viewpor
       innerElementType={GridInnerContainer}
       itemKey={({ columnIndex, rowIndex }) => {
         const idx = getIdx(columnIndex, rowIndex, nbCols);
-        return idx < members.length ? members[idx].id : `empty-${idx}`;
+        return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
       }}
     >
       {({ columnIndex, rowIndex, style }) => {
         const idx = getIdx(columnIndex, rowIndex, nbCols);
-        const member = members[idx];
+        const contributor = contributors[idx];
 
-        if (!member) {
+        if (!contributor) {
           return null;
         }
         return (
           <ContributorCard
-            key={member.id}
-            collective={member.collective}
-            role={member.role}
+            key={contributor.id}
+            contributor={contributor}
             left={style.left}
             top={style.top}
             intl={intl}
@@ -177,18 +214,18 @@ const ContributorsGrid = ({ intl, members, width, maxNbRowsForViewports, viewpor
 };
 
 ContributorsGrid.propTypes = {
-  /** The members */
-  members: PropTypes.arrayOf(
+  /** The contributors */
+  contributors: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      role: PropTypes.oneOf(Object.values(Roles)).isRequired,
-      collective: PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-        slug: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        image: PropTypes.string,
-      }).isRequired,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+      isCore: PropTypes.bool.isRequired,
+      isBacker: PropTypes.bool.isRequired,
+      isFundraiser: PropTypes.bool.isRequired,
+      description: PropTypes.string,
+      collectiveSlug: PropTypes.string,
+      image: PropTypes.string,
     }),
   ),
 

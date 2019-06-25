@@ -74,9 +74,14 @@ class NewCollectivePage extends React.Component {
             <CollectivePage
               collective={data.Collective}
               host={data.Collective.host}
-              members={data.Collective.members}
+              contributors={data.Collective.contributors}
               tiers={data.Collective.tiers}
               events={data.Collective.events}
+              topOrganizations={data.Collective.topOrganizations}
+              topIndividuals={data.Collective.topIndividuals}
+              transactions={data.Collective.transactions}
+              expenses={data.Collective.expenses}
+              stats={data.Collective.stats}
               LoggedInUser={LoggedInUser}
             />
           </React.Fragment>
@@ -85,6 +90,25 @@ class NewCollectivePage extends React.Component {
     );
   }
 }
+
+const MemberFields = gql`
+  fragment MemberFields on Member {
+    id
+    since
+    role
+    collective: member {
+      id
+      name
+      image
+      slug
+      type
+    }
+    stats {
+      id
+      totalDonations
+    }
+  }
+`;
 
 const getCollective = graphql(gql`
   query NewCollectivePage($slug: String!) {
@@ -102,6 +126,10 @@ const getCollective = graphql(gql`
       tags
       type
       currency
+      stats {
+        balance
+        yearlyBudget
+      }
       parentCollective {
         id
         image
@@ -115,16 +143,24 @@ const getCollective = graphql(gql`
         image
         type
       }
-      members {
+      contributors {
         id
-        role
-        collective: member {
-          id
-          type
-          slug
-          name
-          image
-        }
+        name
+        roles
+        isCore
+        isBacker
+        isFundraiser
+        since
+        description
+        collectiveSlug
+        totalAmountDonated
+        image
+      }
+      topOrganizations: members(role: "BACKER", type: "ORGANIZATION", limit: 10) {
+        ...MemberFields
+      }
+      topIndividuals: members(role: "BACKER", type: "USER", limit: 10) {
+        ...MemberFields
       }
       tiers {
         id
@@ -148,8 +184,44 @@ const getCollective = graphql(gql`
         description
         image
       }
+      transactions(limit: 3) {
+        id
+        netAmountInCollectiveCurrency
+        description
+        type
+        createdAt
+        fromCollective {
+          id
+          slug
+          name
+          image
+        }
+        usingVirtualCardFromCollective {
+          id
+          slug
+          name
+        }
+      }
+      expenses(limit: 3) {
+        id
+        amount
+        description
+        createdAt
+        category
+        transaction {
+          id
+        }
+        fromCollective {
+          id
+          slug
+          name
+          image
+        }
+      }
     }
   }
+
+  ${MemberFields}
 `);
 
 export default withUser(getCollective(withIntl(NewCollectivePage)));
