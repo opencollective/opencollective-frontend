@@ -9,6 +9,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLScalarType,
+  GraphQLNonNull,
 } from 'graphql';
 
 import { Kind } from 'graphql/language';
@@ -22,11 +23,13 @@ import { CollectiveInterfaceType, CollectiveSearchResultsType } from './Collecti
 import { TransactionInterfaceType, OrderDirectionType } from './TransactionInterface';
 
 import models, { Op, sequelize } from '../../models';
+import { getContributorsForTier } from '../../lib/contributors';
 import { strip_tags } from '../../lib/utils';
 import status from '../../constants/expense_status';
 import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
+import roles from '../../constants/roles';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
@@ -53,6 +56,27 @@ export const DateString = new GraphQLScalarType({
   name: 'DateString',
   serialize: value => {
     return value.toString();
+  },
+});
+
+export const IsoDateString = new GraphQLScalarType({
+  name: 'IsoDateString',
+  serialize: value => {
+    return value;
+  },
+  parseValue: value => {
+    return value;
+  },
+  parseLiteral: ast => {
+    if (ast.kind !== Kind.STRING) {
+      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
+    }
+
+    const date = moment.parseZone(ast.value);
+    if (!date.isValid()) {
+      throw new GraphQLError('Query error: unable to pass date string. Expected a valid ISO-8601 date string.');
+    }
+    return date;
   },
 });
 
@@ -325,6 +349,83 @@ export const MemberType = new GraphQLObjectType({
   },
 });
 
+export const ContributorRoleEnum = new GraphQLEnumType({
+  name: 'ContributorRole',
+  description: 'Possible roles for a contributor. Extends `Member.Role`.',
+  values: Object.values(roles).reduce((values, key) => {
+    return { ...values, [key]: {} };
+  }, {}),
+});
+
+export const ContributorType = new GraphQLObjectType({
+  name: 'Contributor',
+  description: `
+    A person or an entity that contributes financially or by any other mean to the mission
+    of the collective. While "Member" is dedicated to permissions, this type is meant
+    to surface all the public contributors.
+  `,
+  fields: {
+    id: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'A unique identifier for this member',
+    },
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'Name of the contributor',
+    },
+    roles: {
+      type: new GraphQLList(ContributorRoleEnum),
+      description: 'All the roles for a given contributor',
+      defaultValue: [roles.CONTRIBUTOR],
+    },
+    isCore: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a core contributor (admin)',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.ADMIN);
+      },
+    },
+    isBacker: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a financial contributor',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.BACKER);
+      },
+    },
+    isFundraiser: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a core contributor (admin)',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.FUNDRAISER);
+      },
+    },
+    since: {
+      type: new GraphQLNonNull(IsoDateString),
+      description: 'Member join date',
+    },
+    totalAmountDonated: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'How much money the user has contributed for this (in cents, using collective currency)',
+    },
+    description: {
+      type: GraphQLString,
+      description: 'Description of how the member contribute. Will usually be a tier name, or "design" or "code".',
+    },
+    collectiveSlug: {
+      type: GraphQLString,
+      description: 'If the contributor has a page on Open Collective, this is the slug to link to it',
+    },
+    image: {
+      type: GraphQLString,
+      description: 'Contributor avatar or logo',
+    },
+    publicMessage: {
+      type: GraphQLString,
+      description: 'A public message from contributors to describe their contributions',
+    },
+  },
+});
+
 export const LocationType = new GraphQLObjectType({
   name: 'LocationType',
   description: 'Type for Location',
@@ -350,27 +451,6 @@ export const LocationType = new GraphQLObjectType({
       description: 'Longitude',
     },
   }),
-});
-
-export const IsoDateString = new GraphQLScalarType({
-  name: 'IsoDateString',
-  serialize: value => {
-    return value;
-  },
-  parseValue: value => {
-    return value;
-  },
-  parseLiteral: ast => {
-    if (ast.kind !== Kind.STRING) {
-      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
-    }
-
-    const date = moment.parseZone(ast.value);
-    if (!date.isValid()) {
-      throw new GraphQLError('Query error: unable to pass date string. Expected a valid ISO-8601 date string.');
-    }
-    return date;
-  },
 });
 
 export const InvoiceType = new GraphQLObjectType({
@@ -969,10 +1049,53 @@ export const NotificationType = new GraphQLObjectType({
 export const MembersStatsType = new GraphQLObjectType({
   name: 'MembersStatsType',
   description: 'Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
+  deprecationReason: `
+  2019/06/20 - This endpoint was used for the new tier page and has been replaced
+  by "ContributorsStatsType". It can be deleted as soon as the migration's completed
+  as well as the "members.findByTierId" loader.
+`,
   fields: () => {
     return {
       id: {
         type: GraphQLInt,
+        description: "We always have to return an id for apollo's caching",
+      },
+      all: {
+        type: GraphQLInt,
+        description: 'Total number of contributors',
+      },
+      users: {
+        type: GraphQLInt,
+        description: 'Number of individuals',
+        resolve(stats) {
+          return stats.USER;
+        },
+      },
+      organizations: {
+        type: GraphQLInt,
+        description: 'Number of organizations',
+        resolve(stats) {
+          return stats.ORGANIZATION;
+        },
+      },
+      collectives: {
+        type: GraphQLInt,
+        description: 'Number of collectives',
+        resolve(stats) {
+          return stats.COLLECTIVE;
+        },
+      },
+    };
+  },
+});
+
+export const ContributorsStatsType = new GraphQLObjectType({
+  name: 'ContributorsStats',
+  description: 'Breakdown of contributors per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLNonNull(GraphQLString),
         description: "We always have to return an id for apollo's caching",
       },
       all: {
@@ -1018,9 +1141,21 @@ export const TierStatsType = new GraphQLObjectType({
       },
       members: {
         type: MembersStatsType,
+        deprecationReason: `
+          2019/06/20 - This endpoint was used for the new tier page and has been replaced
+          by "contributors". It can be deleted as soon as the migration's completed
+          as well as the "members.findByTierId" loader.
+        `,
         description: 'Breakdown of all the members that belongs to this tier.',
         resolve(tier, args, req) {
-          return req.loaders.tiers.membersStats.load(tier.id);
+          return req.loaders.tiers.contributorsStats.load(tier.id);
+        },
+      },
+      contributors: {
+        type: ContributorsStatsType,
+        description: 'Breakdown of all the contributors that belongs to this tier.',
+        resolve(tier, args, req) {
+          return req.loaders.tiers.contributorsStats.load(tier.id);
         },
       },
       totalOrders: {
@@ -1247,6 +1382,11 @@ export const TierType = new GraphQLObjectType({
       members: {
         type: new GraphQLList(MemberType),
         description: 'Returns a list of all the members that contributed to this tier',
+        deprecationReason: `
+          2019/06/20 - This endpoint was used for the new tier page and has been replaced
+          by "contributors". It can be deleted as soon as the migration's completed
+          as well as the "members.findByTierId" loader.
+        `,
         args: {
           limit: {
             type: GraphQLInt,
@@ -1257,6 +1397,20 @@ export const TierType = new GraphQLObjectType({
         async resolve(tier, args, req) {
           const members = await req.loaders.members.findByTierId.load(tier.id);
           return members.slice(0, args.limit);
+        },
+      },
+      contributors: {
+        type: new GraphQLList(ContributorType),
+        description: 'Returns a list of all the contributors for this tier',
+        args: {
+          limit: {
+            type: GraphQLInt,
+            description: 'Maximum number of entries to return',
+            defaultValue: 3000,
+          },
+        },
+        resolve(tier, args) {
+          return getContributorsForTier(tier.id, { limit: args.limit });
         },
       },
       stats: {

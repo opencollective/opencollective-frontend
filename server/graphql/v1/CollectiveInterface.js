@@ -28,6 +28,7 @@ import {
   ImageFormatType,
   NotificationType,
   DateString,
+  ContributorType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -37,6 +38,7 @@ import { ApplicationType } from './Application';
 import { types } from '../../constants/collectives';
 import models, { Op } from '../../models';
 import roles from '../../constants/roles';
+import { getContributorsForCollective } from '../../lib/contributors';
 
 export const TypeOfCollectiveType = new GraphQLEnumType({
   name: 'TypeOfCollective',
@@ -586,6 +588,13 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           roles: { type: new GraphQLList(GraphQLString) },
         },
       },
+      contributors: {
+        type: new GraphQLList(ContributorType),
+        description: 'All the persons and entities that contribute to this organization',
+        args: {
+          limit: { type: GraphQLInt, defaultValue: 1000 },
+        },
+      },
       collectives: {
         type: CollectiveSearchResultsType,
         description: 'List of all collectives hosted by this collective',
@@ -1082,6 +1091,16 @@ const CollectiveFields = () => {
             },
           ],
         });
+      },
+    },
+    contributors: {
+      type: new GraphQLList(ContributorType),
+      description: 'All the persons and entities that contribute to this organization',
+      args: {
+        limit: { type: GraphQLInt, defaultValue: 1000 },
+      },
+      resolve(collective, args) {
+        return getContributorsForCollective(collective.id, { limit: args.limit });
       },
     },
     collectives: {
