@@ -4,6 +4,7 @@ import HelloWorks from 'helloworks-sdk';
 import s3 from '../lib/awsS3';
 import models from '../models';
 import fs from 'fs';
+import logger from '../lib/logger';
 
 const { User, LegalDocument, RequiredLegalDocument } = models;
 const {
@@ -32,7 +33,6 @@ async function callback(req, res) {
   if (status && status === 'completed' && workflowId == HELLO_WORKS_WORKFLOW_ID) {
     const { email, year } = metadata;
     const documentId = Object.keys(data)[0];
-    console.log(`workflowId: ${workflowId}, documentId: ${documentId}`);
 
     const user = await User.findOne({
       where: {
@@ -56,7 +56,7 @@ async function callback(req, res) {
       .catch(err => {
         doc.requestStatus = ERROR;
         doc.save();
-        console.log('error saving tax form: ', err);
+        logger.error('error saving tax form: ', err);
         res.sendStatus(400);
       });
   } else {
@@ -76,12 +76,10 @@ function UploadToS3({ id, year, documentType }) {
       return Promise.resolve({ Location: key });
     }
 
-    // TODO: encrypt the form here.
-
     return new Promise((resolve, reject) => {
       s3.upload({ Body: buffer, bucket, key }, (err, data) => {
         if (err) {
-          console.log('error uploading file to s3: ', err);
+          logger.error('error uploading file to s3: ', err);
           reject();
         } else {
           resolve(data);
@@ -92,7 +90,7 @@ function UploadToS3({ id, year, documentType }) {
 }
 
 function saveFileToTempStorage({ buffer, filename }) {
-  fs.writeFile(`/tmp/${filename}`, buffer, console.log);
+  fs.writeFile(`/tmp/${filename}`, buffer, logger.info);
 }
 
 function createTaxFormFilename({ id, year, documentType }) {
