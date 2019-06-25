@@ -112,7 +112,7 @@ export default function(Sequelize, DataTypes) {
         validate: {
           min: 0,
           validateFixedAmount(value) {
-            if (this.type !== 'TICKET' && this.amountType === 'FIXED' && !value) {
+            if (this.type !== 'TICKET' && this.amountType === 'FIXED' && (value === null || value === undefined)) {
               throw new Error(`In ${this.name}'s tier, "Amount" is required`);
             }
           },
