@@ -11,6 +11,7 @@ import Container from '../Container';
 import { AllSectionsNames, Sections, Dimensions } from './_constants';
 import Hero from './Hero';
 import SectionAbout from './SectionAbout';
+import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
 
@@ -68,6 +69,13 @@ export default class CollectivePage extends Component {
         description: PropTypes.string,
       }),
     ),
+
+    /** Collective transactions & expenses */
+    transactions: PropTypes.arrayOf(PropTypes.object),
+    expenses: PropTypes.arrayOf(PropTypes.object),
+
+    /** Collective stats */
+    stats: PropTypes.object,
 
     /** Collective events */
     events: PropTypes.arrayOf(PropTypes.object),
@@ -130,7 +138,7 @@ export default class CollectivePage extends Component {
   };
 
   renderSection(section, canEdit) {
-    const { collective, contributors, tiers, events } = this.props;
+    const { collective, contributors, tiers, events, transactions, stats, expenses } = this.props;
 
     if (section === Sections.ABOUT) {
       return <SectionAbout collective={collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />;
@@ -146,6 +154,8 @@ export default class CollectivePage extends Component {
           topIndividuals={this.props.topIndividuals}
         />
       );
+    } else if (section === Sections.BUDGET) {
+      return <SectionBudget collective={collective} transactions={transactions} expenses={expenses} stats={stats} />;
     }
 
     // Placeholder for sections not implemented yet

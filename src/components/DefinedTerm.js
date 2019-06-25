@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 import styled from 'styled-components';
 
+import { textTransform } from '../lib/styled_system_custom';
 import withIntl from '../lib/withIntl';
 import StyledTooltip from './StyledTooltip';
 
@@ -11,13 +12,18 @@ import StyledTooltip from './StyledTooltip';
  * in both `TranslatedTerms` and `TranslatedDefinitions`.
  */
 export const Terms = {
-  FISCAL_HOST: 'FiscalHost',
+  FISCAL_HOST: 'FISCAL_HOST',
+  GIFT_CARD: 'GIFT_CARD',
 };
 
 const TranslatedTerms = defineMessages({
   [Terms.FISCAL_HOST]: {
     id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
+  },
+  [Terms.GIFT_CARD]: {
+    id: 'GiftCard',
+    defaultMessage: 'Gift card',
   },
 });
 
@@ -27,6 +33,11 @@ const TranslatedDefinitions = defineMessages({
     defaultMessage:
       'A fiscal host is a legal entity holding the money and responsible for the admin/taxes forms for the collective.',
   },
+  [Terms.GIFT_CARD]: {
+    id: 'GiftCard.definition',
+    defaultMessage:
+      'Gift cards empower your employees or community members to support the open source projects they love.',
+  },
 });
 
 const UnderlinedTerm = styled.span`
@@ -34,16 +45,17 @@ const UnderlinedTerm = styled.span`
   border-bottom: 2px dotted #969ba3;
   padding-bottom: 0.1em;
   cursor: help;
+  ${textTransform}
 `;
 
 /**
  * Underlines the given word and show a tooltip with the definition when focused
  * or hovered. Both the term and the definition are translated.
  */
-const DefinedTerm = ({ intl, term }) => {
+const DefinedTerm = ({ intl, term, termTextTransform }) => {
   return (
     <StyledTooltip content={() => intl.formatMessage(TranslatedDefinitions[term])}>
-      <UnderlinedTerm>{intl.formatMessage(TranslatedTerms[term])}</UnderlinedTerm>
+      <UnderlinedTerm textTransform={termTextTransform}>{intl.formatMessage(TranslatedTerms[term])}</UnderlinedTerm>
     </StyledTooltip>
   );
 };
@@ -51,6 +63,8 @@ const DefinedTerm = ({ intl, term }) => {
 DefinedTerm.propTypes = {
   /** The term to be defined */
   term: PropTypes.oneOf(Object.values(Terms)),
+  /** Applies to the underlined term */
+  termTextTransform: PropTypes.string,
   /** @ignore from withIntl */
   intl: PropTypes.object.isRequired,
 };
