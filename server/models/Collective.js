@@ -26,9 +26,7 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
-import status from '../constants/expense_status';
-
-const { PENDING, APPROVED, PAID } = status;
+import expenseStatus from '../constants/expense_status';
 
 const debug = debugLib('collective');
 const debugcollectiveImage = debugLib('collectiveImage');
@@ -2152,6 +2150,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.doesUserHaveTotalExpensesOverThreshold = async function({ threshold, year, UserId }) {
+    const { PENDING, APPROVED, PAID } = expenseStatus;
     const since = moment({ year });
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
@@ -2163,6 +2162,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getUsersWhoHaveTotalExpensesOverThreshold = async function({ threshold, year }) {
+    const { PENDING, APPROVED, PAID } = expenseStatus;
     const since = moment({ year });
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
