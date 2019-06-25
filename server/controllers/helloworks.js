@@ -71,7 +71,7 @@ function UploadToS3({ id, year, documentType }) {
 
     if (!s3) {
       // s3 may not be set in a dev env
-      console.error('s3 is not set, saving file to temp folder. This should only be done in development');
+      logger.error('s3 is not set, saving file to temp folder. This should only be done in development');
       saveFileToTempStorage({ filename: key, buffer });
       return Promise.resolve({ Location: key });
     }
