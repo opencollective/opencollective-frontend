@@ -25,7 +25,6 @@ const client = new HelloWorks({
 });
 
 async function callback(req, res) {
-  console.log(req.body);
   const {
     body: { status, workflow_id: workflowId, data, id, metadata },
   } = req;
