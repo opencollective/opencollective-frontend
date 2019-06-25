@@ -963,6 +963,8 @@
   "TierPage.Share.title": "Aidez {collective} à atteindre leur objectif !",
   "TierPage.ShareGoal": "Partager cet objectif",
   "tiers.support.message": "Support this collective",
+  "TopContributors.Individuals": "Individuals",
+  "TopContributors.Organizations": "Organizations",
   "tos": "Conditions d'utilisation",
   "transaction.closeDetails": "Fermer les détails",
   "transaction.details": "détails de la transaction",

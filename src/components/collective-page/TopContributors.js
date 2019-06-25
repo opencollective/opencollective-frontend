@@ -3,6 +3,7 @@ import { FormattedMessage, FormattedDate } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import styled from 'styled-components';
+import { layout } from 'styled-system';
 
 import { CollectiveType } from '../../constants/collectives';
 import roles from '../../constants/roles';
@@ -28,13 +29,7 @@ const ContributorsList = styled.div`
   flex-direction: column;
   flex-wrap: wrap;
   max-height: 400px;
-
-  /** Limit to 10 items on mobile */
-  @media (max-width: 40em) {
-    & > *:nth-child(1n + 6) {
-      display: none;
-    }
-  }
+  ${layout}
 `;
 
 const AvatarWithRank = styled.div`
@@ -55,7 +50,7 @@ const ContributorRow = ({ rank, member: { since, collective, stats }, currency }
   <Flex my={3} mr={3}>
     <AvatarWithRank>
       <span>{rank}</span>
-      <Avatar type={collective.type} radius={32} src={collective.image} name={collective.name} />
+      <Avatar type={collective.type} radius={30} borderRadius="50%" src={collective.image} name={collective.name} />
     </AvatarWithRank>
     <div>
       <P fontWeight="bold">{collective.name}</P>
@@ -90,29 +85,47 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
 
   return (
     <TopContributorsContainer>
-      <Container maxWidth={900} m="0 auto">
+      <Container maxWidth={1200} m="0 auto">
         <H4 fontWeight="normal" mb={3}>
           <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top Contributors" />
         </H4>
         <Flex mt={2} justifyContent="space-between" flexWrap="wrap">
-          {topOrganizations && (
+          {topOrganizations && topOrganizations.length > 0 && (
             <div>
-              <P fontSize="LeadParagraph">Organizations</P>
-              <ContributorsList>
-                {topOrganizations.map((member, idx) => (
-                  <ContributorRow key={member.id} rank={idx + 1} member={member} currency={currency} />
-                ))}
-              </ContributorsList>
+              <P fontSize="LeadParagraph">
+                <FormattedMessage id="TopContributors.Organizations" defaultMessage="Organizations" />
+              </P>
+              <Flex>
+                <ContributorsList>
+                  {topOrganizations.slice(0, 5).map((member, idx) => (
+                    <ContributorRow key={member.id} rank={idx + 1} member={member} currency={currency} />
+                  ))}
+                </ContributorsList>
+                <ContributorsList display={['none', null, 'flex']}>
+                  {topOrganizations.slice(5, 10).map((member, idx) => (
+                    <ContributorRow key={member.id} rank={idx + 6} member={member} currency={currency} />
+                  ))}
+                </ContributorsList>
+              </Flex>
             </div>
           )}
-          {topIndividuals && (
+          {topIndividuals && topIndividuals.length > 0 && (
             <div>
-              <P fontSize="LeadParagraph">Individuals</P>
-              <ContributorsList>
-                {topIndividuals.map((member, idx) => (
-                  <ContributorRow key={member.id} rank={idx + 1} member={member} currency={currency} />
-                ))}
-              </ContributorsList>
+              <P fontSize="LeadParagraph">
+                <FormattedMessage id="TopContributors.Individuals" defaultMessage="Individuals" />
+              </P>
+              <Flex>
+                <ContributorsList>
+                  {topIndividuals.slice(0, 5).map((member, idx) => (
+                    <ContributorRow key={member.id} rank={idx + 1} member={member} currency={currency} />
+                  ))}
+                </ContributorsList>
+                <ContributorsList display={['none', null, 'flex']}>
+                  {topIndividuals.slice(5, 10).map((member, idx) => (
+                    <ContributorRow key={member.id} rank={idx + 6} member={member} currency={currency} />
+                  ))}
+                </ContributorsList>
+              </Flex>
             </div>
           )}
         </Flex>

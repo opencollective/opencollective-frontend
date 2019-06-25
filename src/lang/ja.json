@@ -963,6 +963,8 @@
   "TierPage.Share.title": "Help {collective} reach their goal!",
   "TierPage.ShareGoal": "Share this goal",
   "tiers.support.message": "Support this collective",
+  "TopContributors.Individuals": "Individuals",
+  "TopContributors.Organizations": "Organizations",
   "tos": "利用規約",
   "transaction.closeDetails": "詳細を閉じる",
   "transaction.details": "取引の詳細",
