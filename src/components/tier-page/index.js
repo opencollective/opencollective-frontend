@@ -82,6 +82,8 @@ class TierPage extends Component {
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      image: PropTypes.string,
+      backgroundImage: PropTypes.string,
     }).isRequired,
 
     /** The actual tier */
@@ -89,9 +91,16 @@ class TierPage extends Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+      interval: PropTypes.string.isRequired,
+      currency: PropTypes.string,
+      goal: PropTypes.number,
       description: PropTypes.string,
       longDescription: PropTypes.string,
       videoUrl: PropTypes.string,
+      stats: PropTypes.shape({
+        totalRecurringDonations: PropTypes.number,
+        totalDonated: PropTypes.number,
+      }),
     }).isRequired,
 
     /** The contributors for this tier */
