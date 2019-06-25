@@ -50,7 +50,7 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
       participant_swVuvW: {
         type: 'email',
         value: user.email,
-        fullName: `${user.firstName} ${user.lastName}`, // Is this an internationalisation problem?
+        fullName: `${user.firstName} ${user.lastName}`,
       },
     };
 
