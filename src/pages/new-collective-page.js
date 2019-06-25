@@ -93,13 +93,18 @@ class NewCollectivePage extends React.Component {
 
 const MemberFields = gql`
   fragment MemberFields on Member {
+    id
     since
+    role
     collective: member {
+      id
       name
       image
       slug
+      type
     }
     stats {
+      id
       totalDonations
     }
   }
