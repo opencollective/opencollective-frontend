@@ -6,13 +6,22 @@ import memoizeOne from 'memoize-one';
 
 import { P, H2 } from '../Text';
 import ContributorsGrid from '../ContributorsGrid';
-import ContributorsFilter, { filterMembers, getMembersFilters, CONTRIBUTOR_FILTERS } from '../ContributorsFilter';
+import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
 
 export default class TierContributors extends React.Component {
   static propTypes = {
-    members: PropTypes.arrayOf(PropTypes.object),
+    /** Contributors */
+    contributors: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+        isCore: PropTypes.bool.isRequired,
+        isBacker: PropTypes.bool.isRequired,
+        isFundraiser: PropTypes.bool.isRequired,
+      }),
+    ),
     /** Some statistics about this tier */
-    membersStats: PropTypes.shape({
+    contributorsStats: PropTypes.shape({
       all: PropTypes.number.isRequired,
       collectives: PropTypes.number.isRequired,
       organizations: PropTypes.number.isRequired,
@@ -20,26 +29,27 @@ export default class TierContributors extends React.Component {
     }).isRequired,
   };
 
-  static MIN_MEMBERS_TO_SHOW_FILTERS = 2;
+  static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
   constructor(props) {
     super(props);
-    this.state = { filter: CONTRIBUTOR_FILTERS.ALL };
+    this.state = { filter: null };
   }
 
   setFilter = filter => {
     this.setState({ filter });
   };
 
-  // Memoize filtering functions as they can get expensive if there are a lot of members
-  getMembersFilters = memoizeOne(getMembersFilters);
-  filterMembers = memoizeOne(filterMembers);
+  // Memoize filtering functions as they can get expensive if there are a lot of contributors
+  getContributorsFilters = memoizeOne(getContributorsFilters);
+  filterContributors = memoizeOne(filterContributors);
 
   render() {
-    const { members, membersStats } = this.props;
+    const { contributors, contributorsStats } = this.props;
     const { filter } = this.state;
-    const filters = this.getMembersFilters(members);
-    const filteredMembers = this.filterMembers(members, filter);
+    const hasFilters = contributors.length >= TierContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
+    const filters = hasFilters && this.getContributorsFilters(contributors);
+    const filteredContributors = hasFilters ? this.filterContributors(contributors, filter) : contributors;
 
     return (
       <Box>
@@ -49,10 +59,11 @@ export default class TierContributors extends React.Component {
               id="TierPage.ContributorsCountGoal"
               defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} one {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed to this goal"
               values={{
-                orgCount: membersStats.organizations,
-                userCount: membersStats.users,
-                both: (membersStats.organizations || membersStats.collectives) && membersStats.users ? 1 : 0,
-                totalCount: membersStats.all,
+                orgCount: contributorsStats.organizations,
+                userCount: contributorsStats.users,
+                both:
+                  (contributorsStats.organizations || contributorsStats.collectives) && contributorsStats.users ? 1 : 0,
+                totalCount: contributorsStats.all,
               }}
             />
           </H2>
@@ -62,12 +73,12 @@ export default class TierContributors extends React.Component {
               defaultMessage="Join us in contributing to this tier!"
             />
           </P>
-          {filters.length > 2 && members.length >= TierContributors.MIN_MEMBERS_TO_SHOW_FILTERS && (
+          {hasFilters && filters.length > 2 && (
             <ContributorsFilter selected={filter} onChange={this.setFilter} filters={filters} />
           )}
         </Box>
         <Box mb={4}>
-          <ContributorsGrid members={filteredMembers} />
+          <ContributorsGrid contributors={filteredContributors} />
         </Box>
       </Box>
     );

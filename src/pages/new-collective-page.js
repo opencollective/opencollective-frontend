@@ -74,7 +74,7 @@ class NewCollectivePage extends React.Component {
             <CollectivePage
               collective={data.Collective}
               host={data.Collective.host}
-              members={data.Collective.members}
+              contributors={data.Collective.contributors}
               tiers={data.Collective.tiers}
               events={data.Collective.events}
               LoggedInUser={LoggedInUser}
@@ -115,16 +115,18 @@ const getCollective = graphql(gql`
         image
         type
       }
-      members {
+      contributors {
         id
-        role
-        collective: member {
-          id
-          type
-          slug
-          name
-          image
-        }
+        name
+        roles
+        isCore
+        isBacker
+        isFundraiser
+        since
+        description
+        collectiveSlug
+        totalAmountDonated
+        image
       }
       tiers {
         id

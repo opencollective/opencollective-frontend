@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, uniqBy } from 'lodash';
+import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 
 import withIntl from '../lib/withIntl';
@@ -11,7 +11,6 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import TierPageContent from '../components/tier-page';
-import { CollectiveType } from '../constants/collectives';
 
 /** Overrides global styles for this page */
 const GlobalStyles = createGlobalStyle`
@@ -34,8 +33,8 @@ class TierPage extends React.Component {
     tierSlug: PropTypes.string,
   };
 
-  static getInitialProps({ query: { tierId, tierSlug } }) {
-    return { tierId: Number(tierId), tierSlug };
+  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug } }) {
+    return { collectiveSlug, tierId: Number(tierId), tierSlug };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -66,20 +65,6 @@ class TierPage extends React.Component {
     }
   }
 
-  /**
-   * As we also count the collective admins among tier contributors, we must add this
-   * to the tier stats.
-   */
-  getMembersStats = (baseStats, admins) => {
-    const countAdminType = type => admins.filter(m => m.collective.type === type).length;
-    return {
-      all: baseStats.all + admins.length,
-      collectives: baseStats.collectives + countAdminType(CollectiveType.COLLECTIVE),
-      organizations: baseStats.organizations + countAdminType(CollectiveType.ORGANIZATION),
-      users: baseStats.users + countAdminType(CollectiveType.USER),
-    };
-  };
-
   render() {
     const { data, LoggedInUser } = this.props;
 
@@ -96,8 +81,8 @@ class TierPage extends React.Component {
               LoggedInUser={LoggedInUser}
               collective={data.Tier.collective}
               tier={data.Tier}
-              members={uniqBy([...data.Tier.collective.admins, ...data.Tier.members], 'collective.id')}
-              membersStats={this.getMembersStats(data.Tier.stats.members, data.Tier.collective.admins)}
+              contributors={data.Tier.contributors}
+              contributorsStats={data.Tier.stats.contributors}
             />
           </React.Fragment>
         )}
@@ -123,7 +108,7 @@ const getCollective = graphql(gql`
         id
         totalDonated
         totalRecurringDonations
-        members {
+        contributors {
           id
           all
           collectives
@@ -157,16 +142,17 @@ const getCollective = graphql(gql`
         }
       }
 
-      members {
+      contributors {
         id
-        role
-        collective: member {
-          id
-          type
-          slug
-          name
-          image
-        }
+        name
+        roles
+        isCore
+        isBacker
+        isFundraiser
+        since
+        description
+        collectiveSlug
+        image
       }
     }
   }
