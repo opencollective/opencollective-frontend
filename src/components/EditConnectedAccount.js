@@ -35,7 +35,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.stripe.description': {
         id: 'collective.create.connectedAccounts.stripe.description',
-        defaultMessage: 'Connect a Stripe account to create collectives and start accepting donations.',
+        defaultMessage: 'Connect a Stripe account to start accepting financial contributions.',
       },
       'collective.connectedAccounts.stripe.connected': {
         id: 'collective.connectedAccounts.stripe.connected',
@@ -47,7 +47,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.twitter.description': {
         id: 'collective.connectedAccounts.twitter.description',
-        defaultMessage: 'Connect a Twitter account to automatically thank new backers',
+        defaultMessage: 'Connect a Twitter account to automatically thank new financial contributors',
       },
       'collective.connectedAccounts.twitter.connected': {
         id: 'collective.connectedAccounts.twitter.connected',

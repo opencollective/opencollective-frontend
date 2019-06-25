@@ -63,7 +63,7 @@ class CollectiveCover extends React.Component {
         id: 'host.apply.btn',
         defaultMessage: 'Apply to host your collective {collective}',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
+      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Admin' },
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
     });
 

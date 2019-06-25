@@ -118,7 +118,7 @@ class EditHost extends React.Component {
                 <p>
                   <FormattedMessage
                     id="editCollective.host.label"
-                    defaultMessage="Your host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
+                    defaultMessage="Your fiscal host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
                     values={{
                       collectives: get(collective, 'host.stats.collectives.hosted'),
                       host: get(collective, 'host.name'),
@@ -129,7 +129,7 @@ class EditHost extends React.Component {
                   <p>
                     <FormattedMessage
                       id="editCollective.host.balance"
-                      defaultMessage="Your host currently holds {balance} on behalf of your collective."
+                      defaultMessage="Your host currently holds {balance} on behalf of your Collective."
                       values={{
                         balance: formatCurrency(collective.stats.balance, collective.currency),
                       }}
@@ -137,7 +137,7 @@ class EditHost extends React.Component {
                     <br />
                     <FormattedMessage
                       id="editCollective.host.change.balanceNotEmpty"
-                      defaultMessage="If you would like to change host, you first need to empty your balance by filing expenses or transfering funds to another collective."
+                      defaultMessage="If you would like to change fiscal host, you first need to empty your Collective balance. You can do this by submitting expenses, or by transfering funds to another Collective (select your Collective balance as the payment method when making a financial contribution) or to your host (via Advanced)."
                     />
                   </p>
                 )}

@@ -54,32 +54,26 @@ class ExportData extends React.Component {
         <ExportImages collective={collective} />
 
         <h1>
-          <FormattedMessage id="export.csv.title" defaultMessage="Export in CSV" />
+          <FormattedMessage id="export.csv.title" defaultMessage="Export CSV" />
         </h1>
         <p>
-          <FormattedMessage
-            id="export.csv.description"
-            defaultMessage="Export all your members in CSV (comma separated values) that can be easily imported into any spreadsheet application"
-          />
+          <FormattedMessage id="export.csv.description" defaultMessage="Export your contributor data in CSV format" />
         </p>
         <div className="actions">
           <Button onClick={async () => await exportMembers(collective.slug)}>
-            <FormattedMessage id="export.all" defaultMessage="Export all members in CSV" />
+            <FormattedMessage id="export.all" defaultMessage="Export CSV" />
           </Button>
         </div>
 
         <h1>
-          <FormattedMessage id="export.json.title" defaultMessage="Export in JSON" />
+          <FormattedMessage id="export.json.title" defaultMessage="Export JSON" />
         </h1>
         <p>
-          <FormattedMessage
-            id="export.json.description"
-            defaultMessage="Export all your members in JSON to integrate with other applications"
-          />
+          <FormattedMessage id="export.json.description" defaultMessage="Export your contributor data in JSON format" />
         </p>
         <ul>
           <li>
-            All members:
+            All contributors:
             <br />
             <a href={`/${collective.slug}/members/all.json`}>
               https://opencollective.com/
@@ -88,7 +82,7 @@ class ExportData extends React.Component {
             </a>
           </li>
           <li>
-            Only users:
+            Only individuals:
             <br />
             <a href={`/${collective.slug}/members/users.json`}>
               https://opencollective.com/
@@ -115,7 +109,7 @@ class ExportData extends React.Component {
             <tr>
               <td className="param">limit</td>
               <td>
-                <FormattedMessage id="export.json.parameters.limit" defaultMessage="number of members to return" />
+                <FormattedMessage id="export.json.parameters.limit" defaultMessage="number of contributors to return" />
               </td>
             </tr>
             <tr>
@@ -123,7 +117,7 @@ class ExportData extends React.Component {
               <td>
                 <FormattedMessage
                   id="export.json.parameters.offset"
-                  defaultMessage="number of members to skip (for paging)"
+                  defaultMessage="number of contributors to skip (for paging)"
                 />
               </td>
             </tr>
@@ -132,7 +126,7 @@ class ExportData extends React.Component {
               <td>
                 <FormattedMessage
                   id="export.json.parameters.TierId"
-                  defaultMessage="only return the members that belong to this TierId. You can find the TierId as part of the URL after selecting a tier on your collective page."
+                  defaultMessage="only return contributors that belong to this TierID, which you can find in the URL after selecting a tier on your Collective page."
                 />
               </td>
             </tr>

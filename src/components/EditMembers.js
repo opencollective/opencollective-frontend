@@ -37,13 +37,13 @@ class EditMembers extends React.Component {
       },
       'members.add': {
         id: 'members.add',
-        defaultMessage: 'add another member',
+        defaultMessage: 'add Core Contributor',
       },
       'members.remove': {
         id: 'members.remove',
-        defaultMessage: 'remove member',
+        defaultMessage: 'remove Core Contributor',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
+      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Admin' },
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
       'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
       'user.description.label': {
@@ -202,7 +202,7 @@ class EditMembers extends React.Component {
             <p>
               <FormattedMessage
                 id="members.edit.description"
-                defaultMessage="Note: Only Core Contributors can edit this collective and approve or reject expenses."
+                defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
               />
             </p>
           )}
