@@ -6,7 +6,6 @@ import Markdown from 'react-markdown';
 
 import withIntl from '../../../lib/withIntl';
 import { getCurrencySymbol } from '../../../lib/utils';
-import { Link } from '../../../server/pages';
 import { Router } from '../../../server/pages';
 
 import InputField from '../../../components/InputField';
