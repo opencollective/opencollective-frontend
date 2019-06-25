@@ -77,6 +77,8 @@ class NewCollectivePage extends React.Component {
               contributors={data.Collective.contributors}
               tiers={data.Collective.tiers}
               events={data.Collective.events}
+              topOrganizations={data.Collective.topOrganizations}
+              topIndividuals={data.Collective.topIndividuals}
               LoggedInUser={LoggedInUser}
             />
           </React.Fragment>
@@ -85,6 +87,20 @@ class NewCollectivePage extends React.Component {
     );
   }
 }
+
+const MemberFields = gql`
+  fragment MemberFields on Member {
+    since
+    collective: member {
+      name
+      image
+      slug
+    }
+    stats {
+      totalDonations
+    }
+  }
+`;
 
 const getCollective = graphql(gql`
   query NewCollectivePage($slug: String!) {
@@ -128,6 +144,12 @@ const getCollective = graphql(gql`
         totalAmountDonated
         image
       }
+      topOrganizations: members(role: "BACKER", type: "ORGANIZATION", limit: 10) {
+        ...MemberFields
+      }
+      topIndividuals: members(role: "BACKER", type: "USER", limit: 10) {
+        ...MemberFields
+      }
       tiers {
         id
         name
@@ -152,6 +174,8 @@ const getCollective = graphql(gql`
       }
     }
   }
+
+  ${MemberFields}
 `);
 
 export default withUser(getCollective(withIntl(NewCollectivePage)));
