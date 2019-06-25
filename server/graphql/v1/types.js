@@ -667,7 +667,7 @@ export const ExpenseType = new GraphQLObjectType({
             invoiceTotalThreshold: 600e2,
             HostCollectiveId: expense.CollectiveId,
             UserId: expense.UserId,
-          }); // TODO define the threshold once
+          });
         },
       },
       user: {
