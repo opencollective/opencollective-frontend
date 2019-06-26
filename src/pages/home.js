@@ -231,11 +231,7 @@ class HomePage extends React.Component {
     const {
       topSpenders: { collectives: topSpenders },
       backers: { collectives: backers },
-      chapters: {
-        stats: {
-          collectives: { memberOf: totalChapters },
-        },
-      },
+      hosts: { total: totalHosts },
       recent: { collectives },
       transactions: { transactions },
     } = this.props.data;
@@ -757,6 +753,18 @@ class HomePage extends React.Component {
                 <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
+                      <FormattedNumber value={totalHosts} />
+                    </P>
+                    <P>
+                      <Link route="hosts" passHref>
+                        <a>
+                          <FormattedMessage id="home.hosts" defaultMessage="hosts" />
+                        </a>
+                      </Link>
+                    </P>
+                  </Container>
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
                       <FormattedNumber value={totalCollectives} />
                     </P>
                     <P>
@@ -770,19 +778,7 @@ class HomePage extends React.Component {
                       <FormattedNumber value={totalDonors} />
                     </P>
                     <P>
-                      <FormattedMessage id="home.backers" defaultMessage="backers" />
-                    </P>
-                  </Container>
-                  <Container {...statsContainerStyles}>
-                    <P {...statsStyles}>
-                      <FormattedNumber value={totalChapters} />
-                    </P>
-                    <P>
-                      <Link route="chapters" passHref>
-                        <a>
-                          <FormattedMessage id="home.chapters" defaultMessage="chapters" />
-                        </a>
-                      </Link>
+                      <FormattedMessage id="home.backers" defaultMessage="contributors" />
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>
@@ -790,7 +786,7 @@ class HomePage extends React.Component {
                       <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
                     <P>
-                      <FormattedMessage id="home.moneyRaised" defaultMessage="raised" />
+                      <FormattedMessage id="home.totalContributed" defaultMessage="contributed" />
                     </P>
                   </Container>
                 </Container>
@@ -1038,12 +1034,8 @@ const query = gql`
         }
       }
     }
-    chapters: Collective(slug: "chapters") {
-      stats {
-        collectives {
-          memberOf
-        }
-      }
+    hosts: allHosts(limit: 100000) {
+      total
     }
   }
 `;
