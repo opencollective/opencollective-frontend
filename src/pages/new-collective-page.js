@@ -126,6 +126,7 @@ const getCollective = graphql(gql`
       tags
       type
       currency
+      settings
       stats {
         balance
         yearlyBudget

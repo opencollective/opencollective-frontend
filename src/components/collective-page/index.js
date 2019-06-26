@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 
 // OC Frontend imports
 import theme from '../../constants/theme';
@@ -45,6 +46,7 @@ export default class CollectivePage extends Component {
       website: PropTypes.string,
       description: PropTypes.string,
       tags: PropTypes.arrayOf(PropTypes.string),
+      settings: PropTypes.object,
     }).isRequired,
 
     /** Collective's host */
@@ -170,6 +172,7 @@ export default class CollectivePage extends Component {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
 
     return (
       <Container borderTop="1px solid #E6E8EB">
@@ -177,7 +180,7 @@ export default class CollectivePage extends Component {
           <Hero
             collective={collective}
             host={host}
-            sections={AllSectionsNames}
+            sections={sections}
             canEdit={canEdit}
             isFixed={isFixed}
             selectedSection={selectedSection}
@@ -185,7 +188,7 @@ export default class CollectivePage extends Component {
             onCollectiveClick={this.onCollectiveClick}
           />
         </Container>
-        {AllSectionsNames.map(section => (
+        {sections.map(section => (
           <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
             {this.renderSection(section, canEdit)}
           </div>
