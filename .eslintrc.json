@@ -11,6 +11,8 @@
     // common warnings in the codebase
     "no-process-exit": "off",
     "node/shebang": "off",
-    "no-useless-escape": "off"
+    "no-useless-escape": "off",
+    // relaxing because we have many errors
+    "require-atomic-updates": "warn"
   }
 }
