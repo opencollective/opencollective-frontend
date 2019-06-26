@@ -439,22 +439,44 @@ const getUniqueCollectiveTags = () => {
 };
 
 /**
- * Returns top sponsors ordered by total amount donated and number of collectives they sponsor
- * (excluding open source collective id 9805)
+ * Returns top sponsors in the past 3 months ordered by total amount donated and number of collectives they sponsor
+ * (excluding open source collective id 9805 and sponsors that have sponsored only one collective)
  */
 const getTopSponsors = () => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 3);
   return sequelize
     .query(
       `
-    SELECT
-      MAX(c.id), MAX(c.name) as name, MAX(c.slug) as slug, MAX(c.mission) as mission, MAX(c.description) as description, MAX(c.image) as image, "CollectiveId", -SUM(amount) as "totalDonations", MAX(c.currency) as currency, COUNT(DISTINCT t."FromCollectiveId") as collectives
-    FROM "Collectives" c LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
-    WHERE c.type = 'ORGANIZATION' AND t.type='DEBIT' AND t.currency='USD' AND t."platformFeeInHostCurrency" < 0 AND c.id != 9805
-    GROUP BY t."CollectiveId"
-    ORDER BY "totalDonations" DESC, collectives DESC LIMIT :limit
+      WITH
+      "topSponsorsLast3Months" as (
+        SELECT "CollectiveId", MAX(c.slug) as slug, MAX(c.type) as type, MAX(c.name) as name, MAX(c.description) as description, MAX(c.image) as image, -SUM(amount) as "totalDonationsLast3months", MAX(c.currency) as currency, COUNT(DISTINCT t."FromCollectiveId") as collectives
+        FROM "Collectives" c LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
+        WHERE c.type = 'ORGANIZATION'
+          AND t.type='DEBIT'
+          AND t.currency='USD'
+          AND t."platformFeeInHostCurrency" < 0
+          AND c.id != 9805
+          AND t."createdAt" > :since
+        GROUP BY t."CollectiveId"
+        ORDER BY "totalDonationsLast3months" DESC, collectives DESC LIMIT 20
+      ), 
+      "topSponsorsTotalDonations" as (
+        SELECT -sum(amount) as "totalDonations", max(t."CollectiveId") as "CollectiveId"
+        FROM "Transactions" t WHERE t."CollectiveId" IN (
+          SELECT s."CollectiveId" FROM "topSponsorsLast3Months" s WHERE s.collectives > 1 LIMIT 6
+        )
+        GROUP BY t."CollectiveId"
+      )
+      SELECT d."totalDonations", s."totalDonationsLast3months", s.*
+      FROM "topSponsorsLast3Months" s
+      LEFT JOIN "topSponsorsTotalDonations" d ON d."CollectiveId" = s."CollectiveId"
+      WHERE collectives > 1
+      ORDER BY d."totalDonations" DESC NULLS LAST
+      LIMIT :limit
     `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
       {
-        replacements: { limit: 6 },
+        replacements: { limit: 6, since: d },
         type: sequelize.QueryTypes.SELECT,
       },
     )
