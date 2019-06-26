@@ -14,8 +14,10 @@ import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import Currency from './Currency';
 
-const hasGoals = (settings = {}) =>
-  get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
+const hasGoals = (settings = {}) => {
+  const goals = get(settings, 'goals', []);
+  return goals.length > 0 && !isEqual(goals[0], {}) && goals[0].amount > 0;
+};
 
 const getGoalPercentage = ({ type, amount }, { balance, yearlyBudget }) =>
   type === 'balance' ? balance / amount : yearlyBudget / amount;
