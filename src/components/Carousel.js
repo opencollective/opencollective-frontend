@@ -17,7 +17,7 @@ const List = styled.ul`
   margin: 0;
   padding: 0;
   position: relative;
-  top: 30px;
+  top: 50px;
 `;
 
 const ListItem = styled.li`
