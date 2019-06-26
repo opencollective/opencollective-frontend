@@ -129,34 +129,33 @@ class Hero extends Component {
             alignItems={isFixed ? 'flex-start' : ['center', 'flex-start']}
           >
             {/* Collective presentation (name, logo, description...) */}
-            <Flex flexDirection={isFixed ? 'row' : 'column'}>
-              <Flex justifyContent={['center', 'flex-start']} alignItems="center">
-                <Container position="relative">
-                  <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-                    <Avatar
-                      borderRadius="25%"
-                      src={collective.image}
-                      type={collective.type}
-                      radius={isFixed ? 40 : 128}
-                      name={collective.name}
-                    />
-                  </LinkCollective>
-                  {canEdit && !isFixed && (
-                    <Container position="absolute" right={-10} bottom={-10}>
-                      <Link route="editCollective" params={{ slug }}>
-                        <StyledRoundButton size={40} bg="#F0F2F5">
-                          <Cog size={24} color="#4B4E52" />
-                        </StyledRoundButton>
-                      </Link>
-                    </Container>
-                  )}
-                </Container>
-              </Flex>
+            <Flex flexDirection={isFixed ? 'row' : 'column'} alignItems={isFixed ? 'center' : ['center', 'flex-start']}>
+              <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
+                <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
+                  <Avatar
+                    borderRadius="25%"
+                    src={collective.image}
+                    type={collective.type}
+                    radius={isFixed ? 40 : 128}
+                    name={collective.name}
+                  />
+                </LinkCollective>
+                {canEdit && !isFixed && (
+                  <Container position="absolute" right={-10} bottom={-5}>
+                    <Link route="editCollective" params={{ slug }}>
+                      <StyledRoundButton size={40} bg="#F0F2F5">
+                        <Cog size={24} color="#4B4E52" />
+                      </StyledRoundButton>
+                    </Link>
+                  </Container>
+                )}
+              </Container>
               <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
                 <H1
                   ml={isFixed ? 2 : undefined}
                   color="black.800"
                   fontSize={isFixed ? 'H5' : 'H3'}
+                  lineHeight={isFixed ? 'H5' : 'H3'}
                   textAlign={['center', 'left']}
                 >
                   {collective.name || collective.slug}
@@ -222,7 +221,7 @@ class Hero extends Component {
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          height={isFixed ? 56 : [56, null, null, 84]}
+          height={isFixed ? 54 : [54, null, null, 84]}
           flexWrap="wrap"
           width={1}
         >
