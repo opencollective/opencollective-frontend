@@ -152,7 +152,7 @@ class Transactions extends React.Component {
                 bsStyle={this.state.type === 'CREDIT' ? 'primary' : 'default'}
                 onClick={() => this.refetch('CREDIT')}
               >
-                <FormattedMessage id="transactions.credits" defaultMessage="credits" />
+                <FormattedMessage id="transactions.credits" defaultMessage="expenses" />
               </Button>
               <Button
                 className="filterBtn debit"
@@ -160,7 +160,7 @@ class Transactions extends React.Component {
                 bsStyle={this.state.type === 'DEBIT' ? 'primary' : 'default'}
                 onClick={() => this.refetch('DEBIT')}
               >
-                <FormattedMessage id="transactions.debits" defaultMessage="debits" />
+                <FormattedMessage id="transactions.debits" defaultMessage="contributions" />
               </Button>
             </ButtonGroup>
           </div>

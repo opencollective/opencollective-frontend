@@ -118,7 +118,7 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
               {get(stats, 'backers.all', 0)}
             </P>
             <P fontSize="1.2rem">
-              <FormattedMessage id="home.backers" defaultMessage="contributors" />
+              <FormattedMessage id="home.backers" defaultMessage="financial contributors" />
             </P>
           </Flex>,
           <Flex width={0.5} alignItems="center" flexDirection="column" key="spending">

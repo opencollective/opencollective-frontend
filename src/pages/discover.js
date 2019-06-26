@@ -108,7 +108,7 @@ const DiscoverPage = ({ router }) => {
                 textAlign="center"
               >
                 <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']}>
-                  Discover awesome collectives to support
+                  Discover awesome Collectives to support
                 </H1>
                 <P color="white.full" fontSize="H4" lineHeight="H4" mt={4}>
                   Let&apos;s make great things together.

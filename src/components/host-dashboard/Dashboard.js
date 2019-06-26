@@ -119,7 +119,7 @@ class HostDashboard extends React.Component {
                   <FormattedMessage
                     id="collective.expenses.title"
                     values={{ n: this.totalExpenses }}
-                    defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
+                    defaultMessage="Expenses"
                   />
                 </h2>
               </div>
@@ -140,7 +140,7 @@ class HostDashboard extends React.Component {
                   <FormattedMessage
                     id="collective.orders.title"
                     values={{ n: this.totalOrders }}
-                    defaultMessage="{n, plural, one {Latest order} other {Latest orders}}"
+                    defaultMessage="Financial Contributions"
                   />
                 </h2>
               </div>

@@ -41,12 +41,12 @@ class UserCollective extends React.Component {
     this.messages = defineMessages({
       'organization.created': {
         id: 'organization.created',
-        defaultMessage: 'Your organization has been created with success.',
+        defaultMessage: 'Your Organization has been created.',
       },
       'organization.created.description': {
         id: 'organization.created.description',
         defaultMessage:
-          'You can now make contributions as an organization. You can also edit your organization profile, add members and other administrators and attach a credit card that can be used by its members within a monthly limit.',
+          'You can now make contributions as an Organization. You can also edit your Organization profile, add team members and admins, and save a credit card with a monthly limit.',
       },
       'organization.isArchived': {
         id: 'organization.isArchived',
@@ -54,7 +54,7 @@ class UserCollective extends React.Component {
       },
       'organization.isArchived.description': {
         id: 'organization.isArchived.description',
-        defaultMessage: 'This organization has been archived and can no longer be used for any activities.',
+        defaultMessage: 'This Organization has been archived and is no longer active.',
       },
       'user.isArchived': {
         id: 'user.isArchived',
@@ -62,7 +62,7 @@ class UserCollective extends React.Component {
       },
       'user.isArchived.description': {
         id: 'user.isArchived.description',
-        defaultMessage: 'This account has been archived and can no longer be used for any activities.',
+        defaultMessage: 'This account has been archived and is no longer active.',
       },
       'organization.collective.since': {
         id: 'organization.collective.since',
@@ -74,7 +74,7 @@ class UserCollective extends React.Component {
       },
       'organization.collective.edit': {
         id: 'organization.collective.edit',
-        defaultMessage: 'edit organization',
+        defaultMessage: 'edit Organization',
       },
       'user.collective.edit': {
         id: 'user.collective.edit',
@@ -82,27 +82,29 @@ class UserCollective extends React.Component {
       },
       'user.collective.memberOf.collective.host.title': {
         id: 'user.collective.memberOf.collective.host.title',
-        defaultMessage: "I'm hosting {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm hosting {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
       'user.collective.memberOf.organization.admin.title': {
         id: 'user.collective.memberOf.organization.admin.title',
-        defaultMessage: "I'm an administrator of {n, plural, one {this organization} other {these {n} organizations}}",
+        defaultMessage: "I'm an admin of {n, plural, one {this Organization} other {these {n} Organizations}}",
       },
       'user.collective.memberOf.organization.member.title': {
         id: 'user.collective.memberOf.organization.member.title',
-        defaultMessage: "I'm a member of {n, plural, one {this organization} other {these {n} organizations}}",
+        defaultMessage: "I'm a team member of {n, plural, one {this Organization} other {these {n} Organizations}}",
       },
       'user.collective.memberOf.collective.admin.title': {
         id: 'user.collective.memberOf.collective.admin.title',
-        defaultMessage: "I'm a core contributor of {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage:
+          "I'm a Core Contributor and admin of {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
       'user.collective.memberOf.collective.member.title': {
         id: 'user.collective.memberOf.collective.member.title',
-        defaultMessage: "I'm a member of {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm a Core Contributor of {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
       'user.collective.memberOf.collective.backer.title': {
         id: 'user.collective.memberOf.collective.backer.title',
-        defaultMessage: "I'm backing {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage:
+          "I'm financially contributing to {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
       'user.collective.memberOf.event.attendee.title': {
         id: 'user.collective.memberOf.event.attendee.title',
@@ -110,7 +112,7 @@ class UserCollective extends React.Component {
       },
       'user.collective.memberOf.collective.fundraiser.title': {
         id: 'user.collective.memberOf.collective.fundraiser.title',
-        defaultMessage: "I've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I've helped raise money for {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
       'user.collective.memberOf.collective.fundraiser.LoggedInDescription': {
         id: 'user.collective.memberOf.collective.fundraiser.LoggedInDescription',
@@ -119,39 +121,41 @@ class UserCollective extends React.Component {
       },
       'user.collective.memberOf.collective.follower.title': {
         id: 'user.collective.memberOf.collective.follower.title',
-        defaultMessage: "I'm following {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "I'm following {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
       'organization.collective.memberOf.collective.host.title': {
         id: 'organization.collective.memberOf.collective.host.title',
-        defaultMessage: 'We are hosting {n, plural, one {this collective} other {{n} collectives}}',
+        defaultMessage: 'We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}',
       },
       'organization.collective.memberOf.collective.admin.title': {
         id: 'organization.collective.memberOf.collective.admin.title',
-        defaultMessage: 'We are a core contributor of {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage:
+          'We are a Core Contributor and admin of {n, plural, one {this Collective} other {these {n} Collectives}}',
       },
       'organization.collective.memberOf.collective.member.title': {
         id: 'organization.collective.memberOf.collective.member.title',
-        defaultMessage: 'We are a member of {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage: 'We are a Core Contributor of {n, plural, one {this Collective} other {these {n} Collectives}}',
       },
       'organization.collective.memberOf.collective.backer.title': {
         id: 'organization.collective.memberOf.collective.backer.title',
-        defaultMessage: 'We are backing {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage:
+          'We are financial contributors to {n, plural, one {this Collective} other {these {n} Collectives}}',
       },
       'organization.collective.memberOf.collective.follower.title': {
         id: 'organization.collective.memberOf.collective.follower.title',
-        defaultMessage: 'We are following {n, plural, one {this collective} other {these {n} collectives}}',
+        defaultMessage: 'We are following {n, plural, one {this Collective} other {these {n} Collectives}}',
       },
       'organization.collective.memberOf.collective.fundraiser.title': {
         id: 'organization.collective.memberOf.collective.fundraiser.title',
-        defaultMessage: "We've helped raise money for {n, plural, one {this collective} other {these {n} collectives}}",
+        defaultMessage: "We've helped raise money for {n, plural, one {this Collective} other {these {n} Collectives}}",
       },
-      'section.host': { id: 'section.host', defaultMessage: 'Hosting' },
+      'section.host': { id: 'section.host', defaultMessage: 'Fiscally hosting' },
       'section.admin': {
         id: 'section.admin',
         defaultMessage: 'Administrating',
       },
-      'section.member': { id: 'section.member', defaultMessage: 'Memberships' },
-      'section.backer': { id: 'section.backer', defaultMessage: 'Backing' },
+      'section.member': { id: 'section.member', defaultMessage: 'Core Contributor' },
+      'section.backer': { id: 'section.backer', defaultMessage: 'Financial contributor' },
       'section.attendee': { id: 'section.attendee', defaultMessage: 'Events' },
       'section.fundraiser': {
         id: 'section.fundraiser',
@@ -385,7 +389,9 @@ class UserCollective extends React.Component {
                     <FormattedMessage
                       id="organization.collective.memberOf.collective.host.title"
                       values={{ n: collective.stats.collectives.hosted }}
-                      defaultMessage={'We are hosting {n, plural, one {this collective} other {{n} collectives}}'}
+                      defaultMessage={
+                        'We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}'
+                      }
                     />
                   </h1>
                   {LoggedInUser && LoggedInUser.canEditCollective(collective) && (
@@ -418,7 +424,7 @@ class UserCollective extends React.Component {
                       id="organization.collective.memberOf.collective.parent.title"
                       values={{ n: collective.stats.collectives.memberOf }}
                       defaultMessage={
-                        '{n, plural, one {this collective is} other {{n} collectives are}} part of our organization'
+                        '{n, plural, one {this Collective is} other {{n} Collectives are}} part of our Organization'
                       }
                     />
                   </h1>
@@ -442,7 +448,7 @@ class UserCollective extends React.Component {
                         tags: get(collective, 'settings.superCollectiveTags').join(', '),
                         n: collective.stats.collectives.memberOf,
                       }}
-                      defaultMessage={'{tags} collectives'}
+                      defaultMessage={'{tags} Collectives'}
                     />
                   </h1>
                   <div className="cardsList">
