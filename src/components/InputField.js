@@ -80,6 +80,8 @@ function FieldGroup({ controlId, label, help, pre, post, after, button, classNam
 class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    description: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.array]),
     defaultValue: PropTypes.oneOfType([
       PropTypes.string,
@@ -102,6 +104,13 @@ class InputField extends React.Component {
     style: PropTypes.object,
     multiple: PropTypes.bool,
     closeOnSelect: PropTypes.bool,
+    charCount: PropTypes.number,
+    maxLength: PropTypes.number,
+    disabled: PropTypes.bool,
+    timeFormat: PropTypes.string,
+    min: PropTypes.number,
+    focus: PropTypes.bool,
+    help: PropTypes.string,
   };
 
   constructor(props) {

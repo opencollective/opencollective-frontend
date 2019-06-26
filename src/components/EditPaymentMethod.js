@@ -17,6 +17,7 @@ class EditPaymentMethod extends React.Component {
     paymentMethod: PropTypes.shape({
       service: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      monthlyLimitPerMember: PropTypes.number,
     }).isRequired,
     subscriptions: PropTypes.arrayOf(PropTypes.any).isRequired,
     onRemove: PropTypes.func.isRequired,

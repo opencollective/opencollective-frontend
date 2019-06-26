@@ -60,6 +60,7 @@ class Hero extends Component {
     /** The collective to display */
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
+      type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       image: PropTypes.string,

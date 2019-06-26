@@ -20,8 +20,12 @@ class EditUserEmailForm extends React.Component {
 
     // from withUser
     data: PropTypes.shape({
+      loading: PropTypes.bool,
       LoggedInUser: PropTypes.shape({
         email: PropTypes.string.isRequired,
+        emailWaitingForValidation: PropTypes.string,
+      }),
+      updateUserEmail: PropTypes.shape({
         emailWaitingForValidation: PropTypes.string,
       }),
     }).isRequired,

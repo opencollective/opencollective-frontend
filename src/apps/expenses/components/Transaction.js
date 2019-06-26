@@ -39,6 +39,7 @@ class Transaction extends React.Component {
     fromCollective: PropTypes.shape({
       id: PropTypes.number,
       image: PropTypes.string,
+      type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
     }),

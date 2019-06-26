@@ -20,8 +20,12 @@ const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 class PledgedCollective extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
-      currency: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
+      pledges: PropTypes.array.isRequired,
+      website: PropTypes.string,
+      githubHandle: PropTypes.string,
     }).isRequired,
     LoggedInUser: PropTypes.object,
   };
