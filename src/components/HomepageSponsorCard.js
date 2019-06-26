@@ -10,6 +10,7 @@ import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import { P } from './Text';
 import { firstSentence } from '../lib/utils';
+import { FormattedMessage } from 'react-intl';
 
 const SponsorCard = ({ currency, image, name, description, slug, totalDonations, type }) => (
   <Container bg="white.full" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
@@ -44,11 +45,12 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
           </StyledLink>
         </Link>
         <br />
-        {firstSentence(description, 80)}
+        {firstSentence(description, 70)}
       </P>
     </Container>
     <P textAlign="center" px={2} pb={3} fontSize={['1.3rem', '1.3rem', '1.4rem']}>
-      Total donated: <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
+      <FormattedMessage id="home.contributed" defaultMessage="contributed" />{' '}
+      <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
     </P>
   </Container>
 );
