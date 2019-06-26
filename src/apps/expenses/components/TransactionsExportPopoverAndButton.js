@@ -168,15 +168,14 @@ class ExportForm extends React.Component {
   }
 }
 
-const ExportFormWithClient = withApollo(ExportForm);
-
 class PopoverButton extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    client: PropTypes.object,
   };
 
   render() {
-    const form = <ExportFormWithClient collective={this.props.collective} />;
+    const form = <ExportForm client={this.props.client} collective={this.props.collective} />;
     return (
       <OverlayTrigger trigger="click" placement="bottom" overlay={form} rootClose>
         <a className="download-csv" role="button" style={{ float: 'right', fontSize: '12px', padding: 7 }}>
@@ -188,4 +187,4 @@ class PopoverButton extends React.Component {
   }
 }
 
-export default withIntl(PopoverButton);
+export default withIntl(withApollo(PopoverButton));
