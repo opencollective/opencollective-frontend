@@ -394,7 +394,7 @@ const queries = {
     },
     async resolve(_, args) {
       let fetchDataFromLedger = parseToBoolean(process.env.GET_TRANSACTIONS_FROM_LEDGER);
-      if (args.hasOwnProperty('fetchDataFromLedger')) {
+      if (Object.prototype.hasOwnProperty.call(args, 'fetchDataFromLedger')) {
         fetchDataFromLedger = args.fetchDataFromLedger;
       }
       // Load collective
