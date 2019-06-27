@@ -18,7 +18,7 @@ import { withUser } from '../components/UserProvider';
 
 class OrderPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, OrderId } }) {
-    return { slug: collectiveSlug, OrderId };
+    return { slug: collectiveSlug, OrderId: Number(OrderId) };
   }
 
   static propTypes = {
