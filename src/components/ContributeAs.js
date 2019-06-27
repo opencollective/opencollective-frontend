@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { capitalize, omit, uniqBy } from 'lodash';
+import { capitalize, omit, uniqBy, get } from 'lodash';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -25,15 +25,10 @@ const SearchIcon = styled(Search)`
 
 const ContributeAsEntryContainer = styled(Container)`
   cursor: pointer;
-  &:hover {
-    background: ${themeGet('colors.black.50')};
-  }
 `;
 
 const messages = defineMessages({
-  'anonymous.new': { id: 'contributeAs.anonymous.new', defaultMessage: 'A new anonymous profile' },
-  anonymous: { id: 'contributeAs.anonymous', defaultMessage: 'anonymous' },
-  'anonymous.pseudonym': { id: 'contributeAs.anonymous.pseudonym', defaultMessage: 'Pseudonym' },
+  anonymous: { id: 'profile.anonymous', defaultMessage: 'anonymous' },
   'org.new': { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
   'org.name': { id: 'contributeAs.org.name', defaultMessage: 'Organization Name' },
   'org.website': { id: 'contributeAs.org.website', defaultMessage: 'Website' },
@@ -54,9 +49,9 @@ const useForm = ({ onProfileChange }) => {
         }
       }
 
-      if (selected.key === 'anonymous.new') {
-        const userData = { name: state.name || 'anonymous', type: 'USER' };
-        setState({ ...state, ...userData });
+      if (selected.key === 'anonymous') {
+        const userData = { name: 'anonymous', type: 'USER', isAnonymous: true };
+        setState({ ...state, ...userData, ...omit(state, ['errors']) });
         return onProfileChange(userData);
       }
 
@@ -80,7 +75,7 @@ const useForm = ({ onProfileChange }) => {
         ...newState,
         errors: { ...state.errors, [target.name]: null },
       });
-      onProfileChange(newState);
+      onProfileChange(omit(newState, ['errors']));
     },
     onSearch: ({ target }) => {
       setState(state => ({
@@ -138,21 +133,15 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
     profiles = profiles.filter(profile => profile.name.match(test));
   }
 
-  const options = uniqBy(
-    [
-      personal,
-      ...profiles,
-      { id: 'org.new', name: intl.formatMessage(messages['org.new']) },
-      { id: 'anonymous.new', name: intl.formatMessage(messages['anonymous.new']) },
-    ],
-    'id',
-  );
+  const options = uniqBy([personal, ...profiles], 'id');
 
   // if the user doesn't have an anonymous profile yet, we offer to create one
   const anonymousProfile = options.find(p => p.type === 'USER' && p.isAnonymous);
   if (!anonymousProfile) {
     options.push({ id: 'anonymous', name: intl.formatMessage(messages['anonymous']) });
   }
+
+  options.push({ id: 'org.new', name: intl.formatMessage(messages['org.new']) });
 
   const lastIndex = Object.keys(options).length - 1;
   const showSearch = Object.keys(profiles).length >= 5 || state.search;
@@ -187,8 +176,8 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             px={4}
             py={3}
             borderBottom={lastIndex !== index ? '1px solid' : 'none'}
-            color={'black.900'}
-            bg={'white.full'}
+            color={key === 'anonymous' && checked ? 'white.full' : 'black.900'}
+            bg={key === 'anonymous' && checked ? 'black.900' : 'white.full'}
             borderColor="black.200"
             flexWrap="wrap"
           >
@@ -199,11 +188,12 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             {value.type !== 'USER' && value.slug && <Logo collective={value} height="3.6rem" />}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>
-                {value.name}
+                {value.isAnonymous && <FormattedMessage id="profile.anonymous" defaultMessage="anonymous" />}
+                {!value.isAnonymous && get(value, 'name', intl.formatMessage(messages['anonymous']))}
               </P>
-              {value.type && (
+              {!value.isAnonymous && value.type && (
                 <P fontSize="Caption" lineHeight="Caption" color="black.500">
-                  {value.type === 'USER' ? (
+                  {value.type === 'USER' && value.name ? (
                     <FormattedMessage
                       id="contributeAs.personal"
                       defaultMessage="Personal account - {email}"
@@ -275,27 +265,6 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                 </Box>
               </Container>
             )}
-            {key === 'anonymous.new' && checked && (
-              <Container as="fieldset" border="none" width={1} py={3} onChange={onFieldChange}>
-                <Box mb={3}>
-                  <StyledInputField
-                    label={intl.formatMessage(messages['anonymous.pseudonym'])}
-                    htmlFor="name"
-                    error={getFieldError('name')}
-                  >
-                    {inputProps => (
-                      <StyledInput
-                        {...inputProps}
-                        {...getFieldProps(inputProps.name)}
-                        placeholder="pseudonym"
-                        defaultValue={intl.formatMessage(messages['anonymous'])}
-                        required
-                      />
-                    )}
-                  </StyledInputField>
-                </Box>
-              </Container>
-            )}
           </ContributeAsEntryContainer>
         )}
       </StyledRadioList>
@@ -309,7 +278,7 @@ ContributeAs.propTypes = {
   /**
    * emits latest selected profile
    *
-   *  - if anoymous is selected, only `{name: 'anonymous', type: 'USER'}` is returned
+   *  - if anonymous is selected, only `{name: 'anonymous', type: 'USER', isAnonymous: true}` is returned
    *  - if 'A new organization' is selected, the latest data from that form is returned
    *  - else the data passed to `profiles` or `personal` is returned
    */
@@ -332,6 +301,7 @@ ContributeAs.propTypes = {
       image: PropTypes.string,
       name: PropTypes.string,
       type: PropTypes.string,
+      isAnonymous: PropTypes.bool,
     }),
   ),
 };
