@@ -114,7 +114,7 @@ class SigninPage extends React.Component {
             />
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={next || '/'} form={form} routes={SigninPage.routes} />
+        <SignInOrJoinFree redirect={next || '/'} initialForm={form} routes={SigninPage.routes} />
       </React.Fragment>
     );
   }
