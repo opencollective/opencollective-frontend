@@ -221,9 +221,9 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
   let minimumFractionDigits = 2;
   let maximumFractionDigits = 2;
 
-  if (options.hasOwnProperty('minimumFractionDigits')) {
+  if (Object.prototype.hasOwnProperty.call(options, 'minimumFractionDigits')) {
     minimumFractionDigits = options.minimumFractionDigits;
-  } else if (options.hasOwnProperty('precision')) {
+  } else if (Object.prototype.hasOwnProperty.call(options, 'precision')) {
     minimumFractionDigits = options.precision;
     maximumFractionDigits = options.precision;
   }

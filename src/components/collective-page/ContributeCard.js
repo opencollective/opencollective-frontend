@@ -50,6 +50,10 @@ const ContributionTypeTag = styled(StyledTag).attrs({
 
 /** Translations */
 const I18nContributionType = defineMessages({
+  [ContributionTypes.FINANCIAL_CUSTOM]: {
+    id: 'ContributionType.Custom',
+    defaultMessage: 'Custom contribution',
+  },
   [ContributionTypes.FINANCIAL_ONE_TIME]: {
     id: 'ContributionType.OneTime',
     defaultMessage: 'One time contribution',
@@ -68,12 +72,24 @@ const I18nContributionType = defineMessages({
   },
 });
 
+const messages = defineMessages({
+  fallbackDescription: {
+    id: 'ContributeCard.Description.Fallback',
+    defaultMessage: 'Join us and help us sustain our activities!',
+  },
+});
+
 /**
  * A contribute card with a "Contribute" call to action
  */
 const ContributeCard = ({ intl, contribution }) => {
   const { type, title, contributeRoute } = contribution;
   const { description, interval, raised, goal, currency, detailsRoute } = contribution;
+  let prettyDescription = description && truncate(description, { length: detailsRoute ? 60 : 256 });
+
+  if (!prettyDescription) {
+    prettyDescription = intl.formatMessage(messages.fallbackDescription);
+  }
 
   return (
     <StyledContributeCard>
@@ -125,18 +141,16 @@ const ContributeCard = ({ intl, contribution }) => {
               </Box>
             </Box>
           )}
-          {(description || detailsRoute) && (
-            <P mb={4} mt={2}>
-              {truncate(description, { length: detailsRoute ? 60 : 256 })}{' '}
-              {detailsRoute && (
-                <Link route={detailsRoute}>
-                  <Span textTransform="capitalize">
-                    <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-                  </Span>
-                </Link>
-              )}
-            </P>
-          )}
+          <P mb={4} mt={2}>
+            {prettyDescription}{' '}
+            {detailsRoute && (
+              <Link route={detailsRoute}>
+                <Span textTransform="capitalize">
+                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+                </Span>
+              </Link>
+            )}
+          </P>
         </div>
         <Link route={contributeRoute}>
           <StyledButton width={1} mb={2} mt={3}>
@@ -167,6 +181,10 @@ ContributeCard.propTypes = {
     detailsRoute: PropTypes.string,
     /** Description */
     description: PropTypes.node,
+    /** Min amount in cents */
+    minAmount: PropTypes.number,
+    /** Defines if the amount is fixed or flexible */
+    amounType: PropTypes.oneOf(['FIXED', 'FLEXIBLE']),
     /** Interval */
     interval: PropTypes.oneOf(['month', 'year']),
     /** Total amount raised in cents */

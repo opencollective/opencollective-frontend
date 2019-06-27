@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
+import { formatCurrency } from '../../lib/utils';
 import withIntl from '../../lib/withIntl';
 import { H2 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -54,13 +55,18 @@ class SectionContribute extends React.PureComponent {
   };
 
   static messages = defineMessages({
-    oneTimeTitle: {
-      id: 'CollectivePage.Contribute.OneTime',
-      defaultMessage: 'One time contribution',
+    customContribution: {
+      id: 'CollectivePage.Contribute.Custom',
+      defaultMessage: 'Custom contribution',
     },
-    oneTimeDescription: {
-      id: 'CollectivePage.Contribute.OneTime.Description',
-      defaultMessage: 'Not ready to go recurring, let’s go with a one time contribution!',
+    customContributionDetails: {
+      id: 'CollectivePage.Contribute.Custom.Description',
+      defaultMessage: 'Nothing there for you? Make a custom one time or recurring contribution.',
+    },
+    fallbackDescription: {
+      id: 'TierCard.DefaultDescription',
+      defaultMessage:
+        '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}} {minAmount, select, 0 {} other {for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!',
     },
   });
 
@@ -71,8 +77,19 @@ class SectionContribute extends React.PureComponent {
     return tier.interval ? ContributionTypes.FINANCIAL_RECURRING : ContributionTypes.FINANCIAL_ONE_TIME;
   }
 
-  static getWayToContributeFromTier(collective, tier) {
+  static getWayToContributeFromTier(collective, tier, intl) {
     const tierRoute = `/${collective.slug}/contribute/${tier.slug}-${tier.id}`;
+    const currency = tier.currency || collective.currency;
+    let description = tier.description;
+    if (!description) {
+      const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minAmount : tier.amount;
+      description = intl.formatMessage(SectionContribute.messages.fallbackDescription, {
+        minAmount,
+        tierName: tier.name,
+        minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
+        interval: tier.interval,
+      });
+    }
 
     return {
       key: `tier-${tier.id}`,
@@ -80,11 +97,11 @@ class SectionContribute extends React.PureComponent {
       title: tier.name,
       contributeRoute: `${tierRoute}/checkout`,
       detailsRoute: tier.hasLongDescription ? tierRoute : null,
-      description: tier.description,
+      description,
       interval: tier.interval,
       goal: tier.goal,
       raised: tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated,
-      currency: tier.currency || collective.currency,
+      currency,
     };
   }
 
@@ -110,14 +127,14 @@ class SectionContribute extends React.PureComponent {
       // Static way to contribute: /donate
       {
         key: 'donate',
-        type: ContributionTypes.FINANCIAL_ONE_TIME,
-        title: intl.formatMessage(SectionContribute.messages.oneTimeTitle),
-        description: intl.formatMessage(SectionContribute.messages.oneTimeDescription),
+        type: ContributionTypes.FINANCIAL_CUSTOM,
+        title: intl.formatMessage(SectionContribute.messages.customContribution),
+        description: intl.formatMessage(SectionContribute.messages.customContributionDetails),
         contributeRoute: `/${collective.slug}/donate`,
       },
       // Add tiers as ways to contribute
       ...(tiers || []).map(tier => {
-        return SectionContribute.getWayToContributeFromTier(collective, tier);
+        return SectionContribute.getWayToContributeFromTier(collective, tier, intl);
       }),
     ];
 
