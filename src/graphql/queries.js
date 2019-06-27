@@ -435,6 +435,7 @@ export const getCollectiveQuery = gql`
             name
             image
             website
+            isAnonymous
           }
         }
       }
@@ -463,6 +464,7 @@ export const getCollectiveQuery = gql`
           type
           image
           backgroundImage
+          isAnonymous
           company
         }
       }

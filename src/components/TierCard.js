@@ -11,6 +11,7 @@ import Logo from './Logo';
 
 import colors from '../constants/colors';
 import { Link } from '../server/pages';
+import LinkCollective from './LinkCollective';
 import { formatCurrency } from '../lib/utils';
 
 class TierCard extends React.Component {
@@ -78,14 +79,12 @@ class TierCard extends React.Component {
         <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
           {fromCollectives.slice(0, limit).map(fromCollective => (
             <div className="image" key={`${tier.slug}-fromCollective-${fromCollective.id}`}>
-              <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-                <a title={fromCollective.name}>
-                  {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
-                    <Avatar collective={fromCollective} radius={32} ml="-15px" />
-                  )}
-                  {fromCollectiveTypeArray.indexOf('USER') === -1 && <Logo collective={fromCollective} height={32} />}
-                </a>
-              </Link>
+              <LinkCollective collective={fromCollective} title={fromCollective.name} passHref>
+                {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
+                  <Avatar collective={fromCollective} radius={32} ml="-15px" />
+                )}
+                {fromCollectiveTypeArray.indexOf('USER') === -1 && <Logo collective={fromCollective} height={32} />}
+              </LinkCollective>
             </div>
           ))}
         </div>

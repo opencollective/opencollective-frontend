@@ -237,6 +237,7 @@ const getMembersQuery = gql`
         image
         backgroundImage
         website
+        isAnonymous
       }
     }
   }
