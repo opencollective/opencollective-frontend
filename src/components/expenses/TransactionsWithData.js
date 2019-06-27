@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 
-import withIntl from '../../../lib/withIntl';
-import Error from '../../../components/Error';
-import { getTransactionsQuery } from '../../../graphql/queries';
+import withIntl from '../../lib/withIntl';
+import { getTransactionsQuery } from '../../graphql/queries';
 
+import Error from '../Error';
 import Transactions from './Transactions';
 
 class TransactionsWithData extends React.Component {

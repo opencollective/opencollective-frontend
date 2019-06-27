@@ -2,19 +2,19 @@ import React from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
-
-import withIntl from '../../../lib/withIntl';
-import { formatCurrency, imagePreview } from '../../../lib/utils';
-import { defaultImage } from '../../../constants/collectives';
-import InputField from '../../../components/InputField';
-import InvoiceDownloadLink from './InvoiceDownloadLink';
-
 import { FileDownload } from 'styled-icons/material/FileDownload';
+
+import withIntl from '../../lib/withIntl';
+import { formatCurrency, imagePreview } from '../../lib/utils';
+import { defaultImage } from '../../constants/collectives';
+
+import InputField from '../InputField';
+import InvoiceDownloadLink from './InvoiceDownloadLink';
 
 class Overlay extends React.Component {
   static propTypes = {

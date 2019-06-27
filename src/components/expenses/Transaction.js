@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import Avatar from '../../../components/Avatar';
-import Container from '../../../components/Container';
-import Link from '../../../components/Link';
-import Moment from '../../../components/Moment';
-import { P, Span } from '../../../components/Text';
-
+import Avatar from '../Avatar';
+import Container from '../Container';
+import Link from '../Link';
+import Moment from '../Moment';
+import { P, Span } from '../Text';
 import TransactionDetails from './TransactionDetails';
 import AmountCurrency from './AmountCurrency';
 

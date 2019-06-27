@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import * as api from '../../../lib/api';
-import { saveAs } from 'file-saver';
 import moment from 'moment';
-
-import { collectiveInvoiceURL, invoiceServiceURL, transactionInvoiceURL } from '../../../lib/url_helpers';
-import { Span } from '../../../components/Text';
+import { saveAs } from 'file-saver';
 import { FormattedMessage } from 'react-intl';
+
+import * as api from '../../lib/api';
+import { collectiveInvoiceURL, invoiceServiceURL, transactionInvoiceURL } from '../../lib/url_helpers';
+
+import { Span } from '../Text';
 
 export default class InvoiceDownloadLink extends Component {
   static propTypes = {

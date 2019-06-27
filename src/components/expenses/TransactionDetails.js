@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { capitalize } from '../../../lib/utils';
-import withIntl from '../../../lib/withIntl';
 import { get } from 'lodash';
 
-import RefundTransactionBtn from './RefundTransactionBtn';
+import withIntl from '../../lib/withIntl';
+import { capitalize } from '../../lib/utils';
 
-import Link from '../../../components/Link';
-import ExternalLinkNewTab from '../../../components/ExternalLinkNewTab';
+import Link from '../Link';
+import ExternalLinkNewTab from '../ExternalLinkNewTab';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
+import RefundTransactionBtn from './RefundTransactionBtn';
 
 class TransactionDetails extends React.Component {
   static propTypes = {

@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
-import Markdown from 'react-markdown';
 
-import withIntl from '../../../lib/withIntl';
-import { getCurrencySymbol } from '../../../lib/utils';
-import { Router } from '../../../server/pages';
+import withIntl from '../../lib/withIntl';
+import { getCurrencySymbol } from '../../lib/utils';
+import { Router } from '../../server/pages';
+import categories from '../../constants/categories';
 
-import InputField from '../../../components/InputField';
-import SignInOrJoinFree from '../../../components/SignInOrJoinFree';
-import categories from '../../../constants/categories';
-import Button from '../../../components/Button';
-import Container from '../../../components/Container';
-import { P } from '../../../components/Text';
+import InputField from '../InputField';
+import SignInOrJoinFree from '../SignInOrJoinFree';
+import Button from '../Button';
+import Container from '../Container';
+import { P } from '../Text';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {

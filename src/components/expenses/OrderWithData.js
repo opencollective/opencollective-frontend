@@ -4,8 +4,9 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import Error from '../../../components/Error';
-import withIntl from '../../../lib/withIntl';
+import withIntl from '../../lib/withIntl';
+
+import Error from '../Error';
 import Order from './Order';
 
 class OrderWithData extends React.Component {

@@ -16,7 +16,7 @@ import { uniqBy, get, union } from 'lodash';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
-import ExpensesSection from '../apps/expenses/components/ExpensesSection';
+import ExpensesSection from './expenses/ExpensesSection';
 import withIntl from '../lib/withIntl';
 import Button from './Button';
 import SectionTitle from './SectionTitle';

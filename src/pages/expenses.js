@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import ExpensesWithData from '../apps/expenses/components/ExpensesWithData';
-import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
+import ExpensesWithData from '../components/expenses/ExpensesWithData';
+import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 
 import Header from '../components/Header';
 import Body from '../components/Body';

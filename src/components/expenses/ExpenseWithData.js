@@ -4,11 +4,11 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import Error from '../../../components/Error';
-import withIntl from '../../../lib/withIntl';
-import Expense from './Expense';
+import withIntl from '../../lib/withIntl';
 
-import CommentsWithData from '../../../components/CommentsWithData';
+import Error from '../Error';
+import CommentsWithData from '../CommentsWithData';
+import Expense from './Expense';
 
 class ExpenseWithData extends React.Component {
   static propTypes = {

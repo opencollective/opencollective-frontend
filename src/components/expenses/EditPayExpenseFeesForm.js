@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../../lib/withIntl';
-import { getCurrencySymbol } from '../../../lib/utils';
+import withIntl from '../../lib/withIntl';
+import { getCurrencySymbol } from '../../lib/utils';
 
-import InputField from '../../../components/InputField';
+import InputField from '../InputField';
 
 class EditPayExpenseFees extends React.Component {
   static propTypes = {

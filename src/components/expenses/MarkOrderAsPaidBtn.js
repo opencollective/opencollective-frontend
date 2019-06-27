@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
-import withIntl from '../../../lib/withIntl';
-import SmallButton from '../../../components/SmallButton';
+import withIntl from '../../lib/withIntl';
+
+import SmallButton from '../SmallButton';
 
 class MarkOrderAsPaidBtn extends React.Component {
   static propTypes = {

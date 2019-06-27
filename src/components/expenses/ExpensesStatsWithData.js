@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 
-import withIntl from '../../../lib/withIntl';
-import Link from '../../../components/Link';
-import Currency from '../../../components/Currency';
+import withIntl from '../../lib/withIntl';
+
+import Link from '../Link';
+import Currency from '../Currency';
 
 class ExpensesStatsWithData extends React.Component {
   static propTypes = {

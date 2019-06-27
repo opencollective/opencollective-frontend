@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
-import withIntl from '../../../lib/withIntl';
-import NotFound from '../../../components/NotFound';
-import { formatCurrency } from '../../../lib/utils';
-import SectionTitle from '../../../components/SectionTitle';
+import withIntl from '../../lib/withIntl';
+import { formatCurrency } from '../../lib/utils';
 
+import NotFound from '../NotFound';
+import SectionTitle from '../SectionTitle';
+import LinkButton from '../LinkButton';
 import ExpensesWithData from './ExpensesWithData';
 import TransactionsWithData from './TransactionsWithData';
-import LinkButton from '../../../components/LinkButton';
 
 class ExpensesSection extends React.Component {
   static propTypes = {

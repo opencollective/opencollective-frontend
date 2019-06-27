@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
 
-import withIntl from '../../../lib/withIntl';
-import Error from '../../../components/Error';
+import withIntl from '../../lib/withIntl';
+
+import Error from '../Error';
 import Orders from './Orders';
 
 class OrdersWithData extends React.Component {

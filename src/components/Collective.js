@@ -18,7 +18,7 @@ import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
 import TeamSection from './TeamSection';
 import UpdatesSection from './UpdatesSection';
-import ExpensesSection from '../apps/expenses/components/ExpensesSection';
+import ExpensesSection from './expenses/ExpensesSection';
 import EventsSection from './EventsSection';
 import LongDescription from './LongDescription';
 

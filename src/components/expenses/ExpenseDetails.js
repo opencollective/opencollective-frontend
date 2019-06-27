@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 
-import withIntl from '../../../lib/withIntl';
-import { capitalize, getCurrencySymbol, imagePreview } from '../../../lib/utils';
-import InputField from '../../../components/InputField';
-import categories from '../../../constants/categories';
+import withIntl from '../../lib/withIntl';
+import { capitalize, getCurrencySymbol, imagePreview } from '../../lib/utils';
+import InputField from '../../components/InputField';
+import categories from '../../constants/categories';
+
 import TransactionDetails from './TransactionDetails';
 
 class ExpenseDetails extends React.Component {

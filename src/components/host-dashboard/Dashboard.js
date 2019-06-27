@@ -5,9 +5,9 @@ import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import ExpensesWithData from '../../apps/expenses/components/ExpensesWithData';
-import OrdersWithData from '../../apps/expenses/components/OrdersWithData';
-import ExpensesStatsWithData from '../../apps/expenses/components/ExpensesStatsWithData';
+import ExpensesWithData from '../expenses/ExpensesWithData';
+import OrdersWithData from '../expenses/OrdersWithData';
+import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
 
 import withIntl from '../../lib/withIntl';
 import MessageBox from '../MessageBox';
