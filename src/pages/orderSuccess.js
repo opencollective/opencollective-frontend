@@ -220,16 +220,18 @@ class OrderSuccessPage extends React.Component {
             <OrderSuccessContributorCardWithData order={order} fromCollective={fromCollective} />
           </Box>
 
-          <Flex flexWrap="wrap" justifyContent="center" mt={2}>
-            <ShareLink href={tweetURL({ url: referralURL, text: message })}>
-              <Twitter size="1.2em" color="#38A1F3" />
-              <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-            </ShareLink>
-            <ShareLink href={facebooKShareURL({ u: referralURL })}>
-              <Facebook size="1.2em" color="#3c5a99" />
-              <FormattedMessage id="shareIt" defaultMessage="Share it" />
-            </ShareLink>
-          </Flex>
+          {!fromCollective.isAnonymous && (
+            <Flex flexWrap="wrap" justifyContent="center" mt={2}>
+              <ShareLink href={tweetURL({ url: referralURL, text: message })}>
+                <Twitter size="1.2em" color="#38A1F3" />
+                <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
+              </ShareLink>
+              <ShareLink href={facebooKShareURL({ u: referralURL })}>
+                <Facebook size="1.2em" color="#3c5a99" />
+                <FormattedMessage id="shareIt" defaultMessage="Share it" />
+              </ShareLink>
+            </Flex>
+          )}
           <Box width={64} my={4} bg="black.300" css={{ height: '1px' }} />
           {collective.tags && (
             <Flex flexDirection="column" alignItems="center" mb={4}>
@@ -250,8 +252,8 @@ class OrderSuccessPage extends React.Component {
               </Flex>
             </Flex>
           )}
-          {!LoggedInUser && this.renderUserProfileBtn(true)}
-          {LoggedInUser && !loggedInUserLoading && (
+          {!fromCollective.isAnonymous && !LoggedInUser && this.renderUserProfileBtn(true)}
+          {!fromCollective.isAnonymous && LoggedInUser && !loggedInUserLoading && (
             <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
               {this.renderUserProfileBtn()}
             </Link>
@@ -262,4 +264,65 @@ class OrderSuccessPage extends React.Component {
   }
 }
 
+<<<<<<< HEAD
 export default withUser(graphql(GetOrderQuery)(injectIntl(OrderSuccessPage)));
+=======
+const getOrder = graphql(gql`
+  query OrderSuccess($OrderId: Int!) {
+    Order(id: $OrderId) {
+      id
+      quantity
+      totalAmount
+      interval
+      currency
+      status
+      publicMessage
+      fromCollective {
+        id
+        image
+        name
+        path
+        slug
+        isAnonymous
+      }
+      collective {
+        name
+        tags
+        path
+      }
+      tier {
+        type
+        name
+        amount
+        presets
+      }
+      paymentMethod {
+        id
+      }
+    }
+  }
+`);
+
+export const updateOrderInfo = graphql(
+  gql`
+    mutation updateOrderInfo($id: Int!, $publicMessage: String!) {
+      updateOrderInfo(id: $id, publicMessage: $publicMessage) {
+        id
+        publicMessage
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      updateOrderInfo: variables => mutate({ variables }),
+    }),
+  },
+);
+
+const addGraphQL = compose(
+  getOrder,
+  updateOrderInfo,
+);
+
+export default withUser(addGraphQL(injectIntl(OrderSuccessPage)));
+>>>>>>> fix(orderSuccess): if anonymous donation, don't link to profile and don't suggest to share https://d.pr/free/i/qgZhMM
