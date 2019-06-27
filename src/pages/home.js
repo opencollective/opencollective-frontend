@@ -231,11 +231,7 @@ class HomePage extends React.Component {
     const {
       topSpenders: { collectives: topSpenders },
       backers: { collectives: backers },
-      chapters: {
-        stats: {
-          collectives: { memberOf: totalChapters },
-        },
-      },
+      hosts: { total: totalHosts },
       recent: { collectives },
       transactions: { transactions },
     } = this.props.data;
@@ -632,7 +628,7 @@ class HomePage extends React.Component {
             >
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.contributeCode" defaultMessage="Contribute code" /> 👩🏻‍💻👨🏿‍💻
+                  <FormattedMessage id="home.contribute" defaultMessage="Contribute" /> 🙌
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
@@ -646,7 +642,7 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles}>
                   <FormattedMessage
                     id="home.devOpenSource"
-                    defaultMessage="Are you a developer who believes in supporting open and welcoming communities? Open Collective is open
+                    defaultMessage="Do you believe in supporting open and welcoming communities? Open Collective is open
                   source (MIT License) so anyone can contribute code or report issues publicly."
                   />
                 </P>
@@ -668,26 +664,51 @@ class HomePage extends React.Component {
                   🙏
                 </P>
 
-                <StyledLink
-                  {...sectionDetailStyles}
-                  color="primary.700"
-                  display="inline-block"
-                  my={4}
-                  href="https://github.com/opencollective"
-                >
-                  <FormattedMessage
-                    id="home.github"
-                    defaultMessage="Check out our Github organization to find out more"
-                  />
-                </StyledLink>
+                <Flex flexDirection="column" my={4}>
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective/opencollective/issues/new?assignees=&labels=&template=feature-spec.md&title="
+                  >
+                    <FormattedMessage id="home.github.featureRequest" defaultMessage="Submit a feature request" />
+                  </StyledLink>
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective/opencollective/issues/new?assignees=&labels=&template=bug_report.md&title="
+                  >
+                    <FormattedMessage id="home.github.reportBug" defaultMessage="Report a bug" />
+                  </StyledLink>
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective/opencollective/blob/master/BOUNTY.md"
+                  >
+                    <FormattedMessage id="home.github.bounties" defaultMessage="Bounties" />
+                  </StyledLink>
+
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective"
+                  >
+                    <FormattedMessage id="home.github" defaultMessage="Open Collective on GitHub" />
+                  </StyledLink>
+                </Flex>
               </Container>
               <Container width={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
-                <img
-                  src="/static/images/home-contributors.png"
-                  alt="Open Collective Contribution Commits"
-                  width="100%"
-                  height="auto"
-                />
+                <a href="https://github.com/opencollective/opencollective/issues">
+                  <img
+                    src="/static/images/home-contribute.png"
+                    alt="Open Collective Issues"
+                    width="100%"
+                    height="auto"
+                  />
+                </a>
               </Container>
             </Container>
 
@@ -757,6 +778,18 @@ class HomePage extends React.Component {
                 <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
+                      <FormattedNumber value={totalHosts} />
+                    </P>
+                    <P>
+                      <Link route="hosts" passHref>
+                        <a>
+                          <FormattedMessage id="home.hosts" defaultMessage="hosts" />
+                        </a>
+                      </Link>
+                    </P>
+                  </Container>
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
                       <FormattedNumber value={totalCollectives} />
                     </P>
                     <P>
@@ -770,19 +803,7 @@ class HomePage extends React.Component {
                       <FormattedNumber value={totalDonors} />
                     </P>
                     <P>
-                      <FormattedMessage id="home.backers" defaultMessage="backers" />
-                    </P>
-                  </Container>
-                  <Container {...statsContainerStyles}>
-                    <P {...statsStyles}>
-                      <FormattedNumber value={totalChapters} />
-                    </P>
-                    <P>
-                      <Link route="chapters" passHref>
-                        <a>
-                          <FormattedMessage id="home.chapters" defaultMessage="chapters" />
-                        </a>
-                      </Link>
+                      <FormattedMessage id="home.backers" defaultMessage="contributors" />
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>
@@ -790,7 +811,7 @@ class HomePage extends React.Component {
                       <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
                     <P>
-                      <FormattedMessage id="home.moneyRaised" defaultMessage="raised" />
+                      <FormattedMessage id="home.totalContributed" defaultMessage="contributed" />
                     </P>
                   </Container>
                 </Container>
@@ -1038,12 +1059,8 @@ const query = gql`
         }
       }
     }
-    chapters: Collective(slug: "chapters") {
-      stats {
-        collectives {
-          memberOf
-        }
-      }
+    hosts: allHosts(limit: 100000) {
+      total
     }
   }
 `;

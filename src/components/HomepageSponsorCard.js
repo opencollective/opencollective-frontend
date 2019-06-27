@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import { defaultImage } from '../constants/collectives';
 import { firstSentence, imagePreview } from '../lib/utils';
@@ -43,11 +44,12 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
           </StyledLink>
         </Link>
         <br />
-        {firstSentence(description, 80)}
+        {firstSentence(description, 70)}
       </P>
     </Container>
     <P textAlign="center" px={2} pb={3} fontSize={['1.3rem', '1.3rem', '1.4rem']}>
-      Total donated: <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
+      <FormattedMessage id="home.contributed" defaultMessage="contributed" />{' '}
+      <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
     </P>
   </Container>
 );
