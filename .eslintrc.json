@@ -4,6 +4,7 @@
   "plugins": ["graphql", "react-hooks"],
   "rules": {
     "no-console": "warn",
+    "require-atomic-updates": "warn",
     "graphql/template-strings": ["error", { "env": "apollo" }],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],

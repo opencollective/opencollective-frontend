@@ -499,7 +499,7 @@ class OrderForm extends React.Component {
       }
       // when the user selects a tier with an interval, we set the default payment method type to credit card
       // which is the only one that supports recurring payments
-      if (newState.order.tier.hasOwnProperty('interval')) {
+      if (Object.prototype.hasOwnProperty.call(newState.order.tier, 'interval')) {
         newState.order.interval = newState.order.tier.interval;
         if (newState.order.interval) {
           newState.paymentMethod.type = 'creditcard';
