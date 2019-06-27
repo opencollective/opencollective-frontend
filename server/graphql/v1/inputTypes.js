@@ -194,6 +194,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     email: { type: GraphQLString },
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
+    isAnonymous: { type: GraphQLBoolean },
   }),
 });
 
