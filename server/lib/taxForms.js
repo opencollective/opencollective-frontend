@@ -30,18 +30,27 @@ export async function isUserTaxFormRequiredBeforePayment({ invoiceTotalThreshold
     },
   });
 
+  if (requiredDocuments.length == 0) {
+    return false;
+  }
+
   const isOverThreshold = await host.doesUserHaveTotalExpensesOverThreshold({
     threshold: invoiceTotalThreshold,
     year,
     UserId,
   });
+
+  if (!isOverThreshold) {
+    return false;
+  }
+
   const hasUserCompletedDocument = await LegalDocument.hasUserCompletedDocument({
     documentType: US_TAX_FORM,
     year,
     user,
   });
 
-  return requiredDocuments.length > 0 && isOverThreshold && !hasUserCompletedDocument;
+  return !hasUserCompletedDocument;
 }
 
 export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year }) {
