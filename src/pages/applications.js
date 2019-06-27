@@ -86,7 +86,7 @@ class Apps extends React.Component {
                             </MessageBox>
                           )}
                           {apiKeys.map(application => (
-                            <StyledCard m="20px 0" p={10} key={application.id}>
+                            <StyledCard m="20px 0" p={10} key={application.id} data-cy="api-key">
                               <div className="keys">
                                 <FormattedMessage
                                   id="applications.ApiKeys.code"
