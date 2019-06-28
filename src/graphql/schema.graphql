@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jun 20 2019 14:54:01 GMT+0200 (GMT+02:00)
+# timestamp: Thu Jun 27 2019 19:41:10 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -1444,7 +1444,7 @@ type Mutation {
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application
-  deleteApplication(id: String!): Application
+  deleteApplication(id: Int!): Application
   createPaymentMethod(
     type: String!
     currency: String!
