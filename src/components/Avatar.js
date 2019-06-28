@@ -9,7 +9,7 @@ import { getBaseImagesUrl } from '../lib/utils';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
-export const StyledAvatar = styled(Flex)`
+const StyledAvatar = styled(Flex)`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
   ${color}
@@ -33,8 +33,7 @@ export const StyledAvatar = styled(Flex)`
     `}
 `;
 
-
-export const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps }) => {
+const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps }) => {
   // Use collective object instead of props
   if (collective) {
     type = collective.type;

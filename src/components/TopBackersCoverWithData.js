@@ -203,7 +203,6 @@ const getTopBackersQuery = gql`
         description
         slug
         image
-        imageUrl
       }
     }
   }

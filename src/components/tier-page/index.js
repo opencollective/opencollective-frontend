@@ -156,13 +156,7 @@ class TierPage extends Component {
           <Container flex="1" maxWidth={1440} m="0 auto">
             <Flex alignItems="center">
               <LinkCollective collective={collective}>
-                <Avatar
-                  collective={collective}
-                  bg="#EBEBEB"
-                  border="1px solid #efefef"
-                  radius={40}
-                  borderRadius={10}
-                />
+                <Avatar collective={collective} bg="#EBEBEB" border="1px solid #efefef" radius={40} borderRadius={10} />
               </LinkCollective>
               <LinkCollective collective={collective}>
                 <H1 color="black.800" fontSize={'H5'} ml={3}>
