@@ -11,6 +11,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectivePage from '../components/collective-page';
+import { TransactionsAndExpensesFragment } from '../components/collective-page/fragments';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -187,44 +188,12 @@ const getCollective = graphql(gql`
         description
         image
       }
-      transactions(limit: 3) {
-        id
-        netAmountInCollectiveCurrency
-        description
-        type
-        createdAt
-        fromCollective {
-          id
-          slug
-          name
-          image
-        }
-        usingVirtualCardFromCollective {
-          id
-          slug
-          name
-        }
-      }
-      expenses(limit: 3) {
-        id
-        amount
-        description
-        createdAt
-        category
-        transaction {
-          id
-        }
-        fromCollective {
-          id
-          slug
-          name
-          image
-        }
-      }
+      ...TransactionsAndExpensesFragment
     }
   }
 
   ${MemberFields}
+  ${TransactionsAndExpensesFragment}
 `);
 
 export default withUser(getCollective(withIntl(NewCollectivePage)));

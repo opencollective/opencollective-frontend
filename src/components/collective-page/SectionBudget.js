@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { filter, orderBy } from 'lodash';
+import { get, filter, orderBy, isEmpty } from 'lodash';
+import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
 
 import { formatCurrency } from '../../lib/utils';
 import { H3, P, Span } from '../Text';
@@ -16,17 +18,24 @@ import LinkCollective from '../LinkCollective';
 import Avatar from '../Avatar';
 
 import ContainerSectionContent from './ContainerSectionContent';
+import { TransactionsAndExpensesFragment } from './fragments';
+
+/** Query to re-fetch transactions and expenses */
+const TransactionsAndExpensesQuery = gql`
+  query NewCollectivePage($slug: String!) {
+    Collective(slug: $slug) {
+      ...TransactionsAndExpensesFragment
+    }
+  }
+
+  ${TransactionsAndExpensesFragment}
+`;
 
 /**
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, transactions, expenses, stats, intl }) => {
-  // Merge items, filter expenses that already have a transaction as they'll already be
-  // included in `transactions`.
-  const unpaidExpenses = filter(expenses, e => !e.transaction);
-  const allItems = orderBy([...transactions, ...unpaidExpenses], i => new Date(i.createdAt), ['desc']).slice(0, 3);
-
+const SectionBudget = ({ collective, stats, intl }) => {
   return (
     <ContainerSectionContent py={6}>
       <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
@@ -40,84 +49,104 @@ const SectionBudget = ({ collective, transactions, expenses, stats, intl }) => {
         />
       </P>
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
-        {transactions && (
-          <Container flex="10" mb={3} width="100%" maxWidth={800}>
-            <DebitCreditList>
-              {allItems.map(item => {
-                const { __typename, id, type, fromCollective, description, createdAt } = item;
-                const isExpense = __typename === 'ExpenseType';
-                const isCredit = type === 'CREDIT';
-                const ItemContainer = isExpense || !isCredit ? DebitItem : CreditItem;
-                const amount = isExpense ? item.amount : item.netAmountInCollectiveCurrency;
-                const currency = collective.currency;
+        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }} pollInterval={15000}>
+          {({ data }) => {
+            const expenses = get(data, 'Collective.expenses');
+            const transactions = get(data, 'Collective.transactions');
 
-                return (
-                  <ItemContainer key={`${__typename}_${id}`}>
-                    <Container p={24} display="flex" justifyContent="space-between">
-                      <Flex>
-                        <Box mr={3}>
-                          <Avatar
-                            src={fromCollective.image}
-                            type={fromCollective.type}
-                            name={fromCollective.name}
-                            radius={40}
-                          />
-                        </Box>
-                        <Flex flexDirection="column" justifyContent="space-between">
-                          <P color="black.900" fontWeight="600">
-                            {description}
-                          </P>
-                          <P color="black.500">
-                            {item.usingVirtualCardFromCollective ? (
-                              <FormattedMessage
-                                id="Transactions.byWithGiftCard"
-                                defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
-                                values={{
-                                  collectiveName: <LinkCollective collective={fromCollective} />,
-                                  date: <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />,
-                                  collectiveGiftCardName: item.usingVirtualCardFromCollective.name,
-                                  giftCard: (
-                                    <DefinedTerm term={Terms.GIFT_CARD} termTextTransform="lowercase" intl={intl} />
-                                  ),
-                                }}
+            if (isEmpty(expenses) && isEmpty(transactions)) {
+              return null;
+            }
+
+            // Merge items, filter expenses that already have a transaction as they'll already be
+            // included in `transactions`.
+            const unpaidExpenses = filter(expenses, e => !e.transaction);
+            const allItemsUnsorted = [...transactions, ...unpaidExpenses];
+            const allItems = orderBy(allItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
+            return (
+              <Container flex="10" mb={3} width="100%" maxWidth={800}>
+                <DebitCreditList>
+                  {allItems.map(item => {
+                    const { __typename, id, type, fromCollective, description, createdAt } = item;
+                    const isExpense = __typename === 'ExpenseType';
+                    const isCredit = type === 'CREDIT';
+                    const ItemContainer = isExpense || !isCredit ? DebitItem : CreditItem;
+                    const amount = isExpense ? item.amount : item.netAmountInCollectiveCurrency;
+                    const currency = collective.currency;
+
+                    return (
+                      <ItemContainer key={`${__typename}_${id}`}>
+                        <Container p={24} display="flex" justifyContent="space-between">
+                          <Flex>
+                            <Box mr={3}>
+                              <Avatar
+                                src={fromCollective.image}
+                                type={fromCollective.type}
+                                name={fromCollective.name}
+                                radius={40}
                               />
+                            </Box>
+                            <Flex flexDirection="column" justifyContent="space-between">
+                              <P color="black.900" fontWeight="600">
+                                {description}
+                              </P>
+                              <P color="black.500">
+                                {item.usingVirtualCardFromCollective ? (
+                                  <FormattedMessage
+                                    id="Transactions.byWithGiftCard"
+                                    defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
+                                    values={{
+                                      collectiveName: <LinkCollective collective={fromCollective} />,
+                                      date: (
+                                        <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
+                                      ),
+                                      collectiveGiftCardName: item.usingVirtualCardFromCollective.name,
+                                      giftCard: (
+                                        <DefinedTerm term={Terms.GIFT_CARD} termTextTransform="lowercase" intl={intl} />
+                                      ),
+                                    }}
+                                  />
+                                ) : (
+                                  <FormattedMessage
+                                    id="Transactions.by"
+                                    defaultMessage="by {collectiveName} on {date}"
+                                    values={{
+                                      collectiveName: <LinkCollective collective={fromCollective} />,
+                                      date: (
+                                        <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
+                                      ),
+                                    }}
+                                  />
+                                )}
+                              </P>
+                            </Flex>
+                          </Flex>
+                          <P fontSize="LeadParagraph">
+                            {isCredit ? (
+                              <Span color="green.700" mr={2}>
+                                +
+                              </Span>
                             ) : (
-                              <FormattedMessage
-                                id="Transactions.by"
-                                defaultMessage="by {collectiveName} on {date}"
-                                values={{
-                                  collectiveName: <LinkCollective collective={fromCollective} />,
-                                  date: <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />,
-                                }}
-                              />
+                              <Span color="red.700" mr={2}>
+                                −
+                              </Span>
                             )}
+                            <Span fontWeight="bold" mr={1}>
+                              {formatCurrency(Math.abs(amount), currency)}
+                            </Span>
+                            <Span color="black.400" textTransform="uppercase">
+                              {currency}
+                            </Span>
                           </P>
-                        </Flex>
-                      </Flex>
-                      <P fontSize="LeadParagraph">
-                        {isCredit ? (
-                          <Span color="green.700" mr={2}>
-                            +
-                          </Span>
-                        ) : (
-                          <Span color="red.700" mr={2}>
-                            −
-                          </Span>
-                        )}
-                        <Span fontWeight="bold" mr={1}>
-                          {formatCurrency(Math.abs(amount), currency)}
-                        </Span>
-                        <Span color="black.400" textTransform="uppercase">
-                          {currency}
-                        </Span>
-                      </P>
-                    </Container>
-                  </ItemContainer>
-                );
-              })}
-            </DebitCreditList>
-          </Container>
-        )}
+                        </Container>
+                      </ItemContainer>
+                    );
+                  })}
+                </DebitCreditList>
+              </Container>
+            );
+          }}
+        </Query>
 
         <Box width="32px" flex="1" />
 
