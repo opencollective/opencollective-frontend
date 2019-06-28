@@ -86,7 +86,7 @@ class OpenSourceApplyPage extends Component {
     const { repositories } = this.state;
 
     if (!LoggedInUser) {
-      return <SignInOrJoinFree redirect={Router.asPath} />;
+      return <SignInOrJoinFree />;
     } else if (!token || repositories.length === 0) {
       return this.renderConnectGithubButton();
     } else {

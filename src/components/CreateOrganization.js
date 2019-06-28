@@ -128,7 +128,7 @@ class CreateOrganization extends React.Component {
           <div className="content">
             {!LoggedInUser && (
               <div className="signin">
-                <SignInOrJoinFree redirect={Router.asPath} />
+                <SignInOrJoinFree />
               </div>
             )}
             {LoggedInUser && (

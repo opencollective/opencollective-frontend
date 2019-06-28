@@ -93,7 +93,7 @@ class CompletePledgePage extends React.Component {
 
             {!loadingLoggedInUser && !LoggedInUser && (
               <Fragment>
-                <SignInOrJoinFree redirect={Router.asPath} />
+                <SignInOrJoinFree />
               </Fragment>
             )}
 
