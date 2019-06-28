@@ -297,6 +297,10 @@ class EditTiers extends React.Component {
       tier.presets = [1000];
     }
 
+    if (!tier.name) {
+      tier.name = '';
+    }
+
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
