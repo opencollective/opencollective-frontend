@@ -10,7 +10,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectivePage from '../components/collective-page';
-import { TransactionsAndExpensesFragment } from '../components/collective-page/fragments';
+import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -31,7 +31,7 @@ class NewCollectivePage extends React.Component {
   };
 
   static getInitialProps({ query: { slug } }) {
-    return { slug };
+    return { slug, onlyPublishedUpdates: true };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -83,6 +83,7 @@ class NewCollectivePage extends React.Component {
               transactions={data.Collective.transactions}
               expenses={data.Collective.expenses}
               stats={data.Collective.stats}
+              updates={data.Collective.updates}
               LoggedInUser={LoggedInUser}
             />
           </React.Fragment>
@@ -111,6 +112,7 @@ const MemberFields = gql`
   }
 `;
 
+// eslint-disable graphql/template-strings
 const getCollective = graphql(gql`
   query NewCollectivePage($slug: String!) {
     Collective(slug: $slug) {
@@ -190,11 +192,15 @@ const getCollective = graphql(gql`
         image
       }
       ...TransactionsAndExpensesFragment
+      updates(limit: 3, onlyPublishedUpdates: true) {
+        ...UpdatesFieldsFragment
+      }
     }
   }
 
   ${MemberFields}
   ${TransactionsAndExpensesFragment}
+  ${UpdatesFieldsFragment}
 `);
 
 export default withUser(getCollective(NewCollectivePage));

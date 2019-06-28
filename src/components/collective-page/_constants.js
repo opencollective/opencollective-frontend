@@ -21,6 +21,7 @@ export const AnimationsDurations = {
 export const Sections = {
   CONTRIBUTE: 'contribute',
   // CONVERSATIONS: 'conversations',
+  UPDATES: 'updates',
   BUDGET: 'budget',
   CONTRIBUTORS: 'contributors',
   ABOUT: 'about',
