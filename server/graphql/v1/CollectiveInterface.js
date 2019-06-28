@@ -677,6 +677,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          onlyPublishedUpdates: { type: GraphQLBoolean },
         },
       },
       events: {
@@ -1351,14 +1352,13 @@ const CollectiveFields = () => {
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        onlyPublishedUpdates: { type: GraphQLBoolean },
       },
       resolve(collective, args) {
-        const query = {
-          CollectiveId: collective.id,
-          publishedAt: { [Op.ne]: null },
-        };
+        const query = { where: { CollectiveId: collective.id } };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
+        if (args.onlyPublishedUpdates) query.where.publishedAt = { [Op.ne]: null };
         return models.Update.findAll(query);
       },
     },
