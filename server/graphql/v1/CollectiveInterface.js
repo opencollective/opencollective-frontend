@@ -29,6 +29,7 @@ import {
   NotificationType,
   DateString,
   ContributorType,
+  UpdateType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -672,7 +673,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       githubHandle: { type: GraphQLString },
       website: { type: GraphQLString },
       updates: {
-        type: new GraphQLList(EventCollectiveType),
+        type: new GraphQLList(UpdateType),
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
@@ -1346,7 +1347,7 @@ const CollectiveFields = () => {
       },
     },
     updates: {
-      type: new GraphQLList(EventCollectiveType),
+      type: new GraphQLList(UpdateType),
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
