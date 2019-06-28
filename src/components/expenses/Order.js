@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 
-import withIntl from '../../../lib/withIntl';
-import Avatar from '../../../components/Avatar';
-import { capitalize } from '../../../lib/utils';
-import Link from '../../../components/Link';
-import Moment from '../../../components/Moment';
+import withIntl from '../../lib/withIntl';
+import colors from '../../constants/colors';
+import { capitalize } from '../../lib/utils';
 
+import Avatar from '..//Avatar';
+import Link from '../Link';
+import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
-import colors from '../../../constants/colors';
 import OrderDetails from './OrderDetails';
 
 class Order extends React.Component {

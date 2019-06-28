@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 
-import withIntl from '../../../lib/withIntl';
-import { isValidEmail } from '../../../lib/utils';
+import withIntl from '../../lib/withIntl';
+import { isValidEmail } from '../../lib/utils';
 
-import SmallButton from '../../../components/SmallButton';
+import SmallButton from '../SmallButton';
 
 class PayExpenseBtn extends React.Component {
   static propTypes = {

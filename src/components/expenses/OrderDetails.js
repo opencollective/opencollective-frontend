@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 
-import withIntl from '../../../lib/withIntl';
+import withIntl from '../../lib/withIntl';
 
 class OrderDetails extends React.Component {
   static propTypes = {

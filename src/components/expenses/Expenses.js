@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import colors from '../../../constants/colors';
 import { get } from 'lodash';
+
+import colors from '../../constants/colors';
 
 import Expense from './Expense';
 

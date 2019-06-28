@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import ExpenseWithData from '../apps/expenses/components/ExpenseWithData';
+import ExpenseWithData from '../components/expenses/ExpenseWithData';
 
 import Header from '../components/Header';
 import Body from '../components/Body';

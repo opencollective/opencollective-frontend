@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import ErrorPage from '../components/ErrorPage';
 
-import TransactionsWithData from '../apps/expenses/components/TransactionsWithData';
+import TransactionsWithData from '../components/expenses/TransactionsWithData';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 

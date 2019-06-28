@@ -1,23 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 
-import withIntl from '../../../lib/withIntl';
-import Avatar from '../../../components/Avatar';
-import { capitalize, formatCurrency } from '../../../lib/utils';
-import Link from '../../../components/Link';
-import SmallButton from '../../../components/SmallButton';
-import Moment from '../../../components/Moment';
+import withIntl from '../../lib/withIntl';
+import { capitalize, formatCurrency } from '../../lib/utils';
+import colors from '../../constants/colors';
 
+import Avatar from '../Avatar';
+import Link from '../Link';
+import SmallButton from '../SmallButton';
+import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
-import colors from '../../../constants/colors';
 
 class Expense extends React.Component {
   static propTypes = {

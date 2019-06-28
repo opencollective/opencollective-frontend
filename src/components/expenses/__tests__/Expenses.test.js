@@ -8,7 +8,7 @@ addLocaleData([...en]);
 
 import Expenses from '../Expenses';
 
-import initClient from '../../../../lib/initClient';
+import initClient from '../../../lib/initClient';
 
 const apolloClient = initClient();
 

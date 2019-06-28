@@ -4,13 +4,13 @@ import moment from 'moment';
 import { withApollo } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
-
-import { getTransactionsQuery } from '../../../graphql/queries';
-import { exportFile } from '../../../lib/export_file';
-import withIntl from '../../../lib/withIntl';
-import InputField from '../../../components/InputField';
-
 import { FileDownload } from 'styled-icons/material/FileDownload';
+
+import withIntl from '../../lib/withIntl';
+import { getTransactionsQuery } from '../../graphql/queries';
+import { exportFile } from '../../lib/export_file';
+
+import InputField from '../InputField';
 
 /* Convert the output of the allTransactions query into a CSV payload
    that can be downloaded directly by the user */

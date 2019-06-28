@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
-import gql from 'graphql-tag';
 
-import withIntl from '../../../lib/withIntl';
-import SmallButton from '../../../components/SmallButton';
+import withIntl from '../../lib/withIntl';
+
+import SmallButton from '../SmallButton';
 
 class RejectExpenseBtn extends React.Component {
   static propTypes = {
