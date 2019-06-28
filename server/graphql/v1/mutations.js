@@ -567,7 +567,7 @@ const mutations = {
     type: ApplicationType,
     args: {
       id: {
-        type: new GraphQLNonNull(GraphQLString),
+        type: new GraphQLNonNull(GraphQLInt),
       },
     },
     resolve(_, args, req) {
