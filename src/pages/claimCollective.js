@@ -185,7 +185,7 @@ class ClaimCollectivePage extends React.Component {
         <Body>
           {(step === 'loading' || step === 'signin') && (
             <Flex id="content" flexDirection="column" alignItems="center" mt={6} mb={6} p={2}>
-              {loadingLoggedInUser ? <Loading /> : <SignInOrJoinFree redirect={Router.asPath} />}
+              {loadingLoggedInUser ? <Loading /> : <SignInOrJoinFree />}
             </Flex>
           )}
 

@@ -5,7 +5,6 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { Router } from '../server/pages';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -70,7 +69,7 @@ class ActionPage extends React.Component {
     if (!LoggedInUser) {
       return (
         <Flex justifyContent="center" alignItems="center" className="content" px={2} py={5}>
-          <SignInOrJoinFree redirect={Router.asPath} />
+          <SignInOrJoinFree />
         </Flex>
       );
     } else {

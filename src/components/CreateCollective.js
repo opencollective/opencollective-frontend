@@ -213,7 +213,7 @@ class CreateCollective extends React.Component {
               </div>
             )}
 
-            {canApply && !LoggedInUser && <SignInOrJoinFree redirect={Router.asPath} />}
+            {canApply && !LoggedInUser && <SignInOrJoinFree />}
 
             {canApply && LoggedInUser && (
               <div>
