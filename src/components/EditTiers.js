@@ -322,7 +322,7 @@ class EditTiers extends React.Component {
                     component={field.component}
                     description={field.description}
                     type={field.type}
-                    defaultValue={defaultValues[field.name] || field.defaultValue}
+                    defaultValue={defaultValues[field.name]}
                     options={field.options}
                     pre={field.pre}
                     placeholder={field.placeholder}
