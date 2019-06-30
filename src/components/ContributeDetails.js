@@ -58,6 +58,7 @@ const ContributeDetails = ({
   showQuantity,
   showInterval,
   customFields,
+  customData,
   onChange,
   onCustomFieldsChange,
 }) => {
@@ -190,16 +191,16 @@ const ContributeDetails = ({
       )}
       {customFields &&
         customFields.length > 0 &&
-        customFields.map((customField, index) => {
+        customFields.map(customField => {
           return (
             <StyledInputField mt={2} key={customField.name} htmlFor={customField.name} label={customField.label}>
               {fieldProps => (
                 <StyledInput
                   type={customField.type}
                   {...fieldProps}
-                  value={customField.value}
+                  value={customData[customField.name]}
                   width={1}
-                  onChange={({ target }) => onCustomFieldsChange(index, target.value)}
+                  onChange={({ target }) => onCustomFieldsChange(customField.name, target.value)}
                 />
               )}
             </StyledInputField>
@@ -239,6 +240,7 @@ ContributeDetails.propTypes = {
   showInterval: PropTypes.bool,
   /** Enable the customFields inputs */
   customFields: PropTypes.array,
+  customData: PropTypes.object,
   onCustomFieldsChange: PropTypes.func,
 };
 
