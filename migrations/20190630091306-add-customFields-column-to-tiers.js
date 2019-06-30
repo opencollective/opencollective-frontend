@@ -1,11 +1,11 @@
 'use strict';
 
-const colName = 'settings';
+const colName = 'customFields';
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
     const colParams = {
-      type: Sequelize.JSON,
+      type: Sequelize.ARRAY(Sequelize.JSON),
     };
     return queryInterface.addColumn('Tiers', colName, colParams);
   },
