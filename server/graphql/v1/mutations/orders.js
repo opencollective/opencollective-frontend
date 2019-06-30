@@ -437,7 +437,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
           percentage: taxPercent,
           taxIDNumber: order.taxIDNumber,
         },
-        customFields: order.customFields,
+        customData: order.customData,
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };
