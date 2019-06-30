@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick, isNil, forEach } from 'lodash';
+import { debounce, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -95,7 +95,7 @@ class CreateOrderPage extends React.Component {
       redeem: query.redeem,
       redirect: query.redirect,
       referral: query.referral,
-      jsonUrl: query.jsonUrl,
+      customData: query.data,
     };
   }
 
@@ -111,7 +111,7 @@ class CreateOrderPage extends React.Component {
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
-    jsonUrl: PropTypes.string,
+    customData: PropTypes.string,
     redirect: PropTypes.string,
     referral: PropTypes.string,
     redeem: PropTypes.bool,
@@ -142,15 +142,7 @@ class CreateOrderPage extends React.Component {
       stepSummary: null,
       error: null,
       stripe: null,
-      customFields: [
-        {
-          type: 'url',
-          label: 'URL of the JSON dependency file',
-          name: 'jsonUrl',
-          required: true,
-          value: '',
-        },
-      ], // customFields is currently set here because tier has no settings set yet, this will be changed later.
+      customData: {},
     };
   }
 
@@ -199,7 +191,7 @@ class CreateOrderPage extends React.Component {
       stepDetails: get(state.stepDetails, 'totalAmount')
         ? state.stepDetails
         : this.getDefaultStepDetails(this.props.data.Tier),
-      customFields: this.getDefaultCustomFields(),
+      customData: this.props.customData, // May needs parsing with JSON.parse
     }));
   }
 
@@ -334,7 +326,7 @@ class CreateOrderPage extends React.Component {
 
   submitOrder = async (paymentMethodOverride = null) => {
     this.setState({ submitting: true, error: null });
-    const { stepProfile, stepDetails, stepPayment, stepSummary, customFields } = this.state;
+    const { stepProfile, stepDetails, stepPayment, stepSummary, customData } = this.state;
 
     // Prepare payment method
     let paymentMethod = paymentMethodOverride;
@@ -355,7 +347,6 @@ class CreateOrderPage extends React.Component {
     }
 
     const tier = this.props.data.Tier;
-
     const order = {
       paymentMethod,
       recaptchaToken,
@@ -371,8 +362,9 @@ class CreateOrderPage extends React.Component {
       collective: pick(this.props.data.Collective, ['id']),
       tier: tier ? pick(tier, ['id', 'amount']) : undefined,
       description: decodeURIComponent(this.props.description || ''),
-      customFields: customFields,
+      customData,
     };
+    console.log(order);
 
     try {
       const res = await this.props.createOrder(order);
@@ -483,20 +475,6 @@ class CreateOrderPage extends React.Component {
       interval,
       totalAmount: amount * quantity,
     };
-  }
-
-  getDefaultCustomFields() {
-    const { customFields } = this.state;
-    const { jsonUrl } = this.props;
-
-    if (jsonUrl) {
-      forEach(customFields, field => {
-        if (field.name === 'jsonUrl') {
-          field.value = jsonUrl;
-        }
-      });
-    }
-    return customFields;
   }
 
   /** Get total amount based on stepDetails with taxes from step summary applied */
@@ -616,12 +594,12 @@ class CreateOrderPage extends React.Component {
   updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
   updateDetails = stepDetails => this.setState({ stepDetails });
 
-  handleCustomFieldsChange = (index, value) => {
-    const { customFields } = this.state;
-    customFields[index].value = value;
+  handleCustomFieldsChange = (name, value) => {
+    const { customData } = this.state;
 
     this.setState({
-      customFields,
+      ...customData,
+      [name]: value,
     });
   };
 
@@ -702,9 +680,10 @@ class CreateOrderPage extends React.Component {
 
   renderStep(step) {
     const { data } = this.props;
-    const { stepDetails, stepPayment, customFields } = this.state;
+    const { stepDetails, stepPayment, customData } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
+    const customFields = tier.customFields || [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
 
@@ -766,6 +745,7 @@ class CreateOrderPage extends React.Component {
               showQuantity={tier && tier.type === 'TICKET'}
               showInterval={tier && tier.type !== 'TICKET'}
               customFields={customFields}
+              customData={customData}
               onCustomFieldsChange={this.handleCustomFieldsChange}
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
@@ -1052,6 +1032,7 @@ const CollectiveWithTierDataQuery = gql`
       currency
       interval
       presets
+      customFields
       maxQuantity
       stats {
         availableQuantity
