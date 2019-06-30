@@ -1195,10 +1195,10 @@ export const TierType = new GraphQLObjectType({
           return tier.password;
         },
       },
-      settings: {
-        type: GraphQLJSON,
+      customFields: {
+        type: new GraphQLList(GraphQLJSON),
         resolve(tier) {
-          return tier.settings;
+          return tier.customFields;
         },
       },
       startsAt: {
@@ -1510,7 +1510,7 @@ export const OrderType = new GraphQLObjectType({
         type: GraphQLJSON,
         description: 'Additional information on order: tax and custom fields',
         resolve(order) {
-          return order.data || null;
+          return pick(order.data, ['tax', 'customData']) || null;
         },
       },
     };
