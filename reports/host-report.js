@@ -38,6 +38,7 @@ async function HostReport(year, month, hostId) {
     endDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
   } else {
     // yearly report
+    month = '';
     yearlyReport = true;
     startDate = new Date(d.getFullYear(), 0, 1);
     endDate = new Date(d.getFullYear() + 1, 0, 1);
@@ -184,6 +185,7 @@ async function HostReport(year, month, hostId) {
     data.host = host;
     data.collective = host;
     data.reportDate = endDate;
+    data.reportName = reportName;
     data.month = !yearlyReport && moment(startDate).format('MMMM');
     data.year = year;
     data.startDate = startDate;
