@@ -683,7 +683,7 @@ class CreateOrderPage extends React.Component {
     const { stepDetails, stepPayment, customData } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
-    const customFields = tier.customFields || [];
+    const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
 
