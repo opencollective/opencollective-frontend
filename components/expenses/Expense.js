@@ -13,6 +13,7 @@ import SmallButton from '../SmallButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
+import ExpenseNeedsTaxForm from './ExpenseNeedsTaxForm';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
@@ -230,11 +231,7 @@ class Expense extends React.Component {
             .rejected .status {
               color: #e21a60;
             }
-            .taxFormRequired {
-              background: #e21a60;
-              color: white;
-              text-transform: uppercase;
-            }
+
             .approved .status {
               color: #72ce00;
             }
@@ -334,15 +331,9 @@ class Expense extends React.Component {
               )}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
-              {editable &&
-                LoggedInUser &&
-                LoggedInUser.canEditExpense(expense) &&
-                this.props.expense.userTaxFormRequiredBeforePayment && (
-                  <span>
-                    <span className="taxFormRequired">{intl.formatMessage(this.messages.taxFormRequired)}</span>
-                    {' | '}
-                  </span>
-                )}
+              {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
+                <ExpenseNeedsTaxForm id={expense.id} message={intl.formatMessage(this.messages.taxFormRequired)} />
+              )}
               <span className="metaItem">
                 <Link
                   route="expenses"
