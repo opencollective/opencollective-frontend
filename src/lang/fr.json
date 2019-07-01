@@ -263,6 +263,7 @@
   "contribute.newCard": "Nouveau : {name}",
   "contribute.newcreditcard": "Nouvelle carte de crédit/débit",
   "contribute.nextStep": "Étape suivante",
+  "contribute.noPaymentMethod": "The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first.",
   "contribute.payment.label": "Choisissez un moyen de paiement :",
   "contribute.prevStep": "Étape précédente",
   "contribute.profile.label": "Contribuer en tant que:",

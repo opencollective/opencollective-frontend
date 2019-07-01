@@ -254,7 +254,10 @@ class CreateOrderPage extends React.Component {
     const { stepPayment } = this.state;
     const isFixedPriceTier = this.isFixedPriceTier();
 
-    if (this.getOrderMinAmount() === 0 && (isFixedPriceTier || !stepPayment)) {
+    if (action === 'prev') {
+      // Don't validate when going back
+      return true;
+    } else if (this.getOrderMinAmount() === 0 && (isFixedPriceTier || !stepPayment)) {
       // Always ignore payment method for free tiers
       return true;
     } else if (!stepPayment) {
@@ -262,8 +265,6 @@ class CreateOrderPage extends React.Component {
       return false;
     } else if (!stepPayment.isNew) {
       // No need to validate existing payment methods
-      return true;
-    } else if (action === 'prev' && stepPayment.isNew && (stepPayment.error || !stepPayment.data)) {
       return true;
     } else if (!stepPayment.data && get(stepPayment, 'paymentMethod.token')) {
       // New credit card - if no data, stripe token has already been exchanged
@@ -665,7 +666,7 @@ class CreateOrderPage extends React.Component {
   }
 
   renderStep(step) {
-    const { LoggedInUser, data } = this.props;
+    const { data } = this.props;
     const { stepDetails, stepPayment } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
@@ -768,7 +769,6 @@ class CreateOrderPage extends React.Component {
             </H5>
             <ContributePayment
               onChange={stepPayment => this.setState({ stepPayment })}
-              paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
               collective={this.state.stepProfile}
               defaultValue={stepPayment}
               onNewCardFormReady={({ stripe }) => this.setState({ stripe })}

@@ -263,6 +263,7 @@
   "contribute.newCard": "新：{name}",
   "contribute.newcreditcard": "New credit/debit card",
   "contribute.nextStep": "下一步",
+  "contribute.noPaymentMethod": "The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first.",
   "contribute.payment.label": "Choose a payment method:",
   "contribute.prevStep": "上一步",
   "contribute.profile.label": "Contribute As:",

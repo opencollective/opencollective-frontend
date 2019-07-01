@@ -263,6 +263,7 @@
   "contribute.newCard": "Новый: {name}",
   "contribute.newcreditcard": "Новая кредитная или дебетовая карта",
   "contribute.nextStep": "Следующий шаг",
+  "contribute.noPaymentMethod": "The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first.",
   "contribute.payment.label": "Выберите метод оплаты:",
   "contribute.prevStep": "Предыдущий шаг",
   "contribute.profile.label": "Сделать вклад как:",

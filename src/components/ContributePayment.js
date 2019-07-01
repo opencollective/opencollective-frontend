@@ -11,11 +11,14 @@ import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt';
 
 import { withStripeLoader } from './StripeProvider';
 import Container from './Container';
+import Link from './Link';
 import { P } from './Text';
 import StyledCard from './StyledCard';
+import MessageBox from './MessageBox';
 import StyledRadioList from './StyledRadioList';
 import { getPaymentMethodName, paymentMethodExpiration } from '../lib/payment_method_label';
 import withIntl from '../lib/withIntl';
+import { CollectiveType } from '../constants/collectives';
 import { formatCurrency } from '../lib/utils';
 
 import CreditCard from './icons/CreditCard';
@@ -101,34 +104,6 @@ class ContributePayment extends React.Component {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
-    this.staticPaymentMethodsOptions = [
-      {
-        key: 'newCreditCard',
-        title: <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />,
-        icon: <CreditCardInactive />,
-        paymentMethod: { type: 'creditcard', service: 'stripe' },
-      },
-    ];
-
-    if (props.withPaypal) {
-      this.staticPaymentMethodsOptions.push({
-        key: 'paypal',
-        title: 'PayPal',
-        paymentMethod: { service: 'paypal', type: 'payment' },
-        icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, props.collective),
-      });
-    }
-
-    if (props.manual) {
-      this.staticPaymentMethodsOptions.push({
-        key: 'manual',
-        title: props.manual.title || 'Bank transfer',
-        paymentMethod: { type: 'manual' },
-        icon: getPaymentMethodIcon({ type: 'manual' }, props.collective),
-        data: props.manual,
-      });
-    }
-
     const paymentMethodsOptions = this.generatePaymentsOptions();
     this.state = {
       paymentMethodsOptions: paymentMethodsOptions,
@@ -150,7 +125,7 @@ class ContributePayment extends React.Component {
   }
 
   dispatchChangeEvent(selectedOption, newCreditCardInfo, save) {
-    if (this.props.onChange) {
+    if (this.props.onChange && selectedOption) {
       const isNew = selectedOption.key === 'newCreditCard';
       this.props.onChange({
         paymentMethod: selectedOption.paymentMethod,
@@ -195,21 +170,51 @@ class ContributePayment extends React.Component {
   }
 
   generatePaymentsOptions() {
-    const { paymentMethods, collective, defaultValue } = this.props;
-    const userPaymentMethods = uniqBy([...paymentMethods, ...get(collective, 'paymentMethods', [])], 'id');
+    const { collective, defaultValue, withPaypal, manual } = this.props;
 
-    const paymentMethodsOptions = [
-      ...userPaymentMethods.map(pm => ({
-        key: `pm-${pm.id}`,
-        title: getPaymentMethodName(pm),
-        subtitle: getPaymentMethodMetadata(pm),
-        icon: getPaymentMethodIcon(pm, collective),
-        paymentMethod: pm,
-      })),
-      ...this.staticPaymentMethodsOptions,
-    ];
+    // Add collective payment methods
+    const paymentMethodsOptions = get(collective, 'paymentMethods', []).map(pm => ({
+      key: `pm-${pm.id}`,
+      title: getPaymentMethodName(pm),
+      subtitle: getPaymentMethodMetadata(pm),
+      icon: getPaymentMethodIcon(pm, collective),
+      paymentMethod: pm,
+    }));
 
-    // Add default value to the list if it's a validated card
+    // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
+    if (collective.type !== CollectiveType.COLLECTIVE) {
+      // New credit card
+      paymentMethodsOptions.push({
+        key: 'newCreditCard',
+        title: <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />,
+        icon: <CreditCardInactive />,
+        paymentMethod: { type: 'creditcard', service: 'stripe' },
+      });
+
+      // Paypal
+      if (withPaypal) {
+        paymentMethodsOptions.push({
+          key: 'paypal',
+          title: 'PayPal',
+          paymentMethod: { service: 'paypal', type: 'payment' },
+          icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, collective),
+        });
+      }
+
+      // Manual (bank transfer)
+      if (manual) {
+        paymentMethodsOptions.push({
+          key: 'manual',
+          title: this.props.manual.title || 'Bank transfer',
+          paymentMethod: { type: 'manual' },
+          icon: getPaymentMethodIcon({ type: 'manual' }, collective),
+          data: this.props.manual,
+        });
+      }
+    }
+
+    // If we got a validated card then switched steps to come back here,
+    // this will display the newly added card on the top.
     if (defaultValue && defaultValue.isNew && defaultValue.key !== 'newCreditCard') {
       paymentMethodsOptions.unshift({
         ...defaultValue,
@@ -225,11 +230,33 @@ class ContributePayment extends React.Component {
       });
     }
 
-    return paymentMethodsOptions;
+    return uniqBy(paymentMethodsOptions, 'key');
   }
 
   render() {
-    const { paymentMethodsOptions, errors } = this.state;
+    const { paymentMethodsOptions, errors, selectedOption } = this.state;
+
+    // If there's no option selected, it means that there's no payment method for this
+    // profile/collective. This can happens when trying to donate from a collective
+    // that have a balance = 0.
+    if (!selectedOption) {
+      const { name, slug } = this.props.collective;
+      return (
+        <MessageBox type="warning" withIcon>
+          <FormattedMessage
+            id="contribute.noPaymentMethod"
+            defaultMessage="The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first."
+            values={{
+              collectiveName: (
+                <Link route="orderCollectiveNew" params={{ collectiveSlug: slug, verb: 'donate' }}>
+                  {name}
+                </Link>
+              ),
+            }}
+          />
+        </MessageBox>
+      );
+    }
 
     return (
       <StyledCard width={1} maxWidth={500} mx="auto">
@@ -239,7 +266,7 @@ class ContributePayment extends React.Component {
           keyGetter="key"
           options={paymentMethodsOptions}
           onChange={this.onChange}
-          defaultValue={this.state.selectedOption.key}
+          defaultValue={selectedOption.key}
           disabled={this.props.disabled}
         >
           {({ radio, checked, index, value: { key, title, subtitle, icon, data } }) => (
@@ -295,13 +322,13 @@ class ContributePayment extends React.Component {
 }
 
 ContributePayment.propTypes = {
-  /** The payment methods to display */
-  paymentMethods: PropTypes.arrayOf(PropTypes.object),
-  /**
-   * An optional collective to get payment methods from. If used at the same time as
-   * `paymentMethods` it will merge both lists and filter uniques using their ids.
-   */
-  collective: PropTypes.object,
+  /** An optional collective to get payment methods from */
+  collective: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+    name: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired,
+    paymentMethods: PropTypes.arrayOf(PropTypes.object),
+  }).isRequired,
   /** Called when the payment method changes */
   onChange: PropTypes.func,
   /**
@@ -327,7 +354,6 @@ ContributePayment.propTypes = {
 
 ContributePayment.defaultProps = {
   withPaypal: false,
-  paymentMethods: [],
   collective: null,
   hideCreditCardPostalCode: false,
 };

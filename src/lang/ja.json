@@ -263,6 +263,7 @@
   "contribute.newCard": "新規: {name}",
   "contribute.newcreditcard": "新しいクレジットカード/デビットカード",
   "contribute.nextStep": "次のステップ",
+  "contribute.noPaymentMethod": "The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first.",
   "contribute.payment.label": "支払い方法を選択:",
   "contribute.prevStep": "1つ前のステップ",
   "contribute.profile.label": "コントリビュート:",
