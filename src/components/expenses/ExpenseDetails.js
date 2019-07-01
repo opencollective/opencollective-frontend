@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
 import { capitalize, getCurrencySymbol, imagePreview } from '../../lib/utils';
 import InputField from '../../components/InputField';
 import categories from '../../constants/categories';
@@ -394,4 +393,4 @@ export const addGetExpense = component => {
   })(component);
 };
 
-export default addGetExpense(withIntl(ExpenseDetails));
+export default addGetExpense(injectIntl(ExpenseDetails));

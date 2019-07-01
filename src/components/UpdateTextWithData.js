@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
@@ -53,4 +52,4 @@ const getUpdateQuery = gql`
 
 export const addGetUpdate = graphql(getUpdateQuery);
 
-export default addGetUpdate(withIntl(UpdateText));
+export default addGetUpdate(UpdateText);

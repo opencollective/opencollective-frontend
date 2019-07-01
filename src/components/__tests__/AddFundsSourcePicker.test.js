@@ -1,9 +1,9 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
 import 'jest-styled-components';
 
 import { MockAddFundsSourcePicker, MockAddFundsSourcePickerForUser } from '../AddFundsSourcePicker';
+import { snapshotI18n } from '../../../test/snapshot-helpers';
+import { mountWithIntl } from '../../../test/intlHelper';
 
 describe('AddFundsSourcePicker component', () => {
   const defaultProps = {
@@ -15,8 +15,7 @@ describe('AddFundsSourcePicker component', () => {
   };
 
   it('renders default options', () => {
-    const tree = renderer.create(<MockAddFundsSourcePicker {...defaultProps} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    snapshotI18n(<MockAddFundsSourcePicker {...defaultProps} />);
   });
 
   it('renders loading state', () => {
@@ -26,8 +25,7 @@ describe('AddFundsSourcePicker component', () => {
         loading: true,
       },
     };
-    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    snapshotI18n(<MockAddFundsSourcePicker {...props} />);
   });
 
   it('renders host name as first option', () => {
@@ -39,8 +37,7 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    snapshotI18n(<MockAddFundsSourcePicker {...props} />);
   });
 
   it('renders fromCollectives by type in optgroup', () => {
@@ -71,8 +68,7 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    const tree = renderer.create(<MockAddFundsSourcePicker {...props} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    snapshotI18n(<MockAddFundsSourcePicker {...props} />);
   });
 
   it('calls onChange prop function when selection changes', () => {
@@ -82,7 +78,7 @@ describe('AddFundsSourcePicker component', () => {
       onChange,
     };
 
-    const component = mount(<MockAddFundsSourcePicker {...props} />);
+    const component = mountWithIntl(<MockAddFundsSourcePicker {...props} />);
 
     component.find('select').simulate('change', { target: { value: 'test' } });
 
@@ -99,8 +95,7 @@ describe('AddFundsSourcePickerForUser component', () => {
   };
 
   it('renders default options', () => {
-    const tree = renderer.create(<MockAddFundsSourcePickerForUser {...defaultProps} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    snapshotI18n(<MockAddFundsSourcePickerForUser {...defaultProps} />);
   });
 
   it('render host options', () => {
@@ -116,7 +111,6 @@ describe('AddFundsSourcePickerForUser component', () => {
       },
     };
 
-    const tree = renderer.create(<MockAddFundsSourcePickerForUser {...props} />).toJSON();
-    expect(tree).toMatchSnapshot();
+    snapshotI18n(<MockAddFundsSourcePickerForUser {...props} />);
   });
 });

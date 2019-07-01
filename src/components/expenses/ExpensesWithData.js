@@ -4,8 +4,6 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
-
 import Error from '../Error';
 import Expenses from './Expenses';
 
@@ -177,4 +175,4 @@ export const addExpensesData = graphql(getExpensesQuery, {
   }),
 });
 
-export default addExpensesData(withIntl(ExpensesWithData));
+export default addExpensesData(ExpensesWithData);

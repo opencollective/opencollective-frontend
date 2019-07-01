@@ -9,7 +9,6 @@ import PledgedCollective from '../components/PledgedCollective';
 
 import { addCollectiveData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
@@ -88,4 +87,4 @@ class CollectivePage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveData(CollectivePage)));
+export default withUser(addCollectiveData(CollectivePage));

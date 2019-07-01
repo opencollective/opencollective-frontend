@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { graphql, compose } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
@@ -151,4 +150,4 @@ const addData = compose(
   addPaymentMethods,
 );
 
-export default addData(withIntl(SendMoneyToCollectiveBtn));
+export default addData(SendMoneyToCollectiveBtn);

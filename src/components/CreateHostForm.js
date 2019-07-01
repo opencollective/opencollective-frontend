@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import EditConnectedAccount from './EditConnectedAccount';
 import { groupBy } from 'lodash';
 import { capitalize } from '../lib/utils';
@@ -255,4 +254,4 @@ class CreateHostForm extends React.Component {
   }
 }
 
-export default withIntl(CreateHostForm);
+export default injectIntl(CreateHostForm);

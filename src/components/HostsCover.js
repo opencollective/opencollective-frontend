@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 import CollectiveCover from './CollectiveCover';
 import Link from './Link';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 const CoverSmallCTA = styled.div`
   a:hover {
@@ -70,4 +69,4 @@ class HostsCover extends React.Component {
   }
 }
 
-export default withIntl(HostsCover);
+export default injectIntl(HostsCover);

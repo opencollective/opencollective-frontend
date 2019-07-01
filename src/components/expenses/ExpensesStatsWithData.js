@@ -5,8 +5,6 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
-
 import Link from '../Link';
 import Currency from '../Currency';
 
@@ -115,4 +113,4 @@ const getExpensesStatsQuery = gql`
 
 export const addData = graphql(getExpensesStatsQuery);
 
-export default addData(withIntl(ExpensesStatsWithData));
+export default addData(ExpensesStatsWithData);

@@ -4,7 +4,6 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
 import { getTransactionsQuery, transactionFields } from '../../graphql/queries';
 
 import SmallButton from '../SmallButton';
@@ -184,4 +183,4 @@ const addMutation = graphql(refundTransactionQuery, {
   }),
 });
 
-export default addMutation(withIntl(RefundTransactionBtn));
+export default addMutation(RefundTransactionBtn);

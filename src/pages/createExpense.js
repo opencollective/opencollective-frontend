@@ -16,7 +16,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class CreateExpensePage extends React.Component {
@@ -273,4 +272,4 @@ const addData = compose(
   addMutation,
 );
 
-export default withIntl(withUser(addData(CreateExpensePage)));
+export default withUser(addData(CreateExpensePage));

@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
 import { capitalize } from '../../lib/utils';
 
 import Link from '../Link';
@@ -315,4 +314,4 @@ class TransactionDetails extends React.Component {
   }
 }
 
-export default withIntl(TransactionDetails);
+export default injectIntl(TransactionDetails);

@@ -8,7 +8,6 @@ import { Flex } from '@rebass/grid';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { URLSearchParams } from 'universal-url';
 
-import withIntl from '../lib/withIntl';
 import { getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 
 import { Router, Link } from '../server/pages';
@@ -379,4 +378,4 @@ const addGraphQL = compose(
 );
 
 export { ClaimCollectivePage as MockClaimCollectivePage };
-export default withUser(addGraphQL(withIntl(ClaimCollectivePage)));
+export default withUser(addGraphQL(ClaimCollectivePage));

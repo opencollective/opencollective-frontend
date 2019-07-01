@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
+
 import SectionTitle from './SectionTitle';
 import { Flex } from '@rebass/grid';
 import MemberCard from './MemberCard';
@@ -46,4 +45,4 @@ class TeamSection extends React.Component {
   }
 }
 
-export default withIntl(TeamSection);
+export default TeamSection;

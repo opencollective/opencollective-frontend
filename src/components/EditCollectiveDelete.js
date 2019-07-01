@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from './UserProvider';
 import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../graphql/mutations';
 import { H2, P } from './Text';
@@ -133,4 +132,4 @@ DeleteCollective.propTypes = {
   refetchLoggedInUser: PropTypes.func,
 };
 
-export default withIntl(withUser(addDeleteCollectiveMutation(addDeleteUserCollectiveMutation(DeleteCollective))));
+export default withUser(addDeleteCollectiveMutation(addDeleteUserCollectiveMutation(DeleteCollective)));

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Error from './Error';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Member from './Member';
@@ -279,4 +278,4 @@ export const addMembersData = graphql(getMembersQuery, {
   }),
 });
 
-export default addMembersData(withIntl(MembersWithData));
+export default addMembersData(MembersWithData);

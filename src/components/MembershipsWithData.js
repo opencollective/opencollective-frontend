@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import Error from './Error';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Membership from './Membership';
 import { Button } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 
 const MEMBERSHIPS_PER_PAGE = 10;
 
@@ -186,4 +185,4 @@ export const addMembershipsData = graphql(getMembershipsQuery, {
   }),
 });
 
-export default addMembershipsData(withIntl(MembershipsWithData));
+export default addMembershipsData(MembershipsWithData);

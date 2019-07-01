@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
 import { FileDownload } from 'styled-icons/material/FileDownload';
 
-import withIntl from '../../lib/withIntl';
 import { getTransactionsQuery } from '../../graphql/queries';
 import { exportFile } from '../../lib/export_file';
 
@@ -187,4 +186,4 @@ class PopoverButton extends React.Component {
   }
 }
 
-export default withIntl(withApollo(PopoverButton));
+export default withApollo(PopoverButton);

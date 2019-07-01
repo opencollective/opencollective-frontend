@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import CollectiveCover from './CollectiveCover';
 import { get } from 'lodash';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 class CreateCollectiveCover extends React.Component {
   static propTypes = {
@@ -73,4 +72,4 @@ class CreateCollectiveCover extends React.Component {
   }
 }
 
-export default withIntl(CreateCollectiveCover);
+export default injectIntl(CreateCollectiveCover);

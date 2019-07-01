@@ -5,7 +5,6 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -158,4 +157,4 @@ const getCollective = graphql(gql`
   }
 `);
 
-export default withUser(getCollective(withIntl(TierPage)));
+export default withUser(getCollective(TierPage));

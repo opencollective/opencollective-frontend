@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-
-import withIntl from '../lib/withIntl';
 
 import { loadScriptAsync } from '../lib/utils';
 
@@ -119,4 +118,4 @@ class MarketingPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(MarketingPage));
+export default injectIntl(withUser(MarketingPage));

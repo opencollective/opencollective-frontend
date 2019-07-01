@@ -9,7 +9,6 @@ import ExpensesWithData from '../expenses/ExpensesWithData';
 import OrdersWithData from '../expenses/OrdersWithData';
 import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
 
-import withIntl from '../../lib/withIntl';
 import MessageBox from '../MessageBox';
 import Loading from '../Loading';
 import CollectivePicker from './CollectivePickerWithData';
@@ -245,4 +244,4 @@ export const addData = graphql(getDataQuery, {
   }),
 });
 
-export default withIntl(withUser(addData(HostDashboard)));
+export default withUser(addData(HostDashboard));

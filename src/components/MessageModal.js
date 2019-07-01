@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 class MessageModal extends React.Component {
   static propTypes = {
@@ -74,4 +73,4 @@ class MessageModal extends React.Component {
   }
 }
 
-export default withIntl(MessageModal);
+export default injectIntl(MessageModal);

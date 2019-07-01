@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import InputField from './InputField';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
-import withIntl from '../lib/withIntl';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
@@ -463,4 +462,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default withIntl(CreateCollectiveForm);
+export default injectIntl(CreateCollectiveForm);

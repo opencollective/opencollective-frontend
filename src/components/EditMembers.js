@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 import InputField from './InputField';
 
@@ -218,4 +217,4 @@ class EditMembers extends React.Component {
   }
 }
 
-export default withIntl(EditMembers);
+export default injectIntl(EditMembers);

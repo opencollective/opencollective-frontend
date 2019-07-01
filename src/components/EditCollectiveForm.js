@@ -6,9 +6,8 @@ import { ArrowBack } from 'styled-icons/material/ArrowBack';
 import { get } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
-import withIntl from '../lib/withIntl';
 import { getEnvVar, parseToBoolean } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 import { Router } from '../server/pages';
@@ -814,4 +813,4 @@ class EditCollectiveForm extends React.Component {
   }
 }
 
-export default withRouter(withIntl(EditCollectiveForm));
+export default withRouter(injectIntl(EditCollectiveForm));

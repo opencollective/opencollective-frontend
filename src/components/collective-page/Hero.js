@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Flex } from '@rebass/grid';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
 import { Twitter } from 'styled-icons/feather/Twitter';
@@ -11,7 +11,6 @@ import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { CheckCircle } from 'styled-icons/feather/CheckCircle';
 
-import withIntl from '../../lib/withIntl';
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../lib/url_helpers';
 import StyledButton from '../StyledButton';
@@ -98,7 +97,7 @@ class Hero extends Component {
     /** Define if we need to display special actions like the "Edit collective" button */
     canEdit: PropTypes.bool,
 
-    /** @ignore from withIntl */
+    /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
   };
 
@@ -248,4 +247,4 @@ class Hero extends Component {
   }
 }
 
-export default withIntl(Hero);
+export default injectIntl(Hero);

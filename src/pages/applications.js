@@ -16,7 +16,6 @@ import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 import StyledCard from '../components/StyledCard';
 import MessageBox from '../components/MessageBox';
-import withIntl from '../lib/withIntl';
 
 class Apps extends React.Component {
   static propTypes = {
@@ -152,4 +151,4 @@ class Apps extends React.Component {
   }
 }
 
-export default withIntl(Apps);
+export default Apps;

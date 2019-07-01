@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
 import { get } from 'lodash';
+import { defineMessages, injectIntl } from 'react-intl';
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
 import { colors } from '../constants/theme';
 
 class InputTypeDropzone extends React.Component {
@@ -230,4 +229,4 @@ class InputTypeDropzone extends React.Component {
   }
 }
 
-export default withIntl(InputTypeDropzone);
+export default injectIntl(InputTypeDropzone);

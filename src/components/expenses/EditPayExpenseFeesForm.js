@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
 import { getCurrencySymbol } from '../../lib/utils';
 
 import InputField from '../InputField';
@@ -136,4 +135,4 @@ class EditPayExpenseFees extends React.Component {
   }
 }
 
-export default withIntl(EditPayExpenseFees);
+export default EditPayExpenseFees;

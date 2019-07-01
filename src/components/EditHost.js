@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import { Radio } from '@material-ui/core';
@@ -322,4 +321,4 @@ class EditHost extends React.Component {
   }
 }
 
-export default withIntl(EditHost);
+export default EditHost;

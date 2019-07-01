@@ -4,8 +4,6 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
-
 import SmallButton from '../SmallButton';
 
 class RejectExpenseBtn extends React.Component {
@@ -52,4 +50,4 @@ const addMutation = graphql(rejectExpenseQuery, {
   }),
 });
 
-export default addMutation(withIntl(RejectExpenseBtn));
+export default addMutation(RejectExpenseBtn);

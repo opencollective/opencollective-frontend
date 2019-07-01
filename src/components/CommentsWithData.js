@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
-import withIntl from '../lib/withIntl';
 import Comments from './Comments';
 import CommentForm from './CommentForm';
 import { graphql, compose } from 'react-apollo';
@@ -253,4 +252,4 @@ const addData = compose(
   addMutation,
 );
 
-export default addData(withIntl(CommentsWithData));
+export default addData(CommentsWithData);

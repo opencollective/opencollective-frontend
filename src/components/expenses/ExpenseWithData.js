@@ -4,8 +4,6 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
-
 import Error from '../Error';
 import CommentsWithData from '../CommentsWithData';
 import Expense from './Expense';
@@ -123,4 +121,4 @@ const getExpenseQuery = gql`
 `;
 
 export const addExpenseData = graphql(getExpenseQuery);
-export default addExpenseData(withIntl(ExpenseWithData));
+export default addExpenseData(ExpenseWithData);

@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { withApollo } from 'react-apollo';
 import { Button, Row, Col, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
 import { getCurrencySymbol, formatCurrency } from '../lib/utils';
-import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import { AddFundsSourcePickerWithData, AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
 
@@ -452,4 +451,4 @@ class AddFundsForm extends React.Component {
   }
 }
 
-export default withIntl(withApollo(AddFundsForm));
+export default injectIntl(withApollo(AddFundsForm));

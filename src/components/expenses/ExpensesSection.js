@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
 import { formatCurrency } from '../../lib/utils';
 
 import NotFound from '../NotFound';
@@ -154,4 +153,4 @@ class ExpensesSection extends React.Component {
   }
 }
 
-export default withIntl(ExpensesSection);
+export default ExpensesSection;

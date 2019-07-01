@@ -2,7 +2,6 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
 
 import Container from './Container';
@@ -57,4 +56,4 @@ EditCollectiveEmptyBalance.propTypes = {
   LoggedInUser: PropTypes.object.isRequired,
 };
 
-export default withIntl(EditCollectiveEmptyBalance);
+export default EditCollectiveEmptyBalance;

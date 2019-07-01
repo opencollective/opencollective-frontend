@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import withIntl from '../lib/withIntl';
-
 import { Flex } from '@rebass/grid';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { P } from './Text';
 import InputField from './InputField';
 import styled from 'styled-components';
@@ -120,4 +117,4 @@ class RedeemForm extends React.Component {
   }
 }
 
-export default withIntl(RedeemForm);
+export default injectIntl(RedeemForm);

@@ -6,7 +6,6 @@ import ErrorPage from '../components/ErrorPage';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class CreateCollectivePage extends React.Component {
@@ -37,10 +36,8 @@ class CreateCollectivePage extends React.Component {
   }
 }
 
-export default withIntl(
-  withUser(
-    addCollectiveCoverData(CreateCollectivePage, {
-      skip: props => !props.slug,
-    }),
-  ),
+export default withUser(
+  addCollectiveCoverData(CreateCollectivePage, {
+    skip: props => !props.slug,
+  }),
 );

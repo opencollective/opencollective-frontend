@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import { exportMembers } from '../lib/export_file';
 import ExportImages from './ExportImages';
 
@@ -160,4 +159,4 @@ class ExportData extends React.Component {
   }
 }
 
-export default withIntl(ExportData);
+export default ExportData;

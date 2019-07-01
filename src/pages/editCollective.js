@@ -14,7 +14,6 @@ import MessageBox from '../components/MessageBox';
 import { addCollectiveToEditData } from '../graphql/queries';
 import { addEditCollectiveMutation } from '../graphql/mutations';
 
-import withIntl from '../lib/withIntl';
 import Loading from '../components/Loading';
 
 class EditCollectivePage extends React.Component {
@@ -108,4 +107,4 @@ const addGraphQL = compose(
   addEditCollectiveMutation,
 );
 
-export default withUser(withIntl(addGraphQL(EditCollectivePage)));
+export default withUser(addGraphQL(EditCollectivePage));

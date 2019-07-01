@@ -3,12 +3,11 @@ import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { get, sortBy } from 'lodash';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 
 import { Add } from 'styled-icons/material/Add';
 
-import withIntl from '../lib/withIntl';
 import { paymentMethodLabel } from '../lib/payment_method_label';
 import { H3, Span } from './Text';
 import Link from './Link';
@@ -340,4 +339,4 @@ const addData = compose(
   addCreditCard,
 );
 
-export default withIntl(withStripeLoader(addData(EditPaymentMethods)));
+export default injectIntl(withStripeLoader(addData(EditPaymentMethods)));

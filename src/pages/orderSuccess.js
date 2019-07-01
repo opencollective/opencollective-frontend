@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
@@ -16,7 +16,6 @@ import orderSuccessBackgroundUrl from '../static/images/order-success-background
 
 import { tweetURL, facebooKShareURL, objectToQueryString } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';
-import withIntl from '../lib/withIntl';
 import { Link } from '../server/pages';
 import { withUser } from '../components/UserProvider';
 import { H3, P, Span } from '../components/Text';
@@ -178,7 +177,7 @@ class OrderSuccessPage extends React.Component {
   static propTypes = {
     OrderId: PropTypes.number.isRequired,
     data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     loggedInUserLoading: PropTypes.bool, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
     updateOrderInfo: PropTypes.func.isRequired,
@@ -551,4 +550,4 @@ const addGraphQL = compose(
   updateOrderInfo,
 );
 
-export default withUser(addGraphQL(withIntl(OrderSuccessPage)));
+export default withUser(addGraphQL(injectIntl(OrderSuccessPage)));

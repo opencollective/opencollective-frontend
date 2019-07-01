@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import EditConnectedAccount from './EditConnectedAccount';
 import { groupBy } from 'lodash';
 import { capitalize } from '../lib/utils';
@@ -18,17 +16,6 @@ class EditConnectedAccounts extends React.Component {
     const { collective } = props;
 
     this.state = { services: ['twitter'], editMode: props.editMode || false };
-
-    this.messages = defineMessages({
-      'collective.connectedAccounts.stripe.button': {
-        id: 'collective.connectedAccounts.stripe.button',
-        defaultMessage: 'Connect Stripe',
-      },
-      'collective.connectedAccounts.stripe.description': {
-        id: 'collective.connectedAccounts.stripe.description',
-        defaultMessage: 'Connect a Stripe account to start accepting donations',
-      },
-    });
     this.connectedAccounts = groupBy(props.connectedAccounts, 'service');
 
     if (collective.type === 'USER') {
@@ -59,4 +46,4 @@ class EditConnectedAccounts extends React.Component {
   }
 }
 
-export default withIntl(EditConnectedAccounts);
+export default EditConnectedAccounts;

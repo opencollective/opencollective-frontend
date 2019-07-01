@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Markdown from 'react-markdown';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
 import { getCurrencySymbol } from '../../lib/utils';
 import categories from '../../constants/categories';
 
@@ -514,4 +513,4 @@ class CreateExpenseForm extends React.Component {
   }
 }
 
-export default withIntl(CreateExpenseForm);
+export default injectIntl(CreateExpenseForm);

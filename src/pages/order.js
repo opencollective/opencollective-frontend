@@ -13,7 +13,6 @@ import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class OrderPage extends React.Component {
@@ -118,4 +117,4 @@ class OrderPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveCoverData(OrderPage)));
+export default withUser(addCollectiveCoverData(OrderPage));

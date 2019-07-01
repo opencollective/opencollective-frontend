@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -10,7 +9,7 @@ import CreateCollectiveCover from './CreateCollectiveCover';
 import ErrorPage from './ErrorPage';
 import SignInOrJoinFree from './SignInOrJoinFree';
 import { get } from 'lodash';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Router } from '../server/pages';
 
 class CreateCollective extends React.Component {
@@ -239,4 +238,4 @@ class CreateCollective extends React.Component {
   }
 }
 
-export default withIntl(addCreateCollectiveMutation(CreateCollective));
+export default injectIntl(addCreateCollectiveMutation(CreateCollective));

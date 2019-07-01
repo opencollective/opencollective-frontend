@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, injectIntl } from 'react-intl';
 import InputField from './InputField';
 import { getStripeToken } from '../lib/stripe';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
@@ -321,4 +320,4 @@ class PaymentMethodChooser extends React.Component {
   }
 }
 
-export default withIntl(PaymentMethodChooser);
+export default injectIntl(PaymentMethodChooser);

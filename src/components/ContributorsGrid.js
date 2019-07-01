@@ -4,10 +4,10 @@ import { Flex } from '@rebass/grid';
 import { FixedSizeGrid } from 'react-window';
 import { truncate, omit } from 'lodash';
 import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 
 import roles from '../constants/roles';
 import formatMemberRole from '../lib/i18n-member-role';
-import withIntl from '../lib/withIntl';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 
@@ -250,7 +250,7 @@ ContributorsGrid.propTypes = {
   /** @ignore from withViewport */
   width: PropTypes.number.isRequired,
 
-  /** @ignore from withIntl */
+  /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };
 
@@ -266,4 +266,4 @@ ContributorsGrid.defaultProps = {
   },
 };
 
-export default withIntl(withViewport(ContributorsGrid, { withWidth: true }));
+export default injectIntl(withViewport(ContributorsGrid, { withWidth: true }));

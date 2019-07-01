@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { debounce, get, pick, isNil } from 'lodash';
@@ -11,7 +11,6 @@ import moment from 'moment';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
-import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency, getEnvVar, parseToBoolean } from '../lib/utils';
@@ -116,7 +115,7 @@ class CreateOrderPage extends React.Component {
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
     LoggedInUser: PropTypes.object, // from withUser
     loadingLoggedInUser: PropTypes.bool, // from withUser
@@ -1058,4 +1057,4 @@ const addGraphQL = compose(
   addCreateOrderMutation,
 );
 
-export default withIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
+export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));

@@ -139,7 +139,7 @@ class Footer extends React.Component {
                   <InfoCircle size={16} cursor="pointer" />
                 </StyledTooltip>
               </P>
-              <div>
+              <div data-cy="language-switcher">
                 {Object.keys(languages).map(key => (
                   <div key={key}>
                     <a

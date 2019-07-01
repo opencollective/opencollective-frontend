@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 
-import withIntl from '../../lib/withIntl';
 import { capitalize, formatCurrency } from '../../lib/utils';
 import colors from '../../constants/colors';
 
@@ -416,4 +415,4 @@ const addMutation = graphql(editExpenseQuery, {
   }),
 });
 
-export default withIntl(addMutation(Expense));
+export default injectIntl(addMutation(Expense));

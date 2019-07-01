@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get, maxBy, debounce, sortBy } from 'lodash';
 import styled, { css } from 'styled-components';
 import slugify from 'slugify';
 
-import withIntl from '../lib/withIntl';
 import { formatCurrency } from '../lib/utils';
 import { fadeIn } from './StyledKeyframes';
 
@@ -533,4 +532,4 @@ class GoalsCover extends React.Component {
   }
 }
 
-export default withIntl(GoalsCover);
+export default injectIntl(GoalsCover);

@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
-import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
 import { Flex, Box } from '@rebass/grid';
@@ -27,7 +26,7 @@ class EditPaymentMethod extends React.Component {
     hasMonthlyLimitPerMember: PropTypes.bool,
     /** Indicates that the payment method is being updated on the backend. Shows spinner. */
     isSaving: PropTypes.bool,
-    /** From withIntl */
+    /** From injectIntl */
     intl: PropTypes.object.isRequired,
   };
 
@@ -187,4 +186,4 @@ class EditPaymentMethod extends React.Component {
   }
 }
 
-export default withIntl(EditPaymentMethod);
+export default injectIntl(EditPaymentMethod);

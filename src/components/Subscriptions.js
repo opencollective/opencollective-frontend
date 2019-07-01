@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import SubscriptionCard from './SubscriptionCard';
 import colors from '../constants/colors';
@@ -195,4 +194,4 @@ class Subscriptions extends React.Component {
   }
 }
 
-export default withIntl(Subscriptions);
+export default injectIntl(Subscriptions);

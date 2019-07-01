@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, pick } from 'lodash';
-import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import InputField from './InputField';
 import SmallButton from './SmallButton';
@@ -157,4 +156,4 @@ class CommentForm extends React.Component {
   }
 }
 
-export default withIntl(CommentForm);
+export default CommentForm;

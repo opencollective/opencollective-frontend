@@ -1,11 +1,10 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
 import { Flex } from '@rebass/grid';
 
-import withIntl from '../../lib/withIntl';
 import { Sections, AllSectionsNames } from './_constants';
 
 const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
@@ -99,7 +98,7 @@ NavBar.propTypes = {
   sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
   /** Currently selected section */
   selected: PropTypes.oneOf(AllSectionsNames),
-  /** @ignore From withIntl */
+  /** @ignore From injectIntl */
   intl: PropTypes.object,
 };
 
@@ -108,4 +107,4 @@ NavBar.defaultProps = {
   linkBuilder: section => `#section-${section}`,
 };
 
-export default withIntl(NavBar);
+export default injectIntl(NavBar);

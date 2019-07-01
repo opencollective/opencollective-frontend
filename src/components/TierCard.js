@@ -3,14 +3,13 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Markdown from 'react-markdown';
 import { get, uniqBy } from 'lodash';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import Avatar from './Avatar';
 import Currency from './Currency';
 import Logo from './Logo';
 
 import colors from '../constants/colors';
-import withIntl from '../lib/withIntl';
 import { Link } from '../server/pages';
 import { formatCurrency } from '../lib/utils';
 
@@ -348,4 +347,4 @@ class TierCard extends React.Component {
   }
 }
 
-export default withIntl(TierCard);
+export default injectIntl(TierCard);

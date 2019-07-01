@@ -8,8 +8,6 @@ import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
 import Link from '../components/Link';
 
-import withIntl from '../lib/withIntl';
-
 import staticPages from './static';
 import { withUser } from '../components/UserProvider';
 
@@ -131,4 +129,4 @@ class StaticPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(StaticPage));
+export default withUser(StaticPage);

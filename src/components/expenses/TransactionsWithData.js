@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 
-import withIntl from '../../lib/withIntl';
 import { getTransactionsQuery } from '../../graphql/queries';
 
 import Error from '../Error';
@@ -90,4 +89,4 @@ export const addTransactionsData = graphql(getTransactionsQuery, {
   }),
 });
 
-export default addTransactionsData(withIntl(TransactionsWithData));
+export default addTransactionsData(TransactionsWithData);

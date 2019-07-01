@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedNumber, FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedNumber, FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Facebook } from 'styled-icons/fa-brands/Facebook';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Linkedin } from 'styled-icons/fa-brands/Linkedin';
@@ -30,8 +30,6 @@ import HomepageSponsorCard from '../components/HomepageSponsorCard';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
-
-import withIntl from '../lib/withIntl';
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -130,7 +128,7 @@ class HomePage extends React.Component {
 
   static propTypes = {
     data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     LoggedInUser: PropTypes.object,
   };
 
@@ -1046,4 +1044,4 @@ const addHomeData = graphql(query);
 
 export { HomePage as MockHomePage };
 
-export default addHomeData(withIntl(HomePage));
+export default addHomeData(injectIntl(HomePage));
