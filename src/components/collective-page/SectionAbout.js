@@ -59,6 +59,7 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
           field="longDescription"
           canEdit={canEdit}
           showEditIcon={!isEmptyDescription}
+          formatBeforeSubmit={v => (isEmptyValue(v) ? null : v)}
         >
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {

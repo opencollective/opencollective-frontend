@@ -38,6 +38,7 @@ class NewCollectivePage extends React.Component {
   // See https://github.com/opencollective/opencollective/issues/1872
   shouldComponentUpdate(newProps) {
     if (get(this.props, 'data.Collective') && !get(newProps, 'data.Collective')) {
+      console.warn('Collective lost from props (#1872)');
       return false;
     } else {
       return true;
@@ -129,6 +130,7 @@ const getCollective = graphql(gql`
       currency
       settings
       stats {
+        id
         balance
         yearlyBudget
       }
