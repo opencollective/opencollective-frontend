@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
 /** An horizontally scrollable container to display contribute cards cards */
 const ContributeCardsContainer = styled.div`
@@ -6,6 +7,8 @@ const ContributeCardsContainer = styled.div`
   padding: 16px 0;
   overflow-x: auto;
   scroll-behavior: smooth;
+
+  ${CustomScrollbarCSS}
 
   /** Respect left margin / center cards on widescreens */
   @media (min-width: 1440px) {
