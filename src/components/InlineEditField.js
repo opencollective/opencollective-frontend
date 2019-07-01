@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { Mutation } from 'react-apollo';
-import { get, set, pick } from 'lodash';
+import { get, pick } from 'lodash';
 import styled from 'styled-components';
 
 import { PencilAlt } from 'styled-icons/fa-solid/PencilAlt';
@@ -55,6 +55,8 @@ class InlineEditField extends Component {
     mutation: PropTypes.object.isRequired,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
+    /** Called to format the value before submitting */
+    formatBeforeSubmit: PropTypes.func,
     /** Set to false to disable edit icon even if user is allowed to edit */
     showEditIcon: PropTypes.bool,
     /** If given, this function will be used to render the field */
@@ -103,9 +105,9 @@ class InlineEditField extends Component {
       return <span>{value}</span>;
     }
   }
-
+  z;
   render() {
-    const { field, values, mutation, canEdit, showEditIcon, placeholder, children } = this.props;
+    const { field, values, mutation, canEdit, formatBeforeSubmit, showEditIcon, placeholder, children } = this.props;
     const { isEditing, draft } = this.state;
     const value = get(values, field);
     const touched = draft !== value;
@@ -167,7 +169,8 @@ class InlineEditField extends Component {
                     disabled={!touched}
                     data-cy="InlineEditField-Btn-Save"
                     onClick={() => {
-                      const variables = set(pick(values, ['id']), field, draft.trim());
+                      const variables = pick(values, ['id']);
+                      variables[field] = formatBeforeSubmit ? formatBeforeSubmit(draft) : draft;
                       updateField({ variables }).then(this.disableEditor);
                     }}
                   >
