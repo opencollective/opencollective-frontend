@@ -51,7 +51,7 @@
     "express-session": "1.16.2",
     "flat": "4.1.0",
     "forest-express-sequelize": "3.2.3",
-    "fs-extra": "8.0.1",
+    "fs-extra": "8.1.0",
     "graphql": "14.4.1",
     "graphql-iso-date": "3.6.1",
     "graphql-type-json": "0.3.0",
