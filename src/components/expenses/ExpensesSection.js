@@ -109,7 +109,7 @@ class ExpensesSection extends React.Component {
                       <FormattedMessage
                         id="collective.expenses.title"
                         values={{ n: this.totalExpenses }}
-                        defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
+                        defaultMessage="Expenses"
                       />
                     </h2>
                     {this.totalExpenses >= 5 && (

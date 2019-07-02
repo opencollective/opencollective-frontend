@@ -92,7 +92,7 @@ class EditHost extends React.Component {
                 <p>
                   <FormattedMessage
                     id="editCollective.host.pending"
-                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. When approved, you will be able to start receiving money for your Collective."
+                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed."
                     values={{
                       host: get(collective, 'host.name'),
                       date: formatDate(get(hostMembership, 'createdAt'), {
@@ -199,11 +199,11 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No host" />
+                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No fiscal host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
-                defaultMessage="Without a host, you can't receive or spend money. But you can still use other features of Open Collective, like filing expenses, posting updates, and creating events."
+                defaultMessage="Without a fiscal host, you can't collect money. You can still use other features, like editing your Collective page, submitting expenses, and posting updates."
               />
             </Box>
           </Flex>
@@ -219,11 +219,11 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Use your own host" />
+                <FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Create a fiscal host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.createHost.description"
-                defaultMessage="You can create your own host as an individual or organization. You will be responsible for holding funds and paying out approved expenses for Collectives you host."
+                defaultMessage="Connect your Stripe account and hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes."
               />
               &nbsp;
               <a href="https://docs.opencollective.com/help/hosts/become-host">
@@ -251,11 +251,14 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to an existing host" />
+                <FormattedMessage
+                  id="collective.edit.host.findHost.title"
+                  defaultMessage="Apply to an existing fiscal host"
+                />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
-                defaultMessage="With this option, there's no need to create a new bank account or worry about accounting and invoicing. Those things will be the responsibility of your fiscal host. Note: most hosts charge a fee to cover administrative overhead. "
+                defaultMessage="With this option, you don't need to hold funds yourself, or set up a legal entity and bank account for your project. The fiscal host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming)."
               />
               {this.state.selectedOption === 'findHost' && (
                 <div>
@@ -284,7 +287,7 @@ class EditHost extends React.Component {
                       />
                     </h3>
                     <Link route="/hosts">
-                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" />
+                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all fiscal hosts" />
                     </Link>
                   </div>
                   <div className="suggestedHostsDescription subtitle">

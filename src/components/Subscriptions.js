@@ -22,15 +22,15 @@ class Subscriptions extends React.Component {
     this.messages = defineMessages({
       'subscription.canceled.label': {
         id: 'subscription.cancelled.label',
-        defaultMessage: 'Cancelled Subscriptions',
+        defaultMessage: 'Previous recurring financial contributions',
       },
       'subscription.pending.label': {
         id: 'subscription.pending.label',
-        defaultMessage: 'Pending Subscriptions',
+        defaultMessage: 'Pending recurring financial contributions',
       },
       'subscription.login.message': {
         id: 'subscription.login.message',
-        defaultMessage: 'Are these your subscriptions? Login above to edit them',
+        defaultMessage: 'Are these your recurring financial contributions? Log in to edit them.',
       },
     });
   }
@@ -61,10 +61,6 @@ class Subscriptions extends React.Component {
       .sort(this.sortBycreatedAt);
     const pendingSubs = subscriptions.filter(({ status }) => status === 'PENDING').sort(this.sortBycreatedAt);
 
-    let userString = `${collective.name || collective.slug} isn't`;
-    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
-      userString = "you aren't";
-    }
     return (
       <div className="Subscriptions">
         <style jsx>
@@ -149,9 +145,9 @@ class Subscriptions extends React.Component {
         {activeSubs.length === 0 && (
           <div className="subscriptions-noactive">
             <img className="subscriptions-noactive-image" src="/static/images/no-subscription-placeholder.svg" />
-            <div className="subscriptions-noactive-text"> Looks like {userString} contributing right now.</div>
+            <div className="subscriptions-noactive-text"> No active recurring financial contributions.</div>
             <div className="subscriptions-noactive-link">
-              <a href="/discover">Discover more collectives</a>
+              <a href="/discover">Discover more Collectives</a>
             </div>
           </div>
         )}

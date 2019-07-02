@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Query, Mutation } from 'react-apollo';
 import { Flex, Box } from '@rebass/grid';
-import { get, update } from 'lodash';
+import { get, update, cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import { cloneDeep } from 'lodash';
 
 import { createApplicationMutation, deleteApplicationMutation } from '../graphql/mutations';
 import { getLoggedInUserApplicationsQuery } from '../graphql/queries';

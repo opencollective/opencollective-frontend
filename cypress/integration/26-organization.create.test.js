@@ -15,6 +15,6 @@ describe('create an organization', () => {
       timeout: 10000,
     }).contains('New org');
     cy.get('.UserCollectivePage .CollectiveCover .website').contains('newco.com');
-    cy.get('.NotificationBar h1').contains('success');
+    cy.get('.NotificationBar h1').contains('Your Organization has been created.');
   });
 });
