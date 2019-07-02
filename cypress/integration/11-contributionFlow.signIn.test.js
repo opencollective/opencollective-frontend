@@ -11,7 +11,7 @@ describe('Contribution Flow: Sign In', () => {
     cy.visit('/apex/donate');
     cy.get('#content input[name=email]').type('zzzzzzzzzzzzz');
     cy.get('#content button[type=submit]').should('be.disabled');
-    cy.get('#content button[type=submit]').focus();
+    cy.get('#content input[name=email]').blur();
     cy.contains("Please include an '@' in the email address. 'zzzzzzzzzzzzz' is missing an '@'.");
   });
 
