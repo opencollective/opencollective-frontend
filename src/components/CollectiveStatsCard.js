@@ -124,7 +124,7 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
           <Flex width={0.5} alignItems="center" flexDirection="column" key="spending">
             <Flex>
               <P fontSize="1.2rem" fontWeight="bold">
-                <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
+                <Currency value={get(stats, 'monthlySpending') || 0} currency={currency} precision={0} abbreviate />
               </P>
               <P fontSize="1.2rem">
                 /
