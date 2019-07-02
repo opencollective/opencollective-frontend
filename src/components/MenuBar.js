@@ -423,7 +423,7 @@ class MenuBar extends React.Component {
             {collective.type !== 'EVENT' && (
               <div className="item">
                 <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
-                  <FormattedMessage id="menu.subscriptions" defaultMessage="Financial contributions" />
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Recurring financial contributions" />
                 </Link>
               </div>
             )}

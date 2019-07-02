@@ -119,7 +119,7 @@ class CreateOrganization extends React.Component {
             description={
               <FormattedMessage
                 id="collectives.create.description"
-                defaultMessage="An organization allows you to make donations as a company or as a team. You can also set a monthly limit within which the members of the organization can make contributions."
+                defaultMessage="An Organization allows you to make financial contributions as a company or team. You can also add a credit card with a monthly limit that team members can use to make contributions."
               />
             }
             collective={this.state.collective}

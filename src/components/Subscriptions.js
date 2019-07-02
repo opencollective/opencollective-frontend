@@ -22,15 +22,15 @@ class Subscriptions extends React.Component {
     this.messages = defineMessages({
       'subscription.canceled.label': {
         id: 'subscription.cancelled.label',
-        defaultMessage: 'Previous recurring financial contributions',
+        defaultMessage: 'Cancelled financial contributions',
       },
       'subscription.pending.label': {
         id: 'subscription.pending.label',
-        defaultMessage: 'Pending recurring financial contributions',
+        defaultMessage: 'Pending financial contributions',
       },
       'subscription.login.message': {
         id: 'subscription.login.message',
-        defaultMessage: 'Are these your recurring financial contributions? Log in to edit them.',
+        defaultMessage: 'Are these your financial contributions? Log in above to edit them',
       },
     });
   }

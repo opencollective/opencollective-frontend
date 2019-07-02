@@ -106,7 +106,7 @@ class SubscriptionsRedirectPage extends React.Component {
                 <div className="Subscriptions-title">
                   {LoggedInUser && (
                     <div>
-                      This page has moved. Your subscriptions are now at
+                      This page has moved. Your recurring financial contributions are now at
                       <Link
                         route={'subscriptions'}
                         params={{

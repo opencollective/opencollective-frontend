@@ -67,7 +67,7 @@ class SubscriptionCard extends React.Component {
       'subscription.whyPastDueText': {
         id: 'subscription.whyPastDueText',
         defaultMessage:
-          'We were unable to charge your last payment. Please update your payment info to continue this subscription.',
+          'We were unable to charge your last payment. Please update your payment info to continue this recurring financial contribution.',
       },
       'subscription.updated': {
         id: 'subscription.updated',
