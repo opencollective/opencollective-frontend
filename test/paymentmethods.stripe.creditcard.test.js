@@ -15,7 +15,7 @@ async function createOrderWithPaymentMethod(paymentMethodName, orderParams = {})
     email: 'tmct@mct.com',
   });
   const host = await models.Collective.create({ name: 'Host Collective' });
-  const tier = await models.Tier.create({ name: 'backer' });
+  const tier = await models.Tier.create({ name: 'backer', amount: 0 });
   const collective = await models.Collective.create({ name: 'Parcel!!' });
   collective.addHost(host);
   const connectedAccount = await models.ConnectedAccount.create({

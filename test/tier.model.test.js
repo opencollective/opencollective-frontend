@@ -56,7 +56,7 @@ describe('Collective model', () => {
               amount: 1000000,
               interval: 'year',
             },
-            { type: 'TIER', name: 'donor', slug: 'donors' },
+            { type: 'TIER', name: 'donor', slug: 'donors', amount: 0 },
           ],
           { CollectiveId: collective.id },
         ),
@@ -96,12 +96,12 @@ describe('Collective model', () => {
       ).to.be.rejectedWith(SequelizeValidationError, 'Validation min on amount failed');
     });
 
-    it('can have a null value', () => {
+    it('can have a 0 value', () => {
       return expect(
         models.Tier.create({
           type: 'TIER',
           name: 'sponsor',
-          amount: null,
+          amount: 0,
           interval: 'year',
         }),
       ).to.be.fulfilled;
