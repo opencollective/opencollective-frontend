@@ -185,6 +185,10 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.STRING,
       },
 
+      customFields: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+      },
+
       startsAt: {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,

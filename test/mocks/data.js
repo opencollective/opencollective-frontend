@@ -691,6 +691,25 @@ export default {
     maxQuantity: 100,
   },
 
+  tierWithCustomFields: {
+    name: 'prepaid',
+    type: 'TIER',
+    slug: 'prepaid',
+    description: '$10/month',
+    amount: 1000,
+    interval: 'month',
+    currency: 'USD',
+    maxQuantity: 10,
+    customFields: [
+      {
+        name: 'jsonUrl',
+        type: 'url',
+        required: true,
+        label: 'URL of the JSON dependency file',
+      },
+    ],
+  },
+
   ticket1: {
     name: 'Free ticket',
     type: 'TICKET',

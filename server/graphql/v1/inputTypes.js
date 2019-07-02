@@ -8,6 +8,7 @@ import {
   GraphQLString,
   GraphQLScalarType,
   GraphQLError,
+  GraphQLEnumType,
 } from 'graphql';
 
 import GraphQLJSON from 'graphql-type-json';
@@ -64,6 +65,30 @@ export const PaymentMethodDataVirtualCardInputType = new GraphQLInputObjectType(
   description: 'Input for virtual card (meta)data',
   fields: () => ({
     email: { type: GraphQLString, description: 'The email virtual card is generated for' },
+  }),
+});
+
+const CustomFieldType = new GraphQLEnumType({
+  name: 'CustomFieldType',
+  description: 'Type of custom field',
+  values: {
+    number: {},
+    text: {},
+    email: {},
+    date: {},
+    radio: {},
+    url: {},
+  },
+});
+
+export const CustomFieldsInputType = new GraphQLInputObjectType({
+  name: 'CustomFieldsInputType',
+  description: 'Input for custom fields for order',
+  fields: () => ({
+    type: { type: CustomFieldType },
+    name: { type: GraphQLString },
+    label: { type: GraphQLString },
+    required: { type: GraphQLBoolean },
   }),
 });
 
@@ -274,6 +299,7 @@ export const TierInputType = new GraphQLInputObjectType({
       description: 'amount that you are trying to raise with this tier',
     },
     password: { type: GraphQLString },
+    customFields: { type: new GraphQLList(CustomFieldsInputType) },
     startsAt: {
       type: GraphQLString,
       description: 'Start of the campaign',
@@ -315,6 +341,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType },
+    customData: { type: GraphQLJSON },
     recaptchaToken: { type: GraphQLString },
     // For taxes
     taxAmount: {

@@ -7,7 +7,7 @@ import * as utils from './utils';
 import models from '../server/models';
 
 describe('graphql.tiers.test', () => {
-  let user1, user2, host, collective1, collective2, tier1, tierProduct, paymentMethod1;
+  let user1, user2, host, collective1, collective2, tier1, tierWithCustomFields, tierProduct, paymentMethod1;
   let sandbox;
 
   beforeEach(() => utils.resetTestDB());
@@ -43,6 +43,7 @@ describe('graphql.tiers.test', () => {
 
   // Create tiers
   beforeEach(() => collective1.createTier(utils.data('tier1')).tap(t => (tier1 = t)));
+  beforeEach(() => collective1.createTier(utils.data('tierWithCustomFields')).tap(t => (tierWithCustomFields = t)));
   beforeEach(() => collective1.createTier(utils.data('tierProduct')).tap(t => (tierProduct = t)));
 
   // Add hosts to collectives
@@ -122,6 +123,7 @@ describe('graphql.tiers.test', () => {
           tiers(slug: $tierSlug, id: $tierId) {
             id
             name
+            customFields
           }
         }
       }`;
@@ -133,7 +135,20 @@ describe('graphql.tiers.test', () => {
         res.errors && console.error(res.errors[0]);
         expect(res.errors).to.not.exist;
         const tiers = res.data.Collective.tiers;
-        expect(tiers).to.have.length(4);
+        expect(tiers).to.have.length(5);
+      });
+
+      it('fetch tier with customFields', async () => {
+        const res = await utils.graphqlQuery(getTiersQuery, {
+          collectiveSlug: collective1.slug,
+          tierId: tierWithCustomFields.id,
+        });
+        res.errors && console.error(res.errors[0]);
+        expect(res.errors).to.not.exist;
+        const tiers = res.data.Collective.tiers;
+        expect(tiers).to.have.length(1);
+        expect(tiers[0].name).to.equal(tierWithCustomFields.name);
+        expect(tiers[0].customFields).to.have.length(1);
       });
 
       it('filter tiers by slug', async () => {
@@ -172,7 +187,8 @@ describe('graphql.tiers.test', () => {
           paymentMethod {
             data,
             name
-          }
+          },
+          data
         }
       }`;
 
@@ -200,6 +216,14 @@ describe('graphql.tiers.test', () => {
         return { ...generateLoggedInOrder(), user: { email } };
       };
 
+      const generateLoggedInOrderWithCustomData = () => {
+        return {
+          ...generateLoggedInOrder(),
+          tier: { id: tierWithCustomFields.id },
+          customData: { jsonUrl: 'https://example.com/dep.json' },
+        };
+      };
+
       it('fails to use a payment method on file if not logged in', async () => {
         const order = generateLoggedOutOrder(user1.email);
         order.paymentMethod = { uuid: paymentMethod1.uuid, service: 'stripe' };
@@ -220,6 +244,15 @@ describe('graphql.tiers.test', () => {
         expect(result.errors[0].message).to.equal(
           "You don't have enough permissions to use this payment method (you need to be an admin of the collective that owns this payment method)",
         );
+      });
+
+      it('it create order with customData', async () => {
+        const orderInput = generateLoggedInOrderWithCustomData();
+        orderInput.paymentMethod = { uuid: paymentMethod1.uuid };
+        const queryResult = await utils.graphqlQuery(createOrderQuery, { order: orderInput }, user1);
+        expect(queryResult.errors).to.not.exist;
+        const createdOrder = queryResult.data.createOrder;
+        expect(createdOrder.data.customData).to.exist;
       });
 
       it('user1 becomes a backer of collective1 using a payment method on file', async () => {
