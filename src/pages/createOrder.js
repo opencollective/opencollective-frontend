@@ -80,6 +80,14 @@ class CreateOrderPage extends React.Component {
       query.interval = null;
     }
 
+    if (query.data) {
+      try {
+        query.data = JSON.parse(query.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     return {
       collectiveSlug: query.collectiveSlug,
       eventSlug: query.eventSlug,
@@ -111,7 +119,7 @@ class CreateOrderPage extends React.Component {
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
-    customData: PropTypes.string,
+    customData: PropTypes.object,
     redirect: PropTypes.string,
     referral: PropTypes.string,
     redeem: PropTypes.bool,
@@ -364,7 +372,6 @@ class CreateOrderPage extends React.Component {
       description: decodeURIComponent(this.props.description || ''),
       customData,
     };
-    console.log(order);
 
     try {
       const res = await this.props.createOrder(order);
