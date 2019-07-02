@@ -138,7 +138,7 @@ class ContributorCard extends React.PureComponent {
 
   render() {
     const { left, top, contributor, intl } = this.props;
-    const { collectiveSlug, name, image, description } = contributor;
+    const { collectiveSlug, name, description } = contributor;
 
     // Collective slug is optional, for example Github contributors won't have
     // a collective slug. This helper renders the link only if needed
@@ -153,7 +153,7 @@ class ContributorCard extends React.PureComponent {
     return (
       <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
         <Flex justifyContent="center" mb={3}>
-          {withCollectiveLink(<Avatar src={image} radius={56} name={name} />)}
+          {withCollectiveLink(<Avatar collective={{ name, slug: collectiveSlug, type: 'USER' }} radius={56} />)}
         </Flex>
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
           {withCollectiveLink(
