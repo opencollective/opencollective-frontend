@@ -46,7 +46,7 @@ class UserCollective extends React.Component {
       'organization.created.description': {
         id: 'organization.created.description',
         defaultMessage:
-          'You can now make contributions as an Organization. You can also edit your Organization profile, add team members and admins, and save a credit card with a monthly limit.',
+          'You can now make financial contributions as an Organization. You can also edit your Organization profile, add team members and admins, and attach a credit card with a monthly limit.',
       },
       'organization.isArchived': {
         id: 'organization.isArchived',

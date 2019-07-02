@@ -62,7 +62,7 @@ class PaymentMethodChooser extends React.Component {
       'paymentMethod.whyUnknown': {
         id: 'paymentMethod.whyUnknown',
         defaultMessage:
-          "This subscription was created using an early version of our site when we didn't store credit card numbers. We suggest that you update this subscription with a newer credit card.",
+          "This recurring contribution was created using an earlier version of our site which didn't store credit card numbers. We suggest that you update it.",
       },
     });
   }

@@ -110,7 +110,7 @@ class SectionTitle extends React.Component {
       },
       'organizationDetails.subtitle': {
         id: 'tier.order.organizationDetails.description',
-        defaultMessage: 'Create an organization. You can edit it later to add other members.',
+        defaultMessage: 'Create an Organization. You can add more team members later.',
       },
       'paymentDetails.title': {
         id: 'tier.order.paymentDetails',

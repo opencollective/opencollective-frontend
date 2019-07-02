@@ -134,11 +134,14 @@ class EditPaymentMethods extends React.Component {
         <React.Fragment>
           <FormattedMessage
             id="errors.PM.Remove.HasActiveSubscriptions"
-            defaultMessage="This payment method cannot be removed because it has active subscriptions."
+            defaultMessage="This payment method cannot be removed because it has active recurring financial contributions."
           />{' '}
           <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
             <Span textTransform="capitalize">
-              <FormattedMessage id="paymentMethod.editSubscriptions" defaultMessage="edit subscriptions" />
+              <FormattedMessage
+                id="paymentMethod.editSubscriptions"
+                defaultMessage="edit recurring financial contributions"
+              />
             </Span>
           </Link>
         </React.Fragment>

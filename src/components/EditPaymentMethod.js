@@ -49,7 +49,7 @@ class EditPaymentMethod extends React.Component {
       },
       'paymentMethod.editSubscriptions': {
         id: 'paymentMethod.editSubscriptions',
-        defaultMessage: 'edit subscriptions',
+        defaultMessage: 'edit recurring financial contributions',
       },
       'paymentMethod.monthlyLimitPerMember.label': {
         id: 'paymentMethod.monthlyLimitPerMember.label',
@@ -58,7 +58,7 @@ class EditPaymentMethod extends React.Component {
       'paymentMethod.monthlyLimitPerMember.description': {
         id: 'paymentMethod.monthlyLimitPerMember.description',
         defaultMessage:
-          'You can set a monthly limit to allow the other members of your organization to use this credit card. If set to zero, only you and the other administrators of this organization will be able to use this card.',
+          'Set a monthly limit to allow other team members of your Organization to use this credit card within that limit. If set to zero, only Organization admins will be able to use this card.',
       },
     });
   }
@@ -116,7 +116,7 @@ class EditPaymentMethod extends React.Component {
                 <div className="actions">
                   <FormattedMessage
                     id="paymentMethod.activeSubscriptions"
-                    defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}"
+                    defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
                     values={{ n: subscriptions.length }}
                   />
                 </div>

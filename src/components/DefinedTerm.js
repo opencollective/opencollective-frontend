@@ -35,8 +35,7 @@ const TranslatedDefinitions = defineMessages({
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',
-    defaultMessage:
-      'Gift cards empower your employees or community members to support the open source projects they love.',
+    defaultMessage: 'Gift cards empower your employees or community members to support the projects they love.',
   },
 });
 
