@@ -31,7 +31,7 @@ async function createOrderWithSubscription(interval, date, quantity = 1) {
     name: 'Donor Collective',
   });
   const collective = await models.Collective.create({ name: 'Parcel' });
-  const tier = await models.Tier.create({ name: 'backer' });
+  const tier = await models.Tier.create({ name: 'backer', amount: 0 });
   const subscription = await models.Subscription.create({
     ...payment,
     isActive: true,
@@ -510,7 +510,7 @@ describe('LibSubscription', () => {
         name: 'Test McTesterson',
       });
       collective = await models.Collective.create({ name: 'Parcel' });
-      tier = await models.Tier.create({ name: 'backer' });
+      tier = await models.Tier.create({ name: 'backer', amount: 0 });
     });
 
     it('should filter orders with NULL subscription IDs', async () => {
