@@ -45,7 +45,7 @@ const InlineField = ({ name, children, label, isLabelClickable }) => (
 InlineField.propTypes = {
   name: PropTypes.string,
   children: PropTypes.node,
-  label: PropTypes.string,
+  label: PropTypes.node,
   isLabelClickable: PropTypes.bool,
 };
 
@@ -92,7 +92,7 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
 RadioButtonWithLabel.propTypes = {
   checked: PropTypes.bool,
   onClick: PropTypes.func,
-  name: PropTypes.object,
+  name: PropTypes.string,
   children: PropTypes.node,
 };
 
