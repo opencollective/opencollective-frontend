@@ -46,7 +46,7 @@ GiftCard.defaultProps = {
 
 GiftCard.propTypes = {
   color: PropTypes.string,
-  size: PropTypes.number,
+  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default GiftCard;
