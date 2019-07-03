@@ -59,6 +59,17 @@ class Collective extends React.Component {
         id: 'collective.isArchived.description',
         defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
       },
+      'collective.isApproved': {
+        id: 'collective.isApproved',
+        defaultMessage: '{name} has been approved.',
+      },
+      'collective.isApproved.description': {
+        id: 'collective.isApproved.description',
+        defaultMessage: 'The collective has been approved by the host ({host}) on {date}',
+        values: {
+          date: <FormattedDate value={collective.approvedAt} month="long" year="numeric" />,
+        },
+      },
       'collective.donate': {
         id: 'collective.donate',
         defaultMessage: 'donate',
@@ -142,7 +153,7 @@ class Collective extends React.Component {
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage') || defaultBackgroundImage;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
-    if (status === 'collectiveCreated') {
+    if (status === 'collectiveCreated' && !collective.isApproved) {
       notification.title = intl.formatMessage(this.messages['collective.created']);
       notification.description = intl.formatMessage(this.messages['collective.created.description'], {
         host: collective.host.name,
@@ -153,6 +164,12 @@ class Collective extends React.Component {
       });
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
+    } else if (status === 'collectiveApproved' || (collective.isApproved && !collective.isArchived)) {
+      notification.title = intl.formatMessage(this.messages['collective.isApproved'], {
+        name: collective.name,
+      });
+      notification.description = intl.formatMessage(this.messages['collective.isApproved.description']);
+      notification.status = 'collectiveApproved';
     }
     const cta =
       collective.isActive && collective.host ? { href: `/${collective.slug}/contribute`, label: 'contribute' } : null;
