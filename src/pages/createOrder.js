@@ -605,8 +605,10 @@ class CreateOrderPage extends React.Component {
     const { customData } = this.state;
 
     this.setState({
-      ...customData,
-      [name]: value,
+      customData: {
+        ...customData,
+        [name]: value,
+      },
     });
   };
 
