@@ -1391,7 +1391,7 @@ export default function(Sequelize, DataTypes) {
     };
 
     // events should take the currency of their parent collective, not necessarily the host of their host.
-    if (!this.ParentCollectiveId) {
+    if (this.type === 'COLLECTIVE') {
       updatedValues.currency = hostCollective.currency;
     }
 
