@@ -143,6 +143,7 @@ const getCollective = graphql(gql`
         collectiveSlug
         totalAmountDonated
         type
+        publicMessage
       }
       tiers {
         id

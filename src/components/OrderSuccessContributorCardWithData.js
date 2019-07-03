@@ -201,6 +201,8 @@ class OrderSuccessContributorCardWithData extends React.Component {
                   fontWeight="bold"
                   fontSize="Caption"
                   color="black.900"
+                  abbreviateInterval={false}
+                  precision={2}
                   amount={totalAmount}
                   currency={currency}
                   interval={interval}

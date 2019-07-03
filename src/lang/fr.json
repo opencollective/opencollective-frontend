@@ -27,6 +27,7 @@
   "addfundstoorg.FromCollectiveId.label": "hôte",
   "amount.free": "gratuit",
   "AmountInterval": "{amount} / {interval, select, month {mois} year {an}}",
+  "AmountIntervalLong": "{amount} per {interval, select, month {month} year {year}}",
   "api.error.unreachable": "Le site est surchargé pour le moment. Merci de réessayer plus tard.",
   "applications.ApiKeys": "Clés API",
   "applications.ApiKeys.code": "Clé API : {code}",
