@@ -11,6 +11,7 @@ import SearchIcon from './SearchIcon';
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
   border-radius: 20px;
+  background-color: white;
 `;
 
 const SearchInput = styled(Box)`
@@ -38,17 +39,17 @@ const handleSubmit = event => {
   event.preventDefault();
 };
 
-const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
+const SearchForm = ({ fontSize, onSubmit = handleSubmit, placeholder = 'Search Open Collective', width = 1 }) => (
   <form action="/search" method="GET" onSubmit={onSubmit}>
     <SearchInputContainer alignItems="center" justifyContent="space-between" p={1}>
       <SearchInput
         as="input"
         type="search"
         name="q"
-        placeholder="Search Open Collective"
+        placeholder={placeholder}
         py={1}
         pl={3}
-        width={1}
+        width={width}
         fontSize={fontSize}
       />
       <SearchButton as="button" mr={1} p={1}>
@@ -61,6 +62,9 @@ const SearchForm = ({ fontSize, onSubmit = handleSubmit }) => (
 SearchForm.propTypes = {
   fontSize: PropTypes.string,
   onSubmit: PropTypes.func,
+  placeholder: PropTypes.string,
+  backgroundColor: PropTypes.string,
+  width: PropTypes.number,
 };
 
 export default SearchForm;

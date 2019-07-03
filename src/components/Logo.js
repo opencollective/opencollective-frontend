@@ -4,8 +4,9 @@ import classNames from 'classnames';
 
 import withFallbackImage from '../lib/withFallbackImage';
 
-const Logo = ({ src, style = {}, height, className }) => {
+const Logo = ({ src, style = {}, height, width, className }) => {
   style.maxHeight = style.height || height;
+  style.maxWidth = style.width || width;
   const backgroundStyle = { height };
   if (height && parseInt(height, 10) == height) {
     backgroundStyle.minWidth = parseInt(height, 10) / 2;
@@ -39,6 +40,7 @@ Logo.propTypes = {
   style: PropTypes.object,
   className: PropTypes.string,
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default withFallbackImage(Logo);

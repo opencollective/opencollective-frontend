@@ -20,6 +20,7 @@ export const defaultImage = {
   COLLECTIVE: '/static/images/default-collective-logo.svg',
   CHAPTER: '/static/images/default-chapter-logo.svg',
   ANONYMOUS: '/static/images/default-anonymous-logo.svg',
+  PLEDGED: '/static/images/default-pledged-logo.svg',
 };
 
 /** The ID of the open source collective */
