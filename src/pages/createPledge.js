@@ -4,12 +4,11 @@ import slugify from 'slugify';
 import gql from 'graphql-tag';
 import { graphql, compose } from 'react-apollo';
 import { get } from 'lodash';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
 import { getCollectiveQuery } from '../graphql/queries';
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import { Link, Router } from '../server/pages';
 import { imagePreview } from '../lib/utils';
@@ -150,7 +149,7 @@ class CreatePledgePage extends React.Component {
   });
 
   static propTypes = {
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     data: PropTypes.object,
     name: PropTypes.string,
     slug: PropTypes.string,
@@ -725,4 +724,4 @@ const addGraphQL = compose(
 );
 
 export { CreatePledgePage as MockCreatePledgePage };
-export default withIntl(withUser(addGraphQL(CreatePledgePage)));
+export default injectIntl(withUser(addGraphQL(CreatePledgePage)));

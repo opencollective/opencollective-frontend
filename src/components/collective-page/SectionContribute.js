@@ -1,11 +1,10 @@
 import React from 'react';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
 import { formatCurrency } from '../../lib/utils';
-import withIntl from '../../lib/withIntl';
 import { H2 } from '../Text';
 import StyledButton from '../StyledButton';
 import Link from '../Link';
@@ -147,7 +146,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { intl, collective, tiers, events, topOrganizations, topIndividuals } = this.props;
+    const { collective, tiers, events, topOrganizations, topIndividuals } = this.props;
     const [financialContributions, otherWaysToContribute] = this.getWaysToContribute(collective, tiers, events);
 
     return (
@@ -166,13 +165,11 @@ class SectionContribute extends React.PureComponent {
                 defaultMessage="Become a financial contributor"
               />
             }
-            intl={intl}
           />
         </Box>
         {otherWaysToContribute.length > 0 && (
           <ContributeRow
             contributionTypes={otherWaysToContribute}
-            intl={intl}
             title={
               <FormattedMessage id="CollectivePage.MoreWaysToContribute" defaultMessage="More ways to contribute" />
             }
@@ -195,4 +192,4 @@ class SectionContribute extends React.PureComponent {
   }
 }
 
-export default withIntl(SectionContribute);
+export default injectIntl(SectionContribute);

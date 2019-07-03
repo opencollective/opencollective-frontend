@@ -12,7 +12,6 @@ import TransactionsWithData from '../components/expenses/TransactionsWithData';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { withUser } from '../components/UserProvider';
@@ -102,4 +101,4 @@ class TransactionsPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveCoverData(TransactionsPage)));
+export default withUser(addCollectiveCoverData(TransactionsPage));

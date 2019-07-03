@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import Hosts from '../components/Hosts';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class HostsPage extends React.Component {
@@ -22,4 +21,4 @@ class HostsPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(HostsPage));
+export default withUser(HostsPage);

@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import CollectiveCard from './CollectiveCard';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import CollectiveCard from './CollectiveCard';
+import Error from './Error';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
@@ -213,4 +212,4 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
   }),
 });
 
-export default addCollectivesData(withIntl(CollectivesWithData));
+export default addCollectivesData(CollectivesWithData);

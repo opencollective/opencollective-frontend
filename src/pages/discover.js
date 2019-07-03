@@ -5,7 +5,6 @@ import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import { withRouter } from 'next/router';
-import withIntl from '../lib/withIntl';
 
 import { Box, Flex } from '@rebass/grid';
 import CollectiveCard from '../components/CollectiveCard';
@@ -196,4 +195,4 @@ DiscoverPage.propTypes = {
   router: PropTypes.object,
 };
 
-export default withIntl(withRouter(DiscoverPage));
+export default withRouter(DiscoverPage);

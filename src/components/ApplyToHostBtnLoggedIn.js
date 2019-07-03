@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 
-import withIntl from '../lib/withIntl';
 import Button from './Button';
 import Link from './Link';
 import { P } from './Text';
@@ -222,4 +221,4 @@ const addGraphQL = compose(
   addMutation,
 );
 
-export default addGraphQL(withIntl(ApplyToHostBtnLoggedIn));
+export default addGraphQL(ApplyToHostBtnLoggedIn);

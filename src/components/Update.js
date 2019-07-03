@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Lock } from 'styled-icons/fa-solid';
-import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { formatDate } from '../lib/utils';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -334,4 +333,4 @@ const addUpdateMutations = compose(
   deleteUpdateMutation,
 );
 
-export default withIntl(addUpdateMutations(Update));
+export default injectIntl(addUpdateMutations(Update));

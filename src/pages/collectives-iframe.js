@@ -4,8 +4,6 @@ import Head from 'next/head';
 
 import MembershipsWithData from '../components/MembershipsWithData';
 
-import withIntl from '../lib/withIntl';
-
 class CollectivesIframe extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id, role, orderBy, limit } }) {
     return { collectiveSlug, id, role, orderBy, limit: Number(limit) };
@@ -126,4 +124,4 @@ class CollectivesIframe extends React.Component {
   }
 }
 
-export default withIntl(CollectivesIframe);
+export default CollectivesIframe;

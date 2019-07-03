@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -167,4 +166,4 @@ const addGraphQL = compose(
   addMutation,
 );
 
-export default withIntl(addGraphQL(CreateHostFormWithData));
+export default addGraphQL(CreateHostFormWithData);

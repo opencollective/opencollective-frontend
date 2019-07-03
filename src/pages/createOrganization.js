@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import CreateOrganization from '../components/CreateOrganization';
 import ErrorPage from '../components/ErrorPage';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class CreateOrganizationPage extends React.Component {
@@ -32,4 +31,4 @@ class CreateOrganizationPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(CreateOrganizationPage));
+export default withUser(CreateOrganizationPage);

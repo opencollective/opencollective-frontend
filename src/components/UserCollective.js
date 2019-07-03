@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import classNames from 'classnames';
 import Header from './Header';
 import Body from './Body';
@@ -11,7 +10,7 @@ import NotificationBar from './NotificationBar';
 import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
 import LongDescription from './LongDescription';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { pick, get, groupBy, uniqBy } from 'lodash';
 import MessageModal from './MessageModal';
 import SectionTitle from './SectionTitle';
@@ -472,4 +471,4 @@ class UserCollective extends React.Component {
   }
 }
 
-export default withIntl(UserCollective);
+export default injectIntl(UserCollective);

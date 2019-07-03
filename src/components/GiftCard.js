@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import withIntl from '../lib/withIntl';
 import Container from './Container';
 import { Span } from './Text';
 import Currency from './Currency';
@@ -107,4 +106,4 @@ class GiftCard extends React.Component {
   }
 }
 
-export default withIntl(GiftCard);
+export default GiftCard;

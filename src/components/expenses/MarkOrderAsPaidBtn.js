@@ -2,9 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { defineMessages, FormattedMessage } from 'react-intl';
-
-import withIntl from '../../lib/withIntl';
+import { FormattedMessage } from 'react-intl';
 
 import SmallButton from '../SmallButton';
 
@@ -23,7 +21,6 @@ class MarkOrderAsPaidBtn extends React.Component {
       paymentProcessorFeeInHostCurrency: 0,
     };
     this.onClick = this.onClick.bind(this);
-    this.messages = defineMessages({});
   }
 
   async onClick() {
@@ -125,4 +122,4 @@ const addMutation = graphql(markOrderAsPaidQuery, {
   }),
 });
 
-export default addMutation(withIntl(MarkOrderAsPaidBtn));
+export default addMutation(MarkOrderAsPaidBtn);

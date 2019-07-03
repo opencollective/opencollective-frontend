@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { textTransform } from '../lib/styled_system_custom';
-import withIntl from '../lib/withIntl';
 import StyledTooltip from './StyledTooltip';
 
 /**
@@ -64,8 +63,8 @@ DefinedTerm.propTypes = {
   term: PropTypes.oneOf(Object.values(Terms)),
   /** Applies to the underlined term */
   termTextTransform: PropTypes.string,
-  /** @ignore from withIntl */
+  /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };
 
-export default withIntl(DefinedTerm);
+export default injectIntl(DefinedTerm);

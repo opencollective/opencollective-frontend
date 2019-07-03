@@ -3,7 +3,6 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../graphql/mutations';
-import withIntl from '../lib/withIntl';
 
 import { H2, P } from './Text';
 import Container from './Container';
@@ -192,4 +191,4 @@ ArchiveCollective.propTypes = {
   unarchiveCollective: PropTypes.func,
 };
 
-export default withIntl(addArchiveCollectiveMutation(addUnarchiveCollectiveMutation(ArchiveCollective)));
+export default addArchiveCollectiveMutation(addUnarchiveCollectiveMutation(ArchiveCollective));

@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import withIntl from '../lib/withIntl';
-
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -61,4 +59,4 @@ class RedeemSuccess extends React.Component {
   }
 }
 
-export default withIntl(RedeemSuccess);
+export default RedeemSuccess;

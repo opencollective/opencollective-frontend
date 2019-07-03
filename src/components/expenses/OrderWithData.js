@@ -4,8 +4,6 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
-
 import Error from '../Error';
 import Order from './Order';
 
@@ -99,4 +97,4 @@ const getOrderQuery = gql`
 `;
 
 export const addOrderData = graphql(getOrderQuery);
-export default addOrderData(withIntl(OrderWithData));
+export default addOrderData(OrderWithData);

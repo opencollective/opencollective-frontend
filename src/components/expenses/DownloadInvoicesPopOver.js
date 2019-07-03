@@ -9,7 +9,6 @@ import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
 import { FileDownload } from 'styled-icons/material/FileDownload';
 
-import withIntl from '../../lib/withIntl';
 import { formatCurrency, imagePreview } from '../../lib/utils';
 import { defaultImage } from '../../constants/collectives';
 
@@ -218,4 +217,4 @@ class PopoverButton extends React.Component {
   }
 }
 
-export default withIntl(addData(PopoverButton));
+export default addData(PopoverButton);

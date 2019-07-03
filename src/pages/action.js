@@ -15,8 +15,6 @@ import { withUser } from '../components/UserProvider';
 
 import { capitalize } from '../lib/utils';
 
-import withIntl from '../lib/withIntl';
-
 /**
  * This page is used to approve/reject in one click an expense or a collective
  */
@@ -142,4 +140,4 @@ const addMutationForAction = action =>
 const actions = ['approveCollective', 'approveExpense', 'rejectExpense'];
 const addMutations = compose.apply(this, actions.map(action => addMutationForAction(action)));
 
-export default withIntl(withUser(addMutations(ActionPage)));
+export default withUser(addMutations(ActionPage));

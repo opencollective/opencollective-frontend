@@ -14,7 +14,6 @@ import SectionTitle from '../components/SectionTitle';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class ExpensesPage extends React.Component {
@@ -130,4 +129,4 @@ class ExpensesPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveCoverData(ExpensesPage)));
+export default withUser(addCollectiveCoverData(ExpensesPage));

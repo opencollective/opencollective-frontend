@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { graphql, compose } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
@@ -98,4 +97,4 @@ const addGraphQL = compose(
   addGetUpdate,
 );
 
-export default addGraphQL(withIntl(PublishUpdateBtn));
+export default addGraphQL(PublishUpdateBtn);

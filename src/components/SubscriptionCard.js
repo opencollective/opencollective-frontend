@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
 import Link from './Link';
@@ -13,7 +13,6 @@ import CancelSubscriptionBtn from './CancelSubscriptionBtn';
 import PaymentMethodChooser from './PaymentMethodChooser';
 import { getSubscriptionsQuery } from '../graphql/queries';
 import Logo from './Logo';
-import withIntl from '../lib/withIntl';
 
 import { Dropdown, MenuItem, Popover, OverlayTrigger } from 'react-bootstrap';
 import { CustomToggle } from './CustomMenu';
@@ -679,4 +678,4 @@ const addMutation = graphql(updateSubscriptionQuery, {
   }),
 });
 
-export default addMutation(withIntl(SubscriptionCard));
+export default addMutation(injectIntl(SubscriptionCard));

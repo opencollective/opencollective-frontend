@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
 import { isValidEmail } from '../../lib/utils';
 
 import SmallButton from '../SmallButton';
@@ -197,4 +196,4 @@ const addMutation = graphql(payExpenseQuery, {
   }),
 });
 
-export default addMutation(withIntl(PayExpenseBtn));
+export default addMutation(injectIntl(PayExpenseBtn));

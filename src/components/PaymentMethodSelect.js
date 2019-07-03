@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import StyledSelect from './StyledSelect';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
-import withIntl from '../lib/withIntl';
 
 const PaymentMethodSelect = ({ intl, paymentMethods, defaultPaymentMethod, ...props }) => {
   return (
@@ -24,8 +24,8 @@ PaymentMethodSelect.propTypes = {
   paymentMethods: PropTypes.arrayOf(PropTypes.object).isRequired,
   /** The default payment method. Will use the first one if not provided. */
   defaultPaymentMethod: PropTypes.object,
-  /** @ignore Provided by withIntl */
+  /** @ignore Provided by injectIntl */
   intl: PropTypes.object,
 };
 
-export default withIntl(PaymentMethodSelect);
+export default injectIntl(PaymentMethodSelect);

@@ -4,8 +4,6 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
-
 import SmallButton from '../SmallButton';
 
 class ApproveExpenseBtn extends React.Component {
@@ -55,4 +53,4 @@ ApproveExpenseBtn.propTypes = {
   approveExpense: PropTypes.bool,
 };
 
-export default addMutation(withIntl(ApproveExpenseBtn));
+export default addMutation(ApproveExpenseBtn);

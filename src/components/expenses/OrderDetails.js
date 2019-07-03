@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-
-import withIntl from '../../lib/withIntl';
+import { FormattedNumber, FormattedMessage } from 'react-intl';
 
 class OrderDetails extends React.Component {
   static propTypes = {
@@ -22,8 +20,6 @@ class OrderDetails extends React.Component {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     };
-
-    this.messages = defineMessages({});
   }
 
   render() {
@@ -98,4 +94,4 @@ class OrderDetails extends React.Component {
   }
 }
 
-export default withIntl(OrderDetails);
+export default OrderDetails;

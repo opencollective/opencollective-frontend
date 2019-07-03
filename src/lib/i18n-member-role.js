@@ -39,7 +39,7 @@ const RolesTranslations = defineMessages({
 /**
  * Translate a member role
  *
- * @param {object} `intl` - see `withIntl`
+ * @param {object} `intl` - see `injectIntl`
  * @param {string} `role` - see `roles`
  */
 const formatMemberRole = (intl, role) => {

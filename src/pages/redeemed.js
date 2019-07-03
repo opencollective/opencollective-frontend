@@ -17,7 +17,6 @@ import { P, H1, H5 } from '../components/Text';
 import GiftCard from '../components/GiftCard';
 import SearchForm from '../components/SearchForm';
 
-import withIntl from '../lib/withIntl';
 import withData from '../lib/withData';
 
 import { withUser } from '../components/UserProvider';
@@ -256,4 +255,4 @@ class RedeemedPage extends React.Component {
   }
 }
 
-export default withData(withIntl(withUser(RedeemedPage)));
+export default withData(withUser(RedeemedPage));

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../constants/colors';
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 class CollectiveCategoryPicker extends React.Component {
   static propTypes = {
@@ -129,4 +128,4 @@ class CollectiveCategoryPicker extends React.Component {
   }
 }
 
-export default withIntl(CollectiveCategoryPicker);
+export default injectIntl(CollectiveCategoryPicker);

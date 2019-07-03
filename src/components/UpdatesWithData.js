@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
-import withIntl from '../lib/withIntl';
 import Updates from './Updates';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -159,4 +158,4 @@ export const addUpdatesData = graphql(getUpdatesQuery, {
   }),
 });
 
-export default addUpdatesData(withIntl(UpdatesWithData));
+export default addUpdatesData(UpdatesWithData);

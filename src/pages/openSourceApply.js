@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { URLSearchParams } from 'universal-url';
@@ -8,7 +8,6 @@ import Page from '../components/Page';
 import Loading from '../components/Loading';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
-import withIntl from '../lib/withIntl';
 import { addCreateCollectiveFromGithubMutation } from '../graphql/mutations';
 import StyledCard from '../components/StyledCard';
 import { H3, P, H2 } from '../components/Text';
@@ -236,4 +235,4 @@ class OpenSourceApplyPage extends Component {
   }
 }
 
-export default withIntl(withUser(addCreateCollectiveFromGithubMutation(OpenSourceApplyPage)));
+export default injectIntl(withUser(addCreateCollectiveFromGithubMutation(OpenSourceApplyPage)));

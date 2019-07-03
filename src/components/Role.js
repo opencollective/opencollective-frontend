@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
-import withIntl from '../lib/withIntl';
 import Container from './Container';
 
 const RolesWrapper = styled(Container)`
@@ -62,4 +61,4 @@ class Role extends React.Component {
   }
 }
 
-export default withIntl(Role);
+export default injectIntl(Role);

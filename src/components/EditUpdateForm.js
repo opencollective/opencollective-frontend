@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { pick, get } from 'lodash';
 import { Box } from '@rebass/grid';
 
@@ -13,7 +13,6 @@ import Container from './Container';
 import StyledCheckbox from './StyledCheckbox';
 
 import storage from '../lib/storage';
-import withIntl from '../lib/withIntl';
 
 const UpdateFormWrapper = styled(Container)`
   width: 100%;
@@ -43,7 +42,6 @@ class EditUpdateForm extends React.Component {
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
-    intl: PropTypes.object.isRequired,
     mode: PropTypes.string,
   };
 
@@ -51,10 +49,6 @@ class EditUpdateForm extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-
-    this.messages = defineMessages({
-      'title.label': { id: 'updates.new.title.label', defaultMessage: 'Title' },
-    });
 
     this.state = {
       modified: false,
@@ -232,4 +226,4 @@ class EditUpdateForm extends React.Component {
   }
 }
 
-export default withIntl(EditUpdateForm);
+export default EditUpdateForm;

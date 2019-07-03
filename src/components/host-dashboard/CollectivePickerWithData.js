@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick } from 'lodash';
 
-import withIntl from '../../lib/withIntl';
 import Currency from '../Currency';
 import ConnectPaypal from '../ConnectPaypal';
 import AddFundsForm from '../AddFundsForm';
@@ -381,4 +380,4 @@ const addMutation = graphql(addFundsToCollectiveQuery, {
   }),
 });
 
-export default addMutation(withIntl(CollectivePickerWithData));
+export default addMutation(injectIntl(CollectivePickerWithData));

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
-import withIntl from '../../lib/withIntl';
 import colors from '../../constants/colors';
 import { capitalize } from '../../lib/utils';
 
@@ -242,4 +241,4 @@ class Order extends React.Component {
   }
 }
 
-export default withIntl(Order);
+export default injectIntl(Order);

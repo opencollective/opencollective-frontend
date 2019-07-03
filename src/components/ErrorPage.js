@@ -9,7 +9,6 @@ import { Support } from 'styled-icons/boxicons-regular/Support';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Redo } from 'styled-icons/fa-solid/Redo';
 
-import withIntl from '../lib/withIntl';
 import { objectToQueryString } from '../lib/url_helpers';
 import Header from './Header';
 import Body from './Body';
@@ -199,4 +198,4 @@ ${truncate(stackTrace, { length: 6000 })}
   }
 }
 
-export default withIntl(ErrorPage);
+export default ErrorPage;

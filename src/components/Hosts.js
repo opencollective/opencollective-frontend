@@ -5,8 +5,7 @@ import Body from './Body';
 import Footer from './Footer';
 import HostsWithData from './HostsWithData';
 import HostsCover from './HostsCover';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 class Hosts extends React.Component {
   static propTypes = {
@@ -80,4 +79,4 @@ class Hosts extends React.Component {
   }
 }
 
-export default withIntl(Hosts);
+export default injectIntl(Hosts);

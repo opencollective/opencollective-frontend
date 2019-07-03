@@ -17,7 +17,6 @@ import StyledCard from './StyledCard';
 import MessageBox from './MessageBox';
 import StyledRadioList from './StyledRadioList';
 import { getPaymentMethodName, paymentMethodExpiration } from '../lib/payment_method_label';
-import withIntl from '../lib/withIntl';
 import { CollectiveType } from '../constants/collectives';
 import { formatCurrency } from '../lib/utils';
 
@@ -358,4 +357,4 @@ ContributePayment.defaultProps = {
   hideCreditCardPostalCode: false,
 };
 
-export default withIntl(withStripeLoader(ContributePayment));
+export default withStripeLoader(ContributePayment);

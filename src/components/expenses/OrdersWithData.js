@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
-import withIntl from '../../lib/withIntl';
-
 import Error from '../Error';
 import Orders from './Orders';
 
@@ -145,4 +143,4 @@ export const addOrdersData = graphql(getOrdersQuery, {
   }),
 });
 
-export default addOrdersData(withIntl(OrdersWithData));
+export default addOrdersData(OrdersWithData);

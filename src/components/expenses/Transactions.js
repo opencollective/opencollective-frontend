@@ -4,7 +4,6 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
 
-import withIntl from '../../lib/withIntl';
 import colors from '../../constants/colors';
 
 import Transaction from './Transaction';
@@ -203,4 +202,4 @@ class Transactions extends React.Component {
   }
 }
 
-export default withIntl(Transactions);
+export default Transactions;

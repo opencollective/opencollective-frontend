@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import gql from 'graphql-tag';
 import InputField from './InputField';
 import SmallButton from './SmallButton';
@@ -224,4 +223,4 @@ const addMutation = graphql(editConnectedAccountQuery, {
   }),
 });
 
-export default addMutation(withIntl(EditTwitterAccount));
+export default addMutation(injectIntl(EditTwitterAccount));

@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
 import { Email } from 'styled-icons/material/Email';
 import { getBaseApiUrl } from '../lib/utils';
-import withIntl from '../lib/withIntl';
 import Page from '../components/Page';
 import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
@@ -94,4 +93,4 @@ class UnsubscribeEmail extends React.Component {
   }
 }
 
-export default withIntl(withUser(UnsubscribeEmail));
+export default withUser(UnsubscribeEmail);

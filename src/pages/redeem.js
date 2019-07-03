@@ -6,7 +6,7 @@ import sanitizeHtml from 'sanitize-html';
 import { graphql } from 'react-apollo';
 import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
 import { Router } from '../server/pages';
@@ -23,7 +23,6 @@ import { P, H1, H5 } from '../components/Text';
 import { getLoggedInUserQuery } from '../graphql/queries';
 import { isValidEmail } from '../lib/utils';
 
-import withIntl from '../lib/withIntl';
 import StyledButton from '../components/StyledButton';
 
 const Error = styled(P)`
@@ -77,7 +76,7 @@ class RedeemPage extends React.Component {
 
   static propTypes = {
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
     LoggedInUser: PropTypes.object, // from withUser
     code: PropTypes.string,
@@ -255,4 +254,4 @@ const addMutation = graphql(redeemMutation, {
   }),
 });
 
-export default withIntl(withUser(addMutation(RedeemPage)));
+export default injectIntl(withUser(addMutation(RedeemPage)));

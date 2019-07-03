@@ -4,8 +4,7 @@ import { Bars as MenuIcon } from 'styled-icons/fa-solid/Bars';
 import SearchIcon from './SearchIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import SearchForm from './SearchForm';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
 
 import Hide from './Hide';
@@ -59,16 +58,6 @@ class TopBar extends React.Component {
     className: '',
     showSearch: true,
   };
-
-  constructor(props) {
-    super(props);
-    this.messages = defineMessages({
-      'menu.homepage': {
-        id: 'menu.homepage',
-        defaultMessage: 'Go to Open Collective Homepage',
-      },
-    });
-  }
 
   render() {
     const { className, loadingLoggedInUser, showSearch } = this.props;
@@ -161,4 +150,4 @@ class TopBar extends React.Component {
   }
 }
 
-export default withIntl(withUser(TopBar));
+export default withUser(TopBar);

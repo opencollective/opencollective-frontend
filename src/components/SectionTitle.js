@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Box } from '@rebass/grid';
+import { defineMessages, injectIntl } from 'react-intl';
 
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
 import Link from './Link';
 import Container from './Container';
 import { H2 } from './Text';
@@ -168,4 +167,4 @@ class SectionTitle extends React.Component {
   }
 }
 
-export default withIntl(SectionTitle);
+export default injectIntl(SectionTitle);
