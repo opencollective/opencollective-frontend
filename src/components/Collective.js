@@ -66,9 +66,6 @@ class Collective extends React.Component {
       'collective.isApproved.description': {
         id: 'collective.isApproved.description',
         defaultMessage: 'The collective has been approved by the host ({host}) on {date}',
-        values: {
-          date: <FormattedDate value={collective.approvedAt} month="long" year="numeric" />,
-        },
       },
       'collective.donate': {
         id: 'collective.donate',

@@ -134,6 +134,8 @@
   "collective.hostFeePercent.description": "Commission on all the donations received by the collectives that you are hosting to cover your administrative costs.",
   "collective.hostFeePercent.label": "Комиссия представителя",
   "collective.image.label": "Аватар",
+  "collective.isApproved": "{name} has been approved.",
+  "collective.isApproved.description": "The collective has been approved by the host ({host}) on {date}",
   "collective.isArchived": "{name} был помещён в архив.",
   "collective.isArchived.description": "Этот коллектив добавили в архив, и он не может быть использован.",
   "collective.isArchived.edit.description": "Этот {type} был добавлен в архив и больше не может быть использован.",

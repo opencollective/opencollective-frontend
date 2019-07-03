@@ -134,6 +134,8 @@
   "collective.hostFeePercent.description": "Commission on all the donations received by the collectives that you are hosting to cover your administrative costs.",
   "collective.hostFeePercent.label": "ホストの手数料",
   "collective.image.label": "アバター",
+  "collective.isApproved": "{name} has been approved.",
+  "collective.isApproved.description": "The collective has been approved by the host ({host}) on {date}",
   "collective.isArchived": "{name} はアーカイブされています。",
   "collective.isArchived.description": "This collective has been archived and can no longer be used for any activities.",
   "collective.isArchived.edit.description": "This {type} has been archived and can no longer be used for any activities.",

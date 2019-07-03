@@ -134,6 +134,8 @@
   "collective.hostFeePercent.description": "Commission sur tous les dons reçus par les collectifs que vous hébergez pour couvrir vos frais administratifs.",
   "collective.hostFeePercent.label": "Commission de l'hôte",
   "collective.image.label": "Avatar",
+  "collective.isApproved": "{name} has been approved.",
+  "collective.isApproved.description": "The collective has been approved by the host ({host}) on {date}",
   "collective.isArchived": "{name} a été archivé.",
   "collective.isArchived.description": "Ce collectif a été archivé et ne peut plus être utilisé.",
   "collective.isArchived.edit.description": "Ce {type} a été archivé et ne peut plus être utilisé.",
