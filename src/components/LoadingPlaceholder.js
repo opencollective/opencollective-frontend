@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
-import { layout } from 'styled-system';
+import { layout, space } from 'styled-system';
 
 import { flicker } from './StyledKeyframes';
 
@@ -20,6 +20,7 @@ const LoadingPlaceholder = styled.div`
   width: 100%;
 
   ${layout}
+  ${space}
 `;
 
 LoadingPlaceholder.propTypes = {
