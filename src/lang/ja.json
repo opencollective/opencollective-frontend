@@ -381,6 +381,7 @@
   "discover.openSourceCollectives": "Open source collectives",
   "discover.other": "Other",
   "discover.pledgedCollectives": "Pledged collectives",
+  "discover.searchNoResult": "No collective matches the current search.",
   "discover.subTitle": "Let's make great things together.",
   "discover.title": "Discover awesome collectives to support",
   "editCollective.host.balance": "Your host currently holds {balance} on behalf of your Collective.",
