@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { Box } from '@rebass/grid';
+import themeGet from '@styled-system/theme-get';
+
 import Currency from './Currency';
 import Link from './Link';
 import Logo from './Logo';
-import StyledLink from './StyledLink';
-import styled from 'styled-components';
+import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
-import { Box } from '@rebass/grid';
-import themeGet from '@styled-system/theme-get';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo-card.svg';
 
@@ -75,16 +76,6 @@ const CollectiveWebsiteText = styled(CardText)`
   font-size: 1.2rem;
   line-height: 1.3;
   margin: 0px;
-`;
-
-const MakePledgeButtonContainer = styled.div`
-  margin: 30px;
-  text-align: center;
-`;
-
-const ClaimCollectiveButtonContainer = styled.div`
-  margin: 30px;
-  text-align: center;
 `;
 
 const CardFooter = styled.div`
@@ -169,7 +160,7 @@ class PledgedCollectiveCard extends React.Component {
               src={defaultPledgedLogo}
               type={collective.type}
               website={collective.website}
-              height={65}
+              height={70}
               width={213}
             />
           </LogoContainer>
@@ -181,21 +172,17 @@ class PledgedCollectiveCard extends React.Component {
           </CollectiveDescriptionText>
           <CollectiveWebsiteText className="website">{website}</CollectiveWebsiteText>
 
-          <MakePledgeButtonContainer>
-            <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
-              <StyledLink textAlign="center" buttonStyle="primary" buttonSize="small" minWidth={150}>
-                <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-              </StyledLink>
-            </Link>
-          </MakePledgeButtonContainer>
+          <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
+            <StyledButton mt={4} width={1} buttonStyle="primary" buttonSize="small" minWidth={150}>
+              <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
+            </StyledButton>
+          </Link>
 
-          <ClaimCollectiveButtonContainer>
-            <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
-              <StyledLink textAlign="center" buttonSize="small" buttonStyle="standard">
-                <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
-              </StyledLink>
-            </Link>
-          </ClaimCollectiveButtonContainer>
+          <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
+            <StyledButton mt={3} width={1} buttonSize="small" buttonStyle="standard">
+              <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
+            </StyledButton>
+          </Link>
         </CardBody>
         <CardFooter>
           {pledgeStats && (
