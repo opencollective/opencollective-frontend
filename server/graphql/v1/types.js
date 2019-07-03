@@ -327,6 +327,13 @@ export const MemberType = new GraphQLObjectType({
           return member.description;
         },
       },
+      publicMessage: {
+        description: 'Custom user message from member to the collective',
+        type: GraphQLString,
+        resolve(member) {
+          return member.publicMessage;
+        },
+      },
       tier: {
         type: TierType,
         resolve(member, args, req) {

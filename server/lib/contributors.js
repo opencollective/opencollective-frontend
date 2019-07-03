@@ -21,6 +21,7 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}
         mc.slug as "collectiveSlug",
         mc.image,
         MIN(m.since) as since,
+        MAX(m."publicMessage") as "publicMessage",
         ARRAY_AGG(DISTINCT m."role") as roles,
         COALESCE(SUM(t."netAmountInCollectiveCurrency"), 0) AS "totalAmountDonated",
         COALESCE(MAX(m.description), MAX(tier.name)) as description
@@ -67,6 +68,7 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         mc.slug as "collectiveSlug",
         mc.image,
         MIN(m.since) as since,
+        MAX(m."publicMessage") as "publicMessage",
         ARRAY_AGG(DISTINCT m."role") as roles,
         COALESCE(SUM(t."netAmountInCollectiveCurrency"), 0) AS "totalAmountDonated",
         COALESCE(MAX(m.description), MAX(tier.name)) as description

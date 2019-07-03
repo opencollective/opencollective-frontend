@@ -423,7 +423,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       taxAmount: taxFromCountry ? order.taxAmount : null,
       interval: order.interval,
       description: order.description || defaultDescription,
-      publicMessage: order.publicMessage,
+      publicMessage: order.publicMessage, // deprecated: '2019-07-03: This info is now stored at the Member level'
       privateMessage: order.privateMessage,
       processedAt: paymentRequired || !collective.isActive ? null : new Date(),
       MatchingPaymentMethodId: order.MatchingPaymentMethodId,
@@ -548,6 +548,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
 /**
  * Update the non-sensitive information of an order, like the public message
+ * @deprecated: '2019-07-03: Public message is now stored at the Member level'
  */
 export async function updateOrderInfo(req, orderParams) {
   const order = await models.Order.findByPk(orderParams.id);

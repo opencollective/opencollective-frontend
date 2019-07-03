@@ -1,3 +1,5 @@
+import { pick } from 'lodash';
+
 import models from '../../../models';
 import errors from '../../../lib/errors';
 import roles from '../../../constants/roles';
@@ -89,4 +91,18 @@ export function removeMember(_, args, req) {
     .then(() => {
       return membership.destroy();
     });
+}
+
+/**
+ * A mutation to edit membership. Dedicated to the member user, not the collective admin.
+ */
+export async function editMembership(_, args, req) {
+  const member = await models.Member.findByPk(args.id);
+
+  // Only admin of member collective can edit the membership
+  if (!member || !req.remoteUser || !req.remoteUser.isAdmin(member.MemberCollectiveId)) {
+    throw new errors.Unauthorized("This member doesn't exist or you don't have the permission to edit it");
+  }
+
+  return member.update(pick(args, ['publicMessage']));
 }

@@ -22,7 +22,7 @@ import {
   markOrderAsPaid,
   updateOrderInfo,
 } from './mutations/orders';
-import { createMember, removeMember } from './mutations/members';
+import { createMember, removeMember, editMembership } from './mutations/members';
 import { editTiers, editTier } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
@@ -372,6 +372,17 @@ const mutations = {
       return removeMember(_, args, req);
     },
   },
+  editMembership: {
+    type: MemberType,
+    description: 'A mutation to edit membership. Dedicated to the user, not the collective admin.',
+    args: {
+      id: { type: GraphQLNonNull(GraphQLInt) },
+      publicMessage: { type: GraphQLString },
+    },
+    resolve(_, args, req) {
+      return editMembership(_, args, req);
+    },
+  },
   createOrder: {
     type: OrderType,
     args: {
@@ -409,6 +420,7 @@ const mutations = {
   updateOrderInfo: {
     type: OrderType,
     description: 'Update the non-sensitive information of an order, like the public message',
+    deprecationReason: '2019-07-03: The public message is now stored at the Member level',
     args: {
       id: {
         type: new GraphQLNonNull(GraphQLInt),

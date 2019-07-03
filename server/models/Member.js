@@ -78,6 +78,10 @@ export default function(Sequelize, DataTypes) {
 
       description: DataTypes.STRING,
 
+      publicMessage: {
+        type: DataTypes.STRING,
+      },
+
       // Dates.
       createdAt: {
         type: DataTypes.DATE,
@@ -106,6 +110,7 @@ export default function(Sequelize, DataTypes) {
           return {
             role: this.role,
             description: this.description,
+            publicMessage: this.publicMessage,
             CreatedByUserId: this.CreatedByUserId,
             CollectiveId: this.CollectiveId,
             MemberCollectiveId: this.MemberCollectiveId,
