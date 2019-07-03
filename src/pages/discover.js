@@ -183,12 +183,12 @@ const DiscoverPage = ({ router }) => {
                 mx="auto"
                 position="relative"
                 px={2}
-                py={80}
+                py={[20, 80]}
                 width={1}
               >
                 <Flex width={[1]} justifyContent="left" flexWrap="wrap" mb={4}>
-                  <Flex width={[1, 0.8]}>
-                    <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+                  <Flex width={[1, 0.8]} my={3}>
+                    <NavList as="ul" p={0} justifyContent="space-between" width={1} css={{ maxWidth: 650 }}>
                       <NavLinkContainer>
                         <Link route="discover" params={{ show: 'all', sort: query.sort }}>
                           <NavLink
@@ -227,7 +227,7 @@ const DiscoverPage = ({ router }) => {
                     </NavList>
                   </Flex>
 
-                  <Flex width={[1, 0.2]} justifyContent="flex-end" alignItems="center">
+                  <Flex width={[1, 0.2]} justifyContent={['center', 'flex-end']} alignItems="center">
                     <StyledSelect
                       name="sort"
                       id="sort"
@@ -280,6 +280,15 @@ const DiscoverPage = ({ router }) => {
                       </Flex>
                     )}
                   </Fragment>
+                )}
+
+                {data && data.allCollectives && data.allCollectives.total === 0 && (
+                  <MessageBox my={5} type="info">
+                    <FormattedMessage
+                      id="discover.searchNoResult"
+                      defaultMessage="No collective matches the current search."
+                    />
+                  </MessageBox>
                 )}
               </Container>
             </Fragment>
