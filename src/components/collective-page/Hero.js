@@ -45,6 +45,7 @@ const MainContainer = styled.div`
     props.isFixed &&
     css`
       position: fixed;
+      top: 0;
       background: white;
     `}
 `;

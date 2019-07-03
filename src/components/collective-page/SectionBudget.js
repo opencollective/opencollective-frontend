@@ -165,11 +165,18 @@ const SectionBudget = ({ collective, stats, intl }) => {
             <P fontSize="H5" mt={1} mb={3}>
               {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
             </P>
-            <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3}>
+            {collective.isArchived ? (
+              <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3} disabled>
                 <FormattedMessage id="CollectivePage.SectionBudget.SubmitExpense" defaultMessage="Submit Expenses" /> →
               </StyledButton>
-            </Link>
+            ) : (
+              <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3}>
+                  <FormattedMessage id="CollectivePage.SectionBudget.SubmitExpense" defaultMessage="Submit Expenses" />{' '}
+                  →
+                </StyledButton>
+              </Link>
+            )}
           </Box>
           <Container flex="1" background="#F5F7FA" py={16} px={24}>
             <P fontSize="Tiny" textTransform="uppercase" color="black.700">
@@ -197,6 +204,7 @@ SectionBudget.propTypes = {
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    isArchived: PropTypes.bool,
   }),
 
   /** Stats */
