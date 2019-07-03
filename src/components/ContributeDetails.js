@@ -192,14 +192,16 @@ const ContributeDetails = ({
       {customFields &&
         customFields.length > 0 &&
         customFields.map(customField => {
+          const value = customData && customData[customField.name] ? customData[customField.name] : '';
           return (
             <StyledInputField mt={2} key={customField.name} htmlFor={customField.name} label={customField.label}>
               {fieldProps => (
                 <StyledInput
                   type={customField.type}
                   {...fieldProps}
-                  value={customData[customField.name]}
+                  value={value}
                   width={1}
+                  required={customField.required}
                   onChange={({ target }) => onCustomFieldsChange(customField.name, target.value)}
                 />
               )}
