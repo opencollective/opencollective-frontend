@@ -8,26 +8,44 @@ import GlobalStyles from './global-styles';
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
-  static async getInitialProps(context) {
-    const props = await super.getInitialProps(context);
-    const {
-      req: { locale, localeDataScript },
-      renderPage,
-    } = context;
+  static async getInitialProps(ctx) {
+    const { locale, localeDataScript } = ctx.req;
 
     const sheet = new ServerStyleSheet();
-    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />));
-    const styleTags = sheet.getStyleElement();
-    const styles = flush();
+    const originalRenderPage = ctx.renderPage;
 
-    return {
-      ...props,
-      ...page,
-      locale,
-      localeDataScript,
-      styleTags,
-      styles,
-    };
+    try {
+      // The new recommended way to process Styled Components
+      // unfortunately not compatible with styled-jsx as is
+      // ctx.renderPage = () =>
+      //   originalRenderPage({
+      //     enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
+      //   })
+
+      // The old recommended way to process Styled Components
+      const page = originalRenderPage(App => props => sheet.collectStyles(<App {...props} />));
+
+      const styledJsxStyles = flush();
+      const styledComponentsStyles = sheet.getStyleElement();
+
+      const initialProps = await Document.getInitialProps(ctx);
+
+      return {
+        ...initialProps,
+        ...page,
+        locale,
+        localeDataScript,
+        styles: (
+          <React.Fragment>
+            {initialProps.styles}
+            {styledJsxStyles}
+            {styledComponentsStyles}
+          </React.Fragment>
+        ),
+      };
+    } finally {
+      sheet.seal();
+    }
   }
 
   constructor(props) {
@@ -51,7 +69,7 @@ export default class IntlDocument extends Document {
   render() {
     return (
       <html>
-        <Head>{this.props.styleTags}</Head>
+        <Head />
         <body>
           <GlobalStyles />
           <Main />
