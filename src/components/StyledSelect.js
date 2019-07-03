@@ -85,7 +85,7 @@ const SelectContainer = styled(Container)`
 `;
 
 SelectContainer.defaultProps = {
-  omitProps: SelectContainer.defaultProps.omitProps.concat('mode'),
+  omitProps: tag.defaultProps.omitProps.concat('mode'),
 };
 
 const SelectPopupContainer = styled(Container)`
