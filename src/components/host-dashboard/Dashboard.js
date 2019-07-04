@@ -165,7 +165,12 @@ class HostDashboard extends React.Component {
 }
 
 const getDataQuery = gql`
-  query Collective($hostCollectiveSlug: String, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
+  query Collective(
+    $hostCollectiveSlug: String
+    $orderBy: CollectiveOrderField
+    $orderDirection: OrderDirection
+    $isActive: Boolean
+  ) {
     Collective(slug: $hostCollectiveSlug) {
       id
       slug
@@ -182,7 +187,7 @@ const getDataQuery = gql`
         balance
         currency
       }
-      collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
+      collectives(orderBy: $orderBy, orderDirection: $orderDirection, isActive: $isActive) {
         total
         collectives {
           id
@@ -220,6 +225,7 @@ export const addData = graphql(getDataQuery, {
         includeHostedCollectives: true,
         orderBy: 'name',
         orderDirection: 'ASC',
+        isActive: true,
       },
     };
   },
