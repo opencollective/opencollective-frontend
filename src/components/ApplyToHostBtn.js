@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import withIntl from '../lib/withIntl';
 import Button from './Button';
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
 import { get } from 'lodash';
@@ -59,4 +58,4 @@ class ApplyToHostBtn extends React.Component {
   }
 }
 
-export default withIntl(ApplyToHostBtn);
+export default ApplyToHostBtn;

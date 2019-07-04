@@ -17,7 +17,8 @@ import { P, H1, H5 } from '../components/Text';
 import GiftCard from '../components/GiftCard';
 import SearchForm from '../components/SearchForm';
 
-import withIntl from '../lib/withIntl';
+import withData from '../lib/withData';
+
 import { withUser } from '../components/UserProvider';
 
 const paymentMethodQuery = gql`
@@ -143,7 +144,7 @@ class RedeemedPage extends React.Component {
     const { amount, emitter, collective, currency, loading } = this.state;
 
     let error;
-    if (get(LoggedInUser, 'collective.id') !== get(collective, 'id')) {
+    if (LoggedInUser && collective && get(LoggedInUser, 'collective.id') !== get(collective, 'id')) {
       error = 'account mismatch';
     }
 
@@ -254,4 +255,4 @@ class RedeemedPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(RedeemedPage));
+export default withData(withUser(RedeemedPage));

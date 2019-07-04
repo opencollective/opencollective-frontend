@@ -21,7 +21,6 @@ import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -202,4 +201,4 @@ const addGraphQL = compose(
   addMutation,
 );
 
-export default withIntl(withUser(addGraphQL(CreateUpdatePage)));
+export default withUser(addGraphQL(CreateUpdatePage));

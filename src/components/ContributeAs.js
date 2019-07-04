@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { capitalize, omit, uniqBy } from 'lodash';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 
 import { Search } from 'styled-icons/octicons/Search';
@@ -19,7 +19,6 @@ import StyledRadioList from './StyledRadioList';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
-import withIntl from '../lib/withIntl';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
@@ -91,7 +90,7 @@ const useForm = ({ onProfileChange }) => {
       lineHeight: 'Paragraph',
       onBlur: event => {
         const hasValue = event.target.value;
-        const wasUpdatedOnce = state.hasOwnProperty(event.target.name);
+        const wasUpdatedOnce = Object.prototype.hasOwnProperty.call(state, event.target.name);
         if (hasValue || wasUpdatedOnce) event.target.reportValidity();
       },
       onInvalid: event => {
@@ -317,4 +316,4 @@ ContributeAs.defaultProps = {
   onProfileChange: () => {}, // noop
 };
 
-export default withIntl(ContributeAs);
+export default injectIntl(ContributeAs);

@@ -8,11 +8,10 @@ import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { Lock } from 'styled-icons/fa-solid';
 import { get } from 'lodash';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
 import Container from './Container';
 import Avatar from './Avatar';
-import withIntl from '../lib/withIntl';
 import Role from './Role';
 import Link from './Link';
 import MessageBox from './MessageBox';
@@ -362,4 +361,4 @@ const addUpdateMutations = compose(
   deleteUpdateMutation,
 );
 
-export default withIntl(addUpdateMutations(StyledUpdate));
+export default injectIntl(addUpdateMutations(StyledUpdate));

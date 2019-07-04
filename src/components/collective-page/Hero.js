@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Flex } from '@rebass/grid';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
 import { Twitter } from 'styled-icons/feather/Twitter';
@@ -11,7 +11,6 @@ import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { CheckCircle } from 'styled-icons/feather/CheckCircle';
 
-import withIntl from '../../lib/withIntl';
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../lib/url_helpers';
 import StyledButton from '../StyledButton';
@@ -60,6 +59,7 @@ class Hero extends Component {
     /** The collective to display */
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
+      type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       image: PropTypes.string,
@@ -97,7 +97,7 @@ class Hero extends Component {
     /** Define if we need to display special actions like the "Edit collective" button */
     canEdit: PropTypes.bool,
 
-    /** @ignore from withIntl */
+    /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
   };
 
@@ -129,34 +129,33 @@ class Hero extends Component {
             alignItems={isFixed ? 'flex-start' : ['center', 'flex-start']}
           >
             {/* Collective presentation (name, logo, description...) */}
-            <Flex flexDirection={isFixed ? 'row' : 'column'}>
-              <Flex justifyContent={['center', 'flex-start']} alignItems="center">
-                <Container position="relative">
-                  <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-                    <Avatar
-                      borderRadius="25%"
-                      src={collective.image}
-                      type={collective.type}
-                      radius={isFixed ? 40 : 128}
-                      name={collective.name}
-                    />
-                  </LinkCollective>
-                  {canEdit && !isFixed && (
-                    <Container position="absolute" right={-10} bottom={-10}>
-                      <Link route="editCollective" params={{ slug }}>
-                        <StyledRoundButton size={40} bg="#F0F2F5">
-                          <Cog size={24} color="#4B4E52" />
-                        </StyledRoundButton>
-                      </Link>
-                    </Container>
-                  )}
-                </Container>
-              </Flex>
+            <Flex flexDirection={isFixed ? 'row' : 'column'} alignItems={isFixed ? 'center' : ['center', 'flex-start']}>
+              <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
+                <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
+                  <Avatar
+                    borderRadius="25%"
+                    src={collective.image}
+                    type={collective.type}
+                    radius={isFixed ? 40 : 128}
+                    name={collective.name}
+                  />
+                </LinkCollective>
+                {canEdit && !isFixed && (
+                  <Container position="absolute" right={-10} bottom={-5}>
+                    <Link route="editCollective" params={{ slug }}>
+                      <StyledRoundButton size={40} bg="#F0F2F5">
+                        <Cog size={24} color="#4B4E52" />
+                      </StyledRoundButton>
+                    </Link>
+                  </Container>
+                )}
+              </Container>
               <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
                 <H1
                   ml={isFixed ? 2 : undefined}
                   color="black.800"
                   fontSize={isFixed ? 'H5' : 'H3'}
+                  lineHeight={isFixed ? 'H5' : 'H3'}
                   textAlign={['center', 'left']}
                 >
                   {collective.name || collective.slug}
@@ -222,7 +221,7 @@ class Hero extends Component {
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          height={isFixed ? 56 : [56, null, null, 84]}
+          height={isFixed ? 54 : [54, null, null, 84]}
           flexWrap="wrap"
           width={1}
         >
@@ -248,4 +247,4 @@ class Hero extends Component {
   }
 }
 
-export default withIntl(Hero);
+export default injectIntl(Hero);

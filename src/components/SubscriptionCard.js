@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
 import Link from './Link';
@@ -13,7 +13,6 @@ import CancelSubscriptionBtn from './CancelSubscriptionBtn';
 import PaymentMethodChooser from './PaymentMethodChooser';
 import { getSubscriptionsQuery } from '../graphql/queries';
 import Logo from './Logo';
-import withIntl from '../lib/withIntl';
 
 import { Dropdown, MenuItem, Popover, OverlayTrigger } from 'react-bootstrap';
 import { CustomToggle } from './CustomMenu';
@@ -67,7 +66,7 @@ class SubscriptionCard extends React.Component {
       'subscription.whyPastDueText': {
         id: 'subscription.whyPastDueText',
         defaultMessage:
-          'We were unable to charge your last payment. Please update your payment info to continue this subscription.',
+          'We were unable to charge your last payment. Please update your payment info to continue this recurring financial contribution.',
       },
       'subscription.updated': {
         id: 'subscription.updated',
@@ -679,4 +678,4 @@ const addMutation = graphql(updateSubscriptionQuery, {
   }),
 });
 
-export default addMutation(withIntl(SubscriptionCard));
+export default addMutation(injectIntl(SubscriptionCard));

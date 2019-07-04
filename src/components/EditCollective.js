@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import Header from './Header';
 import Body from './Body';
@@ -10,9 +10,7 @@ import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveCover from './CollectiveCover';
 import NotificationBar from './NotificationBar';
 import { defaultBackgroundImage } from '../constants/collectives';
-import withIntl from '../lib/withIntl';
 import Loading from './Loading';
-import { Router } from '../server/pages';
 
 class EditCollective extends React.Component {
   static propTypes = {
@@ -201,7 +199,7 @@ class EditCollective extends React.Component {
                   <br />
                   or as a core contributor of the {collective.name} collective.
                 </p>
-                <SignInOrJoinFree redirect={Router.asPath} />
+                <SignInOrJoinFree />
               </div>
             )}
             {canEditCollective && !loggedInEditDataLoaded && <Loading />}
@@ -229,4 +227,4 @@ class EditCollective extends React.Component {
   }
 }
 
-export default withIntl(EditCollective);
+export default injectIntl(EditCollective);

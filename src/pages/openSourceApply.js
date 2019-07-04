@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { URLSearchParams } from 'universal-url';
@@ -8,7 +8,6 @@ import Page from '../components/Page';
 import Loading from '../components/Loading';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
-import withIntl from '../lib/withIntl';
 import { addCreateCollectiveFromGithubMutation } from '../graphql/mutations';
 import StyledCard from '../components/StyledCard';
 import { H3, P, H2 } from '../components/Text';
@@ -70,7 +69,10 @@ class OpenSourceApplyPage extends Component {
       } else {
         this.setState({
           loadingRepos: false,
-          result: { type: 'info', mesg: "We couldn't find any repositories (with >= 100 stars) linked to the account" },
+          result: {
+            type: 'info',
+            mesg: "We couldn't find any repositories (with >= 100 stars) linked to this account",
+          },
         });
       }
     } catch (error) {
@@ -86,7 +88,7 @@ class OpenSourceApplyPage extends Component {
     const { repositories } = this.state;
 
     if (!LoggedInUser) {
-      return <SignInOrJoinFree redirect={Router.asPath} />;
+      return <SignInOrJoinFree />;
     } else if (!token || repositories.length === 0) {
       return this.renderConnectGithubButton();
     } else {
@@ -125,7 +127,7 @@ class OpenSourceApplyPage extends Component {
           <P textAlign="center" fontSize="1.6rem" mb={4} color="black.400">
             <FormattedMessage
               id="openSourceApply.GithubRepositories.description"
-              defaultMessage="Select a project you wish to create a collective for. Only repositories with at least 100 stars are eligible."
+              defaultMessage="Select the project you wish to create a Collective for. Only repositories with at least 100 stars are eligible."
             />
           </P>
           <Container display="flex">
@@ -166,22 +168,22 @@ class OpenSourceApplyPage extends Component {
     return (
       <StyledCard minWidth={400} maxWidth={500} border="none" minHeight={350} p={4} textAlign="center">
         <H3 mb={2}>
-          <FormattedMessage id="openSourceApply.title" defaultMessage="For Open Source projects" />
+          <FormattedMessage id="openSourceApply.title" defaultMessage="For Open Source Projects" />
         </H3>
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description.p1"
-            defaultMessage="When you do an open source project the last thing you want to worry about is creating a legal entity, keeping track of accounting and other tax reports, just because a company wants to support you financially but needs an invoice for that."
+            defaultMessage="You're creating software. You don't want to worry about creating a legal entity or seperate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project."
           />
         </P>
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description.p2"
-            defaultMessage="That's why we have created an umbrella non profit (the {osclink}) that can host your open source community. You just need to have at least 100 stars on Github, operate in full transparency and respect our {communityguidelineslink}."
+            defaultMessage="We have created the {osclink}), a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}."
             values={{
               osclink: <a href="https://opencollective.com/opensourcecollective">Open Source Collective 501c6</a>,
               communityguidelineslink: (
-                <a href="https://github.com/opencollective/opencollective/blob/master/COMMUNITY-GUIDELINES.MD">
+                <a href="https://docs.opencollective.com/help/the-open-collective-way/community-guidelines">
                   {intl.formatMessage(this.messages['guidelines'])}
                 </a>
               ),
@@ -191,7 +193,7 @@ class OpenSourceApplyPage extends Component {
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description.p3"
-            defaultMessage="50% of the commission (so 5% out of the 10%) goes to finance this non profit and pay for legal and accounting and other expenses that can be mutualized for the benefit of the open source community at large."
+            defaultMessage="Fees: 10% of funds raised. Half goes to Open Collective Inc to continue improving the software paltform, and half to the Open Source Collective to cover its legal and financial services."
           />
         </P>
         <P mb={4}>
@@ -233,4 +235,4 @@ class OpenSourceApplyPage extends Component {
   }
 }
 
-export default withIntl(withUser(addCreateCollectiveFromGithubMutation(OpenSourceApplyPage)));
+export default injectIntl(withUser(addCreateCollectiveFromGithubMutation(OpenSourceApplyPage)));

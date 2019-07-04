@@ -5,7 +5,6 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { Router } from '../server/pages';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -15,8 +14,6 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { withUser } from '../components/UserProvider';
 
 import { capitalize } from '../lib/utils';
-
-import withIntl from '../lib/withIntl';
 
 /**
  * This page is used to approve/reject in one click an expense or a collective
@@ -70,7 +67,7 @@ class ActionPage extends React.Component {
     if (!LoggedInUser) {
       return (
         <Flex justifyContent="center" alignItems="center" className="content" px={2} py={5}>
-          <SignInOrJoinFree redirect={Router.asPath} />
+          <SignInOrJoinFree />
         </Flex>
       );
     } else {
@@ -143,4 +140,4 @@ const addMutationForAction = action =>
 const actions = ['approveCollective', 'approveExpense', 'rejectExpense'];
 const addMutations = compose.apply(this, actions.map(action => addMutationForAction(action)));
 
-export default withIntl(withUser(addMutations(ActionPage)));
+export default withUser(addMutations(ActionPage));

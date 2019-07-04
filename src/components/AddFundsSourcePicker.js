@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get, groupBy } from 'lodash';
-import withIntl from '../lib/withIntl';
 
 class AddFundsSourcePicker extends React.Component {
   static propTypes = {
@@ -175,12 +174,12 @@ const addOrganizationsData = graphql(getSourcesQuery, {
   }),
 });
 
-export const AddFundsSourcePickerWithData = withIntl(addOrganizationsData(AddFundsSourcePicker));
+export const AddFundsSourcePickerWithData = injectIntl(addOrganizationsData(AddFundsSourcePicker));
 
-export const AddFundsSourcePickerForUserWithData = withIntl(AddFundsSourcePickerForUser);
+export const AddFundsSourcePickerForUserWithData = injectIntl(AddFundsSourcePickerForUser);
 
 // for testing
-export const MockAddFundsSourcePicker = withIntl(AddFundsSourcePicker);
-export const MockAddFundsSourcePickerForUser = withIntl(AddFundsSourcePickerForUser);
+export const MockAddFundsSourcePicker = injectIntl(AddFundsSourcePicker);
+export const MockAddFundsSourcePickerForUser = injectIntl(AddFundsSourcePickerForUser);
 
 export default AddFundsSourcePickerWithData;

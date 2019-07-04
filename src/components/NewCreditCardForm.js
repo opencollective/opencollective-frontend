@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Elements, CardElement, injectStripe } from 'react-stripe-elements';
 import { Flex } from '@rebass/grid';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import { Span } from './Text';
 import StyledCheckbox from './StyledCheckbox';
-import withIntl from '../lib/withIntl';
 
 const StyledCardElement = styled(CardElement)`
   min-width: 200px;
@@ -102,4 +101,4 @@ const NewCreditCardForm = props => (
   </Elements>
 );
 
-export default withIntl(NewCreditCardForm);
+export default injectIntl(NewCreditCardForm);

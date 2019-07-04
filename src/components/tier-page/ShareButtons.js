@@ -1,5 +1,5 @@
 import React from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import copy from 'copy-to-clipboard';
@@ -13,7 +13,6 @@ import { ContentCopy } from 'styled-icons/material/ContentCopy';
 
 // Open Collective Frontend imports
 import { facebooKShareURL, tweetURL, linkedInShareURL, mailToURL } from '../../lib/url_helpers';
-import withIntl from '../../lib/withIntl';
 
 // Local tier page imports
 import ExternalLinkNewTab from '../ExternalLinkNewTab';
@@ -73,4 +72,4 @@ ShareButtons.propTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default withIntl(ShareButtons);
+export default injectIntl(ShareButtons);

@@ -142,7 +142,7 @@ export const createApplicationMutation = gql`
 `;
 
 export const deleteApplicationMutation = gql`
-  mutation deleteApplication($id: String!) {
+  mutation deleteApplication($id: Int!) {
     deleteApplication(id: $id) {
       id
     }

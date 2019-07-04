@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { WithContext as ReactTags } from 'react-tag-input';
 
 import '../styles/react-tags.css';
@@ -85,4 +84,4 @@ class InputTypeTags extends React.Component {
   }
 }
 
-export default withIntl(InputTypeTags);
+export default injectIntl(InputTypeTags);

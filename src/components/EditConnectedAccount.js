@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { HelpBlock, Button } from 'react-bootstrap';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { connectAccount } from '../lib/api';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -127,4 +126,4 @@ class EditConnectedAccount extends React.Component {
   }
 }
 
-export default withIntl(EditConnectedAccount);
+export default injectIntl(EditConnectedAccount);

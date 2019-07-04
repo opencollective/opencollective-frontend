@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isEqual } from 'lodash';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { defaultImage, defaultBackgroundImage } from '../constants/collectives';
@@ -14,8 +14,7 @@ import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import Currency from './Currency';
 
-const hasGoals = (settings = {}) =>
-  get(settings, 'goals', []).length > 0 && !isEqual(get(settings, 'goals', [])[0], {});
+const hasGoals = (settings = {}) => get(settings, 'goals[0].amount', 0) > 0;
 
 const getGoalPercentage = ({ type, amount }, { balance, yearlyBudget }) =>
   type === 'balance' ? balance / amount : yearlyBudget / amount;
@@ -119,15 +118,21 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
               {get(stats, 'backers.all', 0)}
             </P>
             <P fontSize="1.2rem">
-              <FormattedMessage id="home.backers" defaultMessage="backers" />
+              <FormattedMessage id="home.backers" defaultMessage="financial contributors" />
             </P>
           </Flex>,
-          <Flex width={0.5} alignItems="center" flexDirection="column" key="monthly spending">
-            <P fontSize="1.2rem" fontWeight="bold">
-              <Currency value={get(stats, 'monthlySpending', 0)} currency={currency} precision={0} abbreviate />
-            </P>
+          <Flex width={0.5} alignItems="center" flexDirection="column" key="spending">
+            <Flex>
+              <P fontSize="1.2rem" fontWeight="bold">
+                <Currency value={get(stats, 'monthlySpending') || 0} currency={currency} precision={0} abbreviate />
+              </P>
+              <P fontSize="1.2rem">
+                /
+                <FormattedMessage id="month" defaultMessage="month" />
+              </P>
+            </Flex>
             <P fontSize="1.2rem">
-              <FormattedMessage id="collectiveStats.monthlySpending" defaultMessage="monthly spending" />
+              <FormattedMessage id="collectiveStats.monthlySpending" defaultMessage="spending" />
             </P>
           </Flex>,
         ]

@@ -3,12 +3,11 @@ import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import { graphql, compose } from 'react-apollo';
 import { get, sortBy } from 'lodash';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 
 import { Add } from 'styled-icons/material/Add';
 
-import withIntl from '../lib/withIntl';
 import { paymentMethodLabel } from '../lib/payment_method_label';
 import { H3, Span } from './Text';
 import Link from './Link';
@@ -134,11 +133,14 @@ class EditPaymentMethods extends React.Component {
         <React.Fragment>
           <FormattedMessage
             id="errors.PM.Remove.HasActiveSubscriptions"
-            defaultMessage="This payment method cannot be removed because it has active subscriptions."
+            defaultMessage="This payment method cannot be removed because it has active recurring financial contributions."
           />{' '}
           <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
             <Span textTransform="capitalize">
-              <FormattedMessage id="paymentMethod.editSubscriptions" defaultMessage="edit subscriptions" />
+              <FormattedMessage
+                id="paymentMethod.editSubscriptions"
+                defaultMessage="edit recurring financial contributions"
+              />
             </Span>
           </Link>
         </React.Fragment>
@@ -337,4 +339,4 @@ const addData = compose(
   addCreditCard,
 );
 
-export default withIntl(withStripeLoader(addData(EditPaymentMethods)));
+export default injectIntl(withStripeLoader(addData(EditPaymentMethods)));

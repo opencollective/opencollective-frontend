@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 
 import EventsWithData from '../components/EventsWithData';
 
-import withIntl from '../lib/withIntl';
-
 class EventsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
     return { collectiveSlug };
@@ -20,4 +18,4 @@ class EventsPage extends React.Component {
   }
 }
 
-export default withIntl(EventsPage);
+export default EventsPage;

@@ -9,7 +9,6 @@ import { get } from 'lodash';
 import { Check } from 'styled-icons/boxicons-regular/Check';
 import { Github } from 'styled-icons/fa-brands/Github';
 
-import withIntl from '../../lib/withIntl';
 import { withUser } from '../UserProvider';
 import Loading from '../Loading';
 import StyledCard from '../StyledCard';
@@ -151,4 +150,4 @@ class HostPendingApplications extends React.Component {
   }
 }
 
-export default withUser(withIntl(HostPendingApplications));
+export default withUser(HostPendingApplications);

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { CollectiveCategory } from '../constants/collectives';
-import withIntl from '../lib/withIntl';
 
 const TranslatedTags = defineMessages({
   [CollectiveCategory.ASSOCIATION]: {
@@ -93,4 +92,4 @@ class I18nCollectiveTags extends React.Component {
   }
 }
 
-export default withIntl(I18nCollectiveTags);
+export default injectIntl(I18nCollectiveTags);

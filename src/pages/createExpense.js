@@ -6,8 +6,8 @@ import gql from 'graphql-tag';
 import { Box, Flex } from '@rebass/grid';
 import { pick } from 'lodash';
 
-import ExpensesStatsWithData from '../apps/expenses/components/ExpensesStatsWithData';
-import CreateExpenseForm from '../apps/expenses/components/CreateExpenseForm';
+import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
+import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
@@ -16,7 +16,6 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class CreateExpensePage extends React.Component {
@@ -273,4 +272,4 @@ const addData = compose(
   addMutation,
 );
 
-export default withIntl(withUser(addData(CreateExpensePage)));
+export default withUser(addData(CreateExpensePage));

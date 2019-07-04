@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../lib/api';
-import withIntl from '../lib/withIntl';
 import Currency from './Currency';
 import SmallButton from './SmallButton';
 import MessageBox from './MessageBox';
@@ -186,4 +185,4 @@ class ConnectPaypal extends React.Component {
   }
 }
 
-export default withIntl(ConnectPaypal);
+export default ConnectPaypal;

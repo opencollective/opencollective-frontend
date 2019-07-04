@@ -4,8 +4,6 @@ import Head from 'next/head';
 
 import EventsWithData from '../components/EventsWithData';
 
-import withIntl from '../lib/withIntl';
-
 class EventsIframe extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id } }) {
     return { collectiveSlug, id };
@@ -187,4 +185,4 @@ class EventsIframe extends React.Component {
   }
 }
 
-export default withIntl(EventsIframe);
+export default EventsIframe;

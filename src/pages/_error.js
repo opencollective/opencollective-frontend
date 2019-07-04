@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import withIntl from '../lib/withIntl';
 import ErrorPage from '../components/ErrorPage';
 import { withUser } from '../components/UserProvider';
 
@@ -40,4 +39,4 @@ class Error extends React.Component {
   }
 }
 
-export default withIntl(withUser(Error));
+export default withUser(Error);

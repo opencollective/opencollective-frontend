@@ -8,7 +8,6 @@ import { Flex } from '@rebass/grid';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { URLSearchParams } from 'universal-url';
 
-import withIntl from '../lib/withIntl';
 import { getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 
 import { Router, Link } from '../server/pages';
@@ -185,7 +184,7 @@ class ClaimCollectivePage extends React.Component {
         <Body>
           {(step === 'loading' || step === 'signin') && (
             <Flex id="content" flexDirection="column" alignItems="center" mt={6} mb={6} p={2}>
-              {loadingLoggedInUser ? <Loading /> : <SignInOrJoinFree redirect={Router.asPath} />}
+              {loadingLoggedInUser ? <Loading /> : <SignInOrJoinFree />}
             </Flex>
           )}
 
@@ -379,4 +378,4 @@ const addGraphQL = compose(
 );
 
 export { ClaimCollectivePage as MockClaimCollectivePage };
-export default withUser(addGraphQL(withIntl(ClaimCollectivePage)));
+export default withUser(addGraphQL(ClaimCollectivePage));

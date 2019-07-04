@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Query, Mutation } from 'react-apollo';
 import { Flex, Box } from '@rebass/grid';
-import { get, update } from 'lodash';
+import { get, update, cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { createApplicationMutation, deleteApplicationMutation } from '../graphql/mutations';
@@ -16,7 +16,6 @@ import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 import StyledCard from '../components/StyledCard';
 import MessageBox from '../components/MessageBox';
-import withIntl from '../lib/withIntl';
 
 class Apps extends React.Component {
   static propTypes = {
@@ -65,13 +64,15 @@ class Apps extends React.Component {
                       mutation={deleteApplicationMutation}
                       update={(cache, { data: { deleteApplication } }) => {
                         const { LoggedInUser } = cache.readQuery({ query: getLoggedInUserApplicationsQuery });
+                        const updatedUser = cloneDeep(LoggedInUser);
+
+                        update(updatedUser, 'collective.applications', applications => {
+                          return applications ? applications.filter(a => a.id !== deleteApplication.id) : [];
+                        });
+
                         cache.writeQuery({
                           query: getLoggedInUserApplicationsQuery,
-                          data: {
-                            LoggedInUser: update(LoggedInUser, 'collective.applications', applications => {
-                              return applications ? applications.filter(a => a.id !== deleteApplication.id) : [];
-                            }),
-                          },
+                          data: { LoggedInUser: updatedUser },
                         });
                       }}
                     >
@@ -83,7 +84,7 @@ class Apps extends React.Component {
                             </MessageBox>
                           )}
                           {apiKeys.map(application => (
-                            <StyledCard m="20px 0" p={10} key={application.id}>
+                            <StyledCard m="20px 0" p={10} key={application.id} data-cy="api-key">
                               <div className="keys">
                                 <FormattedMessage
                                   id="applications.ApiKeys.code"
@@ -110,14 +111,17 @@ class Apps extends React.Component {
                     mutation={createApplicationMutation}
                     update={(cache, { data: { createApplication } }) => {
                       const { LoggedInUser } = cache.readQuery({ query: getLoggedInUserApplicationsQuery });
-                      cache.writeQuery({
-                        query: getLoggedInUserApplicationsQuery,
-                        data: {
-                          LoggedInUser: update(LoggedInUser, 'collective.applications', applications => {
-                            return applications ? [...applications, createApplication] : [createApplication];
-                          }),
-                        },
-                      });
+                      const updatedUser = cloneDeep(LoggedInUser);
+
+                      update(updatedUser, 'collective.applications', applications => {
+                        return applications ? [...applications, createApplication] : [createApplication];
+                      }),
+                        cache.writeQuery({
+                          query: getLoggedInUserApplicationsQuery,
+                          data: {
+                            LoggedInUser: updatedUser,
+                          },
+                        });
                     }}
                   >
                     {(createApplication, { loading, error }) => (
@@ -147,4 +151,4 @@ class Apps extends React.Component {
   }
 }
 
-export default withIntl(Apps);
+export default Apps;

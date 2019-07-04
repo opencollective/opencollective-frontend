@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { debounce, get, pick, isNil } from 'lodash';
@@ -11,7 +11,6 @@ import moment from 'moment';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
-import withIntl from '../lib/withIntl';
 import { Router } from '../server/pages';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency, getEnvVar, parseToBoolean } from '../lib/utils';
@@ -116,7 +115,7 @@ class CreateOrderPage extends React.Component {
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
     LoggedInUser: PropTypes.object, // from withUser
     loadingLoggedInUser: PropTypes.bool, // from withUser
@@ -254,7 +253,10 @@ class CreateOrderPage extends React.Component {
     const { stepPayment } = this.state;
     const isFixedPriceTier = this.isFixedPriceTier();
 
-    if (this.getOrderMinAmount() === 0 && (isFixedPriceTier || !stepPayment)) {
+    if (action === 'prev') {
+      // Don't validate when going back
+      return true;
+    } else if (this.getOrderMinAmount() === 0 && (isFixedPriceTier || !stepPayment)) {
       // Always ignore payment method for free tiers
       return true;
     } else if (!stepPayment) {
@@ -262,8 +264,6 @@ class CreateOrderPage extends React.Component {
       return false;
     } else if (!stepPayment.isNew) {
       // No need to validate existing payment methods
-      return true;
-    } else if (action === 'prev' && stepPayment.isNew && (stepPayment.error || !stepPayment.data)) {
       return true;
     } else if (!stepPayment.data && get(stepPayment, 'paymentMethod.token')) {
       // New credit card - if no data, stripe token has already been exchanged
@@ -665,7 +665,7 @@ class CreateOrderPage extends React.Component {
   }
 
   renderStep(step) {
-    const { LoggedInUser, data } = this.props;
+    const { data } = this.props;
     const { stepDetails, stepPayment } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
@@ -768,7 +768,6 @@ class CreateOrderPage extends React.Component {
             </H5>
             <ContributePayment
               onChange={stepPayment => this.setState({ stepPayment })}
-              paymentMethods={get(LoggedInUser, 'collective.paymentMethods', [])}
               collective={this.state.stepProfile}
               defaultValue={stepPayment}
               onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
@@ -822,7 +821,7 @@ class CreateOrderPage extends React.Component {
     const { LoggedInUser } = this.props;
 
     if (!LoggedInUser) {
-      return <SignInOrJoinFree redirect={Router.asPath} />;
+      return <SignInOrJoinFree />;
     }
 
     const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';
@@ -1058,4 +1057,4 @@ const addGraphQL = compose(
   addCreateOrderMutation,
 );
 
-export default withIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
+export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));

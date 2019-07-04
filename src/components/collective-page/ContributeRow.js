@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Flex } from '@rebass/grid';
+import { injectIntl } from 'react-intl';
 
 import { H3 } from '../Text';
 import HorizontalScroller from '../HorizontalScroller';
@@ -25,7 +26,7 @@ class ContributeRow extends React.PureComponent {
         key: PropTypes.string.isRequired,
       }),
     ).isRequired,
-    /** from withIntl */
+    /** from injectIntl */
     intl: PropTypes.object,
   };
 
@@ -61,4 +62,4 @@ class ContributeRow extends React.PureComponent {
   }
 }
 
-export default ContributeRow;
+export default injectIntl(ContributeRow);

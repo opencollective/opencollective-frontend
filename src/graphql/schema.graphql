@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jun 20 2019 14:54:01 GMT+0200 (GMT+02:00)
+# timestamp: Fri Jun 28 2019 15:34:21 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -185,7 +185,7 @@ type Collective implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -416,7 +416,7 @@ interface CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -918,7 +918,7 @@ type Event implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -1444,7 +1444,7 @@ type Mutation {
   refundTransaction(id: Int!): Transaction
   addFundsToOrg(totalAmount: Int!, CollectiveId: Int!, HostCollectiveId: Int!, description: String): PaymentMethodType
   createApplication(application: ApplicationInput!): Application
-  deleteApplication(id: String!): Application
+  deleteApplication(id: Int!): Application
   createPaymentMethod(
     type: String!
     currency: String!
@@ -2027,7 +2027,7 @@ type Organization implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -2945,7 +2945,7 @@ type User implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int

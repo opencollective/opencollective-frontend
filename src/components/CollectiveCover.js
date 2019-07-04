@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled from 'styled-components';
-import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
@@ -524,4 +523,4 @@ ${description}`;
   }
 }
 
-export default withIntl(withUser(CollectiveCover));
+export default injectIntl(withUser(CollectiveCover));

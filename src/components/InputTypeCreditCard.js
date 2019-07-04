@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormControl } from 'react-bootstrap';
-import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
 
 import { getStripe } from '../lib/stripe';
@@ -130,4 +129,4 @@ class InputTypeCreditCard extends React.Component {
   }
 }
 
-export default withIntl(InputTypeCreditCard);
+export default InputTypeCreditCard;

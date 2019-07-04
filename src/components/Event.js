@@ -11,13 +11,12 @@ import Sponsors from './Sponsors';
 import Responses from './Responses';
 import { filterCollection, trimObject } from '../lib/utils';
 import Markdown from 'react-markdown';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
-import ExpensesSection from '../apps/expenses/components/ExpensesSection';
-import withIntl from '../lib/withIntl';
+import ExpensesSection from './expenses/ExpensesSection';
 import Button from './Button';
 import SectionTitle from './SectionTitle';
 import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
@@ -359,4 +358,4 @@ class Event extends React.Component {
   }
 }
 
-export default withIntl(addEventMutations(Event));
+export default injectIntl(addEventMutations(Event));

@@ -6,7 +6,6 @@ import Event from '../components/Event';
 
 import { addEventCollectiveData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class EventPage extends React.Component {
@@ -79,4 +78,4 @@ class EventPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addEventCollectiveData(EventPage)));
+export default withUser(addEventCollectiveData(EventPage));

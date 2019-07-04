@@ -27,7 +27,7 @@ const ContributeDetailsFAQ = ({ tax, hasInterval, ...props }) =>
               <Content>
                 <FormattedMessage
                   id="ContributeDetails.faq.frequency.content"
-                  defaultMessage="You will be charged today, and then on the 1st of each month (for monthly subscriptions) or the 1st of the same month next year (for yearly subscriptions). Warning: you may be charged twice in a short time frame if you are setting up a monthly subscription close to the end of the month."
+                  defaultMessage="You will be charged today, and then on the 1st of each month (for monthly contributions) or the 1st of the same month next year (for yearly contributions). Warning: you may be charged twice in a short time frame if you are setting up a monthly contribution close to the end of the month."
                 />
               </Content>
             </Entry>

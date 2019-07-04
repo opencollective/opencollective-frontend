@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Avatar from './Avatar';
@@ -254,4 +253,4 @@ const addMutation = graphql(editCommentQuery, {
   }),
 });
 
-export default withIntl(addMutation(Comment));
+export default injectIntl(addMutation(Comment));

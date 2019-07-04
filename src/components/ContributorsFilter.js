@@ -1,12 +1,11 @@
 import React from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import styled, { css } from 'styled-components';
 
 import StyledButton from './StyledButton';
 import { Span } from './Text';
-import withIntl from '../lib/withIntl';
 
 export const CONTRIBUTOR_FILTERS = {
   ALL: 'ALL',
@@ -142,7 +141,7 @@ ContributorsFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   /** An optional list of active filters */
   filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
-  /** @ignore from withIntl */
+  /** @ignore from injectIntl */
   intl: PropTypes.object,
 };
 
@@ -150,4 +149,4 @@ ContributorsFilter.defaultProps = {
   filters: FILTERS_LIST,
 };
 
-export default withIntl(ContributorsFilter);
+export default injectIntl(ContributorsFilter);

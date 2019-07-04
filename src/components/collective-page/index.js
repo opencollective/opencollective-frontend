@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
 
 // OC Frontend imports
 import theme from '../../constants/theme';
@@ -14,6 +15,7 @@ import SectionAbout from './SectionAbout';
 import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
+import SectionUpdates from './SectionUpdates';
 
 /** A mutation used by child components to update the collective */
 const EditCollectiveMutation = gql`
@@ -45,6 +47,7 @@ export default class CollectivePage extends Component {
       website: PropTypes.string,
       description: PropTypes.string,
       tags: PropTypes.arrayOf(PropTypes.string),
+      settings: PropTypes.object,
     }).isRequired,
 
     /** Collective's host */
@@ -73,6 +76,9 @@ export default class CollectivePage extends Component {
     /** Collective transactions & expenses */
     transactions: PropTypes.arrayOf(PropTypes.object),
     expenses: PropTypes.arrayOf(PropTypes.object),
+
+    /** Updates / announcements */
+    updates: PropTypes.arrayOf(PropTypes.object),
 
     /** Collective stats */
     stats: PropTypes.object,
@@ -156,6 +162,10 @@ export default class CollectivePage extends Component {
       );
     } else if (section === Sections.BUDGET) {
       return <SectionBudget collective={collective} transactions={transactions} expenses={expenses} stats={stats} />;
+    } else if (section === Sections.UPDATES) {
+      return (
+        <SectionUpdates collective={collective} canSeeDrafts={canEdit} isLoggedIn={Boolean(this.props.LoggedInUser)} />
+      );
     }
 
     // Placeholder for sections not implemented yet
@@ -169,7 +179,8 @@ export default class CollectivePage extends Component {
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+    const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
 
     return (
       <Container borderTop="1px solid #E6E8EB">
@@ -177,7 +188,7 @@ export default class CollectivePage extends Component {
           <Hero
             collective={collective}
             host={host}
-            sections={AllSectionsNames}
+            sections={sections}
             canEdit={canEdit}
             isFixed={isFixed}
             selectedSection={selectedSection}
@@ -185,7 +196,7 @@ export default class CollectivePage extends Component {
             onCollectiveClick={this.onCollectiveClick}
           />
         </Container>
-        {AllSectionsNames.map(section => (
+        {sections.map(section => (
           <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
             {this.renderSection(section, canEdit)}
           </div>

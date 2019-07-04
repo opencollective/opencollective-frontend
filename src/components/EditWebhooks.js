@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { get, pick, isEmpty } from 'lodash';
 import { compose, graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import events from '../constants/notificationEvents';
 import Loading from './Loading';
@@ -285,4 +284,4 @@ const addData = compose(
   editWebhooks,
 );
 
-export default withIntl(addData(EditWebhooks));
+export default injectIntl(addData(EditWebhooks));

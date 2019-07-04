@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
@@ -63,4 +62,4 @@ const addMutation = graphql(cancelSubscriptionQuery, {
   }),
 });
 
-export default addMutation(withIntl(CancelSubscriptionBtn));
+export default addMutation(CancelSubscriptionBtn);

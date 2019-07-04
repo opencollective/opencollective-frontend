@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import { Radio } from '@material-ui/core';
@@ -92,7 +91,7 @@ class EditHost extends React.Component {
                 <p>
                   <FormattedMessage
                     id="editCollective.host.pending"
-                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed. As soon as the host accepts, you will be able to start collecting money for your collective."
+                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed."
                     values={{
                       host: get(collective, 'host.name'),
                       date: formatDate(get(hostMembership, 'createdAt'), {
@@ -156,7 +155,7 @@ class EditHost extends React.Component {
                     <Fineprint>
                       <FormattedMessage
                         id="editCollective.host.change.removeFirst"
-                        defaultMessage="Once removed, you won't be able to accept donations anymore. But you will be able to select another host for your collective."
+                        defaultMessage="Once removed, your Collective won't be able to accept financial anymore. You will be able to apply to another host."
                       />
                     </Fineprint>
                   </div>
@@ -199,11 +198,11 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No host" />
+                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No fiscal host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
-                defaultMessage="Without a host, you can't collect money. But you can still use the other features of Open Collective: filing expenses, posting updates, and creating events."
+                defaultMessage="Without a fiscal host, you can't collect money. You can still use other features, like editing your Collective page, submitting expenses, and posting updates."
               />
             </Box>
           </Flex>
@@ -219,14 +218,14 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Use your own host" />
+                <FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Create a fiscal host" />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.createHost.description"
-                defaultMessage="You can create your own host as an individual or as an organization. You will be responsible for keeping custody of the funds raised by this collective and for paying out the expenses that have been approved."
+                defaultMessage="Connect your Stripe account and hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes."
               />
               &nbsp;
-              <a href="https://github.com/opencollective/opencollective/wiki/Becoming-an-Open-Collective-Host">
+              <a href="https://docs.opencollective.com/help/hosts/become-host">
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
               .
@@ -251,17 +250,20 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to an existing host" />
+                <FormattedMessage
+                  id="collective.edit.host.findHost.title"
+                  defaultMessage="Apply to an existing fiscal host"
+                />
               </h2>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
-                defaultMessage="With this option, everything is taking care of for you. No need to create a new bank account, no need to worry about accounting and invoicing. All of that is being taken care of by an existing non profit organization that acts as your fiscal host. Note: most hosts charge a commission to cover the administrative overhead. "
+                defaultMessage="With this option, you don't need to hold funds yourself, or set up a legal entity and bank account for your project. The fiscal host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming)."
               />
               {this.state.selectedOption === 'findHost' && (
                 <div>
                   <InputField
                     name="currency"
-                    label="What will be the primary currency of your collective?"
+                    label="What will be the primary currency of your Collective?"
                     description=""
                     type="select"
                     options={[
@@ -284,13 +286,13 @@ class EditHost extends React.Component {
                       />
                     </h3>
                     <Link route="/hosts">
-                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all hosts" />
+                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all fiscal hosts" />
                     </Link>
                   </div>
                   <div className="suggestedHostsDescription subtitle">
                     <FormattedMessage
                       id="collective.edit.host.suggestedHosts.description"
-                      defaultMessage="Based on the currency of your collective ({currency}) and the tags ({tags})"
+                      defaultMessage="Based on the currency of your Collective ({currency}) and the tags ({tags})"
                       values={{
                         tags: collective.tags,
                         currency: this.state.currency,
@@ -305,7 +307,7 @@ class EditHost extends React.Component {
                     empty={
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.empty"
-                        defaultMessage="No suggestion. Please look at all available hosts or consider creating a new host."
+                        defaultMessage="No suggestions. Please look at all available hosts or consider creating a new host."
                       />
                     }
                   />
@@ -319,4 +321,4 @@ class EditHost extends React.Component {
   }
 }
 
-export default withIntl(EditHost);
+export default EditHost;

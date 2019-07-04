@@ -5,11 +5,10 @@ import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import ExpensesWithData from '../../apps/expenses/components/ExpensesWithData';
-import OrdersWithData from '../../apps/expenses/components/OrdersWithData';
-import ExpensesStatsWithData from '../../apps/expenses/components/ExpensesStatsWithData';
+import ExpensesWithData from '../expenses/ExpensesWithData';
+import OrdersWithData from '../expenses/OrdersWithData';
+import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
 
-import withIntl from '../../lib/withIntl';
 import MessageBox from '../MessageBox';
 import Loading from '../Loading';
 import CollectivePicker from './CollectivePickerWithData';
@@ -119,7 +118,7 @@ class HostDashboard extends React.Component {
                   <FormattedMessage
                     id="collective.expenses.title"
                     values={{ n: this.totalExpenses }}
-                    defaultMessage="{n, plural, one {Latest expense} other {Latest expenses}}"
+                    defaultMessage="Expenses"
                   />
                 </h2>
               </div>
@@ -140,7 +139,7 @@ class HostDashboard extends React.Component {
                   <FormattedMessage
                     id="collective.orders.title"
                     values={{ n: this.totalOrders }}
-                    defaultMessage="{n, plural, one {Latest order} other {Latest orders}}"
+                    defaultMessage="Financial Contributions"
                   />
                 </h2>
               </div>
@@ -165,7 +164,12 @@ class HostDashboard extends React.Component {
 }
 
 const getDataQuery = gql`
-  query Collective($hostCollectiveSlug: String, $orderBy: CollectiveOrderField, $orderDirection: OrderDirection) {
+  query Collective(
+    $hostCollectiveSlug: String
+    $orderBy: CollectiveOrderField
+    $orderDirection: OrderDirection
+    $isActive: Boolean
+  ) {
     Collective(slug: $hostCollectiveSlug) {
       id
       slug
@@ -182,7 +186,7 @@ const getDataQuery = gql`
         balance
         currency
       }
-      collectives(orderBy: $orderBy, orderDirection: $orderDirection) {
+      collectives(orderBy: $orderBy, orderDirection: $orderDirection, isActive: $isActive) {
         total
         collectives {
           id
@@ -220,6 +224,7 @@ export const addData = graphql(getDataQuery, {
         includeHostedCollectives: true,
         orderBy: 'name',
         orderDirection: 'ASC',
+        isActive: true,
       },
     };
   },
@@ -245,4 +250,4 @@ export const addData = graphql(getDataQuery, {
   }),
 });
 
-export default withIntl(withUser(addData(HostDashboard)));
+export default withUser(addData(HostDashboard));

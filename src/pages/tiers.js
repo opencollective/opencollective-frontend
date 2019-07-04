@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
-import withIntl from '../lib/withIntl';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Container from '../components/Container';
@@ -32,7 +31,6 @@ class TiersPage extends React.Component {
     query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
-    intl: PropTypes.object,
   };
 
   render() {
@@ -99,4 +97,4 @@ class TiersPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveData(TiersPage)));
+export default withUser(addCollectiveData(TiersPage));

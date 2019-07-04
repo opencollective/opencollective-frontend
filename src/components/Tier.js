@@ -4,8 +4,7 @@ import colors from '../constants/colors';
 import TicketController from './TicketController';
 import CTAButton from './Button';
 import Currency from './Currency';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize, formatCurrency } from '../lib/utils';
@@ -460,4 +459,4 @@ class Tier extends React.Component {
   }
 }
 
-export default withIntl(Tier);
+export default injectIntl(Tier);

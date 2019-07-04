@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import SectionTitle from './SectionTitle';
 import InputField from './InputField';
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 class CreateOrganizationForm extends React.Component {
   static propTypes = {
@@ -91,4 +90,4 @@ class CreateOrganizationForm extends React.Component {
   }
 }
 
-export default withIntl(CreateOrganizationForm);
+export default injectIntl(CreateOrganizationForm);

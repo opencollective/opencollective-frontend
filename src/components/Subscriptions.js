@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import SubscriptionCard from './SubscriptionCard';
 import colors from '../constants/colors';
@@ -22,15 +21,15 @@ class Subscriptions extends React.Component {
     this.messages = defineMessages({
       'subscription.canceled.label': {
         id: 'subscription.cancelled.label',
-        defaultMessage: 'Cancelled Subscriptions',
+        defaultMessage: 'Cancelled financial contributions',
       },
       'subscription.pending.label': {
         id: 'subscription.pending.label',
-        defaultMessage: 'Pending Subscriptions',
+        defaultMessage: 'Pending financial contributions',
       },
       'subscription.login.message': {
         id: 'subscription.login.message',
-        defaultMessage: 'Are these your subscriptions? Login above to edit them',
+        defaultMessage: 'Are these your financial contributions? Log in above to edit them',
       },
     });
   }
@@ -61,10 +60,6 @@ class Subscriptions extends React.Component {
       .sort(this.sortBycreatedAt);
     const pendingSubs = subscriptions.filter(({ status }) => status === 'PENDING').sort(this.sortBycreatedAt);
 
-    let userString = `${collective.name || collective.slug} isn't`;
-    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
-      userString = "you aren't";
-    }
     return (
       <div className="Subscriptions">
         <style jsx>
@@ -149,9 +144,9 @@ class Subscriptions extends React.Component {
         {activeSubs.length === 0 && (
           <div className="subscriptions-noactive">
             <img className="subscriptions-noactive-image" src="/static/images/no-subscription-placeholder.svg" />
-            <div className="subscriptions-noactive-text"> Looks like {userString} contributing right now.</div>
+            <div className="subscriptions-noactive-text"> No active recurring financial contributions.</div>
             <div className="subscriptions-noactive-link">
-              <a href="/discover">Discover more collectives</a>
+              <a href="/discover">Discover more Collectives</a>
             </div>
           </div>
         )}
@@ -199,4 +194,4 @@ class Subscriptions extends React.Component {
   }
 }
 
-export default withIntl(Subscriptions);
+export default injectIntl(Subscriptions);

@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 import { Link } from '../server/pages';
-import { FormattedMessage, defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { withUser } from './UserProvider';
 import { formatCurrency, capitalize } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
@@ -265,7 +264,7 @@ class TopBarProfileMenu extends React.Component {
             <ListItem py={1}>
               <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                  <FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" />
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Recurring financial contributions" />
                 </StyledLink>
               </Link>
             </ListItem>
@@ -379,4 +378,4 @@ class TopBarProfileMenu extends React.Component {
   }
 }
 
-export default withIntl(withUser(TopBarProfileMenu));
+export default injectIntl(withUser(TopBarProfileMenu));

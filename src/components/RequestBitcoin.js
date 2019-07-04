@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { FormattedMessage } from 'react-intl';
 import SmallButton from './SmallButton';
 import QRCode from 'qrcode.react';
@@ -89,4 +88,4 @@ class RequestBitcoin extends React.Component {
   }
 }
 
-export default withIntl(RequestBitcoin);
+export default RequestBitcoin;

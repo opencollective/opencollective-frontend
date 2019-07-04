@@ -5,12 +5,12 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectivePage from '../components/collective-page';
+import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -31,12 +31,13 @@ class NewCollectivePage extends React.Component {
   };
 
   static getInitialProps({ query: { slug } }) {
-    return { slug };
+    return { slug, onlyPublishedUpdates: true };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
   shouldComponentUpdate(newProps) {
     if (get(this.props, 'data.Collective') && !get(newProps, 'data.Collective')) {
+      console.warn('Collective lost from props (#1872)');
       return false;
     } else {
       return true;
@@ -82,6 +83,7 @@ class NewCollectivePage extends React.Component {
               transactions={data.Collective.transactions}
               expenses={data.Collective.expenses}
               stats={data.Collective.stats}
+              updates={data.Collective.updates}
               LoggedInUser={LoggedInUser}
             />
           </React.Fragment>
@@ -110,6 +112,7 @@ const MemberFields = gql`
   }
 `;
 
+// eslint-disable graphql/template-strings
 const getCollective = graphql(gql`
   query NewCollectivePage($slug: String!) {
     Collective(slug: $slug) {
@@ -126,7 +129,9 @@ const getCollective = graphql(gql`
       tags
       type
       currency
+      settings
       stats {
+        id
         balance
         yearlyBudget
       }
@@ -171,6 +176,8 @@ const getCollective = graphql(gql`
         goal
         interval
         currency
+        amount
+        minimumAmount
         stats {
           id
           totalDonated
@@ -184,44 +191,16 @@ const getCollective = graphql(gql`
         description
         image
       }
-      transactions(limit: 3) {
-        id
-        netAmountInCollectiveCurrency
-        description
-        type
-        createdAt
-        fromCollective {
-          id
-          slug
-          name
-          image
-        }
-        usingVirtualCardFromCollective {
-          id
-          slug
-          name
-        }
-      }
-      expenses(limit: 3) {
-        id
-        amount
-        description
-        createdAt
-        category
-        transaction {
-          id
-        }
-        fromCollective {
-          id
-          slug
-          name
-          image
-        }
+      ...TransactionsAndExpensesFragment
+      updates(limit: 3, onlyPublishedUpdates: true) {
+        ...UpdatesFieldsFragment
       }
     }
   }
 
   ${MemberFields}
+  ${TransactionsAndExpensesFragment}
+  ${UpdatesFieldsFragment}
 `);
 
-export default withUser(getCollective(withIntl(NewCollectivePage)));
+export default withUser(getCollective(NewCollectivePage));

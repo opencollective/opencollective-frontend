@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import CollectiveCard from './CollectiveCard';
@@ -196,4 +195,4 @@ export const addHostsData = graphql(getHostsQuery, {
   }),
 });
 
-export default addHostsData(withIntl(HostsWithData));
+export default addHostsData(HostsWithData);

@@ -19,8 +19,6 @@ import colors from '../constants/colors';
 
 import { addSearchQueryData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
-
 import { Search } from 'styled-icons/octicons/Search';
 
 const SearchInput = styled(FormControl)`
@@ -183,4 +181,4 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export default withIntl(addSearchQueryData(withRouter(SearchPage)));
+export default addSearchQueryData(withRouter(SearchPage));

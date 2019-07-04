@@ -4,10 +4,9 @@ import { orderBy, truncate } from 'lodash';
 import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
 import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
 import { FixedSizeList } from 'react-window';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import StyledSelect from './StyledSelect';
-import withIntl from '../lib/withIntl';
 
 class InputTypeCountry extends Component {
   static propTypes = {
@@ -20,7 +19,7 @@ class InputTypeCountry extends Component {
     labelBuilder: PropTypes.func,
     /** Switch between display modes */
     mode: PropTypes.oneOf(['select', 'underlined']),
-    /** From withIntl */
+    /** From injectIntl */
     intl: PropTypes.object.isRequired,
     /** Is this input required? */
     required: PropTypes.bool,
@@ -133,4 +132,4 @@ class InputTypeCountry extends Component {
   }
 }
 
-export default withIntl(InputTypeCountry);
+export default injectIntl(InputTypeCountry);

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import OrderWithData from '../apps/expenses/components/OrderWithData';
+import OrderWithData from '../components/expenses/OrderWithData';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -13,12 +13,11 @@ import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class OrderPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, OrderId } }) {
-    return { slug: collectiveSlug, OrderId };
+    return { slug: collectiveSlug, OrderId: Number(OrderId) };
   }
 
   static propTypes = {
@@ -118,4 +117,4 @@ class OrderPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveCoverData(OrderPage)));
+export default withUser(addCollectiveCoverData(OrderPage));

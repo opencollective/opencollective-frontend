@@ -12,8 +12,7 @@ import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import CreateOrganizationForm from './CreateOrganizationForm';
-import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail, getEnvVar } from '../lib/utils';
 import { getPaypal } from '../lib/paypal';
 import { getStripeToken } from '../lib/stripe';
@@ -499,7 +498,7 @@ class OrderForm extends React.Component {
       }
       // when the user selects a tier with an interval, we set the default payment method type to credit card
       // which is the only one that supports recurring payments
-      if (newState.order.tier.hasOwnProperty('interval')) {
+      if (Object.prototype.hasOwnProperty.call(newState.order.tier, 'interval')) {
         newState.order.interval = newState.order.tier.interval;
         if (newState.order.interval) {
           newState.paymentMethod.type = 'creditcard';
@@ -1211,4 +1210,4 @@ class OrderForm extends React.Component {
   }
 }
 
-export default withIntl(withApollo(OrderForm));
+export default injectIntl(withApollo(OrderForm));

@@ -8,7 +8,6 @@ import SubscriptionsWithData from '../components/SubscriptionsWithData';
 
 import colors from '../constants/colors';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class SubscriptionsPage extends React.Component {
@@ -87,4 +86,4 @@ class SubscriptionsPage extends React.Component {
   }
 }
 
-export default withUser(withIntl(SubscriptionsPage));
+export default withUser(SubscriptionsPage);

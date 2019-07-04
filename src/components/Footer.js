@@ -57,12 +57,10 @@ const navigation = {
     'Create a Collective': '/create',
     'Become a Sponsor': '/become-a-sponsor',
     'Become a Fiscal Host': '/become-a-fiscal-host',
-    'Create a Chapter': '/chapters',
     'Make a Pledge': '/pledges/new',
     'Gift Cards': '/gift-cards',
   },
   COMMUNITY: {
-    'Open Source': '/opensource',
     'Report an issue': 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     'Docs & help': 'https://docs.opencollective.com',
@@ -141,7 +139,7 @@ class Footer extends React.Component {
                   <InfoCircle size={16} cursor="pointer" />
                 </StyledTooltip>
               </P>
-              <div>
+              <div data-cy="language-switcher">
                 {Object.keys(languages).map(key => (
                   <div key={key}>
                     <a

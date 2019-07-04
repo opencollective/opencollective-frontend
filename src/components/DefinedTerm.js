@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { textTransform } from '../lib/styled_system_custom';
-import withIntl from '../lib/withIntl';
 import StyledTooltip from './StyledTooltip';
 
 /**
@@ -35,8 +34,7 @@ const TranslatedDefinitions = defineMessages({
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',
-    defaultMessage:
-      'Gift cards empower your employees or community members to support the open source projects they love.',
+    defaultMessage: 'Gift cards empower your employees or community members to support the projects they love.',
   },
 });
 
@@ -65,8 +63,8 @@ DefinedTerm.propTypes = {
   term: PropTypes.oneOf(Object.values(Terms)),
   /** Applies to the underlined term */
   termTextTransform: PropTypes.string,
-  /** @ignore from withIntl */
+  /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };
 
-export default withIntl(DefinedTerm);
+export default injectIntl(DefinedTerm);

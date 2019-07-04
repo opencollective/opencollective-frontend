@@ -11,7 +11,6 @@ import Footer from '../components/Footer';
 
 import { isValidRelativeUrl } from '../lib/utils';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
@@ -138,4 +137,4 @@ class SigninPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(SigninPage));
+export default withUser(SigninPage);

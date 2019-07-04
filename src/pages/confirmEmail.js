@@ -8,7 +8,6 @@ import { Box } from '@rebass/grid';
 
 import { Email } from 'styled-icons/material/Email';
 
-import withIntl from '../lib/withIntl';
 import Page from '../components/Page';
 import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
@@ -137,4 +136,4 @@ export const addConfirmUserEmailMutation = graphql(
   },
 );
 
-export default addConfirmUserEmailMutation(withIntl(withUser(ConfirmEmailPage)));
+export default addConfirmUserEmailMutation(withUser(ConfirmEmailPage));

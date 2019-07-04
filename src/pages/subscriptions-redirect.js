@@ -9,7 +9,6 @@ import Link from '../components/Link';
 
 import colors from '../constants/colors';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class SubscriptionsRedirectPage extends React.Component {
@@ -106,7 +105,7 @@ class SubscriptionsRedirectPage extends React.Component {
                 <div className="Subscriptions-title">
                   {LoggedInUser && (
                     <div>
-                      This page has moved. Your subscriptions are now at
+                      This page has moved. Your recurring financial contributions are now at
                       <Link
                         route={'subscriptions'}
                         params={{
@@ -133,4 +132,4 @@ class SubscriptionsRedirectPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(SubscriptionsRedirectPage));
+export default withUser(SubscriptionsRedirectPage);

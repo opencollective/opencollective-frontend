@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
+import { defineMessages, injectIntl } from 'react-intl';
 import InputField from './InputField';
 import { getStripeToken } from '../lib/stripe';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
@@ -62,7 +61,7 @@ class PaymentMethodChooser extends React.Component {
       'paymentMethod.whyUnknown': {
         id: 'paymentMethod.whyUnknown',
         defaultMessage:
-          "This subscription was created using an early version of our site when we didn't store credit card numbers. We suggest that you update this subscription with a newer credit card.",
+          "This recurring contribution was created using an earlier version of our site which didn't store credit card numbers. We suggest that you update it.",
       },
     });
   }
@@ -321,4 +320,4 @@ class PaymentMethodChooser extends React.Component {
   }
 }
 
-export default withIntl(PaymentMethodChooser);
+export default injectIntl(PaymentMethodChooser);

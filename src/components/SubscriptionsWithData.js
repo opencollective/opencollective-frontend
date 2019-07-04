@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
-import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo';
 import { getSubscriptionsQuery } from '../graphql/queries';
 import Subscriptions from './Subscriptions';
@@ -73,4 +72,4 @@ export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
   },
 });
 
-export default addSubscriptionsData(withIntl(SubscriptionsWithData));
+export default addSubscriptionsData(SubscriptionsWithData);

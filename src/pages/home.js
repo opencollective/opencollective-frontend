@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedNumber, FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedNumber, FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Facebook } from 'styled-icons/fa-brands/Facebook';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Linkedin } from 'styled-icons/fa-brands/Linkedin';
@@ -30,8 +30,6 @@ import HomepageSponsorCard from '../components/HomepageSponsorCard';
 import Carousel from '../components/Carousel';
 import Currency from '../components/Currency';
 import ErrorPage from '../components/ErrorPage';
-
-import withIntl from '../lib/withIntl';
 
 const responsiveAlign = ['center', null, 'left'];
 const sectionHeadingStyles = {
@@ -130,7 +128,7 @@ class HomePage extends React.Component {
 
   static propTypes = {
     data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object.isRequired, // from withIntl
+    intl: PropTypes.object.isRequired, // from injectIntl
     LoggedInUser: PropTypes.object,
   };
 
@@ -139,12 +137,11 @@ class HomePage extends React.Component {
     this.carouselMessages = defineMessages({
       raiseMoneyHeading: {
         id: 'home.carousel.raiseMoneyHeading',
-        defaultMessage: 'Raise money online with recurring subscriptions.',
+        defaultMessage: 'Raise money online with recurring financial contributions.',
       },
       raiseMoneyDetails: {
         id: 'home.carousel.raiseMoneyDetails',
-        defaultMessage:
-          'Connect with the Open Collective community and raise the funds required to sustain your community.',
+        defaultMessage: 'Connect with the Open Collective community and raise funds to sustain your community.',
       },
       contributeHeading: {
         id: 'home.carousel.contributeHeading',
@@ -152,8 +149,7 @@ class HomePage extends React.Component {
       },
       contributeDetails: {
         id: 'home.carousel.contributeDetails',
-        defaultMessage:
-          'Everyone can contribute to your open collective. All you need is for people to believe in your mission.',
+        defaultMessage: 'Everyone who believes in your mission can contribute to your Open Collective.',
       },
       transparencyHeading: {
         id: 'home.carousel.transparencyHeading',
@@ -162,16 +158,15 @@ class HomePage extends React.Component {
       transparencyDetails: {
         id: 'home.carousel.transparencyDetails',
         defaultMessage:
-          'Every contribution helps you support your collective. Open Collective shows everyone how these financial contributions are earned and spent.',
+          'Every contribution helps you support your Collective. Shows everyone how these financial contributions are earned and spent.',
       },
       missionHeading: {
         id: 'home.carousel.missionHeading',
-        defaultMessage: 'A bottom - up group where anyone can become a core contributor.',
+        defaultMessage: 'A bottom-up group, where anyone can become a Core Contributor.',
       },
       missionDetails: {
         id: 'home.carousel.missionDetails',
-        defaultMessage:
-          'The mission is what persists and unites you with your community. Leaders can change over time.',
+        defaultMessage: 'Leaders can change over time, but the mission and community persist.',
       },
     });
   }
@@ -182,8 +177,8 @@ class HomePage extends React.Component {
 
   async componentDidMount() {
     // separate request to not block showing LoggedInUser
-    const { stats } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
-    this.setState({ stats });
+    const { stats, sponsors } = await fetch(`${getBaseApiUrl()}/homepage`).then(response => response.json());
+    this.setState({ stats, sponsors });
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -231,17 +226,13 @@ class HomePage extends React.Component {
     const {
       topSpenders: { collectives: topSpenders },
       backers: { collectives: backers },
-      chapters: {
-        stats: {
-          collectives: { memberOf: totalChapters },
-        },
-      },
+      hosts: { total: totalHosts },
       recent: { collectives },
-      sponsors: { collectives: sponsors },
       transactions: { transactions },
     } = this.props.data;
     const {
       stats: { totalAnnualBudget, totalCollectives, totalDonors },
+      sponsors,
     } = this.state;
 
     const filteredTransactions = transactions.filter(({ type, order, category, fromCollective, collective }) => {
@@ -257,7 +248,10 @@ class HomePage extends React.Component {
 
     return (
       <Fragment>
-        <Header title="Home" LoggedInUser={LoggedInUser} />
+        <Header
+          description="The Internet generation needs organizations that reflect who we are; where anybody can contribute to a shared mission; where leaders can easily change; and where money flows in full transparency. Create an Open Collective for your community."
+          LoggedInUser={LoggedInUser}
+        />
         <Body>
           <Container
             alignItems="center"
@@ -342,7 +336,7 @@ class HomePage extends React.Component {
 
           <Container maxWidth={1200} mx="auto" px={2}>
             <H3 as="h2" textAlign={['center', null, 'left']} pb={3}>
-              <FormattedMessage id="home.activeCollectives" defaultMessage="Active collectives" />
+              <FormattedMessage id="home.activeCollectives" defaultMessage="Active Collectives" />
             </H3>
 
             <Container py={3}>
@@ -392,7 +386,7 @@ class HomePage extends React.Component {
               mx="auto"
               textAlign="center"
             >
-              <FormattedMessage id="home.discoverMore" defaultMessage="Discover more collectives" />
+              <FormattedMessage id="home.discoverMore" defaultMessage="Discover more Collectives" />
             </StyledLink>
           </Container>
 
@@ -408,7 +402,7 @@ class HomePage extends React.Component {
               >
                 <FormattedMessage
                   id="home.joinFor"
-                  defaultMessage="Join the movement for a world with more open, transparent, and sustainable communities."
+                  defaultMessage="Join the movement of open, transparent, and sustainable communities."
                 />
               </H1>
               <P
@@ -421,9 +415,8 @@ class HomePage extends React.Component {
               >
                 <FormattedMessage
                   id="home.participate"
-                  defaultMessage="There are many ways to participate: create an open collective, become a host, make a financial
-                contribution, attend an event or simply share the love by showing others how they can benefit from
-                operating as an open community. Here’s how:"
+                  defaultMessage="There are many ways to participate: create a Collective, become a fiscal host, make a financial
+                contribution, attend an event, or spread the word about Collectives you love."
                 />
               </P>
             </Container>
@@ -439,7 +432,7 @@ class HomePage extends React.Component {
             >
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.create" defaultMessage="Create an open collective" />
+                  <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
@@ -453,10 +446,9 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles}>
                   <FormattedMessage
                     id="home.createFor"
-                    defaultMessage="Create an open collective for your group and leverage the power of the community to live up to your
-                  mission."
+                    defaultMessage="Create a Collective for your group and unlock the power of your community."
                   />{' '}
-                  <a href="/discover">
+                  <a href="https://docs.opencollective.com/help/collectives">
                     <FormattedMessage id="home.learnMore" defaultMessage="Learn more" />.
                   </a>
                 </P>
@@ -470,7 +462,7 @@ class HomePage extends React.Component {
                       fontWeight="500"
                       textAlign="center"
                     >
-                      <FormattedMessage id="home.create" defaultMessage="Create an open collective" />
+                      <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
                     </StyledLink>
                   </Link>
                 </Flex>
@@ -492,7 +484,7 @@ class HomePage extends React.Component {
                 <H4 {...sectionSubHeadingStyles}>
                   <FormattedMessage
                     id="home.greatCompanies"
-                    defaultMessage="Great companies supporting great collectives with"
+                    defaultMessage="Great companies supporting great Collectives"
                   />{' '}
                   💙
                 </H4>
@@ -500,12 +492,12 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles}>
                   <FormattedMessage
                     id="home.orgSupport"
-                    defaultMessage="Support collectives on behalf of your organization."
+                    defaultMessage="Support Collectives on behalf of your organization."
                   />{' '}
                   <strong>
                     <FormattedMessage
                       id="home.invoice"
-                      defaultMessage="You'll get an invoice for every financial contribution your company makes as well as a monthly
+                      defaultMessage="You'll get an invoice for every financial contribution as well as a monthly
                     report."
                     />
                   </strong>
@@ -514,7 +506,7 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles} my={3}>
                   <FormattedMessage
                     id="home.onboard"
-                    defaultMessage="If you’re looking to onboard and financially support an initiative through Open Collective, {letUsKnowLink} and we’ll gladly set them up and get them going."
+                    defaultMessage="If you’re looking to financially support an initiative through Open Collective, {letUsKnowLink} and we’ll gladly help it get up and going."
                     values={{
                       letUsKnowLink: (
                         <a href="mailto:info@opencollective.com">
@@ -546,11 +538,12 @@ class HomePage extends React.Component {
                 justifyContent="space-between"
                 px={[1, null, 4]}
               >
-                {sponsors.map(c => (
-                  <Container width={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}>
-                    <HomepageSponsorCard {...c} />
-                  </Container>
-                ))}
+                {sponsors &&
+                  sponsors.map(c => (
+                    <Container width={[0.5, null, 0.33]} mb={2} px={1} maxWidth={224} key={c.id}>
+                      <HomepageSponsorCard {...c} />
+                    </Container>
+                  ))}
               </Container>
             </Container>
 
@@ -559,7 +552,7 @@ class HomePage extends React.Component {
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container width={[1, null, 0.5]} mb={4}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.becomeABacker" defaultMessage="Become a backer" />
+                  <FormattedMessage id="home.becomeABacker" defaultMessage="Become a financial contributor" />
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
@@ -569,12 +562,8 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles}>
                   <FormattedMessage
                     id="home.joinAndDiscover"
-                    defaultMessage="Join Open Collective and discover the different initiatives that need your support. Embrace the
-                  mission that drives them and contribute to their group effort."
+                    defaultMessage="Discover Collectives that need support. Contribute to the efforts of projects you love."
                   />{' '}
-                  <strong>
-                    <FormattedMessage id="home.becomePart" defaultMessage="Become part of the movement." />
-                  </strong>
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
@@ -586,7 +575,7 @@ class HomePage extends React.Component {
                     fontWeight="bold"
                     textAlign="center"
                   >
-                    <FormattedMessage id="home.becomeABacker" defaultMessage="Become a backer" />
+                    <FormattedMessage id="home.becomeABacker" defaultMessage="Become a financial contributor" />
                   </StyledLink>
                 </Flex>
               </Container>
@@ -628,62 +617,80 @@ class HomePage extends React.Component {
             >
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.contributeCode" defaultMessage="Contribute code" /> 👩🏻‍💻👨🏿‍💻
+                  <FormattedMessage id="home.contribute" defaultMessage="Contribute" /> 🙌
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
-                  <FormattedMessage
-                    id="home.buildingTogether"
-                    defaultMessage="Building Open Collective together to get further, faster"
-                  />{' '}
-                  🚀
+                  <FormattedMessage id="home.buildingTogether" defaultMessage="Building Open Collective together" /> 🚀
                 </H4>
 
                 <P {...sectionDetailStyles}>
                   <FormattedMessage
                     id="home.devOpenSource"
-                    defaultMessage="Are you a developer who believes in supporting open and welcoming communities? Open Collective is open
-                  source (MIT License) so anyone can contribute code or report issues publicly."
+                    defaultMessage="Do you believe in supporting open and welcoming communities? Open Collective is open source (MIT), so anyone can contribute code or report issues publicly."
                   />
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
                   <FormattedMessage
                     id="home.goal"
-                    defaultMessage="Our goal is to provide all communities around the world the software that they need to operate as open
-                  and transparent collectives. We want to enable them to thrive in the same way that WordPress enabled
-                  millions of blogs to exist."
+                    defaultMessage="Our goal is to enable communities around the world to operate as open and transparent Collectives."
                   />
                 </P>
 
                 <P {...sectionDetailStyles} my={3}>
                   <FormattedMessage
                     id="home.specialThanks"
-                    defaultMessage="Special thanks to all of you who already contributed in some way!"
+                    defaultMessage="Special thanks to all of you who've already contributed in some way!"
                   />{' '}
                   🙏
                 </P>
 
-                <StyledLink
-                  {...sectionDetailStyles}
-                  color="primary.700"
-                  display="inline-block"
-                  my={4}
-                  href="https://github.com/opencollective"
-                >
-                  <FormattedMessage
-                    id="home.github"
-                    defaultMessage="Check out our Github organization to find out more"
-                  />
-                </StyledLink>
+                <Flex flexDirection="column" my={4}>
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective/opencollective/issues/new?assignees=&labels=&template=feature-spec.md&title="
+                  >
+                    <FormattedMessage id="home.github.featureRequest" defaultMessage="Submit a feature request" />
+                  </StyledLink>
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective/opencollective/issues/new?assignees=&labels=&template=bug_report.md&title="
+                  >
+                    <FormattedMessage id="home.github.reportBug" defaultMessage="Report a bug" />
+                  </StyledLink>
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective/opencollective/blob/master/BOUNTY.md"
+                  >
+                    <FormattedMessage id="home.github.bounties" defaultMessage="Bounties" />
+                  </StyledLink>
+
+                  <StyledLink
+                    {...sectionDetailStyles}
+                    color="primary.700"
+                    display="inline-block"
+                    href="https://github.com/opencollective"
+                  >
+                    <FormattedMessage id="home.github" defaultMessage="Open Collective on GitHub" />
+                  </StyledLink>
+                </Flex>
               </Container>
               <Container width={[1, null, 0.5]} textAlign="center" px={2} maxWidth={600}>
-                <img
-                  src="/static/images/home-contributors.png"
-                  alt="Open Collective Contribution Commits"
-                  width="100%"
-                  height="auto"
-                />
+                <a href="https://github.com/opencollective/opencollective/issues">
+                  <img
+                    src="/static/images/home-contribute.png"
+                    alt="Open Collective Issues"
+                    width="100%"
+                    height="auto"
+                  />
+                </a>
               </Container>
             </Container>
 
@@ -697,27 +704,21 @@ class HomePage extends React.Component {
               alignItems="center"
             >
               <Container width={[1, null, 0.5]}>
-                <H2 {...sectionHeadingStyles}>Become a host</H2>
+                <H2 {...sectionHeadingStyles}>Become a fiscal host</H2>
 
                 <H4 {...sectionSubHeadingStyles}>
                   <FormattedMessage
                     id="home.umbrella"
-                    defaultMessage="Help provide the umbrella legal entities open collectives need to raise funds"
+                    defaultMessage="Become an umbrella entity to help Collectives raise funds"
                   />{' '}
                   ⚖️
                 </H4>
 
                 <P {...sectionDetailStyles}>
-                  <strong>
-                    <FormattedMessage id="home.hostDetails1" defaultMessage="Grow the movement" />
-                  </strong>{' '}
+                  {' '}
                   <FormattedMessage
                     id="home.hostDetails2"
-                    defaultMessage="by becoming a host of open collectives in your city or your
-                  industry. Hosts are acting as fiscal sponsors. They collect the money on behalf of the collectives and
-                  enable them to issue invoices. They are mutualising the legal and accounting overhead that come with
-                  creating and maintaining a legal entity so that the open collectives that they host can focus on their
-                  mission."
+                    defaultMessage="Fiscal hosts collect and hold funds on behalf of Collectives, enabling them to transact without setting up their own legal entity or bank account. The Open Collective platform provides powerful tools that drastically reduce the admin and overhead involved in fiscal sponsorship, so more fiscal hosts can act as umbrella organizations for projects in their industry or city."
                   />
                 </P>
 
@@ -730,7 +731,7 @@ class HomePage extends React.Component {
                       fontWeight="500"
                       textAlign="center"
                     >
-                      <FormattedMessage id="home.becomeHost" defaultMessage="Become a host" />
+                      <FormattedMessage id="home.becomeHost" defaultMessage="Become a fiscal host" />
                     </StyledLink>
                   </Link>
                 </Flex>
@@ -753,6 +754,18 @@ class HomePage extends React.Component {
                 <Container display="flex" flexWrap="wrap" alignItems="center" justifyContent="center">
                   <Container {...statsContainerStyles}>
                     <P {...statsStyles}>
+                      <FormattedNumber value={totalHosts} />
+                    </P>
+                    <P>
+                      <Link route="hosts" passHref>
+                        <a>
+                          <FormattedMessage id="home.hosts" defaultMessage="hosts" />
+                        </a>
+                      </Link>
+                    </P>
+                  </Container>
+                  <Container {...statsContainerStyles}>
+                    <P {...statsStyles}>
                       <FormattedNumber value={totalCollectives} />
                     </P>
                     <P>
@@ -766,19 +779,7 @@ class HomePage extends React.Component {
                       <FormattedNumber value={totalDonors} />
                     </P>
                     <P>
-                      <FormattedMessage id="home.backers" defaultMessage="backers" />
-                    </P>
-                  </Container>
-                  <Container {...statsContainerStyles}>
-                    <P {...statsStyles}>
-                      <FormattedNumber value={totalChapters} />
-                    </P>
-                    <P>
-                      <Link route="chapters" passHref>
-                        <a>
-                          <FormattedMessage id="home.chapters" defaultMessage="chapters" />
-                        </a>
-                      </Link>
+                      <FormattedMessage id="home.backers" defaultMessage="financial contributors" />
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>
@@ -786,7 +787,7 @@ class HomePage extends React.Component {
                       <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
                     <P>
-                      <FormattedMessage id="home.moneyRaised" defaultMessage="raised" />
+                      <FormattedMessage id="home.totalContributed" defaultMessage="contributed" />
                     </P>
                   </Container>
                 </Container>
@@ -808,8 +809,7 @@ class HomePage extends React.Component {
                 >
                   <FormattedMessage
                     id="home.speadDescription"
-                    defaultMessage="Do you know people or organizations that will benefit from an open structure and a transparent
-                  operation? Let them know that Open Collective exists!"
+                    defaultMessage="Do you know people or organizations that would benefit from an open structure and transparent operations? Let them know about Open Collective!"
                   />
                 </P>
               </Container>
@@ -883,7 +883,7 @@ class HomePage extends React.Component {
                 <H4 color="white.full" mb={4}>
                   <FormattedMessage
                     id="home.discoverOpenSourceProjects"
-                    defaultMessage="Discover the Open Source projects your organization is using that need financial support."
+                    defaultMessage="Discover and support the open source projects your organization relies on."
                   />
                 </H4>
 
@@ -1021,19 +1021,6 @@ const query = gql`
         }
       }
     }
-    sponsors: allCollectives(type: ORGANIZATION, limit: 6, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
-      collectives {
-        id
-        currency
-        type
-        slug
-        name
-        image
-        stats {
-          totalAmountSpent
-        }
-      }
-    }
     backers: allCollectives(type: USER, limit: 30, orderBy: monthlySpending, orderDirection: DESC, offset: 0) {
       collectives {
         id
@@ -1047,12 +1034,8 @@ const query = gql`
         }
       }
     }
-    chapters: Collective(slug: "chapters") {
-      stats {
-        collectives {
-          memberOf
-        }
-      }
+    hosts: allHosts(limit: 100000) {
+      total
     }
   }
 `;
@@ -1061,4 +1044,4 @@ const addHomeData = graphql(query);
 
 export { HomePage as MockHomePage };
 
-export default addHomeData(withIntl(HomePage));
+export default addHomeData(injectIntl(HomePage));

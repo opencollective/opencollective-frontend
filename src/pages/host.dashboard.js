@@ -8,7 +8,6 @@ import { CheckDouble } from 'styled-icons/boxicons-regular/CheckDouble';
 
 import styled, { css } from 'styled-components';
 
-import withIntl from '../lib/withIntl';
 import { addCollectiveCoverData } from '../graphql/queries';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
@@ -165,4 +164,4 @@ class HostDashboardPage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveCoverData(HostDashboardPage)));
+export default withUser(addCollectiveCoverData(HostDashboardPage));

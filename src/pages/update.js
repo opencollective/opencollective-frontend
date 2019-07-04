@@ -10,7 +10,6 @@ import UpdateWithData from '../components/UpdateWithData';
 
 import { addCollectiveCoverData } from '../graphql/queries';
 
-import withIntl from '../lib/withIntl';
 import { withUser } from '../components/UserProvider';
 
 class UpdatePage extends React.Component {
@@ -68,4 +67,4 @@ class UpdatePage extends React.Component {
   }
 }
 
-export default withIntl(withUser(addCollectiveCoverData(UpdatePage)));
+export default withUser(addCollectiveCoverData(UpdatePage));

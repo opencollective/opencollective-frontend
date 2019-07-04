@@ -8,8 +8,6 @@ import colors from '../constants/colors';
 
 import { firstSentence } from '../lib/utils';
 
-import withIntl from '../lib/withIntl';
-
 class NametagsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, eventSlug, template, format, nametagWidth, nametagHeight } }) {
     return {
@@ -332,4 +330,4 @@ const getAttendeesQuery = gql`
 
 export const addAttendeesData = graphql(getAttendeesQuery);
 
-export default withIntl(addAttendeesData(NametagsPage));
+export default addAttendeesData(NametagsPage);

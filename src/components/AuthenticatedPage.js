@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
-import { Router } from '../server/pages';
 import { withUser } from './UserProvider';
 import Page from './Page';
 import Loading from './Loading';
@@ -51,7 +50,7 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree redirect={Router.asPath} />
+              <SignInOrJoinFree />
             </Flex>
           )}
         </Flex>

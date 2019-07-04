@@ -7,12 +7,11 @@ import { get, throttle, uniqBy, pick } from 'lodash';
 import { graphql } from 'react-apollo';
 import { Modal, Row, Col } from 'react-bootstrap';
 
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { animateScroll } from 'react-scrollchor/lib/helpers';
 import { Pencil } from 'styled-icons/octicons/Pencil';
 
 import colors from '../constants/colors';
-import withIntl from '../lib/withIntl';
 import { withUser } from './UserProvider';
 
 import Avatar from './Avatar';
@@ -423,7 +422,7 @@ class MenuBar extends React.Component {
             {collective.type !== 'EVENT' && (
               <div className="item">
                 <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
-                  <FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" />
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Recurring financial contributions" />
                 </Link>
               </div>
             )}
@@ -635,4 +634,4 @@ const addMutationForAddFundsToOrg = graphql(addFundsToOrgQuery, {
   }),
 });
 
-export default addMutationForAddFundsToOrg(withIntl(withUser(MenuBar)));
+export default addMutationForAddFundsToOrg(injectIntl(withUser(MenuBar)));

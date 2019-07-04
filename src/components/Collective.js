@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-
-import withIntl from '../lib/withIntl';
 
 import Header from './Header';
 import Body from './Body';
@@ -18,7 +16,7 @@ import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
 import TeamSection from './TeamSection';
 import UpdatesSection from './UpdatesSection';
-import ExpensesSection from '../apps/expenses/components/ExpensesSection';
+import ExpensesSection from './expenses/ExpensesSection';
 import EventsSection from './EventsSection';
 import LongDescription from './LongDescription';
 
@@ -380,4 +378,4 @@ class Collective extends React.Component {
   }
 }
 
-export default withIntl(Collective);
+export default injectIntl(Collective);

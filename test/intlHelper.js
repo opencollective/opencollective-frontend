@@ -11,15 +11,9 @@ import { mount, shallow } from 'enzyme';
 
 import en from 'react-intl/locale-data/en';
 import messages from '../src/lang/en.json';
-// import fr from 'react-intl/locale-data/fr';
-// import es from 'react-intl/locale-data/es';
-// import frFR from '../lang/fr-FR.json';
 
 addLocaleData([...en]);
-addLocaleData({
-  locale: 'en-US',
-  parentLocale: 'en',
-});
+addLocaleData({ locale: 'en-US', parentLocale: 'en' });
 
 // Create the IntlProvider to retrieve context for wrapping around.
 const intlProvider = new IntlProvider({ locale: 'en-US', messages }, {});

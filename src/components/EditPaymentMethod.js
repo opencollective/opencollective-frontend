@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
-import withIntl from '../lib/withIntl';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
 import { Flex, Box } from '@rebass/grid';
@@ -17,6 +16,7 @@ class EditPaymentMethod extends React.Component {
     paymentMethod: PropTypes.shape({
       service: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      monthlyLimitPerMember: PropTypes.number,
     }).isRequired,
     subscriptions: PropTypes.arrayOf(PropTypes.any).isRequired,
     onRemove: PropTypes.func.isRequired,
@@ -26,7 +26,7 @@ class EditPaymentMethod extends React.Component {
     hasMonthlyLimitPerMember: PropTypes.bool,
     /** Indicates that the payment method is being updated on the backend. Shows spinner. */
     isSaving: PropTypes.bool,
-    /** From withIntl */
+    /** From injectIntl */
     intl: PropTypes.object.isRequired,
   };
 
@@ -48,7 +48,7 @@ class EditPaymentMethod extends React.Component {
       },
       'paymentMethod.editSubscriptions': {
         id: 'paymentMethod.editSubscriptions',
-        defaultMessage: 'edit subscriptions',
+        defaultMessage: 'edit recurring financial contributions',
       },
       'paymentMethod.monthlyLimitPerMember.label': {
         id: 'paymentMethod.monthlyLimitPerMember.label',
@@ -57,7 +57,7 @@ class EditPaymentMethod extends React.Component {
       'paymentMethod.monthlyLimitPerMember.description': {
         id: 'paymentMethod.monthlyLimitPerMember.description',
         defaultMessage:
-          'You can set a monthly limit to allow the other members of your organization to use this credit card. If set to zero, only you and the other administrators of this organization will be able to use this card.',
+          'Set a monthly limit to allow other team members of your Organization to use this credit card within that limit. If set to zero, only Organization admins will be able to use this card.',
       },
     });
   }
@@ -115,7 +115,7 @@ class EditPaymentMethod extends React.Component {
                 <div className="actions">
                   <FormattedMessage
                     id="paymentMethod.activeSubscriptions"
-                    defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}"
+                    defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
                     values={{ n: subscriptions.length }}
                   />
                 </div>
@@ -186,4 +186,4 @@ class EditPaymentMethod extends React.Component {
   }
 }
 
-export default withIntl(EditPaymentMethod);
+export default injectIntl(EditPaymentMethod);
