@@ -132,6 +132,24 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
   return null;
 }
 
+export function getCollectiveImage(collective, params = {}) {
+  const sections = [getBaseImagesUrl(), collective.slug];
+
+  sections.push(params.name || 'avatar');
+
+  for (const key of ['style', 'height', 'width']) {
+    if (params[key]) {
+      sections.push(params[key]);
+    }
+  }
+
+  return `${sections.join('/')}.${params.format || 'png'}`;
+}
+
+export function getCollectiveBackgroundImage(collective, params = {}) {
+  return getCollectiveImage(collective, { ...params, name: 'background' });
+}
+
 export function prettyUrl(url) {
   if (!url) return '';
   return url

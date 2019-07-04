@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { getBaseImagesUrl } from '../lib/utils';
+import { getCollectiveImage } from '../lib/utils';
 
 const Logo = ({ collective, src, style = {}, height, width, className }) => {
   style.maxHeight = style.height || height;
@@ -12,7 +12,7 @@ const Logo = ({ collective, src, style = {}, height, width, className }) => {
     backgroundStyle.minWidth = parseInt(height, 10) / 2;
   }
   if (collective) {
-    src = `${getBaseImagesUrl()}/${collective.slug}/logo.png`;
+    src = getCollectiveImage(collective, { name: 'logo' });
   }
   return (
     <div className={classNames('Logo', className)} style={backgroundStyle}>
