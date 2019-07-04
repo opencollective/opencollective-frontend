@@ -79,6 +79,16 @@ const messages = defineMessages({
   },
 });
 
+const getContributeCTA = type => {
+  if (type === ContributionTypes.FINANCIAL_GOAL) {
+    return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
+  } else if (type === ContributionTypes.EVENT_PARTICIPATE) {
+    return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
+  } else {
+    return <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />;
+  }
+};
+
 /**
  * A contribute card with a "Contribute" call to action
  */
@@ -154,11 +164,7 @@ const ContributeCard = ({ intl, contribution }) => {
         </div>
         <Link route={contributeRoute}>
           <StyledButton width={1} mb={2} mt={3}>
-            {goal ? (
-              <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />
-            ) : (
-              <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />
-            )}
+            {getContributeCTA(type)}
           </StyledButton>
         </Link>
       </Flex>
