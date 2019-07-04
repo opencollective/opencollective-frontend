@@ -141,7 +141,7 @@ const StyledCollectiveCard = ({ collective, children, ...props }) => {
         <Box mt={-32}>
           <Link route="collective" params={{ slug: collective.slug }}>
             <a>
-              <Avatar src={collective.image} radius={48} name={collective.name} />
+              <Avatar collective={collective} radius={48} />
             </a>
           </Link>
         </Box>

@@ -155,13 +155,7 @@ class Comment extends React.Component {
             title={comment.fromCollective.name}
             passHref
           >
-            <Avatar
-              src={comment.fromCollective.image}
-              type={comment.fromCollective.type}
-              name={comment.fromCollective.name}
-              key={comment.fromCollective.id}
-              radius={40}
-            />
+            <Avatar collective={comment.fromCollective} key={comment.fromCollective.id} radius={40} />
           </Link>
         </div>
         <div className="body">

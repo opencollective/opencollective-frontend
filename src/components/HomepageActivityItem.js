@@ -13,14 +13,7 @@ const HomepageActivityItem = ({ amount, createdAt, currency, fromCollective, col
   return (
     <Container display="flex" alignItems="center">
       <LinkCollective collective={fromCollective} title={fromCollective.name}>
-        <Avatar
-          src={fromCollective.image}
-          id={fromCollective.id}
-          radius={40}
-          className="noFrame"
-          type={fromCollective.type}
-          name={fromCollective.name}
-        />
+        <Avatar collective={fromCollective} id={fromCollective.id} radius={40} className="noFrame" />
       </LinkCollective>
       <Container ml={3}>
         <P fontSize="1.2rem" color="#9399A3" display="inline">

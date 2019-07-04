@@ -133,7 +133,7 @@ ${totalDonationsStr}`;
           {viewMode === 'USER' && (
             <Link route={'collective'} params={{ slug: this.props.member.member.slug }} target="_top" title={title}>
               <Flex mt={2}>
-                <Avatar src={member.image} radius={45} name={name} type={member.type} className="noFrame" />
+                <Avatar collective={member} radius={45} className="noFrame" />
                 <div className="bubble">
                   <div className="name">{name}</div>
                   <div className="description" style={{ color: colors.darkgray }}>

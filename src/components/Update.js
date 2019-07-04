@@ -169,13 +169,7 @@ class Update extends React.Component {
         </style>
         <div className="fromCollective">
           <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
-            <Avatar
-              src={update.fromCollective.image}
-              type={update.fromCollective.type}
-              name={update.fromCollective.name}
-              key={update.fromCollective.id}
-              radius={40}
-            />
+            <Avatar collective={update.fromCollective} radius={40} />
           </a>
         </div>
         <div className="body">

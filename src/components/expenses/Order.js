@@ -198,14 +198,7 @@ class Order extends React.Component {
             title={order.fromCollective.name}
             passHref
           >
-            <Avatar
-              src={order.fromCollective.image}
-              type={order.fromCollective.type}
-              name={order.fromCollective.name}
-              key={order.fromCollective.id}
-              radius={40}
-              className="noFrame"
-            />
+            <Avatar collective={order.fromCollective} key={order.fromCollective.id} radius={40} className="noFrame" />
           </Link>
         </div>
         <div className="body">

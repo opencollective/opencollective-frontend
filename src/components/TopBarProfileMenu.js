@@ -155,13 +155,7 @@ class TopBarProfileMenu extends React.Component {
                     fontWeight="400"
                   >
                     <Flex alignItems="center">
-                      <Avatar
-                        src={get(membership, 'collective.image')}
-                        type={get(membership, 'collective.type')}
-                        name={get(membership, 'collective.name')}
-                        radius="2.8rem"
-                        mr={2}
-                      />
+                      <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
                       {get(membership, 'collective.name')}
                     </Flex>
                   </StyledLink>
@@ -214,13 +208,7 @@ class TopBarProfileMenu extends React.Component {
                     fontWeight="400"
                   >
                     <Flex alignItems="center">
-                      <Avatar
-                        src={get(membership, 'collective.image')}
-                        type={get(membership, 'collective.type')}
-                        name={get(membership, 'collective.name')}
-                        radius="2.8rem"
-                        mr={2}
-                      />
+                      <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
                       {get(membership, 'collective.name')}
                     </Flex>
                   </StyledLink>
@@ -309,15 +297,7 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
-        {LoggedInUser.image && (
-          <Avatar
-            radius="3rem"
-            mr={2}
-            src={LoggedInUser.image}
-            type={get(LoggedInUser, 'collective.type')}
-            name={get(LoggedInUser, 'collective.name')}
-          />
-        )}
+        <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
         <Hide xs sm>
           <P
             color="#46b0ed"

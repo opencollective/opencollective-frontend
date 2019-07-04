@@ -64,7 +64,7 @@ class TopBackersCoverWithData extends React.Component {
             `}
           </style>
           <Link route="collective" params={{ slug: org.slug }} title={this.renderMemberTitle(member)} passHref>
-            <Logo src={org.image} type={org.type} website={org.website} height={36} />
+            <Logo collective={org} height={36} />
           </Link>
         </div>
       </div>
@@ -78,14 +78,7 @@ class TopBackersCoverWithData extends React.Component {
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
         <Link route="collective" params={{ slug: user.slug }} title={this.renderMemberTitle(member)} passHref>
-          <Avatar
-            src={user.image}
-            name={user.name}
-            type={user.type}
-            radius={48}
-            size={[30, null, 48]}
-            className="noFrame"
-          />
+          <Avatar collective={user} radius={48} size={[30, null, 48]} className="noFrame" />
         </Link>
       </div>
     );

@@ -891,7 +891,6 @@ class CreateOrderPage extends React.Component {
     }
 
     const collective = data.Collective;
-    const logo = collective.image || get(collective.parentCollective, 'image');
     const isLoadingContent = loadingLoggedInUser || data.loading;
 
     return (
@@ -903,15 +902,7 @@ class CreateOrderPage extends React.Component {
       >
         <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4} mb={4}>
           <Link className="goBack" {...this.getCollectiveLinkParams(collectiveSlug, eventSlug)}>
-            <Logo
-              src={logo}
-              className="logo"
-              type={collective.type}
-              website={collective.website}
-              height="10rem"
-              key={logo}
-              style={{ margin: '0 auto' }}
-            />
+            <Logo collective={collective} className="logo" height="10rem" style={{ margin: '0 auto' }} />
             <H2 as="h1" color="black.900" textAlign="center">
               {collective.name}
             </H2>

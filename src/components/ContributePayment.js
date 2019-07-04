@@ -46,8 +46,7 @@ const getPaymentMethodIcon = (pm, collective) => {
   } else if (pm.type === 'prepaid') {
     return <MoneyCheck width="26px" height="18px" />;
   } else if (pm.type === 'collective' && collective) {
-    const { image, type, name } = collective;
-    return <Avatar src={image} type={type} size="3.6rem" name={name} />;
+    return <Avatar collective={collective} size="3.6rem" />;
   } else if (pm.type === 'manual') {
     return <ExchangeAlt size="1.5em" color="#c9ced4" />;
   }

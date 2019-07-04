@@ -275,9 +275,7 @@ class Expense extends React.Component {
             passHref
           >
             <Avatar
-              src={expense.fromCollective.image}
-              type={expense.fromCollective.type}
-              name={expense.fromCollective.name}
+              collective={expense.fromCollective}
               key={expense.fromCollective.id}
               radius={40}
               className="noFrame"
