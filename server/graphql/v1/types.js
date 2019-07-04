@@ -30,6 +30,7 @@ import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
 import roles from '../../constants/roles';
+import { isUserTaxFormRequiredBeforePayment } from '../../lib/taxForms';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
@@ -653,6 +654,19 @@ export const ExpenseType = new GraphQLObjectType({
             } else {
               return null;
             }
+          });
+        },
+      },
+      userTaxFormRequiredBeforePayment: {
+        type: GraphQLBoolean,
+        async resolve(expense) {
+          const incurredYear = moment(expense.incurredAt).year();
+
+          return isUserTaxFormRequiredBeforePayment({
+            year: incurredYear,
+            invoiceTotalThreshold: 600e2,
+            HostCollectiveId: expense.CollectiveId,
+            UserId: expense.UserId,
           });
         },
       },
