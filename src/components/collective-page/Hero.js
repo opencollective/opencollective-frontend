@@ -10,6 +10,7 @@ import { Github } from 'styled-icons/feather/Github';
 import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { CheckCircle } from 'styled-icons/feather/CheckCircle';
+import { Mail } from 'styled-icons/feather/Mail';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../lib/url_helpers';
@@ -229,16 +230,19 @@ class Hero extends Component {
             sections={this.props.sections}
             selected={this.props.selectedSection}
             onSectionClick={this.props.onSectionClick}
-            collectiveSlug={collective.slug}
           />
           <Container py={2} ml={3} display={['none', null, null, 'block']}>
-            <StyledButton mx={2}>
+            <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
+              <StyledButton mx={2}>
+                <Mail size="1.2em" />
+                &nbsp;
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
+              </StyledButton>
+            </a>
+            <StyledButton mx={2} disabled title="Coming soon">
               <CheckCircle size="1.1em" />
               &nbsp;
               <FormattedMessage id="Collective.Hero.GetUpdates" defaultMessage="Get updates" />
-            </StyledButton>
-            <StyledButton mx={2}>
-              <FormattedMessage id="Collective.Hero.Share" defaultMessage="Share" />
             </StyledButton>
           </Container>
         </ContainerSectionContent>
