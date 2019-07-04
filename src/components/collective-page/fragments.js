@@ -17,11 +17,13 @@ export const TransactionsAndExpensesFragment = gql`
         slug
         name
         image
+        type
       }
       usingVirtualCardFromCollective {
         id
         slug
         name
+        type
       }
     }
     expenses(limit: 3) {
@@ -38,7 +40,31 @@ export const TransactionsAndExpensesFragment = gql`
         slug
         name
         image
+        type
       }
+    }
+  }
+`;
+
+/**
+ * Fields fetched for updates
+ */
+export const UpdatesFieldsFragment = gql`
+  fragment UpdatesFieldsFragment on UpdateType {
+    id
+    slug
+    title
+    summary
+    createdAt
+    publishedAt
+    isPrivate
+    userCanSeeUpdate
+    fromCollective {
+      id
+      type
+      name
+      slug
+      image
     }
   }
 `;

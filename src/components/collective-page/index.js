@@ -15,6 +15,7 @@ import SectionAbout from './SectionAbout';
 import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
+import SectionUpdates from './SectionUpdates';
 
 /** A mutation used by child components to update the collective */
 const EditCollectiveMutation = gql`
@@ -75,6 +76,9 @@ export default class CollectivePage extends Component {
     /** Collective transactions & expenses */
     transactions: PropTypes.arrayOf(PropTypes.object),
     expenses: PropTypes.arrayOf(PropTypes.object),
+
+    /** Updates / announcements */
+    updates: PropTypes.arrayOf(PropTypes.object),
 
     /** Collective stats */
     stats: PropTypes.object,
@@ -158,6 +162,10 @@ export default class CollectivePage extends Component {
       );
     } else if (section === Sections.BUDGET) {
       return <SectionBudget collective={collective} transactions={transactions} expenses={expenses} stats={stats} />;
+    } else if (section === Sections.UPDATES) {
+      return (
+        <SectionUpdates collective={collective} canSeeDrafts={canEdit} isLoggedIn={Boolean(this.props.LoggedInUser)} />
+      );
     }
 
     // Placeholder for sections not implemented yet
@@ -171,7 +179,7 @@ export default class CollectivePage extends Component {
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
     const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
 
     return (

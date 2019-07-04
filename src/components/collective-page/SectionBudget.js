@@ -24,6 +24,7 @@ import { TransactionsAndExpensesFragment } from './fragments';
 const TransactionsAndExpensesQuery = gql`
   query NewCollectivePage($slug: String!) {
     Collective(slug: $slug) {
+      id
       ...TransactionsAndExpensesFragment
     }
   }
@@ -53,7 +54,6 @@ const SectionBudget = ({ collective, stats, intl }) => {
           {({ data }) => {
             const expenses = get(data, 'Collective.expenses');
             const transactions = get(data, 'Collective.transactions');
-
             if (isEmpty(expenses) && isEmpty(transactions)) {
               return null;
             }

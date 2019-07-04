@@ -58,6 +58,10 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.About',
     defaultMessage: 'About',
   },
+  [Sections.UPDATES]: {
+    id: 'CollectivePage.NavBar.Updates',
+    defaultMessage: 'Updates',
+  },
 });
 
 /**
