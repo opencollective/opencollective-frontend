@@ -174,9 +174,9 @@ Subject: {{{collective.name}}} Collective {{month}} {{year}} Report
         <td valign="top" width="48">
           <a href="{{@root.config.host.website}}/{{fromCollective.slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">
             {{#if isSponsor}}
-              <img src={{resizeImage fromCollective.image height=48}} height="48" alt="{{fromCollective.name}}" border="0" />
+              <img src="{{@root.config.host.images}}/{{fromCollective.slug}}/logo.png}" height="48" alt="{{fromCollective.name}}" border="0" />
             {{else}}
-              <img src={{resizeImage fromCollective.image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{fromCollective.name}}" border="0" />
+              <img src="{{@root.config.host.images}}/{{fromCollective.slug}}/avatar/rounded.png" height="36" width="36" alt="{{fromCollective.name}}" border="0" />
             {{/if}}
           </a>          
         </td>
@@ -210,9 +210,9 @@ Subject: {{{collective.name}}} Collective {{month}} {{year}} Report
         <td valign="top" width="48">
           <a href="{{@root.config.host.website}}/{{fromCollective.slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">
             {{#if isSponsor}}
-              <img src={{resizeImage fromCollective.image height=48}} height="48" alt="{{fromCollective.name}}" border="0" />
+              <img src="{{@root.config.host.images}}/{{fromCollective.slug}}/logo.png}" height="48" alt="{{fromCollective.name}}" border="0" />
             {{else}}
-              <img src={{resizeImage fromCollective.image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve,e_grayscale/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{fromCollective.name}}" border="0" />
+              <img src="{{@root.config.host.images}}/{{fromCollective.slug}}/avatar/rounded.png" height="36" width="36" alt="{{fromCollective.name}}" border="0" />
             {{/if}}
           </a>          
         </td>
@@ -270,9 +270,9 @@ Subject: {{{collective.name}}} Collective {{month}} {{year}} Report
         {{#each activeBackers}}
           <a href="{{@root.config.host.website}}/{{slug}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
             {{#if isSponsor}}
-              <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
+              <img src="{{@root.config.host.images}}/{{slug}}/logo.png" height="48" alt="{{name}}" border="0" />
             {{else}}
-              <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{name}}" border="0" />
+              <img src="{{@root.config.host.images}}/{{slug}}/avatar/rounded.png" height="36" width="36" alt="{{name}}" border="0"" />
             {{/if}}
           </a>
         {{/each}}
