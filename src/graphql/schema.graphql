@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Jun 28 2019 15:34:21 GMT+0200 (GMT+02:00)
+# timestamp: Thu Jul 04 2019 17:49:47 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -720,6 +720,11 @@ type Contributor {
   totalAmountDonated: Int!
 
   """
+  Wether the contributor is an individual, an organization...
+  """
+  type: String!
+
+  """
   Description of how the member contribute. Will usually be a tier name, or "design" or "code".
   """
   description: String
@@ -787,6 +792,28 @@ type ContributorsStats {
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
+}
+
+"""
+Input for custom fields for order
+"""
+input CustomFieldsInputType {
+  type: CustomFieldType
+  name: String
+  label: String
+  required: Boolean
+}
+
+"""
+Type of custom field
+"""
+enum CustomFieldType {
+  number
+  text
+  email
+  date
+  radio
+  url
 }
 
 scalar DateString
@@ -1762,6 +1789,7 @@ input OrderInputType {
   fromCollective: CollectiveAttributesInputType
   collective: CollectiveAttributesInputType!
   tier: TierInputType
+  customData: JSON
   recaptchaToken: String
 
   """
@@ -1897,7 +1925,7 @@ type OrderType {
   status: OrderStatus
 
   """
-  Additional information on order: tax
+  Additional information on order: tax and custom fields
   """
   data: JSON
 }
@@ -2537,6 +2565,7 @@ type Tier {
   maxQuantityPerUser: Int
   goal: Int
   password: String
+  customFields: [JSON]
   startsAt: DateString
   endsAt: DateString
   collective: CollectiveInterface
@@ -2612,6 +2641,7 @@ input TierInputType {
   """
   goal: Int
   password: String
+  customFields: [CustomFieldsInputType]
 
   """
   Start of the campaign

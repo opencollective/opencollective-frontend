@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
+import { CollectiveType } from '../../constants/collectives';
 import { formatCurrency } from '../../lib/utils';
 import { H2 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -48,8 +49,11 @@ class SectionContribute extends React.PureComponent {
         image: PropTypes.string,
       }),
     ),
-    topOrganizations: PropTypes.arrayOf(PropTypes.object),
-    topIndividuals: PropTypes.arrayOf(PropTypes.object),
+    contributors: PropTypes.arrayOf(
+      PropTypes.shape({
+        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+      }),
+    ),
     intl: PropTypes.object,
   };
 
@@ -145,9 +149,47 @@ class SectionContribute extends React.PureComponent {
     return [financialContributions, moreWaysToContribute];
   });
 
+  getTopContributors = memoizeOne(contributors => {
+    const nbMaxInTop = 10;
+    const topOrgs = [];
+    const topIndividuals = [];
+    let doneWithOrgs = false;
+    let doneWithIndividuals = false;
+
+    for (const contributor of contributors) {
+      // We only care about financial contributors that donated $$$
+      if (!contributor.isBacker || !contributor.totalAmountDonated) {
+        continue;
+      }
+
+      // Put contributors in the array corresponding to their types
+      if (!doneWithIndividuals && contributor.type === CollectiveType.USER) {
+        topIndividuals.push(contributor);
+        if (topIndividuals.length === nbMaxInTop) {
+          doneWithIndividuals = true;
+        }
+      } else if (
+        (!doneWithOrgs && contributor.type === CollectiveType.ORGANIZATION) ||
+        contributor.type === CollectiveType.COLLECTIVE
+      ) {
+        topOrgs.push(contributor);
+        if (topOrgs.length === nbMaxInTop) {
+          doneWithOrgs = true;
+        }
+      }
+
+      if (doneWithOrgs && doneWithIndividuals) {
+        break;
+      }
+    }
+
+    return [topOrgs, topIndividuals];
+  });
+
   render() {
-    const { collective, tiers, events, topOrganizations, topIndividuals } = this.props;
+    const { collective, tiers, events, contributors } = this.props;
     const [financialContributions, otherWaysToContribute] = this.getWaysToContribute(collective, tiers, events);
+    const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
 
     return (
       <Box py={[null, null, 3]}>
@@ -182,11 +224,13 @@ class SectionContribute extends React.PureComponent {
             </StyledButton>
           </Link>
         </ContainerSectionContent>
-        <TopContributors
-          topOrganizations={topOrganizations}
-          topIndividuals={topIndividuals}
-          currency={collective.currency}
-        />
+        {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
+          <TopContributors
+            topOrganizations={topOrganizations}
+            topIndividuals={topIndividuals}
+            currency={collective.currency}
+          />
+        )}
       </Box>
     );
   }
