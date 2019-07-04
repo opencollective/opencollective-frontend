@@ -95,6 +95,11 @@ describe('Mutation Tests', () => {
         currency
         host {
           id
+          currency
+        }
+        parentCollective {
+          id
+          currency
         }
         isActive
         tiers {
@@ -154,8 +159,8 @@ describe('Mutation Tests', () => {
         );
       });
 
-      it('creates an event with multiple tiers', async () => {
-        await host.collective.update({ settings: { apply: true } });
+      it('creates an event with multiple tiers, uses the currency of parent collective', async () => {
+        await host.collective.update({ currency: 'CAD', settings: { apply: true } });
         const event = getEventData(collective1);
 
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
@@ -173,7 +178,7 @@ describe('Mutation Tests', () => {
           where: { CollectiveId: event.id },
           order: [['MemberCollectiveId', 'ASC']],
         });
-
+        expect(createdEvent.currency).to.equal(createdEvent.parentCollective.currency);
         expect(members).to.have.length(3);
         expect(members[0].CollectiveId).to.equal(event.id);
         expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);

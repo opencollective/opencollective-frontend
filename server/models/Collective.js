@@ -1387,9 +1387,13 @@ export default function(Sequelize, DataTypes) {
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       hostFeePercent: hostCollective.hostFeePercent,
-      currency: hostCollective.currency,
       isActive,
     };
+
+    // events should take the currency of their parent collective, not necessarily the host of their host.
+    if (this.type === 'COLLECTIVE') {
+      updatedValues.currency = hostCollective.currency;
+    }
 
     const promises = [models.Member.create(member), this.update(updatedValues)];
 
