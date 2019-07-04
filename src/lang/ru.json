@@ -613,6 +613,7 @@
   "host.dashboard": "Доска",
   "host.dashboard.paypal.balance": "PayPal pre-approval balance:",
   "host.dashboard.title": "{collective} - Доска представителей",
+  "host.expenses.title": "Expenses",
   "host.HostCollectiveId.label": "Выберите организацию",
   "host.hostFee.help": "The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.",
   "host.link": "Использовать этот хост",

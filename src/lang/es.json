@@ -613,6 +613,7 @@
   "host.dashboard": "Panel",
   "host.dashboard.paypal.balance": "PayPal card balance:",
   "host.dashboard.title": "{collective} - Host Dashboard",
+  "host.expenses.title": "Expenses",
   "host.HostCollectiveId.label": "Seleccione una organizacion",
   "host.hostFee.help": "The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.",
   "host.link": "Usa este host",

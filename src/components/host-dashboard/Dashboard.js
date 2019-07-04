@@ -115,11 +115,7 @@ class HostDashboard extends React.Component {
             <div id="expenses" className="first col">
               <div className="header">
                 <h2>
-                  <FormattedMessage
-                    id="collective.expenses.title"
-                    values={{ n: this.totalExpenses }}
-                    defaultMessage="Expenses"
-                  />
+                  <FormattedMessage id="host.expenses.title" defaultMessage="Expenses" />
                 </h2>
               </div>
               <ExpensesWithData
