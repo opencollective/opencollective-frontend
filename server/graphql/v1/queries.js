@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { find, get, uniq } from 'lodash';
+import { find, get, uniq, pick } from 'lodash';
 import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
 import { parseToBoolean } from '../../lib/utils';
@@ -1000,6 +1000,31 @@ const queries = {
   allCollectiveTags: {
     type: new GraphQLList(GraphQLString),
     resolve: rawQueries.getUniqueCollectiveTags,
+  },
+
+  /**
+   * Find a specific member. If multiple members match the given criterias, only
+   * one will be returned.
+   */
+  member: {
+    type: MemberType,
+    args: {
+      id: { type: GraphQLInt },
+      CollectiveId: { type: GraphQLInt },
+      MemberCollectiveId: { type: GraphQLInt },
+      TierId: { type: GraphQLInt },
+    },
+    async resolve(_, args) {
+      if (!args.id && !(args.MemberCollectiveId && (args.CollectiveId || args.TierId))) {
+        throw new errors.ValidationFailed(
+          'Must provide either an id, a pair of MemberCollectiveId/CollectiveId or a pair of MemberCollectiveId/TierId',
+        );
+      }
+
+      return models.Member.findOne({
+        where: pick(args, ['id', 'CollectiveId', 'MemberCollectiveId', 'tierId']),
+      });
+    },
   },
 
   /*
