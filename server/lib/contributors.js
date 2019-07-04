@@ -32,13 +32,7 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}
         "Transactions" t
           ON t."type" = 'CREDIT'
           AND (t."FromCollectiveId" = mc.id OR t."UsingVirtualCardFromCollectiveId" = mc.id)
-      CROSS JOIN LATERAL (
-        SELECT name
-        FROM "Tiers"
-        WHERE id = m."TierId"
-        ORDER BY "Tiers".amount DESC
-        LIMIT 1
-      ) AS tier
+      LEFT JOIN "Tiers" tier ON m."TierId" = tier.id
       WHERE
         m."CollectiveId" = ?
       GROUP BY	  
@@ -74,17 +68,12 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         "Collectives" mc
       INNER JOIN
         "Members" m ON m."MemberCollectiveId" = mc.id
+      INNER JOIN
+        "Tiers" tier ON m."TierId" = tier.id
       LEFT JOIN
         "Transactions" t
           ON t."type" = 'CREDIT'
           AND (t."FromCollectiveId" = mc.id OR t."UsingVirtualCardFromCollectiveId" = mc.id)
-      CROSS JOIN LATERAL (
-        SELECT name
-        FROM "Tiers"
-        WHERE id = m."TierId"
-        ORDER BY "Tiers".amount DESC
-        LIMIT 1
-      ) AS tier
       WHERE
         m."TierId" = ?
       GROUP BY	  
