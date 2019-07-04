@@ -295,6 +295,7 @@
   "contributeAs.org.website": "Website",
   "contributeAs.personal": "Personal account - {email}",
   "ContributeCard.Btn": "Contribute",
+  "ContributeCard.BtnEvent": "Get tickets",
   "ContributeCard.BtnGoal": "Contribute with this goal",
   "ContributeCard.Description.Fallback": "Join us and help us sustain our activities!",
   "ContributeCard.ReadMore": "Read more",
