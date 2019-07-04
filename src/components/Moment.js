@@ -4,11 +4,9 @@ import moment from 'moment';
 import { FormattedDate } from 'react-intl';
 
 const Moment = ({ value, relative }) => {
-  const date = new Date(value);
-  const formattedLongDateStr = moment(date).format('LLLL');
-  return (
-    <span title={formattedLongDateStr}>{relative ? moment(date).fromNow() : <FormattedDate value={value} />}</span>
-  );
+  const date = moment(new Date(value));
+  const formattedLongDateStr = date.format('LLLL');
+  return <span title={formattedLongDateStr}>{relative ? date.fromNow() : <FormattedDate value={value} />}</span>;
 };
 
 Moment.propTypes = {
