@@ -26,7 +26,7 @@
   "addfunds.totalAmount": "Сумма финансирования",
   "addfundstoorg.FromCollectiveId.label": "представитель",
   "amount.free": "бесплатно",
-  "AmountInterval": "{amount} / {interval, select, month {mo.} year {yr.}}",
+  "AmountInterval": "No",
   "api.error.unreachable": "Не получается связаться с API. Пожалуйста, попробуйте позже.",
   "applications.ApiKeys": "API ключи",
   "applications.ApiKeys.code": "API ключ: {code}",
