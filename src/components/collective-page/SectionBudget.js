@@ -88,12 +88,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                         <Container p={24} display="flex" justifyContent="space-between">
                           <Flex>
                             <Box mr={3}>
-                              <Avatar
-                                src={fromCollective.image}
-                                type={fromCollective.type}
-                                name={fromCollective.name}
-                                radius={40}
-                              />
+                              <Avatar collective={fromCollective} radius={40} />
                             </Box>
                             <Flex flexDirection="column" justifyContent="space-between">
                               <P color="black.900" fontWeight="600">
@@ -257,7 +252,6 @@ SectionBudget.propTypes = {
         id: PropTypes.number,
         slug: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-        image: PropTypes.string.isRequired,
       }).isRequired,
     }),
   ),
