@@ -35,58 +35,17 @@ const EditCollectiveMutation = gql`
  */
 export default class CollectivePage extends Component {
   static propTypes = {
-    /** The collective to display */
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      backgroundImage: PropTypes.string,
-      twitterHandle: PropTypes.string,
-      githubHandle: PropTypes.string,
-      website: PropTypes.string,
-      description: PropTypes.string,
-      tags: PropTypes.arrayOf(PropTypes.string),
-      settings: PropTypes.object,
-    }).isRequired,
-
-    /** Collective's host */
-    host: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
-    }),
-
-    /** Collective contributors */
+    collective: PropTypes.object.isRequired,
+    host: PropTypes.object,
     contributors: PropTypes.arrayOf(PropTypes.object),
     topOrganizations: PropTypes.arrayOf(PropTypes.object),
     topIndividuals: PropTypes.arrayOf(PropTypes.object),
-
-    /** Collective tiers */
-    tiers: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        description: PropTypes.string,
-      }),
-    ),
-
-    /** Collective transactions & expenses */
+    tiers: PropTypes.arrayOf(PropTypes.object),
     transactions: PropTypes.arrayOf(PropTypes.object),
     expenses: PropTypes.arrayOf(PropTypes.object),
-
-    /** Updates / announcements */
     updates: PropTypes.arrayOf(PropTypes.object),
-
-    /** Collective stats */
     stats: PropTypes.object,
-
-    /** Collective events */
     events: PropTypes.arrayOf(PropTypes.object),
-
-    /** The logged in user */
     LoggedInUser: PropTypes.object,
   };
 
