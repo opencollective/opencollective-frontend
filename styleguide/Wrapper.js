@@ -3,7 +3,6 @@ import { ThemeProvider, createGlobalStyle } from 'styled-components';
 
 import StripeProvider from '../src/components/StripeProvider';
 import theme from '../src/constants/theme';
-import AppGlobalStyles from '../src/pages/global-styles';
 import { IntlProvider } from 'react-intl';
 
 const StyleguideGlobalStyles = createGlobalStyle`
@@ -18,7 +17,6 @@ export default class ThemeWrapper extends Component {
   render() {
     return (
       <Fragment>
-        <AppGlobalStyles />
         <StyleguideGlobalStyles />
         <ThemeProvider theme={theme}>
           <IntlProvider locale="en">

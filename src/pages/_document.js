@@ -3,7 +3,6 @@ import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
 import { pick } from 'lodash';
-import GlobalStyles from './global-styles';
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -71,7 +70,6 @@ export default class IntlDocument extends Document {
       <html>
         <Head />
         <body>
-          <GlobalStyles />
           <Main />
           <script
             dangerouslySetInnerHTML={{
