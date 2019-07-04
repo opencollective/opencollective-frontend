@@ -130,6 +130,8 @@ export default function(Sequelize, DataTypes) {
 
       amountType: {
         type: DataTypes.ENUM('FLEXIBLE', 'FIXED'),
+        allowNull: false,
+        defaultValue: 'FIXED',
       },
 
       minimumAmount: {

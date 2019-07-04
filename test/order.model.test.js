@@ -7,7 +7,7 @@ describe('order.model.test.js', () => {
   before(() => utils.resetTestDB());
   before('create a user', () => models.User.createUserWithCollective({ name: 'Xavier' }).then(u => (user = u)));
   before('create a collective', () => models.Collective.create({ name: 'Webpack' }).then(c => (collective = c)));
-  before('create a tier', () => models.Tier.create({ name: 'backer' }).then(t => (tier = t)));
+  before('create a tier', () => models.Tier.create({ name: 'backer', amount: 0 }).then(t => (tier = t)));
   before('create an order', () =>
     models.Order.create({
       CreatedByUserId: user.id,
