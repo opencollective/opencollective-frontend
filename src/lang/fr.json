@@ -128,7 +128,6 @@
   "collective.expensePolicy.placeholder": "Par exemple : quel type de dépenses seront acceptées, les limites sur le montant, les documents requis et qui contacter s'il y a des questions.",
   "collective.expenses.title": "{n, plural, one {Latest expense} other {Latest expenses}}",
   "collective.githubHandle.label": "Github",
-  "Collective.Hero.GetUpdates": "S'abonner aux actualités",
   "Collective.Hero.Host": "{FiscalHost} : {hostName}",
   "collective.host.cancelanytime": "Vous pouvez annuler à n'importe quel moment.",
   "collective.host.disclaimer": "En cliquant ci-dessus, vous vous engagez à donner {amount} {interval, select, month {par mois} year {par an} other {}} à {hostname} pour {collective}.",
