@@ -132,7 +132,9 @@ class Hero extends Component {
             <Flex flexDirection={isFixed ? 'row' : 'column'} alignItems={isFixed ? 'center' : ['center', 'flex-start']}>
               <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
                 <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-                  <Avatar borderRadius="25%" collective={collective} radius={isFixed ? 40 : 128} />
+                  <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%">
+                    <Avatar borderRadius="25%" collective={collective} radius={isFixed ? 40 : 128} />
+                  </Container>
                 </LinkCollective>
                 {canEdit && !isFixed && (
                   <Container position="absolute" right={-10} bottom={-5}>
@@ -147,6 +149,7 @@ class Hero extends Component {
               <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
                 <H1
                   ml={isFixed ? 2 : undefined}
+                  p={2}
                   color="black.800"
                   fontSize={isFixed ? 'H5' : 'H3'}
                   lineHeight={isFixed ? 'H5' : 'H3'}
@@ -159,7 +162,7 @@ class Hero extends Component {
 
             {!isFixed && (
               <React.Fragment>
-                <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap">
+                <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap" px={2}>
                   <StyledTag my={2} mb={2}>
                     <I18nCollectiveTags tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags)} />
                   </StyledTag>
@@ -227,8 +230,9 @@ class Hero extends Component {
           <Container py={2} ml={3} display={['none', null, null, 'block']}>
             <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
               <StyledButton mx={2}>
-                <Mail size="1.2em" />
-                &nbsp;
+                <Span mr="5px">
+                  <Mail size="1.1em" style={{ verticalAlign: 'sub' }} />
+                </Span>
                 <FormattedMessage id="Contact" defaultMessage="Contact" />
               </StyledButton>
             </a>
