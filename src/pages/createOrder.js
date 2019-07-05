@@ -199,7 +199,7 @@ class CreateOrderPage extends React.Component {
       stepDetails: get(state.stepDetails, 'totalAmount')
         ? state.stepDetails
         : this.getDefaultStepDetails(this.props.data.Tier),
-      customData: this.props.customData, // May needs parsing with JSON.parse
+      customData: this.props.customData,
     }));
   }
 
