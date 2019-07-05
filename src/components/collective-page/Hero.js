@@ -9,7 +9,6 @@ import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
 import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Cog } from 'styled-icons/typicons/Cog';
-import { CheckCircle } from 'styled-icons/feather/CheckCircle';
 import { Mail } from 'styled-icons/feather/Mail';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
@@ -236,11 +235,6 @@ class Hero extends Component {
                 <FormattedMessage id="Contact" defaultMessage="Contact" />
               </StyledButton>
             </a>
-            <StyledButton mx={2} disabled title="Coming soon">
-              <CheckCircle size="1.1em" />
-              &nbsp;
-              <FormattedMessage id="Collective.Hero.GetUpdates" defaultMessage="Get updates" />
-            </StyledButton>
           </Container>
         </ContainerSectionContent>
       </MainContainer>
