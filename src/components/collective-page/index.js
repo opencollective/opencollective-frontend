@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
@@ -45,9 +45,12 @@ class CollectivePage extends Component {
     transactions: PropTypes.arrayOf(PropTypes.object),
     expenses: PropTypes.arrayOf(PropTypes.object),
     updates: PropTypes.arrayOf(PropTypes.object),
-    stats: PropTypes.object,
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
+    stats: PropTypes.shape({
+      balance: PropTypes.number.isRequired,
+      yearlyBudget: PropTypes.number.isRequired,
+    }),
   };
 
   constructor(props) {
@@ -68,12 +71,30 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  getSections = memoizeOne(collective => {
+  getSections = memoizeOne((props, isAdmin) => {
+    const { collective, host, stats, updates, transactions, expenses } = props;
     const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
-    if (collective.isArchived) {
-      return sections.filter(s => s !== Sections.CONTRIBUTE);
+    const sectionsToRemove = new Set([]);
+
+    // Can't contribute anymore if the collective is archived or has no host
+    if (collective.isArchived || !host) {
+      sectionsToRemove.add(Sections.CONTRIBUTE);
     }
-    return sections;
+
+    // Some sections are hidden for non-admins (usually when there's no data)
+    if (!isAdmin) {
+      if (isEmpty(updates)) {
+        sectionsToRemove.add(Sections.UPDATES);
+      }
+      if (isEmpty(transactions) && isEmpty(expenses) && stats.balance === 0) {
+        sectionsToRemove.add(Sections.BUDGET);
+      }
+      if (!collective.longDescription) {
+        sectionsToRemove.add(Sections.ABOUT);
+      }
+    }
+
+    return sections.filter(section => !sectionsToRemove.has(section));
   });
 
   onScroll = debounceScroll(() => {
@@ -88,7 +109,7 @@ class CollectivePage extends Component {
 
     const distanceThreshold = 200;
     const currentViewBottom = window.scrollY + window.innerHeight;
-    const sections = this.getSections(this.props.collective);
+    const sections = Object.keys(this.sectionsRefs);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
@@ -112,35 +133,51 @@ class CollectivePage extends Component {
   };
 
   renderSection(section, canEdit) {
-    const { collective, contributors, tiers, events, transactions, stats, expenses } = this.props;
-
-    if (section === Sections.ABOUT) {
-      return <SectionAbout collective={collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />;
-    } else if (section === Sections.CONTRIBUTORS) {
-      return <SectionContributors collectiveName={collective.name} contributors={contributors} />;
-    } else if (section === Sections.CONTRIBUTE) {
-      return <SectionContribute collective={collective} tiers={tiers} events={events} contributors={contributors} />;
-    } else if (section === Sections.BUDGET) {
-      return <SectionBudget collective={collective} transactions={transactions} expenses={expenses} stats={stats} />;
-    } else if (section === Sections.UPDATES) {
-      return (
-        <SectionUpdates collective={collective} canSeeDrafts={canEdit} isLoggedIn={Boolean(this.props.LoggedInUser)} />
-      );
+    switch (section) {
+      case Sections.ABOUT:
+        return (
+          <SectionAbout collective={this.props.collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />
+        );
+      case Sections.BUDGET:
+        return (
+          <SectionBudget
+            collective={this.props.collective}
+            transactions={this.props.transactions}
+            expenses={this.props.expenses}
+            stats={this.props.stats}
+          />
+        );
+      case Sections.CONTRIBUTE:
+        return (
+          <SectionContribute
+            collective={this.props.collective}
+            tiers={this.props.tiers}
+            events={this.props.events}
+            contributors={this.props.contributors}
+          />
+        );
+      case Sections.CONTRIBUTORS:
+        return (
+          <SectionContributors collectiveName={this.props.collective.name} contributors={this.props.contributors} />
+        );
+      case Sections.UPDATES:
+        return (
+          <SectionUpdates
+            collective={this.props.collective}
+            canSeeDrafts={canEdit}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
+          />
+        );
+      default:
+        return null;
     }
-
-    // Placeholder for sections not implemented yet
-    return (
-      <Container display="flex" borderBottom="1px solid lightgrey" py={8} justifyContent="center" fontSize={36}>
-        [Section] {section}
-      </Container>
-    );
   }
 
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
     const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const sections = this.getSections(collective);
+    const sections = this.getSections(this.props, canEdit);
 
     return (
       <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>

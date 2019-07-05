@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
@@ -105,7 +105,9 @@ class SectionUpdates extends React.Component {
   render() {
     const { collective, canSeeDrafts } = this.props;
     const updates = get(this.props.data, 'Collective.updates', []);
-    if ((!updates || updates.length === 0) && !canSeeDrafts) {
+
+    // Nothing to show if updates is empty and user can't add new ones
+    if (isEmpty(updates) && !canSeeDrafts) {
       return null;
     }
 
@@ -114,84 +116,105 @@ class SectionUpdates extends React.Component {
         <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
           <FormattedMessage id="CollectivePage.SectionUpdates.Title" defaultMessage="Latest updates" />
         </H3>
-
-        <StyledCard>
-          {updates.map((update, idx) => (
-            <Container
-              key={update.id}
-              p={24}
-              display="flex"
-              justifyContent="space-between"
-              borderBottom={idx === updates.length - 1 ? undefined : '1px solid #e6e8eb'}
-            >
-              <Flex>
-                <Box mr={3}>
-                  <Avatar
-                    src={update.fromCollective.image}
-                    type={update.fromCollective.type}
-                    name={update.fromCollective.name}
-                    radius={40}
-                  />
-                </Box>
-                <Flex flexDirection="column" justifyContent="space-between">
-                  <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
-                    <P color="black.900" fontWeight="600">
-                      {update.title}
-                    </P>
-                  </Link>
-                  {update.userCanSeeUpdate ? (
-                    <P color="black.700" dangerouslySetInnerHTML={{ __html: update.summary }} />
-                  ) : (
-                    <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
-                      <FormattedMessage
-                        id="update.private.cannot_view_message"
-                        defaultMessage="Become a backer of {collective} to see this update"
-                        values={{ collective: collective.name }}
-                      />
-                    </PrivateUpdateMesgBox>
-                  )}
-                  <Container color="black.400" mt={2} fontSize="Caption">
-                    {update.isPrivate && (
-                      <StyledTooltip
-                        content={() => (
-                          <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
-                        )}
-                      >
-                        <Box mr={1}>
-                          <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
-                        </Box>
-                      </StyledTooltip>
-                    )}
-                    {update.publishedAt ? (
-                      <FormattedMessage
-                        id="update.publishedAtBy"
-                        defaultMessage="Published on {date} by {author}"
-                        values={{
-                          date: formatDate(update.publishedAt, {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          }),
-                          author: update.fromCollective.name,
-                        }}
-                      />
+        {isEmpty(updates) ? (
+          <div>
+            <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="Paragraph">
+              <FormattedMessage
+                id="SectionUpdates.PostFirst"
+                defaultMessage="Use this section to promote your actions and keep your community up-to-date."
+              />
+            </MessageBox>
+            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+              <StyledButton buttonSize="large" width={1}>
+                <FormattedMessage id="SectionUpdates.CreateBtn" defaultMessage="Post an update" />
+              </StyledButton>
+            </Link>
+          </div>
+        ) : (
+          <StyledCard>
+            {updates.map((update, idx) => (
+              <Container
+                key={update.id}
+                p={24}
+                display="flex"
+                justifyContent="space-between"
+                borderBottom={idx === updates.length - 1 ? undefined : '1px solid #e6e8eb'}
+              >
+                <Flex>
+                  <Box mr={3}>
+                    <Avatar
+                      src={update.fromCollective.image}
+                      type={update.fromCollective.type}
+                      name={update.fromCollective.name}
+                      radius={40}
+                    />
+                  </Box>
+                  <Flex flexDirection="column" justifyContent="space-between">
+                    <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
+                      <P color="black.900" fontWeight="600">
+                        {update.title}
+                      </P>
+                    </Link>
+                    {update.userCanSeeUpdate ? (
+                      <P color="black.700" dangerouslySetInnerHTML={{ __html: update.summary }} />
                     ) : (
-                      <FormattedMessage
-                        id="update.createdAtBy"
-                        defaultMessage={'Created on {date} (draft) by {author}'}
-                        values={{
-                          date: formatDate(update.createdAt),
-                          author: update.fromCollective.name,
-                        }}
-                      />
+                      <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
+                        <FormattedMessage
+                          id="update.private.cannot_view_message"
+                          defaultMessage="Become a backer of {collective} to see this update"
+                          values={{ collective: collective.name }}
+                        />
+                      </PrivateUpdateMesgBox>
                     )}
-                  </Container>
+                    <Container color="black.400" mt={2} fontSize="Caption">
+                      {update.isPrivate && (
+                        <StyledTooltip
+                          content={() => (
+                            <FormattedMessage id="update.private.lock_text" defaultMessage="This update is private" />
+                          )}
+                        >
+                          <Box mr={1}>
+                            <Lock
+                              data-tip
+                              data-for="privateLockText"
+                              data-cy="privateIcon"
+                              size={12}
+                              cursor="pointer"
+                            />
+                          </Box>
+                        </StyledTooltip>
+                      )}
+                      {update.publishedAt ? (
+                        <FormattedMessage
+                          id="update.publishedAtBy"
+                          defaultMessage="Published on {date} by {author}"
+                          values={{
+                            date: formatDate(update.publishedAt, {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                            }),
+                            author: update.fromCollective.name,
+                          }}
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="update.createdAtBy"
+                          defaultMessage={'Created on {date} (draft) by {author}'}
+                          values={{
+                            date: formatDate(update.createdAt),
+                            author: update.fromCollective.name,
+                          }}
+                        />
+                      )}
+                    </Container>
+                  </Flex>
                 </Flex>
-              </Flex>
-            </Container>
-          ))}
-        </StyledCard>
-        {(updates.length > 0 || canSeeDrafts) && (
+              </Container>
+            ))}
+          </StyledCard>
+        )}
+        {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
             <StyledButton buttonSize="large" mt={3} width={1}>
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
