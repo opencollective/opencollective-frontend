@@ -27,6 +27,7 @@
   "addfundstoorg.FromCollectiveId.label": "представитель",
   "amount.free": "бесплатно",
   "AmountInterval": "No",
+  "AmountIntervalLong": "{amount} per {interval, select, month {month} year {year}}",
   "api.error.unreachable": "Не получается связаться с API. Пожалуйста, попробуйте позже.",
   "applications.ApiKeys": "API ключи",
   "applications.ApiKeys.code": "API ключ: {code}",
