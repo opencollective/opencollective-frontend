@@ -14,8 +14,9 @@ import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 import Link from './Link';
 import { P } from './Text';
 import Container from './Container';
-import Avatar from './Avatar';
+import { ContributorAvatar } from './Avatar';
 import { fadeIn } from './StyledKeyframes';
+import { CollectiveType } from '../constants/collectives';
 
 // Define static dimensions
 const COLLECTIVE_CARD_MARGIN_X = 32;
@@ -125,12 +126,12 @@ class ContributorCard extends React.PureComponent {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+      type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
       isCore: PropTypes.bool.isRequired,
       isBacker: PropTypes.bool.isRequired,
       isFundraiser: PropTypes.bool.isRequired,
       description: PropTypes.string,
       collectiveSlug: PropTypes.string,
-      image: PropTypes.string,
     }).isRequired,
     left: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
@@ -153,7 +154,7 @@ class ContributorCard extends React.PureComponent {
     return (
       <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
         <Flex justifyContent="center" mb={3}>
-          {withCollectiveLink(<Avatar collective={{ name, slug: collectiveSlug, type: 'USER' }} radius={56} />)}
+          {withCollectiveLink(<ContributorAvatar contributor={contributor} radius={56} />)}
         </Flex>
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
           {withCollectiveLink(
@@ -231,7 +232,6 @@ ContributorsGrid.propTypes = {
       isFundraiser: PropTypes.bool.isRequired,
       description: PropTypes.string,
       collectiveSlug: PropTypes.string,
-      image: PropTypes.string,
     }),
   ),
 

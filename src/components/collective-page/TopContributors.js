@@ -11,7 +11,7 @@ import withViewport from '../../lib/withViewport';
 import Container from '../Container';
 import Link from '../Link';
 import { H4, P, Span } from '../Text';
-import Avatar from '../Avatar';
+import { ContributorAvatar } from '../Avatar';
 
 import TopContributorsBackgroundSVG from './TopContributorsBackground.svg';
 
@@ -46,23 +46,19 @@ const AvatarWithRank = styled.div`
   border: 1px solid #dcdee0;
 `;
 
-const ContributorRow = ({
-  rank,
-  currency,
-  contributor: { since, totalAmountDonated, image, name, type, collectiveSlug },
-}) => (
+const ContributorRow = ({ rank, currency, contributor }) => (
   <Flex my={3} mr={3}>
-    <Link route="new-collective-page" params={{ slug: collectiveSlug }}>
+    <Link route="new-collective-page" params={{ slug: contributor.collectiveSlug }}>
       <AvatarWithRank>
         <span>{rank}</span>
-        <Avatar type={type} radius={30} borderRadius="50%" src={image} name={name} />
+        <ContributorAvatar contributor={contributor} radius={30} borderRadius="50%" />
       </AvatarWithRank>
     </Link>
     <div>
-      <P fontWeight="bold">{name}</P>
+      <P fontWeight="bold">{contributor.name}</P>
       <P color="black.500">
-        <Span fontWeight="bold">{formatCurrency(totalAmountDonated, currency)}</Span> since{' '}
-        <FormattedDate value={since} month="long" year="numeric" />
+        <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span> since{' '}
+        <FormattedDate value={contributor.since} month="long" year="numeric" />
       </P>
     </div>
   </Flex>
@@ -78,7 +74,6 @@ ContributorRow.propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     totalAmountDonated: PropTypes.number.isRequired,
     since: PropTypes.string.isRequired,
-    image: PropTypes.string,
   }).isRequired,
 };
 
