@@ -994,6 +994,7 @@
   "TopContributors.Individuals": "Individuals",
   "TopContributors.Organizations": "Organizations",
   "tos": "Conditions d'utilisation",
+  "TotalDonatedSince": "{totalDonated} since {date}",
   "transaction.closeDetails": "Fermer les détails",
   "transaction.details": "détails de la transaction",
   "transaction.downloadPDF": "Télécharger (pdf)",

@@ -57,8 +57,14 @@ const ContributorRow = ({ rank, currency, contributor }) => (
     <div>
       <P fontWeight="bold">{contributor.name}</P>
       <P color="black.500">
-        <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span> since{' '}
-        <FormattedDate value={contributor.since} month="long" year="numeric" />
+        <FormattedMessage
+          id="TotalDonatedSince"
+          defaultMessage="{totalDonated} since {date}"
+          values={{
+            totalDonated: <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>,
+            date: <FormattedDate value={contributor.since} month="long" year="numeric" />,
+          }}
+        />
       </P>
     </div>
   </Flex>

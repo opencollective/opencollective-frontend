@@ -994,6 +994,7 @@
   "TopContributors.Individuals": "Individuals",
   "TopContributors.Organizations": "Organizations",
   "tos": "Terms of Service",
+  "TotalDonatedSince": "{totalDonated} since {date}",
   "transaction.closeDetails": "Close Details",
   "transaction.details": "transaction details",
   "transaction.downloadPDF": "Download (pdf)",

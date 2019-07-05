@@ -994,6 +994,7 @@
   "TopContributors.Individuals": "Individuals",
   "TopContributors.Organizations": "Organizations",
   "tos": "利用規約",
+  "TotalDonatedSince": "{totalDonated} since {date}",
   "transaction.closeDetails": "詳細を閉じる",
   "transaction.details": "取引の詳細",
   "transaction.downloadPDF": "ダウンロード (PDF)",

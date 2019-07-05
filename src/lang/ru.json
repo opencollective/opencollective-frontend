@@ -994,6 +994,7 @@
   "TopContributors.Individuals": "Individuals",
   "TopContributors.Organizations": "Organizations",
   "tos": "Условия предоставления услуг",
+  "TotalDonatedSince": "{totalDonated} since {date}",
   "transaction.closeDetails": "Скрыть детали",
   "transaction.details": "детали транзакции",
   "transaction.downloadPDF": "Загрузить (pdf)",
