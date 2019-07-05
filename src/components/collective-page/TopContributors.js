@@ -94,7 +94,7 @@ ContributorRow.propTypes = {
 const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
   return (
     <TopContributorsContainer>
-      <Container maxWidth={1200} m="0 auto">
+      <Container maxWidth={1400} m="0 auto">
         <H4 fontWeight="normal" mb={3}>
           <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top Contributors" />
         </H4>
