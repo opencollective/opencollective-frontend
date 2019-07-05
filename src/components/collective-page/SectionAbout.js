@@ -45,6 +45,7 @@ const Markdown = dynamic(() => import('react-markdown'));
  */
 const SectionAbout = ({ collective, canEdit, editMutation }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
+  canEdit = collective.isArchived ? false : canEdit;
 
   return (
     <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 4]}>
@@ -110,6 +111,7 @@ SectionAbout.propTypes = {
     id: PropTypes.number.isRequired,
     longDescription: PropTypes.string,
     name: PropTypes.string,
+    isArchived: PropTypes.bool,
   }).isRequired,
   /** A mutation used to update the description */
   editMutation: PropTypes.object,

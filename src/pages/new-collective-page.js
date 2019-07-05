@@ -10,6 +10,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectivePage from '../components/collective-page';
+import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
 
 /** Add global style to enable smooth scroll on the page */
@@ -25,13 +26,15 @@ const GlobalStyles = createGlobalStyle`
  */
 class NewCollectivePage extends React.Component {
   static propTypes = {
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired, // from getInitialProps
+    /** A special status to show the notification bar (collective created, archived...etc) */
+    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
   };
 
-  static getInitialProps({ query: { slug } }) {
-    return { slug, onlyPublishedUpdates: true };
+  static getInitialProps({ query: { slug, status } }) {
+    return { slug, status };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -61,7 +64,7 @@ class NewCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser } = this.props;
+    const { data, LoggedInUser, status } = this.props;
 
     return !data || data.error ? (
       <ErrorPage data={data} />
@@ -72,6 +75,7 @@ class NewCollectivePage extends React.Component {
         ) : (
           <React.Fragment>
             <GlobalStyles />
+            <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
             <CollectivePage
               collective={data.Collective}
               host={data.Collective.host}
@@ -82,6 +86,7 @@ class NewCollectivePage extends React.Component {
               expenses={data.Collective.expenses}
               stats={data.Collective.stats}
               updates={data.Collective.updates}
+              status={status}
               LoggedInUser={LoggedInUser}
             />
           </React.Fragment>
@@ -109,6 +114,7 @@ const getCollective = graphql(gql`
       type
       currency
       settings
+      isArchived
       stats {
         id
         balance

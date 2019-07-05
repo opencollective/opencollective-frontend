@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
 import theme from '../../constants/theme';
@@ -33,7 +34,7 @@ const EditCollectiveMutation = gql`
  *
  * See design: https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/09.-Collectives?node-id=2338%3A36062
  */
-export default class CollectivePage extends Component {
+class CollectivePage extends Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     host: PropTypes.object,
@@ -67,6 +68,14 @@ export default class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
+  getSections = memoizeOne(collective => {
+    const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
+    if (collective.isArchived) {
+      return sections.filter(s => s !== Sections.CONTRIBUTE);
+    }
+    return sections;
+  });
+
   onScroll = debounceScroll(() => {
     // Fixes the Hero when a certain scroll threshold is reached
     if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
@@ -77,11 +86,11 @@ export default class CollectivePage extends Component {
       this.setState({ isFixed: false });
     }
 
-    // Update selected section
     const distanceThreshold = 200;
     const currentViewBottom = window.scrollY + window.innerHeight;
-    for (let i = AllSectionsNames.length - 1; i >= 0; i--) {
-      const sectionName = AllSectionsNames[i];
+    const sections = this.getSections(this.props.collective);
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
       if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
         if (this.state.selectedSection !== sectionName) {
@@ -131,17 +140,17 @@ export default class CollectivePage extends Component {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
     const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
+    const sections = this.getSections(collective);
 
     return (
-      <Container borderTop="1px solid #E6E8EB">
+      <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
         <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
           <Hero
             collective={collective}
             host={host}
             sections={sections}
             canEdit={canEdit}
-            isFixed={isFixed}
+            isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
             selectedSection={selectedSection}
             onSectionClick={this.onSectionClick}
             onCollectiveClick={this.onCollectiveClick}
@@ -156,3 +165,5 @@ export default class CollectivePage extends Component {
     );
   }
 }
+
+export default CollectivePage;
