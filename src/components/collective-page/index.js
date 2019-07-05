@@ -56,10 +56,7 @@ class CollectivePage extends Component {
   constructor(props) {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
-    this.state = {
-      isFixed: false,
-      selectedSection: AllSectionsNames[0],
-    };
+    this.state = { isFixed: false, selectedSection: null };
   }
 
   componentDidMount() {
@@ -188,7 +185,7 @@ class CollectivePage extends Component {
             sections={sections}
             canEdit={canEdit}
             isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
-            selectedSection={selectedSection}
+            selectedSection={selectedSection || sections[0]}
             onSectionClick={this.onSectionClick}
             onCollectiveClick={this.onCollectiveClick}
           />
