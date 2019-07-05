@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { FixedSizeGrid } from 'react-window';
-import { truncate, omit } from 'lodash';
+import { truncate } from 'lodash';
 import styled from 'styled-components';
 import { injectIntl } from 'react-intl';
 
@@ -34,21 +34,34 @@ const StyledGridContainer = styled.div`
  * Override the default grid to disable fixed width. As we use the full screen width
  * this is not necessary.
  */
-const GridContainer = React.forwardRef(({ style, ...props }, ref) => {
-  return <StyledGridContainer ref={ref} style={omit(style, ['width'])} {...props} />;
+const GridContainer = React.forwardRef(({ style, paddingLeft, hasScroll, ...props }, ref) => {
+  return (
+    <StyledGridContainer
+      ref={ref}
+      style={{
+        ...style,
+        width: '100%',
+        paddingLeft,
+        overflowX: hasScroll ? 'auto' : 'hidden',
+      }}
+      {...props}
+    />
+  );
 });
 
 GridContainer.displayName = 'GridContainer';
 
 GridContainer.propTypes = {
   style: PropTypes.object,
+  paddingLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  hasScroll: PropTypes.bool,
 };
 
 /**
  * Add margin to the inner container width
  */
 const GridInnerContainer = ({ style, ...props }) => {
-  return <div style={{ ...style, width: style.width + 32 }} {...props} />;
+  return <div style={{ ...style, position: 'relative', width: style.width + COLLECTIVE_CARD_MARGIN_X }} {...props} />;
 };
 
 GridInnerContainer.propTypes = {
@@ -87,7 +100,7 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
   if (nbItems <= maxVisibleItems) {
     // If all items can fit in the view without scrolling, we arrange the view
     // to fit them all by showing fully filled lines
-    const nbCols = maxVisibleNbCols;
+    const nbCols = Math.min(maxVisibleNbCols, nbItems);
     const nbRows = Math.ceil(nbItems / maxVisibleNbCols);
     return [nbCols, nbRows];
   } else {
@@ -177,12 +190,14 @@ class ContributorCard extends React.PureComponent {
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
-const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, viewport }) => {
+const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, viewport, getPaddingLeft }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
 
   // Preload more items when viewport width is unknown to avoid displaying blank spaces on SSR
   const viewWidth = viewport === VIEWPORTS.UNKNOWN ? width * 3 : width;
+  const paddingLeft = getPaddingLeft ? getPaddingLeft({ width, nbRows }) : 0;
+  const hasScroll = nbCols * COLLECTIVE_CARD_FULL_WIDTH + paddingLeft > width;
 
   return (
     <FixedSizeGrid
@@ -192,7 +207,7 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
       width={viewWidth}
-      outerElementType={GridContainer}
+      outerElementType={props => <GridContainer {...props} paddingLeft={paddingLeft} hasScroll={hasScroll} />}
       innerElementType={GridInnerContainer}
       itemKey={({ columnIndex, rowIndex }) => {
         const idx = getIdx(columnIndex, rowIndex, nbCols);
@@ -206,6 +221,7 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
         if (!contributor) {
           return null;
         }
+
         return (
           <ContributorCard
             key={contributor.id}
@@ -243,6 +259,9 @@ ContributorsGrid.propTypes = {
     [VIEWPORTS.DESKTOP]: PropTypes.number,
     [VIEWPORTS.WIDESCREEN]: PropTypes.number,
   }).isRequired,
+
+  /** A callback to calculate left padding */
+  getPaddingLeft: PropTypes.func,
 
   /** @ignore from withViewport */
   viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
