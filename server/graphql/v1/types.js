@@ -415,6 +415,10 @@ export const ContributorType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLInt),
       description: 'How much money the user has contributed for this (in cents, using collective currency)',
     },
+    type: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'Wether the contributor is an individual, an organization...',
+    },
     description: {
       type: GraphQLString,
       description: 'Description of how the member contribute. Will usually be a tier name, or "design" or "code".',
