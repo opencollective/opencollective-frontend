@@ -35,13 +35,7 @@ class UpdatePage extends React.Component {
 
     return (
       <div className="UpdatePage">
-        <Header
-          title={collective.name}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
           <CollectiveCover

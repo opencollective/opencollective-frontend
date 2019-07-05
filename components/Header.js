@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
+import { get } from 'lodash';
+
 import TopBar from './TopBar';
 
-import { truncate, getQueryParams } from '../lib/utils';
 import storage from '../lib/storage';
+import { truncate, getQueryParams, getCollectiveImage } from '../lib/utils';
 
 class Header extends React.Component {
   static propTypes = {
+    collective: PropTypes.object,
     canonicalURL: PropTypes.string,
     description: PropTypes.string,
     image: PropTypes.string,
@@ -20,9 +23,19 @@ class Header extends React.Component {
 
   constructor(props) {
     super(props);
-    const { description, image, twitterHandle, title } = props;
+
+    const { collective } = props;
+
+    const title = props.title || (collective && collective.name);
+    const image = props.image || (collective && getCollectiveImage(collective));
+    const description = props.description || (collective && (collective.description || collective.longDescription));
+    const twitterHandle =
+      props.twitterHandle ||
+      (collective && (collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')));
+
     const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
     const defaultImage = 'https://opencollective.com/static/images/opencollective-og-default.jpg';
+
     const meta = {
       'twitter:site': '@opencollect',
       'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
@@ -38,11 +51,17 @@ class Header extends React.Component {
     };
 
     this.meta = [];
+
     for (const name in meta) {
       this.meta.push({
         name,
         content: meta[name],
       });
+    }
+
+    this.title = title || 'Open Collective - open your finances to your community';
+    if (!this.title.match(/open collective/i)) {
+      this.title += ' - Open Collective';
     }
   }
 
@@ -55,10 +74,6 @@ class Header extends React.Component {
 
   render() {
     const { css, className, canonicalURL } = this.props;
-    let title = this.props.title || 'Open Collective - open your finances to your community';
-    if (!title.match(/open collective/i)) {
-      title += ' - Open Collective';
-    }
     return (
       <header>
         <Head>
@@ -68,7 +83,7 @@ class Header extends React.Component {
           <meta property="og:logo" content="/static/images/opencollectivelogo480x80" size="480x80" />
           <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
           {css && <link rel="stylesheet" href={css} />}
-          <title>{title}</title>
+          <title>{this.title}</title>
           {this.meta.map(({ name, content }) => (
             <meta property={name} content={content} key={`meta-${name}`} />
           ))}
