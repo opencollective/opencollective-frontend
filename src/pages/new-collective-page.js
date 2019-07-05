@@ -78,8 +78,6 @@ class NewCollectivePage extends React.Component {
               contributors={data.Collective.contributors}
               tiers={data.Collective.tiers}
               events={data.Collective.events}
-              topOrganizations={data.Collective.topOrganizations}
-              topIndividuals={data.Collective.topIndividuals}
               transactions={data.Collective.transactions}
               expenses={data.Collective.expenses}
               stats={data.Collective.stats}
@@ -92,25 +90,6 @@ class NewCollectivePage extends React.Component {
     );
   }
 }
-
-const MemberFields = gql`
-  fragment MemberFields on Member {
-    id
-    since
-    role
-    collective: member {
-      id
-      name
-      image
-      slug
-      type
-    }
-    stats {
-      id
-      totalDonations
-    }
-  }
-`;
 
 // eslint-disable graphql/template-strings
 const getCollective = graphql(gql`
@@ -160,12 +139,7 @@ const getCollective = graphql(gql`
         collectiveSlug
         totalAmountDonated
         image
-      }
-      topOrganizations: members(role: "BACKER", type: "ORGANIZATION", limit: 10) {
-        ...MemberFields
-      }
-      topIndividuals: members(role: "BACKER", type: "USER", limit: 10) {
-        ...MemberFields
+        type
       }
       tiers {
         id
@@ -198,7 +172,6 @@ const getCollective = graphql(gql`
     }
   }
 
-  ${MemberFields}
   ${TransactionsAndExpensesFragment}
   ${UpdatesFieldsFragment}
 `);

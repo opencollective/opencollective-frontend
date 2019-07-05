@@ -6,10 +6,10 @@ import styled from 'styled-components';
 import { layout } from 'styled-system';
 
 import { CollectiveType } from '../../constants/collectives';
-import roles from '../../constants/roles';
 import { formatCurrency } from '../../lib/utils';
 import withViewport from '../../lib/withViewport';
 import Container from '../Container';
+import Link from '../Link';
 import { H4, P, Span } from '../Text';
 import Avatar from '../Avatar';
 
@@ -46,16 +46,22 @@ const AvatarWithRank = styled.div`
   border: 1px solid #dcdee0;
 `;
 
-const ContributorRow = ({ rank, member: { since, collective, stats }, currency }) => (
+const ContributorRow = ({
+  rank,
+  currency,
+  contributor: { since, totalAmountDonated, image, name, type, collectiveSlug },
+}) => (
   <Flex my={3} mr={3}>
-    <AvatarWithRank>
-      <span>{rank}</span>
-      <Avatar type={collective.type} radius={30} borderRadius="50%" src={collective.image} name={collective.name} />
-    </AvatarWithRank>
+    <Link route="new-collective-page" params={{ slug: collectiveSlug }}>
+      <AvatarWithRank>
+        <span>{rank}</span>
+        <Avatar type={type} radius={30} borderRadius="50%" src={image} name={name} />
+      </AvatarWithRank>
+    </Link>
     <div>
-      <P fontWeight="bold">{collective.name}</P>
+      <P fontWeight="bold">{name}</P>
       <P color="black.500">
-        <Span fontWeight="bold">{formatCurrency(stats.totalDonations, currency)}</Span> since{' '}
+        <Span fontWeight="bold">{formatCurrency(totalAmountDonated, currency)}</Span> since{' '}
         <FormattedDate value={since} month="long" year="numeric" />
       </P>
     </div>
@@ -65,13 +71,15 @@ const ContributorRow = ({ rank, member: { since, collective, stats }, currency }
 ContributorRow.propTypes = {
   rank: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
-  member: PropTypes.shape({
-    since: PropTypes.string,
-    collective: PropTypes.object,
-    stats: PropTypes.shape({
-      totalDonations: PropTypes.number,
-    }),
-  }),
+  contributor: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+    collectiveSlug: PropTypes.string.isRequired,
+    totalAmountDonated: PropTypes.number.isRequired,
+    since: PropTypes.string.isRequired,
+    image: PropTypes.string,
+  }).isRequired,
 };
 
 /**
@@ -79,10 +87,6 @@ ContributorRow.propTypes = {
  * financial contributions.
  */
 const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
-  if (!topOrganizations && !topIndividuals) {
-    return null;
-  }
-
   return (
     <TopContributorsContainer>
       <Container maxWidth={1200} m="0 auto">
@@ -97,13 +101,13 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
               </P>
               <Flex>
                 <ContributorsList>
-                  {topOrganizations.slice(0, 5).map((member, idx) => (
-                    <ContributorRow key={member.id} rank={idx + 1} member={member} currency={currency} />
+                  {topOrganizations.slice(0, 5).map((contributor, idx) => (
+                    <ContributorRow key={contributor.id} rank={idx + 1} contributor={contributor} currency={currency} />
                   ))}
                 </ContributorsList>
                 <ContributorsList display={['none', null, 'flex']}>
-                  {topOrganizations.slice(5, 10).map((member, idx) => (
-                    <ContributorRow key={member.id} rank={idx + 6} member={member} currency={currency} />
+                  {topOrganizations.slice(5, 10).map((contributor, idx) => (
+                    <ContributorRow key={contributor.id} rank={idx + 6} contributor={contributor} currency={currency} />
                   ))}
                 </ContributorsList>
               </Flex>
@@ -116,13 +120,13 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
               </P>
               <Flex>
                 <ContributorsList>
-                  {topIndividuals.slice(0, 5).map((member, idx) => (
-                    <ContributorRow key={member.id} rank={idx + 1} member={member} currency={currency} />
+                  {topIndividuals.slice(0, 5).map((contributor, idx) => (
+                    <ContributorRow key={contributor.id} rank={idx + 1} contributor={contributor} currency={currency} />
                   ))}
                 </ContributorsList>
                 <ContributorsList display={['none', null, 'flex']}>
-                  {topIndividuals.slice(5, 10).map((member, idx) => (
-                    <ContributorRow key={member.id} rank={idx + 6} member={member} currency={currency} />
+                  {topIndividuals.slice(5, 10).map((contributor, idx) => (
+                    <ContributorRow key={contributor.id} rank={idx + 6} contributor={contributor} currency={currency} />
                   ))}
                 </ContributorsList>
               </Flex>
@@ -136,34 +140,8 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
 
 TopContributors.propTypes = {
   currency: PropTypes.string.isRequired,
-
-  topOrganizations: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      role: PropTypes.oneOf(Object.values(roles)).isRequired,
-      collective: PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-        slug: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        image: PropTypes.string,
-      }).isRequired,
-    }),
-  ),
-
-  topIndividuals: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      role: PropTypes.oneOf(Object.values(roles)).isRequired,
-      collective: PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-        slug: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        image: PropTypes.string,
-      }).isRequired,
-    }),
-  ),
+  topOrganizations: PropTypes.arrayOf(PropTypes.object),
+  topIndividuals: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default withViewport(TopContributors);
