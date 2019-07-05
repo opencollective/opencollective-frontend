@@ -37,6 +37,8 @@ describe('New collective page', () => {
   describe('Edit page as collective admin', () => {
     before(() => {
       cy.login({ redirect: `/${collectiveSlug}/v2` });
+      // Wait for new collective page to load before disabling smooth scroll
+      cy.contains('Become a financial contributor');
       disableSmoothScroll();
     });
 
