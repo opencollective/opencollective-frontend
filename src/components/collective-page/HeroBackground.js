@@ -24,12 +24,24 @@ const BackgroundContainer = styled.div`
     background-size: cover;
 
     mask-image: url(${HeroBackgroundMask});
-    mask-size: contain;
+    mask-size: 100% 35%;
     mask-repeat: no-repeat;
     mask-position: top right;
 
-    @media (min-width: 1440px) {
-      mask-size: 75% 100%;
+    @media (min-width: 30em) {
+      mask-size: 100% 50%;
+    }
+
+    @media (min-width: 52em) {
+      mask-size: 100% 60%;
+    }
+
+    @media (min-width: 64em) {
+      mask-size: 100% 75%;
+    }
+
+    @media (min-width: 88em) {
+      mask-size: 100% 100%;
     }
   }
 `;
