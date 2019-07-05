@@ -102,7 +102,7 @@
     "stripe": "7.4.0",
     "twitter": "1.7.1",
     "uuid": "3.3.2",
-    "validator": "11.0.0",
+    "validator": "11.1.0",
     "winston": "3.2.1"
   },
   "devDependencies": {
