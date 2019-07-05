@@ -16,6 +16,7 @@ import DebitCreditList, { DebitItem, CreditItem } from '../DebitCreditList';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import LinkCollective from '../LinkCollective';
 import Avatar from '../Avatar';
+import MessageBox from '../MessageBox';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import { TransactionsAndExpensesFragment } from './fragments';
@@ -55,7 +56,15 @@ const SectionBudget = ({ collective, stats, intl }) => {
             const expenses = get(data, 'Collective.expenses');
             const transactions = get(data, 'Collective.transactions');
             if (isEmpty(expenses) && isEmpty(transactions)) {
-              return null;
+              return (
+                <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="Paragraph">
+                  <FormattedMessage
+                    id="SectionBudget.Empty"
+                    defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
+                  financial contributors or when someone creates an expense."
+                  />
+                </MessageBox>
+              );
             }
 
             // Merge items, filter expenses that already have a transaction as they'll already be
@@ -156,6 +165,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
           width="100%"
           flexDirection={['column', 'row', 'column']}
           mb={2}
+          mx={[null, null, 3]}
           minWidth={300}
         >
           <Box flex="1" py={16} px={24}>
