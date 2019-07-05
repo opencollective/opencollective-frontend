@@ -149,6 +149,7 @@ const getCollective = graphql(gql`
         isFundraiser
         since
         description
+        publicMessage
         collectiveSlug
         type
       }

@@ -144,6 +144,7 @@ class ContributorCard extends React.PureComponent {
       isBacker: PropTypes.bool.isRequired,
       isFundraiser: PropTypes.bool.isRequired,
       description: PropTypes.string,
+      publicMessage: PropTypes.string,
       collectiveSlug: PropTypes.string,
     }).isRequired,
     left: PropTypes.number.isRequired,
@@ -152,7 +153,7 @@ class ContributorCard extends React.PureComponent {
 
   render() {
     const { left, top, contributor, intl } = this.props;
-    const { collectiveSlug, name, description } = contributor;
+    const { collectiveSlug, name, description, publicMessage } = contributor;
 
     // Collective slug is optional, for example Github contributors won't have
     // a collective slug. This helper renders the link only if needed
@@ -171,16 +172,21 @@ class ContributorCard extends React.PureComponent {
         </Flex>
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
           {withCollectiveLink(
-            <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
-              {truncate(name, { length: 42 })}
+            <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900" title={name}>
+              {truncate(name, { length: 40 })}
             </P>,
           )}
           <P fontSize="Tiny" lineHeight="Caption" color="black.500">
             {getRole(contributor, intl)}
           </P>
-          <P fontSize="Caption" fontWeight="bold">
-            {description}
+          <P fontSize="Caption" fontWeight="bold" title={description}>
+            {truncate(description, { length: 20 })}
           </P>
+          {publicMessage && (
+            <Container textAlign="center" color="black.600" fontSize="Tiny" my={2} title={publicMessage}>
+              “{truncate(publicMessage, { length: 60 })}”
+            </Container>
+          )}
         </Container>
       </StyledContributorCard>
     );

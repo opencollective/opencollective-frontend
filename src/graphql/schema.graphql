@@ -1296,6 +1296,11 @@ type Member {
   member: CollectiveInterface
   role: String
   description: String
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   tier: Tier
   stats: StatsMemberType
   since: DateString
@@ -1440,6 +1445,11 @@ type Mutation {
     collective: CollectiveAttributesInputType!
     role: String!
   ): Member
+
+  """
+  A mutation to edit membership. Dedicated to the user, not the collective admin.
+  """
+  editMembership(id: Int!, publicMessage: String): Member
   createOrder(order: OrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
@@ -1457,7 +1467,7 @@ type Mutation {
     Public message to motivate others to contribute
     """
     publicMessage: String
-  ): OrderType
+  ): OrderType @deprecated(reason: "2019-07-03: The public message is now stored at the Member level")
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!): UpdateType
@@ -2404,6 +2414,7 @@ type Query {
     offset: Int = 0
   ): CollectiveSearchResults
   allCollectiveTags: [String]
+  member(id: Int, CollectiveId: Int, MemberCollectiveId: Int, TierId: Int): Member
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
