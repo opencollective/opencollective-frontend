@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { layout } from 'styled-system';
+import { truncate } from 'lodash';
 
 import { CollectiveType } from '../../constants/collectives';
 import { formatCurrency } from '../../lib/utils';
@@ -33,8 +34,8 @@ const ContributorsList = styled.div`
 `;
 
 const AvatarWithRank = styled.div`
-  width: 63px;
-  height: 32px;
+  width: 75px;
+  height: 40px;
   margin-right: 8px;
   background: white;
   display: flex;
@@ -43,19 +44,22 @@ const AvatarWithRank = styled.div`
   padding-left: 14px;
   font-size: 10px;
   border-radius: 32px;
-  border: 1px solid #dcdee0;
 `;
 
 const ContributorRow = ({ rank, currency, contributor }) => (
   <Flex my={3} mr={3}>
-    <Link route="new-collective-page" params={{ slug: contributor.collectiveSlug }}>
-      <AvatarWithRank>
-        <span>{rank}</span>
-        <ContributorAvatar contributor={contributor} radius={30} borderRadius="50%" />
-      </AvatarWithRank>
-    </Link>
+    <AvatarWithRank>
+      <span>{rank}</span>
+      <Link route="new-collective-page" params={{ slug: contributor.collectiveSlug }}>
+        <ContributorAvatar contributor={contributor} radius={38} borderRadius="25%" />
+      </Link>
+    </AvatarWithRank>
     <div>
-      <P fontWeight="bold">{contributor.name}</P>
+      <Link route="new-collective-page" params={{ slug: contributor.collectiveSlug }}>
+        <P fontWeight="bold" color="black.700">
+          {truncate(contributor.name, { length: 20 })}
+        </P>
+      </Link>
       <P color="black.500">
         <FormattedMessage
           id="TotalDonatedSince"
