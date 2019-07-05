@@ -64,4 +64,28 @@ Avatar.propTypes = {
   animationDuration: PropTypes.number,
 };
 
+/**
+ * Similar to `Avatar`, but builds from a Contributor instead of a collective
+ */
+export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
+  return (
+    <StyledAvatar
+      size={radius}
+      type={contributor.type}
+      background={`url(${getBaseImagesUrl()}/${contributor.collectiveSlug}/avatar.png)`}
+      {...styleProps}
+    />
+  );
+};
+
+ContributorAvatar.propTypes = {
+  /** Collective object */
+  contributor: PropTypes.shape({
+    name: PropTypes.string,
+    collectiveSlug: PropTypes.string,
+    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+  }).isRequired,
+  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
 export default Avatar;

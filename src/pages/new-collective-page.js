@@ -100,7 +100,6 @@ const getCollective = graphql(gql`
       name
       description
       longDescription
-      image
       backgroundImage
       twitterHandle
       githubHandle
@@ -124,7 +123,6 @@ const getCollective = graphql(gql`
         id
         name
         slug
-        image
         type
       }
       contributors {
@@ -138,7 +136,6 @@ const getCollective = graphql(gql`
         description
         collectiveSlug
         totalAmountDonated
-        image
         type
       }
       tiers {

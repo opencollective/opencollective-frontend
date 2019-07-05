@@ -63,7 +63,6 @@ class Hero extends Component {
       type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
       backgroundImage: PropTypes.string,
       twitterHandle: PropTypes.string,
       githubHandle: PropTypes.string,
@@ -77,7 +76,6 @@ class Hero extends Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
     }),
 
     /** Should the component be fixed and collapsed at the top of the window? */
@@ -133,13 +131,7 @@ class Hero extends Component {
             <Flex flexDirection={isFixed ? 'row' : 'column'} alignItems={isFixed ? 'center' : ['center', 'flex-start']}>
               <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
                 <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-                  <Avatar
-                    borderRadius="25%"
-                    src={collective.image}
-                    type={collective.type}
-                    radius={isFixed ? 40 : 128}
-                    name={collective.name}
-                  />
+                  <Avatar borderRadius="25%" collective={collective} radius={isFixed ? 40 : 128} />
                 </LinkCollective>
                 {canEdit && !isFixed && (
                   <Container position="absolute" right={-10} bottom={-5}>
