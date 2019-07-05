@@ -5,15 +5,17 @@ import { Box } from '@rebass/grid';
 import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
 
+import Container from '../Container';
 import { P, H2, H3, Span } from '../Text';
 import ContributorsGrid from '../ContributorsGrid';
 import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
+
+import { Dimensions } from './_constants';
 import ContainerSectionContent from './ContainerSectionContent';
 import ContributorsGridBackgroundSVG from './ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */
-const MainContainer = styled.div`
-  padding: 128px 0;
+const MainContainer = styled(Container)`
   background: url(${ContributorsGridBackgroundSVG});
 
   @media (max-width: 52em) {
@@ -65,7 +67,7 @@ export default class SectionContributors extends React.PureComponent {
     const filteredContributors = hasFilters ? this.filterContributors(contributors, filter) : contributors;
 
     return (
-      <MainContainer>
+      <MainContainer py={[4, 6]}>
         <ContainerSectionContent>
           <H2 mb={4} px={3} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
             <FormattedMessage
@@ -93,7 +95,21 @@ export default class SectionContributors extends React.PureComponent {
           )}
         </ContainerSectionContent>
         <Box mb={4}>
-          <ContributorsGrid contributors={filteredContributors} />
+          <ContributorsGrid
+            contributors={filteredContributors}
+            getPaddingLeft={({ width, nbRows }) => {
+              if (width < Dimensions.MAX_SECTION_WIDTH) {
+                // No need for padding on screens small enough so they don't have padding
+                return 0;
+              } else if (nbRows > 1) {
+                // If multiline, center contributors cards
+                return (width - Dimensions.MAX_SECTION_WIDTH) / 8;
+              } else {
+                // Otherwise add a normal section padding on the left
+                return (width - Dimensions.MAX_SECTION_WIDTH) / 2;
+              }
+            }}
+          />
         </Box>
       </MainContainer>
     );

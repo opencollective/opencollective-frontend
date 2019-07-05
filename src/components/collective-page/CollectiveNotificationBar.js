@@ -44,11 +44,7 @@ const CollectiveNotificationBar = ({ intl, status, collective, host }) => {
   const notification = getNotification(intl, status, collective, host);
 
   return !notification ? null : (
-    <NotificationBar
-      status={status}
-      title={intl.formatMessage(messages.collectiveArchived, { name: collective.name })}
-      description={intl.formatMessage(messages.collectiveArchivedDescription)}
-    />
+    <NotificationBar status={status} title={notification.title} description={notification.description} />
   );
 };
 

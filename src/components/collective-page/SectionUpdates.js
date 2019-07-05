@@ -112,7 +112,7 @@ class SectionUpdates extends React.Component {
     }
 
     return (
-      <ContainerSectionContent py={6}>
+      <ContainerSectionContent py={[5, 6]}>
         <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
           <FormattedMessage id="CollectivePage.SectionUpdates.Title" defaultMessage="Latest updates" />
         </H3>

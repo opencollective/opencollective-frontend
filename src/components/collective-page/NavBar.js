@@ -3,8 +3,8 @@ import { PropTypes } from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
-import { Flex } from '@rebass/grid';
 
+import Container from '../Container';
 import { Sections, AllSectionsNames } from './_constants';
 
 const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
@@ -70,7 +70,7 @@ const i18nSection = defineMessages({
  */
 const NavBar = ({ sections, selected, onSectionClick, linkBuilder, intl }) => {
   return (
-    <Flex data-cy="CollectivePage.NavBar" css={{ height: '100%', overflowX: 'auto' }}>
+    <Container display="flex" height="100%" css={{ overflowX: 'auto' }} data-cy="CollectivePage.NavBar">
       {sections.map(section => (
         <MenuLink
           key={section}
@@ -84,7 +84,7 @@ const NavBar = ({ sections, selected, onSectionClick, linkBuilder, intl }) => {
           {i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
         </MenuLink>
       ))}
-    </Flex>
+    </Container>
   );
 };
 
