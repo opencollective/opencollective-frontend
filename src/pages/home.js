@@ -817,7 +817,7 @@ class HomePage extends React.Component {
               <Flex flexDirection={['column', null, 'row']} justifyContent="center">
                 <StyledLink
                   {...socialButtonStyles}
-                  href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collection%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
+                  href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collective%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
                     <Twitter size={18} color={colors.primary[500]} />
