@@ -11,8 +11,8 @@ const ContributeCardsContainer = styled.div`
   ${CustomScrollbarCSS}
 
   /** Respect left margin / center cards on widescreens */
-  @media (min-width: 1440px) {
-    padding-left: calc((100% - 1440px) / 2 - 32px);
+  @media (min-width: 1500px) {
+    padding-left: calc((100% - 1500px) / 2);
   }
 `;
 

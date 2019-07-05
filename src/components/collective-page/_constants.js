@@ -2,8 +2,8 @@
  * Shared dimensions between collective page's components
  */
 export const Dimensions = {
-  PADDING_X: [15, 30, null, null, 120],
-  MAX_SECTION_WIDTH: 1700,
+  PADDING_X: [15, 30],
+  MAX_SECTION_WIDTH: 1500,
   HERO_FIXED_HEIGHT: 110,
   HERO_PLACEHOLDER_HEIGHT: [500, 420, 420, 450],
 };
