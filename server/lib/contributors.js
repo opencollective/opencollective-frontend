@@ -34,6 +34,7 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}
         "Transactions" t
           ON t."type" = 'CREDIT'
           AND (t."FromCollectiveId" = mc.id OR t."UsingVirtualCardFromCollectiveId" = mc.id)
+          AND t."CollectiveId" = m."CollectiveId"
       LEFT JOIN "Tiers" tier ON m."TierId" = tier.id
       WHERE
         m."CollectiveId" = ? AND m."deletedAt" IS NULL
@@ -78,6 +79,7 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         "Transactions" t
           ON t."type" = 'CREDIT'
           AND (t."FromCollectiveId" = mc.id OR t."UsingVirtualCardFromCollectiveId" = mc.id)
+          AND t."CollectiveId" = m."CollectiveId"
       WHERE
         m."TierId" = ? AND m."deletedAt" IS NULL
       GROUP BY	  
