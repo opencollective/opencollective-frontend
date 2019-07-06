@@ -78,7 +78,7 @@ ContributorRow.propTypes = {
   rank: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
   contributor: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
     collectiveSlug: PropTypes.string.isRequired,
