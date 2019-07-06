@@ -20,13 +20,15 @@ class Header extends React.Component {
 
   constructor(props) {
     super(props);
-    const { description, image, twitterHandle } = props;
+    const { description, image, twitterHandle, title } = props;
     const meta = {
       'twitter:site': 'opencollect',
       'twitter:creator': twitterHandle,
       'fb:app_id': '266835577107099',
       'og:image': image,
       description: truncate(description, 256),
+      'og:description': truncate(description, 256),
+      'og:title': title,
     };
 
     this.meta = [];
