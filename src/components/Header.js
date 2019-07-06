@@ -27,8 +27,10 @@ class Header extends React.Component {
       'fb:app_id': '266835577107099',
       'og:image': image,
       description: truncate(description, 256),
-      'og:description': truncate(description, 256),
-      'og:title': title,
+      'twitter:card': 'summary',
+      'twitter:title': `${title} - Open Collective`,
+      'twitter:description': description,
+      'twitter:image': image,
     };
 
     this.meta = [];
