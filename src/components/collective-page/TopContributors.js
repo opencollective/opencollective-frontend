@@ -46,39 +46,43 @@ const AvatarWithRank = styled.div`
   border-radius: 32px;
 `;
 
-const ContributorRow = ({ rank, currency, contributor }) => (
-  <Flex my={3} mr={3}>
-    <AvatarWithRank>
-      <span>{rank}</span>
-      <Link route="new-collective-page" params={{ slug: contributor.collectiveSlug }}>
-        <ContributorAvatar contributor={contributor} radius={38} borderRadius="25%" />
-      </Link>
-    </AvatarWithRank>
-    <div>
-      <Link route="new-collective-page" params={{ slug: contributor.collectiveSlug }}>
-        <P fontWeight="bold" color="black.700">
-          {truncate(contributor.name, { length: 20 })}
+const ContributorRow = ({ rank, currency, contributor }) => {
+  const route = contributor.type === CollectiveType.COLLECTIVE ? 'new-collective-page' : 'collective';
+
+  return (
+    <Flex my={3} mr={3}>
+      <AvatarWithRank>
+        <span>{rank}</span>
+        <Link route={route} params={{ slug: contributor.collectiveSlug }}>
+          <ContributorAvatar contributor={contributor} radius={38} borderRadius="25%" />
+        </Link>
+      </AvatarWithRank>
+      <div>
+        <Link route={route} params={{ slug: contributor.collectiveSlug }}>
+          <P fontWeight="bold" color="black.700">
+            {truncate(contributor.name, { length: 20 })}
+          </P>
+        </Link>
+        <P color="black.500">
+          <FormattedMessage
+            id="TotalDonatedSince"
+            defaultMessage="{totalDonated} since {date}"
+            values={{
+              totalDonated: <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>,
+              date: <FormattedDate value={contributor.since} month="long" year="numeric" />,
+            }}
+          />
         </P>
-      </Link>
-      <P color="black.500">
-        <FormattedMessage
-          id="TotalDonatedSince"
-          defaultMessage="{totalDonated} since {date}"
-          values={{
-            totalDonated: <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>,
-            date: <FormattedDate value={contributor.since} month="long" year="numeric" />,
-          }}
-        />
-      </P>
-    </div>
-  </Flex>
-);
+      </div>
+    </Flex>
+  );
+};
 
 ContributorRow.propTypes = {
   rank: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
   contributor: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
     collectiveSlug: PropTypes.string.isRequired,
