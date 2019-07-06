@@ -31,30 +31,27 @@ const StyledGridContainer = styled.div`
 `;
 
 /**
- * Override the default grid to disable fixed width. As we use the full screen width
- * this is not necessary.
+ * We have to define the outer container here because react-window doesn't
+ * let you pass custom props to outer container.
  */
-const GridContainer = React.forwardRef(({ style, paddingLeft, hasScroll, ...props }, ref) => {
-  return (
-    <StyledGridContainer
-      ref={ref}
-      style={{
-        ...style,
-        width: '100%',
-        paddingLeft,
-        overflowX: hasScroll ? 'auto' : 'hidden',
-      }}
-      {...props}
-    />
-  );
-});
+const getGridContainer = (paddingLeft, hasScroll) => {
+  // eslint-disable-next-line react/prop-types
+  const GridContainer = ({ style, ...props }, ref) => {
+    return (
+      <StyledGridContainer
+        ref={ref}
+        style={{
+          ...style,
+          width: '100%',
+          paddingLeft,
+          overflowX: hasScroll ? 'auto' : 'hidden',
+        }}
+        {...props}
+      />
+    );
+  };
 
-GridContainer.displayName = 'GridContainer';
-
-GridContainer.propTypes = {
-  style: PropTypes.object,
-  paddingLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  hasScroll: PropTypes.bool,
+  return React.forwardRef(GridContainer);
 };
 
 /**
@@ -213,7 +210,7 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
       width={viewWidth}
-      outerElementType={props => <GridContainer {...props} paddingLeft={paddingLeft} hasScroll={hasScroll} />}
+      outerElementType={getGridContainer(paddingLeft, hasScroll)}
       innerElementType={GridInnerContainer}
       itemKey={({ columnIndex, rowIndex }) => {
         const idx = getIdx(columnIndex, rowIndex, nbCols);
