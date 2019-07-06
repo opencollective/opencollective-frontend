@@ -24,29 +24,33 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}
         MIN(m.since) as since,
         MAX(m."publicMessage") as "publicMessage",
         ARRAY_AGG(DISTINCT m."role") as roles,
-        COALESCE(SUM(t."netAmountInCollectiveCurrency"), 0) AS "totalAmountDonated",
-        COALESCE(MAX(m.description), MAX(tier.name)) as description
+        COALESCE(MAX(m.description), MAX(tier.name)) as description,
+        (
+          SELECT  COALESCE(SUM(amount), 0) 
+          FROM    "Transactions" 
+          WHERE   "CollectiveId" = :collectiveId 
+          AND     TYPE = 'CREDIT'
+          AND     "deletedAt" IS NULL
+          AND     "RefundTransactionId" IS NULL
+          AND     ("FromCollectiveId" = mc.id OR "UsingVirtualCardFromCollectiveId" = mc.id)
+        ) AS "totalAmountDonated"
       FROM
         "Collectives" mc
       INNER JOIN
-        "Members" m ON m."MemberCollectiveId" = mc.id
-      LEFT JOIN
-        "Transactions" t
-          ON t."type" = 'CREDIT'
-          AND (t."FromCollectiveId" = mc.id OR t."UsingVirtualCardFromCollectiveId" = mc.id)
-          AND t."CollectiveId" = m."CollectiveId"
-      LEFT JOIN "Tiers" tier ON m."TierId" = tier.id
+        "Members" m ON m."MemberCollectiveId" = mc.id AND m."deletedAt" IS NULL
+      LEFT JOIN 
+        "Tiers" tier ON m."TierId" = tier.id
       WHERE
-        m."CollectiveId" = ? AND m."deletedAt" IS NULL
+        m."CollectiveId" = :collectiveId
       GROUP BY	  
         mc.id
       ORDER BY
         "totalAmountDonated" DESC,
         "since" ASC
-      LIMIT ?
+      LIMIT :limit
     `,
     {
-      replacements: [collectiveId, limit],
+      replacements: { collectiveId, limit },
       type: sequelize.QueryTypes.SELECT,
     },
   );
@@ -67,23 +71,26 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         MIN(m.since) as since,
         MAX(m."publicMessage") as "publicMessage",
         ARRAY_AGG(DISTINCT m."role") as roles,
-        COALESCE(SUM(t."netAmountInCollectiveCurrency"), 0) AS "totalAmountDonated",
-        COALESCE(MAX(m.description), MAX(tier.name)) as description
+        COALESCE(MAX(m.description), MAX(tier.name)) as description,
+        (
+          SELECT  COALESCE(SUM(amount), 0) 
+          FROM    "Transactions" 
+          WHERE   "CollectiveId" = tier."CollectiveId" 
+          AND     TYPE = 'CREDIT' 
+          AND     "deletedAt" IS NULL 
+          AND     "RefundTransactionId" IS NULL
+          AND     ("FromCollectiveId" = mc.id OR "UsingVirtualCardFromCollectiveId" = mc.id)
+        ) AS "totalAmountDonated"
       FROM
         "Collectives" mc
       INNER JOIN
-        "Members" m ON m."MemberCollectiveId" = mc.id
+        "Members" m ON m."MemberCollectiveId" = mc.id AND m."deletedAt" IS NULL
       INNER JOIN
         "Tiers" tier ON m."TierId" = tier.id
-      LEFT JOIN
-        "Transactions" t
-          ON t."type" = 'CREDIT'
-          AND (t."FromCollectiveId" = mc.id OR t."UsingVirtualCardFromCollectiveId" = mc.id)
-          AND t."CollectiveId" = m."CollectiveId"
       WHERE
-        m."TierId" = ? AND m."deletedAt" IS NULL
+        m."TierId" = ?
       GROUP BY	  
-        mc.id
+        tier.id, mc.id
       ORDER BY
         "totalAmountDonated" DESC,
         "since" ASC
