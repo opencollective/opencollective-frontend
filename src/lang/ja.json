@@ -1,9 +1,9 @@
 {
   "actions.approveCollective.processing": "コレクティブを承認",
   "actions.approveExpense.processing": "請求を承認",
-  "actions.delete": "Delete",
+  "actions.delete": "削除",
   "actions.done": "完了",
-  "actions.download": "Download",
+  "actions.download": "ダウンロード",
   "actions.rejectExpense.processing": "請求を拒否",
   "addfunds.amount.label": "金額",
   "addfunds.description.label": "説明",
