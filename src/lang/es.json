@@ -1120,6 +1120,7 @@
   "virtualCards.returnToEdit": "Volver a la lista de tarjetas de regalo",
   "virtualCards.sentTo": "enviado a {email}",
   "virtualCards.viewDetails": "Ver Detalles",
+  "webhooks": "Webhooks",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",
   "webhooks.types.label": "Activities",
