@@ -57,7 +57,10 @@ const ContributeDetails = ({
   maxQuantity,
   showQuantity,
   showInterval,
+  customFields,
+  customData,
   onChange,
+  onCustomFieldsChange,
 }) => {
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
@@ -186,6 +189,25 @@ const ContributeDetails = ({
           )}
         </StyledInputField>
       )}
+      {customFields &&
+        customFields.length > 0 &&
+        customFields.map(customField => {
+          const value = customData && customData[customField.name] ? customData[customField.name] : '';
+          return (
+            <StyledInputField mt={2} key={customField.name} htmlFor={customField.name} label={customField.label}>
+              {fieldProps => (
+                <StyledInput
+                  type={customField.type}
+                  {...fieldProps}
+                  value={value}
+                  width={1}
+                  required={customField.required}
+                  onChange={({ target }) => onCustomFieldsChange(customField.name, target.value)}
+                />
+              )}
+            </StyledInputField>
+          );
+        })}
     </Flex>
   );
 };
@@ -218,6 +240,10 @@ ContributeDetails.propTypes = {
   showQuantity: PropTypes.bool,
   /** Enable the interval input */
   showInterval: PropTypes.bool,
+  /** Enable the customFields inputs */
+  customFields: PropTypes.array,
+  customData: PropTypes.object,
+  onCustomFieldsChange: PropTypes.func,
 };
 
 ContributeDetails.defaultProps = {

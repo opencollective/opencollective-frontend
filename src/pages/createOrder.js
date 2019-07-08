@@ -80,6 +80,14 @@ class CreateOrderPage extends React.Component {
       query.interval = null;
     }
 
+    if (query.data) {
+      try {
+        query.data = JSON.parse(query.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     return {
       collectiveSlug: query.collectiveSlug,
       eventSlug: query.eventSlug,
@@ -95,6 +103,7 @@ class CreateOrderPage extends React.Component {
       redeem: query.redeem,
       redirect: query.redirect,
       referral: query.referral,
+      customData: query.data,
     };
   }
 
@@ -110,6 +119,7 @@ class CreateOrderPage extends React.Component {
     description: PropTypes.string,
     verb: PropTypes.string,
     step: PropTypes.string,
+    customData: PropTypes.object,
     redirect: PropTypes.string,
     referral: PropTypes.string,
     redeem: PropTypes.bool,
@@ -140,12 +150,12 @@ class CreateOrderPage extends React.Component {
       stepSummary: null,
       error: null,
       stripe: null,
+      customData: {},
     };
   }
 
   async componentDidMount() {
     this.loadInitialData();
-
     // Load payment providers scripts in the background
     this.props.loadStripe();
     if (this.hasPaypal()) {
@@ -189,6 +199,7 @@ class CreateOrderPage extends React.Component {
       stepDetails: get(state.stepDetails, 'totalAmount')
         ? state.stepDetails
         : this.getDefaultStepDetails(this.props.data.Tier),
+      customData: this.props.customData,
     }));
   }
 
@@ -323,7 +334,7 @@ class CreateOrderPage extends React.Component {
 
   submitOrder = async (paymentMethodOverride = null) => {
     this.setState({ submitting: true, error: null });
-    const { stepProfile, stepDetails, stepPayment, stepSummary } = this.state;
+    const { stepProfile, stepDetails, stepPayment, stepSummary, customData } = this.state;
 
     // Prepare payment method
     let paymentMethod = paymentMethodOverride;
@@ -359,6 +370,7 @@ class CreateOrderPage extends React.Component {
       collective: pick(this.props.data.Collective, ['id']),
       tier: tier ? pick(tier, ['id', 'amount']) : undefined,
       description: decodeURIComponent(this.props.description || ''),
+      customData,
     };
 
     try {
@@ -589,6 +601,17 @@ class CreateOrderPage extends React.Component {
   updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
   updateDetails = stepDetails => this.setState({ stepDetails });
 
+  handleCustomFieldsChange = (name, value) => {
+    const { customData } = this.state;
+
+    this.setState({
+      customData: {
+        ...customData,
+        [name]: value,
+      },
+    });
+  };
+
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
     return get(this.props.data, 'Collective.host.id') === 11004 && !get(this.state, 'stepDetails.interval');
@@ -666,9 +689,10 @@ class CreateOrderPage extends React.Component {
 
   renderStep(step) {
     const { data } = this.props;
-    const { stepDetails, stepPayment } = this.state;
+    const { stepDetails, stepPayment, customData } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
+    const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
 
@@ -729,6 +753,9 @@ class CreateOrderPage extends React.Component {
               maxQuantity={get(tier, 'stats.availableQuantity') || get(tier, 'maxQuantity')}
               showQuantity={tier && tier.type === 'TICKET'}
               showInterval={tier && tier.type !== 'TICKET'}
+              customFields={customFields}
+              customData={customData}
+              onCustomFieldsChange={this.handleCustomFieldsChange}
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
           </Container>
@@ -1014,6 +1041,7 @@ const CollectiveWithTierDataQuery = gql`
       currency
       interval
       presets
+      customFields
       maxQuantity
       stats {
         availableQuantity
