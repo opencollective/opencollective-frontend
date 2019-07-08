@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { background, color, border, space, layout } from 'styled-system';
+import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
@@ -9,11 +9,12 @@ import { getCollectiveImage } from '../lib/utils';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
-const StyledAvatar = styled(Flex)`
+const StyledAvatar = styled(Flex).attrs(props => ({
+  style: { backgroundImage: props.src ? `url(${props.src})` : null },
+}))`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
   ${color}
-  ${background}
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -34,19 +35,14 @@ const StyledAvatar = styled(Flex)`
 `;
 
 const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps }) => {
-  const style = {};
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
     name = collective.name;
     src = getCollectiveImage(collective);
   }
-  // Avoid setting null/undefined background images
-  if (src) {
-    style.backgroundImage = `url(${src})`;
-  }
   return (
-    <StyledAvatar size={radius} type={type} style={style} {...styleProps}>
+    <StyledAvatar size={radius} type={type} src={src} {...styleProps}>
       {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
     </StyledAvatar>
   );
