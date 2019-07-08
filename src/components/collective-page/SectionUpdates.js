@@ -87,7 +87,6 @@ class SectionUpdates extends React.Component {
               type: PropTypes.string,
               name: PropTypes.string,
               slug: PropTypes.string,
-              image: PropTypes.string,
             }),
           }),
         ),
@@ -142,12 +141,7 @@ class SectionUpdates extends React.Component {
               >
                 <Flex>
                   <Box mr={3}>
-                    <Avatar
-                      src={update.fromCollective.image}
-                      type={update.fromCollective.type}
-                      name={update.fromCollective.name}
-                      radius={40}
-                    />
+                    <Avatar collective={update.fromCollective} radius={40} />
                   </Box>
                   <Flex flexDirection="column" justifyContent="space-between">
                     <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
