@@ -89,7 +89,7 @@
     "react-stripe-elements": "3.0.0",
     "react-tag-input": "6.4.0",
     "react-tooltip": "3.10.0",
-    "react-window": "1.8.4",
+    "react-window": "1.8.5",
     "regenerator-runtime": "0.13.2",
     "rehype-react": "3.1.0",
     "rehype-sanitize": "3.0.0",
