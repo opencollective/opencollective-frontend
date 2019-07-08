@@ -33,7 +33,7 @@ export const transactionFields = `
     name
     slug
     path
-    image
+    type
   }
   usingVirtualCardFromCollective {
     id
