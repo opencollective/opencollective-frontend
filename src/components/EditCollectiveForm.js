@@ -49,9 +49,6 @@ const MenuItem = styled(Link)`
   ${({ selected }) => selected && selectedStyle};
 `;
 
-const archiveIsEnabled = parseToBoolean(getEnvVar('SHOW_ARCHIVE_COLLECTIVE'));
-const deleteIsEnabled = parseToBoolean(getEnvVar('SHOW_DELETE_COLLECTIVE'));
-const emptyBalanceIsEnabled = parseToBoolean(getEnvVar('SHOW_EMPTY_BALANCE_COLLECTIVE'));
 const webhooksEnabled = parseToBoolean(getEnvVar('ENABLE_WEBHOOKS'));
 
 class EditCollectiveForm extends React.Component {
@@ -671,11 +668,11 @@ class EditCollectiveForm extends React.Component {
             {this.state.section === 'advanced' && (
               <Box>
                 {collective.type === 'USER' && <EditUserEmailForm />}
-                {emptyBalanceIsEnabled && collective.type === 'COLLECTIVE' && (
+                {collective.type === 'COLLECTIVE' && (
                   <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
                 )}
-                {archiveIsEnabled && <EditCollectiveArchive collective={collective} />}
-                {deleteIsEnabled && collective.type !== 'EVENT' && <EditCollectiveDelete collective={collective} />}
+                {<EditCollectiveArchive collective={collective} />}
+                {collective.type !== 'EVENT' && <EditCollectiveDelete collective={collective} />}
                 <hr />
               </Box>
             )}
