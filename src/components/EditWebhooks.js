@@ -1,14 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 import { get, pick, isEmpty } from 'lodash';
 import { compose, graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import InputField from './InputField';
 import events from '../constants/notificationEvents';
 import Loading from './Loading';
+import StyledButton from './StyledButton';
+import { Add } from 'styled-icons/material/Add';
+import { Close } from 'styled-icons/material/Close';
+import { Flex, Box } from '@rebass/grid';
+import StyledHr from './StyledHr';
+import StyledSelect from './StyledSelect';
+import StyledInputGroup from './StyledInputGroup';
 
 class EditWebhooks extends React.Component {
   static propTypes = {
@@ -68,9 +73,10 @@ class EditWebhooks extends React.Component {
         id: 'webhooks.remove',
         defaultMessage: 'Remove webhook',
       },
-      loading: { id: 'loading', defaultMessage: 'loading' },
-      save: { id: 'save', defaultMessage: 'save' },
-      saved: { id: 'saved', defaultMessage: 'saved' },
+      loading: { id: 'loading', defaultMessage: 'Loading' },
+      save: { id: 'save', defaultMessage: 'Save' },
+      saved: { id: 'saved', defaultMessage: 'Saved' },
+      title: { id: 'webhooks', defaultMessage: 'Webhooks' },
     });
 
     this.fields = [
@@ -95,6 +101,8 @@ class EditWebhooks extends React.Component {
       },
     ];
   }
+
+  getWebhookCount = () => Object.keys(this.state.webhooks).length;
 
   editWebhook = (index, fieldname, value) => {
     const { webhooks } = this.state;
@@ -152,33 +160,88 @@ class EditWebhooks extends React.Component {
 
   renderWebhook = (webhook, index) => {
     const { intl } = this.props;
+    const webHookCount = this.getWebhookCount();
+    const [url, activities] = this.fields;
 
     return (
       <div className="webhook" key={index}>
-        <Button bsStyle="danger" onClick={() => this.removeWebhook(index)}>
-          {intl.formatMessage(this.messages['webhooks.remove'])}
-        </Button>
-
-        <Form horizontal>
-          {this.fields.map(field => (
-            <InputField
-              className="horizontal"
-              key={field.name}
-              name={field.name}
-              label={field.label}
-              type={field.type}
-              disabled={typeof field.disabled === 'function' ? field.disabled(webhook) : field.disabled}
-              value={get(webhook, field.name)}
-              defaultValue={field.defaultValue}
-              options={field.options}
-              pre={field.pre}
-              placeholder={field.placeholder}
-              multiple={field.multiple || false}
-              onChange={value => this.editWebhook(index, field.name, value)}
-              required={field.required}
-            />
-          ))}
-        </Form>
+        <style jsx>
+          {`
+            p.input-index-indicator {
+              margin: 0;
+              padding: 0;
+              transform: translate(-36px, 1px);
+              position: absolute;
+              color: #d7d9e0;
+              font-size: 2.5rem;
+            }
+            p.input-label {
+              margin: 0;
+              padding: 0;
+              position: absolute;
+              transform: translate(1px, -28px);
+            }
+            div.margin {
+              margin: 4rem 0 4rem 0;
+            }
+          `}
+        </style>
+        <Flex flexDirection={['column-reverse', null, 'row']} my={4}>
+          <Flex justifyContent="space-between" css={{ flexGrow: 1 }}>
+            <Box css={{ width: '65%' }}>
+              <form>
+                <div className="margin">
+                  <p className="input-index-indicator">{index + 1}</p>
+                  <p className="input-label">{url.label}</p>
+                  <StyledInputGroup
+                    key={url.name}
+                    name={url.name}
+                    type={url.type}
+                    required={url.required}
+                    placeholder={url.placeholder || ''}
+                    value={get(webhook, url.name)}
+                    prepend="http://"
+                    onChange={value => this.editWebhook(index, url.name, value.target.value)}
+                    disabled={typeof url.disabled === 'function' ? url.disabled(webhook) : url.disabled}
+                  />
+                  <div className="margin">
+                    <p className="input-label">{activities.label}</p>
+                    <StyledSelect
+                      minWidth={1}
+                      key={activities.name}
+                      name={activities.name}
+                      options={activities.options.map(i => i.label).flat()}
+                      value={get(webhook, activities.name)}
+                      multiple={activities.multiple}
+                      defaultValue={url.defaultValue}
+                      required={url.required}
+                      onChange={value => this.editWebhook(index, activities.name, value.value)}
+                      disabled={
+                        typeof activities.disabled === 'function' ? activities.disabled(webhook) : activities.disabled
+                      }
+                    />
+                  </div>
+                </div>
+              </form>
+            </Box>
+            <Box>
+              <div className="margin">
+                <StyledButton
+                  buttonStyle="standard"
+                  buttonSize="small"
+                  px={4}
+                  mt={2}
+                  onClick={() => this.removeWebhook(index)}
+                  hidden={webHookCount <= 1}
+                >
+                  <Close size="1em" />
+                  {'  '}
+                  {intl.formatMessage(this.messages['webhooks.remove'])}
+                </StyledButton>
+              </div>
+            </Box>
+          </Flex>
+        </Flex>
       </div>
     );
   };
@@ -192,14 +255,17 @@ class EditWebhooks extends React.Component {
 
     let submitBtnMessageId = 'save';
     if (['loading', 'saved'].includes(status)) {
-      submitBtnMessageId = status;
+      submitBtnMessageId = 'saved';
     }
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
+    const submitBtnLabelEnd = this.messages['title'] && intl.formatMessage(this.messages['title']);
+    const captializedSubmitBtnLabel = submitBtnLabel.charAt(0).toUpperCase() + submitBtnLabel.slice(1);
+    const webHookCount = this.getWebhookCount();
 
     return loading ? (
       <Loading />
     ) : (
-      <div className="EditWebhooks">
+      <div css={{ 'margin-left': '2.5rem' }} className="EditWebhooks">
         <style jsx>
           {`
             .error {
@@ -207,29 +273,48 @@ class EditWebhooks extends React.Component {
             }
           `}
         </style>
-
         <div className="webhooks">
-          <h2>{this.props.title}</h2>
+          <h2 className="">{this.props.title}</h2>
+          <StyledHr my={4} />
           {webhooks.map(this.renderWebhook)}
         </div>
 
         <div className="editWebhooksActions">
-          <Button bsStyle="primary" onClick={() => this.addWebhook()}>
+          <StyledButton
+            buttonStyle="standard"
+            buttonSize="medium"
+            onClick={this.addWebhook}
+            css={{ width: '65%' }}
+            borderStyle="dashed"
+            borderWidth="1px"
+            borderRadius={4}
+            px={4}
+          >
+            <Add size="1em" />
+            {'  '}
             {intl.formatMessage(this.messages['webhooks.add'])}
-          </Button>
+          </StyledButton>
         </div>
+
+        <StyledHr my={4} />
 
         {status === 'error' && <div className="error">{error}</div>}
 
         <div className="actions">
-          <Button
-            bsStyle="primary"
-            type="submit"
+          <StyledButton
+            buttonStyle="primary"
+            buttonSize="medium"
             onClick={this.handleSubmit}
             disabled={loading || !this.state.modified}
+            loading={status == 'loading'}
+            px={4}
           >
-            {submitBtnLabel}
-          </Button>
+            {captializedSubmitBtnLabel}
+            {'  '}
+            {webHookCount}
+            {'  '}
+            {submitBtnLabelEnd}
+          </StyledButton>
         </div>
       </div>
     );
