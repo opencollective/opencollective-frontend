@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import '../server/env';
 
-import models from '../server/models';
+import childProcessPromise from 'child-process-promise';
 
-const exec = require('child-process-promise').exec;
-const roles = require('../server/constants/roles');
+import models from '../server/models';
+import roles from '../server/constants/roles';
+
+const exec = childProcessPromise.exec;
 
 const data = {};
 

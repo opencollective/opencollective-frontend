@@ -12,7 +12,6 @@ const command = `mocha test/transactions.routes.test.js`;
 const initialIndex = 0;
 const initialSteps = 100;
 
-import fs from 'fs';
 import { exec, execSync } from 'child_process';
 
 const commits = execSync(`git log --pretty=%H:%cd --date=short`, {
@@ -21,7 +20,6 @@ const commits = execSync(`git log --pretty=%H:%cd --date=short`, {
 
 const commits_array = commits.split('\n');
 
-let steps;
 let index;
 let stdout;
 

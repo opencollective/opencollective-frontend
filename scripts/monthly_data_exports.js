@@ -17,7 +17,7 @@ const queries = [
   {
     filename: 'TopCollectivesByNewBackers.csv',
     query: `
-    SELECT max(c.slug) as collective, max(c."createdAt") as "createdAt", count(*) as "totalNewBackers", 
+    SELECT max(c.slug) as collective, max(c."createdAt") as "createdAt", count(*) as "totalNewBackers",
     max(c.website) as website, max(c."twitterHandle") as twitter, max(c.description) as description
     FROM "Members" m
     LEFT JOIN "Collectives" c ON m."CollectiveId" = c.id
@@ -31,7 +31,7 @@ const queries = [
   {
     filename: 'TopNewCollectivesByDonations.csv',
     query: `
-  SELECT sum(amount)::float / 100 as "totalAmount", max(t.currency) as currency, max(c.slug) as collective, 
+  SELECT sum(amount)::float / 100 as "totalAmount", max(t.currency) as currency, max(c.slug) as collective,
   max(c.website) as website, max(c."twitterHandle") as twitter, max(c.description) as description
   FROM "Transactions" t
   LEFT JOIN "Collectives" c ON c.id = t."CollectiveId"
@@ -48,8 +48,8 @@ const queries = [
   {
     filename: 'Top100Backers.csv',
     query: `
-  with res as (SELECT CONCAT('https://opencollective.com/', max(backer.slug)) as backer, sum(amount)::float / 100 as "amount", 
-  max(t.currency) as currency, string_agg(DISTINCT c.slug, ', ') AS "collectives supported", max(backer."twitterHandle") as twitter, 
+  with res as (SELECT CONCAT('https://opencollective.com/', max(backer.slug)) as backer, sum(amount)::float / 100 as "amount",
+  max(t.currency) as currency, string_agg(DISTINCT c.slug, ', ') AS "collectives supported", max(backer."twitterHandle") as twitter,
   max(backer.description) as description, max(backer.website) as website
   FROM "Transactions" t
   LEFT JOIN "Collectives" backer ON backer.id = t."FromCollectiveId"
@@ -67,13 +67,13 @@ const queries = [
   {
     filename: 'transactions.csv',
     query: `
-    SELECT 
-    t."createdAt", c.slug as "collective slug", t.type as "transaction type", t.amount::float / 100, 
-    t.currency, fc.slug as "from slug", fc.type as "from type", t.description, e.category as "expense category", 
-    h.slug as "host slug", t."hostCurrency", t."hostCurrencyFxRate", 
+    SELECT
+    t."createdAt", c.slug as "collective slug", t.type as "transaction type", t.amount::float / 100,
+    t.currency, fc.slug as "from slug", fc.type as "from type", t.description, e.category as "expense category",
+    h.slug as "host slug", t."hostCurrency", t."hostCurrencyFxRate",
     pm.service as "payment processor", pm.type as "payment method type",
-    t."paymentProcessorFeeInHostCurrency"::float / 100 as "paymentProcessorFeeInHostCurrency", 
-    t."hostFeeInHostCurrency"::float / 100 as "hostFeeInHostCurrency", 
+    t."paymentProcessorFeeInHostCurrency"::float / 100 as "paymentProcessorFeeInHostCurrency",
+    t."hostFeeInHostCurrency"::float / 100 as "hostFeeInHostCurrency",
     t."platformFeeInHostCurrency"::float / 100 as "platformFeeInHostCurrency"
     FROM "Transactions" t
     LEFT JOIN "Collectives" fc ON fc.id=t."FromCollectiveId"
@@ -130,7 +130,7 @@ async function run() {
     });
 
     try {
-      const csv = json2csv(res);
+      const csv = json2csv(data);
       fs.writeFileSync(`${path}/${query.filename}`, csv);
     } catch (err) {
       console.log(err);

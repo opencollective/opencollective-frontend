@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 import '../server/env';
 
-const util = require('util');
-const exec = require('child_process').exec;
-const execPromise = util.promisify(exec);
-const spawn = require('child_process').spawn;
-const prompts = require('prompts');
-const moment = require('moment');
+import util from 'util';
+import childProcessPromise from 'child-process-promise';
+
+import prompts from 'prompts';
+import moment from 'moment';
 
 const reports = [
   {
@@ -37,8 +36,14 @@ const reports = [
 
 const PG_DATABASE = process.env.PG_DATABASE || 'opencollective_prod_snapshot';
 
+const exec = childProcessPromise.exec;
+const execPromise = util.promisify(exec);
+
+console.log('This script is being deprecated.');
+console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
+process.exit();
+
 function getChoices(array) {
-  const res = [];
   return array.map(key => ({ title: key.template, value: key.command }));
 }
 
@@ -94,15 +99,13 @@ async function runReport(responses) {
   return new Promise(resolve => {
     const cmd = exec(command, { env });
     cmd.stdout.pipe(process.stdout);
-    cmd.on('exit', code => {
+    cmd.on('exit', () => {
       resolve();
     });
   });
 }
 
-async function main({ argv }) {
-  // console.log('hi', argv)
-
+async function main() {
   console.log('This utility generates one of the automatic email reports for users or hosts.');
   console.log('Useful for resending a report or for testing.');
   console.log('');

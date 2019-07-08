@@ -13,6 +13,10 @@ import '../server/env';
 import models, { sequelize } from '../server/models';
 import _, { get, set } from 'lodash';
 
+console.log('This script is being deprecated.');
+console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
+process.exit();
+
 const done = err => {
   if (err) console.log('err', err);
   console.log('done!');
@@ -54,7 +58,7 @@ function run() {
     .then(async data => {
       const groupedByHostId = _.groupBy(data, 'HostId');
 
-      for (let [key, value] of Object.entries(groupedByHostId)) {
+      for (const [key, value] of Object.entries(groupedByHostId)) {
         const uniqueUserIds = _.uniq(value.map(pair => pair.UserId));
         await checkAndInsertUserIntoHostList(key, uniqueUserIds);
       }

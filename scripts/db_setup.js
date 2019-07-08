@@ -15,7 +15,7 @@ import '../server/env';
  */
 
 import format from 'pg-format';
-import { URL } from 'url';
+
 import * as libdb from '../server/lib/db';
 
 /** Create a user in postgres if it doesn't exist.
