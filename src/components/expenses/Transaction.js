@@ -37,9 +37,9 @@ class Transaction extends React.Component {
     }),
     fromCollective: PropTypes.shape({
       id: PropTypes.number,
-      image: PropTypes.string,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
     }),
     usingVirtualCardFromCollective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
