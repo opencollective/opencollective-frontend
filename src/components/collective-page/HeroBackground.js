@@ -13,40 +13,28 @@ const BackgroundContainer = styled.div`
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: ${themeGet('colors.primary.300')};
-  background: linear-gradient(
-    to top right,
-    ${props => `${props.theme.colors.primary[500]}, ${props.theme.colors.primary[100]}`}
-  );
   z-index: -1;
-  animation: ${fadeIn};
-  animation-duration: 0.3s;
+  animation: ${fadeIn} 0.25s cubic-bezier(0, 1, 0.5, 1);
   animation-fill-mode: both;
+  max-width: 1368px; // Should match SVG's viewbox
 
-  @supports (mask-size: contain) {
+  @supports (mask-size: cover) {
+    background-color: ${themeGet('colors.primary.300')};
+    background: linear-gradient(
+      10deg,
+      ${props => `${props.theme.colors.primary[700]}, ${props.theme.colors.primary[500]}`}
+    );
     ${backgroundImage}
     background-repeat: no-repeat;
     background-size: cover;
 
-    mask-image: url(${HeroBackgroundMask});
-    mask-size: 100% 35%;
-    mask-repeat: no-repeat;
-    mask-position: top right;
+    mask: url(${HeroBackgroundMask}) no-repeat;
+    mask-size: cover;
+    mask-position-x: 100%;
+    mask-position-y: -150px;
 
-    @media (min-width: 30em) {
-      mask-size: 100% 50%;
-    }
-
-    @media (min-width: 52em) {
-      mask-size: 100% 60%;
-    }
-
-    @media (min-width: 64em) {
-      mask-size: 100% 75%;
-    }
-
-    @media (min-width: 88em) {
-      mask-size: 100% 100%;
+    @media (max-width: 900px) {
+      mask-position-x: 20%;
     }
   }
 `;
