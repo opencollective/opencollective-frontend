@@ -137,9 +137,9 @@ class Hero extends Component {
                 </LinkCollective>
                 {canEdit && !isFixed && (
                   <Container position="absolute" right={-10} bottom={-5}>
-                    <Link route="editCollective" params={{ slug }}>
+                    <Link route="editCollective" params={{ slug }} title={formatMessage(Hero.Translations.settings)}>
                       <StyledRoundButton size={40} bg="#F0F2F5">
-                        <Cog size={24} color="#4B4E52" />
+                        <Cog size={24} />
                       </StyledRoundButton>
                     </Link>
                   </Container>
