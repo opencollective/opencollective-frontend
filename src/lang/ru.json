@@ -1120,6 +1120,7 @@
   "virtualCards.returnToEdit": "Вернуться к подарочным открыткам",
   "virtualCards.sentTo": "отправлено на {email}",
   "virtualCards.viewDetails": "Показать детали",
+  "webhooks": "Webhooks",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",
   "webhooks.types.label": "Activities",

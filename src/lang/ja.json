@@ -1120,6 +1120,7 @@
   "virtualCards.returnToEdit": "ギフトカードリストに戻る",
   "virtualCards.sentTo": "{email} に送信された",
   "virtualCards.viewDetails": "詳細を表示する",
+  "webhooks": "Webhooks",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",
   "webhooks.types.label": "Activities",
