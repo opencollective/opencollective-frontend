@@ -71,7 +71,7 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
     <StyledAvatar
       size={radius}
       type={contributor.type}
-      background={`url(${getBaseImagesUrl()}/${contributor.collectiveSlug}/avatar.png)`}
+      src={getCollectiveImage({ slug: contributor.collectiveSlug })}
       {...styleProps}
     />
   );
