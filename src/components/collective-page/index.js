@@ -72,7 +72,7 @@ class CollectivePage extends Component {
 
   getSections = memoizeOne((props, isAdmin) => {
     const { collective, host, stats, updates, transactions, expenses } = props;
-    const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
+    const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
     const sectionsToRemove = new Set([]);
 
     // Can't contribute anymore if the collective is archived or has no host
@@ -173,7 +173,7 @@ class CollectivePage extends Component {
   }
 
   getTheme() {
-    const customColor = get(this.props.collective, 'settings.collective-page.primaryColor');
+    const customColor = get(this.props.collective, 'settings.collectivePage.primaryColor');
     if (!customColor) {
       return theme;
     } else {
