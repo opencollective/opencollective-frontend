@@ -1,19 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { background, color, border, space, layout } from 'styled-system';
+import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
-import { getBaseImagesUrl } from '../lib/utils';
+import { getCollectiveImage } from '../lib/utils';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
-const StyledAvatar = styled(Flex)`
+const StyledAvatar = styled(Flex).attrs(props => ({
+  style: { backgroundImage: props.src ? `url(${props.src})` : null },
+}))`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
   ${color}
-  ${background}
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -38,12 +39,10 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
   if (collective) {
     type = collective.type;
     name = collective.name;
-    src = `${getBaseImagesUrl()}/${collective.slug}/avatar.png`;
+    src = getCollectiveImage(collective);
   }
-  // Avoid setting null/undefined background images
-  const backgroundImage = src ? `url(${src})` : undefined;
   return (
-    <StyledAvatar size={radius} type={type} background={backgroundImage} {...styleProps}>
+    <StyledAvatar size={radius} type={type} src={src} {...styleProps}>
       {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
     </StyledAvatar>
   );
@@ -72,7 +71,7 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
     <StyledAvatar
       size={radius}
       type={contributor.type}
-      background={`url(${getBaseImagesUrl()}/${contributor.collectiveSlug}/avatar.png)`}
+      src={getCollectiveImage({ slug: contributor.collectiveSlug })}
       {...styleProps}
     />
   );
