@@ -8,15 +8,12 @@ import { template } from 'lodash';
 import { URL, URLSearchParams } from 'universal-url';
 
 import pages from './pages';
-import email from './lib/email';
 import { languages } from './intl';
 import { maxAge } from './middlewares';
 import { logger } from './logger';
 import { getBaseApiUrl } from '../lib/utils';
 
 export default (server, app) => {
-  const urlencodedParser = express.urlencoded({ extended: false });
-
   server.use((req, res, next) => {
     if (!req.language && req.locale !== 'en') {
       // Prevent server side caching of non english content
@@ -144,18 +141,6 @@ export default (server, app) => {
         host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
       }),
     );
-  });
-
-  // Form submission in Marketing pages
-
-  server.post('/:pageSlug(gift-of-giving|gift-cards)', urlencodedParser, (req, res, next) => {
-    email.sendMessage({
-      to: 'Open Collective <info@opencollective.com>',
-      from: 'Open Collective <info@opencollective.com>',
-      subject: 'Gift of Giving',
-      text: JSON.stringify(req.body, null, 2),
-    });
-    next();
   });
 
   return pages.getRequestHandler(server.next);
