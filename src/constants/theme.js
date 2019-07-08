@@ -1,7 +1,7 @@
 import { variant } from 'styled-system';
 import { transparentize } from 'polished';
 
-export const colors = {
+export const defaultColors = {
   black: {
     900: '#090A0A',
     800: '#313233',
@@ -26,6 +26,16 @@ export const colors = {
     500: '#00CC36',
     300: '#6CE0A2',
     100: '#E6FAEF',
+  },
+  blue: {
+    800: '#0041A3',
+    700: '#145ECC',
+    500: '#3385FF',
+    400: '#66A3FF',
+    300: '#99C9FF',
+    200: '#B8DEFF',
+    100: '#EBF4FF',
+    50: '#F0F8FF',
   },
   primary: {
     800: '#0041A3',
@@ -64,7 +74,7 @@ export const colors = {
   },
 };
 
-const fontSizes = {
+const defaultFontSizes = {
   H1: 52,
   H2: 40,
   H3: 32,
@@ -77,7 +87,7 @@ const fontSizes = {
   Tiny: 10,
 };
 
-const lineHeights = {
+const defaultLineHeights = {
   H1: '56px',
   H2: '44px',
   H3: '36px',
@@ -91,9 +101,14 @@ const lineHeights = {
 };
 
 // using default space values from styled-system
-const space = [0, 4, 8, 16, 32, 64, 128, 256, 512];
+const defaultSpace = [0, 4, 8, 16, 32, 64, 128, 256, 512];
 
-const theme = {
+export const generateTheme = ({
+  colors = defaultColors,
+  fontSizes = defaultFontSizes,
+  lineHeights = defaultLineHeights,
+  space = defaultSpace,
+} = {}) => ({
   colors,
   fontSizes,
   lineHeights,
@@ -214,9 +229,9 @@ const theme = {
       color: colors.white.full,
     },
     info: {
-      backgroundColor: colors.primary[50],
-      borderColor: colors.primary[500],
-      color: colors.primary[700],
+      backgroundColor: colors.blue[50],
+      borderColor: colors.blue[500],
+      color: colors.blue[700],
     },
     success: {
       backgroundColor: colors.green[100],
@@ -237,7 +252,9 @@ const theme = {
   sizes: {
     navbarHeight: 68,
   },
-};
+});
+
+const theme = generateTheme();
 
 export const buttonStyle = variant({
   key: 'buttons',

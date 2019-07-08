@@ -17,6 +17,7 @@ import DefinedTerm, { Terms } from '../DefinedTerm';
 import LinkCollective from '../LinkCollective';
 import Avatar from '../Avatar';
 import MessageBox from '../MessageBox';
+import StyledLink from '../StyledLink';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import { TransactionsAndExpensesFragment } from './fragments';
@@ -100,7 +101,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                                     id="Transactions.byWithGiftCard"
                                     defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
                                     values={{
-                                      collectiveName: <LinkCollective collective={fromCollective} />,
+                                      collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
                                       date: (
                                         <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
                                       ),
@@ -115,7 +116,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                                     id="Transactions.by"
                                     defaultMessage="by {collectiveName} on {date}"
                                     values={{
-                                      collectiveName: <LinkCollective collective={fromCollective} />,
+                                      collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
                                       date: (
                                         <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
                                       ),

@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { get, isEmpty } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { ThemeProvider } from 'styled-components';
+import { lighten, darken } from 'polished';
 
 // OC Frontend imports
-import theme from '../../constants/theme';
+import theme, { generateTheme } from '../../constants/theme';
 import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
 
@@ -170,32 +172,58 @@ class CollectivePage extends Component {
     }
   }
 
+  getTheme() {
+    const customColor = get(this.props.collective, 'settings.collective-page.primaryColor');
+    if (!customColor) {
+      return theme;
+    } else {
+      return generateTheme({
+        colors: {
+          ...theme.colors,
+          primary: {
+            800: darken(0.1, customColor),
+            700: darken(0.05, customColor),
+            500: customColor,
+            400: lighten(0.05, customColor),
+            300: lighten(0.1, customColor),
+            200: lighten(0.15, customColor),
+            100: lighten(0.2, customColor),
+            50: lighten(0.25, customColor),
+          },
+        },
+      });
+    }
+  }
+
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
     const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
     const sections = this.getSections(this.props, canEdit);
+    const pageTheme = this.getTheme();
 
     return (
-      <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
-        <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
-          <Hero
-            collective={collective}
-            host={host}
-            sections={sections}
-            canEdit={canEdit}
-            isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
-            selectedSection={selectedSection || sections[0]}
-            onSectionClick={this.onSectionClick}
-            onCollectiveClick={this.onCollectiveClick}
-          />
+      <ThemeProvider theme={pageTheme}>
+        <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
+          <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
+            <Hero
+              collective={collective}
+              host={host}
+              sections={sections}
+              canEdit={canEdit}
+              isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
+              selectedSection={selectedSection || sections[0]}
+              onSectionClick={this.onSectionClick}
+              onCollectiveClick={this.onCollectiveClick}
+            />
+          </Container>
+          {sections.map(section => (
+            <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+              {this.renderSection(section, canEdit)}
+            </div>
+          ))}
         </Container>
-        {sections.map(section => (
-          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-            {this.renderSection(section, canEdit)}
-          </div>
-        ))}
-      </Container>
+      </ThemeProvider>
     );
   }
 }

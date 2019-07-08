@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
+import themeGet from '@styled-system/theme-get';
 
 import Container from '../Container';
 import { Sections, AllSectionsNames } from './_constants';
@@ -21,19 +22,20 @@ const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
   white-space: nowrap;
 
   &:focus {
-    color: #090a0a;
+    color: ${themeGet('colors.primary.700')};
     text-decoration: none;
   }
 
   &:hover {
-    color: #404040;
+    color: ${themeGet('colors.primary.400')};
   }
 
   ${props =>
     props.isSelected &&
     css`
       color: #090a0a;
-      border-bottom: 3px solid #090a0a;
+      font-weight: 500;
+      border-bottom: 3px solid ${themeGet('colors.primary.500')};
     `}
 `;
 
