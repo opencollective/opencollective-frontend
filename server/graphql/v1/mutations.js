@@ -703,11 +703,11 @@ const mutations = {
       if (args.limitedToOpenSourceCollectives) {
         const openSourceHost = await models.Collective.findOne({
           attributes: ['id'],
-          where: { slug: 'opensourcecollective' },
+          where: { slug: 'opensource' },
         });
         if (!openSourceHost) {
           throw new Error(
-            'Cannot find OpenSource collective host. You can disable the opensource-only limitation, or contact us on info@opencollective.com if this keeps hapening',
+            'Cannot find the host "Open Source Collective". You can disable the opensource-only limitation, or contact us at info@opencollective.com if this keeps happening',
           );
         }
         args.limitedToHostCollectiveIds = [openSourceHost.id];
