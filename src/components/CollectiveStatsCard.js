@@ -129,14 +129,14 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
                   defaultMessage="{amount} monthly spending"
                   values={{
                     amount: (
-                      <P fontWeight="bold">
+                      <Span fontWeight="bold">
                         <Currency
                           value={get(stats, 'monthlySpending') || 0}
                           currency={currency}
                           precision={0}
                           abbreviate
                         />
-                      </P>
+                      </Span>
                     ),
                   }}
                 />
