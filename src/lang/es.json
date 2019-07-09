@@ -606,6 +606,7 @@
   "home.totalContributed": "contributed",
   "home.transparency": "Un grupo de personas con una misión compartida que opera con total transparencia",
   "home.umbrella": "Become an umbrella entity to help Collectives raise funds",
+  "HomepageActivityItem.Description": "{contributor} {type, select, DEBIT {submitted a {amount} expense} other {contributed {amount} {interval, select, month {a month} year {a year} other {}}}} to {collective}.",
   "host.apply.btn": "Apply to host your collective {collective}",
   "host.apply.create.btn": "Aplicar para crear un colectivo",
   "host.apply.pending": "Application pending for {collective}",
