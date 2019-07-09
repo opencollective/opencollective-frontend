@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types';
 import styled from 'styled-components';
 import { backgroundImage } from 'styled-system';
 import { fadeIn } from '../../constants/animations.js';
+import themeGet from '@styled-system/theme-get';
 
 import HeroBackgroundMask from './HeroBackgroundMask.svg';
 
@@ -12,7 +13,11 @@ const BackgroundContainer = styled.div`
   top: 0;
   width: 100%;
   height: 100%;
-  background: #145ecc;
+  background-color: ${themeGet('colors.primary.300')};
+  background: linear-gradient(
+    to top right,
+    ${props => `${props.theme.colors.primary[500]}, ${props.theme.colors.primary[100]}`}
+  );
   z-index: -1;
   animation: ${fadeIn};
   animation-duration: 0.3s;
@@ -51,7 +56,7 @@ const BackgroundContainer = styled.div`
  * css `mask` is not supported.
  */
 const HeroBackground = ({ backgroundImage }) => {
-  return <BackgroundContainer backgroundImage={`url(${backgroundImage})`} />;
+  return <BackgroundContainer backgroundImage={backgroundImage ? `url(${backgroundImage})` : undefined} />;
 };
 
 HeroBackground.propTypes = {

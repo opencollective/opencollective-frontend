@@ -11,12 +11,11 @@ import { URLSearchParams } from 'universal-url';
 import { getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 
 import { Router, Link } from '../server/pages';
-import { colors } from '../constants/theme';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import { H2, H5, P } from '../components/Text';
+import { H2, H5, P, Span } from '../components/Text';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -196,7 +195,8 @@ class ClaimCollectivePage extends React.Component {
 
                 <Container
                   bg="white.full"
-                  border={`1px solid ${invalid ? colors.red[300] : colors.black.transparent[8]}`}
+                  border="1px solid"
+                  borderColor={invalid ? 'red.300' : 'black.transparent.8'}
                   borderRadius="16px"
                   display="flex"
                   flexDirection="column"
@@ -230,8 +230,8 @@ class ClaimCollectivePage extends React.Component {
 
                       <P fontSize="Caption">Make sure to Grant access in the GitHub permission page.</P>
 
-                      <StyledLink
-                        buttonStyle="standard"
+                      <StyledButton
+                        as="a"
                         buttonSize="medium"
                         href={this.getGithubConnectUrl()}
                         fontWeight="medium"
@@ -239,12 +239,11 @@ class ClaimCollectivePage extends React.Component {
                         mt={4}
                         mx="auto"
                         width={1}
+                        textAlign="center"
                       >
-                        <Flex display="inline-flex" alignItems="center" justifyContent="space-evenly">
-                          <Github size={17} color={colors.black[500]} />
-                          Authenticate
-                        </Flex>
-                      </StyledLink>
+                        <Github size={17} />
+                        <Span ml={3}>Authenticate</Span>
+                      </StyledButton>
                     </Fragment>
                   )}
                   {step === 'invalid' && (
@@ -258,7 +257,7 @@ class ClaimCollectivePage extends React.Component {
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <circle cx="33" cy="33" r="32.5" fill="white" stroke={colors.red[300]} />
+                          <circle cx="33" cy="33" r="32.5" fill="white" stroke="#FF99AA" />
                           <path
                             fillRule="evenodd"
                             clipRule="evenodd"
@@ -286,7 +285,7 @@ class ClaimCollectivePage extends React.Component {
                         width={1}
                       >
                         <Flex display="inline-flex" alignItems="center" justifyContent="space-evenly">
-                          <Github size={17} fill={colors.black[500]} />
+                          <Github size={17} fill="#9D9FA3" />
                           Authenticate
                         </Flex>
                       </StyledLink>
