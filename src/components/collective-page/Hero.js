@@ -119,7 +119,7 @@ class Hero extends Component {
     return (
       <MainContainer isFixed={isFixed}>
         {/* Hero top */}
-        <Container position="relative" pb={isFixed ? 0 : 4}>
+        <Container position="relative" pb={isFixed ? 0 : 4} minHeight={isFixed ? undefined : 325}>
           {!isFixed && <HeroBackground backgroundImage={collective.backgroundImage} />}
           <ContainerSectionContent
             pt={isFixed ? 16 : 40}

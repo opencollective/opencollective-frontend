@@ -173,7 +173,7 @@ class CollectivePage extends Component {
   }
 
   getTheme() {
-    const customColor = get(this.props.collective, 'settings.collectivePage.primaryColor');
+    const customColor = get(this.props.collective, 'settings.collectivePage.primaryColor', '#000000');
     if (!customColor) {
       return theme;
     } else {
