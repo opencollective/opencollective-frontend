@@ -80,9 +80,6 @@ export default function(app) {
     next();
   });
 
-  // Cors.
-  app.use(cors());
-
   // Cache Middleware
   if (get(config, 'cache.middleware')) {
     app.use(cacheMiddleware());
@@ -95,6 +92,9 @@ export default function(app) {
 
   // Forest
   forest(app);
+
+  // Cors.
+  app.use(cors());
 
   const verify = (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile });
 
