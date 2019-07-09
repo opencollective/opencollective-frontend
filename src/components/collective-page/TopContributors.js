@@ -9,12 +9,12 @@ import { truncate } from 'lodash';
 import { CollectiveType } from '../../constants/collectives';
 import { formatCurrency } from '../../lib/utils';
 import withViewport from '../../lib/withViewport';
-import Container from '../Container';
 import Link from '../Link';
 import { H4, P, Span } from '../Text';
 import { ContributorAvatar } from '../Avatar';
 
 import TopContributorsBackgroundSVG from './TopContributorsBackground.svg';
+import ContainerSectionContent from './ContainerSectionContent';
 
 /** The container for Top Contributors view */
 const TopContributorsContainer = styled.div`
@@ -98,7 +98,7 @@ ContributorRow.propTypes = {
 const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
   return (
     <TopContributorsContainer>
-      <Container maxWidth={1400} m="0 auto">
+      <ContainerSectionContent m="0 auto">
         <H4 fontWeight="normal" mb={3}>
           <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top Contributors" />
         </H4>
@@ -142,7 +142,7 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
             </div>
           )}
         </Flex>
-      </Container>
+      </ContainerSectionContent>
     </TopContributorsContainer>
   );
 };
