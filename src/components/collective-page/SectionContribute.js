@@ -226,8 +226,8 @@ class SectionContribute extends React.PureComponent {
         </ContainerSectionContent>
         {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors
-            topOrganizations={topOrganizations}
-            topIndividuals={topIndividuals}
+            organizations={topOrganizations}
+            individuals={topIndividuals}
             currency={collective.currency}
           />
         )}
