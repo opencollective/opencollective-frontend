@@ -10,6 +10,17 @@ const ContributeCardsContainer = styled.div`
 
   ${CustomScrollbarCSS}
 
+  /** Hide scrollbar when not hovered */
+  &:not(:hover) {
+    &::-webkit-scrollbar-thumb {
+      background: white;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: white;
+    }
+  }
+
   /** Respect left margin / center cards on widescreens */
   @media (min-width: 1500px) {
     padding-left: calc((100% - 1500px) / 2);
