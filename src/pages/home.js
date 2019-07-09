@@ -778,7 +778,7 @@ class HomePage extends React.Component {
                     <P {...statsStyles}>
                       <FormattedNumber value={totalDonors} />
                     </P>
-                    <P>
+                    <P maxWidth={115} textAlign="center">
                       <FormattedMessage id="home.backers" defaultMessage="financial contributors" />
                     </P>
                   </Container>
