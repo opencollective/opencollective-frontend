@@ -177,7 +177,7 @@ data['report.platform'] = {
   month: 'January',
   hosts: [
     {
-      host: 'opensourcecollective',
+      host: 'opensource',
       currency: 'USD',
       HostCollectiveId: 11004,
       backers: 2978,
