@@ -110,7 +110,7 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
         {settings.goals[0].title}
       </P>,
     ]}
-    <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
+    <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3} textAlign="center" alignItems="center">
       {get(stats, 'backers.all', 0) || get(stats, 'backers.all', 0) ? (
         [
           <Flex width={0.5} alignItems="center" flexDirection="column" key="backers">
