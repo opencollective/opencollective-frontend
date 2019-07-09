@@ -171,7 +171,7 @@ class UserCollective extends React.Component {
     window.oc = { collective: this.collective }; // for easy debugging
   }
 
-  renderRole(role) {
+  renderRole(role, backerCollectiveTypes) {
     const { intl, collective, LoggedInUser } = this.props;
     const type = collective.type.toLowerCase();
     const memberOfByRole = groupBy(collective.memberOf, 'role');
@@ -197,10 +197,17 @@ class UserCollective extends React.Component {
         subtitle = intl.formatMessage(this.messages[subtitleMessageId], values);
       }
 
+      const renderBackerRoleHeader = () => {
+        if (role === 'BACKER' && memberOfCollectiveType === backerCollectiveTypes[0]) {
+          return <SectionTitle title={title} subtitle={subtitle} />;
+        }
+        return <SectionTitle subtitle={subtitle} />;
+      };
+
       return (
         <section id={role.toLowerCase()} className={collectiveType} key={`${role}-${memberOfCollectiveType}`}>
           <div className="content">
-            <SectionTitle title={title} subtitle={subtitle} />
+            {role === 'BACKER' ? renderBackerRoleHeader() : <SectionTitle title={title} subtitle={subtitle} />}
 
             <Memberships className={role} LoggedInUser={LoggedInUser} memberships={memberships} />
           </div>
@@ -210,8 +217,8 @@ class UserCollective extends React.Component {
 
     return (
       <div key={role}>
-        {renderRoleForType('ORGANIZATION')}
         {renderRoleForType('COLLECTIVE')}
+        {renderRoleForType('ORGANIZATION')}
         {renderRoleForType('EVENT')}
       </div>
     );
@@ -461,7 +468,20 @@ class UserCollective extends React.Component {
                 </section>
               )}
 
-              {Object.keys(memberOfByRole).map(role => role !== 'HOST' && this.renderRole(role))}
+              {Object.keys(memberOfByRole).map(role => {
+                const backerCollectiveTypes = [];
+
+                if (role !== 'HOST' && role === 'BACKER') {
+                  memberOfByRole[role].map(member => {
+                    if (member.collective.type) {
+                      backerCollectiveTypes.push(member.collective.type);
+                    }
+                  });
+
+                  return this.renderRole(role, backerCollectiveTypes);
+                } else return;
+              })}
+              {Object.keys(memberOfByRole).map(role => role !== 'HOST' && role !== 'BACKER' && this.renderRole(role))}
             </div>
           </div>
         </Body>
