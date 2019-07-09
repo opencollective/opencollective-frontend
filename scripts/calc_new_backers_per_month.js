@@ -5,11 +5,14 @@ import '../server/env';
  * This script calculates how many new backers and old backers we have added by calendar months
  */
 
-import Promise from 'bluebird';
 import fs from 'fs';
-import moment from 'moment';
 import { parse as json2csv } from 'json2csv';
-import models, { sequelize, Op } from '../server/models';
+
+import models, { Op } from '../server/models';
+
+console.log('This script is being deprecated.');
+console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
+process.exit();
 
 const done = err => {
   if (err) console.log(err);
@@ -19,8 +22,7 @@ const done = err => {
 };
 
 const results = {};
-const arrayLength = 30;
-//const csvFields = ['id', 'slug', 'newBackerCount', 'oldBackerCount'];
+// const csvFields = ['id', 'slug', 'newBackerCount', 'oldBackerCount'];
 const outputFilename = 'new_backer_count_output.csv';
 
 const getMonthYearKeyFromDate = date => {
@@ -32,7 +34,7 @@ const calculateNewBackersPerMonth = () => {
 
   return models.Order.findAll({
     where: {
-      /*PaymentMethodId: {
+      /* PaymentMethodId: {
         [Op.not]: null
       }*/
       CollectiveId: {
@@ -65,7 +67,7 @@ const calculateNewBackersPerMonth = () => {
       }
     })
     .then(() => {
-      let csvFields = ['month', 'newBackers', 'oldBackers'];
+      const csvFields = ['month', 'newBackers', 'oldBackers'];
       console.log(results);
       const data = Object.keys(results).map(result => ({
         month: result,

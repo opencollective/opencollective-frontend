@@ -29,8 +29,6 @@ import { result, includes } from 'lodash';
 
 import models, { sequelize } from '../server/models';
 import * as transactionsLib from '../server/lib/transactions';
-import * as paymentsLib from '../server/lib/payments';
-import { OC_FEE_PERCENT } from '../server/constants/transactions';
 import { sleep } from '../server/lib/utils';
 import { toNegative } from '../server/lib/math';
 import libemail from '../server/lib/email';
@@ -445,7 +443,7 @@ export class Migration {
     // console.log('    * D:hostFee.....: ', debit.hostFeeInHostCurrency);
     // console.log('    * D:platformFee.: ', debit.platformFeeInHostCurrency);
     // console.log('    * D:ppFee.......: ', debit.paymentProcessorFeeInHostCurrency);
-    return false;
+    // return false;
   };
 
   /** Run the whole migration */

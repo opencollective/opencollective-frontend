@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import '../server/env';
 
-const _ = require('lodash');
 import models from '../server/models';
 
 const testStripeAccounts = {

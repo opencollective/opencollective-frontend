@@ -568,7 +568,7 @@ if (!templateName) {
           text,
           html: attributes.body,
         },
-        (err, info) => {
+        () => {
           console.log('email sent');
         },
       );
