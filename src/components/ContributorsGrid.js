@@ -28,6 +28,17 @@ const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGI
 /** Adds custom scrollbar for Chrome */
 const StyledGridContainer = styled.div`
   ${CustomScrollbarCSS}
+
+  /** Hide scrollbar when not hovered */
+  &:not(:hover) {
+    &::-webkit-scrollbar-thumb {
+      background: white;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: white;
+    }
+  }
 `;
 
 /**
