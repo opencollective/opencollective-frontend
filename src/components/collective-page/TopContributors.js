@@ -18,7 +18,6 @@ import ContainerSectionContent from './ContainerSectionContent';
 
 /** The container for Top Contributors view */
 const TopContributorsContainer = styled.div`
-  min-height: 425px;
   padding: 32px 16px;
   margin-top: 48px;
   background: url(${TopContributorsBackgroundSVG}) no-repeat center;
@@ -96,6 +95,7 @@ ContributorRow.propTypes = {
  * financial contributions.
  */
 const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
+  const hasBothTypes = Boolean(topOrganizations.length && topIndividuals.length);
   return (
     <TopContributorsContainer>
       <ContainerSectionContent m="0 auto">
@@ -105,9 +105,11 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
         <Flex mt={2} justifyContent="space-between" flexWrap="wrap">
           {topOrganizations && topOrganizations.length > 0 && (
             <div>
-              <P fontSize="LeadParagraph">
-                <FormattedMessage id="TopContributors.Organizations" defaultMessage="Organizations" />
-              </P>
+              {hasBothTypes && (
+                <P fontSize="LeadParagraph">
+                  <FormattedMessage id="TopContributors.Organizations" defaultMessage="Organizations" />
+                </P>
+              )}
               <Flex>
                 <ContributorsList>
                   {topOrganizations.slice(0, 5).map((contributor, idx) => (
@@ -124,9 +126,11 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
           )}
           {topIndividuals && topIndividuals.length > 0 && (
             <div>
-              <P fontSize="LeadParagraph">
-                <FormattedMessage id="TopContributors.Individuals" defaultMessage="Individuals" />
-              </P>
+              {hasBothTypes && (
+                <P fontSize="LeadParagraph">
+                  <FormattedMessage id="TopContributors.Individuals" defaultMessage="Individuals" />
+                </P>
+              )}
               <Flex>
                 <ContributorsList>
                   {topIndividuals.slice(0, 5).map((contributor, idx) => (
@@ -149,8 +153,8 @@ const TopContributors = ({ topOrganizations, topIndividuals, currency }) => {
 
 TopContributors.propTypes = {
   currency: PropTypes.string.isRequired,
-  topOrganizations: PropTypes.arrayOf(PropTypes.object),
-  topIndividuals: PropTypes.arrayOf(PropTypes.object),
+  topOrganizations: PropTypes.arrayOf(PropTypes.object).isRequired,
+  topIndividuals: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default withViewport(TopContributors);
