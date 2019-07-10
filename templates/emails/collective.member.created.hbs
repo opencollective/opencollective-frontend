@@ -10,29 +10,35 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
 <p>Hi,</p>
 {{/if}}
 
-<p>Just a quick note to let you know that <a href="{{config.host.website}}/{{member.memberCollective.slug}}">{{member.memberCollective.name}}</a> is now a {{{toLowerCase member.role}}} of <a href="{{config.host.website}}{{collective.urlPath}}">{{collective.name}}</a>.</p>
+<p>Just a quick note to let you know that {{#if member.memberCollective.isAnonymous}}anonymous{{else}}<a
+    href="{{config.host.website}}/{{member.memberCollective.slug}}">{{member.memberCollective.name}}</a>{{/if}} is now a
+  {{{toLowerCase member.role}}} of <a href="{{config.host.website}}{{collective.urlPath}}">{{collective.name}}</a>.</p>
 
 {{#if order.publicMessage}}
-  <p class="pullQuote">“{{order.publicMessage}}”<br />- {{member.memberCollective.name}}</p>
+<p class="pullQuote">“{{order.publicMessage}}”<br />- {{member.memberCollective.name}}</p>
 {{/if}}
 
 {{#if tweet}}
 <center>
-  {{tweet.text}}<br />      
-  <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}" class="btn blue"><div>Thank that person on Twitter!</div></a>
+  {{tweet.text}}<br />
+  <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}" class="btn blue">
+    <div>Thank that person on Twitter!</div>
+  </a>
 </center>
 {{/if}}
 
+{{#if member.memberCollective.isAnonymous}}
+{{else}}
 <h2>About {{member.memberCollective.name}}</h2>
 <table>
   <tr>
     {{#if member.memberCollective.previewImage}}
-      <td>
-        <a href="{{config.host.website}}/{{member.memberCollective.slug}}">
-          <img src="{{member.memberCollective.previewImage}}" height="64" /><br />
-        </a>
-      </td>
-      <td width="10"></td>
+    <td>
+      <a href="{{config.host.website}}/{{member.memberCollective.slug}}">
+        <img src="{{member.memberCollective.previewImage}}" height="64" /><br />
+      </a>
+    </td>
+    <td width="10"></td>
     {{/if}}
     <td>
       {{#if member.memberCollective.company}}
@@ -43,37 +49,60 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
 
       <a href="{{member.memberCollective.website}}">{{member.memberCollective.website}}</a>
       {{#if member.memberCollective.twitterHandle}}
-        &nbsp;·&nbsp;
-        <a href="https://twitter.com/{{member.memberCollective.twitterHandle}}">@{{member.memberCollective.twitterHandle}}</a><br />
+      &nbsp;·&nbsp;
+      <a
+        href="https://twitter.com/{{member.memberCollective.twitterHandle}}">@{{member.memberCollective.twitterHandle}}</a><br />
       {{/if}}
       <br />
-      <a href="{{config.host.website}}/{{member.memberCollective.slug}}">{{config.host.website}}/{{member.memberCollective.slug}}</a>
+      <a
+        href="{{config.host.website}}/{{member.memberCollective.slug}}">{{config.host.website}}/{{member.memberCollective.slug}}</a>
     </td>
   </tr>
 </table>
+{{/if}}
 
 {{#if order }}
-  <h2>Order</h2>
-  <p>{{order.description}}</p>
-  <table>
-    {{#if order.tier}}
-    <tr><th>{{{capitalize order.tier.type}}}:</th><td>{{order.tier.name}}</td></tr>
-    {{/if}}
-    <tr><th>Amount:</th><td>{{{currency order.totalAmount currency=order.currency}}}</td></tr>
-    {{#if order.subscription}}
-      {{#if order.subscription.interval}}
-        <tr><th>Frequency:</th><td>{{order.subscription.interval}}</td></tr>
-      {{/if}}
-    {{else}}
-    <tr><th>Frequency:</th><td>one time</td></tr>
-    {{/if}}
-    {{#if order.publicMessage}}
-    <tr><th>Public message:</th><td>{{order.publicMessage}}</td></tr>
-    {{/if}}
-    {{#if order.referral}}
-    <tr><th>Referral:</th><td><a href="{{config.host.website}}/{{order.referral.slug}}">{{order.referral.name}}</a> {{#if order.referral.twitterHandle}}<a href="https://twitter.com/{{order.referral.twitterHandle}}">@{{order.referral.twitterHandle}}</a>{{/if}}</td></tr>
-    {{/if}}
-  </table>
+<h2>Order</h2>
+<p>{{order.description}}</p>
+<table>
+  {{#if order.tier}}
+  <tr>
+    <th>{{{capitalize order.tier.type}}}:</th>
+    <td>{{order.tier.name}}</td>
+  </tr>
+  {{/if}}
+  <tr>
+    <th>Amount:</th>
+    <td>{{{currency order.totalAmount currency=order.currency}}}</td>
+  </tr>
+  {{#if order.subscription}}
+  {{#if order.subscription.interval}}
+  <tr>
+    <th>Frequency:</th>
+    <td>{{order.subscription.interval}}</td>
+  </tr>
+  {{/if}}
+  {{else}}
+  <tr>
+    <th>Frequency:</th>
+    <td>one time</td>
+  </tr>
+  {{/if}}
+  {{#if order.publicMessage}}
+  <tr>
+    <th>Public message:</th>
+    <td>{{order.publicMessage}}</td>
+  </tr>
+  {{/if}}
+  {{#if order.referral}}
+  <tr>
+    <th>Referral:</th>
+    <td><a href="{{config.host.website}}/{{order.referral.slug}}">{{order.referral.name}}</a>
+      {{#if order.referral.twitterHandle}}<a
+        href="https://twitter.com/{{order.referral.twitterHandle}}">@{{order.referral.twitterHandle}}</a>{{/if}}</td>
+  </tr>
+  {{/if}}
+</table>
 {{/if}}
 
 <p>If you have questions about Open Collective, feel free to reply to this email.</p>

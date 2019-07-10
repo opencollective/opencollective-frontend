@@ -451,7 +451,7 @@ const sendOrderProcessingEmail = async order => {
     user: user.info,
     collective: collective.info,
     host: host.info,
-    fromCollective: fromCollective.minimal,
+    fromCollective: fromCollective.activity,
     subscriptionsLink: `${config.host.website}/${fromCollective.slug}/subscriptions`,
   };
   const instructions = get(host, 'settings.paymentMethods.manual.instructions');

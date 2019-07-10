@@ -540,6 +540,7 @@ export default function(Sequelize, DataTypes) {
             name: this.name,
             company: this.company,
             website: this.website,
+            isAnonymous: this.isAnonymous,
             twitterHandle: this.twitterHandle,
             githubHandle: this.githubHandle,
             description: this.description,
