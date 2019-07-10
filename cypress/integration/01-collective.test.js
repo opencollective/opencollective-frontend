@@ -28,7 +28,7 @@ describe('collective page', () => {
   });
 
   it('opens new expense page', () => {
-    cy.get('.desktopOnly Link.submitExpense').click();
+    cy.get('.desktopOnly link.submitExpense').click();
     cy.wait(500);
     cy.get('.ExpensesPage .CreateExpenseForm').contains('Sign up or login to submit an expense');
     cy.get('.ExpensesPage .desktopOnly .menu .item.budget').click();
