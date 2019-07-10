@@ -24,7 +24,7 @@ const ContributeCardsContainer = styled.div`
 
   /** Respect left margin / center cards on widescreens */
   @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
-    padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH}px) / 2);
+    padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH + 10}px) / 2);
   }
 `;
 

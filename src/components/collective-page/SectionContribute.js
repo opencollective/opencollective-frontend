@@ -195,7 +195,7 @@ class SectionContribute extends React.PureComponent {
     return (
       <Box py={[null, null, 3]}>
         <ContainerSectionContent>
-          <H2 mb={3} px={3} fontWeight="normal" color="black.900">
+          <H2 mb={3} fontWeight="normal" color="black.900">
             <FormattedMessage id="CollectivePage.Contribute" defaultMessage="Contribute" />
           </H2>
         </ContainerSectionContent>
