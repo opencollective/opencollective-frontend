@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { getCollectiveImage } from '../lib/utils';
+import { defaultImage } from '../constants/collectives';
 
 const Logo = ({ collective, src, style = {}, height, width, className }) => {
   style.maxHeight = style.height || height;
@@ -12,7 +13,11 @@ const Logo = ({ collective, src, style = {}, height, width, className }) => {
     backgroundStyle.minWidth = parseInt(height, 10) / 2;
   }
   if (collective) {
-    src = getCollectiveImage(collective, { name: 'logo' });
+    if (collective.image) {
+      src = getCollectiveImage(collective, { name: 'logo' });
+    } else {
+      src = defaultImage[collective.type || 'ORGANIZATION'];
+    }
   }
   return (
     <div className={classNames('Logo', className)} style={backgroundStyle}>
