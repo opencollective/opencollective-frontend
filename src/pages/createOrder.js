@@ -705,7 +705,7 @@ class CreateOrderPage extends React.Component {
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
-
+    const isAnonymous = get(this.state, 'stepProfile.isAnonymous');
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
@@ -769,8 +769,15 @@ class CreateOrderPage extends React.Component {
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
           </Container>
-          {interval ? (
-            <ContributeDetailsFAQ hasInterval mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          {interval || isAnonymous ? (
+            <ContributeDetailsFAQ
+              isAnonymous={isAnonymous}
+              hasInterval={!!interval}
+              mt={4}
+              display={['none', null, 'block']}
+              width={1 / 5}
+              minWidth="335px"
+            />
           ) : (
             <Box width={[0, null, null, 1 / 5]} />
           )}

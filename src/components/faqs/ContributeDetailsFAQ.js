@@ -9,13 +9,31 @@ import FAQ from './FAQ';
 /**
  * FAQ associated to the `ContributeDetails` component.
  */
-const ContributeDetailsFAQ = ({ tax, hasInterval, ...props }) =>
-  !tax && !hasInterval ? (
+const ContributeDetailsFAQ = ({ tax, isAnonymous, hasInterval, ...props }) =>
+  !tax && !hasInterval && !isAnonymous ? (
     <Container {...props} />
   ) : (
     <FAQ {...props}>
       {({ Container, Entry, Title, Content }) => (
         <Container>
+          {isAnonymous && (
+            <Entry>
+              <Title>
+                <FormattedMessage
+                  id="ContributeDetails.faq.isAnonymous.title"
+                  defaultMessage="What is an anonymous contribution?"
+                />
+              </Title>
+              <Content>
+                <FormattedMessage
+                  id="ContributeDetails.faq.isAnonymous.content"
+                  defaultMessage={
+                    'If you chose to contribute as "anonymous", your financial contribution will show up publicly as an anonymous donation and it won\'t link to your public profile. However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal host and the administrators of the collective can export a list of all the financial contributors with their personal information.'
+                  }
+                />
+              </Content>
+            </Entry>
+          )}
           {hasInterval && (
             <Entry>
               <Title>
@@ -44,6 +62,7 @@ const ContributeDetailsFAQ = ({ tax, hasInterval, ...props }) =>
   );
 
 ContributeDetailsFAQ.propTypes = {
+  isAnonymous: PropTypes.bool,
   hasInterval: PropTypes.bool,
   tax: PropTypes.shape({
     help: PropTypes.shape({

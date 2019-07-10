@@ -20,7 +20,7 @@ const CreateProfileFAQ = props => (
           <Content>
             <FormattedMessage
               id="createProfile.faq.persoVsOrg.content"
-              defaultMessage="Create an organization profile if you want to support projects in the name of your company."
+              defaultMessage="Create an organization profile if you want to make a financial contribution in the name of your company or organization. An organization profile allows you to enable other members of your organization to make financial contributions within certain limits that you can define. Organizations can also issue gift cards."
             />
           </Content>
         </Entry>
@@ -32,7 +32,7 @@ const CreateProfileFAQ = props => (
           <Content>
             <FormattedMessage
               id="createProfile.faq.email.content"
-              defaultMessage="For legal reasons, your email is shared with the administrators of the fiscal sponsor that is hosting the collective. We don't share it with any other partner. We don't use it for any type of marketing. We hate spam as much as you do."
+              defaultMessage="For legal reasons, your email is shared with the administrators of the collective and of its fiscal host. We don't share it with any other partner. We don't use it for any type of marketing. We hate spam as much as you do."
             />
           </Content>
         </Entry>
