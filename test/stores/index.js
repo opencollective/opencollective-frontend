@@ -67,6 +67,32 @@ export async function newUser(name, data = {}) {
 }
 
 /**
+ * Create a new anonymous profile
+ */
+export async function newAnonymousProfile(user) {
+  if (!user) {
+    throw new Error('newAnonymousProfile requires a User');
+  }
+  if (!user.CollectiveId) {
+    throw new Error('newAnonymousProfile requires a User with a UserCollective (user.CollectiveId)');
+  }
+  const anonymousCollective = await models.Collective.create({
+    CreatedByUserId: user.id,
+    isAnonymous: true,
+    type: 'USER',
+    name: 'anonymous',
+    slug: 'anonymous-agefede29',
+  });
+  await models.Member.create({
+    CreatedByUserId: user.id,
+    CollectiveId: anonymousCollective.id,
+    MemberCollectiveId: user.CollectiveId,
+    role: 'ADMIN',
+  });
+  return anonymousCollective;
+}
+
+/**
  * Create a new host and its admin user
  *
  * @param {String} name Name of the host collective
@@ -78,7 +104,7 @@ export async function newUser(name, data = {}) {
 export async function newHost(name, currency, hostFee, userData = {}) {
   // Host Admin
   const slug = slugify(name);
-  const hostAdmin = (await newUser(`${name} Admin`, userData)).user;
+  const hostAdmin = (await newUser(`${name} Admin`, { firstName: 'host', lastName: 'admin', ...userData })).user;
   const hostFeePercent = hostFee ? parseInt(hostFee) : 0;
   const hostCollective = await models.Collective.create({
     name,
