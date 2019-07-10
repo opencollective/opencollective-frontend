@@ -108,4 +108,4 @@ NavBar.defaultProps = {
   linkBuilder: section => `#section-${section}`,
 };
 
-export default injectIntl(NavBar);
+export default React.memo(injectIntl(NavBar));

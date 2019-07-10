@@ -193,7 +193,7 @@ class SectionContribute extends React.PureComponent {
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
 
     return (
-      <Box py={[null, null, 3]}>
+      <Box py={[null, null, 5]}>
         <ContainerSectionContent>
           <H2 mb={3} fontWeight="normal" color="black.900">
             <FormattedMessage id="CollectivePage.Contribute" defaultMessage="Contribute" />
