@@ -91,7 +91,12 @@ export default class SectionContributors extends React.PureComponent {
             />
           </P>
           {hasFilters && filters.length > 2 && (
-            <ContributorsFilter selected={filter} onChange={this.setFilter} filters={filters} />
+            <ContributorsFilter
+              selected={filter}
+              onChange={this.setFilter}
+              filters={filters}
+              selectedButtonStyle="primary"
+            />
           )}
         </ContainerSectionContent>
         <Box mb={4}>
