@@ -180,7 +180,7 @@ class SectionContribute extends React.PureComponent {
 
     if (nbFreeColsFromOrgs > 0) {
       takeNbIndividuals += nbFreeColsFromOrgs * 5;
-    } else if (nbFreeColsFromIndividuals) {
+    } else if (nbFreeColsFromIndividuals > 0) {
       takeNbOrgs += nbFreeColsFromIndividuals * 5;
     }
 

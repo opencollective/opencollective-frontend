@@ -11,8 +11,8 @@ import withViewport from '../../lib/withViewport';
 import Link from '../Link';
 import { H4, P, Span } from '../Text';
 import { ContributorAvatar } from '../Avatar';
+import Container from '../Container';
 
-import ContainerSectionContent from './ContainerSectionContent';
 import TopContributorsBackgroundSVG from './TopContributorsBackground.svg';
 
 /** The container for Top Contributors view */
@@ -28,24 +28,30 @@ const ContributorsList = styled(Flex)`
   margin-bottom: 16px;
   flex-direction: row;
 
-  @media (max-width: 52em) {
+  @media (max-width: 64em) {
     // Only show 5 contributors on mobile/tablet
     & > *:nth-child(1n + 6) {
       display: none;
     }
   }
 
-  @media (max-width: 64em) {
-    // Only show 10 contributors on mobile/tablet
+  @media (max-width: 88em) {
+    // Only show 10 contributors on desktop
     & > *:nth-child(1n + 11) {
       display: none;
     }
   }
 `;
 
+const ContributorItem = styled.div`
+  display: flex;
+  margin: 16px 24px 16px 0;
+  width: 200px;
+`;
+
 const AvatarWithRank = styled.div`
-  width: 75px;
-  height: 40px;
+  width: 63px;
+  height: 32px;
   margin-right: 8px;
   background: white;
   display: flex;
@@ -61,53 +67,59 @@ const AvatarWithRank = styled.div`
  * contributors that belongs in this column.
  */
 const getFlexBasisForCol = (nbContributors, totalContributors) => {
-  const baseSpace = 0.1;
-  return `${Math.trunc((nbContributors / totalContributors - baseSpace) * 100)}%`;
+  const baseSpaceBetween = 0.1;
+  const maxPercentage = 0.75;
+  const percentageNbContributors = nbContributors / totalContributors;
+  const width = Math.min(percentageNbContributors - baseSpaceBetween, maxPercentage);
+  return `${Math.trunc(width * 100)}%`;
 };
 
 /**
  * Shows a list of contributors with the section title. Auto-size based on number
  * of contributors.
  */
-const ContributorsBlock = ({ title, contributors, totalNbContributors, currency, showTitle }) => (
-  <Box flex="50% 1 3" style={{ flexBasis: getFlexBasisForCol(contributors.length, totalNbContributors) }}>
-    {showTitle && <P fontSize="LeadParagraph">{title}</P>}
-    <ContributorsList>
-      {contributors.map((contributor, idx) => {
-        const route = contributor.type === CollectiveType.COLLECTIVE ? 'new-collective-page' : 'collective';
-        return (
-          <Flex my={3} mr={3} css={{ width: 300 }} key={contributor.id}>
-            <AvatarWithRank>
-              <span>{idx + 1}</span>
-              <Link route={route} params={{ slug: contributor.collectiveSlug }}>
-                <ContributorAvatar contributor={contributor} radius={38} borderRadius="25%" />
-              </Link>
-            </AvatarWithRank>
-            <div>
-              <Link route={route} params={{ slug: contributor.collectiveSlug }}>
-                <P fontWeight="bold" color="black.700">
-                  {truncate(contributor.name, { length: 20 })}
+const ContributorsBlock = ({ title, contributors, totalNbContributors, currency, showTitle }) => {
+  const isFillingFullscreen = contributors.length === totalNbContributors && contributors.length === 20;
+  return (
+    <Box flex="50% 1 3" style={{ flexBasis: getFlexBasisForCol(contributors.length, totalNbContributors) }}>
+      {showTitle && <P fontSize="LeadParagraph">{title}</P>}
+      <ContributorsList justifyContent={isFillingFullscreen ? [null, null, null, null, 'space-between'] : 'flex-start'}>
+        {contributors.map((contributor, idx) => {
+          const route = contributor.type === CollectiveType.COLLECTIVE ? 'new-collective-page' : 'collective';
+          return (
+            <ContributorItem key={contributor.id}>
+              <AvatarWithRank>
+                <span>{idx + 1}</span>
+                <Link route={route} params={{ slug: contributor.collectiveSlug }}>
+                  <ContributorAvatar contributor={contributor} radius={28} borderRadius="25%" />
+                </Link>
+              </AvatarWithRank>
+              <div>
+                <Link route={route} params={{ slug: contributor.collectiveSlug }}>
+                  <P fontSize="Caption" lineHeight="Caption" fontWeight="bold" color="black.700">
+                    {truncate(contributor.name, { length: 20 })}
+                  </P>
+                </Link>
+                <P color="black.500" fontSize="Tiny" lineHeight="Tiny">
+                  <FormattedMessage
+                    id="TotalDonatedSince"
+                    defaultMessage="{totalDonated} since {date}"
+                    values={{
+                      totalDonated: (
+                        <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>
+                      ),
+                      date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
+                    }}
+                  />
                 </P>
-              </Link>
-              <P color="black.500">
-                <FormattedMessage
-                  id="TotalDonatedSince"
-                  defaultMessage="{totalDonated} since {date}"
-                  values={{
-                    totalDonated: (
-                      <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>
-                    ),
-                    date: <FormattedDate value={contributor.since} month="long" year="numeric" />,
-                  }}
-                />
-              </P>
-            </div>
-          </Flex>
-        );
-      })}
-    </ContributorsList>
-  </Box>
-);
+              </div>
+            </ContributorItem>
+          );
+        })}
+      </ContributorsList>
+    </Box>
+  );
+};
 
 ContributorsBlock.propTypes = {
   currency: PropTypes.string.isRequired,
@@ -167,7 +179,7 @@ const TopContributors = ({ organizations, individuals, currency }) => {
 
   return (
     <TopContributorsContainer>
-      <ContainerSectionContent>
+      <Container maxWidth={1050} m="0 auto" px={[15, 30]}>
         <H4 fontWeight="normal" mb={3}>
           <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top Contributors" />
         </H4>
@@ -175,7 +187,7 @@ const TopContributors = ({ organizations, individuals, currency }) => {
           {Blocks[0]}
           {Blocks[1]}
         </Flex>
-      </ContainerSectionContent>
+      </Container>
     </TopContributorsContainer>
   );
 };
