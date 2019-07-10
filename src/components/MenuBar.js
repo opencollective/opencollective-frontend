@@ -326,9 +326,9 @@ class MenuBar extends React.Component {
         </style>
         {this.state.sticky && stickyCTA && cta}
         {!collective.isArchived && ['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 && (
-          <a className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
+          <Link className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-          </a>
+          </Link>
         )}
 
         {LoggedInUser &&
