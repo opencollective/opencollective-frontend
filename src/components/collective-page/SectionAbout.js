@@ -103,7 +103,11 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
             } else if (value[0] !== '<') {
               // Fallback while we transition from old collective page to the new one.
               // Should be removed after migration to V2 is done.
-              return <Markdown source={value} data-cy="longDescription" />;
+              return (
+                <HTMLContent>
+                  <Markdown source={value} data-cy="longDescription" />
+                </HTMLContent>
+              );
             } else {
               return <HTMLContent content={value} data-cy="longDescription" />;
             }
