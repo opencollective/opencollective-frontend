@@ -184,12 +184,16 @@ class OrderSuccessContributorCardWithData extends React.Component {
               </LinkCollective>
             </Box>
           </CollectiveLogoContainer>
-          <Container display="flex" mt={2} cursor="pointer" justifyContent="center">
-            <Link route="collective" passHref params={{ slug: fromCollective.slug }}>
-              <StyledLink fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
-                {fromCollective.name}
-              </StyledLink>
-            </Link>
+          <Container
+            display="flex"
+            mt={2}
+            justifyContent="center"
+            fontSize="Paragraph"
+            fontWeight="bold"
+            lineHeight="Caption"
+            color="black.900"
+          >
+            <LinkCollective collective={fromCollective}>{fromCollective.name}</LinkCollective>
           </Container>
           <Flex flexDirection="column" p={12} alignItems="center">
             {totalAmount !== 0 && (

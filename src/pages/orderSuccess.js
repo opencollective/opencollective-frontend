@@ -64,10 +64,12 @@ const GetOrderQuery = gql`
       status
       fromCollective {
         id
+        type
         slug
         name
         image
         path
+        isAnonymous
       }
       collective {
         id
@@ -264,65 +266,4 @@ class OrderSuccessPage extends React.Component {
   }
 }
 
-<<<<<<< HEAD
 export default withUser(graphql(GetOrderQuery)(injectIntl(OrderSuccessPage)));
-=======
-const getOrder = graphql(gql`
-  query OrderSuccess($OrderId: Int!) {
-    Order(id: $OrderId) {
-      id
-      quantity
-      totalAmount
-      interval
-      currency
-      status
-      publicMessage
-      fromCollective {
-        id
-        image
-        name
-        path
-        slug
-        isAnonymous
-      }
-      collective {
-        name
-        tags
-        path
-      }
-      tier {
-        type
-        name
-        amount
-        presets
-      }
-      paymentMethod {
-        id
-      }
-    }
-  }
-`);
-
-export const updateOrderInfo = graphql(
-  gql`
-    mutation updateOrderInfo($id: Int!, $publicMessage: String!) {
-      updateOrderInfo(id: $id, publicMessage: $publicMessage) {
-        id
-        publicMessage
-      }
-    }
-  `,
-  {
-    props: ({ mutate }) => ({
-      updateOrderInfo: variables => mutate({ variables }),
-    }),
-  },
-);
-
-const addGraphQL = compose(
-  getOrder,
-  updateOrderInfo,
-);
-
-export default withUser(addGraphQL(injectIntl(OrderSuccessPage)));
->>>>>>> fix(orderSuccess): if anonymous donation, don't link to profile and don't suggest to share https://d.pr/free/i/qgZhMM
