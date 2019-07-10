@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex } from '@rebass/grid';
 import dynamic from 'next/dynamic';
 
 import { H3, Span } from '../Text';
@@ -10,6 +10,7 @@ import InlineEditField from '../InlineEditField';
 import Container from '../Container';
 import StyledButton from '../StyledButton';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -45,6 +46,7 @@ const Markdown = dynamic(() => import('react-markdown'));
  */
 const SectionAbout = ({ collective, canEdit, editMutation }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
+  canEdit = collective.isArchived ? false : canEdit;
 
   return (
     <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 4]}>
@@ -76,11 +78,17 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
               return (
                 <Flex justifyContent="center">
                   {canEdit ? (
-                    <Box margin="0 auto">
+                    <Flex flexDirection="column" alignItems="center">
+                      <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
+                        <FormattedMessage
+                          id="SectionAbout.Why"
+                          defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"
+                        />
+                      </MessageBox>
                       <StyledButton buttonSize="large" onClick={enableEditor}>
                         <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add your mission" />
                       </StyledButton>
-                    </Box>
+                    </Flex>
                   ) : (
                     <Span color="black.500" fontStyle="italic">
                       <FormattedMessage
@@ -93,7 +101,13 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
                 </Flex>
               );
             } else if (value[0] !== '<') {
-              return <Markdown source={value} data-cy="longDescription" />;
+              // Fallback while we transition from old collective page to the new one.
+              // Should be removed after migration to V2 is done.
+              return (
+                <HTMLContent>
+                  <Markdown source={value} data-cy="longDescription" />
+                </HTMLContent>
+              );
             } else {
               return <HTMLContent content={value} data-cy="longDescription" />;
             }
@@ -110,6 +124,7 @@ SectionAbout.propTypes = {
     id: PropTypes.number.isRequired,
     longDescription: PropTypes.string,
     name: PropTypes.string,
+    isArchived: PropTypes.bool,
   }).isRequired,
   /** A mutation used to update the description */
   editMutation: PropTypes.object,

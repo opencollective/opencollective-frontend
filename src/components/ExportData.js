@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import { exportMembers } from '../lib/export_file';
+import StyledLink from './StyledLink';
 import ExportImages from './ExportImages';
 
 class ExportData extends React.Component {
@@ -53,50 +54,80 @@ class ExportData extends React.Component {
         <ExportImages collective={collective} />
 
         <h1>
-          <FormattedMessage id="export.csv.title" defaultMessage="Export CSV" />
+          <FormattedMessage id="ExportContributors.Title" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
         </h1>
         <p>
-          <FormattedMessage id="export.csv.description" defaultMessage="Export your contributor data in CSV format" />
+          <FormattedMessage
+            id="ExportContributors.Description"
+            defaultMessage="Export your contributors data in {format} format"
+            values={{ format: 'CSV' }}
+          />
         </p>
         <div className="actions">
           <Button onClick={async () => await exportMembers(collective.slug)}>
-            <FormattedMessage id="export.all" defaultMessage="Export CSV" />
+            <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
           </Button>
         </div>
 
         <h1>
-          <FormattedMessage id="export.json.title" defaultMessage="Export JSON" />
+          <FormattedMessage
+            id="ExportContributors.Title"
+            defaultMessage="Export {format}"
+            values={{ format: 'JSON' }}
+          />
         </h1>
         <p>
-          <FormattedMessage id="export.json.description" defaultMessage="Export your contributor data in JSON format" />
+          <FormattedMessage
+            id="ExportContributors.Description"
+            defaultMessage="Export your contributors data in {format} format"
+            values={{ format: 'JSON' }}
+          />
         </p>
         <ul>
           <li>
-            All contributors:
-            <br />
-            <a href={`/${collective.slug}/members/all.json`}>
-              https://opencollective.com/
-              {collective.slug}
-              /members/all.json
-            </a>
+            <FormattedMessage
+              id="ExportContributors.All"
+              defaultMessage="All contributors: {link}"
+              values={{
+                link: (
+                  <StyledLink display="block" href={`/${collective.slug}/members/all.json`}>
+                    https://opencollective.com/
+                    {collective.slug}
+                    /members/all.json
+                  </StyledLink>
+                ),
+              }}
+            />
           </li>
           <li>
-            Only individuals:
-            <br />
-            <a href={`/${collective.slug}/members/users.json`}>
-              https://opencollective.com/
-              {collective.slug}
-              /members/users.json
-            </a>
+            <FormattedMessage
+              id="ExportContributors.OnlyIndividuals"
+              defaultMessage="Only individuals: {link}"
+              values={{
+                link: (
+                  <StyledLink display="block" href={`/${collective.slug}/members/users.json`}>
+                    https://opencollective.com/
+                    {collective.slug}
+                    /members/users.json
+                  </StyledLink>
+                ),
+              }}
+            />
           </li>
           <li>
-            Only organizations:
-            <br />
-            <a href={`/${collective.slug}/members/organizations.json`}>
-              https://opencollective.com/
-              {collective.slug}
-              /members/organizations.json
-            </a>
+            <FormattedMessage
+              id="ExportContributors.OnlyOrganizations"
+              defaultMessage="Only organizations: {link}"
+              values={{
+                link: (
+                  <StyledLink display="block" href={`/${collective.slug}/members/organizations.json`}>
+                    https://opencollective.com/
+                    {collective.slug}
+                    /members/organizations.json
+                  </StyledLink>
+                ),
+              }}
+            />
           </li>
         </ul>
 

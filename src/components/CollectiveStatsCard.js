@@ -96,7 +96,7 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
     </Container>
 
     {!hasGoals(settings) && (
-      <P fontSize="1rem" textAlign="center" color="#9399A3" mt={2} mb={5}>
+      <P fontSize="1rem" textAlign="center" color="#9399A3" mt={2} mb={5} p={2}>
         <FormattedMessage id="collectiveStats.noBudget" defaultMessage="No budget goals yet." />
       </P>
     )}
@@ -110,32 +110,40 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
         {settings.goals[0].title}
       </P>,
     ]}
-    <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3}>
-      {get(stats, 'backers.all', 0) || get(stats, 'backers.all', 0) ? (
-        [
-          <Flex width={0.5} alignItems="center" flexDirection="column" key="backers">
+    <Container display="flex" borderTop="1px solid #E3E4E6" py={2} mt={3} textAlign="center" alignItems="center">
+      {get(stats, 'backers.all', 0) ? (
+        <React.Fragment>
+          <Flex flex="50% 1 0" alignItems="center" flexDirection="column" px={2}>
             <P fontSize="1.2rem" fontWeight="bold">
               {get(stats, 'backers.all', 0)}
             </P>
             <P fontSize="1.2rem">
               <FormattedMessage id="home.backers" defaultMessage="financial contributors" />
             </P>
-          </Flex>,
-          <Flex width={0.5} alignItems="center" flexDirection="column" key="spending">
-            <Flex>
-              <P fontSize="1.2rem" fontWeight="bold">
-                <Currency value={get(stats, 'monthlySpending') || 0} currency={currency} precision={0} abbreviate />
-              </P>
+          </Flex>
+          {get(stats, 'monthlySpending', 0) > 0 && (
+            <Flex flex="50% 1 0" justifyContent="center" px={2}>
               <P fontSize="1.2rem">
-                /
-                <FormattedMessage id="month" defaultMessage="month" />
+                <FormattedMessage
+                  id="collectiveStats.monthlySpending"
+                  defaultMessage="{amount} monthly spending"
+                  values={{
+                    amount: (
+                      <Span fontWeight="bold">
+                        <Currency
+                          value={get(stats, 'monthlySpending') || 0}
+                          currency={currency}
+                          precision={0}
+                          abbreviate
+                        />
+                      </Span>
+                    ),
+                  }}
+                />
               </P>
             </Flex>
-            <P fontSize="1.2rem">
-              <FormattedMessage id="collectiveStats.monthlySpending" defaultMessage="spending" />
-            </P>
-          </Flex>,
-        ]
+          )}
+        </React.Fragment>
       ) : (
         <Link route={`/${slug}/contribute`} passHref>
           <StyledLink fontSize="1.2rem" width="100%" textAlign="center">

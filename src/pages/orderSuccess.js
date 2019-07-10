@@ -1,16 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 
 import { Facebook } from 'styled-icons/fa-brands/Facebook';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
-import { Times } from 'styled-icons/fa-solid/Times';
 
 import orderSuccessBackgroundUrl from '../static/images/order-success-background.svg';
 
@@ -21,16 +19,11 @@ import { withUser } from '../components/UserProvider';
 import { H3, P, Span } from '../components/Text';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-import { fadeIn } from '../components/StyledKeyframes';
 import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 import Loading from '../components/Loading';
-import StyledCard from '../components/StyledCard';
-import Container from '../components/Container';
+import OrderSuccessContributorCardWithData from '../components/OrderSuccessContributorCardWithData';
 import MessageBox from '../components/MessageBox';
-import StyledInput from '../components/StyledInput';
-import SpeechTriangle from '../components/icons/SpeechTriangle';
-import Avatar from '../components/Avatar';
 
 const OrderSuccessContainer = styled(Flex)`
   background: white url(${orderSuccessBackgroundUrl}) 0 0/100% no-repeat;
@@ -60,118 +53,42 @@ ShareLink.defaultProps = {
   omitProps: StyledLink.defaultProps.omitProps,
 };
 
-const CollectiveLogoContainer = styled(Flex)`
-  position: relative;
-  border-top: 1px solid ${themeGet('colors.black.200')};
-  justify-content: center;
-  a {
-    display: block;
-    &:hover {
-      opacity: 0.8;
+const GetOrderQuery = gql`
+  query OrderSuccess($OrderId: Int!) {
+    Order(id: $OrderId) {
+      id
+      quantity
+      totalAmount
+      interval
+      currency
+      status
+      fromCollective {
+        id
+        slug
+        name
+        image
+        path
+      }
+      collective {
+        id
+        slug
+        name
+        tags
+        path
+      }
+      tier {
+        id
+        type
+        name
+        amount
+        presets
+      }
+      paymentMethod {
+        id
+      }
     }
   }
-  img {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto;
-    background: ${themeGet('colors.black.100')};
-    display: block;
-    position: absolute;
-    border-radius: 8px;
-    margin-top: -24px;
-  }
 `;
-
-const PublicMessagePopup = styled.div`
-  position: relative;
-  padding: 8px;
-  margin-right: 32px;
-  margin-left: 32px;
-  margin-bottom: 32px;
-  border: 1px solid #f3f3f3;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
-  animation: ${fadeIn} 0.3s ease-in-out;
-
-  @media screen and (min-width: 52em) {
-    position: absolute;
-    top: 0;
-    left: 160px;
-  }
-`;
-
-const SpeechCaret = styled(SpeechTriangle)`
-  position: absolute;
-  left: -26px;
-  top: 15%;
-  color: white;
-  filter: drop-shadow(-4px 4px 2px rgba(20, 20, 20, 0.09));
-  height: 32px;
-  width: 32px;
-
-  @media screen and (max-width: 510px) {
-    display: none;
-  }
-`;
-
-const PublicMessage = styled.p`
-  font-size: ${themeGet('fontSizes.Tiny')}px;
-  lineheight: ${themeGet('fontSizes.Caption')}px;
-  color: ${themeGet('colors.black.600')};
-  margin-top: 12px;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
-const publicMessageMaxLength = 140;
-
-/**
- * A collective card to present collectives. This component only displays the
- * collective banner and the logo. What's displayed in the card body is up to you.
- */
-const StyledCollectiveCard = ({ collective, children, ...props }) => {
-  return (
-    <StyledCard className="collective-card" {...props}>
-      <CollectiveLogoContainer mt={47}>
-        <Box mt={-32}>
-          <Link route="collective" params={{ slug: collective.slug }}>
-            <a>
-              <Avatar src={collective.image} radius={48} name={collective.name} />
-            </a>
-          </Link>
-        </Box>
-      </CollectiveLogoContainer>
-      <Container display="flex" mt={2} cursor="pointer" justifyContent="center">
-        <Link route="collective" passHref params={{ slug: collective.slug }}>
-          <StyledLink fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
-            {collective.name}
-          </StyledLink>
-        </Link>
-      </Container>
-      {children}
-    </StyledCard>
-  );
-};
-
-StyledCollectiveCard.propTypes = {
-  /** All props accepted by `StyledCard` */
-  ...StyledCard.propTypes,
-  /** The collective to display data for */
-  collective: PropTypes.shape({
-    settings: PropTypes.object,
-    image: PropTypes.string,
-    type: PropTypes.string,
-    website: PropTypes.string,
-    name: PropTypes.string,
-  }).isRequired,
-};
-
-StyledCollectiveCard.defaultProps = { width: 160, mx: 'auto' };
 
 class OrderSuccessPage extends React.Component {
   static propTypes = {
@@ -180,7 +97,6 @@ class OrderSuccessPage extends React.Component {
     intl: PropTypes.object.isRequired, // from injectIntl
     loggedInUserLoading: PropTypes.bool, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    updateOrderInfo: PropTypes.func.isRequired,
   };
 
   static getInitialProps({ query: { OrderId } }) {
@@ -189,13 +105,6 @@ class OrderSuccessPage extends React.Component {
 
   constructor(props) {
     super(props);
-
-    const messageInput = get(props, 'data.Order.publicMessage');
-    this.state = {
-      hasPublicMessagePopup: !messageInput,
-      messageInput: messageInput || '',
-      submitting: false,
-    };
 
     this.messages = defineMessages({
       tweet: {
@@ -206,63 +115,7 @@ class OrderSuccessPage extends React.Component {
         id: 'order.created.tweet.event',
         defaultMessage: "I'm attending {event}. Join me!",
       },
-      publicMessagePlaceholder: {
-        id: 'contribute.publicMessage.placeholder',
-        defaultMessage: 'Motivate others to contribute in 140 characters :) ...',
-      },
     });
-  }
-
-  componentDidMount() {
-    if (!get(this.props, 'data.Order.publicMessage')) {
-      this.setState({ hasPublicMessagePopup: true });
-    } else {
-      this.loadMessageInputFromProps();
-    }
-  }
-
-  componentDidUpdate(oldProps) {
-    if (get(this.props, 'data.Order.publicMessage') !== get(oldProps, 'data.Order.publicMessage')) {
-      this.loadMessageInputFromProps();
-    }
-  }
-
-  loadMessageInputFromProps() {
-    this.setState({ messageInput: get(this.props, 'data.Order.publicMessage', '') });
-  }
-
-  submitPublicMessage = async () => {
-    const publicMessage = this.state.messageInput.trim();
-    try {
-      this.setState({ submitting: true });
-      await this.props.updateOrderInfo({ id: this.props.OrderId, publicMessage });
-      this.setState({ submitting: false, hasPublicMessagePopup: false });
-    } catch (e) {
-      this.setState({ error: e.message, submitting: false });
-    }
-  };
-
-  openPublicMessagePopup = () => {
-    this.setState({
-      messageInput: get(this.props, 'data.Order.publicMessage', ''),
-      hasPublicMessagePopup: true,
-    });
-  };
-
-  renderContributeDetailsSummary(amount, currency, interval) {
-    const formattedAmount = formatCurrency(amount, currency);
-    return !interval ? (
-      formattedAmount
-    ) : (
-      <Span>
-        {formattedAmount}{' '}
-        <FormattedMessage
-          id="tier.interval"
-          defaultMessage="per {interval, select, month {month} year {year} other {}}"
-          values={{ interval: interval }}
-        />
-      </Span>
-    );
   }
 
   renderUserProfileBtn(loading = false) {
@@ -325,7 +178,7 @@ class OrderSuccessPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, loggedInUserLoading, intl } = this.props;
+    const { data, LoggedInUser, loggedInUserLoading } = this.props;
 
     if (data.loading) {
       return <Loading />;
@@ -334,7 +187,7 @@ class OrderSuccessPage extends React.Component {
     }
 
     const order = data.Order;
-    const { collective, fromCollective, totalAmount, interval, currency, tier } = order;
+    const { collective, fromCollective, tier } = order;
     const referralOpts = objectToQueryString({ referral: fromCollective.id });
     const websiteUrl = process.env.WEBSITE_URL || 'https://opencollective.com';
     const referralURL = `${websiteUrl}${collective.path}/${referralOpts}`;
@@ -363,94 +216,9 @@ class OrderSuccessPage extends React.Component {
             </Box>
           )}
 
-          <Container display="flex" position="relative" flexWrap="wrap" justifyContent="center" p={2} mb={4}>
-            <StyledCollectiveCard mt={4} mb={32} collective={fromCollective} showCover={false}>
-              <Flex flexDirection="column" p={12} alignItems="center">
-                {totalAmount !== 0 && (
-                  <React.Fragment>
-                    <Span fontSize="10px">
-                      <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
-                    </Span>
-                    <Span fontWeight="bold" fontSize="Caption">
-                      {this.renderContributeDetailsSummary(totalAmount, currency, interval)}
-                    </Span>
-                    {order.publicMessage && (
-                      <Container textAlign="center" color="black.600">
-                        <PublicMessage onClick={this.openPublicMessagePopup}>“{order.publicMessage}”</PublicMessage>
-                      </Container>
-                    )}
-                    {!order.publicMessage && !this.state.hasPublicMessagePopup && (
-                      <Span
-                        mt={2}
-                        cursor="pointer"
-                        fontSize="Tiny"
-                        color="black.600"
-                        textAlign="center"
-                        onClick={() => this.setState({ hasPublicMessagePopup: true })}
-                      >
-                        <FormattedMessage
-                          id="contribute.publicMessage"
-                          defaultMessage="Leave a public message (Optional)"
-                        />
-                      </Span>
-                    )}
-                  </React.Fragment>
-                )}
-              </Flex>
-            </StyledCollectiveCard>
-            {this.state.hasPublicMessagePopup && (
-              <PublicMessagePopup data-cy="public-message-popup">
-                <Flex justifyContent="flex-end">
-                  <Times
-                    size="1em"
-                    color="#a2a2a2"
-                    cursor="pointer"
-                    onClick={() => this.setState({ hasPublicMessagePopup: false })}
-                  />
-                </Flex>
-                <Flex flexDirection="column" p={2}>
-                  <Span fontSize="Paragraph" color="black.600" mb={2}>
-                    <FormattedMessage
-                      id="contribute.publicMessage"
-                      defaultMessage="Leave a public message (Optional)"
-                    />
-                  </Span>
-                  <StyledInput
-                    name="publicMessage"
-                    as="textarea"
-                    px={10}
-                    py={10}
-                    width={240}
-                    height={112}
-                    fontSize="Paragraph"
-                    style={{ resize: 'none' }}
-                    placeholder={intl.formatMessage(this.messages['publicMessagePlaceholder'])}
-                    value={this.state.messageInput}
-                    onChange={e => this.setState({ messageInput: e.target.value.slice(0, publicMessageMaxLength) })}
-                    maxLength={publicMessageMaxLength}
-                  />
-                  {this.state.error && (
-                    <Span color="red.500" fontSize="Caption" mt={2}>
-                      {this.state.error}
-                    </Span>
-                  )}
-                  <Box m="0 auto">
-                    <StyledButton
-                      buttonSize="small"
-                      fontWeight="bold"
-                      px={4}
-                      mt={3}
-                      onClick={this.submitPublicMessage}
-                      loading={this.state.submitting}
-                    >
-                      <FormattedMessage id="button.submit" defaultMessage="Submit" />
-                    </StyledButton>
-                  </Box>
-                </Flex>
-                <SpeechCaret />
-              </PublicMessagePopup>
-            )}
-          </Container>
+          <Box my={[2, 5]}>
+            <OrderSuccessContributorCardWithData order={order} fromCollective={fromCollective} />
+          </Box>
 
           <Flex flexWrap="wrap" justifyContent="center" mt={2}>
             <ShareLink href={tweetURL({ url: referralURL, text: message })}>
@@ -494,60 +262,4 @@ class OrderSuccessPage extends React.Component {
   }
 }
 
-const getOrder = graphql(gql`
-  query OrderSuccess($OrderId: Int!) {
-    Order(id: $OrderId) {
-      id
-      quantity
-      totalAmount
-      interval
-      currency
-      status
-      publicMessage
-      fromCollective {
-        id
-        image
-        name
-        path
-        slug
-      }
-      collective {
-        name
-        tags
-        path
-      }
-      tier {
-        type
-        name
-        amount
-        presets
-      }
-      paymentMethod {
-        id
-      }
-    }
-  }
-`);
-
-export const updateOrderInfo = graphql(
-  gql`
-    mutation updateOrderInfo($id: Int!, $publicMessage: String!) {
-      updateOrderInfo(id: $id, publicMessage: $publicMessage) {
-        id
-        publicMessage
-      }
-    }
-  `,
-  {
-    props: ({ mutate }) => ({
-      updateOrderInfo: variables => mutate({ variables }),
-    }),
-  },
-);
-
-const addGraphQL = compose(
-  getOrder,
-  updateOrderInfo,
-);
-
-export default withUser(addGraphQL(injectIntl(OrderSuccessPage)));
+export default withUser(graphql(GetOrderQuery)(injectIntl(OrderSuccessPage)));

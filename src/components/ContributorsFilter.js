@@ -2,7 +2,6 @@ import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
-import styled, { css } from 'styled-components';
 
 import StyledButton from './StyledButton';
 import { Span } from './Text';
@@ -89,45 +88,28 @@ export const filterContributors = (contributors, filter) => {
 };
 
 /**
- * An individual filtering button
- */
-const FilterBtn = styled(({ filter, isSelected, onChange, ...props }) => {
-  return (
-    <StyledButton
-      onClick={isSelected ? undefined : () => onChange(filter)}
-      buttonStyle={isSelected ? 'dark' : 'standard'}
-      {...props}
-    />
-  );
-})`
-  margin: 0 8px;
-
-  ${props =>
-    !props.isSelected &&
-    css`
-    bg: '#F5F7FA',
-    color: '#4E5052',
-    border: '1px solid #F5F7FA',
-  `}
-`;
-
-/**
  * A set of filters for contributors types. This file also exports helper functions
  * to deal with the filters, incuding:
  * - `getContributorsFilters`: For a given list of Contributors, returns all the filters that can be applied to the list.
  * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */
-const ContributorsFilter = ({ intl, selected, onChange, filters }) => {
+const ContributorsFilter = ({ intl, selected, onChange, filters, selectedButtonStyle }) => {
   const activeFilter = selected || CONTRIBUTOR_FILTERS.ALL;
   return (
     <Flex css={{ overflowX: 'auto' }}>
       {filters.map(filter => {
+        const isSelected = filter === activeFilter;
         return (
-          <FilterBtn key={filter} filter={filter} onChange={onChange} isSelected={filter === activeFilter}>
+          <StyledButton
+            key={filter}
+            onClick={isSelected ? undefined : () => onChange(filter)}
+            buttonStyle={isSelected ? selectedButtonStyle : 'standard'}
+            mx={2}
+          >
             <Span textTransform="capitalize" whiteSpace="nowrap">
               {intl.formatMessage(Translations[filter])}
             </Span>
-          </FilterBtn>
+          </StyledButton>
         );
       })}
     </Flex>
@@ -141,12 +123,15 @@ ContributorsFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   /** An optional list of active filters */
   filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
+  /** Default button style when selected */
+  selectedButtonStyle: PropTypes.oneOf(['primary', 'dark']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };
 
 ContributorsFilter.defaultProps = {
   filters: FILTERS_LIST,
+  selectedButtonStyle: 'dark',
 };
 
 export default injectIntl(ContributorsFilter);

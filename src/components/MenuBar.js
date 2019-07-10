@@ -550,25 +550,9 @@ class MenuBar extends React.Component {
                     <div className="logo">
                       <Link route={logoLink} key={logoLink}>
                         {collective.type === 'USER' && (
-                          <Avatar
-                            src={collective.image}
-                            type={collective.type}
-                            name={collective.name}
-                            key={collective.image}
-                            className="logo"
-                            radius="4.8rem"
-                          />
+                          <Avatar collective={collective} className="logo" radius="4.8rem" />
                         )}
-                        {collective.type !== 'USER' && (
-                          <Logo
-                            src={collective.image}
-                            key={collective.image}
-                            className="logo"
-                            type={collective.type}
-                            website={collective.website}
-                            height="48"
-                          />
-                        )}
+                        {collective.type !== 'USER' && <Logo collective={collective} className="logo" height="48" />}
                       </Link>
                     </div>
                   </div>
@@ -585,24 +569,8 @@ class MenuBar extends React.Component {
                 <div className="pullRight">{this.renderButtons()}</div>
                 <div className="logo">
                   <Link route={logoLink} key={logoLink}>
-                    {collective.type === 'USER' && (
-                      <Avatar
-                        src={collective.image}
-                        type={collective.type}
-                        name={collective.name}
-                        className="logo"
-                        radius="6.4rem"
-                      />
-                    )}
-                    {collective.type !== 'USER' && (
-                      <Logo
-                        src={collective.image}
-                        className="logo"
-                        type={collective.type}
-                        website={collective.website}
-                        height="64"
-                      />
-                    )}
+                    {collective.type === 'USER' && <Avatar collective={collective} className="logo" radius="6.4rem" />}
+                    {collective.type !== 'USER' && <Logo collective={collective} className="logo" height="64" />}
                   </Link>
                 </div>
                 <div className="pullLeft menu">{this.renderMenu()}</div>

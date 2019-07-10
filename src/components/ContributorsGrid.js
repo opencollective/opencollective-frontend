@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { FixedSizeGrid } from 'react-window';
-import { truncate, omit } from 'lodash';
+import { truncate } from 'lodash';
 import styled from 'styled-components';
 import { injectIntl } from 'react-intl';
 
@@ -14,8 +14,9 @@ import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 import Link from './Link';
 import { P } from './Text';
 import Container from './Container';
-import Avatar from './Avatar';
+import { ContributorAvatar } from './Avatar';
 import { fadeIn } from './StyledKeyframes';
+import { CollectiveType } from '../constants/collectives';
 
 // Define static dimensions
 const COLLECTIVE_CARD_MARGIN_X = 32;
@@ -27,27 +28,48 @@ const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGI
 /** Adds custom scrollbar for Chrome */
 const StyledGridContainer = styled.div`
   ${CustomScrollbarCSS}
+
+  /** Hide scrollbar when not hovered */
+  &:not(:hover) {
+    &::-webkit-scrollbar-thumb {
+      background: white;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: white;
+    }
+  }
 `;
 
 /**
- * Override the default grid to disable fixed width. As we use the full screen width
- * this is not necessary.
+ * We have to define the outer container here because react-window doesn't
+ * let you pass custom props to outer container.
  */
-const GridContainer = React.forwardRef(({ style, ...props }, ref) => {
-  return <StyledGridContainer ref={ref} style={omit(style, ['width'])} {...props} />;
-});
+const getGridContainer = (paddingLeft, hasScroll) => {
+  // eslint-disable-next-line react/prop-types
+  const GridContainer = ({ style, ...props }, ref) => {
+    return (
+      <StyledGridContainer
+        ref={ref}
+        style={{
+          ...style,
+          width: '100%',
+          paddingLeft,
+          overflowX: hasScroll ? 'auto' : 'hidden',
+        }}
+        {...props}
+      />
+    );
+  };
 
-GridContainer.displayName = 'GridContainer';
-
-GridContainer.propTypes = {
-  style: PropTypes.object,
+  return React.forwardRef(GridContainer);
 };
 
 /**
  * Add margin to the inner container width
  */
 const GridInnerContainer = ({ style, ...props }) => {
-  return <div style={{ ...style, width: style.width + 32 }} {...props} />;
+  return <div style={{ ...style, position: 'relative', width: style.width + COLLECTIVE_CARD_MARGIN_X }} {...props} />;
 };
 
 GridInnerContainer.propTypes = {
@@ -86,7 +108,7 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
   if (nbItems <= maxVisibleItems) {
     // If all items can fit in the view without scrolling, we arrange the view
     // to fit them all by showing fully filled lines
-    const nbCols = maxVisibleNbCols;
+    const nbCols = Math.min(maxVisibleNbCols, nbItems);
     const nbRows = Math.ceil(nbItems / maxVisibleNbCols);
     return [nbCols, nbRows];
   } else {
@@ -125,12 +147,13 @@ class ContributorCard extends React.PureComponent {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+      type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
       isCore: PropTypes.bool.isRequired,
       isBacker: PropTypes.bool.isRequired,
       isFundraiser: PropTypes.bool.isRequired,
       description: PropTypes.string,
+      publicMessage: PropTypes.string,
       collectiveSlug: PropTypes.string,
-      image: PropTypes.string,
     }).isRequired,
     left: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
@@ -138,7 +161,7 @@ class ContributorCard extends React.PureComponent {
 
   render() {
     const { left, top, contributor, intl } = this.props;
-    const { collectiveSlug, name, image, description } = contributor;
+    const { collectiveSlug, name, description, publicMessage } = contributor;
 
     // Collective slug is optional, for example Github contributors won't have
     // a collective slug. This helper renders the link only if needed
@@ -153,20 +176,25 @@ class ContributorCard extends React.PureComponent {
     return (
       <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
         <Flex justifyContent="center" mb={3}>
-          {withCollectiveLink(<Avatar src={image} radius={56} name={name} />)}
+          {withCollectiveLink(<ContributorAvatar contributor={contributor} radius={56} />)}
         </Flex>
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
           {withCollectiveLink(
-            <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
-              {truncate(name, { length: 42 })}
+            <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900" title={name}>
+              {truncate(name, { length: 40 })}
             </P>,
           )}
           <P fontSize="Tiny" lineHeight="Caption" color="black.500">
             {getRole(contributor, intl)}
           </P>
-          <P fontSize="Caption" fontWeight="bold">
-            {description}
+          <P fontSize="Caption" fontWeight="bold" title={description}>
+            {truncate(description, { length: 20 })}
           </P>
+          {publicMessage && (
+            <Container textAlign="center" color="black.600" fontSize="Tiny" my={2} title={publicMessage}>
+              “{truncate(publicMessage, { length: 60 })}”
+            </Container>
+          )}
         </Container>
       </StyledContributorCard>
     );
@@ -176,12 +204,14 @@ class ContributorCard extends React.PureComponent {
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
-const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, viewport }) => {
+const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, viewport, getPaddingLeft }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
 
   // Preload more items when viewport width is unknown to avoid displaying blank spaces on SSR
   const viewWidth = viewport === VIEWPORTS.UNKNOWN ? width * 3 : width;
+  const paddingLeft = getPaddingLeft ? getPaddingLeft({ width, nbRows }) : 0;
+  const hasScroll = nbCols * COLLECTIVE_CARD_FULL_WIDTH + paddingLeft > width;
 
   return (
     <FixedSizeGrid
@@ -191,7 +221,7 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
       width={viewWidth}
-      outerElementType={GridContainer}
+      outerElementType={getGridContainer(paddingLeft, hasScroll)}
       innerElementType={GridInnerContainer}
       itemKey={({ columnIndex, rowIndex }) => {
         const idx = getIdx(columnIndex, rowIndex, nbCols);
@@ -205,6 +235,7 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
         if (!contributor) {
           return null;
         }
+
         return (
           <ContributorCard
             key={contributor.id}
@@ -231,7 +262,6 @@ ContributorsGrid.propTypes = {
       isFundraiser: PropTypes.bool.isRequired,
       description: PropTypes.string,
       collectiveSlug: PropTypes.string,
-      image: PropTypes.string,
     }),
   ),
 
@@ -243,6 +273,9 @@ ContributorsGrid.propTypes = {
     [VIEWPORTS.DESKTOP]: PropTypes.number,
     [VIEWPORTS.WIDESCREEN]: PropTypes.number,
   }).isRequired,
+
+  /** A callback to calculate left padding */
+  getPaddingLeft: PropTypes.func,
 
   /** @ignore from withViewport */
   viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),

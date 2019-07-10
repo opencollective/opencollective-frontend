@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
+import { CollectiveType } from '../../constants/collectives';
 import { formatCurrency } from '../../lib/utils';
 import { H2 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -48,8 +49,11 @@ class SectionContribute extends React.PureComponent {
         image: PropTypes.string,
       }),
     ),
-    topOrganizations: PropTypes.arrayOf(PropTypes.object),
-    topIndividuals: PropTypes.arrayOf(PropTypes.object),
+    contributors: PropTypes.arrayOf(
+      PropTypes.shape({
+        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+      }),
+    ),
     intl: PropTypes.object,
   };
 
@@ -145,14 +149,53 @@ class SectionContribute extends React.PureComponent {
     return [financialContributions, moreWaysToContribute];
   });
 
+  getTopContributors = memoizeOne(contributors => {
+    const topOrgs = [];
+    const topIndividuals = [];
+
+    for (const contributor of contributors) {
+      // We only care about financial contributors that donated $$$
+      if (!contributor.isBacker || !contributor.totalAmountDonated) {
+        continue;
+      }
+
+      // Put contributors in the array corresponding to their types
+      if (contributor.type === CollectiveType.USER) {
+        topIndividuals.push(contributor);
+      } else if (contributor.type === CollectiveType.ORGANIZATION || contributor.type === CollectiveType.COLLECTIVE) {
+        topOrgs.push(contributor);
+      }
+
+      if (topIndividuals.length >= 10 && topOrgs.length >= 10) {
+        break;
+      }
+    }
+
+    // If one of the two categories is not filled, complete with more contributors from the other
+    const nbColsPerCategory = 2;
+    const nbFreeColsFromOrgs = nbColsPerCategory - Math.ceil(topOrgs.length / 5);
+    const nbFreeColsFromIndividuals = nbColsPerCategory - Math.ceil(topOrgs.length / 5);
+    let takeNbOrgs = 10;
+    let takeNbIndividuals = 10;
+
+    if (nbFreeColsFromOrgs > 0) {
+      takeNbIndividuals += nbFreeColsFromOrgs * 5;
+    } else if (nbFreeColsFromIndividuals > 0) {
+      takeNbOrgs += nbFreeColsFromIndividuals * 5;
+    }
+
+    return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
+  });
+
   render() {
-    const { collective, tiers, events, topOrganizations, topIndividuals } = this.props;
+    const { collective, tiers, events, contributors } = this.props;
     const [financialContributions, otherWaysToContribute] = this.getWaysToContribute(collective, tiers, events);
+    const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
 
     return (
       <Box py={[null, null, 3]}>
         <ContainerSectionContent>
-          <H2 mb={3} px={3} fontWeight="normal" color="black.900">
+          <H2 mb={3} fontWeight="normal" color="black.900">
             <FormattedMessage id="CollectivePage.Contribute" defaultMessage="Contribute" />
           </H2>
         </ContainerSectionContent>
@@ -182,11 +225,13 @@ class SectionContribute extends React.PureComponent {
             </StyledButton>
           </Link>
         </ContainerSectionContent>
-        <TopContributors
-          topOrganizations={topOrganizations}
-          topIndividuals={topIndividuals}
-          currency={collective.currency}
-        />
+        {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
+          <TopContributors
+            organizations={topOrganizations}
+            individuals={topIndividuals}
+            currency={collective.currency}
+          />
+        )}
       </Box>
     );
   }

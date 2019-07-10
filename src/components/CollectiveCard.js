@@ -237,7 +237,7 @@ class CollectiveCard extends React.Component {
           <div className="head">
             <div className="background" style={coverStyle} />
             <div className="logo">
-              <Logo src={collective.image} type={collective.type} website={collective.website} height={65} />
+              <Logo collective={collective} height={65} />
             </div>
           </div>
           <div className="body">

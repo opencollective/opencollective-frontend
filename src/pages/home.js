@@ -11,7 +11,6 @@ import { Linkedin } from 'styled-icons/fa-brands/Linkedin';
 
 import { pickAvatar } from '../lib/collective.lib';
 import { getBaseApiUrl, imagePreview } from '../lib/utils';
-import { colors } from '../constants/theme';
 
 import { Link } from '../server/pages';
 
@@ -598,7 +597,7 @@ class HomePage extends React.Component {
                 </Container>
                 <Hide xs sm position="absolute" top={0} left={0} width="100%" height="100%" pointerEvents="none">
                   <Container
-                    background={`linear-gradient(to left, ${colors.primary[200]}, rgba(255, 255, 255, 0) 50%)`}
+                    background={`linear-gradient(to left, #B8DEFF, rgba(255, 255, 255, 0) 50%)`}
                     width="100%"
                     height="100%"
                   />
@@ -778,7 +777,7 @@ class HomePage extends React.Component {
                     <P {...statsStyles}>
                       <FormattedNumber value={totalDonors} />
                     </P>
-                    <P>
+                    <P maxWidth={115} textAlign="center">
                       <FormattedMessage id="home.backers" defaultMessage="financial contributors" />
                     </P>
                   </Container>
@@ -817,10 +816,10 @@ class HomePage extends React.Component {
               <Flex flexDirection={['column', null, 'row']} justifyContent="center">
                 <StyledLink
                   {...socialButtonStyles}
-                  href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collection%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
+                  href="https://twitter.com/intent/tweet?text=Check%20out%20Open%20Collective%2C%20a%20platform%20for%20organizations%2C%20communities%2C%20and%20projects%20to%20operate%20transparently!&url=https%3A%2F%2Fopencollective.com"
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
-                    <Twitter size={18} color={colors.primary[500]} />
+                    <Twitter size={18} />
                     <Span>
                       <FormattedMessage id="shareOnTwitter" defaultMessage="Share on Twitter" />
                     </Span>
@@ -832,7 +831,7 @@ class HomePage extends React.Component {
                   href="https://www.facebook.com/sharer/sharer.php?u=https%3A//opencollective.com"
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
-                    <Facebook size={18} color={colors.primary[500]} />
+                    <Facebook size={18} />
                     <Span>
                       <FormattedMessage id="shareOnFacebook" defaultMessage="Share on Facebook" />
                     </Span>
@@ -844,7 +843,7 @@ class HomePage extends React.Component {
                   href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A//opencollective.com&title=Check%20out%20Open%20Collective&summary=Open%20Collection%20is%20a%20platform%20for%20organizations,%20communities,%20and%20projects%20to%20operate%20transparently&source="
                 >
                   <Container display="flex" alignItems="center" justifyContent="space-evenly">
-                    <Linkedin size={18} color={colors.primary[500]} />
+                    <Linkedin size={18} />
                     <Span>
                       <FormattedMessage id="shareOnLinkedIn" defaultMessage="Share on LinkedIn" />
                     </Span>

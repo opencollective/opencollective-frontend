@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { ThemeProvider } from 'styled-components';
+import { lighten, darken } from 'polished';
 
 // OC Frontend imports
-import theme from '../../constants/theme';
+import theme, { generateTheme } from '../../constants/theme';
 import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
 
@@ -33,70 +36,29 @@ const EditCollectiveMutation = gql`
  *
  * See design: https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/09.-Collectives?node-id=2338%3A36062
  */
-export default class CollectivePage extends Component {
+class CollectivePage extends Component {
   static propTypes = {
-    /** The collective to display */
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      backgroundImage: PropTypes.string,
-      twitterHandle: PropTypes.string,
-      githubHandle: PropTypes.string,
-      website: PropTypes.string,
-      description: PropTypes.string,
-      tags: PropTypes.arrayOf(PropTypes.string),
-      settings: PropTypes.object,
-    }).isRequired,
-
-    /** Collective's host */
-    host: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
-    }),
-
-    /** Collective contributors */
+    collective: PropTypes.object.isRequired,
+    host: PropTypes.object,
     contributors: PropTypes.arrayOf(PropTypes.object),
     topOrganizations: PropTypes.arrayOf(PropTypes.object),
     topIndividuals: PropTypes.arrayOf(PropTypes.object),
-
-    /** Collective tiers */
-    tiers: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        description: PropTypes.string,
-      }),
-    ),
-
-    /** Collective transactions & expenses */
+    tiers: PropTypes.arrayOf(PropTypes.object),
     transactions: PropTypes.arrayOf(PropTypes.object),
     expenses: PropTypes.arrayOf(PropTypes.object),
-
-    /** Updates / announcements */
     updates: PropTypes.arrayOf(PropTypes.object),
-
-    /** Collective stats */
-    stats: PropTypes.object,
-
-    /** Collective events */
     events: PropTypes.arrayOf(PropTypes.object),
-
-    /** The logged in user */
     LoggedInUser: PropTypes.object,
+    stats: PropTypes.shape({
+      balance: PropTypes.number.isRequired,
+      yearlyBudget: PropTypes.number.isRequired,
+    }),
   };
 
   constructor(props) {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
-    this.state = {
-      isFixed: false,
-      selectedSection: AllSectionsNames[0],
-    };
+    this.state = { isFixed: false, selectedSection: null };
   }
 
   componentDidMount() {
@@ -108,6 +70,32 @@ export default class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
+  getSections = memoizeOne((props, isAdmin) => {
+    const { collective, host, stats, updates, transactions, expenses } = props;
+    const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
+    const sectionsToRemove = new Set([]);
+
+    // Can't contribute anymore if the collective is archived or has no host
+    if (collective.isArchived || !host) {
+      sectionsToRemove.add(Sections.CONTRIBUTE);
+    }
+
+    // Some sections are hidden for non-admins (usually when there's no data)
+    if (!isAdmin) {
+      if (isEmpty(updates)) {
+        sectionsToRemove.add(Sections.UPDATES);
+      }
+      if (isEmpty(transactions) && isEmpty(expenses) && stats.balance === 0) {
+        sectionsToRemove.add(Sections.BUDGET);
+      }
+      if (!collective.longDescription) {
+        sectionsToRemove.add(Sections.ABOUT);
+      }
+    }
+
+    return sections.filter(section => !sectionsToRemove.has(section));
+  });
+
   onScroll = debounceScroll(() => {
     // Fixes the Hero when a certain scroll threshold is reached
     if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
@@ -118,11 +106,11 @@ export default class CollectivePage extends Component {
       this.setState({ isFixed: false });
     }
 
-    // Update selected section
     const distanceThreshold = 200;
     const currentViewBottom = window.scrollY + window.innerHeight;
-    for (let i = AllSectionsNames.length - 1; i >= 0; i--) {
-      const sectionName = AllSectionsNames[i];
+    const sections = Object.keys(this.sectionsRefs);
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
       if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
         if (this.state.selectedSection !== sectionName) {
@@ -144,64 +132,100 @@ export default class CollectivePage extends Component {
   };
 
   renderSection(section, canEdit) {
-    const { collective, contributors, tiers, events, transactions, stats, expenses } = this.props;
-
-    if (section === Sections.ABOUT) {
-      return <SectionAbout collective={collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />;
-    } else if (section === Sections.CONTRIBUTORS) {
-      return <SectionContributors collectiveName={collective.name} contributors={contributors} />;
-    } else if (section === Sections.CONTRIBUTE) {
-      return (
-        <SectionContribute
-          collective={collective}
-          tiers={tiers}
-          events={events}
-          topOrganizations={this.props.topOrganizations}
-          topIndividuals={this.props.topIndividuals}
-        />
-      );
-    } else if (section === Sections.BUDGET) {
-      return <SectionBudget collective={collective} transactions={transactions} expenses={expenses} stats={stats} />;
-    } else if (section === Sections.UPDATES) {
-      return (
-        <SectionUpdates collective={collective} canSeeDrafts={canEdit} isLoggedIn={Boolean(this.props.LoggedInUser)} />
-      );
+    switch (section) {
+      case Sections.ABOUT:
+        return (
+          <SectionAbout collective={this.props.collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />
+        );
+      case Sections.BUDGET:
+        return (
+          <SectionBudget
+            collective={this.props.collective}
+            transactions={this.props.transactions}
+            expenses={this.props.expenses}
+            stats={this.props.stats}
+          />
+        );
+      case Sections.CONTRIBUTE:
+        return (
+          <SectionContribute
+            collective={this.props.collective}
+            tiers={this.props.tiers}
+            events={this.props.events}
+            contributors={this.props.contributors}
+          />
+        );
+      case Sections.CONTRIBUTORS:
+        return (
+          <SectionContributors collectiveName={this.props.collective.name} contributors={this.props.contributors} />
+        );
+      case Sections.UPDATES:
+        return (
+          <SectionUpdates
+            collective={this.props.collective}
+            canSeeDrafts={canEdit}
+            isLoggedIn={Boolean(this.props.LoggedInUser)}
+          />
+        );
+      default:
+        return null;
     }
+  }
 
-    // Placeholder for sections not implemented yet
-    return (
-      <Container display="flex" borderBottom="1px solid lightgrey" py={8} justifyContent="center" fontSize={36}>
-        [Section] {section}
-      </Container>
-    );
+  getTheme() {
+    const customColor = get(this.props.collective, 'settings.collectivePage.primaryColor', '#000000');
+    if (!customColor) {
+      return theme;
+    } else {
+      return generateTheme({
+        colors: {
+          ...theme.colors,
+          primary: {
+            800: darken(0.1, customColor),
+            700: darken(0.05, customColor),
+            500: customColor,
+            400: lighten(0.05, customColor),
+            300: lighten(0.1, customColor),
+            200: lighten(0.15, customColor),
+            100: lighten(0.2, customColor),
+            50: lighten(0.25, customColor),
+          },
+        },
+      });
+    }
   }
 
   render() {
     const { collective, host, LoggedInUser } = this.props;
     const { isFixed, selectedSection } = this.state;
     const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const sections = get(collective, 'settings.collective-page.sections', AllSectionsNames);
+    const sections = this.getSections(this.props, canEdit);
+    const pageTheme = this.getTheme();
 
     return (
-      <Container borderTop="1px solid #E6E8EB">
-        <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
-          <Hero
-            collective={collective}
-            host={host}
-            sections={sections}
-            canEdit={canEdit}
-            isFixed={isFixed}
-            selectedSection={selectedSection}
-            onSectionClick={this.onSectionClick}
-            onCollectiveClick={this.onCollectiveClick}
-          />
+      <ThemeProvider theme={pageTheme}>
+        <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
+          <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
+            <Hero
+              collective={collective}
+              host={host}
+              sections={sections}
+              canEdit={canEdit}
+              isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
+              selectedSection={selectedSection || sections[0]}
+              onSectionClick={this.onSectionClick}
+              onCollectiveClick={this.onCollectiveClick}
+            />
+          </Container>
+          {sections.map(section => (
+            <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+              {this.renderSection(section, canEdit)}
+            </div>
+          ))}
         </Container>
-        {sections.map(section => (
-          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-            {this.renderSection(section, canEdit)}
-          </div>
-        ))}
-      </Container>
+      </ThemeProvider>
     );
   }
 }
+
+export default CollectivePage;

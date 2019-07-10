@@ -132,6 +132,24 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
   return null;
 }
 
+export function getCollectiveImage(collective, params = {}) {
+  const sections = [getBaseImagesUrl(), collective.slug];
+
+  sections.push(params.name || 'avatar');
+
+  for (const key of ['style', 'height', 'width']) {
+    if (params[key]) {
+      sections.push(params[key]);
+    }
+  }
+
+  return `${sections.join('/')}.${params.format || 'png'}`;
+}
+
+export function getCollectiveBackgroundImage(collective, params = {}) {
+  return getCollectiveImage(collective, { ...params, name: 'background' });
+}
+
 export function prettyUrl(url) {
   if (!url) return '';
   return url
@@ -170,43 +188,6 @@ export function getQueryParams() {
     urlParams[decode(match[1])] = decode(match[2]);
   }
   return urlParams;
-}
-
-// source: https://stackoverflow.com/questions/8498592/extract-hostname-name-from-string
-function extractHostname(url) {
-  let hostname;
-  // find & remove protocol (http, ftp, etc.) and get hostname
-
-  if (url.indexOf('://') > -1) {
-    hostname = url.split('/')[2];
-  } else {
-    hostname = url.split('/')[0];
-  }
-
-  // find & remove port number
-  hostname = hostname.split(':')[0];
-  // find & remove "?"
-  hostname = hostname.split('?')[0];
-
-  return hostname;
-}
-
-export function getDomain(url = '') {
-  let domain = extractHostname(url);
-  const splitArr = domain.split('.'),
-    arrLen = splitArr.length;
-
-  // extracting the root domain here
-  // if there is a subdomain
-  if (arrLen > 2) {
-    domain = `${splitArr[arrLen - 2]}.${splitArr[arrLen - 1]}`;
-    // check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
-    if (splitArr[arrLen - 1].length == 2 && splitArr[arrLen - 1].length == 2) {
-      // this is using a ccTLD
-      domain = `${splitArr[arrLen - 3]}.${domain}`;
-    }
-  }
-  return domain;
 }
 
 export function formatDate(date, options = { month: 'long', year: 'numeric' }) {

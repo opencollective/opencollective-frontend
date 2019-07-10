@@ -10,6 +10,7 @@ import StyledCard from '../StyledCard';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 
@@ -37,7 +38,7 @@ const CoverImage = styled.div`
 
 /** A tag to describe the type of contribution (one time, recurring...etc) */
 const ContributionTypeTag = styled(StyledTag).attrs({
-  color: 'primary.500',
+  color: 'blue.500',
   fontSize: 'Tiny',
   lineHeight: 'Tiny',
 })`
@@ -78,6 +79,16 @@ const messages = defineMessages({
     defaultMessage: 'Join us and help us sustain our activities!',
   },
 });
+
+const getContributeCTA = type => {
+  if (type === ContributionTypes.FINANCIAL_GOAL) {
+    return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
+  } else if (type === ContributionTypes.EVENT_PARTICIPATE) {
+    return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
+  } else {
+    return <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />;
+  }
+};
 
 /**
  * A contribute card with a "Contribute" call to action
@@ -144,21 +155,17 @@ const ContributeCard = ({ intl, contribution }) => {
           <P mb={4} mt={2}>
             {prettyDescription}{' '}
             {detailsRoute && (
-              <Link route={detailsRoute}>
-                <Span textTransform="capitalize">
+              <StyledLink as={Link} route={detailsRoute}>
+                <Span textTransform="capitalize" whiteSpace="nowrap">
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </Span>
-              </Link>
+              </StyledLink>
             )}
           </P>
         </div>
         <Link route={contributeRoute}>
           <StyledButton width={1} mb={2} mt={3}>
-            {goal ? (
-              <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />
-            ) : (
-              <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />
-            )}
+            {getContributeCTA(type)}
           </StyledButton>
         </Link>
       </Flex>

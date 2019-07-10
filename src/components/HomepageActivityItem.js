@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedNumber } from 'react-intl';
+import { FormattedNumber, FormattedMessage } from 'react-intl';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -13,42 +13,33 @@ const HomepageActivityItem = ({ amount, createdAt, currency, fromCollective, col
   return (
     <Container display="flex" alignItems="center">
       <LinkCollective collective={fromCollective} title={fromCollective.name}>
-        <Avatar
-          src={fromCollective.image}
-          id={fromCollective.id}
-          radius={40}
-          className="noFrame"
-          type={fromCollective.type}
-          name={fromCollective.name}
-        />
+        <Avatar collective={fromCollective} id={fromCollective.id} radius={40} className="noFrame" />
       </LinkCollective>
       <Container ml={3}>
         <P fontSize="1.2rem" color="#9399A3" display="inline">
-          <LinkCollective collective={fromCollective} title={fromCollective.name}>
-            {fromCollective.name}
-          </LinkCollective>
-          {type === 'DEBIT' ? ' submitted a ' : ' contributed '}
-          <Span color="#2E3033">
-            <FormattedNumber
-              currency={currency}
-              currencyDisplay="symbol"
-              maximumFractionDigits={2}
-              minimumFractionDigits={2}
-              style="currency"
-              value={Math.abs(amount) / 100}
-            />
-          </Span>
-          {subscription && ` a ${subscription.interval} `}
-          {type === 'DEBIT' && ' expense '}
-          {' to '}{' '}
-          <LinkCollective collective={collective} title={collective.name}>
-            {collective.name}
-          </LinkCollective>
-          .
+          <FormattedMessage
+            id="HomepageActivityItem.Description"
+            defaultMessage="{contributor} {type, select, DEBIT {submitted a {amount} expense} other {contributed {amount} {interval, select, month {a month} year {a year} other {}}}} to {collective}."
+            values={{
+              type,
+              interval: subscription && subscription.interval,
+              contributor: <LinkCollective collective={fromCollective} />,
+              amount: (
+                <Span color="#2E3033">
+                  <FormattedNumber
+                    currency={currency}
+                    currencyDisplay="symbol"
+                    maximumFractionDigits={2}
+                    minimumFractionDigits={2}
+                    style="currency"
+                    value={Math.abs(amount) / 100}
+                  />
+                </Span>
+              ),
+              collective: <LinkCollective collective={collective} />,
+            }}
+          />
         </P>
-        <Container position="relative" top={4} left={4} display="inline-block">
-          <P fontSize="1.6rem">{type === 'DEBIT' && ' 🎉'}</P>
-        </Container>
         <P fontSize="1rem" color="#AEB2B8">
           {moment(formattedCreatedAt).fromNow()}
         </P>

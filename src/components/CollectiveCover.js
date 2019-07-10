@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectI
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
-import { get, pick } from 'lodash';
+import { get } from 'lodash';
 import { withUser } from './UserProvider';
 import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
@@ -384,17 +384,10 @@ ${description}`;
           <div className="content">
             <Link route={href} className="goBack">
               {collective.type === 'USER' && (
-                <Avatar src={logo} className="logo" radius="10rem" key={logo} {...pick(collective, ['type', 'name'])} />
+                <Avatar collective={collective} className="logo" radius="10rem" key={logo} />
               )}
               {collective.type !== 'USER' && (
-                <Logo
-                  src={logo}
-                  className="logo"
-                  type={collective.type}
-                  website={collective.website}
-                  height="10rem"
-                  key={logo}
-                />
+                <Logo collective={collective} className="logo" height="10rem" key={logo} />
               )}
             </Link>
             <h1>{title}</h1>

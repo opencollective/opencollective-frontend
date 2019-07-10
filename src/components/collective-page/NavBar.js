@@ -1,10 +1,11 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
-import { Flex } from '@rebass/grid';
+import themeGet from '@styled-system/theme-get';
 
+import Container from '../Container';
 import { Sections, AllSectionsNames } from './_constants';
 
 const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
@@ -21,19 +22,20 @@ const MenuLink = styled(props => <a {...omit(props, ['isSelected'])} />)`
   white-space: nowrap;
 
   &:focus {
-    color: #090a0a;
+    color: ${themeGet('colors.primary.700')};
     text-decoration: none;
   }
 
   &:hover {
-    color: #404040;
+    color: ${themeGet('colors.primary.400')};
   }
 
   ${props =>
     props.isSelected &&
     css`
       color: #090a0a;
-      border-bottom: 3px solid #090a0a;
+      font-weight: 500;
+      border-bottom: 3px solid ${themeGet('colors.primary.500')};
     `}
 `;
 
@@ -68,9 +70,9 @@ const i18nSection = defineMessages({
  * The NavBar that displays all the invidual sections. The component will take the
  * entire height available, so parent is responsible for its size.
  */
-const NavBar = ({ sections, selected, collectiveSlug, onSectionClick, linkBuilder, intl }) => {
+const NavBar = ({ sections, selected, onSectionClick, linkBuilder, intl }) => {
   return (
-    <Flex data-cy="CollectivePage.NavBar" css={{ height: '100%', overflowX: 'auto' }}>
+    <Container display="flex" height="100%" css={{ overflowX: 'auto' }} data-cy="CollectivePage.NavBar">
       {sections.map(section => (
         <MenuLink
           key={section}
@@ -84,10 +86,7 @@ const NavBar = ({ sections, selected, collectiveSlug, onSectionClick, linkBuilde
           {i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
         </MenuLink>
       ))}
-      <MenuLink href={`mailto:hello@${collectiveSlug}.opencollective.com`}>
-        <FormattedMessage id="NavBar.Contact" defaultMessage="Contact" />
-      </MenuLink>
-    </Flex>
+    </Container>
   );
 };
 
@@ -96,8 +95,6 @@ NavBar.propTypes = {
   onSectionClick: PropTypes.func.isRequired,
   /** An optionnal function to build links URLs. Usefull to override behaviour in test/styleguide envs. */
   linkBuilder: PropTypes.func.isRequired,
-  /** Collective slug, to build the contact URL. */
-  collectiveSlug: PropTypes.string.isRequired,
   /** The list of sections to be displayed by the NavBar */
   sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
   /** Currently selected section */

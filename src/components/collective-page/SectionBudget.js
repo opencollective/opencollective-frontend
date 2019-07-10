@@ -16,6 +16,8 @@ import DebitCreditList, { DebitItem, CreditItem } from '../DebitCreditList';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import LinkCollective from '../LinkCollective';
 import Avatar from '../Avatar';
+import MessageBox from '../MessageBox';
+import StyledLink from '../StyledLink';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import { TransactionsAndExpensesFragment } from './fragments';
@@ -38,7 +40,7 @@ const TransactionsAndExpensesQuery = gql`
  */
 const SectionBudget = ({ collective, stats, intl }) => {
   return (
-    <ContainerSectionContent py={6}>
+    <ContainerSectionContent py={[5, 6]}>
       <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
         <FormattedMessage id="CollectivePage.SectionBudget.Title" defaultMessage="Latest transactions" />
       </H3>
@@ -55,7 +57,15 @@ const SectionBudget = ({ collective, stats, intl }) => {
             const expenses = get(data, 'Collective.expenses');
             const transactions = get(data, 'Collective.transactions');
             if (isEmpty(expenses) && isEmpty(transactions)) {
-              return null;
+              return (
+                <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="Paragraph">
+                  <FormattedMessage
+                    id="SectionBudget.Empty"
+                    defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
+                  financial contributors or when someone creates an expense."
+                  />
+                </MessageBox>
+              );
             }
 
             // Merge items, filter expenses that already have a transaction as they'll already be
@@ -79,12 +89,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                         <Container p={24} display="flex" justifyContent="space-between">
                           <Flex>
                             <Box mr={3}>
-                              <Avatar
-                                src={fromCollective.image}
-                                type={fromCollective.type}
-                                name={fromCollective.name}
-                                radius={40}
-                              />
+                              <Avatar collective={fromCollective} radius={40} />
                             </Box>
                             <Flex flexDirection="column" justifyContent="space-between">
                               <P color="black.900" fontWeight="600">
@@ -96,7 +101,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                                     id="Transactions.byWithGiftCard"
                                     defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
                                     values={{
-                                      collectiveName: <LinkCollective collective={fromCollective} />,
+                                      collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
                                       date: (
                                         <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
                                       ),
@@ -111,7 +116,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                                     id="Transactions.by"
                                     defaultMessage="by {collectiveName} on {date}"
                                     values={{
-                                      collectiveName: <LinkCollective collective={fromCollective} />,
+                                      collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
                                       date: (
                                         <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
                                       ),
@@ -156,6 +161,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
           width="100%"
           flexDirection={['column', 'row', 'column']}
           mb={2}
+          mx={[null, null, 3]}
           minWidth={300}
         >
           <Box flex="1" py={16} px={24}>
@@ -165,11 +171,18 @@ const SectionBudget = ({ collective, stats, intl }) => {
             <P fontSize="H5" mt={1} mb={3}>
               {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
             </P>
-            <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3}>
+            {collective.isArchived ? (
+              <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3} disabled>
                 <FormattedMessage id="CollectivePage.SectionBudget.SubmitExpense" defaultMessage="Submit Expenses" /> →
               </StyledButton>
-            </Link>
+            ) : (
+              <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3}>
+                  <FormattedMessage id="CollectivePage.SectionBudget.SubmitExpense" defaultMessage="Submit Expenses" />{' '}
+                  →
+                </StyledButton>
+              </Link>
+            )}
           </Box>
           <Container flex="1" background="#F5F7FA" py={16} px={24}>
             <P fontSize="Tiny" textTransform="uppercase" color="black.700">
@@ -197,6 +210,7 @@ SectionBudget.propTypes = {
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    isArchived: PropTypes.bool,
   }),
 
   /** Stats */
@@ -239,7 +253,6 @@ SectionBudget.propTypes = {
         id: PropTypes.number,
         slug: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-        image: PropTypes.string.isRequired,
       }).isRequired,
     }),
   ),

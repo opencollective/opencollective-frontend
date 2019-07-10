@@ -1,5 +1,5 @@
-# source: http://localhost:3000/api/graphql
-# timestamp: Fri Jun 28 2019 15:34:21 GMT+0200 (GMT+02:00)
+# source: https://opencollective.com/api/graphql
+# timestamp: Mon Jul 08 2019 10:28:18 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -720,6 +720,11 @@ type Contributor {
   totalAmountDonated: Int!
 
   """
+  Wether the contributor is an individual, an organization...
+  """
+  type: String!
+
+  """
   Description of how the member contribute. Will usually be a tier name, or "design" or "code".
   """
   description: String
@@ -787,6 +792,28 @@ type ContributorsStats {
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
+}
+
+"""
+Input for custom fields for order
+"""
+input CustomFieldsInputType {
+  type: CustomFieldType
+  name: String
+  label: String
+  required: Boolean
+}
+
+"""
+Type of custom field
+"""
+enum CustomFieldType {
+  number
+  text
+  email
+  date
+  radio
+  url
 }
 
 scalar DateString
@@ -1269,6 +1296,11 @@ type Member {
   member: CollectiveInterface
   role: String
   description: String
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   tier: Tier
   stats: StatsMemberType
   since: DateString
@@ -1413,6 +1445,11 @@ type Mutation {
     collective: CollectiveAttributesInputType!
     role: String!
   ): Member
+
+  """
+  A mutation to edit membership. Dedicated to the user, not the collective admin.
+  """
+  editMembership(id: Int!, publicMessage: String): Member
   createOrder(order: OrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
@@ -1430,7 +1467,7 @@ type Mutation {
     Public message to motivate others to contribute
     """
     publicMessage: String
-  ): OrderType
+  ): OrderType @deprecated(reason: "2019-07-03: The public message is now stored at the Member level")
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!): UpdateType
@@ -1762,6 +1799,7 @@ input OrderInputType {
   fromCollective: CollectiveAttributesInputType
   collective: CollectiveAttributesInputType!
   tier: TierInputType
+  customData: JSON
   recaptchaToken: String
 
   """
@@ -1897,7 +1935,7 @@ type OrderType {
   status: OrderStatus
 
   """
-  Additional information on order: tax
+  Additional information on order: tax and custom fields
   """
   data: JSON
 }
@@ -2376,6 +2414,7 @@ type Query {
     offset: Int = 0
   ): CollectiveSearchResults
   allCollectiveTags: [String]
+  member(id: Int, CollectiveId: Int, MemberCollectiveId: Int, TierId: Int): Member
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -2537,6 +2576,7 @@ type Tier {
   maxQuantityPerUser: Int
   goal: Int
   password: String
+  customFields: [JSON]
   startsAt: DateString
   endsAt: DateString
   collective: CollectiveInterface
@@ -2612,6 +2652,7 @@ input TierInputType {
   """
   goal: Int
   password: String
+  customFields: [CustomFieldsInputType]
 
   """
   Start of the campaign

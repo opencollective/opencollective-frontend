@@ -121,7 +121,6 @@ const getCollective = graphql(gql`
         slug
         type
         name
-        image
         backgroundImage
         admins: members(role: "ADMIN") {
           id
@@ -150,8 +149,9 @@ const getCollective = graphql(gql`
         isFundraiser
         since
         description
+        publicMessage
         collectiveSlug
-        image
+        type
       }
     }
   }

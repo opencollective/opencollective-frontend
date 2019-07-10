@@ -37,7 +37,6 @@ class Transaction extends React.Component {
     }),
     fromCollective: PropTypes.shape({
       id: PropTypes.number,
-      image: PropTypes.string,
       type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
@@ -142,14 +141,7 @@ class Transaction extends React.Component {
       <Flex my={4}>
         <Container alignSelf="flex-start">
           <Link route="collective" params={{ slug: fromCollective.slug }} title={fromCollective.name} passHref>
-            <Avatar
-              src={fromCollective.image}
-              type={fromCollective.type}
-              name={fromCollective.name}
-              id={fromCollective.id}
-              radius={40}
-              className="noFrame"
-            />
+            <Avatar collective={fromCollective} id={fromCollective.id} radius={40} className="noFrame" />
           </Link>
         </Container>
         <Container ml={3} width={1}>

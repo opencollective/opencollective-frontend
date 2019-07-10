@@ -9,7 +9,7 @@ import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
 import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Cog } from 'styled-icons/typicons/Cog';
-import { CheckCircle } from 'styled-icons/feather/CheckCircle';
+import { Mail } from 'styled-icons/feather/Mail';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../lib/url_helpers';
@@ -44,6 +44,7 @@ const MainContainer = styled.div`
     props.isFixed &&
     css`
       position: fixed;
+      top: 0;
       background: white;
     `}
 `;
@@ -62,7 +63,6 @@ class Hero extends Component {
       type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
       backgroundImage: PropTypes.string,
       twitterHandle: PropTypes.string,
       githubHandle: PropTypes.string,
@@ -76,7 +76,6 @@ class Hero extends Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      image: PropTypes.string,
     }),
 
     /** Should the component be fixed and collapsed at the top of the window? */
@@ -120,8 +119,8 @@ class Hero extends Component {
     return (
       <MainContainer isFixed={isFixed}>
         {/* Hero top */}
-        <Container position="relative" pb={isFixed ? 0 : 4}>
-          {!isFixed && <HeroBackground backgroundImage={collective.backgroundImage} />}
+        <Container position="relative" pb={isFixed ? 0 : 4} minHeight={isFixed ? undefined : 325}>
+          <HeroBackground backgroundImage={collective.backgroundImage} isDisplayed={!isFixed} />
           <ContainerSectionContent
             pt={isFixed ? 16 : 40}
             display="flex"
@@ -132,19 +131,15 @@ class Hero extends Component {
             <Flex flexDirection={isFixed ? 'row' : 'column'} alignItems={isFixed ? 'center' : ['center', 'flex-start']}>
               <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
                 <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-                  <Avatar
-                    borderRadius="25%"
-                    src={collective.image}
-                    type={collective.type}
-                    radius={isFixed ? 40 : 128}
-                    name={collective.name}
-                  />
+                  <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%">
+                    <Avatar borderRadius="25%" collective={collective} radius={isFixed ? 40 : 128} />
+                  </Container>
                 </LinkCollective>
                 {canEdit && !isFixed && (
                   <Container position="absolute" right={-10} bottom={-5}>
-                    <Link route="editCollective" params={{ slug }}>
+                    <Link route="editCollective" params={{ slug }} title={formatMessage(Hero.Translations.settings)}>
                       <StyledRoundButton size={40} bg="#F0F2F5">
-                        <Cog size={24} color="#4B4E52" />
+                        <Cog size={24} />
                       </StyledRoundButton>
                     </Link>
                   </Container>
@@ -153,6 +148,7 @@ class Hero extends Component {
               <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
                 <H1
                   ml={isFixed ? 2 : undefined}
+                  p={2}
                   color="black.800"
                   fontSize={isFixed ? 'H5' : 'H3'}
                   lineHeight={isFixed ? 'H5' : 'H3'}
@@ -165,7 +161,7 @@ class Hero extends Component {
 
             {!isFixed && (
               <React.Fragment>
-                <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap">
+                <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap" px={2}>
                   <StyledTag my={2} mb={2}>
                     <I18nCollectiveTags tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags)} />
                   </StyledTag>
@@ -229,17 +225,16 @@ class Hero extends Component {
             sections={this.props.sections}
             selected={this.props.selectedSection}
             onSectionClick={this.props.onSectionClick}
-            collectiveSlug={collective.slug}
           />
           <Container py={2} ml={3} display={['none', null, null, 'block']}>
-            <StyledButton mx={2}>
-              <CheckCircle size="1.1em" />
-              &nbsp;
-              <FormattedMessage id="Collective.Hero.GetUpdates" defaultMessage="Get updates" />
-            </StyledButton>
-            <StyledButton mx={2}>
-              <FormattedMessage id="Collective.Hero.Share" defaultMessage="Share" />
-            </StyledButton>
+            <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
+              <StyledButton mx={2}>
+                <Span mr="5px">
+                  <Mail size="1.1em" style={{ verticalAlign: 'sub' }} />
+                </Span>
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
+              </StyledButton>
+            </a>
           </Container>
         </ContainerSectionContent>
       </MainContainer>

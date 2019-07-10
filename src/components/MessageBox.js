@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import * as styledSystem from 'styled-system';
+import { display, height, maxHeight, maxWidth, minHeight, minWidth, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { Box } from '@rebass/grid';
@@ -12,6 +12,7 @@ import { ExclamationCircle } from 'styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from 'styled-icons/fa-solid/ExclamationTriangle';
 
 import { messageType } from '../constants/theme';
+import { Span } from './Text';
 import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';
 
@@ -20,12 +21,13 @@ const Message = styled(Box)`
   border-radius: 8px;
   padding: ${themeGet('space.3')}px;
 
-  ${styledSystem.display}
-  ${styledSystem.height}
-  ${styledSystem.maxHeight}
-  ${styledSystem.maxWidth}
-  ${styledSystem.minHeight}
-  ${styledSystem.minWidth}
+  ${display}
+  ${height}
+  ${maxHeight}
+  ${maxWidth}
+  ${minHeight}
+  ${minWidth}
+  ${typography}
 
   ${messageType}
 `;
@@ -45,14 +47,14 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
   return (
     <Message {...props}>
       {isLoading && (
-        <Box mr={2} css={{ display: 'inline-block' }}>
+        <Span mr={2} css={{ display: 'inline-block' }}>
           <StyledSpinner size="1.5em" />
-        </Box>
+        </Span>
       )}
       {icon && !isLoading && (
-        <Box mr={2} css={{ display: 'inline-block' }}>
+        <Span mr={2} css={{ display: 'inline-block' }}>
           {icon}
-        </Box>
+        </Span>
       )}
       {children}
     </Message>
