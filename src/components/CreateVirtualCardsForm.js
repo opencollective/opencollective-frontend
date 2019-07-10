@@ -364,7 +364,7 @@ class CreateVirtualCardsForm extends Component {
         <Flex flexDirection="column">
           <InlineField
             name="amount"
-            label={<FormattedMessage id="virtualCards.create.amount" defaultMessage="Amount" />}
+            label={<FormattedMessage id="virtualCards.create.amount" defaultMessage="Amount in US dollars" />}
           >
             <StyledInputAmount
               id="virtualcard-amount"

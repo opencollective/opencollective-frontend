@@ -1091,7 +1091,7 @@
   "virtualCards.claimedBy": "réclamé par {user}",
   "virtualCards.closeDetails": "Fermer les détails",
   "virtualCards.create": "Créer des cartes cadeaux",
-  "virtualCards.create.amount": "Montant",
+  "virtualCards.create.amount": "Montant en dollars américains",
   "virtualCards.create.customMessage": "Message personnalisé",
   "virtualCards.create.expiryDate": "Date d'expiration",
   "virtualCards.create.generateCodes": "J'enverrai les codes moi-même",

@@ -1091,7 +1091,7 @@
   "virtualCards.claimedBy": "{user} が請求",
   "virtualCards.closeDetails": "詳細を閉じる",
   "virtualCards.create": "ギフト カードを作成",
-  "virtualCards.create.amount": "金額",
+  "virtualCards.create.amount": "私たちの金額ドル",
   "virtualCards.create.customMessage": "カスタムメッセージ",
   "virtualCards.create.expiryDate": "有効期限",
   "virtualCards.create.generateCodes": "コードを自分に送信",

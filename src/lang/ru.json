@@ -1091,7 +1091,7 @@
   "virtualCards.claimedBy": "claimed by {user}",
   "virtualCards.closeDetails": "Скрыть детали",
   "virtualCards.create": "Создать подарочные карты",
-  "virtualCards.create.amount": "Сумма",
+  "virtualCards.create.amount": "Сумма в долларах США",
   "virtualCards.create.customMessage": "Custom message",
   "virtualCards.create.expiryDate": "Дата истечения",
   "virtualCards.create.generateCodes": "I'll send the codes myself",
