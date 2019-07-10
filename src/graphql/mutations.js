@@ -63,6 +63,7 @@ const createCollectiveQuery = gql`
       type
       website
       twitterHandle
+      isAnonymous
     }
   }
 `;

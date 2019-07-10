@@ -141,7 +141,7 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
     options.push({ id: 'anonymous', type: 'USER', isAnonymous: true, name: intl.formatMessage(messages['anonymous']) });
   }
 
-  options.push({ id: 'org.new', name: intl.formatMessage(messages['org.new']) });
+  options.push({ id: 'org.new', type: 'ORGANIZATION', name: intl.formatMessage(messages['org.new']) });
 
   const lastIndex = Object.keys(options).length - 1;
   const showSearch = Object.keys(profiles).length >= 5 || state.search;
@@ -202,6 +202,15 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                   ) : (
                     capitalize(value.type)
                   )}
+                </P>
+              )}
+              {value.isAnonymous && (
+                <P fontSize="Caption" lineHeight="Caption" color="black.500">
+                  <FormattedMessage
+                    id="profile.anonymous.description"
+                    defaultMessage="Keep my contribution private (see FAQ for more info)"
+                    values={{ email: value.email }}
+                  />
                 </P>
               )}
             </Flex>
