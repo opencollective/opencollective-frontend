@@ -10,12 +10,10 @@ import themeGet from '@styled-system/theme-get';
 
 import { Times } from 'styled-icons/fa-solid/Times';
 
-import { Link } from '../server/pages';
 import { Span } from './Text';
 import LinkCollective from './LinkCollective';
 import { fadeIn } from './StyledKeyframes';
 import StyledButton from './StyledButton';
-import StyledLink from './StyledLink';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import StyledCard from './StyledCard';
 import Container from './Container';

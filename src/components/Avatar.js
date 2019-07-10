@@ -5,7 +5,7 @@ import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
-import { getBaseImagesUrl } from '../lib/utils';
+import { getBaseImagesUrl, getCollectiveImage } from '../lib/utils';
 import { defaultImage } from '../constants/collectives';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
