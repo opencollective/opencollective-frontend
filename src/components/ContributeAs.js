@@ -138,7 +138,7 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
   // if the user doesn't have an anonymous profile yet, we offer to create one
   const anonymousProfile = options.find(p => p.type === 'USER' && p.isAnonymous);
   if (!anonymousProfile) {
-    options.push({ id: 'anonymous', name: intl.formatMessage(messages['anonymous']) });
+    options.push({ id: 'anonymous', type: 'USER', isAnonymous: true, name: intl.formatMessage(messages['anonymous']) });
   }
 
   options.push({ id: 'org.new', name: intl.formatMessage(messages['org.new']) });
@@ -176,8 +176,8 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             px={4}
             py={3}
             borderBottom={lastIndex !== index ? '1px solid' : 'none'}
-            color={key === 'anonymous' && checked ? 'white.full' : 'black.900'}
-            bg={key === 'anonymous' && checked ? 'black.900' : 'white.full'}
+            color={value.isAnonymous && checked ? 'white.full' : 'black.900'}
+            bg={value.isAnonymous && checked ? 'black.900' : 'white.full'}
             borderColor="black.200"
             flexWrap="wrap"
           >
