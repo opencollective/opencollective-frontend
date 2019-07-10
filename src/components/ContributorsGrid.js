@@ -181,7 +181,7 @@ class ContributorCard extends React.PureComponent {
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
           {withCollectiveLink(
             <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900" title={name}>
-              {truncate(name, { length: 40 })}
+              {truncate(name, { length: 18 })}
             </P>,
           )}
           <P fontSize="Tiny" lineHeight="Caption" color="black.500">
