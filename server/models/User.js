@@ -477,60 +477,52 @@ export default (Sequelize, DataTypes) => {
     });
   };
 
-  User.createUserWithCollective = (userData, transaction) => {
+  User.createUserWithCollective = async (userData, transaction) => {
     if (!userData) return Promise.reject(new Error('Cannot create a user: no user data provided'));
 
     const sequelizeParams = transaction ? { transaction } : undefined;
-    let user;
     debug('createUserWithCollective', userData);
-    return User.create(userData, sequelizeParams)
-      .then(u => {
-        user = u;
-        let name = userData.firstName;
-        if (name && userData.lastName) {
-          name += ` ${userData.lastName}`;
-        }
+    const user = await User.create(userData, sequelizeParams);
+    let name = userData.firstName;
+    if (name && userData.lastName) {
+      name += ` ${userData.lastName}`;
+    }
 
-        // If user doesn't provide a name, set it to "anonymous". If we cannot
-        // slugify it (for example firstName="------") then fallback on "user".
-        let collectiveName = userData.name || name;
-        if (!collectiveName || collectiveName.trim().length === 0) {
-          collectiveName = 'anonymous';
-        } else if (slugify(collectiveName).length === 0) {
-          collectiveName = 'user';
-        }
+    // If user doesn't provide a name, set it to "anonymous". If we cannot
+    // slugify it (for example firstName="------") then fallback on "user".
+    let collectiveName = userData.name || name;
+    if (!collectiveName || collectiveName.trim().length === 0) {
+      collectiveName = 'anonymous';
+    } else if (slugify(collectiveName).length === 0) {
+      collectiveName = 'user';
+    }
 
-        const userCollective = {
-          type: 'USER',
-          name: collectiveName,
-          image: userData.image,
-          mission: userData.mission,
-          description: userData.description,
-          longDescription: userData.longDescription,
-          website: userData.website,
-          twitterHandle: userData.twitterHandle,
-          githubHandle: userData.githubHandle,
-          currency: userData.currency,
-          hostFeePercent: userData.hostFeePercent,
-          isActive: true,
-          CreatedByUserId: userData.CreatedByUserId || user.id,
-          data: { UserId: user.id },
-        };
-        return models.Collective.create(userCollective, sequelizeParams);
-      })
-      .tap(collective => {
-        // It's difficult to predict when the image will be updated by findImageForUser
-        // So we skip that in test environment to make it more predictable
-        if (config.env !== 'test' && config.env !== 'circleci') {
-          collective.findImageForUser(user);
-        }
-        user.CollectiveId = collective.id;
-        return user.save(sequelizeParams);
-      })
-      .then(collective => {
-        user.collective = collective;
-        return user;
-      });
+    const userCollectiveData = {
+      type: 'USER',
+      name: collectiveName,
+      image: userData.image,
+      mission: userData.mission,
+      description: userData.description,
+      longDescription: userData.longDescription,
+      website: userData.website,
+      twitterHandle: userData.twitterHandle,
+      githubHandle: userData.githubHandle,
+      currency: userData.currency,
+      hostFeePercent: userData.hostFeePercent,
+      isActive: true,
+      CreatedByUserId: userData.CreatedByUserId || user.id,
+      data: { UserId: user.id },
+    };
+    user.collective = await models.Collective.create(userCollectiveData, sequelizeParams);
+
+    // It's difficult to predict when the image will be updated by findImageForUser
+    // So we skip that in test environment to make it more predictable
+    if (config.env !== 'test' && config.env !== 'circleci') {
+      user.collective.findImageForUser(user);
+    }
+    user.CollectiveId = user.collective.id;
+    await user.save(sequelizeParams);
+    return user;
   };
 
   User.splitName = name => {
