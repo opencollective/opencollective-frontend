@@ -306,6 +306,10 @@ export default (Sequelize, DataTypes) => {
     });
   };
 
+  User.prototype.getAnonymousProfile = function() {
+    return models.Collective.findOne({ where: { isAnonymous: true, CreatedByUserId: this.id } });
+  };
+
   User.prototype.populateRoles = async function() {
     if (this.rolesByCollectiveId) {
       debug('roles already populated');
@@ -313,9 +317,12 @@ export default (Sequelize, DataTypes) => {
     }
     const rolesByCollectiveId = {};
     const adminOf = [];
-    const memberships = await models.Member.findAll({
-      where: { MemberCollectiveId: this.CollectiveId },
-    });
+    const where = { MemberCollectiveId: this.CollectiveId };
+    const anonymousProfile = await this.getAnonymousProfile();
+    if (anonymousProfile) {
+      where.MemberCollectiveId = { [Op.in]: [this.CollectiveId, anonymousProfile.id] };
+    }
+    const memberships = await models.Member.findAll({ where });
     memberships.map(m => {
       rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
       rolesByCollectiveId[m.CollectiveId].push(m.role);
