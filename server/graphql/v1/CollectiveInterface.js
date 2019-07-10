@@ -745,8 +745,12 @@ const CollectiveFields = () => {
     },
     createdByUser: {
       type: UserType,
-      resolve(collective) {
-        if (collective.isAnonymous) return {};
+      resolve(collective, args, req) {
+        if (
+          collective.isAnonymous &&
+          (!req.remoteUser || !req.remoteUser.isAdmin(collective.inTheContextOfCollectiveId))
+        )
+          return {};
         return models.User.findByPk(collective.CreatedByUserId);
       },
     },

@@ -316,7 +316,10 @@ export const MemberType = new GraphQLObjectType({
       member: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
+          const memberCollective =
+            member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
+          memberCollective.inTheContextOfCollectiveId = member.CollectiveId;
+          return memberCollective;
         },
       },
       role: {
@@ -1572,12 +1575,14 @@ export const OrderType = new GraphQLObjectType({
       fromCollective: {
         description: 'Collective ordering (most of the time it will be the collective of the createdByUser)',
         type: CollectiveInterfaceType,
-        resolve(order, args, req) {
+        async resolve(order, args, req) {
           if (!order.FromCollectiveId) {
             console.warn('There is no FromCollectiveId for order', order.id);
             return null;
           }
-          return req.loaders.collective.findById.load(order.FromCollectiveId);
+          const fromCollective = await req.loaders.collective.findById.load(order.FromCollectiveId);
+          fromCollective.inTheContextOfCollectiveId = order.CollectiveId;
+          return fromCollective;
         },
       },
       collective: {
