@@ -140,13 +140,16 @@ export const UserType = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         resolve(user, args, req) {
-          return user.getPersonalDetails(req.remoteUser).then(user => user.email);
+          return user.getPersonalDetails && user.getPersonalDetails(req.remoteUser).then(user => user.email);
         },
       },
       emailWaitingForValidation: {
         type: GraphQLString,
         resolve(user, args, req) {
-          return user.getPersonalDetails(req.remoteUser).then(user => user.emailWaitingForValidation);
+          return (
+            user.getPersonalDetails &&
+            user.getPersonalDetails(req.remoteUser).then(user => user.emailWaitingForValidation)
+          );
         },
       },
       memberOf: {
@@ -167,7 +170,7 @@ export const UserType = new GraphQLObjectType({
       paypalEmail: {
         type: GraphQLString,
         resolve(user, args, req) {
-          return user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
+          return user.getPersonalDetails && user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
         },
       },
     };
