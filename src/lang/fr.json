@@ -710,7 +710,7 @@
   "openSourceApply.GithubRepositories.description": "Select the project you wish to create a Collective for. Only repositories with at least 100 stars are eligible.",
   "openSourceApply.GithubRepositories.title": "Choisissez un dépôt",
   "openSourceApply.guidelines": "instructions",
-  "openSourceApply.title": "For Open Source Projects",
+  "openSourceApply.title": "Pour les projets open-source",
   "order.active": "actif",
   "order.cancelled": "annulé",
   "order.created.tweet": "Je viens de contribuer {amount} à {collective}. Toi aussi, contribue!",
