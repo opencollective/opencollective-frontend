@@ -261,4 +261,4 @@ SectionBudget.propTypes = {
   intl: PropTypes.object,
 };
 
-export default injectIntl(SectionBudget);
+export default React.memo(injectIntl(SectionBudget));

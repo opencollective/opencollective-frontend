@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { ThemeProvider } from 'styled-components';
 import { lighten, darken } from 'polished';
 
 // OC Frontend imports
 import theme, { generateTheme } from '../../constants/theme';
-import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
 
 // Collective page imports
@@ -70,6 +69,10 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
+  isAdmin = memoizeOne((LoggedInUser, collective) => {
+    return Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+  });
+
   getSections = memoizeOne((props, isAdmin) => {
     const { collective, host, stats, updates, transactions, expenses } = props;
     const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
@@ -96,39 +99,50 @@ class CollectivePage extends Component {
     return sections.filter(section => !sectionsToRemove.has(section));
   });
 
-  onScroll = debounceScroll(() => {
+  onScroll = throttle(() => {
+    let { isFixed, selectedSection } = this.state;
+
     // Fixes the Hero when a certain scroll threshold is reached
     if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
-      if (!this.state.isFixed) {
-        this.setState({ isFixed: true });
-      }
-    } else if (this.state.isFixed) {
-      this.setState({ isFixed: false });
+      isFixed = true;
+    } else if (isFixed) {
+      isFixed = false;
     }
 
+    // Get the currently selected section
     const distanceThreshold = 200;
     const currentViewBottom = window.scrollY + window.innerHeight;
-    const sections = Object.keys(this.sectionsRefs);
+    const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
+    const sections = this.getSections(this.props, isAdmin);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
       if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
-        if (this.state.selectedSection !== sectionName) {
-          this.setState({ selectedSection: sectionName });
-        }
+        selectedSection = sectionName;
         break;
       }
     }
-  });
+
+    // Update the state only if necessary
+    if (this.state.isFixed !== isFixed || this.state.selectedSection !== selectedSection) {
+      this.setState({ isFixed, selectedSection });
+    }
+  }, 100);
 
   onSectionClick = sectionName => {
-    window.location.hash = `section-${sectionName}`;
     const sectionTop = this.sectionsRefs[sectionName].offsetTop;
-    window.scrollTo(0, sectionTop - Dimensions.HERO_FIXED_HEIGHT);
+    window.scrollTo({ top: sectionTop - Dimensions.HERO_FIXED_HEIGHT, behavior: 'smooth' });
+    // Changing hash directly tends to make the page jump to the section without respect for
+    // the smooth scroll behaviour, so we try to use `history.pushState` if available
+    if (window.history.pushState) {
+      window.history.pushState(null, null, `section-${sectionName}`);
+    } else {
+      window.location.hash = `section-${sectionName}`;
+    }
   };
 
   onCollectiveClick = () => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   renderSection(section, canEdit) {
@@ -196,9 +210,9 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, LoggedInUser } = this.props;
+    const { LoggedInUser, collective, host } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+    const canEdit = this.isAdmin(LoggedInUser, collective);
     const sections = this.getSections(this.props, canEdit);
     const pageTheme = this.getTheme();
 
