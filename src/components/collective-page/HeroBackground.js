@@ -1,30 +1,44 @@
-import React from 'react';
 import { PropTypes } from 'prop-types';
-import styled from 'styled-components';
-import { backgroundImage } from 'styled-system';
-import { fadeIn } from '../../constants/animations.js';
-import themeGet from '@styled-system/theme-get';
+import styled, { css } from 'styled-components';
 
 import HeroBackgroundMask from './HeroBackgroundMask.svg';
 
-const BackgroundContainer = styled.div`
+const generateBackground = (theme, backgroundImage) => {
+  const color = theme.colors.primary[300];
+  const gradient = `linear-gradient(10deg, ${theme.colors.primary[700]}, ${theme.colors.primary[100]})`;
+  const defaultBackground = `${gradient}, ${color}`;
+  return backgroundImage ? `url(${backgroundImage}), ${defaultBackground}` : defaultBackground;
+};
+
+/**
+ * Wraps the logic to display the hero background. Fallsback on a white background if
+ * css `mask` is not supported.
+ */
+const HeroBackground = styled.div`
   position: absolute;
   right: 0;
   top: 0;
-  width: 100%;
   height: 100%;
-  z-index: -1;
-  animation: ${fadeIn} 0.25s cubic-bezier(0, 1, 0.5, 1);
-  animation-fill-mode: both;
+  width: 100%;
   max-width: 1368px; // Should match SVG's viewbox
+  z-index: -1;
+  opacity: 1;
+  transition: opacity 0.25s cubic-bezier(0, 1, 0.5, 1);
+
+  /**
+   * We hide background like that for two reasons:
+   * 1. Removing the block would re-load the image when expending
+   * 2. It allows us to animate opacity (cannot do it with display: none)
+   */
+  ${props =>
+    !props.isDisplayed &&
+    css`
+      height: 0;
+      opacity: 0;
+    `}
 
   @supports (mask-size: cover) {
-    background-color: ${themeGet('colors.primary.300')};
-    background: linear-gradient(
-      10deg,
-      ${props => `${props.theme.colors.primary[700]}, ${props.theme.colors.primary[500]}`}
-    );
-    ${backgroundImage}
+    background: ${props => generateBackground(props.theme, props.backgroundImage)};
     background-repeat: no-repeat;
     background-size: cover;
 
@@ -39,17 +53,16 @@ const BackgroundContainer = styled.div`
   }
 `;
 
-/**
- * Wraps the logic to display the hero background. Fallsback on a white background if
- * css `mask` is not supported.
- */
-const HeroBackground = ({ backgroundImage }) => {
-  return <BackgroundContainer backgroundImage={backgroundImage ? `url(${backgroundImage})` : undefined} />;
-};
-
 HeroBackground.propTypes = {
   /** The background image to crop */
   backgroundImage: PropTypes.string,
+  /** If set to false, the css attribute display="none" will be added */
+  isDisplayed: PropTypes.bool,
 };
 
+HeroBackground.defaultProps = {
+  isDisplayed: true,
+};
+
+/** @component */
 export default HeroBackground;
