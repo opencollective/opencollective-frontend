@@ -25,6 +25,8 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   font-weight: bold;
   justify-content: center;
   overflow: hidden;
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
   ${space}
   ${layout}
@@ -37,7 +39,7 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
     name = collective.name;
     if (collective.isAnonymous) {
       src = defaultImage['ANONYMOUS'];
-    } else {
+    } else if (collective.image) {
       src = `${getBaseImagesUrl()}/${collective.slug}/avatar.png`;
     }
   }
