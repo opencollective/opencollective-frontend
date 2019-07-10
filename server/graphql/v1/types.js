@@ -1546,7 +1546,10 @@ export const OrderType = new GraphQLObjectType({
       },
       createdByUser: {
         type: UserType,
-        resolve(order) {
+        async resolve(order, args, req) {
+          const fromCollective = await order.getFromCollective();
+          if (fromCollective.isAnonymous && (!req.remoteUser || !req.remoteUser.isAdmin(order.CollectiveId))) return {};
+
           return order.getCreatedByUser();
         },
       },
