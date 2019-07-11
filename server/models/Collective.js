@@ -20,7 +20,7 @@ import emailLib from '../lib/email';
 import queries from '../lib/queries';
 import { convertToCurrency } from '../lib/currency';
 import { isBlacklistedCollectiveSlug, collectiveSlugBlacklist } from '../lib/collectivelib';
-import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5 } from '../lib/utils';
+import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5, strip_tags } from '../lib/utils';
 
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -215,7 +215,17 @@ export default function(Sequelize, DataTypes) {
       mission: DataTypes.STRING, // max 95 characters
       description: DataTypes.STRING, // max 95 characters
 
-      longDescription: DataTypes.TEXT, // markdown
+      longDescription: {
+        type: DataTypes.TEXT,
+        set(longDescription) {
+          if (longDescription) {
+            this.setDataValue('longDescription', strip_tags(longDescription));
+          } else {
+            this.setDataValue('longDescription', null);
+          }
+        },
+      },
+
       expensePolicy: DataTypes.TEXT, // markdown
 
       currency: CustomDataTypes(DataTypes).currency,
