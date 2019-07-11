@@ -4,8 +4,6 @@
 export const Dimensions = {
   PADDING_X: [15, 30],
   MAX_SECTION_WIDTH: 1200,
-  HERO_FIXED_HEIGHT: 110,
-  HERO_PLACEHOLDER_HEIGHT: [500, 420, 420, 450],
 };
 
 /**

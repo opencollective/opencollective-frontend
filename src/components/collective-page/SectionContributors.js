@@ -67,7 +67,7 @@ export default class SectionContributors extends React.PureComponent {
     const filteredContributors = hasFilters ? this.filterContributors(contributors, filter) : contributors;
 
     return (
-      <MainContainer py={[4, 6]}>
+      <MainContainer py={[4, 5]}>
         <ContainerSectionContent>
           <H2 mb={4} px={3} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
             <FormattedMessage
