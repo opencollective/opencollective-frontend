@@ -4,10 +4,17 @@ import PropTypes from 'prop-types';
 export default class Body extends React.Component {
   static propTypes = {
     children: PropTypes.node,
+    withoutGlobalStyles: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    withoutGlobalStyles: false,
   };
 
   render() {
-    return (
+    return this.props.withoutGlobalStyles ? (
+      <main>{this.props.children}</main>
+    ) : (
       <main>
         <style jsx global>
           {`

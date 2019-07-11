@@ -5,5 +5,5 @@ import { webpackCollective, openSourceHost } from '../../mocks/collectives';
 
 ```js
 import { webpackCollective, openSourceHost } from '../../mocks/collectives';
-<Hero isFixed={false} collective={webpackCollective} host={openSourceHost} canEditCollective />;
+<Hero collective={webpackCollective} host={openSourceHost} isAdmin />;
 ```
