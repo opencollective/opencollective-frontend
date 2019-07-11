@@ -362,6 +362,15 @@ export function editCollective(_, args, req) {
   }
   return Promise.all(promises)
     .then(() => {
+      // If trying to edit parent collective, ensure user is an admin of it
+      const newParentCollectiveId = args.collective.ParentCollectiveId;
+      const isChangingParent = newParentCollectiveId && newParentCollectiveId !== collective.ParentCollectiveId;
+      if (isChangingParent && !req.remoteUser.isAdmin(newParentCollectiveId)) {
+        throw new errors.Unauthorized({
+          message: `You must be logged in as the creator of this Event or as an admin of the ${parentCollective.slug} collective to edit this Event Collective`,
+        });
+      }
+
       if (args.collective.slug && newCollectiveData.type === 'EVENT') {
         // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
         // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
