@@ -40,7 +40,7 @@ const TransactionsAndExpensesQuery = gql`
  */
 const SectionBudget = ({ collective, stats, intl }) => {
   return (
-    <ContainerSectionContent py={[5, 6]}>
+    <ContainerSectionContent py={[4, 5]}>
       <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
         <FormattedMessage id="CollectivePage.SectionBudget.Title" defaultMessage="Latest transactions" />
       </H3>

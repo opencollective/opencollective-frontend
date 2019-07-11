@@ -9,9 +9,10 @@ import { lighten, darken } from 'polished';
 // OC Frontend imports
 import theme, { generateTheme } from '../../constants/theme';
 import Container from '../Container';
+import CollectiveNavbar from '../CollectiveNavbar';
 
 // Collective page imports
-import { AllSectionsNames, Sections, Dimensions } from './_constants';
+import { AllSectionsNames, Sections } from './_constants';
 import Hero from './Hero';
 import SectionAbout from './SectionAbout';
 import SectionBudget from './SectionBudget';
@@ -57,6 +58,7 @@ class CollectivePage extends Component {
   constructor(props) {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
+    this.navbarRef = React.createRef();
     this.state = { isFixed: false, selectedSection: null };
   }
 
@@ -100,17 +102,22 @@ class CollectivePage extends Component {
   });
 
   onScroll = throttle(() => {
+    // Ref may be null when NextJS hot reloads the page
+    if (!this.navbarRef.current) {
+      return;
+    }
+
     let { isFixed, selectedSection } = this.state;
 
     // Fixes the Hero when a certain scroll threshold is reached
-    if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
+    if (this.navbarRef.current.getBoundingClientRect().top === 0) {
       isFixed = true;
     } else if (isFixed) {
       isFixed = false;
     }
 
     // Get the currently selected section
-    const distanceThreshold = 200;
+    const distanceThreshold = 300;
     const currentViewBottom = window.scrollY + window.innerHeight;
     const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
     const sections = this.getSections(this.props, isAdmin);
@@ -130,19 +137,18 @@ class CollectivePage extends Component {
   }, 100);
 
   onSectionClick = sectionName => {
-    const sectionTop = this.sectionsRefs[sectionName].offsetTop;
-    window.scrollTo({ top: sectionTop - Dimensions.HERO_FIXED_HEIGHT, behavior: 'smooth' });
+    window.scrollTo(0, this.sectionsRefs[sectionName].offsetTop - 75);
     // Changing hash directly tends to make the page jump to the section without respect for
     // the smooth scroll behaviour, so we try to use `history.pushState` if available
     if (window.history.pushState) {
-      window.history.pushState(null, null, `section-${sectionName}`);
+      window.history.pushState(null, null, `#section-${sectionName}`);
     } else {
-      window.location.hash = `section-${sectionName}`;
+      window.location.hash = `#section-${sectionName}`;
     }
   };
 
   onCollectiveClick = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
   renderSection(section, canEdit) {
@@ -212,28 +218,37 @@ class CollectivePage extends Component {
   render() {
     const { LoggedInUser, collective, host } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const canEdit = this.isAdmin(LoggedInUser, collective);
-    const sections = this.getSections(this.props, canEdit);
+    const isAdmin = this.isAdmin(LoggedInUser, collective);
+    const sections = this.getSections(this.props, isAdmin);
     const pageTheme = this.getTheme();
 
     return (
       <ThemeProvider theme={pageTheme}>
-        <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
-          <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
-            <Hero
+        <Container
+          position="relative"
+          borderTop="1px solid #E6E8EB"
+          css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+        >
+          <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
+          <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
+            <CollectiveNavbar
               collective={collective}
-              host={host}
               sections={sections}
-              canEdit={canEdit}
-              isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
-              selectedSection={selectedSection || sections[0]}
-              onSectionClick={this.onSectionClick}
+              selected={selectedSection || sections[0]}
               onCollectiveClick={this.onCollectiveClick}
+              hideInfos={!isFixed}
+              isAnimated={true}
+              onSectionClick={this.onSectionClick}
+              LinkComponent={({ section, label }) => (
+                <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
+                  {label}
+                </a>
+              )}
             />
           </Container>
           {sections.map(section => (
             <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-              {this.renderSection(section, canEdit)}
+              {this.renderSection(section, isAdmin)}
             </div>
           ))}
         </Container>

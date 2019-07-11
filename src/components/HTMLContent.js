@@ -39,6 +39,7 @@ const HTMLContent = styled(({ content, ...props }) => {
 })`
   /** Override global styles to match what we have in the editor */
   width: 100%;
+  line-height: 1.75em;
 
   h1,
   h2,
