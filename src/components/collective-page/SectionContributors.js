@@ -102,13 +102,18 @@ export default class SectionContributors extends React.PureComponent {
         <Box mb={4}>
           <ContributorsGrid
             contributors={filteredContributors}
-            getPaddingLeft={({ width, nbRows }) => {
+            getPaddingLeft={({ width, rowWidth, nbRows }) => {
               if (width < Dimensions.MAX_SECTION_WIDTH) {
                 // No need for padding on screens small enough so they don't have padding
                 return 0;
               } else if (nbRows > 1) {
-                // If multiline, center contributors cards
-                return (width - Dimensions.MAX_SECTION_WIDTH) / 8;
+                if (rowWidth <= width) {
+                  // If multiline and possible center contributors cards
+                  return (width - rowWidth) / 2;
+                } else {
+                  // Otherwise if multiline and the grid is full, just use the full screen
+                  return 0;
+                }
               } else {
                 // Otherwise add a normal section padding on the left
                 return (width - Dimensions.MAX_SECTION_WIDTH) / 2;
