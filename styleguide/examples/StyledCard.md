@@ -1,4 +1,8 @@
 This component has no default opinions about padding or layout internally.
+<<<<<<< HEAD
+=======
+
+>>>>>>> fix(collective): fix twitter card
 ```js
 <StyledCard>
   <h3>Cool component card</h3>

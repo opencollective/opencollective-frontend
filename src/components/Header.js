@@ -28,7 +28,11 @@ class Header extends React.Component {
       'og:image': image,
       description: truncate(description, 256),
       'twitter:card': 'summary_large_image',
+<<<<<<< HEAD
       'twitter:title': title ? `${title} - Open Collective` : `Open Collective`,
+=======
+      'twitter:title': title ? `${title} - Open Collective` : 'Open Collective',
+>>>>>>> chore(deps): bump rehype-react from 3.1.0 to 4.0.0
       'twitter:description': description,
       'twitter:image': image,
     };

@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 Display the list of repositories 
+=======
+Display the list of repositories
+
+>>>>>>> fix(collective): fix twitter card
 ```js
 const repositories = [
   {
@@ -17,13 +22,24 @@ const repositories = [
     name: 'JobTweets',
     owner: { login: 'flickz', type: 'User' },
     stargazers_count: 103,
+<<<<<<< HEAD
   }
+=======
+  },
+>>>>>>> fix(collective): fix twitter card
 ];
 
 <GithubRepositories
   repositories={repositories}
   onCreateCollective={data => {
+<<<<<<< HEAD
     console.log(data)
   }}
   />
 ```
+=======
+    console.log(data);
+  }}
+/>;
+```
+>>>>>>> fix(collective): fix twitter card

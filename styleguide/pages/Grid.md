@@ -7,5 +7,8 @@ The [margin and padding props](https://www.npmjs.com/package/@rebass/grid#margin
 ```md
 const spacing = [0, 4, 8, 16, 32, 64, 128, 256, 512];
 ```
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> fix(collective): fix twitter card

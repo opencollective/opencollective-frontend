@@ -22,11 +22,15 @@ options.use.push(
 );
 
 filePaths.forEach(filePath => {
+<<<<<<< HEAD
   imagemin(
     [`${filePath}*.png`],
     path.dirname(`${filePath}*.png`),
     options,
   ).then(files => {
+=======
+  imagemin([`${filePath}*.png`], path.dirname(`${filePath}*.png`), options).then(files => {
+>>>>>>> fix(collective): fix twitter card
     console.log(`${filePath}*.png was optimized, ${files.length} files`);
   });
 });
