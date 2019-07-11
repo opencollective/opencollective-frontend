@@ -1556,7 +1556,7 @@ export default function(Sequelize, DataTypes) {
             const editableAttributes = pick(member, ['role', 'description', 'since']);
             debug('editMembers', 'update member', member.id, editableAttributes);
             return models.Member.update(editableAttributes, {
-              where: { id: member.id },
+              where: { id: member.id, CollectiveId: this.id },
             });
           } else {
             // Create new membership
