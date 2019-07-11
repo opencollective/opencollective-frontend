@@ -68,7 +68,7 @@
     "jsonwebtoken": "8.5.1",
     "juice": "5.2.0",
     "limax": "1.7.0",
-    "lodash": "4.17.13",
+    "lodash": "4.17.14",
     "lru-cache": "5.1.1",
     "md5": "2.2.1",
     "memjs": "1.2.2",
