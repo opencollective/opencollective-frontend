@@ -378,7 +378,7 @@ class CreateOrderPage extends React.Component {
       const orderCreated = res.data.createOrder;
       this.setState({ submitting: false, submitted: true, error: null });
       this.props.refetchLoggedInUser();
-      if (this.props.redirect && isURL(this.props.redirect)) {
+      if (this.props.redirect && isURL(this.props.redirect, { require_tld: false })) {
         const transactionId = get(orderCreated, 'transactions[0].id', null);
         const status = orderCreated.status;
         const redirectTo = `${this.props.redirect}?transactionid=${transactionId}&status=${status}`;
