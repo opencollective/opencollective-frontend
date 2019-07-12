@@ -13,13 +13,10 @@ import { H4, P, Span } from '../Text';
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 
-import TopContributorsBackgroundSVG from './TopContributorsBackground.svg';
-
 /** The container for Top Contributors view */
 const TopContributorsContainer = styled.div`
   padding: 32px 16px;
   margin-top: 48px;
-  background: url(${TopContributorsBackgroundSVG}) no-repeat center;
   background-color: #f5f7fa;
 `;
 
@@ -82,7 +79,11 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
   const isFillingFullscreen = contributors.length === totalNbContributors && contributors.length === 20;
   return (
     <Box flex="50% 1 3" style={{ flexBasis: getFlexBasisForCol(contributors.length, totalNbContributors) }}>
-      {showTitle && <P fontSize="LeadParagraph">{title}</P>}
+      {showTitle && (
+        <P fontSize="LeadParagraph" color="black.700">
+          {title}
+        </P>
+      )}
       <ContributorsList justifyContent={isFillingFullscreen ? [null, null, null, null, 'space-between'] : 'flex-start'}>
         {contributors.map((contributor, idx) => {
           const route = contributor.type === CollectiveType.COLLECTIVE ? 'new-collective-page' : 'collective';
@@ -180,7 +181,7 @@ const TopContributors = ({ organizations, individuals, currency }) => {
   return (
     <TopContributorsContainer>
       <Container maxWidth={1050} m="0 auto" px={[15, 30]}>
-        <H4 fontWeight="normal" mb={3}>
+        <H4 fontWeight="normal" color="black.700" mb={3}>
           <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top Contributors" />
         </H4>
         <Flex mt={2} flexWrap="wrap" justify-content="space-between">
