@@ -230,9 +230,6 @@ const getCollectiveQuery = gql`
           all
         }
       }
-      createdByUser {
-        id
-      }
       host {
         id
         slug

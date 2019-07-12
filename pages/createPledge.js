@@ -688,9 +688,6 @@ export const addCreatePledgeMutation = graphql(
         id
         createdAt
         status
-        createdByUser {
-          id
-        }
         fromCollective {
           id
           slug
