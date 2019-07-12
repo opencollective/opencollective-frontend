@@ -10,7 +10,8 @@ cp -R src $STAGE
 echo "> Pruning __tests__"
 rm -rf $STAGE/pages/__tests__
 
-echo "> Compiling next.config.js"
+echo "> Compiling env.js and next.config.js"
+npx babel $STAGE/env.js -o $STAGE/env.js
 npx babel $STAGE/next.config.js -o $STAGE/next.config.js
 
 echo "> Building next"
