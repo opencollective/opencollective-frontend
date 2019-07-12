@@ -11,7 +11,7 @@
     "npm": "6.5.0"
   },
   "dependencies": {
-    "@babel/runtime": "7.1.2",
+    "@babel/runtime": "7.4.5",
     "@material-ui/core": "4.2.0",
     "@opencollective/taxes": "2.3.0",
     "@rebass/grid": "6.0.0",
@@ -58,7 +58,7 @@
     "memoize-one": "5.0.5",
     "moment": "2.24.0",
     "moment-timezone": "0.5.26",
-    "next": "8.1.0",
+    "next": "9.0.1",
     "next-routes": "1.4.2",
     "node-fetch": "2.6.0",
     "nodemailer": "6.2.1",
@@ -142,9 +142,9 @@
     "styleguide:deploy": "npm run styleguide:build && npx now styleguide && npx now alias -A styleguide/now.json"
   },
   "devDependencies": {
-    "@babel/cli": "7.1.2",
-    "@babel/core": "7.1.2",
-    "@babel/node": "7.0.0",
+    "@babel/cli": "7.4.4",
+    "@babel/core": "7.4.5",
+    "@babel/node": "7.4.5",
     "babel-eslint": "^10.0.2",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-react-intl": "^3.5.1",
