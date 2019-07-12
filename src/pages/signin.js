@@ -96,6 +96,7 @@ class SigninPage extends React.Component {
     }
 
     const error = errorLoggedInUser || this.state.error;
+    console.log('>>> pages/signin form', form);
     return (
       <React.Fragment>
         {error && (
@@ -114,7 +115,7 @@ class SigninPage extends React.Component {
             />
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={next || '/'} initialForm={form} routes={SigninPage.routes} />
+        <SignInOrJoinFree redirect={next || '/'} form={form} routes={SigninPage.routes} />
       </React.Fragment>
     );
   }

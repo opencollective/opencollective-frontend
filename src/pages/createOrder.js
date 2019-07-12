@@ -865,7 +865,7 @@ class CreateOrderPage extends React.Component {
     const { LoggedInUser } = this.props;
 
     if (!LoggedInUser) {
-      return <SignInOrJoinFree redirect={Router.asPath} initialForm="create-account" />;
+      return <SignInOrJoinFree redirect={Router.asPath} form="create-account" />;
     }
 
     const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';

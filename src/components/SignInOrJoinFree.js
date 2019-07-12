@@ -26,8 +26,8 @@ class SignInOrJoinFree extends React.Component {
     redirect: PropTypes.string,
     /** createUserQuery binding */
     createUser: PropTypes.func,
-    /** Use this prop to define the initial form */
-    initialForm: PropTypes.oneOf(['signin', 'create-account']),
+    /** Use this prop to set the form to display */
+    form: PropTypes.oneOf(['signin', 'create-account']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -36,7 +36,7 @@ class SignInOrJoinFree extends React.Component {
   };
 
   state = {
-    form: this.props.initialForm || 'signin',
+    form: this.props.form || 'signin',
     error: null,
     submitting: false,
     unknownEmailError: false,
@@ -107,7 +107,7 @@ class SignInOrJoinFree extends React.Component {
 
   render() {
     const { submitting, error, unknownEmailError, email } = this.state;
-    const displayedForm = this.state.form;
+    const displayedForm = this.props.form || this.state.form;
     const routes = this.props.routes || {};
 
     return (
