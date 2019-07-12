@@ -5,7 +5,9 @@ import models from '../server/models';
 import roles from '../server/constants/roles';
 import * as libcurrency from '../server/lib/currency';
 import paypalMock from './mocks/paypal';
+import dataMocks from './mocks/data';
 import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
+import { randEmail } from './features/support/stores';
 
 let host, admin, user, collective, paypalPaymentMethod;
 
@@ -363,6 +365,62 @@ describe('graphql.paymentMethods.test.js', () => {
       const paymentMethod = result.data.Collective.paymentMethods.find(pm => pm.service === 'paypal');
       expect(preapprovalDetailsStub.callCount).to.equal(1);
       expect(paymentMethod.balance).to.equal(198750); // $2000 - $12.50
+    });
+  });
+});
+
+describe('CRUD', () => {
+  // Queries
+  const CreateCreditCardMutation = `
+    mutation createCreditCard(
+      $CollectiveId: Int!
+      $name: String!
+      $token: String!
+      $data: StripeCreditCardDataInputType!
+      $monthlyLimitPerMember: Int
+    ) {
+      createCreditCard(
+        CollectiveId: $CollectiveId
+        name: $name
+        token: $token
+        data: $data
+        monthlyLimitPerMember: $monthlyLimitPerMember
+      ) {
+        id
+      }
+    }
+  `;
+
+  // Test variables
+  let user = null;
+  let externalUser = null;
+
+  // Test preparation
+  before(async () => {
+    user = await models.User.createUserWithCollective({ email: randEmail() });
+    externalUser = await models.User.createUserWithCollective({ email: randEmail() });
+  });
+
+  // Test begins
+  describe('Add', () => {
+    it('Must be authenticated', async () => {
+      const result = await utils.graphqlQuery(
+        CreateCreditCardMutation,
+        { ...dataMocks.validCreditCard, CollectiveId: user.CollectiveId },
+        null,
+      );
+
+      expect(result.errors[0].message).to.equal('You need to be logged in to create this payment method.');
+    });
+
+    it('Needs to be an admin', async () => {
+      const result = await utils.graphqlQuery(
+        CreateCreditCardMutation,
+        { ...dataMocks.validCreditCard, CollectiveId: user.CollectiveId },
+        externalUser,
+      );
+
+      expect(result.errors[0].message).to.equal('You must be an admin of this Collective.');
     });
   });
 });
