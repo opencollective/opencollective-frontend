@@ -1628,51 +1628,6 @@ export default function(Sequelize, DataTypes) {
       .then(() => this.getTiers());
   };
 
-  /*
-   * Assumes:
-   * - only credit cards on stripe can be updated
-   */
-
-  Collective.prototype.editPaymentMethods = function(paymentMethods, defaultAttributes = {}) {
-    if (!paymentMethods) return Promise.resolve();
-    // We only allow editing of Stripe Payment Methods for the moment
-    // (to avoid marking other types as archived see issue #698)
-    return models.PaymentMethod.findAll({
-      where: {
-        CollectiveId: this.id,
-        archivedAt: { [Op.eq]: null },
-        service: 'stripe',
-        type: 'creditcard',
-      },
-    })
-      .then(oldPaymentMethods => {
-        // remove the paymentMethods that are not present anymore in the updated collective
-        const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
-        return models.PaymentMethod.update({ archivedAt: new Date() }, { where: { id: { [Op.in]: diff } } });
-      })
-      .then(() => {
-        return Promise.map(paymentMethods, pm => {
-          if (pm.id) {
-            return models.PaymentMethod.update(pm, { where: { id: pm.id } });
-          } else {
-            pm.CollectiveId = this.id;
-            pm.currency = pm.currency || this.currency;
-            models.PaymentMethod.update(
-              { primary: false },
-              {
-                where: { CollectiveId: this.id, archivedAt: { [Op.eq]: null } },
-              },
-            );
-            return models.PaymentMethod.createFromStripeSourceToken({
-              ...defaultAttributes,
-              ...pm,
-              type: 'creditcard',
-            }); // TODO: nicer to not have to hard code 'creditcard'
-          }
-        });
-      });
-  };
-
   Collective.prototype.getExpenses = function(status, startDate, endDate = new Date(), createdByUserId) {
     const where = {
       createdAt: { [Op.lt]: endDate },

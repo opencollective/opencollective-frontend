@@ -24,7 +24,7 @@ import * as libpayments from '../../../../server/lib/payments';
  * > randEmail('foo@bar.com')
  * 'foo-lwfi9uaq9ua@bar.com'
  */
-export function randEmail(email) {
+export function randEmail(email = 'test-user@emailprovider.com') {
   const [user, domain] = email.replace(/\s/g, '-').split('@');
   const rand = Math.random()
     .toString(36)

@@ -466,44 +466,24 @@ describe('createOrder', () => {
   it('creates an order as logged in user using saved credit card', async () => {
     // Given a user
     const xdamman = (await store.newUser('xdamman')).user;
-    // And the parameters for the query
-    const collectiveToEdit = {
-      id: xdamman.CollectiveId,
-      paymentMethods: [],
-    };
-    collectiveToEdit.paymentMethods.push({
+
+    // And that this user has a payment method saved
+    const pm = await models.PaymentMethod.create({
+      CollectiveId: xdamman.CollectiveId,
       name: '4242',
       service: 'stripe',
+      type: 'creditcard',
       token: 'tok_2B5j8xDjPFcHOcTm3ogdnq0K',
     });
-    // And then the collective is edited with the above data
-    let res;
-    const query = `
-      mutation editCollective($collective: CollectiveInputType!) {
-        editCollective(collective: $collective) {
-          id,
-          paymentMethods {
-            uuid
-            service
-            name
-          }
-        }
-      }
-      `;
-    res = await utils.graphqlQuery(query, { collective: collectiveToEdit }, xdamman);
-    res.errors && console.error(res.errors);
-    expect(res.errors).to.not.exist;
 
     // And the order is setup with the above data
     const order = cloneDeep(baseOrder);
     order.collective = { id: fearlesscitiesbrussels.id };
     order.fromCollective = { id: xdamman.CollectiveId };
-    order.paymentMethod = {
-      uuid: res.data.editCollective.paymentMethods[0].uuid,
-    };
+    order.paymentMethod = { uuid: pm.uuid };
 
     // When the order is created
-    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
+    const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
 
     // There should be no errors
     res.errors && console.error(res.errors);

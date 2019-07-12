@@ -178,6 +178,18 @@ export default {
     },
   },
 
+  validCreditCard: {
+    service: 'stripe',
+    name: '4242',
+    token: 'tok_visa',
+    data: {
+      brand: 'VISA',
+      funding: 'credit',
+      expMonth: 1,
+      expYear: 2022,
+    },
+  },
+
   activities1: {
     activities: [
       {

@@ -115,9 +115,6 @@ export async function createCollective(_, args, req) {
     collective.addUserWithRole(req.remoteUser, roles.ADMIN, {
       CreatedByUserId: req.remoteUser.id,
     }),
-    collective.editPaymentMethods(args.collective.paymentMethods, {
-      CreatedByUserId: req.remoteUser.id,
-    }),
   ];
 
   if (collectiveData.HostCollectiveId) {
@@ -429,16 +426,6 @@ export function editCollective(_, args, req) {
         CreatedByUserId: req.remoteUser.id,
       }),
     )
-    .then(() => {
-      // TODO Deprecated since 2019-02-06 - We now use specific graphql queries
-      if (args.collective.paymentMethods) {
-        return collective.editPaymentMethods(args.collective.paymentMethods, {
-          CreatedByUserId: req.remoteUser.id,
-        });
-      } else {
-        return collective;
-      }
-    })
     .then(() => {
       // Ask cloudflare to refresh the cache for this collective's page
       purgeCacheForPage(`/${collective.slug}`);

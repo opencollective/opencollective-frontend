@@ -1,14 +1,11 @@
-import sinon from 'sinon';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import models from '../server/models';
-import { appStripe } from '../server/paymentProviders/stripe/gateway';
 import * as expenses from '../server/graphql/v1/mutations/expenses';
 
 import * as utils from './utils';
 import * as store from './features/support/stores';
-import stripeMock from './mocks/stripe';
 
 describe('graphql.collective.test.js', () => {
   beforeEach(async () => {
@@ -809,128 +806,6 @@ describe('graphql.collective.test.js', () => {
       expect(res2.errors[0].message).to.equal(
         'You must be logged in as an admin or as the host of this organization collective to edit it',
       );
-    });
-
-    it('edit payment methods', async () => {
-      let query, res, paymentMethods;
-
-      sinon.stub(appStripe.customers, 'create').callsFake(() => Promise.resolve(stripeMock.customers.create));
-
-      const collective = {
-        id: pubnubCollective.id,
-        paymentMethods: [
-          {
-            service: 'stripe',
-            name: '4242',
-            token: 'tok_123456781234567812345678',
-            data: {
-              brand: 'VISA',
-              funding: 'credit',
-              expMonth: 1,
-              expYear: 2022,
-            },
-          },
-        ],
-      };
-
-      query = `
-    mutation editCollective($collective: CollectiveInputType!) {
-      editCollective(collective: $collective) {
-        id,
-        slug,
-        paymentMethods {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    `;
-
-      res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
-      res.errors && console.error(res.errors);
-      expect(res.errors).to.not.exist;
-
-      paymentMethods = res.data.editCollective.paymentMethods;
-
-      expect(paymentMethods).to.have.length(2);
-      expect(paymentMethods[1].uuid).to.have.length(36);
-      expect(paymentMethods[1].name).to.equal('4242');
-
-      // Adds another credit card
-      collective.paymentMethods[0].id = paymentMethods[1].id;
-      collective.paymentMethods.push({
-        name: '1212',
-        service: 'stripe',
-        token: 'tok_123456781234567812345678',
-      });
-
-      query = `
-    mutation editCollective($collective: CollectiveInputType!) {
-      editCollective(collective: $collective) {
-        id,
-        slug,
-        paymentMethods {
-          id
-          uuid
-          name
-        }
-      }
-    }
-    `;
-
-      res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
-      res.errors && console.error(res.errors);
-      expect(res.errors).to.not.exist;
-
-      paymentMethods = res.data.editCollective.paymentMethods;
-
-      expect(paymentMethods).to.have.length(3);
-      expect(paymentMethods[1].uuid).to.have.length(36);
-      expect(paymentMethods[1].name).to.equal('1212');
-      expect(paymentMethods[2].uuid).to.have.length(36);
-      expect(paymentMethods[2].name).to.equal('4242');
-
-      query = `
-    query Collective($slug: String) {
-      Collective(slug: $slug) {
-        paymentMethods {
-          uuid,
-          name
-        }
-      }
-    }`;
-
-      res = await utils.graphqlQuery(query, { slug: 'pubnub' }, pubnubAdmin);
-      res.errors && console.error(res.errors[0]);
-      expect(res.errors).to.not.exist;
-
-      paymentMethods = res.data.Collective.paymentMethods;
-      expect(paymentMethods).to.have.length(3);
-      expect(paymentMethods[1].uuid).to.have.length(36);
-      expect(paymentMethods[1].name).to.equal('1212');
-      expect(paymentMethods[2].uuid).to.have.length(36);
-      expect(paymentMethods[2].name).to.equal('4242');
-
-      // Should not return the credit cards if not logged in;
-      res = await utils.graphqlQuery(query, { slug: 'pubnub' });
-      res.errors && console.error(res.errors[0]);
-      expect(res.errors).to.not.exist;
-
-      paymentMethods = res.data.Collective.paymentMethods;
-      expect(paymentMethods).to.have.length(0);
-
-      // Shouldn't return the credit cards if not logged in as an admin of the collective
-      const { member } = await store.newUser('member');
-
-      res = await utils.graphqlQuery(query, { slug: 'pubnub' }, member);
-      res.errors && console.error(res.errors[0]);
-      expect(res.errors).to.not.exist;
-
-      paymentMethods = res.data.Collective.paymentMethods;
-      expect(paymentMethods).to.have.length(0);
-
-      appStripe.customers.create.restore();
     });
 
     it('apply to host', async () => {
