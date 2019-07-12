@@ -49,7 +49,7 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 4]}>
+    <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 5]}>
       <H3 fontSize="H2" lineHeight="H2" fontWeight="normal" textAlign="center" mb={5}>
         <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
       </H3>
@@ -132,4 +132,4 @@ SectionAbout.propTypes = {
   canEdit: PropTypes.bool,
 };
 
-export default SectionAbout;
+export default React.memo(SectionAbout);
