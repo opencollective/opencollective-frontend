@@ -17,18 +17,17 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
-  static getInitialProps({ query: { token, next, form } }) {
+  static getInitialProps({ query: { token, next } }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
       next = decodeURIComponent(next);
     }
 
     next = next && isValidRelativeUrl(next) ? next : null;
-    return { token, next, form: form || 'signin' };
+    return { token, next };
   }
 
   static propTypes = {
-    form: PropTypes.oneOf(['signin', 'create-account']).isRequired,
     token: PropTypes.string,
     next: PropTypes.string,
     login: PropTypes.func,
@@ -61,7 +60,7 @@ class SigninPage extends React.Component {
 
   async componentDidUpdate(oldProps) {
     const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
-    if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
+    if (wasConnected && !this.props.errorLoggedInUser) {
       // --- User logged in ---
       this.setState({ success: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
@@ -79,11 +78,11 @@ class SigninPage extends React.Component {
   }
 
   renderContent() {
-    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, LoggedInUser } = this.props;
 
     if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
-    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
+    } else if (!loadingLoggedInUser && LoggedInUser) {
       return (
         <MessageBox type="warning" withIcon>
           <FormattedMessage
@@ -96,7 +95,7 @@ class SigninPage extends React.Component {
     }
 
     const error = errorLoggedInUser || this.state.error;
-    console.log('>>> pages/signin form', form);
+
     return (
       <React.Fragment>
         {error && (
@@ -115,7 +114,7 @@ class SigninPage extends React.Component {
             />
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={next || '/'} form={form} routes={SigninPage.routes} />
+        <SignInOrJoinFree redirect={next || '/'} initialForm={'create-account'} routes={SigninPage.routes} />
       </React.Fragment>
     );
   }

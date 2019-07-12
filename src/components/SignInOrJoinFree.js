@@ -26,8 +26,8 @@ class SignInOrJoinFree extends React.Component {
     redirect: PropTypes.string,
     /** createUserQuery binding */
     createUser: PropTypes.func,
-    /** Use this prop to set the form to display */
-    form: PropTypes.oneOf(['signin', 'create-account']),
+    /** Use this prop to set the initial form to display */
+    initialForm: PropTypes.oneOf(['signin', 'create-account']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -36,7 +36,7 @@ class SignInOrJoinFree extends React.Component {
   };
 
   state = {
-    form: this.props.form || 'signin',
+    form: this.props.initialForm || 'signin',
     error: null,
     submitting: false,
     unknownEmailError: false,
@@ -107,8 +107,7 @@ class SignInOrJoinFree extends React.Component {
 
   render() {
     const { submitting, error, unknownEmailError, email } = this.state;
-    const displayedForm = this.props.form || this.state.form;
-    const routes = this.props.routes || {};
+    const displayedForm = this.state.form;
 
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
@@ -121,7 +120,7 @@ class SignInOrJoinFree extends React.Component {
           <SignIn
             email={email}
             onEmailChange={email => this.setState({ email })}
-            onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+            onSecondaryAction={() => this.switchForm('create-account')}
             onSubmit={this.signIn}
             loading={submitting}
             unknownEmail={unknownEmailError}
@@ -135,7 +134,7 @@ class SignInOrJoinFree extends React.Component {
                 onEmailChange={email => this.setState({ email })}
                 onPersonalSubmit={this.createProfile}
                 onOrgSubmit={this.createProfile}
-                onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
+                onSecondaryAction={() => this.switchForm('signin')}
                 submitting={submitting}
                 mx={[2, 4]}
               />
