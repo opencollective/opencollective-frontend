@@ -181,7 +181,7 @@ class ContributorCard extends React.PureComponent {
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
           {withCollectiveLink(
             <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900" title={name}>
-              {truncate(name, { length: 40 })}
+              {truncate(name, { length: 18 })}
             </P>,
           )}
           <P fontSize="Tiny" lineHeight="Caption" color="black.500">
@@ -210,8 +210,9 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
 
   // Preload more items when viewport width is unknown to avoid displaying blank spaces on SSR
   const viewWidth = viewport === VIEWPORTS.UNKNOWN ? width * 3 : width;
-  const paddingLeft = getPaddingLeft ? getPaddingLeft({ width, nbRows }) : 0;
-  const hasScroll = nbCols * COLLECTIVE_CARD_FULL_WIDTH + paddingLeft > width;
+  const rowWidth = nbCols * COLLECTIVE_CARD_FULL_WIDTH + COLLECTIVE_CARD_MARGIN_X;
+  const paddingLeft = getPaddingLeft ? getPaddingLeft({ width, rowWidth, nbRows }) : 0;
+  const hasScroll = rowWidth + paddingLeft > width;
 
   return (
     <FixedSizeGrid

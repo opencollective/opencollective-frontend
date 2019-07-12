@@ -1,5 +1,5 @@
 import { PropTypes } from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import HeroBackgroundMask from './HeroBackgroundMask.svg';
 
@@ -22,20 +22,6 @@ const HeroBackground = styled.div`
   width: 100%;
   max-width: 1368px; // Should match SVG's viewbox
   z-index: -1;
-  opacity: 1;
-  transition: opacity 0.25s cubic-bezier(0, 1, 0.5, 1);
-
-  /**
-   * We hide background like that for two reasons:
-   * 1. Removing the block would re-load the image when expending
-   * 2. It allows us to animate opacity (cannot do it with display: none)
-   */
-  ${props =>
-    !props.isDisplayed &&
-    css`
-      height: 0;
-      opacity: 0;
-    `}
 
   @supports (mask-size: cover) {
     background: ${props => generateBackground(props.theme, props.backgroundImage)};

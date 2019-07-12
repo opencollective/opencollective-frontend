@@ -249,9 +249,6 @@ class Event extends React.Component {
                 title={event.name}
                 LoggedInUser={LoggedInUser}
                 cta={{ label: 'tickets', href: '#tickets' }}
-                style={
-                  get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')
-                }
               />
 
               <div>

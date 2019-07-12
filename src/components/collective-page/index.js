@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { ThemeProvider } from 'styled-components';
 import { lighten, darken } from 'polished';
 
 // OC Frontend imports
 import theme, { generateTheme } from '../../constants/theme';
-import { debounceScroll } from '../../lib/ui-utils';
 import Container from '../Container';
+import CollectiveNavbar from '../CollectiveNavbar';
 
 // Collective page imports
-import { AllSectionsNames, Sections, Dimensions } from './_constants';
+import { AllSectionsNames, Sections } from './_constants';
 import Hero from './Hero';
 import SectionAbout from './SectionAbout';
 import SectionBudget from './SectionBudget';
@@ -58,6 +58,7 @@ class CollectivePage extends Component {
   constructor(props) {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
+    this.navbarRef = React.createRef();
     this.state = { isFixed: false, selectedSection: null };
   }
 
@@ -69,6 +70,10 @@ class CollectivePage extends Component {
   componentWillUnmount() {
     window.removeEventListener('scroll', this.onScroll);
   }
+
+  isAdmin = memoizeOne((LoggedInUser, collective) => {
+    return Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+  });
 
   getSections = memoizeOne((props, isAdmin) => {
     const { collective, host, stats, updates, transactions, expenses } = props;
@@ -96,35 +101,50 @@ class CollectivePage extends Component {
     return sections.filter(section => !sectionsToRemove.has(section));
   });
 
-  onScroll = debounceScroll(() => {
-    // Fixes the Hero when a certain scroll threshold is reached
-    if (window.scrollY >= theme.sizes.navbarHeight + Dimensions.HERO_FIXED_HEIGHT) {
-      if (!this.state.isFixed) {
-        this.setState({ isFixed: true });
-      }
-    } else if (this.state.isFixed) {
-      this.setState({ isFixed: false });
+  onScroll = throttle(() => {
+    // Ref may be null when NextJS hot reloads the page
+    if (!this.navbarRef.current) {
+      return;
     }
 
-    const distanceThreshold = 200;
+    let { isFixed, selectedSection } = this.state;
+
+    // Fixes the Hero when a certain scroll threshold is reached
+    if (this.navbarRef.current.getBoundingClientRect().top === 0) {
+      isFixed = true;
+    } else if (isFixed) {
+      isFixed = false;
+    }
+
+    // Get the currently selected section
+    const distanceThreshold = 300;
     const currentViewBottom = window.scrollY + window.innerHeight;
-    const sections = Object.keys(this.sectionsRefs);
+    const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
+    const sections = this.getSections(this.props, isAdmin);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
       if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
-        if (this.state.selectedSection !== sectionName) {
-          this.setState({ selectedSection: sectionName });
-        }
+        selectedSection = sectionName;
         break;
       }
     }
-  });
+
+    // Update the state only if necessary
+    if (this.state.isFixed !== isFixed || this.state.selectedSection !== selectedSection) {
+      this.setState({ isFixed, selectedSection });
+    }
+  }, 100);
 
   onSectionClick = sectionName => {
-    window.location.hash = `section-${sectionName}`;
-    const sectionTop = this.sectionsRefs[sectionName].offsetTop;
-    window.scrollTo(0, sectionTop - Dimensions.HERO_FIXED_HEIGHT);
+    window.scrollTo(0, this.sectionsRefs[sectionName].offsetTop - 75);
+    // Changing hash directly tends to make the page jump to the section without respect for
+    // the smooth scroll behaviour, so we try to use `history.pushState` if available
+    if (window.history.pushState) {
+      window.history.pushState(null, null, `#section-${sectionName}`);
+    } else {
+      window.location.hash = `#section-${sectionName}`;
+    }
   };
 
   onCollectiveClick = () => {
@@ -196,30 +216,39 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, LoggedInUser } = this.props;
+    const { LoggedInUser, collective, host } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const canEdit = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const sections = this.getSections(this.props, canEdit);
+    const isAdmin = this.isAdmin(LoggedInUser, collective);
+    const sections = this.getSections(this.props, isAdmin);
     const pageTheme = this.getTheme();
 
     return (
       <ThemeProvider theme={pageTheme}>
-        <Container borderTop="1px solid #E6E8EB" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
-          <Container height={Dimensions.HERO_PLACEHOLDER_HEIGHT}>
-            <Hero
+        <Container
+          position="relative"
+          borderTop="1px solid #E6E8EB"
+          css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+        >
+          <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
+          <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
+            <CollectiveNavbar
               collective={collective}
-              host={host}
               sections={sections}
-              canEdit={canEdit}
-              isFixed={collective.isArchived ? false : isFixed} // Never fix `Hero` for archived collectives as css `filter` breaks the fixed layout, see https://drafts.fxtf.org/filter-effects/#FilterProperty
-              selectedSection={selectedSection || sections[0]}
-              onSectionClick={this.onSectionClick}
+              selected={selectedSection || sections[0]}
               onCollectiveClick={this.onCollectiveClick}
+              hideInfos={!isFixed}
+              isAnimated={true}
+              onSectionClick={this.onSectionClick}
+              LinkComponent={({ section, label }) => (
+                <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
+                  {label}
+                </a>
+              )}
             />
           </Container>
           {sections.map(section => (
             <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-              {this.renderSection(section, canEdit)}
+              {this.renderSection(section, isAdmin)}
             </div>
           ))}
         </Container>

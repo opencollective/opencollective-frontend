@@ -17,12 +17,20 @@ class SendMoneyToCollectiveBtn extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     data: PropTypes.object,
     createOrder: PropTypes.func,
+    confirmTransfer: PropTypes.func,
+    isTransferApproved: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
     this.state = {};
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.isTransferApproved !== prevProps.isTransferApproved) {
+      this.onClick();
+    }
   }
 
   async onClick() {
@@ -72,7 +80,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
             }
           `}
         </style>
-        <SmallButton className="approve" bsStyle="success" onClick={this.onClick}>
+        <SmallButton className="approve" bsStyle="success" onClick={this.props.confirmTransfer}>
           {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
           {!this.state.loading && (
             <FormattedMessage

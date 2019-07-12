@@ -46,10 +46,7 @@ class CollectiveCard extends React.Component {
       }
     }
 
-    const coverStyle =
-      get(collective, 'settings.style.hero.cover') ||
-      get(collective.parentCollective, 'settings.style.hero.cover') ||
-      {};
+    const coverStyle = {};
     const backgroundImage = imagePreview(
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage'),
       defaultBackgroundImage['COLLECTIVE'],
