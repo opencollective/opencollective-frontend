@@ -122,13 +122,13 @@ class SubscriptionCard extends React.Component {
     const { intl, LoggedInUser, subscription } = this.props;
     const { collective } = subscription;
 
-    const coverStyle = { ...get(collective, 'settings.style.hero.cover') };
     const backgroundImage = imagePreview(
       collective.backgroundImage,
       collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type],
       { width: 400 },
     );
-    if (!coverStyle.backgroundImage && backgroundImage) {
+    const coverStyle = {};
+    if (backgroundImage) {
       coverStyle.backgroundImage = `url('${backgroundImage}')`;
       coverStyle.backgroundSize = 'cover';
       coverStyle.backgroundPosition = 'center center';
