@@ -37,7 +37,6 @@ class ExpenseDetails extends React.Component {
         id: 'expense.payoutMethod.paypal.hidden',
         defaultMessage: 'PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})',
       },
-      // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
       other: {
         id: 'expense.payoutMethod.manual',
         defaultMessage: 'Other (see instructions)',
@@ -78,7 +77,9 @@ class ExpenseDetails extends React.Component {
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
     const paypalEmail = get(expense, 'user.paypalEmail') || get(expense, 'user.email');
-    const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], {
+    // Don't display "donation" unless it's the current payoutMethod (phasing out)
+    const payoutMethods = expense.payoutMethod === 'donation' ? ['paypal', 'other', 'donation'] : ['paypal', 'other'];
+    const payoutMethodOptions = this.getOptions(payoutMethods, {
       paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
     });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
@@ -286,7 +287,7 @@ class ExpenseDetails extends React.Component {
               <InputField
                 name="payoutMethod"
                 type="select"
-                options={payoutMethods}
+                options={payoutMethodOptions}
                 defaultValue={expense.payoutMethod}
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
               />

@@ -43,10 +43,6 @@ class CreateExpenseForm extends React.Component {
         id: 'expense.payoutMethod.manual',
         defaultMessage: 'Other (see instructions)',
       },
-      donation: {
-        id: 'expense.payoutMethod.donation',
-        defaultMessage: 'Donation',
-      },
       'error.descriptionMissing': {
         id: 'expense.error.descriptionMissing',
         defaultMessage: 'Missing description',
@@ -177,7 +173,7 @@ class CreateExpenseForm extends React.Component {
     const { LoggedInUser, intl, collective } = this.props;
     const { expense } = this.state;
 
-    const payoutMethods = this.getOptions(['paypal', 'other', 'donation'], {
+    const payoutMethodOptions = this.getOptions(['paypal', 'other'], {
       paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']),
     });
 
@@ -440,7 +436,7 @@ class CreateExpenseForm extends React.Component {
               <InputField
                 type="select"
                 name="payoutMethod"
-                options={payoutMethods}
+                options={payoutMethodOptions}
                 defaultValue={expense.payoutMethod}
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
               />
