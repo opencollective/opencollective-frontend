@@ -80,7 +80,7 @@
     "node-fetch": "2.6.0",
     "node-slack": "0.0.7",
     "nodemailer": "6.2.1",
-    "p-queue": "6.0.2",
+    "p-queue": "6.1.0",
     "passport": "0.4.0",
     "passport-github": "1.1.0",
     "passport-meetup-oauth2": "0.0.2",
