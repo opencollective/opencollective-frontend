@@ -21,7 +21,7 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
 describe('new expense when logged out', () => {
   it('requires to login to submit an expense', () => {
     cy.visit('/testcollective/expenses');
-    cy.get('a.submitExpense.darkBackground')
+    cy.get('.Button.submitExpense.darkBackground')
       .contains('Submit Expense')
       .click({ force: true });
     cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
