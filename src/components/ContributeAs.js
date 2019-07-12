@@ -28,7 +28,7 @@ const ContributeAsEntryContainer = styled(Container)`
 `;
 
 const messages = defineMessages({
-  anonymous: { id: 'profile.anonymous', defaultMessage: 'anonymous' },
+  incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
   'org.new': { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
   'org.name': { id: 'contributeAs.org.name', defaultMessage: 'Organization Name' },
   'org.website': { id: 'contributeAs.org.website', defaultMessage: 'Website' },
@@ -49,8 +49,8 @@ const useForm = ({ onProfileChange }) => {
         }
       }
 
-      if (selected.key === 'anonymous') {
-        const userData = { name: 'anonymous', type: 'USER', isAnonymous: true };
+      if (selected.key === 'incognito') {
+        const userData = { name: 'incognito', type: 'USER', isAnonymous: true };
         setState({ ...state, ...userData, ...omit(state, ['errors']) });
         return onProfileChange(userData);
       }
@@ -135,10 +135,10 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
 
   const options = uniqBy([personal, ...profiles], 'id');
 
-  // if the user doesn't have an anonymous profile yet, we offer to create one
-  const anonymousProfile = options.find(p => p.type === 'USER' && p.isAnonymous);
-  if (!anonymousProfile) {
-    options.push({ id: 'anonymous', type: 'USER', isAnonymous: true, name: intl.formatMessage(messages['anonymous']) });
+  // if the user doesn't have an incognito profile yet, we offer to create one
+  const incognitoProfile = options.find(p => p.type === 'USER' && p.isAnonymous);
+  if (!incognitoProfile) {
+    options.push({ id: 'incognito', type: 'USER', isAnonymous: true, name: intl.formatMessage(messages['incognito']) });
   }
 
   options.push({ id: 'org.new', type: 'ORGANIZATION', name: intl.formatMessage(messages['org.new']) });
@@ -188,8 +188,8 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             {value.type !== 'USER' && value.slug && <Logo collective={value} height="3.6rem" />}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>
-                {value.isAnonymous && <FormattedMessage id="profile.anonymous" defaultMessage="anonymous" />}
-                {!value.isAnonymous && get(value, 'name', intl.formatMessage(messages['anonymous']))}
+                {value.isAnonymous && <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
+                {!value.isAnonymous && get(value, 'name', intl.formatMessage(messages['incognito']))}
               </P>
               {!value.isAnonymous && value.type && (
                 <P fontSize="Caption" lineHeight="Caption" color="black.500">
@@ -207,9 +207,8 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
               {value.isAnonymous && (
                 <P fontSize="Caption" lineHeight="Caption" color="black.500">
                   <FormattedMessage
-                    id="profile.anonymous.description"
+                    id="profile.incognito.description"
                     defaultMessage="Keep my contribution private (see FAQ for more info)"
-                    values={{ email: value.email }}
                   />
                 </P>
               )}
@@ -287,7 +286,7 @@ ContributeAs.propTypes = {
   /**
    * emits latest selected profile
    *
-   *  - if anonymous is selected, only `{name: 'anonymous', type: 'USER', isAnonymous: true}` is returned
+   *  - if incognito is selected, only `{name: 'incognito', type: 'USER', isAnonymous: true}` is returned
    *  - if 'A new organization' is selected, the latest data from that form is returned
    *  - else the data passed to `profiles` or `personal` is returned
    */

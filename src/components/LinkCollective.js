@@ -25,8 +25,8 @@ const LinkCollective = ({
   isNewVersion,
   ...props
 }) => {
-  if (type === 'USER' && (!name || name === 'anonymous' || isAnonymous)) {
-    return children || <FormattedMessage id="profile.anonymous" defaultMessage="anonymous" />;
+  if (type === 'USER' && (!name || isAnonymous)) {
+    return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
     <Link
