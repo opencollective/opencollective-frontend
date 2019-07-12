@@ -217,7 +217,7 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
 /**
  * Check if user is logged in by searching for its username in navbar
  */
-Cypress.Commands.add('assertLoggedIn', (username, timeout) => {
+Cypress.Commands.add('assertLoggedIn', (username, timeout = 5000) => {
   cy.log('Ensure user is logged in');
   const loginSection = cy.get('.LoginTopBarProfileButton-name', { timeout });
   if (username) {
