@@ -6,12 +6,13 @@
 /* Test libraries */
 import sinon from 'sinon';
 import uuidv4 from 'uuid/v4';
-import * as utils from '../../../utils';
 
 /* Libraries that create the objects */
-import models from '../../../../server/models';
-import * as expenses from '../../../../server/graphql/v1/mutations/expenses';
-import * as libpayments from '../../../../server/lib/payments';
+import models from '../../server/models';
+import * as expenses from '../../server/graphql/v1/mutations/expenses';
+import * as libpayments from '../../server/lib/payments';
+
+import * as utils from '../utils';
 
 /** Randomize email since it's a unique key in the database
  *

@@ -1,11 +1,12 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import sinon from 'sinon';
+
 import * as payments from '../server/lib/payments';
+import models from '../server/models';
 
 import * as utils from './utils';
-import models from '../server/models';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 describe('Query Tests', () => {
   let user1, user2, host, collective1, collective2, tier1, ticket1, sandbox;

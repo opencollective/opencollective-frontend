@@ -55,21 +55,7 @@ jobs:
       - <<: *persist_cache
       - run: npm run prettier:check
 
-  test-bdd:
-    docker:
-      - image: circleci/node:11.8.0
-      - image: circleci/postgres:9.6.8-alpine-postgis-ram
-    environment:
-      - <<: *test_env
-    steps:
-      - checkout
-      - <<: *restore_cache
-      - run: npm ci
-      - run: npm run db:setup
-      - <<: *persist_cache
-      - run: npm run test:bdd
-
-  test-unit:
+  test:
     docker:
       - image: circleci/node:11.8.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
@@ -84,7 +70,7 @@ jobs:
       - run: npm ci
       - run: npm run db:setup
       - <<: *persist_cache
-      - run: npm run test:unit
+      - run: npm run test
       - run: npm run test:coverage
       - store_test_results:
           path: /tmp/circleci-test-results
@@ -97,7 +83,5 @@ workflows:
           <<: *test_filters
       - prettier:
           <<: *test_filters
-      - test-bdd:
-          <<: *test_filters
-      - test-unit:
+      - test:
           <<: *test_filters

@@ -1,13 +1,14 @@
 /* Test utilities */
 import { expect } from 'chai';
-import * as utils from './utils';
-import * as store from './features/support/stores';
 
 /* Support code */
 import models from '../server/models';
 
 /* Code being tested */
 import * as libtransactions from '../server/lib/transactions';
+
+import * as utils from './utils';
+import * as store from './stores';
 
 describe('lib.transactions.test.js', () => {
   beforeEach(utils.resetTestDB);

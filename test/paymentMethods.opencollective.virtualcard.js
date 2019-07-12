@@ -1,17 +1,20 @@
 // Test tools
-import app from '../server/index';
+
 import sinon from 'sinon';
 import moment from 'moment';
 import nock from 'nock';
 import request from 'supertest-as-promised';
 import { expect } from 'chai';
-import * as utils from './utils';
+
+import app from '../server/index';
 import models from '../server/models';
 import virtualcard from '../server/paymentProviders/opencollective/virtualcard';
-import * as store from './features/support/stores';
 import emailLib from '../server/lib/email';
-import initNock from './paymentMethods.opencollective.virtualcard.nock';
 import { maxInteger } from '../server/constants/math';
+
+import * as utils from './utils';
+import * as store from './stores';
+import initNock from './paymentMethods.opencollective.virtualcard.nock';
 
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;

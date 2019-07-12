@@ -9,7 +9,7 @@ import Index from 'algoliasearch/src/Index';
 
 // Internal testing tools
 import * as utils from './utils';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 describe('graphql.search.test.js', () => {
   let sandbox;
