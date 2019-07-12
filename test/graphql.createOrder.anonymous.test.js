@@ -113,6 +113,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].fromCollective.createdByUser.firstName).to.be.null;
       expect(collectiveData.members[0].member.createdByUser.firstName).to.equal('admin');
       expect(collectiveData.members[1].member.createdByUser.firstName).to.equal('backer');
+      expect(collectiveData.members[2].member.slug).to.be.null;
       expect(collectiveData.members[2].member.createdByUser.firstName).to.be.null;
       expect(collectiveData.members[2].member.createdByUser.email).to.be.null;
       expect(collectiveData.members[3].member.createdByUser.firstName).to.equal('host');
@@ -142,12 +143,27 @@ describe('grahpql.createOrder.opencollective', () => {
 
       expect(collectiveData.members[0].member.createdByUser.firstName).to.equal('admin');
       expect(collectiveData.members[1].member.createdByUser.firstName).to.equal('backer');
+      expect(collectiveData.members[2].member.slug).to.be.null;
       expect(collectiveData.members[2].member.createdByUser.firstName).to.be.null;
       expect(collectiveData.members[2].member.createdByUser.email).to.be.null;
       expect(collectiveData.members[3].member.createdByUser.firstName).to.equal('host');
       expect(collectiveData.transactions[0].createdByUser.firstName).to.be.null;
       expect(collectiveData.transactions[0].createdByUser.lastName).to.be.null;
       expect(collectiveData.transactions[0].createdByUser.email).to.be.null;
+    });
+
+    it('expose anonymous slug to the owner of the anonymous collective', async () => {
+      const res = await utils.graphqlQuery(
+        getCollectiveQuery,
+        {
+          slug: collective.slug,
+        },
+        user,
+      );
+      res.errors && console.error(res.errors[0]);
+      expect(res.errors).to.not.exist;
+      const collectiveData = res.data.Collective;
+      expect(collectiveData.members[2].member.slug).to.not.be.null;
     });
 
     it('expose anonymous email to the collective admin', async () => {
@@ -170,6 +186,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].fromCollective.createdByUser.email).to.equal(user.email);
       expect(collectiveData.members[0].member.createdByUser.firstName).to.equal('admin');
       expect(collectiveData.members[1].member.createdByUser.firstName).to.equal('backer');
+      expect(collectiveData.members[2].member.slug).to.be.null;
       expect(collectiveData.members[2].member.createdByUser.firstName).to.equal('u');
       expect(collectiveData.members[2].member.createdByUser.lastName).to.equal('ser');
       expect(collectiveData.members[2].member.createdByUser.email).to.equal(user.email);
@@ -199,6 +216,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].fromCollective.createdByUser.email).to.equal(user.email);
       expect(collectiveData.members[0].member.createdByUser.firstName).to.equal('admin');
       expect(collectiveData.members[1].member.createdByUser.firstName).to.equal('backer');
+      expect(collectiveData.members[2].member.slug).to.be.null;
       expect(collectiveData.members[2].member.createdByUser.firstName).to.equal('u');
       expect(collectiveData.members[2].member.createdByUser.lastName).to.equal('ser');
       expect(collectiveData.members[2].member.createdByUser.email).to.equal(user.email);
