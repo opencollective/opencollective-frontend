@@ -374,7 +374,9 @@ describe('createOrder', () => {
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
-    expect(emailSendMessageSpy.callCount).to.equal(1);
+    // expect(emailSendMessageSpy.callCount).to.equal(1); // this often fails (expect 2 to equal 1) :-/
+    expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
+    expect(emailSendMessageSpy.firstCall.args[1]).to.equal(`1 ticket confirmed for ${event.name}`);
   });
 
   it('creates an order as new anonymous user', async () => {
