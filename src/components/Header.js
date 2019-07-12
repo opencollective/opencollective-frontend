@@ -25,7 +25,7 @@ class Header extends React.Component {
     const defaultImage = image ? image : 'https://opencollective.com/static/images/opencollectiveicon-240x240@2x.png';
     const meta = {
       'twitter:site': '@opencollect',
-      'twitter:creator': twitterHandle ? `@${twitterHandle}` : ' ',
+      'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
       'fb:app_id': '266835577107099',
       'og:image': defaultImage,
       description: truncate(description, 256),
