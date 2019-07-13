@@ -326,9 +326,9 @@ class MenuBar extends React.Component {
         </style>
         {this.state.sticky && stickyCTA && cta}
         {!collective.isArchived && ['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 && (
-          <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
+          <Link className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-          </Button>
+          </Link>
         )}
 
         {LoggedInUser &&
@@ -338,9 +338,9 @@ class MenuBar extends React.Component {
             <div>
               <div className="item editCollective">
                 <AddFundsModal />
-                <Link className="addFunds darkBackground" onClick={() => this.setState({ showAddFunds: true })}>
+                <Button className="addFunds darkBackground" onClick={() => this.setState({ showAddFunds: true })}>
                   <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
-                </Link>
+                </Button>
               </div>
             </div>
           )}
