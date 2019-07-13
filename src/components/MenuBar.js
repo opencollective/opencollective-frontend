@@ -338,9 +338,9 @@ class MenuBar extends React.Component {
             <div>
               <div className="item editCollective">
                 <AddFundsModal />
-                <Button className="addFunds darkBackground" onClick={() => this.setState({ showAddFunds: true })}>
+                <Link className="addFunds darkBackground" onClick={() => this.setState({ showAddFunds: true })}>
                   <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
-                </Button>
+                </Link>
               </div>
             </div>
           )}
