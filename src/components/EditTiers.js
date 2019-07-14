@@ -104,6 +104,10 @@ class EditTiers extends React.Component {
         id: 'tier.goal.label',
         defaultMessage: 'Goal',
       },
+      'button.label': {
+        id: 'tier.button.label',
+        defaultMessage: 'Button text',
+      },
       'goal.description': {
         id: 'tier.goal.description',
         defaultMessage: 'The amount that you are trying to raise with this tier',
@@ -223,6 +227,11 @@ class EditTiers extends React.Component {
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: tier => ['TICKET', 'PRODUCT', 'TIER'].indexOf(tier.type) !== -1,
+      },
+      {
+        name: 'button',
+        type: 'text',
+        label: intl.formatMessage(this.messages['button.label']),
       },
     ];
 
