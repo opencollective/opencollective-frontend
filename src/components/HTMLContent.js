@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { getLuminance } from 'polished';
+import styled, { css } from 'styled-components';
 
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
@@ -38,6 +39,7 @@ const HTMLContent = styled(({ content, ...props }) => {
 })`
   /** Override global styles to match what we have in the editor */
   width: 100%;
+  line-height: 1.75em;
 
   h1,
   h2,
@@ -63,11 +65,11 @@ const HTMLContent = styled(({ content, ...props }) => {
 
   ul {
     padding: 0;
-    padding-left: 2.5em;
+    padding-left: 1.5em;
     position: relative;
 
     @media (max-width: 40em) {
-      padding-left: 1.5em;
+      padding-left: 1.25em;
     }
 
     li {
@@ -89,6 +91,37 @@ const HTMLContent = styled(({ content, ...props }) => {
       }
     }
   }
+
+  // Apply custom theme if the color is safe to apply
+
+  ${props => {
+    let primaryColor = props.theme.colors.primary[500];
+    let secondaryColor = props.theme.colors.primary[100];
+    const luminance = getLuminance(primaryColor);
+
+    if (luminance < 0 || luminance > 0.9) {
+      return null;
+    } else if (luminance < 0.05) {
+      primaryColor = props.theme.colors.primary[400];
+      secondaryColor = props.theme.colors.primary[100];
+    } else if (luminance > 0.75) {
+      primaryColor = props.theme.colors.primary[900];
+      secondaryColor = props.theme.colors.primary[500];
+    }
+
+    return css`
+      a {
+        color: ${primaryColor};
+        &:hover {
+          color: ${secondaryColor};
+        }
+      }
+
+      ul li::before {
+        border-color: ${primaryColor};
+      }
+    `;
+  }}
 `;
 
 HTMLContent.propTypes = {

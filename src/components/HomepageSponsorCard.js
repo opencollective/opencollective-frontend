@@ -48,8 +48,13 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
       </P>
     </Container>
     <P textAlign="center" px={2} pb={3} fontSize={['1.3rem', '1.3rem', '1.4rem']}>
-      <FormattedMessage id="home.contributed" defaultMessage="contributed" />{' '}
-      <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />
+      <FormattedMessage
+        id="ContributedAmount"
+        defaultMessage="Contributed {amount}"
+        values={{
+          amount: <Currency fontWeight="bold" value={totalDonations} currency={currency} precision={0} abbreviate />,
+        }}
+      />
     </P>
   </Container>
 );

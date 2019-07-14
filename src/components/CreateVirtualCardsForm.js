@@ -400,7 +400,7 @@ class CreateVirtualCardsForm extends Component {
                 defaultMessage="Limit to collectives hosted by the {openSourceCollectiveLink}"
                 values={{
                   openSourceCollectiveLink: (
-                    <Link route="collective" params={{ slug: 'opensourcecollective' }}>
+                    <Link route="collective" params={{ slug: 'opensource' }}>
                       Open Source Collective 501c6 (Non Profit)
                     </Link>
                   ),

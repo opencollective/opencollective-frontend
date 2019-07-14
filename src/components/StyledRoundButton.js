@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import StyledButton from './StyledButton';
@@ -6,12 +5,10 @@ import StyledButton from './StyledButton';
 /**
  * A round button with content centered. Accepts all props from `StyledButton`
  */
-const StyledRoundButton = styled(({ size, ...props }) => (
-  <StyledButton display="flex" width={size} height={size} p={0} {...props} />
-))`
-  justify-content: center;
-  align-items: center;
-`;
+const StyledRoundButton = styled(StyledButton).attrs({
+  p: 0,
+  textAlign: 'center',
+})``;
 
 StyledRoundButton.propTypes = {
   /** From styled-system: accepts any css 'width' value */
@@ -22,4 +19,5 @@ StyledRoundButton.defaultProps = {
   size: 42,
 };
 
+/** @component */
 export default StyledRoundButton;
