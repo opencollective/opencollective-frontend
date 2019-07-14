@@ -7,8 +7,7 @@
   },
   "private": true,
   "engines": {
-    "node": "11.8.0",
-    "npm": "6.5.0"
+    "node": "10.x"
   },
   "dependencies": {
     "@babel/runtime": "7.4.5",
@@ -110,36 +109,37 @@
   },
   "scripts": {
     "start": "node dist/server",
-    "dev": "babel-node src/server",
+    "dev": "babel-node server",
     "build": "npm-run-all build:updates build:clean build:next build:server",
-    "build:clean": "shx rm -rf dist src/.next",
+    "build:clean": "shx rm -rf dist .next",
     "build:langs": "npm run langs:update",
     "build:updates": "npm --prefix node_modules/cloudflare-ip run update-list",
     "build:next": "cross-env scripts/build_next.sh",
     "build:server": "cross-env scripts/build_server.sh",
     "test": "npm run test:jest && npm run test:e2e",
-    "test:jest": "cross-env TZ=UTC jest src/*",
-    "test:e2e": "cross-env TZ=UTC scripts/run_e2e_tests.sh",
+    "test:jest": "cross-env TZ=UTC jest components lib pages",
+    "test:e2e": "cross-env TZ=UTC ./scripts/run_e2e_tests.sh",
     "test:update": "npm run test:jest -- --updateSnapshot",
-    "deploy:production": "cross-env scripts/pre-deploy.sh production && git push production master",
-    "deploy:staging": "cross-env scripts/pre-deploy.sh staging && git push -f staging master",
-    "git:clean": "cross-env scripts/git_clean.sh",
-    "lint": "eslint \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
+    "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production master",
+    "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging master",
+    "git:clean": "cross-env ./scripts/git_clean.sh",
+    "lint": "eslint \"*.js\" \"@(components|lib|pages|scripts|server|test)/**/*.js\"",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
     "pretest": "npm-run-all lint:quiet prettier:check",
     "langs:update": "npm-run-all build:clean langs:build langs:translate",
-    "langs:build": "babel src --only \"src/components/*,src/lib/*,src/pages/*\" --out-dir dist --delete-dir-on-start",
+    "langs:build": "babel . --only \"components/*,lib/*,pages/*\" --out-dir dist --delete-dir-on-start",
     "langs:translate": "babel-node scripts/translate.js",
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "cypress": "cross-env TZ=UTC cypress run",
     "cypress:open": "cross-env TZ=UTC cypress open",
-    "prettier": "prettier \"*.@(js|json|md)\" \"cypress/**/*.@(js|json|md)\" \"src/**/*.@(js|json|md)\" \"test/**/*.@(js|json|md)\"",
+    "prettier": "prettier \"*.@(js|json|md)\" \"@(components|lib|pages|scripts|server|test)/**/*.@(js|json|md)\"",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
-    "graphql:get-schema": "npx graphql-cli get-schema -p opencollective -e dev && prettier src/graphql/schema.graphql --write",
+    "graphql:get-schema": "npm run graphql:update",
+    "graphql:update": "npx graphql-cli get-schema -p opencollective -e dev && prettier lib/graphql/schema.graphql --write",
     "styleguide:dev": "styleguidist server",
     "styleguide:build": "styleguidist build",
     "styleguide:deploy": "npm run styleguide:build && npx now styleguide && npx now alias -A styleguide/now.json"
@@ -198,9 +198,9 @@
       "<rootDir>/test/setup.js"
     ],
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/__fixtures__/",
-      ".history"
+      "/.next/",
+      "/dist/",
+      "/node_modules/"
     ]
   },
   "config": {

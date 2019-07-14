@@ -1,4 +1,4 @@
-import '../src/env';
+import '../env';
 
 import 'raf/polyfill';
 

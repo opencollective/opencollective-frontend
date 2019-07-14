@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { ThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
-
-import StripeProvider from '../src/components/StripeProvider';
-import theme from '../src/constants/theme';
 import { IntlProvider } from 'react-intl';
+
+import StripeProvider from '../components/StripeProvider';
+import theme from '../lib/constants/theme';
 
 const STRIPE_KEY = process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB';
 

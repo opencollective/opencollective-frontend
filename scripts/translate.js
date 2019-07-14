@@ -4,7 +4,7 @@ import { sync as mkdirpSync } from 'mkdirp';
 import { orderBy, difference, has } from 'lodash';
 
 const MESSAGES_PATTERN = './dist/messages/**/*.json';
-const LANG_DIR = './src/lang/';
+const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
 
 // Aggregates the default messages that were extracted from the app's
@@ -16,7 +16,7 @@ const defaultMessages = globSync(MESSAGES_PATTERN)
   .map(file => JSON.parse(file))
   .reduce((collection, descriptors) => {
     descriptors.forEach(({ id, defaultMessage }) => {
-      if (collection.hasOwnProperty(id)) {
+      if (Object.prototype.hasOwnProperty.call(collection, id)) {
         if (collection[id] !== defaultMessage) {
           console.error(`🛑 [Error] Duplicate message id with different messages: ${id}`);
         }
