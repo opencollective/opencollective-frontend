@@ -286,6 +286,10 @@ export const TierInputType = new GraphQLInputObjectType({
       type: GraphQLInt,
       description: 'amount in the lowest unit of the currency of the host (ie. in cents)',
     },
+    button: {
+      type: GraphQLString,
+      description: 'Button text'
+    },
     currency: { type: GraphQLString },
     presets: { type: new GraphQLList(GraphQLInt) },
     interval: { type: GraphQLString },
