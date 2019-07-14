@@ -4,5 +4,5 @@
 !scripts
 !package.json
 !package-lock.json
-src/.next
-src/**/__tests__/*
+.next
+**/__tests__/*

@@ -1,2 +1,2 @@
-src/static/*
-src/.next/*
+static/*
+.next/*

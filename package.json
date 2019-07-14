@@ -7,8 +7,7 @@
   },
   "private": true,
   "engines": {
-    "node": "11.8.0",
-    "npm": "6.5.0"
+    "node": "10.x"
   },
   "dependencies": {
     "@babel/runtime": "7.4.5",
@@ -110,21 +109,21 @@
   },
   "scripts": {
     "start": "node dist/server",
-    "dev": "babel-node src/server",
+    "dev": "babel-node server",
     "build": "npm run build:updates && npm run build:clean && npm run build:next && npm run build:server",
-    "build:clean": "rm -rf dist src/.next",
-    "build:langs": "rm -rf dist/messages && babel src/**/*.js src/**/**/*.js > /dev/null && babel-node scripts/translate.js",
+    "build:clean": "rm -rf dist .next",
+    "build:langs": "rm -rf dist/messages && babel ./ --only \"components/*,lib/*,pages/*\" > /dev/null && babel-node scripts/translate.js",
     "build:updates": "npm --prefix node_modules/cloudflare-ip run update-list",
     "build:next": "./scripts/build_next.sh",
     "build:server": "./scripts/build_server.sh",
     "test": "npm run test:jest && npm run test:e2e",
-    "test:jest": "TZ=UTC jest src/*",
+    "test:jest": "TZ=UTC jest components lib pages",
     "test:e2e": "TZ=UTC ./scripts/run_e2e_tests.sh",
     "test:update": "npm run test:jest -- --updateSnapshot",
     "deploy:production": "./scripts/pre-deploy.sh production && git push production master",
     "deploy:staging": "./scripts/pre-deploy.sh staging && git push -f staging master",
     "git:clean": "./scripts/git_clean.sh",
-    "lint": "eslint \"cypress/**/*.js\" \"src/**/*.js\" \"test/**/*.js\"",
+    "lint": "eslint \"*.js\" \"@(components|lib|pages|scripts|server|test)/**/*.js\"",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
     "pretest": "npm run lint:quiet && npm run prettier:check",
@@ -132,11 +131,11 @@
     "semantic-release": "semantic-release",
     "cypress": "TZ=UTC cypress run",
     "cypress:open": "TZ=UTC cypress open",
-    "prettier": "prettier \"*.@(js|json|md)\" \"cypress/**/*.@(js|json|md)\" \"src/**/*.@(js|json|md)\" \"test/**/*.@(js|json|md)\"",
+    "prettier": "prettier \"*.@(js|json|md)\" \"@(components|lib|pages|scripts|server|test)/**/*.@(js|json|md)\"",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
-    "graphql:get-schema": "npx graphql-cli get-schema -p opencollective -e dev && prettier src/graphql/schema.graphql --write",
+    "graphql:get-schema": "npx graphql-cli get-schema -p opencollective -e dev && prettier lib/graphql/schema.graphql --write",
     "styleguide:dev": "styleguidist server",
     "styleguide:build": "styleguidist build",
     "styleguide:deploy": "npm run styleguide:build && npx now styleguide && npx now alias -A styleguide/now.json"
@@ -191,9 +190,9 @@
       "<rootDir>/test/setup.js"
     ],
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/__fixtures__/",
-      ".history"
+      "/.next/",
+      "/dist/",
+      "/node_modules/"
     ]
   },
   "config": {

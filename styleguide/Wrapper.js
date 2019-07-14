@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
-
-import StripeProvider from '../src/components/StripeProvider';
-import theme from '../src/constants/theme';
 import { IntlProvider } from 'react-intl';
+
+import StripeProvider from '../components/StripeProvider';
+import theme from '../lib/constants/theme';
 
 const StyleguideGlobalStyles = createGlobalStyle`
   body {

@@ -1,7 +1,7 @@
 files:
-  - source: /src/lang/en.json
-    translation: /src/lang/%two_letters_code%.json
-  - source: /src/static/**/*.html
+  - source: /lang/en.json
+    translation: /lang/%two_letters_code%.json
+  - source: /static/**/*.html
     ignore:
       - '*.test.html'
       - '*.fr.html'
