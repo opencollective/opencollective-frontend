@@ -14,7 +14,7 @@ const apolloClient = initClient();
 
 describe('Expenses component', () => {
   const host = {
-    slug: 'opensource',
+    slug: 'opensourcecollective',
     currency: 'USD',
     paymentMethods: [
       {

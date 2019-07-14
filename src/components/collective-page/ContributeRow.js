@@ -38,7 +38,7 @@ class ContributeRow extends React.PureComponent {
         {(ref, Chevrons) => (
           <div>
             <ContainerSectionContent>
-              <Flex justifyContent="space-between" alignItems="center" mb={3}>
+              <Flex justifyContent="space-between" alignItems="center" mb={3} px={3}>
                 <H3 fontSize="H5" fontWeight="normal" color="black.900">
                   {title}
                 </H3>

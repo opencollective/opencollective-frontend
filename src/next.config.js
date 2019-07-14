@@ -1,5 +1,3 @@
-import './env';
-
 import withCSS from '@zeit/next-css';
 import { get } from 'lodash';
 
@@ -18,11 +16,11 @@ const nextConfig = {
       // Will be replaced by webpack by their values!
       new webpack.EnvironmentPlugin({
         API_KEY: null,
-        API_URL: null,
-        INVOICES_URL: null,
-        GIFTCARDS_GENERATOR_URL: null,
+        API_URL: 'https://api.opencollective.com',
+        INVOICES_URL: 'https://invoices.opencollective.com',
+        GIFTCARDS_GENERATOR_URL: 'https://giftcards-generator.opencollective.com',
         DYNAMIC_IMPORT: true,
-        WEBSITE_URL: null,
+        WEBSITE_URL: 'https://opencollective.com',
       }),
     );
 

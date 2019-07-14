@@ -1,48 +1,62 @@
+import React from 'react';
 import { PropTypes } from 'prop-types';
 import styled from 'styled-components';
+import { backgroundImage } from 'styled-system';
+import { fadeIn } from '../../constants/animations.js';
 
 import HeroBackgroundMask from './HeroBackgroundMask.svg';
 
-const generateBackground = (theme, backgroundImage) => {
-  const color = theme.colors.primary[300];
-  const gradient = `linear-gradient(10deg, ${theme.colors.primary[700]}, ${theme.colors.primary[100]})`;
-  const defaultBackground = `${gradient}, ${color}`;
-  return backgroundImage ? `url(${backgroundImage}), ${defaultBackground}` : defaultBackground;
-};
+const BackgroundContainer = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #145ecc;
+  z-index: -1;
+  animation: ${fadeIn};
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+
+  @supports (mask-size: contain) {
+    ${backgroundImage}
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    mask-image: url(${HeroBackgroundMask});
+    mask-size: 100% 35%;
+    mask-repeat: no-repeat;
+    mask-position: top right;
+
+    @media (min-width: 30em) {
+      mask-size: 100% 50%;
+    }
+
+    @media (min-width: 52em) {
+      mask-size: 100% 60%;
+    }
+
+    @media (min-width: 64em) {
+      mask-size: 100% 75%;
+    }
+
+    @media (min-width: 88em) {
+      mask-size: 100% 100%;
+    }
+  }
+`;
 
 /**
  * Wraps the logic to display the hero background. Fallsback on a white background if
  * css `mask` is not supported.
  */
-const HeroBackground = styled.div`
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  max-width: 1368px; // Should match SVG's viewbox
-  z-index: -1;
-
-  @supports (mask-size: cover) {
-    background: ${props => generateBackground(props.theme, props.backgroundImage)};
-    background-repeat: no-repeat;
-    background-size: cover;
-
-    mask: url(${HeroBackgroundMask}) no-repeat;
-    mask-size: cover;
-    mask-position-x: 100%;
-    mask-position-y: -150px;
-
-    @media (max-width: 900px) {
-      mask-position-x: 20%;
-    }
-  }
-`;
+const HeroBackground = ({ backgroundImage }) => {
+  return <BackgroundContainer backgroundImage={`url(${backgroundImage})`} />;
+};
 
 HeroBackground.propTypes = {
   /** The background image to crop */
   backgroundImage: PropTypes.string,
 };
 
-/** @component */
 export default HeroBackground;

@@ -139,11 +139,14 @@ ${description}`;
       defaultBackgroundImage[collective.type],
       { height: 500 },
     );
+    const customStyles =
+      get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
       backgroundPosition: 'center center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
+      ...customStyles,
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');

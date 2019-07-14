@@ -76,18 +76,9 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
   render() {
     const { host, data } = this.props;
-
     if (data.loading) {
       return (
         <Button className="blue" disabled>
-          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-        </Button>
-      );
-    }
-
-    if (host && host.slug === 'opensource') {
-      return (
-        <Button className="blue" href={`/${host.slug}/apply`}>
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
         </Button>
       );

@@ -10,7 +10,6 @@ import StyledCard from '../StyledCard';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 
@@ -38,7 +37,7 @@ const CoverImage = styled.div`
 
 /** A tag to describe the type of contribution (one time, recurring...etc) */
 const ContributionTypeTag = styled(StyledTag).attrs({
-  color: 'blue.500',
+  color: 'primary.500',
   fontSize: 'Tiny',
   lineHeight: 'Tiny',
 })`
@@ -155,11 +154,11 @@ const ContributeCard = ({ intl, contribution }) => {
           <P mb={4} mt={2}>
             {prettyDescription}{' '}
             {detailsRoute && (
-              <StyledLink as={Link} route={detailsRoute}>
-                <Span textTransform="capitalize" whiteSpace="nowrap">
+              <Link route={detailsRoute}>
+                <Span textTransform="capitalize">
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </Span>
-              </StyledLink>
+              </Link>
             )}
           </P>
         </div>

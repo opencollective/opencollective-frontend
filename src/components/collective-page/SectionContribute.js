@@ -150,8 +150,11 @@ class SectionContribute extends React.PureComponent {
   });
 
   getTopContributors = memoizeOne(contributors => {
+    const nbMaxInTop = 10;
     const topOrgs = [];
     const topIndividuals = [];
+    let doneWithOrgs = false;
+    let doneWithIndividuals = false;
 
     for (const contributor of contributors) {
       // We only care about financial contributors that donated $$$
@@ -160,31 +163,27 @@ class SectionContribute extends React.PureComponent {
       }
 
       // Put contributors in the array corresponding to their types
-      if (contributor.type === CollectiveType.USER) {
+      if (!doneWithIndividuals && contributor.type === CollectiveType.USER) {
         topIndividuals.push(contributor);
-      } else if (contributor.type === CollectiveType.ORGANIZATION || contributor.type === CollectiveType.COLLECTIVE) {
+        if (topIndividuals.length === nbMaxInTop) {
+          doneWithIndividuals = true;
+        }
+      } else if (
+        (!doneWithOrgs && contributor.type === CollectiveType.ORGANIZATION) ||
+        contributor.type === CollectiveType.COLLECTIVE
+      ) {
         topOrgs.push(contributor);
+        if (topOrgs.length === nbMaxInTop) {
+          doneWithOrgs = true;
+        }
       }
 
-      if (topIndividuals.length >= 10 && topOrgs.length >= 10) {
+      if (doneWithOrgs && doneWithIndividuals) {
         break;
       }
     }
 
-    // If one of the two categories is not filled, complete with more contributors from the other
-    const nbColsPerCategory = 2;
-    const nbFreeColsFromOrgs = nbColsPerCategory - Math.ceil(topOrgs.length / 5);
-    const nbFreeColsFromIndividuals = nbColsPerCategory - Math.ceil(topOrgs.length / 5);
-    let takeNbOrgs = 10;
-    let takeNbIndividuals = 10;
-
-    if (nbFreeColsFromOrgs > 0) {
-      takeNbIndividuals += nbFreeColsFromOrgs * 5;
-    } else if (nbFreeColsFromIndividuals > 0) {
-      takeNbOrgs += nbFreeColsFromIndividuals * 5;
-    }
-
-    return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
+    return [topOrgs, topIndividuals];
   });
 
   render() {
@@ -193,9 +192,9 @@ class SectionContribute extends React.PureComponent {
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
 
     return (
-      <Box py={[4, 5]}>
+      <Box py={[null, null, 3]}>
         <ContainerSectionContent>
-          <H2 mb={3} fontWeight="normal" color="black.900">
+          <H2 mb={3} px={3} fontWeight="normal" color="black.900">
             <FormattedMessage id="CollectivePage.Contribute" defaultMessage="Contribute" />
           </H2>
         </ContainerSectionContent>
@@ -227,8 +226,8 @@ class SectionContribute extends React.PureComponent {
         </ContainerSectionContent>
         {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors
-            organizations={topOrganizations}
-            individuals={topIndividuals}
+            topOrganizations={topOrganizations}
+            topIndividuals={topIndividuals}
             currency={collective.currency}
           />
         )}

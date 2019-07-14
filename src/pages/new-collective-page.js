@@ -69,7 +69,7 @@ class NewCollectivePage extends React.Component {
     return !data || data.error ? (
       <ErrorPage data={data} />
     ) : (
-      <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
+      <Page {...this.getPageMetaData(data.collective)}>
         {data.loading || !data.Collective ? (
           <Loading />
         ) : (
@@ -102,7 +102,6 @@ const getCollective = graphql(gql`
     Collective(slug: $slug) {
       id
       slug
-      path
       name
       description
       longDescription

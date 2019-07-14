@@ -49,7 +49,7 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 5]}>
+    <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 4]}>
       <H3 fontSize="H2" lineHeight="H2" fontWeight="normal" textAlign="center" mb={5}>
         <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
       </H3>
@@ -103,11 +103,7 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
             } else if (value[0] !== '<') {
               // Fallback while we transition from old collective page to the new one.
               // Should be removed after migration to V2 is done.
-              return (
-                <HTMLContent>
-                  <Markdown source={value} data-cy="longDescription" />
-                </HTMLContent>
-              );
+              return <Markdown source={value} data-cy="longDescription" />;
             } else {
               return <HTMLContent content={value} data-cy="longDescription" />;
             }
@@ -132,4 +128,4 @@ SectionAbout.propTypes = {
   canEdit: PropTypes.bool,
 };
 
-export default React.memo(SectionAbout);
+export default SectionAbout;

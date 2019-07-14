@@ -9,8 +9,8 @@ import { debounce } from 'lodash';
  * leading calls with a max wait of 100 to ensure everything stays responsive.
  */
 export const debounceScroll = func => {
-  return debounce(func, 100, {
-    maxWait: 100,
+  return debounce(func, 200, {
+    maxWait: 50,
     leading: true,
     trailing: true,
   });

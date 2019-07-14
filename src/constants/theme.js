@@ -1,7 +1,7 @@
 import { variant } from 'styled-system';
 import { transparentize } from 'polished';
 
-export const defaultColors = {
+export const colors = {
   black: {
     900: '#090A0A',
     800: '#313233',
@@ -26,16 +26,6 @@ export const defaultColors = {
     500: '#00CC36',
     300: '#6CE0A2',
     100: '#E6FAEF',
-  },
-  blue: {
-    800: '#0041A3',
-    700: '#145ECC',
-    500: '#3385FF',
-    400: '#66A3FF',
-    300: '#99C9FF',
-    200: '#B8DEFF',
-    100: '#EBF4FF',
-    50: '#F0F8FF',
   },
   primary: {
     800: '#0041A3',
@@ -74,7 +64,7 @@ export const defaultColors = {
   },
 };
 
-const defaultFontSizes = {
+const fontSizes = {
   H1: 52,
   H2: 40,
   H3: 32,
@@ -87,7 +77,7 @@ const defaultFontSizes = {
   Tiny: 10,
 };
 
-const defaultLineHeights = {
+const lineHeights = {
   H1: '56px',
   H2: '44px',
   H3: '36px',
@@ -101,14 +91,9 @@ const defaultLineHeights = {
 };
 
 // using default space values from styled-system
-const defaultSpace = [0, 4, 8, 16, 32, 64, 128, 256, 512];
+const space = [0, 4, 8, 16, 32, 64, 128, 256, 512];
 
-export const generateTheme = ({
-  colors = defaultColors,
-  fontSizes = defaultFontSizes,
-  lineHeights = defaultLineHeights,
-  space = defaultSpace,
-} = {}) => ({
+const theme = {
   colors,
   fontSizes,
   lineHeights,
@@ -229,9 +214,9 @@ export const generateTheme = ({
       color: colors.white.full,
     },
     info: {
-      backgroundColor: colors.blue[50],
-      borderColor: colors.blue[500],
-      color: colors.blue[700],
+      backgroundColor: colors.primary[50],
+      borderColor: colors.primary[500],
+      color: colors.primary[700],
     },
     success: {
       backgroundColor: colors.green[100],
@@ -252,9 +237,7 @@ export const generateTheme = ({
   sizes: {
     navbarHeight: 68,
   },
-});
-
-const theme = generateTheme();
+};
 
 export const buttonStyle = variant({
   key: 'buttons',

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import momentTimezone from 'moment-timezone';
 import { Button } from 'react-bootstrap';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import Header from './Header';
@@ -118,7 +119,13 @@ class CreateEvent extends React.Component {
         />
 
         <Body>
-          <CollectiveCover href={`/${collective.slug}`} className="small" title={title} collective={collective} />
+          <CollectiveCover
+            href={`/${collective.slug}`}
+            className="small"
+            title={title}
+            collective={collective}
+            style={get(collective, 'settings.style.hero.cover')}
+          />
 
           <div className="content">
             {!canCreateEvent && (

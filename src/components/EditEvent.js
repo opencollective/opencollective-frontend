@@ -6,6 +6,7 @@ import Footer from './Footer';
 import EditEventForm from './EditEventForm';
 import CollectiveCover from './CollectiveCover';
 import { Button } from 'react-bootstrap';
+import { get } from 'lodash';
 import { addEditCollectiveMutation } from '../graphql/mutations';
 import { Router } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
@@ -85,6 +86,7 @@ class EditEvent extends React.Component {
             collective={parentCollective}
             className="small"
             title={<FormattedMessage id="menu.edit.event" defaultMessage="edit event" />}
+            style={get(parentCollective, 'settings.style.hero.cover')}
           />
 
           <div className="content">

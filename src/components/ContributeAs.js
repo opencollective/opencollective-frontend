@@ -184,8 +184,11 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             <Box as="span" mr={3}>
               {radio}
             </Box>
-            {value.type === 'USER' && <Avatar collective={value} size="3.6rem" />}{' '}
-            {value.type !== 'USER' && value.slug && <Logo collective={value} height="3.6rem" />}
+            {value.type === 'USER' ? (
+              <Avatar collective={value} size="3.6rem" />
+            ) : (
+              <Logo collective={value} height="3.6rem" />
+            )}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>
                 {value.name}

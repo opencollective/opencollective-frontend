@@ -5,8 +5,9 @@ import { pick } from 'lodash';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Star } from 'styled-icons/fa-solid/Star';
 
+import { colors } from '../constants/theme';
 import Container from './Container';
-import { P, Span } from './Text';
+import { P } from './Text';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
@@ -57,18 +58,20 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
     <Fragment>
       <Container display="flex" justifyContent="space-between" alignItems="flex-start">
         <Container display="flex">
-          <Span mr={3}>{radio}</Span>
-          <Span mr={3} color="black.300">
-            <Github size={40} />
-          </Span>
-          <span>
+          <Box as="span" mr={3}>
+            {radio}
+          </Box>
+          <Box as="span" mr={3}>
+            <Github size={40} color={colors.black[300]} />
+          </Box>
+          <Box as="span">
             <P fontWeight={500} fontSize="1.4rem">
               {value.full_name}
             </P>
             <P textTransform="uppercase" color="black.400" fontSize="1rem">
               {repositoryTypeName}
             </P>
-          </span>
+          </Box>
         </Container>
         <Container>
           <Box>
@@ -119,13 +122,17 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                     <Container cursor="pointer">
                       {props.value === 'repository' && (
                         <Container fontWeight="400" fontSize="1.2rem" mb={2}>
-                          <Span mr={3}>{props.radio}</Span>
+                          <Box as="span" mr={3}>
+                            {props.radio}
+                          </Box>
                           Create a collective for the repository ({value.name})
                         </Container>
                       )}
                       {props.value === 'organization' && (
                         <Container fontWeight="400" fontSize="1.2rem" mb={4}>
-                          <Span mr={3}>{props.radio}</Span>
+                          <Box as="span" mr={3}>
+                            {props.radio}
+                          </Box>
                           Create a collective for the organization ({login})
                         </Container>
                       )}

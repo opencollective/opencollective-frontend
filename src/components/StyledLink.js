@@ -12,12 +12,6 @@ import { buttonSize, buttonStyle } from '../constants/theme';
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledLink = styled(tag.a)`
-  color: ${themeGet('colors.primary.500')};
-
-  &:hover {
-    color: ${themeGet('colors.primary.300')};
-  }
-
   ${border}
   ${color}
   ${layout}

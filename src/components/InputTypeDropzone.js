@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
-import { themeGet } from '@styled-system/theme-get';
-
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
+import { colors } from '../constants/theme';
 
 class InputTypeDropzone extends React.Component {
   static propTypes = {
@@ -187,15 +186,15 @@ class InputTypeDropzone extends React.Component {
               display: flex;
             }
             .dropzone:focus {
-              border-color: ${themeGet('colors.primary.300')};
+              border-color: ${colors.primary['300']};
             }
             .removeImage {
-              color: ${themeGet('colors.primary.400')};
+              color: ${colors.primary['400']};
               cursor: pointer;
               font-size: 11px;
             }
             .removeImage:hover {
-              color: ${themeGet('colors.primary.500')};
+              color: ${colors.primary['500']};
             }
           `}
         </style>

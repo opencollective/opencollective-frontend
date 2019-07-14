@@ -54,7 +54,7 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
  * This section is a temporary replacement for the `Conversations` section that
  * will come later. It follows the design specified for it.
  */
-class SectionUpdates extends React.PureComponent {
+class SectionUpdates extends React.Component {
   static propTypes = {
     /** Collective */
     collective: PropTypes.shape({

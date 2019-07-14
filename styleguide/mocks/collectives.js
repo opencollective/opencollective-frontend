@@ -1,6 +1,6 @@
 export const openSourceHost = {
   id: 11004,
-  slug: 'opensource',
+  slug: 'opensourcecollective',
   name: 'Open Source Collective 501c6 (Non Profit)',
   image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5f4a3920-11b6-11e8-b28d-b359f3c5ca14.png',
   __typename: 'Organization',
@@ -805,7 +805,7 @@ export const webpackCollective = {
         description:
           'US based non profit (501c6) to provide a host for open source projects around the world and make it easy for companies to support them.',
         name: 'Open Source Collective 501c6 (Non Profit)',
-        slug: 'opensource',
+        slug: 'opensourcecollective',
         type: 'ORGANIZATION',
         image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5f4a3920-11b6-11e8-b28d-b359f3c5ca14.png',
         backgroundImage: null,

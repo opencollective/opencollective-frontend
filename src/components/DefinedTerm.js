@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
 import StyledTooltip from './StyledTooltip';
@@ -44,12 +43,6 @@ const UnderlinedTerm = styled.span`
   border-bottom: 2px dotted #969ba3;
   padding-bottom: 0.1em;
   cursor: help;
-
-  &:hover {
-    color: ${themeGet('colors.primary.400')};
-    border-color: ${themeGet('colors.primary.400')};
-  }
-
   ${textTransform}
 `;
 

@@ -19,7 +19,6 @@ const Page = ({
   twitterHandle,
   showSearch,
   canonicalURL,
-  withoutGlobalStyles,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -37,9 +36,7 @@ const Page = ({
         image={image}
         canonicalURL={canonicalURL}
       />
-      <Body withoutGlobalStyles={withoutGlobalStyles}>
-        {typeof children === 'function' ? children(childProps) : children}
-      </Body>
+      <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       <Footer />
     </Fragment>
   );
@@ -58,7 +55,6 @@ Page.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
-  withoutGlobalStyles: PropTypes.bool,
   title: PropTypes.string,
   twitterHandle: PropTypes.string,
 };

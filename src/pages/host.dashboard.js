@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
-import { omit } from 'lodash';
+import { get, omit } from 'lodash';
 
 import { Wallet } from 'styled-icons/boxicons-regular/Wallet';
 import { CheckDouble } from 'styled-icons/boxicons-regular/CheckDouble';
@@ -117,6 +117,7 @@ class HostDashboardPage extends React.Component {
             collective={host}
             href={`/${host.slug}/dashboard`}
             className="small"
+            style={get(host, 'settings.style.hero.cover')}
             title={
               <FormattedMessage
                 id="host.dashboard.title"
