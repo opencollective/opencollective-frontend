@@ -318,6 +318,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
             'presets',
             'minimumAmount',
             'goal',
+            'button',
           ]),
         );
       }

@@ -168,6 +168,7 @@ const getTiersQuery = gql`
         minimumAmount
         currency
         interval
+        'button',
       }
     }
   }
