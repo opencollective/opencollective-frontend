@@ -599,7 +599,8 @@ export async function claimCollective(_, args, req) {
       order: pledge.info,
     });
   });
-  Promise.all(emails);
+
+  await Promise.all(emails);
 
   // return successful status, frontend should redirect to claimed collective page
   await collective.save();

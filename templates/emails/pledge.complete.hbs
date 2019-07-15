@@ -17,7 +17,7 @@ Subject: {{ collective.name }} has been claimed! Time to complete your pledge.
   <p>The {{collective.name}} collective has been created thanks to your pledge to give {{{currency order.totalAmount currency=order.currency}}}🙏🏼.</p>
 {{/if}}
 
-<p>Please go ahead and fulfill your pledge using the following link <a href="https://opencollective.com/pledges/{{order.id}}">Complete My Pledge</a>
+<p>Please go ahead and fulfill your pledge using the following link <a href="{{config.host.website}}/pledges/{{order.id}}">Complete My Pledge</a>
 
 <p>Thank you for helping this collective come to life!</p>
 
