@@ -139,6 +139,8 @@
   "collective.isArchived": "{name} был помещён в архив.",
   "collective.isArchived.description": "Этот коллектив добавили в архив, и он не может быть использован.",
   "collective.isArchived.edit.description": "Этот {type} был добавлен в архив и больше не может быть использован.",
+  "collective.isPending": "{name} is pending.",
+  "collective.isPending.description": "The collective is pending and must be approved by the host for any further activities.",
   "collective.location.label": "Город",
   "collective.longDescription.label": "Длинное описание",
   "collective.markdown.description": "Использовать редактор markdown",

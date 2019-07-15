@@ -139,6 +139,8 @@
   "collective.isArchived": "{name} はアーカイブされています。",
   "collective.isArchived.description": "This collective has been archived and can no longer be used for any activities.",
   "collective.isArchived.edit.description": "This {type} has been archived and can no longer be used for any activities.",
+  "collective.isPending": "{name} is pending.",
+  "collective.isPending.description": "The collective is pending and must be approved by the host for any further activities.",
   "collective.location.label": "都市",
   "collective.longDescription.label": "詳細",
   "collective.markdown.description": "Markdown エディターを使う",

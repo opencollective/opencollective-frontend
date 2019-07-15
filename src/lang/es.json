@@ -139,6 +139,8 @@
   "collective.isArchived": "{name} ha sido archivado.",
   "collective.isArchived.description": "Este colectivo ha sido archivado y no podrá seguir siendo usado para ninguna actividad.",
   "collective.isArchived.edit.description": "Este {type} ha sido archivado y no podrá seguir siendo usado para ninguna actividad.",
+  "collective.isPending": "{name} is pending.",
+  "collective.isPending.description": "The collective is pending and must be approved by the host for any further activities.",
   "collective.location.label": "Ciudad",
   "collective.longDescription.label": "Descripción larga",
   "collective.markdown.description": "Utilizar el editor de markdown",
