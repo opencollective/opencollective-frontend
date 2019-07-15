@@ -21,16 +21,20 @@ class Header extends React.Component {
   constructor(props) {
     super(props);
     const { description, image, twitterHandle, title } = props;
+    const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
+    const defaultImage = 'https://opencollective.com/static/images/opencollectiveicon-240x240@2x.png';
     const meta = {
-      'twitter:site': 'opencollect',
-      'twitter:creator': twitterHandle,
+      'twitter:site': '@opencollect',
+      'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
       'fb:app_id': '266835577107099',
-      'og:image': image,
+      'og:image': image || defaultImage,
       description: truncate(description, 256),
-      'twitter:card': 'summary',
-      'twitter:title': `${title} - Open Collective`,
-      'twitter:description': description,
-      'twitter:image': image,
+      'og:description': truncate(description, 256),
+      'twitter:card': 'summary_large_image',
+      'twitter:title': metaTitle,
+      'twitter:description': truncate(description, 256),
+      'twitter:image': image || defaultImage,
+      'og:title': metaTitle,
     };
 
     this.meta = [];
