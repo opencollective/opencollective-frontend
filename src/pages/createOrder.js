@@ -317,6 +317,8 @@ class CreateOrderPage extends React.Component {
       this.setState({ submitting: true });
       if (this.state.stepProfile.isAnonymous) {
         this.state.stepProfile.slug = `anonymous-${uuid().split('-')[0]}`;
+      } else {
+        this.state.stepProfile.type = this.state.stepProfile.type || 'ORGANIZATION';
       }
 
       try {

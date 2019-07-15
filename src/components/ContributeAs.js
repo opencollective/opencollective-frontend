@@ -225,7 +225,7 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                       <StyledInput
                         {...inputProps}
                         {...getFieldProps(inputProps.name)}
-                        placeholder="i.e. AirBnb, Women Who Code"
+                        placeholder="e.g. AirBnb, Women Who Code"
                         required
                       />
                     )}
