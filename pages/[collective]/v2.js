@@ -5,13 +5,13 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Page from '../components/Page';
-import Loading from '../components/Loading';
-import CollectivePage from '../components/collective-page';
-import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
+import { withUser } from '../../components/UserProvider';
+import ErrorPage from '../../components/ErrorPage';
+import Page from '../../components/Page';
+import Loading from '../../components/Loading';
+import CollectivePage from '../../components/collective-page';
+import CollectiveNotificationBar from '../../components/collective-page/CollectiveNotificationBar';
+import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../../components/collective-page/fragments';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -33,8 +33,8 @@ class NewCollectivePage extends React.Component {
     LoggedInUser: PropTypes.object, // from withUser
   };
 
-  static getInitialProps({ query: { slug, status } }) {
-    return { slug, status };
+  static getInitialProps({ query: { collective, status } }) {
+    return { slug: collective, status };
   }
 
   // See https://github.com/opencollective/opencollective/issues/1872

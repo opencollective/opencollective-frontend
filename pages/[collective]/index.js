@@ -2,17 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
-import ErrorPage from '../components/ErrorPage';
-import Collective from '../components/Collective';
-import UserCollective from '../components/UserCollective';
-import PledgedCollective from '../components/PledgedCollective';
+import ErrorPage from '../../components/ErrorPage';
+import Collective from '../../components/Collective';
+import UserCollective from '../../components/UserCollective';
+import PledgedCollective from '../../components/PledgedCollective';
 
-import { addCollectiveData } from '../lib/graphql/queries';
+import { addCollectiveData } from '../../lib/graphql/queries';
 
-import { ssrNotFoundError } from '../lib/nextjs_utils';
-import { withUser } from '../components/UserProvider';
-import Loading from '../components/Loading';
-import Page from '../components/Page';
+import { ssrNotFoundError } from '../../lib/nextjs_utils';
+import { withUser } from '../../components/UserProvider';
+import Loading from '../../components/Loading';
+import Page from '../../components/Page';
 
 class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query }) {
@@ -20,7 +20,7 @@ class CollectivePage extends React.Component {
       res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
 
-    return { slug: query && query.slug, query };
+    return { slug: query && query.collective, query };
   }
 
   static propTypes = {
