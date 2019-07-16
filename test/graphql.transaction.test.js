@@ -8,7 +8,7 @@ import { describe, it } from 'mocha';
 import models from '../server/models';
 
 import * as utils from './utils';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 describe('graphql.transaction.test.js', () => {
   before(async () => {

@@ -7,10 +7,11 @@ import uuid from 'uuid/v4';
 
 import models from '../server/models';
 import twitter from '../server/lib/twitter';
-import * as utils from './utils';
-import * as store from './features/support/stores';
 import emailLib from '../server/lib/email';
 import { maxInteger } from '../server/constants/math';
+
+import * as utils from './utils';
+import * as store from './stores';
 
 const baseOrder = Object.freeze({
   quantity: 1,

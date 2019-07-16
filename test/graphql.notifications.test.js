@@ -1,11 +1,13 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import config from 'config';
-import * as utils from './utils';
+
 import models from '../server/models';
 import channels from '../server/constants/channels';
 import { activities, roles } from '../server/constants';
-import { randUrl } from './features/support/stores';
+
+import * as utils from './utils';
+import { randUrl } from './stores';
 
 describe('graphql.notifications.test', () => {
   let user1, user2, collective1, notification;

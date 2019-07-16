@@ -6,7 +6,7 @@ import * as libpayments from '../server/lib/payments';
 
 /* Test tools */
 import * as utils from './utils';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 /* What's being tested */
 import prepaid from '../server/paymentProviders/opencollective/prepaid';

@@ -5,7 +5,7 @@ import models from '../server/models';
 
 /* Test tools */
 import * as utils from './utils';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 const addFundsToOrgQuery = `
   mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {

@@ -3,10 +3,11 @@ import config from 'config';
 import { expect } from 'chai';
 import { URL } from 'url';
 
-import * as utils from '../test/utils';
-import { randEmail } from './features/support/stores';
 import models from '../server/models';
 import * as auth from '../server/lib/auth';
+
+import * as utils from './utils';
+import { randEmail } from './stores';
 
 const userData = utils.data('user1');
 

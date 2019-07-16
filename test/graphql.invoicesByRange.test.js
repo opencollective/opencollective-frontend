@@ -12,7 +12,7 @@ moment.suppressDeprecationWarnings = true;
 
 /* Test utilities */
 import * as utils from './utils';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 const startOctober2017ISOString = moment('2017-10-01').toISOString(true);
 const startNovember2017ISOString = moment('2017-11-01').toISOString(true);

@@ -1,21 +1,16 @@
-/* Need to mock config in a test */
 import config from 'config';
-
-/* Test utilities */
+import uuidv4 from 'uuid/v4';
 import nock from 'nock';
 import request from 'supertest';
 import sinon from 'sinon';
 import { expect } from 'chai';
-import * as utils from './utils';
-import * as store from './features/support/stores';
 
-/* Components needed for writing the test */
-import uuidv4 from 'uuid/v4';
 import app from '../server/index';
 import models from '../server/models';
-
-/* What's being tested */
 import * as paypalPayment from '../server/paymentProviders/paypal/payment';
+
+import * as utils from './utils';
+import * as store from './stores';
 
 const application = utils.data('application');
 

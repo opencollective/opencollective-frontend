@@ -1,10 +1,10 @@
 import uuidv4 from 'uuid/v4';
 import { expect } from 'chai';
 
-import { randEmail } from './features/support/stores';
-
 import models from '../server/models';
 import prepaid from '../server/paymentProviders/opencollective/prepaid';
+
+import { randEmail } from './stores';
 
 describe('paymentMethods.opencollective.prepaid', () => {
   const PREPAID_INITIAL_BALANCE = 5000;

@@ -1,13 +1,16 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import * as utils from './utils';
+
 import models from '../server/models';
 import roles from '../server/constants/roles';
 import * as libcurrency from '../server/lib/currency';
+import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
+
 import paypalMock from './mocks/paypal';
 import dataMocks from './mocks/data';
-import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
-import { randEmail } from './features/support/stores';
+
+import * as utils from './utils';
+import { randEmail } from './stores';
 
 let host, admin, user, collective, paypalPaymentMethod;
 

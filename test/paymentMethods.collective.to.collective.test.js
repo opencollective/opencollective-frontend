@@ -1,8 +1,10 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import * as utils from './utils';
+
 import models from '../server/models';
-import * as store from './features/support/stores';
+
+import * as utils from './utils';
+import * as store from './stores';
 
 const ORDER_TOTAL_AMOUNT = 1000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
