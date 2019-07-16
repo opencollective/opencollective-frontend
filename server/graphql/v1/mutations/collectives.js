@@ -316,9 +316,8 @@ export function editCollective(_, args, req) {
   }
 
   const newCollectiveData = {
-    ...omit(args.collective, ['location']),
+    ...omit(args.collective, ['location', 'type', 'ParentCollectiveId']),
     LastEditedByUserId: req.remoteUser.id,
-    type: args.collective.type || 'COLLECTIVE',
   };
 
   // Set location values
@@ -341,52 +340,41 @@ export function editCollective(_, args, req) {
 
   let collective, parentCollective;
 
-  const promises = [
-    req.loaders.collective.findById.load(args.collective.id).then(c => {
-      if (!c) throw new Error(`Collective with id ${args.collective.id} not found`);
+  return req.loaders.collective.findById
+    .load(args.collective.id)
+    .then(c => {
+      if (!c) {
+        throw new Error(`Collective with id ${args.collective.id} not found`);
+      }
       collective = c;
-    }),
-  ];
-
-  if (args.collective.ParentCollectiveId) {
-    promises.push(
-      req.loaders.collective.findById.load(args.collective.ParentCollectiveId).then(pc => {
-        if (!pc)
-          return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
-        parentCollective = pc;
-      }),
-    );
-  }
-  return Promise.all(promises)
+    })
     .then(() => {
-      // If trying to edit parent collective, ensure user is an admin of it
-      const newParentCollectiveId = args.collective.ParentCollectiveId;
-      const isChangingParent = newParentCollectiveId && newParentCollectiveId !== collective.ParentCollectiveId;
-      if (isChangingParent && !req.remoteUser.isAdmin(newParentCollectiveId)) {
-        throw new errors.Unauthorized({
-          message: `You must be logged in as the creator of this Event or as an admin of the ${parentCollective.slug} collective to edit this Event Collective`,
+      if (collective.ParentCollectiveId) {
+        return req.loaders.collective.findById.load(collective.ParentCollectiveId).then(pc => {
+          if (!pc) {
+            return Promise.reject(new Error(`Parent collective with id ${collective.ParentCollectiveId} not found`));
+          }
+          parentCollective = pc;
         });
       }
-
-      if (args.collective.slug && newCollectiveData.type === 'EVENT') {
+    })
+    .then(() => {
+      if (args.collective.slug && collective.type === 'EVENT') {
         // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
         // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
         const slug = slugify(args.collective.slug.replace(/(\-[0-9]+[a-z]{2})$/i, '') || args.collective.name);
         newCollectiveData.slug = `${slug}-${parentCollective.id}${collective.type.substr(0, 2)}`.toLowerCase();
       }
-      if (newCollectiveData.type === 'EVENT') {
-        return (
-          req.remoteUser.id === collective.CreatedByUserId ||
-          req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id)
-        );
+      if (collective.type === 'EVENT') {
+        return req.remoteUser.isAdmin(collective.id) || req.remoteUser.isAdmin(parentCollective.id);
       } else {
-        return req.remoteUser.isAdmin(newCollectiveData.id);
+        return req.remoteUser.isAdmin(collective.id);
       }
     })
     .then(canEditCollective => {
       if (!canEditCollective) {
         let errorMsg;
-        switch (newCollectiveData.type) {
+        switch (collective.type) {
           case types.EVENT:
             errorMsg = `You must be logged in as the creator of this Event or as an admin of the ${parentCollective.slug} collective to edit this Event Collective`;
             break;
@@ -396,7 +384,7 @@ export function editCollective(_, args, req) {
             break;
 
           default:
-            errorMsg = `You must be logged in as an admin or as the host of this ${newCollectiveData.type.toLowerCase()} collective to edit it`;
+            errorMsg = `You must be logged in as an admin or as the host of this ${collective.type.toLowerCase()} collective to edit it`;
         }
         return Promise.reject(new errors.Unauthorized({ message: errorMsg }));
       }
