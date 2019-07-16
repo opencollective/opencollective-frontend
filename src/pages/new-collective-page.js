@@ -66,31 +66,35 @@ class NewCollectivePage extends React.Component {
   render() {
     const { data, LoggedInUser, status } = this.props;
 
-    return !data || data.error ? (
-      <ErrorPage data={data} />
-    ) : (
-      <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
-        {data.loading || !data.Collective ? (
+    if (!data || data.error) {
+      return <ErrorPage data={data} />;
+    } else if (data.loading || !data.Collective) {
+      return (
+        <Page {...this.getPageMetaData()} withoutGlobalStyles>
           <Loading />
-        ) : (
-          <React.Fragment>
-            <GlobalStyles />
-            <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
-            <CollectivePage
-              collective={data.Collective}
-              host={data.Collective.host}
-              contributors={data.Collective.contributors}
-              tiers={data.Collective.tiers}
-              events={data.Collective.events}
-              transactions={data.Collective.transactions}
-              expenses={data.Collective.expenses}
-              stats={data.Collective.stats}
-              updates={data.Collective.updates}
-              status={status}
-              LoggedInUser={LoggedInUser}
-            />
-          </React.Fragment>
-        )}
+        </Page>
+      );
+    }
+
+    const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(data.Collective));
+    return (
+      <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
+        <GlobalStyles />
+        <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
+        <CollectivePage
+          collective={data.Collective}
+          host={data.Collective.host}
+          contributors={data.Collective.contributors}
+          tiers={data.Collective.tiers}
+          events={data.Collective.events}
+          transactions={data.Collective.transactions}
+          expenses={data.Collective.expenses}
+          stats={data.Collective.stats}
+          updates={data.Collective.updates}
+          LoggedInUser={LoggedInUser}
+          isAdmin={isAdmin}
+          status={status}
+        />
       </Page>
     );
   }

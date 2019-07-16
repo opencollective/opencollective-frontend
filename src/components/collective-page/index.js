@@ -49,6 +49,7 @@ class CollectivePage extends Component {
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
+    isAdmin: PropTypes.bool.isRequired,
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
@@ -71,12 +72,8 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  isAdmin = memoizeOne((LoggedInUser, collective) => {
-    return Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-  });
-
-  getSections = memoizeOne((props, isAdmin) => {
-    const { collective, host, stats, updates, transactions, expenses } = props;
+  getSections = memoizeOne(props => {
+    const { collective, host, stats, updates, transactions, expenses, isAdmin } = props;
     const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
     const sectionsToRemove = new Set([]);
 
@@ -120,7 +117,7 @@ class CollectivePage extends Component {
     const distanceThreshold = 400;
     const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
     const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
-    const sections = this.getSections(this.props, isAdmin);
+    const sections = this.getSections(this.props);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
@@ -151,11 +148,15 @@ class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
-  renderSection(section, canEdit) {
+  renderSection(section) {
     switch (section) {
       case Sections.ABOUT:
         return (
-          <SectionAbout collective={this.props.collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />
+          <SectionAbout
+            collective={this.props.collective}
+            canEdit={this.props.isAdmin}
+            editMutation={EditCollectiveMutation}
+          />
         );
       case Sections.BUDGET:
         return (
@@ -183,7 +184,7 @@ class CollectivePage extends Component {
         return (
           <SectionUpdates
             collective={this.props.collective}
-            canSeeDrafts={canEdit}
+            canSeeDrafts={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
@@ -216,10 +217,9 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { LoggedInUser, collective, host } = this.props;
+    const { collective, host, isAdmin } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const isAdmin = this.isAdmin(LoggedInUser, collective);
-    const sections = this.getSections(this.props, isAdmin);
+    const sections = this.getSections(this.props);
     const pageTheme = this.getTheme();
 
     return (
@@ -248,7 +248,7 @@ class CollectivePage extends Component {
           </Container>
           {sections.map(section => (
             <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-              {this.renderSection(section, isAdmin)}
+              {this.renderSection(section)}
             </div>
           ))}
         </Container>
