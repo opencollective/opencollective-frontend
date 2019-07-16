@@ -13,6 +13,7 @@ import { buttonSize, buttonStyle } from '../constants/theme';
  */
 const StyledLink = styled(tag.a)`
   color: ${themeGet('colors.primary.500')};
+  cursor: pointer;
 
   &:hover {
     color: ${themeGet('colors.primary.300')};

@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { createGlobalStyle } from 'styled-components';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import dynamic from 'next/dynamic';
+import { lighten, darken } from 'polished';
+import theme, { generateTheme } from '../constants/theme';
 
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
@@ -12,6 +15,9 @@ import Loading from '../components/Loading';
 import CollectivePage from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
+
+/** We load the edit sidebar dynamically because it's only shown to collective's admins */
+const EditCollectiveSidebar = dynamic(() => import('../components/collective-page/EditCollectiveSidebar'));
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -63,6 +69,29 @@ class NewCollectivePage extends React.Component {
     }
   }
 
+  getTheme(collective) {
+    const customColor = get(collective, 'settings.collectivePage.primaryColor', '#000000');
+    if (!customColor) {
+      return theme;
+    } else {
+      return generateTheme({
+        colors: {
+          ...theme.colors,
+          primary: {
+            800: darken(0.1, customColor),
+            700: darken(0.05, customColor),
+            500: customColor,
+            400: lighten(0.05, customColor),
+            300: lighten(0.1, customColor),
+            200: lighten(0.15, customColor),
+            100: lighten(0.2, customColor),
+            50: lighten(0.25, customColor),
+          },
+        },
+      });
+    }
+  }
+
   render() {
     const { data, LoggedInUser, status } = this.props;
 
@@ -81,20 +110,25 @@ class NewCollectivePage extends React.Component {
       <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
         <GlobalStyles />
         <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
-        <CollectivePage
-          collective={data.Collective}
-          host={data.Collective.host}
-          contributors={data.Collective.contributors}
-          tiers={data.Collective.tiers}
-          events={data.Collective.events}
-          transactions={data.Collective.transactions}
-          expenses={data.Collective.expenses}
-          stats={data.Collective.stats}
-          updates={data.Collective.updates}
-          LoggedInUser={LoggedInUser}
-          isAdmin={isAdmin}
-          status={status}
-        />
+        <ThemeProvider theme={this.getTheme()}>
+          <React.Fragment>
+            {isAdmin && <EditCollectiveSidebar collective={data.Collective} />}
+            <CollectivePage
+              collective={data.Collective}
+              host={data.Collective.host}
+              contributors={data.Collective.contributors}
+              tiers={data.Collective.tiers}
+              events={data.Collective.events}
+              transactions={data.Collective.transactions}
+              expenses={data.Collective.expenses}
+              stats={data.Collective.stats}
+              updates={data.Collective.updates}
+              LoggedInUser={LoggedInUser}
+              isAdmin={isAdmin}
+              status={status}
+            />
+          </React.Fragment>
+        </ThemeProvider>
       </Page>
     );
   }
