@@ -35,7 +35,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
     Host ()
   </option>
   <optgroup
-    label="COLLECTIVE"
+    label="COLLECTIVES"
   >
     <option
       value="collective-id"
@@ -44,7 +44,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
     </option>
   </optgroup>
   <optgroup
-    label="ORGANIZATION"
+    label="ORGANIZATIONS"
   >
     <option
       value="organization-id"
