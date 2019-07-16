@@ -742,7 +742,6 @@ describe('graphql.collective.test.js', () => {
     it('edits members', async () => {
       const collective = {
         id: pubnubCollective.id,
-        type: 'ORGANIZATION',
         slug: 'pubnub',
         name: 'PubNub ',
         description: null,
@@ -804,7 +803,7 @@ describe('graphql.collective.test.js', () => {
       const res2 = await utils.graphqlQuery(query, { collective }, member);
       expect(res2.errors).to.exist;
       expect(res2.errors[0].message).to.equal(
-        'You must be logged in as an admin or as the host of this organization collective to edit it',
+        'You must be logged in as an admin or as the host of this collective collective to edit it',
       );
     });
 
