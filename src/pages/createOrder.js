@@ -378,10 +378,11 @@ class CreateOrderPage extends React.Component {
       const orderCreated = res.data.createOrder;
       this.setState({ submitting: false, submitted: true, error: null });
       this.props.refetchLoggedInUser();
-      if (this.props.redirect && isURL(this.props.redirect)) {
+      if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
+        const orderId = get(orderCreated, 'id', null);
         const transactionId = get(orderCreated, 'transactions[0].id', null);
         const status = orderCreated.status;
-        const redirectTo = `${this.props.redirect}?transactionid=${transactionId}&status=${status}`;
+        const redirectTo = `${this.props.redirect}?orderId=${orderId}&transactionid=${transactionId}&status=${status}`;
         window.location.href = redirectTo;
       } else {
         this.pushStepRoute('success', { OrderId: orderCreated.id });
@@ -390,6 +391,12 @@ class CreateOrderPage extends React.Component {
       this.setState({ submitting: false, error: e.message });
     }
   };
+
+  isValidRedirect(url) {
+    const validationParams = process.env.NODE_ENV === 'production' ? {} : { require_tld: false };
+
+    return isURL(url, validationParams);
+  }
 
   getLoggedInUserDefaultContibuteProfile() {
     if (get(this.state, 'stepProfile')) {
