@@ -112,8 +112,8 @@
     "start": "node dist/server",
     "dev": "babel-node src/server",
     "build": "npm run build:updates && npm run build:clean && npm run build:next && npm run build:server",
-    "build:clean": "rm -rf dist src/.next",
-    "build:langs": "rm -rf dist/messages && babel src/**/*.js src/**/**/*.js > /dev/null && babel-node scripts/translate.js",
+    "build:clean": "rimraf dist src/.next",
+    "build:langs": "rimraf dist/messages && babel src/**/*.js src/**/**/*.js > /dev/null && babel-node scripts/translate.js",
     "build:updates": "npm --prefix node_modules/cloudflare-ip run update-list",
     "build:next": "./scripts/build_next.sh",
     "build:server": "./scripts/build_server.sh",
@@ -178,6 +178,7 @@
     "raw-loader": "^3.0.0",
     "react-styleguidist": "9.0.4",
     "react-test-renderer": "^16.8.6",
+    "rimraf": "^2.6.3",
     "sinon": "^7.3.2",
     "url-loader": "^2.0.1",
     "webpack-bundle-analyzer": "^3.3.2"
