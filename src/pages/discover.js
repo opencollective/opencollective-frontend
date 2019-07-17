@@ -26,6 +26,7 @@ const DiscoverPageDataQuery = gql`
     $orderBy: CollectiveOrderField
     $limit: Int
     $isPledged: Boolean
+    $isActive: Boolean
   ) {
     allCollectiveTags
     allCollectives(
@@ -36,6 +37,7 @@ const DiscoverPageDataQuery = gql`
       tags: $tags
       limit: $limit
       isPledged: $isPledged
+      isActive: $isActive
     ) {
       limit
       offset
@@ -117,6 +119,8 @@ const DiscoverPage = ({ router }) => {
     tags: !query.show || query.show === 'all' ? undefined : [query.show],
     orderBy: query.sort === 'newest' ? 'createdAt' : 'totalDonations',
     limit: 15,
+    isActive: query.show !== 'pledged',
+    isPledged: query.show === 'pledged',
   };
 
   if (query.show == 'pledged') {
