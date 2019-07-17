@@ -3,11 +3,8 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { ThemeProvider } from 'styled-components';
-import { lighten, darken } from 'polished';
 
 // OC Frontend imports
-import theme, { generateTheme } from '../../constants/theme';
 import Container from '../Container';
 import CollectiveNavbar from '../CollectiveNavbar';
 
@@ -49,6 +46,7 @@ class CollectivePage extends Component {
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
+    isAdmin: PropTypes.bool.isRequired,
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
@@ -71,12 +69,8 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  isAdmin = memoizeOne((LoggedInUser, collective) => {
-    return Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-  });
-
-  getSections = memoizeOne((props, isAdmin) => {
-    const { collective, host, stats, updates, transactions, expenses } = props;
+  getSections = memoizeOne(props => {
+    const { collective, host, stats, updates, transactions, expenses, isAdmin } = props;
     const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
     const sectionsToRemove = new Set([]);
 
@@ -119,8 +113,7 @@ class CollectivePage extends Component {
     // Get the currently selected section
     const distanceThreshold = 400;
     const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
-    const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
-    const sections = this.getSections(this.props, isAdmin);
+    const sections = this.getSections(this.props);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
@@ -151,11 +144,15 @@ class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
-  renderSection(section, canEdit) {
+  renderSection(section) {
     switch (section) {
       case Sections.ABOUT:
         return (
-          <SectionAbout collective={this.props.collective} canEdit={canEdit} editMutation={EditCollectiveMutation} />
+          <SectionAbout
+            collective={this.props.collective}
+            canEdit={this.props.isAdmin}
+            editMutation={EditCollectiveMutation}
+          />
         );
       case Sections.BUDGET:
         return (
@@ -183,7 +180,7 @@ class CollectivePage extends Component {
         return (
           <SectionUpdates
             collective={this.props.collective}
-            canSeeDrafts={canEdit}
+            canSeeDrafts={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
@@ -192,67 +189,40 @@ class CollectivePage extends Component {
     }
   }
 
-  getTheme() {
-    const customColor = get(this.props.collective, 'settings.collectivePage.primaryColor', '#000000');
-    if (!customColor) {
-      return theme;
-    } else {
-      return generateTheme({
-        colors: {
-          ...theme.colors,
-          primary: {
-            800: darken(0.1, customColor),
-            700: darken(0.05, customColor),
-            500: customColor,
-            400: lighten(0.05, customColor),
-            300: lighten(0.1, customColor),
-            200: lighten(0.15, customColor),
-            100: lighten(0.2, customColor),
-            50: lighten(0.25, customColor),
-          },
-        },
-      });
-    }
-  }
-
   render() {
-    const { LoggedInUser, collective, host } = this.props;
+    const { collective, host, isAdmin } = this.props;
     const { isFixed, selectedSection } = this.state;
-    const isAdmin = this.isAdmin(LoggedInUser, collective);
-    const sections = this.getSections(this.props, isAdmin);
-    const pageTheme = this.getTheme();
+    const sections = this.getSections(this.props);
 
     return (
-      <ThemeProvider theme={pageTheme}>
-        <Container
-          position="relative"
-          borderTop="1px solid #E6E8EB"
-          css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
-        >
-          <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
-          <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
-            <CollectiveNavbar
-              collective={collective}
-              sections={sections}
-              selected={selectedSection || sections[0]}
-              onCollectiveClick={this.onCollectiveClick}
-              hideInfos={!isFixed}
-              isAnimated={true}
-              onSectionClick={this.onSectionClick}
-              LinkComponent={({ section, label }) => (
-                <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
-                  {label}
-                </a>
-              )}
-            />
-          </Container>
-          {sections.map(section => (
-            <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-              {this.renderSection(section, isAdmin)}
-            </div>
-          ))}
+      <Container
+        position="relative"
+        borderTop="1px solid #E6E8EB"
+        css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+      >
+        <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
+        <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
+          <CollectiveNavbar
+            collective={collective}
+            sections={sections}
+            selected={selectedSection || sections[0]}
+            onCollectiveClick={this.onCollectiveClick}
+            hideInfos={!isFixed}
+            isAnimated={true}
+            onSectionClick={this.onSectionClick}
+            LinkComponent={({ section, label }) => (
+              <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
+                {label}
+              </a>
+            )}
+          />
         </Container>
-      </ThemeProvider>
+        {sections.map(section => (
+          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+            {this.renderSection(section)}
+          </div>
+        ))}
+      </Container>
     );
   }
 }

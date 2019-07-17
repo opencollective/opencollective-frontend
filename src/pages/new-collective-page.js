@@ -3,15 +3,19 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { createGlobalStyle } from 'styled-components';
+import memoizeOne from 'memoize-one';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import { lighten, darken } from 'polished';
 
+import theme, { generateTheme } from '../constants/theme';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
-import CollectivePage from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
+import CollectivePage from '../components/collective-page';
+import { getCollectivePrimaryColor } from '../components/collective-page/_utils';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -29,22 +33,16 @@ class NewCollectivePage extends React.Component {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
-    data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      Collective: PropTypes.object,
+    }).isRequired, // from withData
   };
 
   static getInitialProps({ query: { slug, status } }) {
     return { slug, status };
-  }
-
-  // See https://github.com/opencollective/opencollective/issues/1872
-  shouldComponentUpdate(newProps) {
-    if (get(this.props, 'data.Collective') && !get(newProps, 'data.Collective')) {
-      console.warn('Collective lost from props (#1872)');
-      return false;
-    } else {
-      return true;
-    }
   }
 
   getPageMetaData(collective) {
@@ -63,34 +61,63 @@ class NewCollectivePage extends React.Component {
     }
   }
 
+  getTheme = memoizeOne(primaryColor => {
+    if (!primaryColor) {
+      return theme;
+    } else {
+      return generateTheme({
+        colors: {
+          ...theme.colors,
+          primary: {
+            800: darken(0.1, primaryColor),
+            700: darken(0.05, primaryColor),
+            500: primaryColor,
+            400: lighten(0.05, primaryColor),
+            300: lighten(0.1, primaryColor),
+            200: lighten(0.15, primaryColor),
+            100: lighten(0.2, primaryColor),
+            50: lighten(0.25, primaryColor),
+          },
+        },
+      });
+    }
+  });
+
   render() {
     const { data, LoggedInUser, status } = this.props;
 
-    return !data || data.error ? (
-      <ErrorPage data={data} />
-    ) : (
-      <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
-        {data.loading || !data.Collective ? (
+    if (!data || data.error) {
+      return <ErrorPage data={data} />;
+    } else if (data.loading || !data.Collective) {
+      return (
+        <Page {...this.getPageMetaData()} withoutGlobalStyles>
           <Loading />
-        ) : (
-          <React.Fragment>
-            <GlobalStyles />
-            <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
-            <CollectivePage
-              collective={data.Collective}
-              host={data.Collective.host}
-              contributors={data.Collective.contributors}
-              tiers={data.Collective.tiers}
-              events={data.Collective.events}
-              transactions={data.Collective.transactions}
-              expenses={data.Collective.expenses}
-              stats={data.Collective.stats}
-              updates={data.Collective.updates}
-              status={status}
-              LoggedInUser={LoggedInUser}
-            />
-          </React.Fragment>
-        )}
+        </Page>
+      );
+    }
+
+    const collective = data.Collective;
+    const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+    return (
+      <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
+        <GlobalStyles />
+        <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
+        <ThemeProvider theme={this.getTheme(getCollectivePrimaryColor(collective))}>
+          <CollectivePage
+            collective={collective}
+            host={collective.host}
+            contributors={collective.contributors}
+            tiers={collective.tiers}
+            events={collective.events}
+            transactions={collective.transactions}
+            expenses={collective.expenses}
+            stats={collective.stats}
+            updates={collective.updates}
+            LoggedInUser={LoggedInUser}
+            isAdmin={isAdmin}
+            status={status}
+          />
+        </ThemeProvider>
       </Page>
     );
   }

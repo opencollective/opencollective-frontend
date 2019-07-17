@@ -36,3 +36,6 @@ export const ContributionTypes = {
   FINANCIAL_GOAL: 'FINANCIAL_GOAL',
   EVENT_PARTICIPATE: 'EVENT_PARTICIPATE',
 };
+
+/** Default primary colors for collectives */
+export const DEFAULT_PRIMARY_COLOR = '#000000';
