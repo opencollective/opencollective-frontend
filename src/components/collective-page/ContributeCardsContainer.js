@@ -14,11 +14,11 @@ const ContributeCardsContainer = styled.div`
   /** Hide scrollbar when not hovered */
   &:not(:hover) {
     &::-webkit-scrollbar-thumb {
-      background: white;
+      background: transparent;
     }
 
     &::-webkit-scrollbar-track {
-      background: white;
+      background: transparent;
     }
   }
 
