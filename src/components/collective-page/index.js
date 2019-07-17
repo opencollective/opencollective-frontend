@@ -110,7 +110,7 @@ class CollectivePage extends Component {
     let { isFixed, selectedSection } = this.state;
 
     // Fixes the Hero when a certain scroll threshold is reached
-    if (this.navbarRef.current.getBoundingClientRect().top === 0) {
+    if (this.navbarRef.current.getBoundingClientRect().top <= 0) {
       isFixed = true;
     } else if (isFixed) {
       isFixed = false;
