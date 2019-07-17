@@ -9,6 +9,8 @@ describe('lib.encryption', () => {
 
     const encrypted = encrypt(buff, key);
 
+    expect(encrypted).to.not.eq(message);
+
     const result = decrypt(encrypted, key);
 
     expect(result).to.eq(message);
