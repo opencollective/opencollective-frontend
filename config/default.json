@@ -117,7 +117,7 @@
     "documentEncryptionKey": "Pz/LnMPzhxQqsbXZ0SCb3sP0uhw8dCxspoAXLXO4CV8=",
     "aws": {
       "s3": {
-        "bucket": "opencollective-helloworks-documents",
+        "bucket": "opencollective-staging-us-tax-forms",
         "region": "us-west-1",
         "apiVersion": "2006-03-01"
       }
