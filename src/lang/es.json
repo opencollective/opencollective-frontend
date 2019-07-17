@@ -908,6 +908,7 @@
   "tier.amountType.flexible": "cantidad flexible",
   "tier.amountType.label": "Amount type",
   "tier.button": "conviértete en {name}",
+  "tier.button.label": "Button text",
   "Tier.Contribute": "Contribuye",
   "tier.contribute": "contribuye",
   "tier.customAmount.error.minimumAmount": "La cantidad mínima debería ser {minimumAmount}",

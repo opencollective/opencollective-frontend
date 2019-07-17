@@ -908,6 +908,7 @@
   "tier.amountType.flexible": "柔軟な金額",
   "tier.amountType.label": "金額タイプ",
   "tier.button": "{name} になる",
+  "tier.button.label": "Button text",
   "Tier.Contribute": "Contribute",
   "tier.contribute": "コントリビュート",
   "tier.customAmount.error.minimumAmount": "最低額は {minimumAmount} です",
