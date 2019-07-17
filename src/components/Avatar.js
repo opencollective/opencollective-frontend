@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
@@ -18,7 +18,7 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: ${({ type }) => (type === 'USER' ? '100px' : '25%')};
+  border-radius: ${({ type }) => (type === 'USER' ? '50%' : '25%')};
   ${border}
   color: ${themeGet('colors.black.400')};
   font-weight: bold;
@@ -27,11 +27,6 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   flex-shrink: 0;
   ${space}
   ${layout}
-  ${props =>
-    props.animationDuration &&
-    css`
-      transition: width ${props.animationDuration}ms, height ${props.animationDuration}ms;
-    `}
 `;
 
 const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps }) => {
