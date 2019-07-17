@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex } from '@rebass/grid';
+import styled from 'styled-components';
 import { get } from 'lodash';
 
 import { Twitter } from 'styled-icons/feather/Twitter';
@@ -13,7 +14,7 @@ import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../lib/url_helpers';
 import StyledRoundButton from '../StyledRoundButton';
 import ExternalLinkNewTab from '../ExternalLinkNewTab';
-import { Span, H1, H2 } from '../Text';
+import { Span, H1 } from '../Text';
 import Container from '../Container';
 import Avatar from '../Avatar';
 import I18nCollectiveTags from '../I18nCollectiveTags';
@@ -35,6 +36,25 @@ const Translations = defineMessages({
     defaultMessage: 'Settings',
   },
 });
+
+const StyledShortDescription = styled.h2`
+  margin-top: 8px;
+  font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
+  line-height: 24px;
+  text-align: center;
+
+  @media (min-width: 40em) {
+    text-align: left;
+  }
+
+  @media (min-width: 64em) {
+    max-width: 600px;
+  }
+
+  @media (min-width: 88em) {
+    max-width: 750px;
+  }
+`;
 
 /**
  * Collective's page Hero/Banner/Cover component.
@@ -116,9 +136,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
           </Container>
         )}
       </Flex>
-      <H2 mt={2} fontSize="LeadParagraph" lineHeight="24px" textAlign="center">
-        {collective.description}
-      </H2>
+      <StyledShortDescription>{collective.description}</StyledShortDescription>
     </ContainerSectionContent>
   </Container>
 );
