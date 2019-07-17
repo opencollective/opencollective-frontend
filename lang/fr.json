@@ -928,6 +928,7 @@
   "tier.amountType.flexible": "montant flexible",
   "tier.amountType.label": "Type de montant",
   "tier.button": "devenir un {name}",
+  "tier.button.label": "Button text",
   "Tier.Contribute": "Contribuer",
   "tier.contribute": "contribuer",
   "tier.customAmount.error.minimumAmount": "Le montant doit être au minimum {minimumAmount}",
