@@ -2061,10 +2061,19 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getImageUrl = function(args = {}) {
-    const imageType = this.type === 'USER' ? 'avatar' : 'logo';
-    const imageHeight = args.height ? `/${args.height}` : '';
-    const imageFormat = args.format || 'png';
-    return `${config.host.images}/${this.slug}/${imageType}${imageHeight}.${imageFormat}`;
+    const sections = [config.host.images, this.slug];
+
+    if (this.image) {
+      sections.push(md5(this.image).substring(0, 7));
+    }
+
+    sections.push(this.type === 'USER' ? 'avatar' : 'logo');
+
+    if (args.height) {
+      sections.push(args.height);
+    }
+
+    return `${sections.join('/')}.${args.format || 'png'}`;
   };
 
   Collective.prototype.getBackgroundImageUrl = function(args = {}) {
