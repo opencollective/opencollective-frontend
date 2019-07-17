@@ -124,6 +124,7 @@ class CreateOrderPage extends React.Component {
     referral: PropTypes.string,
     redeem: PropTypes.bool,
     createOrder: PropTypes.func.isRequired, // from addCreateOrderMutation
+    createOrderForDispatch: PropTypes.func.isRequired, // from addCreateOrderMutation
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from injectIntl
     loadStripe: PropTypes.func.isRequired, // from withStripeLoader
@@ -374,8 +375,15 @@ class CreateOrderPage extends React.Component {
     };
 
     try {
-      const res = await this.props.createOrder(order);
-      const orderCreated = res.data.createOrder;
+      let orderCreated;
+      if (tier.type === 'PREPAID') {
+        const res = await this.props.createOrderForDispatch(order);
+        orderCreated = res.data.createOrder;
+      } else {
+        const res = await this.props.createOrder(order);
+        orderCreated = res.data.createOrder;
+      }
+
       this.setState({ submitting: false, submitted: true, error: null });
       this.props.refetchLoggedInUser();
       if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
@@ -1076,11 +1084,31 @@ export const addCreateOrderMutation = graphql(
   },
 );
 
+export const addCreateOrderForDispatchMutation = graphql(
+  gql`
+    mutation createOrderForDispatch($order: OrderInputType!) {
+      createOrderForDispatch(order: $order) {
+        id
+        status
+        transactions {
+          id
+        }
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      createOrderForDispatch: order => mutate({ variables: { order } }),
+    }),
+  },
+);
+
 const addGraphQL = compose(
   graphql(CollectiveDataQuery, { skip: props => props.tierId }),
   graphql(CollectiveWithTierDataQuery, { skip: props => !props.tierId }),
   addCreateCollectiveMutation,
   addCreateOrderMutation,
+  addCreateOrderForDispatchMutation,
 );
 
 export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
