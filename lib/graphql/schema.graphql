@@ -1,5 +1,5 @@
-# source: http://localhost:3000/api/graphql
-# timestamp: Wed Jul 10 2019 23:08:11 GMT+0200 (Central European Summer Time)
+# source: https://opencollective.com/api/graphql
+# timestamp: Wed Jul 17 2019 10:42:57 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -290,7 +290,6 @@ input CollectiveInputType {
   data: JSON
   members: [MemberInputType]
   notifications: [NotificationInputType]
-  paymentMethods: [PaymentMethodInputType]
   HostCollectiveId: Int
   hostFeePercent: Int
   ParentCollectiveId: Int
@@ -2594,7 +2593,6 @@ type Tier {
   maxQuantity: Int
   maxQuantityPerUser: Int
   goal: Int
-  button: String
   password: String
   customFields: [JSON]
   startsAt: DateString
@@ -2659,6 +2657,11 @@ input TierInputType {
   amount in the lowest unit of the currency of the host (ie. in cents)
   """
   amount: Int
+
+  """
+  Button text
+  """
+  button: String
   currency: String
   presets: [Int]
   interval: String
@@ -2674,10 +2677,6 @@ input TierInputType {
   password: String
   customFields: [CustomFieldsInputType]
 
-"""
-  Button text
-  """
-  button: String
   """
   Start of the campaign
   """
