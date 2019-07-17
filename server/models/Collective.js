@@ -397,6 +397,12 @@ export default function(Sequelize, DataTypes) {
         },
       },
 
+      inTheContextOfCollectiveId: {
+        type: new DataTypes.VIRTUAL(DataTypes.STRING),
+        description:
+          'Variable to keep track of the Parent Collective Id when traversing the graph of collective relationships. This is needed to know if the current logged in user can access the createdByUser of the collective.',
+      },
+
       tags: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         set(tags) {
