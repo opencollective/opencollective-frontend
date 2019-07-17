@@ -95,7 +95,7 @@ class TopBarProfileMenu extends React.Component {
 
     const memberships = uniqBy(LoggedInUser.memberOf.filter(m => m.role !== 'BACKER'), m => m.collective.id);
 
-    const anonymousProfileMembership = memberships.find(m => m.collective.isAnonymous);
+    const incognitoProfileMembership = memberships.find(m => m.collective.isIncognito);
 
     const collectives = memberships
       .filter(m => m.collective.type === 'COLLECTIVE')
@@ -251,11 +251,11 @@ class TopBarProfileMenu extends React.Component {
                 </StyledLink>
               </Link>
             </ListItem>
-            {anonymousProfileMembership && (
+            {incognitoProfileMembership && (
               <ListItem py={1}>
-                <Link route="collective" params={{ slug: anonymousProfileMembership.collective.slug }} passHref>
+                <Link route="collective" params={{ slug: incognitoProfileMembership.collective.slug }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    <FormattedMessage id="menu.anonymousProfile" defaultMessage="Anonymous profile" />
+                    <FormattedMessage id="menu.incognitoProfile" defaultMessage="Anonymous profile" />
                   </StyledLink>
                 </Link>
               </ListItem>

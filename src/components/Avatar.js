@@ -37,7 +37,7 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
   if (collective) {
     type = collective.type;
     name = collective.name;
-    if (collective.isAnonymous) {
+    if (collective.isIncognito) {
       src = defaultImage['ANONYMOUS'];
     } else if (collective.image) {
       src = `${getBaseImagesUrl()}/${collective.slug}/avatar.png`;
@@ -63,7 +63,7 @@ Avatar.propTypes = {
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
-  isAnonymous: PropTypes.bool,
+  isIncognito: PropTypes.bool,
 };
 
 /**

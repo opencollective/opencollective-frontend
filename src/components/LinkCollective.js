@@ -15,17 +15,17 @@ const getEventParentCollectiveSlug = parentCollective => {
 
 /**
  * Create a `Link` to the collective based on collective type.
- * It properly deals with type `EVENT` and `isAnonymous`
+ * It properly deals with type `EVENT` and `isIncognito`
  */
 const LinkCollective = ({
   target,
   title,
-  collective: { type, slug, name, parentCollective, isAnonymous },
+  collective: { type, slug, name, parentCollective, isIncognito },
   children,
   isNewVersion,
   ...props
 }) => {
-  if (type === 'USER' && (!name || isAnonymous)) {
+  if (type === 'USER' && (!name || isIncognito)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
@@ -59,7 +59,7 @@ LinkCollective.propTypes = {
     name: PropTypes.string,
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
-    isAnonymous: PropTypes.bool,
+    isIncognito: PropTypes.bool,
     parentCollective: PropTypes.shape({
       slug: PropTypes.string,
     }),

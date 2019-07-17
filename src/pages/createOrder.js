@@ -315,8 +315,8 @@ class CreateOrderPage extends React.Component {
     // Check if we're creating a new profile
     if (!this.state.stepProfile.id) {
       this.setState({ submitting: true });
-      if (this.state.stepProfile.isAnonymous) {
-        this.state.stepProfile.slug = `anonymous-${uuid().split('-')[0]}`;
+      if (this.state.stepProfile.isIncognito) {
+        this.state.stepProfile.slug = `incognito-${uuid().split('-')[0]}`;
       } else {
         this.state.stepProfile.type = this.state.stepProfile.type || 'ORGANIZATION';
       }
@@ -707,7 +707,7 @@ class CreateOrderPage extends React.Component {
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
-    const isAnonymous = get(this.state, 'stepProfile.isAnonymous');
+    const isIncognito = get(this.state, 'stepProfile.isIncognito');
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
@@ -771,9 +771,9 @@ class CreateOrderPage extends React.Component {
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
           </Container>
-          {interval || isAnonymous ? (
+          {interval || isIncognito ? (
             <ContributeDetailsFAQ
-              isAnonymous={isAnonymous}
+              isIncognito={isIncognito}
               hasInterval={!!interval}
               mt={4}
               display={['none', null, 'block']}

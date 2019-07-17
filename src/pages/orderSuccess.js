@@ -69,7 +69,7 @@ const GetOrderQuery = gql`
         name
         image
         path
-        isAnonymous
+        isIncognito
       }
       collective {
         id
@@ -147,7 +147,7 @@ class OrderSuccessPage extends React.Component {
       return (
         <FormattedMessage
           id="contributeFlow.successMessageBacker"
-          defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
+          defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
           values={{
             fromCollectiveName: fromCollective.name,
             collectiveName: collective.name,
@@ -159,7 +159,7 @@ class OrderSuccessPage extends React.Component {
     return tier.type === 'TICKET' ? (
       <FormattedMessage
         id="contributeFlow.successMessageTicket"
-        defaultMessage="{fromCollectiveName, select, anonymous {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})"
+        defaultMessage="{fromCollectiveName, select, incognito {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})"
         values={{
           fromCollectiveName: fromCollective.name,
           eventName: <strong>{collective.name}</strong>,
@@ -169,7 +169,7 @@ class OrderSuccessPage extends React.Component {
     ) : (
       <FormattedMessage
         id="contributeFlow.successMessage"
-        defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
+        defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
         values={{
           fromCollectiveName: fromCollective.name,
           collectiveName: <strong>{collective.name}</strong>,
@@ -222,7 +222,7 @@ class OrderSuccessPage extends React.Component {
             <OrderSuccessContributorCardWithData order={order} fromCollective={fromCollective} />
           </Box>
 
-          {!fromCollective.isAnonymous && (
+          {!fromCollective.isIncognito && (
             <Flex flexWrap="wrap" justifyContent="center" mt={2}>
               <ShareLink href={tweetURL({ url: referralURL, text: message })}>
                 <Twitter size="1.2em" color="#38A1F3" />
@@ -254,8 +254,8 @@ class OrderSuccessPage extends React.Component {
               </Flex>
             </Flex>
           )}
-          {!fromCollective.isAnonymous && !LoggedInUser && this.renderUserProfileBtn(true)}
-          {!fromCollective.isAnonymous && LoggedInUser && !loggedInUserLoading && (
+          {!fromCollective.isIncognito && !LoggedInUser && this.renderUserProfileBtn(true)}
+          {!fromCollective.isIncognito && LoggedInUser && !loggedInUserLoading && (
             <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
               {this.renderUserProfileBtn()}
             </Link>

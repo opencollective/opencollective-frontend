@@ -4,7 +4,7 @@ import FAQ from './FAQ';
 
 /**
  * FAQ associated to the `CreateProfile` component. Explains differences between
- * account types (perso. vs org.) as well as anonymous contributions.
+ * account types (perso. vs org.) as well as incognito contributions.
  */
 const CreateProfileFAQ = props => (
   <FAQ {...props}>
@@ -44,7 +44,7 @@ const CreateProfileFAQ = props => (
           <Content>
             <FormattedMessage
               id="createProfile.faq.privacy.content"
-              defaultMessage="We care about privacy. We don't use cookies. No Google Analytics. No tracking. Then why are we asking you for your personal information? Because for legal reasons the host of the collective needs to know who is giving them money (KYC as in Know Your Customer). However, we give you full control on how your information is being shown publicly (yes you can make anonymous contributions, see below)."
+              defaultMessage="We care about privacy. We don't use cookies. No Google Analytics. No tracking. Then why are we asking you for your personal information? Because for legal reasons the host of the collective needs to know who is giving them money (KYC as in Know Your Customer). However, we give you full control on how your information is being shown publicly (yes you can make incognito contributions, see below)."
             />
           </Content>
         </Entry>

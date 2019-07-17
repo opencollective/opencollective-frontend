@@ -114,9 +114,9 @@ type Collective implements CollectiveInterface {
   canApply: Boolean
 
   """
-  Returns whether this collective is anonymous
+  Returns whether this collective is incognito
   """
-  isAnonymous: Boolean
+  isIncognito: Boolean
 
   """
   Returns whether this collective is archived
@@ -256,7 +256,7 @@ input CollectiveAttributesInputType {
   maxAmount: Int
   currency: String
   settings: JSON
-  isAnonymous: Boolean
+  isIncognito: Boolean
   tags: [String]
 }
 
@@ -297,7 +297,7 @@ input CollectiveInputType {
   email: String
   firstName: String
   lastName: String
-  isAnonymous: Boolean
+  isIncognito: Boolean
 }
 
 """
@@ -343,7 +343,7 @@ interface CollectiveInterface {
   slug: String
   path: String
   isHost: Boolean
-  isAnonymous: Boolean
+  isIncognito: Boolean
   canApply: Boolean
   isArchived: Boolean
   isDeletable: Boolean
@@ -882,9 +882,9 @@ type Event implements CollectiveInterface {
   canApply: Boolean
 
   """
-  Returns whether this collective is anonymous
+  Returns whether this collective is incognito
   """
-  isAnonymous: Boolean
+  isIncognito: Boolean
 
   """
   Returns whether this collective is archived
@@ -2008,9 +2008,9 @@ type Organization implements CollectiveInterface {
   canApply: Boolean
 
   """
-  Returns whether this collective is anonymous
+  Returns whether this collective is incognito
   """
-  isAnonymous: Boolean
+  isIncognito: Boolean
 
   """
   Returns whether this collective is archived
@@ -2934,9 +2934,9 @@ type User implements CollectiveInterface {
   canApply: Boolean
 
   """
-  Returns whether this collective is anonymous
+  Returns whether this collective is incognito
   """
-  isAnonymous: Boolean
+  isIncognito: Boolean
 
   """
   Returns whether this collective is archived

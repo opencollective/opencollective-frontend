@@ -117,7 +117,7 @@ export const getLoggedInUserQuery = gql`
           id
           slug
           type
-          isAnonymous
+          isIncognito
           name
           currency
           isHost
@@ -435,7 +435,7 @@ export const getCollectiveQuery = gql`
             name
             image
             website
-            isAnonymous
+            isIncognito
           }
         }
       }
@@ -464,7 +464,7 @@ export const getCollectiveQuery = gql`
           type
           image
           backgroundImage
-          isAnonymous
+          isIncognito
           company
         }
       }

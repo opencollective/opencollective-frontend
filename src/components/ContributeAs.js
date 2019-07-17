@@ -50,7 +50,7 @@ const useForm = ({ onProfileChange }) => {
       }
 
       if (selected.key === 'incognito') {
-        const userData = { name: 'incognito', type: 'USER', isAnonymous: true };
+        const userData = { name: 'incognito', type: 'USER', isIncognito: true };
         setState({ ...state, ...userData, ...omit(state, ['errors']) });
         return onProfileChange(userData);
       }
@@ -136,9 +136,9 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
   const options = uniqBy([personal, ...profiles], 'id');
 
   // if the user doesn't have an incognito profile yet, we offer to create one
-  const incognitoProfile = options.find(p => p.type === 'USER' && p.isAnonymous);
+  const incognitoProfile = options.find(p => p.type === 'USER' && p.isIncognito);
   if (!incognitoProfile) {
-    options.push({ id: 'incognito', type: 'USER', isAnonymous: true, name: intl.formatMessage(messages['incognito']) });
+    options.push({ id: 'incognito', type: 'USER', isIncognito: true, name: intl.formatMessage(messages['incognito']) });
   }
 
   options.push({ id: 'org.new', type: 'ORGANIZATION', name: intl.formatMessage(messages['org.new']) });
@@ -176,8 +176,8 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             px={4}
             py={3}
             borderBottom={lastIndex !== index ? '1px solid' : 'none'}
-            color={value.isAnonymous && checked ? 'white.full' : 'black.900'}
-            bg={value.isAnonymous && checked ? 'black.900' : 'white.full'}
+            color={value.isIncognito && checked ? 'white.full' : 'black.900'}
+            bg={value.isIncognito && checked ? 'black.900' : 'white.full'}
             borderColor="black.200"
             flexWrap="wrap"
           >
@@ -188,10 +188,10 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             {value.type !== 'USER' && value.slug && <Logo collective={value} height="3.6rem" />}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>
-                {value.isAnonymous && <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
-                {!value.isAnonymous && get(value, 'name', intl.formatMessage(messages['incognito']))}
+                {value.isIncognito && <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
+                {!value.isIncognito && get(value, 'name', intl.formatMessage(messages['incognito']))}
               </P>
-              {!value.isAnonymous && value.type && (
+              {!value.isIncognito && value.type && (
                 <P fontSize="Caption" lineHeight="Caption" color="black.500">
                   {value.type === 'USER' && value.name ? (
                     <FormattedMessage
@@ -204,7 +204,7 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                   )}
                 </P>
               )}
-              {value.isAnonymous && (
+              {value.isIncognito && (
                 <P fontSize="Caption" lineHeight="Caption" color="black.500">
                   <FormattedMessage
                     id="profile.incognito.description"
@@ -286,7 +286,7 @@ ContributeAs.propTypes = {
   /**
    * emits latest selected profile
    *
-   *  - if incognito is selected, only `{name: 'incognito', type: 'USER', isAnonymous: true}` is returned
+   *  - if incognito is selected, only `{name: 'incognito', type: 'USER', isIncognito: true}` is returned
    *  - if 'A new organization' is selected, the latest data from that form is returned
    *  - else the data passed to `profiles` or `personal` is returned
    */
@@ -309,7 +309,7 @@ ContributeAs.propTypes = {
       image: PropTypes.string,
       name: PropTypes.string,
       type: PropTypes.string,
-      isAnonymous: PropTypes.bool,
+      isIncognito: PropTypes.bool,
     }),
   ),
 };

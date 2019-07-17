@@ -9,24 +9,24 @@ import FAQ from './FAQ';
 /**
  * FAQ associated to the `ContributeDetails` component.
  */
-const ContributeDetailsFAQ = ({ tax, isAnonymous, hasInterval, ...props }) =>
-  !tax && !hasInterval && !isAnonymous ? (
+const ContributeDetailsFAQ = ({ tax, isIncognito, hasInterval, ...props }) =>
+  !tax && !hasInterval && !isIncognito ? (
     <Container {...props} />
   ) : (
     <FAQ {...props}>
       {({ Container, Entry, Title, Content }) => (
         <Container>
-          {isAnonymous && (
+          {isIncognito && (
             <Entry>
               <Title>
                 <FormattedMessage
-                  id="ContributeDetails.faq.isAnonymous.title"
+                  id="ContributeDetails.faq.isIncognito.title"
                   defaultMessage="What is an incognito contribution?"
                 />
               </Title>
               <Content>
                 <FormattedMessage
-                  id="ContributeDetails.faq.isAnonymous.content"
+                  id="ContributeDetails.faq.isIncognito.content"
                   defaultMessage={
                     'If you chose to contribute as "incognito", your financial contribution will show up publicly as an incognito donation and it won\'t link to your public profile. However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal host and the administrators of the collective can export a list of all the financial contributors with their personal information.'
                   }
@@ -62,7 +62,7 @@ const ContributeDetailsFAQ = ({ tax, isAnonymous, hasInterval, ...props }) =>
   );
 
 ContributeDetailsFAQ.propTypes = {
-  isAnonymous: PropTypes.bool,
+  isIncognito: PropTypes.bool,
   hasInterval: PropTypes.bool,
   tax: PropTypes.shape({
     help: PropTypes.shape({
