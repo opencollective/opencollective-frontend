@@ -16,7 +16,7 @@ import ContributorsGridBackgroundSVG from './ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
-  background: url(${ContributorsGridBackgroundSVG});
+  background: linear-gradient(180deg, transparent 90%, white), url(${ContributorsGridBackgroundSVG});
 
   @media (max-width: 52em) {
     background-size: cover;
