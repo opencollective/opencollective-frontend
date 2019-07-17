@@ -1,7 +1,6 @@
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
-import md5 from 'md5';
 import Promise from 'bluebird';
 import { pick, omit, get, isNil } from 'lodash';
 import config from 'config';
@@ -14,7 +13,7 @@ import * as github from '../../../lib/github';
 import recaptcha from '../../../lib/recaptcha';
 import slackLib from '../../../lib/slack';
 import * as libPayments from '../../../lib/payments';
-import { capitalize, pluralize, formatCurrency } from '../../../lib/utils';
+import { capitalize, pluralize, formatCurrency, md5 } from '../../../lib/utils';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount } from '../../../lib/subscriptions';
 
 import roles from '../../../constants/roles';
