@@ -89,14 +89,6 @@ const editCollectiveQuery = gql`
 `;
 /* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
-const deleteEventCollectiveQuery = gql`
-  mutation deleteEventCollective($id: Int!) {
-    deleteEventCollective(id: $id) {
-      id
-    }
-  }
-`;
-
 const deleteCollectiveQuery = gql`
   mutation deleteCollective($id: Int!) {
     deleteCollective(id: $id) {
@@ -345,14 +337,6 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
       }
       CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
       return await mutate({ variables: { collective: CollectiveInputType } });
-    },
-  }),
-});
-
-export const addDeleteEventCollectiveMutation = graphql(deleteEventCollectiveQuery, {
-  props: ({ mutate }) => ({
-    deleteEventCollective: async id => {
-      return await mutate({ variables: { id } });
     },
   }),
 });
