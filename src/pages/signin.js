@@ -17,18 +17,19 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import MessageBox from '../components/MessageBox';
 
 class SigninPage extends React.Component {
-  static getInitialProps({ query: { token, next } }) {
+  static getInitialProps({ query: { token, next, form } }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
       next = decodeURIComponent(next);
     }
 
     next = next && isValidRelativeUrl(next) ? next : null;
-    return { token, next };
+    return { token, next, form };
   }
 
   static propTypes = {
     token: PropTypes.string,
+    form: PropTypes.string,
     next: PropTypes.string,
     login: PropTypes.func,
     errorLoggedInUser: PropTypes.string,
@@ -78,7 +79,7 @@ class SigninPage extends React.Component {
   }
 
   renderContent() {
-    const { loadingLoggedInUser, errorLoggedInUser, token, next, LoggedInUser } = this.props;
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
 
     if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
@@ -114,7 +115,7 @@ class SigninPage extends React.Component {
             />
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={next || '/'} initialForm={'create-account'} routes={SigninPage.routes} />
+        <SignInOrJoinFree redirect={next || '/'} initialForm={form} routes={SigninPage.routes} />
       </React.Fragment>
     );
   }

@@ -4,7 +4,6 @@ import generateToken from '../support/token';
 describe('signin', () => {
   it('redirects directly when using a dev test account', () => {
     cy.visit('/signin?next=/testuseradmin');
-    cy.contains('button', 'Sign In').click();
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
     cy.get('.LoginTopBarProfileButton-name').contains('testuseradmin', { timeout: 15000 });
@@ -43,7 +42,6 @@ describe('signin', () => {
   it('redirects if token is invalid but user is already logged in', () => {
     // Sign in with test account
     cy.visit('/signin?next=/testuseradmin');
-    cy.contains('button', 'Sign In').click();
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
     cy.assertLoggedIn();
@@ -62,7 +60,6 @@ describe('signin', () => {
 
     // Sign in with test account
     cy.visit('/signin?next=/testuseradmin');
-    cy.contains('button', 'Sign In').click();
     cy.get('input[name=email]').type(user.email);
     cy.get('button[type=submit]').click();
     cy.assertLoggedIn();
@@ -90,7 +87,6 @@ describe('signin', () => {
 
   it("doesn't go into redirect loop if given own address in redirect", () => {
     cy.visit('/signin?next=/signin');
-    cy.contains('button', 'Sign In').click();
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/`);
@@ -98,6 +94,7 @@ describe('signin', () => {
 
   it('can signup as regular user', () => {
     cy.visit('/signin');
+    cy.contains('button', 'Join Free').click();
 
     // Test frontend validations
     cy.get('input[name=email]').type('Incorrect value');
@@ -120,6 +117,7 @@ describe('signin', () => {
   it('can signup as organization', () => {
     cy.visit('/signin');
     // Select "Create oganization"
+    cy.contains('button', 'Join Free').click();
     cy.contains('Create Organization Profile').click();
 
     // Test frontend validations
