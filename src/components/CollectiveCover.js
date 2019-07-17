@@ -146,8 +146,6 @@ ${description}`;
       backgroundRepeat: 'no-repeat',
     };
 
-    const logo = collective.image || get(collective.parentCollective, 'image');
-
     let cta;
     if (this.props.cta) {
       if (this.props.cta.href) {
@@ -380,11 +378,10 @@ ${description}`;
 
           <div className="content">
             <Link route={href} className="goBack">
-              {collective.type === 'USER' && (
-                <Avatar collective={collective} className="logo" radius="10rem" key={logo} />
-              )}
-              {collective.type !== 'USER' && (
-                <Logo collective={collective} className="logo" height="10rem" key={logo} />
+              {collective.type === 'USER' ? (
+                <Avatar collective={collective} className="logo" radius="10rem" />
+              ) : (
+                <Logo collective={collective} className="logo" height="10rem" />
               )}
             </Link>
             <h1>{title}</h1>

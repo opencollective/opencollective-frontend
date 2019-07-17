@@ -133,6 +133,12 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
 }
 
 export function getCollectiveImage(collective, params = {}) {
+  // If available use the imageUrl provided by the API
+  if (collective.imageUrl) {
+    return collective.imageUrl;
+  }
+
+  // Otherwise compute the image URL ourselves
   const sections = [getBaseImagesUrl(), collective.slug];
 
   sections.push(params.name || 'avatar');
