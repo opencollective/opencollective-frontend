@@ -18,7 +18,7 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: ${({ type }) => (type === 'USER' ? '100px' : '25%')};
+  border-radius: ${({ type }) => (type === 'USER' ? '50%' : '25%')};
   ${border}
   color: ${themeGet('colors.black.400')};
   font-weight: bold;

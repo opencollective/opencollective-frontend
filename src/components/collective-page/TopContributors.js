@@ -92,7 +92,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
               <AvatarWithRank>
                 <span>{idx + 1}</span>
                 <Link route={route} params={{ slug: contributor.collectiveSlug }}>
-                  <ContributorAvatar contributor={contributor} radius={28} borderRadius="25%" />
+                  <ContributorAvatar contributor={contributor} radius={32} />
                 </Link>
               </AvatarWithRank>
               <div>
