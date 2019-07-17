@@ -47,7 +47,7 @@ export default {
   },
 
   updateUserInfoFromClearbit(user) {
-    // don't try to fetch user details if user hasn't provided a first name (i.e. if they wanted to remain anonymous)
+    // don't try to fetch user details if user hasn't provided a first name (i.e. if they wanted to remain incognito)
     if (!user.email || !user.firstName) {
       return Promise.resolve();
     }

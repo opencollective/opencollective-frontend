@@ -379,7 +379,7 @@ describe('createOrder', () => {
     expect(emailSendMessageSpy.firstCall.args[1]).to.equal(`1 ticket confirmed for ${event.name}`);
   });
 
-  it('creates an order as new anonymous user', async () => {
+  it('creates an order as new incognito user', async () => {
     // Given an order request
     const newOrder = cloneDeep(baseOrder);
     newOrder.collective = { id: fearlesscitiesbrussels.id };
@@ -399,10 +399,10 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
 
     // And then the donor's Collective slug & name should be
-    // anonymous
+    // incognito
     const fromCollective = res.data.createOrder.fromCollective;
-    expect(fromCollective.slug).to.match(/anonymous/);
-    expect(fromCollective.name).to.match(/anonymous/);
+    expect(fromCollective.slug).to.match(/incognito/);
+    expect(fromCollective.name).to.match(/incognito/);
   });
 
   it("doesn't store the payment method for user if order fail", async () => {

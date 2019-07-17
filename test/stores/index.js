@@ -67,29 +67,29 @@ export async function newUser(name, data = {}) {
 }
 
 /**
- * Create a new anonymous profile
+ * Create a new incognito profile
  */
-export async function newAnonymousProfile(user) {
+export async function newIncognitoProfile(user) {
   if (!user) {
-    throw new Error('newAnonymousProfile requires a User');
+    throw new Error('newIncognitoProfile requires a User');
   }
   if (!user.CollectiveId) {
-    throw new Error('newAnonymousProfile requires a User with a UserCollective (user.CollectiveId)');
+    throw new Error('newIncognitoProfile requires a User with a UserCollective (user.CollectiveId)');
   }
-  const anonymousCollective = await models.Collective.create({
+  const incognitoCollective = await models.Collective.create({
     CreatedByUserId: user.id,
-    isAnonymous: true,
+    isIncognito: true,
     type: 'USER',
-    name: 'anonymous',
-    slug: 'anonymous-agefede29',
+    name: 'incognito',
+    slug: 'incognito-agefede29',
   });
   await models.Member.create({
     CreatedByUserId: user.id,
-    CollectiveId: anonymousCollective.id,
+    CollectiveId: incognitoCollective.id,
     MemberCollectiveId: user.CollectiveId,
     role: 'ADMIN',
   });
-  return anonymousCollective;
+  return incognitoCollective;
 }
 
 /**

@@ -180,14 +180,14 @@ const TransactionFields = () => {
     createdByUser: {
       type: UserType,
       async resolve(transaction, args, req) {
-        // We don't return the user if the transaction has been created by someone who wanted to remain anonymous
+        // We don't return the user if the transaction has been created by someone who wanted to remain incognito
         // This is very suboptimal. We should probably record the CreatedByCollectiveId (or better CreatedByProfileId) instead of the User.
         if (transaction && transaction.getCreatedByUser) {
           const fromCollective = await transaction.getFromCollective();
-          if (fromCollective.isAnonymous && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.CollectiveId)))
+          if (fromCollective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.CollectiveId)))
             return {};
           const collective = await transaction.getCollective();
-          if (collective.isAnonymous && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.FromCollectiveId)))
+          if (collective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.FromCollectiveId)))
             return {};
           return transaction.getCreatedByUser();
         }

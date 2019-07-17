@@ -552,7 +552,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       slug: { type: GraphQLString },
       path: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
-      isAnonymous: { type: GraphQLBoolean },
+      isIncognito: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
       isArchived: { type: GraphQLBoolean },
       isDeletable: { type: GraphQLBoolean },
@@ -747,7 +747,7 @@ const CollectiveFields = () => {
       type: UserType,
       resolve(collective, args, req) {
         if (
-          collective.isAnonymous &&
+          collective.isIncognito &&
           (!req.remoteUser || !req.remoteUser.isAdmin(collective.inTheContextOfCollectiveId))
         )
           return {};
@@ -928,8 +928,8 @@ const CollectiveFields = () => {
     slug: {
       type: GraphQLString,
       resolve(collective, args, req) {
-        // we don't return the slug of an anonymous collective unless the logged in user is the owner
-        if (collective.isAnonymous && (!req.remoteUser || req.remoteUser.id !== collective.CreatedByUserId))
+        // we don't return the slug of an incognito collective unless the logged in user is the owner
+        if (collective.isIncognito && (!req.remoteUser || req.remoteUser.id !== collective.CreatedByUserId))
           return null;
 
         return collective.slug;
@@ -955,11 +955,11 @@ const CollectiveFields = () => {
         return Boolean(collective.settings && collective.settings.apply);
       },
     },
-    isAnonymous: {
-      description: 'Returns whether this collective is anonymous',
+    isIncognito: {
+      description: 'Returns whether this collective is incognito',
       type: GraphQLBoolean,
       resolve(collective) {
-        return collective.isAnonymous;
+        return collective.isIncognito;
       },
     },
     isArchived: {

@@ -3,12 +3,12 @@
 module.exports = {
   up: (queryInterface, sequelize) => {
     return queryInterface
-      .addColumn('Collectives', 'isAnonymous', {
+      .addColumn('Collectives', 'isIncognito', {
         type: sequelize.BOOLEAN,
         defaultValue: false,
       })
       .then(() =>
-        queryInterface.addColumn('CollectiveHistories', 'isAnonymous', {
+        queryInterface.addColumn('CollectiveHistories', 'isIncognito', {
           type: sequelize.BOOLEAN,
           defaultValue: false,
         }),
@@ -17,7 +17,7 @@ module.exports = {
 
   down: (queryInterface, sequelize) => {
     return queryInterface
-      .removeColumn('Collectives', 'isAnonymous')
-      .then(() => queryInterface.removeColumn('CollectiveHistories', 'isAnonymous'));
+      .removeColumn('Collectives', 'isIncognito')
+      .then(() => queryInterface.removeColumn('CollectiveHistories', 'isIncognito'));
   },
 };

@@ -194,7 +194,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     email: { type: GraphQLString },
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
-    isAnonymous: { type: GraphQLBoolean },
+    isIncognito: { type: GraphQLBoolean },
   }),
 });
 
@@ -236,7 +236,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     maxAmount: { type: GraphQLInt },
     currency: { type: GraphQLString },
     settings: { type: GraphQLJSON },
-    isAnonymous: { type: GraphQLBoolean },
+    isIncognito: { type: GraphQLBoolean },
     tags: { type: new GraphQLList(GraphQLString) },
   }),
 });

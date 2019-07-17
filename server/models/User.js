@@ -307,7 +307,7 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.prototype.getAnonymousProfile = function() {
-    return models.Collective.findOne({ where: { isAnonymous: true, CreatedByUserId: this.id } });
+    return models.Collective.findOne({ where: { isIncognito: true, CreatedByUserId: this.id } });
   };
 
   User.prototype.populateRoles = async function() {
@@ -318,9 +318,9 @@ export default (Sequelize, DataTypes) => {
     const rolesByCollectiveId = {};
     const adminOf = [];
     const where = { MemberCollectiveId: this.CollectiveId };
-    const anonymousProfile = await this.getAnonymousProfile();
-    if (anonymousProfile) {
-      where.MemberCollectiveId = { [Op.in]: [this.CollectiveId, anonymousProfile.id] };
+    const incognitoProfile = await this.getAnonymousProfile();
+    if (incognitoProfile) {
+      where.MemberCollectiveId = { [Op.in]: [this.CollectiveId, incognitoProfile.id] };
     }
     const memberships = await models.Member.findAll({ where });
     memberships.map(m => {
@@ -495,11 +495,11 @@ export default (Sequelize, DataTypes) => {
       name += ` ${userData.lastName}`;
     }
 
-    // If user doesn't provide a name, set it to "anonymous". If we cannot
+    // If user doesn't provide a name, set it to "incognito". If we cannot
     // slugify it (for example firstName="------") then fallback on "user".
     let collectiveName = userData.name || name;
     if (!collectiveName || collectiveName.trim().length === 0) {
-      collectiveName = 'anonymous';
+      collectiveName = 'incognito';
     } else if (slugify(collectiveName).length === 0) {
       collectiveName = 'user';
     }

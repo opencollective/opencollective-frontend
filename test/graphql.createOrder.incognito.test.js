@@ -5,7 +5,7 @@ import * as libpayments from '../server/lib/payments';
 
 /* Test tools */
 import * as utils from './utils';
-import * as store from './features/support/stores';
+import * as store from './stores';
 
 const getCollectiveQuery = `
 query Collective($slug: String) {
@@ -60,24 +60,24 @@ query Collective($slug: String) {
 }`;
 
 describe('grahpql.createOrder.opencollective', () => {
-  let adminUser, backerUser, user, anonymousCollective, hostCollective, collective, hostAdmin;
+  let adminUser, backerUser, user, incognitoCollective, hostCollective, collective, hostAdmin;
 
   before(async () => {
     await utils.resetTestDB();
     ({ user: adminUser } = await store.newUser('new admin user', { firstName: 'admin', lastName: 'user' }));
     ({ user: backerUser } = await store.newUser('new backerUser', { firstName: 'backer', lastName: 'user' }));
     ({ user } = await store.newUser('new user', { firstName: 'u', lastName: 'ser' }));
-    anonymousCollective = await store.newAnonymousProfile(user);
+    incognitoCollective = await store.newIncognitoProfile(user);
     ({ hostCollective, collective, hostAdmin } = await store.newCollectiveWithHost('test', 'USD', 'USD', 10));
     await collective.addUserWithRole(adminUser, 'ADMIN');
     await collective.addUserWithRole(backerUser, 'BACKER');
   }); /* End of "beforeEach" */
 
-  describe('making an anonymous donation ', async () => {
+  describe('making an incognito donation ', async () => {
     before(async () => {
       // Given the following order with a payment method
       const { order } = await store.newOrder({
-        from: anonymousCollective,
+        from: incognitoCollective,
         to: collective,
         amount: 2000,
         currency: 'USD',
@@ -96,7 +96,7 @@ describe('grahpql.createOrder.opencollective', () => {
       await libpayments.executeOrder(user, order);
     });
 
-    it("doesn't leak anonymous info when querying the api not logged in", async () => {
+    it("doesn't leak incognito info when querying the api not logged in", async () => {
       const res = await utils.graphqlQuery(getCollectiveQuery, {
         slug: collective.slug,
       });
@@ -106,7 +106,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].createdByUser.firstName).to.be.null;
       expect(collectiveData.orders[0].createdByUser.lastName).to.be.null;
       expect(collectiveData.orders[0].createdByUser.email).to.be.null;
-      expect(collectiveData.orders[0].fromCollective.name).to.equal('anonymous');
+      expect(collectiveData.orders[0].fromCollective.name).to.equal('incognito');
       expect(collectiveData.orders[0].fromCollective.createdByUser.firstName).to.be.null;
       expect(collectiveData.orders[0].fromCollective.createdByUser.lastName).to.be.null;
       expect(collectiveData.orders[0].fromCollective.createdByUser.email).to.be.null;
@@ -122,7 +122,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.transactions[0].createdByUser.email).to.be.null;
     });
 
-    it("doesn't leak anonymous info when querying the api logged in as another backer", async () => {
+    it("doesn't leak incognito info when querying the api logged in as another backer", async () => {
       const res = await utils.graphqlQuery(
         getCollectiveQuery,
         {
@@ -136,7 +136,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].createdByUser.firstName).to.be.null;
       expect(collectiveData.orders[0].createdByUser.lastName).to.be.null;
       expect(collectiveData.orders[0].createdByUser.email).to.be.null;
-      expect(collectiveData.orders[0].fromCollective.name).to.equal('anonymous');
+      expect(collectiveData.orders[0].fromCollective.name).to.equal('incognito');
       expect(collectiveData.orders[0].fromCollective.createdByUser.firstName).to.be.null;
       expect(collectiveData.orders[0].fromCollective.createdByUser.lastName).to.be.null;
       expect(collectiveData.orders[0].fromCollective.createdByUser.email).to.be.null;
@@ -152,7 +152,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.transactions[0].createdByUser.email).to.be.null;
     });
 
-    it('expose anonymous slug to the owner of the anonymous collective', async () => {
+    it('expose incognito slug to the owner of the incognito collective', async () => {
       const res = await utils.graphqlQuery(
         getCollectiveQuery,
         {
@@ -166,7 +166,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.members[2].member.slug).to.not.be.null;
     });
 
-    it('expose anonymous email to the collective admin', async () => {
+    it('expose incognito email to the collective admin', async () => {
       const res = await utils.graphqlQuery(
         getCollectiveQuery,
         {
@@ -180,7 +180,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].createdByUser.firstName).to.equal('u');
       expect(collectiveData.orders[0].createdByUser.lastName).to.equal('ser');
       expect(collectiveData.orders[0].createdByUser.email).to.equal(user.email);
-      expect(collectiveData.orders[0].fromCollective.name).to.equal('anonymous');
+      expect(collectiveData.orders[0].fromCollective.name).to.equal('incognito');
       expect(collectiveData.orders[0].fromCollective.createdByUser.firstName).to.equal('u');
       expect(collectiveData.orders[0].fromCollective.createdByUser.lastName).to.equal('ser');
       expect(collectiveData.orders[0].fromCollective.createdByUser.email).to.equal(user.email);
@@ -196,7 +196,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.transactions[0].createdByUser.email).to.equal(user.email);
     });
 
-    it('expose anonymous email to the host admin', async () => {
+    it('expose incognito email to the host admin', async () => {
       const res = await utils.graphqlQuery(
         getCollectiveQuery,
         {
@@ -210,7 +210,7 @@ describe('grahpql.createOrder.opencollective', () => {
       expect(collectiveData.orders[0].createdByUser.firstName).to.equal('u');
       expect(collectiveData.orders[0].createdByUser.lastName).to.equal('ser');
       expect(collectiveData.orders[0].createdByUser.email).to.equal(user.email);
-      expect(collectiveData.orders[0].fromCollective.name).to.equal('anonymous');
+      expect(collectiveData.orders[0].fromCollective.name).to.equal('incognito');
       expect(collectiveData.orders[0].fromCollective.createdByUser.firstName).to.equal('u');
       expect(collectiveData.orders[0].fromCollective.createdByUser.lastName).to.equal('ser');
       expect(collectiveData.orders[0].fromCollective.createdByUser.email).to.equal(user.email);

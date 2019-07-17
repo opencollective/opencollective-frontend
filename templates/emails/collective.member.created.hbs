@@ -10,7 +10,7 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
 <p>Hi,</p>
 {{/if}}
 
-<p>Just a quick note to let you know that {{#if member.memberCollective.isAnonymous}}anonymous{{else}}<a
+<p>Just a quick note to let you know that {{#if member.memberCollective.isIncognito}}someone (incognito){{else}}<a
     href="{{config.host.website}}/{{member.memberCollective.slug}}">{{member.memberCollective.name}}</a>{{/if}} is now a
   {{{toLowerCase member.role}}} of <a href="{{config.host.website}}{{collective.urlPath}}">{{collective.name}}</a>.</p>
 
@@ -27,7 +27,7 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
 </center>
 {{/if}}
 
-{{#if member.memberCollective.isAnonymous}}
+{{#if member.memberCollective.isIncognito}}
 {{else}}
 <h2>About {{member.memberCollective.name}}</h2>
 <table>

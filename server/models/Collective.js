@@ -324,7 +324,7 @@ export default function(Sequelize, DataTypes) {
         defaultValue: false,
       },
 
-      isAnonymous: {
+      isIncognito: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
@@ -540,7 +540,7 @@ export default function(Sequelize, DataTypes) {
             name: this.name,
             company: this.company,
             website: this.website,
-            isAnonymous: this.isAnonymous,
+            isIncognito: this.isIncognito,
             twitterHandle: this.twitterHandle,
             githubHandle: this.githubHandle,
             description: this.description,
@@ -752,7 +752,7 @@ export default function(Sequelize, DataTypes) {
     }
 
     if (this.type === 'USER') {
-      if (user && user.email && this.name && this.name !== 'anonymous') {
+      if (user && user.email && this.name && this.name !== 'incognito') {
         const emailHash = md5(user.email.toLowerCase().trim());
         const avatar = `https://www.gravatar.com/avatar/${emailHash}?default=404`;
         return this.checkAndUpdateImage(avatar);
