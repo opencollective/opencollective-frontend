@@ -40,7 +40,7 @@ const Translations = defineMessages({
  * Collective's page Hero/Banner/Cover component.
  */
 const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
-  <Container position="relative" minHeight={325} zIndex={9999}>
+  <Container position="relative" minHeight={325} zIndex={1000}>
     <HeroBackground backgroundImage={collective.backgroundImage} />
     <ContainerSectionContent pt={40} display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
       {/* Collective presentation (name, logo, description...) */}
