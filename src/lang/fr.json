@@ -387,6 +387,8 @@
   "discover.other": "Autres",
   "discover.pledgedCollectives": "Pledged collectives",
   "discover.searchNoResult": "Aucun collectif trouvé.",
+  "discover.sort.Newest": "Newest",
+  "discover.sort.Popularity": "Most popular",
   "discover.subTitle": "Ensemble nous pouvons faire des choses fantastiques.",
   "discover.title": "Découvrez des collectifs similaires à soutenir",
   "editCollective.host.balance": "Votre hôte détient actuellement {balance} pour votre Collectif.",

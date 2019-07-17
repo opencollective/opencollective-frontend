@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { withRouter } from 'next/router';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
@@ -111,39 +111,46 @@ const SearchFormContainer = styled(Box)`
   min-width: 10rem;
 `;
 
-const DiscoverPage = ({ router }) => {
+const sortOptions = {
+  popularity: 'popularity',
+  newest: 'newest',
+};
+
+const I18nSortLabels = defineMessages({
+  [sortOptions.popularity]: {
+    id: 'discover.sort.Popularity',
+    defaultMessage: 'Most popular',
+  },
+  [sortOptions.newest]: {
+    id: 'discover.sort.Newest',
+    defaultMessage: 'Newest',
+  },
+});
+
+const DiscoverPage = ({ router, intl }) => {
   const { query } = router;
 
   const params = {
     offset: Number(query.offset) || 0,
     tags: !query.show || query.show === 'all' ? undefined : [query.show],
-    orderBy: query.sort === 'newest' ? 'createdAt' : 'totalDonations',
+    orderBy: query.sort === sortOptions.newest ? 'createdAt' : 'totalDonations',
     limit: 15,
     isActive: query.show !== 'pledged',
     isPledged: query.show === 'pledged',
   };
 
-  if (query.show == 'pledged') {
-    params['isPledged'] = true;
-  }
-
-  const applyFilter = (name, value) => {
+  const setRouteParam = (name, value) => {
     router.push({
       pathname: router.pathname,
       query: { ...router.query, offset: 0, [name]: value },
     });
   };
 
-  const sortOptions = {
-    totalDonations: 'Most Popular',
-    newest: 'Newest',
-  };
-
-  const selectedSort = sortOptions[query.sort || 'totalDonations'];
+  const selectedSort = sortOptions[query.sort] || sortOptions.popularity;
 
   const handleSubmit = event => {
     const searchInput = event.target.elements.q;
-    applyFilter('show', searchInput.value);
+    setRouteParam('show', searchInput.value);
     event.preventDefault();
   };
 
@@ -240,11 +247,11 @@ const DiscoverPage = ({ router }) => {
                       placeholder={'Sort by'}
                       onChange={selected => {
                         if (selected && selected.key) {
-                          applyFilter('sort', selected != selected.key);
+                          setRouteParam('sort', selected && selected.key);
                         }
                       }}
                     >
-                      {({ value }) => <span style={{ display: 'flex', alignItems: 'flex-end' }}>{value}</span>}
+                      {({ value }) => intl.formatMessage(I18nSortLabels[value])}
                     </StyledSelect>
                   </Flex>
                 </Flex>
@@ -308,4 +315,4 @@ DiscoverPage.propTypes = {
   intl: PropTypes.object,
 };
 
-export default withRouter(DiscoverPage);
+export default withRouter(injectIntl(DiscoverPage));
