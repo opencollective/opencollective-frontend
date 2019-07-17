@@ -56,6 +56,7 @@ const DiscoverPageDataQuery = gql`
         website
         githubHandle
         stats {
+          id
           yearlyBudget
           backers {
             all
