@@ -113,7 +113,6 @@ class CollectivePage extends Component {
     // Get the currently selected section
     const distanceThreshold = 400;
     const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
-    const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
     const sections = this.getSections(this.props);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];

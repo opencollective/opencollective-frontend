@@ -33,22 +33,16 @@ class NewCollectivePage extends React.Component {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
-    data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object, // from withUser
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      Collective: PropTypes.object,
+    }).isRequired, // from withData
   };
 
   static getInitialProps({ query: { slug, status } }) {
     return { slug, status };
-  }
-
-  // See https://github.com/opencollective/opencollective/issues/1872
-  shouldComponentUpdate(newProps) {
-    if (get(this.props, 'data.Collective') && !get(newProps, 'data.Collective')) {
-      console.warn('Collective lost from props (#1872)');
-      return false;
-    } else {
-      return true;
-    }
   }
 
   getPageMetaData(collective) {
@@ -102,23 +96,23 @@ class NewCollectivePage extends React.Component {
       );
     }
 
-    const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(data.Collective));
-    const primaryColor = getCollectivePrimaryColor(data.collective);
+    const collective = data.Collective;
+    const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
     return (
-      <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
+      <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
-        <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
-        <ThemeProvider theme={this.getTheme(primaryColor)}>
+        <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
+        <ThemeProvider theme={this.getTheme(getCollectivePrimaryColor(collective))}>
           <CollectivePage
-            collective={data.Collective}
-            host={data.Collective.host}
-            contributors={data.Collective.contributors}
-            tiers={data.Collective.tiers}
-            events={data.Collective.events}
-            transactions={data.Collective.transactions}
-            expenses={data.Collective.expenses}
-            stats={data.Collective.stats}
-            updates={data.Collective.updates}
+            collective={collective}
+            host={collective.host}
+            contributors={collective.contributors}
+            tiers={collective.tiers}
+            events={collective.events}
+            transactions={collective.transactions}
+            expenses={collective.expenses}
+            stats={collective.stats}
+            updates={collective.updates}
             LoggedInUser={LoggedInUser}
             isAdmin={isAdmin}
             status={status}
