@@ -3,15 +3,19 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { createGlobalStyle } from 'styled-components';
+import memoizeOne from 'memoize-one';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import { lighten, darken } from 'polished';
 
+import theme, { generateTheme } from '../constants/theme';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
-import CollectivePage from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
+import CollectivePage from '../components/collective-page';
+import { getCollectivePrimaryColor } from '../components/collective-page/_utils';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -63,6 +67,28 @@ class NewCollectivePage extends React.Component {
     }
   }
 
+  getTheme = memoizeOne(primaryColor => {
+    if (!primaryColor) {
+      return theme;
+    } else {
+      return generateTheme({
+        colors: {
+          ...theme.colors,
+          primary: {
+            800: darken(0.1, primaryColor),
+            700: darken(0.05, primaryColor),
+            500: primaryColor,
+            400: lighten(0.05, primaryColor),
+            300: lighten(0.1, primaryColor),
+            200: lighten(0.15, primaryColor),
+            100: lighten(0.2, primaryColor),
+            50: lighten(0.25, primaryColor),
+          },
+        },
+      });
+    }
+  });
+
   render() {
     const { data, LoggedInUser, status } = this.props;
 
@@ -77,24 +103,27 @@ class NewCollectivePage extends React.Component {
     }
 
     const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(data.Collective));
+    const primaryColor = getCollectivePrimaryColor(data.collective);
     return (
       <Page {...this.getPageMetaData(data.collective)} withoutGlobalStyles>
         <GlobalStyles />
         <CollectiveNotificationBar collective={data.Collective} host={data.Collective.host} status={status} />
-        <CollectivePage
-          collective={data.Collective}
-          host={data.Collective.host}
-          contributors={data.Collective.contributors}
-          tiers={data.Collective.tiers}
-          events={data.Collective.events}
-          transactions={data.Collective.transactions}
-          expenses={data.Collective.expenses}
-          stats={data.Collective.stats}
-          updates={data.Collective.updates}
-          LoggedInUser={LoggedInUser}
-          isAdmin={isAdmin}
-          status={status}
-        />
+        <ThemeProvider theme={this.getTheme(primaryColor)}>
+          <CollectivePage
+            collective={data.Collective}
+            host={data.Collective.host}
+            contributors={data.Collective.contributors}
+            tiers={data.Collective.tiers}
+            events={data.Collective.events}
+            transactions={data.Collective.transactions}
+            expenses={data.Collective.expenses}
+            stats={data.Collective.stats}
+            updates={data.Collective.updates}
+            LoggedInUser={LoggedInUser}
+            isAdmin={isAdmin}
+            status={status}
+          />
+        </ThemeProvider>
       </Page>
     );
   }

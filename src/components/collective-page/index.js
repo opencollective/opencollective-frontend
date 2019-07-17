@@ -3,11 +3,8 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { ThemeProvider } from 'styled-components';
-import { lighten, darken } from 'polished';
 
 // OC Frontend imports
-import theme, { generateTheme } from '../../constants/theme';
 import Container from '../Container';
 import CollectiveNavbar from '../CollectiveNavbar';
 
@@ -193,66 +190,40 @@ class CollectivePage extends Component {
     }
   }
 
-  getTheme() {
-    const customColor = get(this.props.collective, 'settings.collectivePage.primaryColor', '#000000');
-    if (!customColor) {
-      return theme;
-    } else {
-      return generateTheme({
-        colors: {
-          ...theme.colors,
-          primary: {
-            800: darken(0.1, customColor),
-            700: darken(0.05, customColor),
-            500: customColor,
-            400: lighten(0.05, customColor),
-            300: lighten(0.1, customColor),
-            200: lighten(0.15, customColor),
-            100: lighten(0.2, customColor),
-            50: lighten(0.25, customColor),
-          },
-        },
-      });
-    }
-  }
-
   render() {
     const { collective, host, isAdmin } = this.props;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props);
-    const pageTheme = this.getTheme();
 
     return (
-      <ThemeProvider theme={pageTheme}>
-        <Container
-          position="relative"
-          borderTop="1px solid #E6E8EB"
-          css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
-        >
-          <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
-          <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
-            <CollectiveNavbar
-              collective={collective}
-              sections={sections}
-              selected={selectedSection || sections[0]}
-              onCollectiveClick={this.onCollectiveClick}
-              hideInfos={!isFixed}
-              isAnimated={true}
-              onSectionClick={this.onSectionClick}
-              LinkComponent={({ section, label }) => (
-                <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
-                  {label}
-                </a>
-              )}
-            />
-          </Container>
-          {sections.map(section => (
-            <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
-              {this.renderSection(section)}
-            </div>
-          ))}
+      <Container
+        position="relative"
+        borderTop="1px solid #E6E8EB"
+        css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+      >
+        <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
+        <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
+          <CollectiveNavbar
+            collective={collective}
+            sections={sections}
+            selected={selectedSection || sections[0]}
+            onCollectiveClick={this.onCollectiveClick}
+            hideInfos={!isFixed}
+            isAnimated={true}
+            onSectionClick={this.onSectionClick}
+            LinkComponent={({ section, label }) => (
+              <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
+                {label}
+              </a>
+            )}
+          />
         </Container>
-      </ThemeProvider>
+        {sections.map(section => (
+          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+            {this.renderSection(section)}
+          </div>
+        ))}
+      </Container>
     );
   }
 }
