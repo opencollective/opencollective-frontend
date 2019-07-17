@@ -974,6 +974,7 @@
   "tier.type.donation": "donación (regalo)",
   "tier.type.label": "tipo",
   "tier.type.membership": "membership (recurring)",
+  "tier.type.prepaid": "prepaid (card)",
   "tier.type.product": "producto (ej. camiseta)",
   "tier.type.service": "servicio (ej. soporte)",
   "tier.type.sponsor.add": "sumar otra categoría",

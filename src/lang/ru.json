@@ -974,6 +974,7 @@
   "tier.type.donation": "donation (gift)",
   "tier.type.label": "тип",
   "tier.type.membership": "membership (recurring)",
+  "tier.type.prepaid": "prepaid (card)",
   "tier.type.product": "продукт (например, майка)",
   "tier.type.service": "услуга (например, тех. поддержка)",
   "tier.type.sponsor.add": "добавить уровень",

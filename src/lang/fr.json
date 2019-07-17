@@ -974,6 +974,7 @@
   "tier.type.donation": "don (sans contrepartie)",
   "tier.type.label": "type",
   "tier.type.membership": "membre (récurrent)",
+  "tier.type.prepaid": "prepaid (card)",
   "tier.type.product": "produit (e.g. t-shirt)",
   "tier.type.service": "service (ex. support)",
   "tier.type.sponsor.add": "ajouter un autre tier",

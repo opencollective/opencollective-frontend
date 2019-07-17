@@ -974,6 +974,7 @@
   "tier.type.donation": "寄付 (ギフト)",
   "tier.type.label": "タイプ",
   "tier.type.membership": "メンバーシップ (定期)",
+  "tier.type.prepaid": "prepaid (card)",
   "tier.type.product": "プロダクト (例: Tシャツ)",
   "tier.type.service": "サービス (例: サポート)",
   "tier.type.sponsor.add": "ほかの Tier を追加",

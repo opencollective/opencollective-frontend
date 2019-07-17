@@ -974,6 +974,7 @@
   "tier.type.donation": "donation (gift)",
   "tier.type.label": "类型",
   "tier.type.membership": "membership (recurring)",
+  "tier.type.prepaid": "prepaid (card)",
   "tier.type.product": "product (e.g. t-shirt)",
   "tier.type.service": "service (e.g. support)",
   "tier.type.sponsor.add": "add another tier",
