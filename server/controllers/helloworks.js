@@ -41,6 +41,9 @@ async function callback(req, res) {
         email,
       },
     });
+
+    const userCollectiveName = await user.username;
+
     const doc = await LegalDocument.findByTypeYearUser({ year, documentType: US_TAX_FORM, user });
 
     client.workflowInstances
@@ -49,7 +52,7 @@ async function callback(req, res) {
         documentId,
       })
       .then(buff => Promise.resolve(encrypt(buff, ENCRYPTION_KEY)))
-      .then(UploadToS3({ id: user.id, year, documentType: US_TAX_FORM }))
+      .then(UploadToS3({ id: userCollectiveName, year, documentType: US_TAX_FORM }))
       .then(({ Location: location }) => {
         doc.requestStatus = RECEIVED;
         doc.documentLink = location;
