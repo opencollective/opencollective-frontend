@@ -117,14 +117,14 @@ class CollectivePage extends Component {
     }
 
     // Get the currently selected section
-    const distanceThreshold = 300;
-    const currentViewBottom = window.scrollY + window.innerHeight;
+    const distanceThreshold = 400;
+    const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
     const isAdmin = this.isAdmin(this.props.LoggedInUser, this.props.collective);
     const sections = this.getSections(this.props, isAdmin);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
-      if (sectionRef && currentViewBottom - distanceThreshold > sectionRef.offsetTop) {
+      if (sectionRef && currentViewBottom > sectionRef.offsetTop) {
         selectedSection = sectionName;
         break;
       }
