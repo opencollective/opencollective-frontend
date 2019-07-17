@@ -125,9 +125,9 @@ const CollectiveNavbar = ({
 }) => {
   return (
     <Container borderBottom="1px solid #e6e8eb" background="white">
-      <Container margin="0 auto" maxWidth={Dimensions.MAX_SECTION_WIDTH} px={Dimensions.PADDING_X}>
+      <Container margin="0 auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
         {/** Collective infos */}
-        <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
+        <InfosContainer isHidden={hideInfos} isAnimated={isAnimated} px={Dimensions.PADDING_X}>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
             <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%">
               <Avatar borderRadius="25%" collective={collective} radius={40} />
@@ -142,7 +142,13 @@ const CollectiveNavbar = ({
 
         {/** Navbar items and buttons */}
         <Container display="flex" justifyContent="space-between" alignItems="center" height={[60, null, 80]}>
-          <Container display="flex" height="100%" css={{ overflowX: 'auto' }} data-cy="CollectivePage.NavBar">
+          <Container
+            display="flex"
+            height="100%"
+            css={{ overflowX: 'auto' }}
+            px={Dimensions.PADDING_X}
+            data-cy="CollectivePage.NavBar"
+          >
             {sections.map(section => (
               <MenuLinkContainer
                 key={section}
