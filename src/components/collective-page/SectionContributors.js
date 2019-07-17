@@ -69,36 +69,38 @@ export default class SectionContributors extends React.PureComponent {
     return (
       <MainContainer py={[4, 5]}>
         <ContainerSectionContent>
-          <H2 mb={4} px={3} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
+          <H2 mb={4} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
             <FormattedMessage
               id="CollectivePage.AllOfUs"
               defaultMessage="{collectiveName} is all of us"
               values={{ collectiveName }}
             />
           </H2>
-          <H3 mb={3} px={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+          <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
             <FormattedMessage
               id="CollectivePage.OurContributors"
               defaultMessage="Our contributors {count}"
               values={{ count: <Span color="black.400">{contributors.length}</Span> }}
             />
           </H3>
-          <P color="black.600" mb={4} px={3}>
+          <P color="black.600" mb={4}>
             <FormattedMessage
               id="CollectivePage.ContributorsDescription"
               defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
               values={{ collectiveName }}
             />
           </P>
-          {hasFilters && filters.length > 2 && (
+        </ContainerSectionContent>
+        {hasFilters && filters.length > 2 && (
+          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH - 30} margin="0 auto">
             <ContributorsFilter
               selected={filter}
               onChange={this.setFilter}
               filters={filters}
               selectedButtonStyle="primary"
             />
-          )}
-        </ContainerSectionContent>
+          </Container>
+        )}
         <Box mb={4}>
           <ContributorsGrid
             contributors={filteredContributors}
