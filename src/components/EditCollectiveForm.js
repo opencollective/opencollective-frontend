@@ -720,7 +720,7 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'tiers' && (
                 <EditTiers
                   title="Tiers"
-                  types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
+                  types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION', 'PREPAID']}
                   tiers={this.state.tiers}
                   collective={collective}
                   currency={collective.currency}

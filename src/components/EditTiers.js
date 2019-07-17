@@ -51,6 +51,7 @@ class EditTiers extends React.Component {
         defaultMessage: 'product (e.g. t-shirt)',
       },
       DONATION: { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
+      PREPAID: { id: 'tier.type.prepaid', defaultMessage: 'prepaid (card)' },
       TICKET: {
         id: 'tier.type.ticket',
         defaultMessage: 'ticket (allow multiple tickets per order)',
@@ -215,7 +216,7 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['onetime', 'month', 'year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: tier => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].indexOf(tier.type) !== -1,
+        when: tier => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE', 'PREPAID'].indexOf(tier.type) !== -1,
       },
       {
         name: 'maxQuantity',
