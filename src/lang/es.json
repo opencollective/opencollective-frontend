@@ -195,7 +195,7 @@
   "collective.user.orderProcessing.message": "Actualmente estamos procesando su donación a {collective}. Lo agregaremos a su perfil y le enviaremos un correo electrónico de confirmación una vez que se confirme el pago.",
   "collective.website.description": "Escribe la dirección web de tu página web o página de Facebook",
   "collective.website.label": "Página web",
-  "CollectivePage.AddLongDescription": "Add your mission",
+  "CollectivePage.AddLongDescription": "Añade tu misión",
   "CollectivePage.AllOfUs": "{collectiveName} somos todos nosotros",
   "CollectivePage.Contribute": "Contribuir",
   "CollectivePage.Contribute.Custom": "Custom contribution",
