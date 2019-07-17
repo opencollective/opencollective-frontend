@@ -56,20 +56,20 @@ const MenuLinkContainer = styled.div`
     `}
 `;
 
-const InfosContainer = styled.div`
+const InfosContainer = styled(Container)`
   display: flex;
-  padding: 24px 0 0;
+  padding-top: 18px;
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
   @media (max-width: 52em) {
-    padding: 18px 0 0;
+    padding-top: 16px;
   }
 
   @media (max-width: 40em) {
-    padding: 16px 0 0;
+    padding-top: 8px;
   }
 
   /** Hidden state */
@@ -141,7 +141,7 @@ const CollectiveNavbar = ({
         </InfosContainer>
 
         {/** Navbar items and buttons */}
-        <Container display="flex" justifyContent="space-between" alignItems="center" height={[60, null, 80]}>
+        <Container display="flex" justifyContent="space-between" alignItems="center" height={[50, null, 65]}>
           <Container
             display="flex"
             height="100%"
