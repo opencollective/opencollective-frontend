@@ -9,6 +9,7 @@ import fetch from 'isomorphic-fetch';
 import moment from 'moment';
 import * as ics from 'ics';
 import { get, difference, uniqBy, pick, pickBy, sumBy, keys, omit, defaults, includes, isNull } from 'lodash';
+import uuid from 'uuid/v4';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 
@@ -574,14 +575,20 @@ export default function(Sequelize, DataTypes) {
       hooks: {
         beforeValidate: instance => {
           if (instance.slug) return Promise.resolve();
-
-          const potentialSlugs = [
-            instance.slug,
-            instance.image ? userlib.getUsernameFromGithubURL(instance.image) : null,
-            instance.twitterHandle ? instance.twitterHandle.replace(/@/g, '') : null,
-            instance.name ? instance.name.replace(/ /g, '-') : null,
-          ];
-          return Collective.generateSlug(potentialSlugs).then(slug => {
+          let potentialSlugs,
+            useSlugify = true;
+          if (instance.isIncognito) {
+            useSlugify = false;
+            potentialSlugs = [`incognito-${uuid().split('-')[0]}`];
+          } else {
+            potentialSlugs = [
+              instance.slug,
+              instance.image ? userlib.getUsernameFromGithubURL(instance.image) : null,
+              instance.twitterHandle ? instance.twitterHandle.replace(/@/g, '') : null,
+              instance.name ? instance.name.replace(/ /g, '-') : null,
+            ];
+          }
+          return Collective.generateSlug(potentialSlugs, useSlugify).then(slug => {
             if (!slug) {
               return Promise.reject(
                 new Error("We couldn't generate a unique slug for this collective", potentialSlugs),
@@ -2189,7 +2196,7 @@ export default function(Sequelize, DataTypes) {
    * If there is a username suggested, we'll check that it's valid or increase it's count
    * Otherwise, we'll suggest something.
    */
-  Collective.generateSlug = suggestions => {
+  Collective.generateSlug = (suggestions, useSlugify = true) => {
     /*
      * Checks a given slug in a list and if found, increments count and recursively checks again
      */
@@ -2202,9 +2209,11 @@ export default function(Sequelize, DataTypes) {
       }
     };
 
-    suggestions = suggestions
-      .filter(slug => (slug ? true : false)) // filter out any nulls
-      .map(slug => slugify(slug)); // Will also trim, lowercase and remove + signs
+    suggestions = suggestions.filter(slug => (slug ? true : false)); // filter out any nulls
+
+    if (useSlugify) {
+      suggestions = suggestions.map(slug => slugify(slug)); // Will also trim, lowercase and remove + signs
+    }
 
     // fetch any matching slugs or slugs for the top choice in the list above
     return Sequelize.query(
