@@ -95,6 +95,7 @@ const getOrdersQuery = gql`
       fromCollective {
         id
         type
+        isIncognito
         name
         slug
         image

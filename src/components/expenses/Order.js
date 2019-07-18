@@ -7,6 +7,7 @@ import { capitalize } from '../../lib/utils';
 
 import Avatar from '..//Avatar';
 import Link from '../Link';
+import LinkCollective from '../LinkCollective';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
@@ -192,14 +193,9 @@ class Order extends React.Component {
         </style>
 
         <div className="fromCollective">
-          <Link
-            route="collective"
-            params={{ slug: order.fromCollective.slug }}
-            title={order.fromCollective.name}
-            passHref
-          >
+          <LinkCollective collective={order.fromCollective} title={order.fromCollective.name} passHref>
             <Avatar collective={order.fromCollective} key={order.fromCollective.id} radius={40} className="noFrame" />
-          </Link>
+          </LinkCollective>
         </div>
         <div className="body">
           <div className="header">
@@ -217,7 +213,7 @@ class Order extends React.Component {
               {' | '}
               {includeHostedCollectives && order.collective && (
                 <span className="collective">
-                  <Link route={`/${order.collective.slug}`}>{order.collective.slug}</Link>
+                  <LinkCollective collective={order.collective}>{order.collective.slug}</LinkCollective>
                   {' | '}
                 </span>
               )}
