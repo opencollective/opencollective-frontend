@@ -471,6 +471,7 @@ export const getCollectiveQuery = gql`
         }
       }
       ... on User {
+        isIncognito
         memberOf(limit: 60) {
           id
           role
