@@ -315,11 +315,7 @@ class CreateOrderPage extends React.Component {
     // Check if we're creating a new profile
     if (!this.state.stepProfile.id) {
       this.setState({ submitting: true });
-      if (this.state.stepProfile.isIncognito) {
-        this.state.stepProfile.slug = `incognito-${uuid().split('-')[0]}`;
-      } else {
-        this.state.stepProfile.type = this.state.stepProfile.type || 'ORGANIZATION';
-      }
+      this.state.stepProfile.type = this.state.stepProfile.type || 'ORGANIZATION';
 
       try {
         const { data: result } = await this.props.createCollective(this.state.stepProfile);
