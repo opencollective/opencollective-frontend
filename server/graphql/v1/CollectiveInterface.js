@@ -927,11 +927,7 @@ const CollectiveFields = () => {
     },
     slug: {
       type: GraphQLString,
-      resolve(collective, args, req) {
-        // we don't return the slug of an incognito collective unless the logged in user is the owner
-        if (collective.isIncognito && (!req.remoteUser || req.remoteUser.id !== collective.CreatedByUserId))
-          return null;
-
+      resolve(collective) {
         return collective.slug;
       },
     },
