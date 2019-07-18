@@ -13,17 +13,23 @@ class Header extends React.Component {
     image: PropTypes.string,
     twitterHandle: PropTypes.string,
     css: PropTypes.string,
+    meta: PropTypes.object,
     className: PropTypes.string,
     title: PropTypes.string,
     showSearch: PropTypes.bool,
   };
 
+  static defaultProps = {
+    meta: {},
+  };
+
   constructor(props) {
     super(props);
-    const { description, image, twitterHandle, title } = props;
+    const { description, image, twitterHandle, title, meta } = props;
     const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
     const defaultImage = 'https://opencollective.com/static/images/opencollectiveicon-240x240@2x.png';
-    const meta = {
+    const defaultMeta = {
+      ...meta,
       'twitter:site': '@opencollect',
       'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
       'fb:app_id': '266835577107099',
@@ -38,7 +44,7 @@ class Header extends React.Component {
     };
 
     this.meta = [];
-    for (const name in meta) {
+    for (const name in defaultMeta) {
       this.meta.push({
         name,
         content: meta[name],
