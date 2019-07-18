@@ -947,6 +947,7 @@ const query = gql`
           name
           slug
           type
+          isIncognito
         }
         collective {
           name
@@ -1002,6 +1003,7 @@ const query = gql`
       collectives {
         id
         type
+        isIncognito
         slug
         currency
         name
@@ -1025,6 +1027,7 @@ const query = gql`
         id
         currency
         type
+        isIncognito
         slug
         name
         image
