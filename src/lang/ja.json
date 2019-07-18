@@ -1095,6 +1095,8 @@
   "user.twitterHandle.description": "あれば",
   "user.twitterHandle.label": "Twitter",
   "user.website.label": "ウェブサイト",
+  "UserCollective.incognito.description": "This user decided to remain incognito",
+  "UserCollective.incognito.title": "Incognito user",
   "usercollective.since": "{year}年から",
   "VideoLinkerBox.AddVideo": "Add a video",
   "VideoLinkerBox.SetUrl": "Set the video URL above. We support the following platforms: {supportedVideoProviders}",

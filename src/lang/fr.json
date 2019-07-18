@@ -1095,6 +1095,8 @@
   "user.twitterHandle.description": "(si vous avez un compte Twitter)",
   "user.twitterHandle.label": "Twitter",
   "user.website.label": "site Internet",
+  "UserCollective.incognito.description": "This user decided to remain incognito",
+  "UserCollective.incognito.title": "Incognito user",
   "usercollective.since": "depuis {year}",
   "VideoLinkerBox.AddVideo": "Ajouter une vidéo",
   "VideoLinkerBox.SetUrl": "Ajoutez l'adresse de la vidéo au dessus. Les plateformes suivantes sont supportées : {supportedVideoProviders}",
