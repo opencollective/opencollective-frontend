@@ -11,6 +11,7 @@ import Container from '../Container';
 import StyledButton from '../StyledButton';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
+import { CollectiveType } from '../../constants/collectives';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -51,7 +52,15 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
   return (
     <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 5]}>
       <H3 fontSize="H2" lineHeight="H2" fontWeight="normal" textAlign="center" mb={5}>
-        <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
+        {collective.type === CollectiveType.COLLECTIVE ? (
+          <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
+        ) : (
+          <FormattedMessage
+            id="SectionAbout.TitleAlt"
+            defaultMessage="About {collectiveName}"
+            values={{ collectiveName: collective.name }}
+          />
+        )}
       </H3>
 
       <Container width="100%" maxWidth={700} margin="0 auto">
@@ -124,6 +133,7 @@ SectionAbout.propTypes = {
     id: PropTypes.number.isRequired,
     longDescription: PropTypes.string,
     name: PropTypes.string,
+    type: PropTypes.string,
     isArchived: PropTypes.bool,
   }).isRequired,
   /** A mutation used to update the description */

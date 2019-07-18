@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
-import { layout, space } from 'styled-system';
+import { layout, space, border } from 'styled-system';
 
 import { flicker } from './StyledKeyframes';
 
@@ -16,9 +16,9 @@ const LoadingPlaceholder = styled.div`
   animation: ${AnimateBackground} 1s linear infinite, ${flicker({ minOpacity: 0.8 })} 1s linear infinite;
   background: linear-gradient(to right, #eee 2%, #ddd 18%, #eee 33%);
   background-size: 200%;
-  border-radius: 15px;
   width: 100%;
-
+  
+  ${border}
   ${layout}
   ${space}
 `;
@@ -29,6 +29,7 @@ LoadingPlaceholder.propTypes = {
 
 LoadingPlaceholder.defaultProps = {
   height: '100%',
+  borderRadius: '2%',
 };
 
 /** @component */

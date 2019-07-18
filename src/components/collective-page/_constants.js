@@ -17,6 +17,7 @@ export const AnimationsDurations = {
  * A map of unique identifiers for the sections of the page
  */
 export const Sections = {
+  COLLECTIVES: 'collectives',
   CONTRIBUTE: 'contribute',
   // CONVERSATIONS: 'conversations',
   UPDATES: 'updates',

@@ -1,6 +1,17 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { compose, background, border, flexbox, shadow, color, layout, space, typography } from 'styled-system';
+import {
+  compose,
+  background,
+  border,
+  flexbox,
+  shadow,
+  color,
+  layout,
+  space,
+  typography,
+  position,
+} from 'styled-system';
 import styledPropTypes from '@styled-system/prop-types';
 import { overflow } from '../lib/styled_system_custom';
 
@@ -18,6 +29,7 @@ const StyledCard = styled.div(
     shadow,
     color,
     layout,
+    position,
     space,
     overflow,
   ),

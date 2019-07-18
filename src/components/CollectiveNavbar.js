@@ -107,6 +107,10 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Updates',
     defaultMessage: 'Updates',
   },
+  [Sections.COLLECTIVES]: {
+    id: 'CollectivePage.NavBar.Collectives',
+    defaultMessage: 'Collectives',
+  },
 });
 
 /**
@@ -130,7 +134,7 @@ const CollectiveNavbar = ({
         <InfosContainer isHidden={hideInfos} isAnimated={isAnimated} px={Dimensions.PADDING_X}>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
             <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%">
-              <Avatar borderRadius="25%" collective={collective} radius={40} />
+              <Avatar collective={collective} radius={40} />
             </Container>
           </LinkCollective>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
