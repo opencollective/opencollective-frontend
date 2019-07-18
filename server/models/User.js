@@ -306,7 +306,7 @@ export default (Sequelize, DataTypes) => {
     });
   };
 
-  User.prototype.getAnonymousProfile = function() {
+  User.prototype.getIncognitoProfile = function() {
     return models.Collective.findOne({ where: { isIncognito: true, CreatedByUserId: this.id } });
   };
 
@@ -318,7 +318,7 @@ export default (Sequelize, DataTypes) => {
     const rolesByCollectiveId = {};
     const adminOf = [];
     const where = { MemberCollectiveId: this.CollectiveId };
-    const incognitoProfile = await this.getAnonymousProfile();
+    const incognitoProfile = await this.getIncognitoProfile();
     if (incognitoProfile) {
       where.MemberCollectiveId = { [Op.in]: [this.CollectiveId, incognitoProfile.id] };
     }
