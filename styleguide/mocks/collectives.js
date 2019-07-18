@@ -1742,7 +1742,7 @@ export const webpackCollective = {
       member: {
         id: 3736,
         description: null,
-        name: 'Anonymous',
+        name: 'Incognito',
         slug: 'incognito-3736',
         type: 'USER',
         image: null,

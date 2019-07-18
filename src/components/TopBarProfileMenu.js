@@ -255,7 +255,7 @@ class TopBarProfileMenu extends React.Component {
               <ListItem py={1}>
                 <Link route="collective" params={{ slug: incognitoProfileMembership.collective.slug }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    <FormattedMessage id="menu.incognitoProfile" defaultMessage="Anonymous profile" />
+                    <FormattedMessage id="menu.incognitoProfile" defaultMessage="Incognito profile" />
                   </StyledLink>
                 </Link>
               </ListItem>
