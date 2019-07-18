@@ -4,93 +4,80 @@ import models from '../../../models';
 import errors from '../../../lib/errors';
 import roles from '../../../constants/roles';
 
-export function createMember(_, args, req) {
-  let collective;
-
-  const checkPermission = () => {
+export async function createMember(_, args, req) {
+  const checkPermission = collective => {
     if (!req.remoteUser) {
       throw new errors.Unauthorized('You need to be logged in to create a member');
     }
-    if (req.remoteUser.isAdmin(collective.id)) {
-      return true;
+    if (!req.remoteUser.isAdmin(collective.id)) {
+      throw new errors.Unauthorized(
+        `You need to be logged in as a core contributor or as a host of the ${collective.slug} collective`,
+      );
     }
-    throw new errors.Unauthorized(
-      `You need to be logged in as a core contributor or as a host of the ${collective.slug} collective`,
-    );
   };
 
-  return (
-    req.loaders.collective.findById
-      .load(args.collective.id)
-      .then(c => {
-        if (!c) throw new Error(`Collective with id ${args.collective.id} not found`);
-        collective = c;
-      })
-      .then(() => {
-        if (args.role !== roles.FOLLOWER) {
-          return checkPermission();
-        } else {
-          return null;
-        }
-      })
-      // find or create user
-      .then(() => {
-        if (args.member.id) {
-          return req.loaders.collective.findById.load(args.member.id).then(memberCollective => {
-            return {
-              id: memberCollective.CreatedByUserId,
-              CollectiveId: memberCollective.id,
-            };
-          });
-        }
-      })
-      .then(u => u || models.User.findOrCreateByEmail(args.member.email, args.member))
-      // add user as member of the collective
-      .then(user =>
-        models.Member.create({
-          CreatedByUserId: user.id,
-          MemberCollectiveId: user.CollectiveId,
-          CollectiveId: collective.id,
-          role: args.role.toUpperCase() || roles.FOLLOWER,
-          since: args.since,
-        }),
-      )
-  );
+  const collective = await req.loaders.collective.findById.load(args.collective.id);
+
+  if (!collective) {
+    throw new Error(`Collective with id ${args.collective.id} not found`);
+  }
+
+  if (args.role !== roles.FOLLOWER) {
+    checkPermission(collective);
+  }
+
+  let user;
+  if (args.member.id) {
+    user = await models.User.findOne({ where: { CollectiveId: args.member.id } });
+  }
+  if (!user) {
+    user = await models.User.findOrCreateByEmail(args.member.email, args.member);
+  }
+
+  return models.Member.create({
+    // NOTE: doesn't look like a good idea to set CreatedByUserId != req.remoteUser.id
+    CreatedByUserId: user.id,
+    MemberCollectiveId: user.CollectiveId,
+    CollectiveId: collective.id,
+    role: args.role.toUpperCase() || roles.FOLLOWER,
+    since: args.since,
+  });
 }
 
-export function removeMember(_, args, req) {
-  let membership;
-
-  const checkPermission = () => {
+export async function removeMember(_, args, req) {
+  const checkPermission = member => {
     if (!req.remoteUser) {
       throw new errors.Unauthorized('You need to be logged in to remove a member');
     }
-    if (req.remoteUser.id === membership.CreatedByUserId) {
+    if (req.remoteUser.isAdmin(member.MemberCollectiveId)) {
       return true;
     }
-    if (req.remoteUser.isAdmin(membership.CollectiveId)) {
+    if (req.remoteUser.isAdmin(member.CollectiveId)) {
       return true;
     }
     throw new errors.Unauthorized(
-      `You need to be logged in as this user or as a core contributor or as a host of the collective id ${membership.CollectiveId}`,
+      `You need to be logged in as this user or as a core contributor or as a host of the collective id ${member.CollectiveId}`,
     );
   };
 
-  return models.Member.findOne({
+  const collective = args.collective;
+  const memberCollective = args.member; // args.member is not a "member" but a "collective", we make it explicit
+
+  const member = await models.Member.findOne({
     where: {
-      MemberCollectiveId: args.member.id,
-      CollectiveId: args.collective.id,
+      MemberCollectiveId: memberCollective.id,
+      CollectiveId: collective.id,
       role: args.role,
     },
-  })
-    .then(m => {
-      if (!m) throw new errors.NotFound('Member not found');
-      membership = m;
-    })
-    .then(checkPermission)
-    .then(() => {
-      return membership.destroy();
-    });
+  });
+
+  if (!member) {
+    throw new errors.NotFound('Member not found');
+  }
+
+  checkPermission(member);
+
+  return member.destroy();
 }
 
 /**
