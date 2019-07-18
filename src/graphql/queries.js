@@ -258,6 +258,7 @@ export const getCollectiveToEditQueryFields = `
     interval
     currency
     maxQuantity
+    button
   }
   memberOf {
     id
