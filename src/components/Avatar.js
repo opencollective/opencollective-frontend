@@ -5,7 +5,7 @@ import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
-import { getBaseImagesUrl, getCollectiveImage } from '../lib/utils';
+import { getCollectiveImage } from '../lib/utils';
 import { defaultImage } from '../constants/collectives';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
@@ -40,7 +40,7 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
     if (collective.isIncognito) {
       src = defaultImage['ANONYMOUS'];
     } else if (collective.image) {
-      src = `${getBaseImagesUrl()}/${collective.slug}/avatar.png`;
+      src = getCollectiveImage(collective);
     }
   }
   return (
