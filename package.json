@@ -151,7 +151,7 @@
     "babel-plugin-react-remove-properties": "0.3.0",
     "babel-plugin-styled-components": "1.10.6",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
-    "commitizen": "^3.1.1",
+    "commitizen": "^3.1.2",
     "cypress": "^3.4.0",
     "cz-conventional-changelog": "^2.1.0",
     "enzyme": "^3.10.0",
