@@ -1,4 +1,3 @@
-import md5 from 'md5';
 import config from 'config';
 import debug from 'debug';
 import { get } from 'lodash';
@@ -9,6 +8,7 @@ import makeRedisProvider from './redis';
 
 import logger from '../logger';
 import models from '../../models';
+import { md5 } from '../utils';
 
 export const PROVIDER_TYPES = {
   MEMCACHE: 'MEMCACHE',
