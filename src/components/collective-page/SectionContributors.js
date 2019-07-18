@@ -7,7 +7,7 @@ import memoizeOne from 'memoize-one';
 
 import Container from '../Container';
 import { P, H2, H3, Span } from '../Text';
-import ContributorsGrid from '../ContributorsGrid';
+import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../ContributorsGrid';
 import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
 
 import { Dimensions } from './_constants';
@@ -126,14 +126,16 @@ export default class SectionContributors extends React.PureComponent {
               } else if (nbRows > 1) {
                 if (rowWidth <= width) {
                   // If multiline and possible center contributors cards
-                  return (width - rowWidth) / 2;
+                  const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
+                  return (width - rowWidth) / 2 - cardsLeftOffset;
                 } else {
                   // Otherwise if multiline and the grid is full, just use the full screen
                   return 0;
                 }
               } else {
                 // Otherwise add a normal section padding on the left
-                return (width - Dimensions.MAX_SECTION_WIDTH) / 2;
+                const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
+                return (width - Dimensions.MAX_SECTION_WIDTH) / 2 - cardsLeftOffset;
               }
             }}
           />
