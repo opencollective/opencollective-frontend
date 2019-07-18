@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
+import IncognitoUserCollective from '../components/IncognitoUserCollective';
 import PledgedCollective from '../components/PledgedCollective';
 
 import { addCollectiveData } from '../graphql/queries';
@@ -80,7 +81,11 @@ class CollectivePage extends React.Component {
     }
 
     if (collective && ['USER', 'ORGANIZATION'].includes(collective.type)) {
-      return <UserCollective {...props} />;
+      if (collective.isIncognito && (!LoggedInUser || !LoggedInUser.canEditCollective(collective))) {
+        return <IncognitoUserCollective {...props} />;
+      } else {
+        return <UserCollective {...props} />;
+      }
     }
 
     return <ErrorPage LoggedInUser={LoggedInUser} data={data} />;
