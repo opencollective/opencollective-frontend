@@ -361,6 +361,7 @@ export const getCollectiveQuery = gql`
       name
       company
       image
+      imageUrl
       backgroundImage
       description
       longDescription
