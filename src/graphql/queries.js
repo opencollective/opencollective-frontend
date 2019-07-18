@@ -26,6 +26,7 @@ export const transactionFields = `
     id
     slug
     type
+    isIncognito
     name
   }
   fromCollective {
@@ -34,6 +35,7 @@ export const transactionFields = `
     slug
     path
     type
+    isIncognito
   }
   usingVirtualCardFromCollective {
     id
@@ -697,6 +699,7 @@ const getCollectiveCoverQuery = gql`
           name
           slug
           type
+          isIncognito
           image
         }
       }

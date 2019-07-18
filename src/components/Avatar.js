@@ -52,7 +52,13 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
 
 Avatar.propTypes = {
   /** Collective object */
-  collective: PropTypes.object,
+  collective: PropTypes.shape({
+    type: PropTypes.string,
+    name: PropTypes.string,
+    slug: PropTypes.string,
+    image: PropTypes.string,
+    isIncognito: PropTypes.bool,
+  }),
   /** Collective name */
   name: PropTypes.string,
   /** Collective image url */
@@ -63,7 +69,6 @@ Avatar.propTypes = {
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
-  isIncognito: PropTypes.bool,
 };
 
 /**

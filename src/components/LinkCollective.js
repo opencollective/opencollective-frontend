@@ -25,7 +25,7 @@ const LinkCollective = ({
   isNewVersion,
   ...props
 }) => {
-  if (type === 'USER' && (!name || isIncognito)) {
+  if (type === 'USER' && (!name || isIncognito || !slug)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
@@ -57,7 +57,7 @@ LinkCollective.propTypes = {
   /** The collective to link to */
   collective: PropTypes.shape({
     name: PropTypes.string,
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string,
     type: PropTypes.string.isRequired,
     isIncognito: PropTypes.bool,
     parentCollective: PropTypes.shape({
