@@ -288,7 +288,7 @@ export const TierInputType = new GraphQLInputObjectType({
     },
     button: {
       type: GraphQLString,
-      description: 'Button text'
+      description: 'Button text',
     },
     currency: { type: GraphQLString },
     presets: { type: new GraphQLList(GraphQLInt) },
