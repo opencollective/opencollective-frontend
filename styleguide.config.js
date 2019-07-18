@@ -4,6 +4,7 @@ const fileExistsCaseInsensitive = require('react-styleguidist/lib/scripts/utils/
 
 module.exports = {
   assetsDir: 'styleguide',
+  require: [path.join(__dirname, 'src/styles/app.css')],
   getExampleFilename(componentPath) {
     const parsedPath = path.parse(componentPath);
     const parentDirName = parsedPath.dir.split('src/components/')[1] || '';
@@ -90,6 +91,10 @@ module.exports = {
               limit: 1000000,
             },
           },
+        },
+        {
+          test: /\.(css)$/,
+          use: ['style-loader', 'css-loader'],
         },
       ],
     },
