@@ -130,7 +130,8 @@ class CollectivePage extends Component {
   }, 100);
 
   onSectionClick = sectionName => {
-    window.scrollTo(0, this.sectionsRefs[sectionName].offsetTop - 50);
+    const offsetY = window.innerWidth > 830 ? 30 : 10;
+    window.scrollTo(0, this.sectionsRefs[sectionName].offsetTop - offsetY);
     // Changing hash directly tends to make the page jump to the section without respect for
     // the smooth scroll behaviour, so we try to use `history.pushState` if available
     if (window.history.pushState) {
