@@ -928,6 +928,7 @@
   "tier.amountType.flexible": "гибкая сумма",
   "tier.amountType.label": "Тип суммы",
   "tier.button": "become a {name}",
+  "tier.button.label": "Button text",
   "Tier.Contribute": "Contribute",
   "tier.contribute": "пожертвовать",
   "tier.customAmount.error.minimumAmount": "Minimum amount should be {minimumAmount}",
