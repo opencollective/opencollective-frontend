@@ -226,7 +226,7 @@ class UserCollective extends React.Component {
     const status = get(query, 'status');
 
     const isProfileEmpty = !(collective.description || collective.longDescription);
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEditCollective = LoggedInUser && !collective.isIncognito && LoggedInUser.canEditCollective(collective);
     const type = collective.type.toLowerCase();
     let cta;
     if (collective.canApply && !collective.isArchived) {

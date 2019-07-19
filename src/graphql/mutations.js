@@ -63,6 +63,7 @@ const createCollectiveQuery = gql`
       type
       website
       twitterHandle
+      isIncognito
     }
   }
 `;
@@ -228,6 +229,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'quantity',
         'HostCollectiveId',
         'ParentCollectiveId',
+        'isIncognito',
         'data',
         CollectiveInputType,
       ]);

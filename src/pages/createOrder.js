@@ -312,16 +312,17 @@ class CreateOrderPage extends React.Component {
       return false;
     }
 
-    // Check if we're creating a new organization
+    // Check if we're creating a new profile
     if (!this.state.stepProfile.id) {
       this.setState({ submitting: true });
+      this.state.stepProfile.type = this.state.stepProfile.type || 'ORGANIZATION';
 
       try {
         const { data: result } = await this.props.createCollective(this.state.stepProfile);
-        const createdOrg = result.createCollective;
+        const createdProfile = result.createCollective;
 
         await this.props.refetchLoggedInUser();
-        this.setState({ stepProfile: createdOrg, submitting: false });
+        this.setState({ stepProfile: createdProfile, submitting: false });
       } catch (error) {
         this.setState({ error: error.message, submitting: false });
         window.scrollTo(0, 0);
@@ -702,7 +703,7 @@ class CreateOrderPage extends React.Component {
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
-
+    const isIncognito = get(this.state, 'stepProfile.isIncognito');
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
@@ -766,8 +767,15 @@ class CreateOrderPage extends React.Component {
             />
             {tier && tier.type === 'TICKET' && <EventDetails event={data.Collective} tier={tier} />}
           </Container>
-          {interval ? (
-            <ContributeDetailsFAQ hasInterval mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+          {interval || isIncognito ? (
+            <ContributeDetailsFAQ
+              isIncognito={isIncognito}
+              hasInterval={!!interval}
+              mt={4}
+              display={['none', null, 'block']}
+              width={1 / 5}
+              minWidth="335px"
+            />
           ) : (
             <Box width={[0, null, null, 1 / 5]} />
           )}
@@ -934,7 +942,7 @@ class CreateOrderPage extends React.Component {
         image={collective.image || collective.backgroundImage}
         title={eventSlug ? `Order tickets - ${collective.name}` : `Contribute - ${collective.name}`}
       >
-        <Flex alignItems="center" flexDirection="column" mx="auto" width={300} pt={4} mb={4}>
+        <Flex alignItems="center" flexDirection="column" mx="auto" width={320} pt={4} mb={4}>
           <Link className="goBack" {...this.getCollectiveLinkParams(collectiveSlug, eventSlug)}>
             <Logo collective={collective} className="logo" height="10rem" style={{ margin: '0 auto' }} />
             <H2 as="h1" color="black.900" textAlign="center">

@@ -26,6 +26,7 @@ export const transactionFields = `
     id
     slug
     type
+    isIncognito
     name
   }
   fromCollective {
@@ -34,6 +35,7 @@ export const transactionFields = `
     slug
     path
     type
+    isIncognito
   }
   usingVirtualCardFromCollective {
     id
@@ -117,6 +119,7 @@ export const getLoggedInUserQuery = gql`
           id
           slug
           type
+          isIncognito
           name
           currency
           isHost
@@ -435,6 +438,7 @@ export const getCollectiveQuery = gql`
             name
             image
             website
+            isIncognito
           }
         }
       }
@@ -463,10 +467,12 @@ export const getCollectiveQuery = gql`
           type
           image
           backgroundImage
+          isIncognito
           company
         }
       }
       ... on User {
+        isIncognito
         memberOf(limit: 60) {
           id
           role
@@ -695,6 +701,7 @@ const getCollectiveCoverQuery = gql`
           name
           slug
           type
+          isIncognito
           image
         }
       }

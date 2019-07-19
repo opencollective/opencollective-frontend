@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { capitalize, omit, uniqBy } from 'lodash';
+import { capitalize, omit, uniqBy, get } from 'lodash';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -9,7 +9,6 @@ import { Box, Flex } from '@rebass/grid';
 import { Search } from 'styled-icons/octicons/Search';
 
 import { escapeInput } from '../lib/utils';
-
 import Avatar from './Avatar';
 import Container from './Container';
 import Logo from './Logo';
@@ -26,12 +25,10 @@ const SearchIcon = styled(Search)`
 
 const ContributeAsEntryContainer = styled(Container)`
   cursor: pointer;
-  &:hover {
-    background: ${themeGet('colors.black.50')};
-  }
 `;
 
 const messages = defineMessages({
+  incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
   'org.new': { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
   'org.name': { id: 'contributeAs.org.name', defaultMessage: 'Organization Name' },
   'org.website': { id: 'contributeAs.org.website', defaultMessage: 'Website' },
@@ -44,7 +41,7 @@ const useForm = ({ onProfileChange }) => {
   return {
     getFieldError: name => state.errors[name],
     onChange: selected => {
-      if (selected.key === 'new-org') {
+      if (selected.key === 'org.new') {
         if (state.name && state.website) {
           return onProfileChange({ type: 'ORGANIZATION', ...omit(state, ['errors']) });
         } else {
@@ -52,8 +49,10 @@ const useForm = ({ onProfileChange }) => {
         }
       }
 
-      if (selected.key === 'anonymous') {
-        return onProfileChange({ name: 'anonymous' });
+      if (selected.key === 'incognito') {
+        const userData = { name: 'incognito', type: 'USER', isIncognito: true };
+        setState({ ...state, ...userData, ...omit(state, ['errors']) });
+        return onProfileChange(userData);
       }
 
       return onProfileChange(selected.value);
@@ -76,7 +75,7 @@ const useForm = ({ onProfileChange }) => {
         ...newState,
         errors: { ...state.errors, [target.name]: null },
       });
-      onProfileChange({ type: 'ORGANIZATION', ...omit(newState, ['errors']) });
+      onProfileChange(omit(newState, ['errors']));
     },
     onSearch: ({ target }) => {
       setState(state => ({
@@ -134,15 +133,16 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
     profiles = profiles.filter(profile => profile.name.match(test));
   }
 
-  const options = uniqBy(
-    [
-      personal,
-      ...profiles,
-      { id: 'new-org', name: intl.formatMessage(messages['org.new']) },
-      // { id: 'anonymous', name: 'Anonymously' }
-    ],
-    'id',
-  );
+  const options = uniqBy([personal, ...profiles], 'id');
+
+  // if the user doesn't have an incognito profile yet, we offer to create one
+  const incognitoProfile = options.find(p => p.type === 'USER' && p.isIncognito);
+  if (!incognitoProfile) {
+    options.push({ id: 'incognito', type: 'USER', isIncognito: true, name: intl.formatMessage(messages['incognito']) });
+  }
+
+  options.push({ id: 'org.new', type: 'ORGANIZATION', name: intl.formatMessage(messages['org.new']) });
+
   const lastIndex = Object.keys(options).length - 1;
   const showSearch = Object.keys(profiles).length >= 5 || state.search;
 
@@ -176,8 +176,8 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             px={4}
             py={3}
             borderBottom={lastIndex !== index ? '1px solid' : 'none'}
-            color={key === 'anonymous' && checked ? 'white.full' : 'black.900'}
-            bg={key === 'anonymous' && checked ? 'black.900' : 'white.full'}
+            color={value.isIncognito && checked ? 'white.full' : 'black.900'}
+            bg={value.isIncognito && checked ? 'black.900' : 'white.full'}
             borderColor="black.200"
             flexWrap="wrap"
           >
@@ -188,11 +188,12 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
             {value.type !== 'USER' && value.slug && <Logo collective={value} height="3.6rem" />}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>
-                {value.name}
+                {value.isIncognito && <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
+                {!value.isIncognito && get(value, 'name', intl.formatMessage(messages['incognito']))}
               </P>
-              {value.type && (
+              {!value.isIncognito && value.type && (
                 <P fontSize="Caption" lineHeight="Caption" color="black.500">
-                  {value.type === 'USER' ? (
+                  {value.type === 'USER' && value.name ? (
                     <FormattedMessage
                       id="contributeAs.personal"
                       defaultMessage="Personal account - {email}"
@@ -203,8 +204,16 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                   )}
                 </P>
               )}
+              {value.isIncognito && (
+                <P fontSize="Caption" lineHeight="Caption" color="black.500">
+                  <FormattedMessage
+                    id="profile.incognito.description"
+                    defaultMessage="Keep my contribution private (see FAQ for more info)"
+                  />
+                </P>
+              )}
             </Flex>
-            {key === 'new-org' && checked && (
+            {key === 'org.new' && checked && (
               <Container as="fieldset" border="none" width={1} py={3} onChange={onFieldChange}>
                 <Box mb={3}>
                   <StyledInputField
@@ -216,7 +225,7 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                       <StyledInput
                         {...inputProps}
                         {...getFieldProps(inputProps.name)}
-                        placeholder="i.e. AirBnb, Women Who Code"
+                        placeholder="e.g. AirBnb, Women Who Code"
                         required
                       />
                     )}
@@ -264,11 +273,6 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                 </Box>
               </Container>
             )}
-            {key === 'anonymous' && checked && (
-              <Flex flex="1 1 auto" justifyContent="flex-end">
-                <Logo name={key} height="3rem" />
-              </Flex>
-            )}
           </ContributeAsEntryContainer>
         )}
       </StyledRadioList>
@@ -282,7 +286,7 @@ ContributeAs.propTypes = {
   /**
    * emits latest selected profile
    *
-   *  - if anoymous is selected, only `{name: 'anonymous'}` is returned
+   *  - if incognito is selected, only `{name: 'incognito', type: 'USER', isIncognito: true}` is returned
    *  - if 'A new organization' is selected, the latest data from that form is returned
    *  - else the data passed to `profiles` or `personal` is returned
    */
@@ -305,6 +309,7 @@ ContributeAs.propTypes = {
       image: PropTypes.string,
       name: PropTypes.string,
       type: PropTypes.string,
+      isIncognito: PropTypes.bool,
     }),
   ),
 };

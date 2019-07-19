@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
-import Link from '../Link';
+import LinkCollective from '../LinkCollective';
 import Moment from '../Moment';
 import { P, Span } from '../Text';
 import TransactionDetails from './TransactionDetails';
@@ -39,7 +39,7 @@ class Transaction extends React.Component {
       id: PropTypes.number,
       type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
+      slug: PropTypes.string,
     }),
     usingVirtualCardFromCollective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
@@ -49,7 +49,7 @@ class Transaction extends React.Component {
       id: PropTypes.number.isRequired,
       type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
+      slug: PropTypes.string,
     }),
     subscription: PropTypes.shape({
       interval: PropTypes.oneOf(['month', 'year']),
@@ -76,11 +76,7 @@ class Transaction extends React.Component {
     // If not using a VirtualCard, fromCollective will always represent the
     // collective that made the payment.
     if (!usingVirtualCardFromCollective) {
-      return (
-        <Link route="collective" params={{ slug: fromCollective.slug }}>
-          {fromCollective.name}
-        </Link>
-      );
+      return <LinkCollective collective={fromCollective}>{fromCollective.name}</LinkCollective>;
     }
 
     // If using a VirtualCard and this is the debit transaction, `fromCollective`
@@ -91,17 +87,15 @@ class Transaction extends React.Component {
 
     return (
       <span>
-        <Link route="collective" params={{ slug: originCollective.slug }}>
-          {originCollective.name}
-        </Link>{' '}
+        <LinkCollective collective={originCollective}>{originCollective.name}</LinkCollective>{' '}
         <FormattedMessage
           id="transaction.usingGiftCardFrom"
           defaultMessage="using a gift card from {collectiveLink}"
           values={{
             collectiveLink: (
-              <Link route="collective" params={{ slug: usingVirtualCardFromCollective.slug }}>
+              <LinkCollective collective={usingVirtualCardFromCollective}>
                 {usingVirtualCardFromCollective.name}
-              </Link>
+              </LinkCollective>
             ),
           }}
         />
@@ -140,9 +134,9 @@ class Transaction extends React.Component {
     return (
       <Flex my={4}>
         <Container alignSelf="flex-start">
-          <Link route="collective" params={{ slug: fromCollective.slug }} title={fromCollective.name} passHref>
+          <LinkCollective collective={fromCollective} title={fromCollective.name} passHref>
             <Avatar collective={fromCollective} id={fromCollective.id} radius={40} className="noFrame" />
-          </Link>
+          </LinkCollective>
         </Container>
         <Container ml={3} width={1}>
           <Flex justifyContent="space-between" alignItems="baseline">
