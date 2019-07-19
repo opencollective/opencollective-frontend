@@ -1234,27 +1234,6 @@ const queries = {
   },
 
   /*
-   * Deprecated: Given a prepaid code, return validity and amount
-   */
-  ocPaymentMethod: {
-    type: PaymentMethodType,
-    args: {
-      token: { type: new GraphQLNonNull(GraphQLString) },
-    },
-    resolve(_, args) {
-      return models.PaymentMethod.findOne({
-        where: {
-          token: args.token,
-          expiryDate: {
-            [Op.gt]: new Date(),
-          },
-          archivedAt: null, // archived PMs are assumed to be used or inactive
-        },
-      });
-    },
-  },
-
-  /*
    * Given a prepaid code, return validity and amount
    */
   PaymentMethod: {
