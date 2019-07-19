@@ -20,9 +20,7 @@ const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth }
             minWidth={minButtonWidth}
             mx={2}
           >
-            <Span textTransform="capitalize" whiteSpace="nowrap">
-              {getLabel(filter)}
-            </Span>
+            <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
           </StyledButton>
         );
       })}
@@ -36,10 +34,12 @@ StyledFilters.propTypes = {
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.string,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  selectedButtonStyle: PropTypes.oneOf(['primary', 'dark']),
 };
 
 StyledFilters.defaultProps = {
   getLabel: filter => filter,
+  selectedButtonStyle: 'primary',
 };
 
 export default StyledFilters;
