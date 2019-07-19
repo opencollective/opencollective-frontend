@@ -170,10 +170,6 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     longDescription: { type: GraphQLString },
     expensePolicy: { type: GraphQLString },
     location: { type: LocationInputType },
-    countryISO: {
-      type: GraphQLString,
-      deprecationReason: 'From 03/20/2019 - use `location.country` instead',
-    },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
@@ -225,10 +221,6 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     twitterHandle: { type: GraphQLString },
     githubHandle: { type: GraphQLString },
     location: { type: LocationInputType },
-    countryISO: {
-      type: GraphQLString,
-      deprecationReason: 'From 03/20/2019 - use `location.country` instead',
-    },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
