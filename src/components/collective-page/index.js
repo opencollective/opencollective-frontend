@@ -18,6 +18,7 @@ import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
 import SectionUpdates from './SectionUpdates';
 import SectionCollectives from './SectionCollectives';
+import SectionTransactions from './SectionTransactions';
 
 /** A mutation used by child components to update the collective */
 const EditCollectiveMutation = gql`
@@ -106,6 +107,7 @@ class CollectivePage extends Component {
       sectionsToRemove.add(Sections.BUDGET);
     } else {
       sectionsToRemove.add(Sections.COLLECTIVES);
+      sectionsToRemove.add(Sections.TRANSACTIONS);
     }
 
     return sections.filter(section => !sectionsToRemove.has(section));
@@ -202,6 +204,8 @@ class CollectivePage extends Component {
         );
       case Sections.COLLECTIVES:
         return <SectionCollectives collective={this.props.collective} />;
+      case Sections.TRANSACTIONS:
+        return <SectionTransactions collective={this.props.collective} />;
       default:
         return null;
     }

@@ -111,6 +111,10 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Collectives',
     defaultMessage: 'Collectives',
   },
+  [Sections.TRANSACTIONS]: {
+    id: 'CollectivePage.NavBar.Transactions',
+    defaultMessage: 'Transactions',
+  },
 });
 
 /**

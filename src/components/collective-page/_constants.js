@@ -23,6 +23,7 @@ export const Sections = {
   UPDATES: 'updates',
   BUDGET: 'budget',
   CONTRIBUTORS: 'contributors',
+  TRANSACTIONS: 'transactions',
   ABOUT: 'about',
 };
 
