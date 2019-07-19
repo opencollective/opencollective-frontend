@@ -64,10 +64,12 @@ const GetOrderQuery = gql`
       status
       fromCollective {
         id
+        type
         slug
         name
         image
         path
+        isIncognito
       }
       collective {
         id
@@ -145,7 +147,7 @@ class OrderSuccessPage extends React.Component {
       return (
         <FormattedMessage
           id="contributeFlow.successMessageBacker"
-          defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
+          defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
           values={{
             fromCollectiveName: fromCollective.name,
             collectiveName: collective.name,
@@ -157,7 +159,7 @@ class OrderSuccessPage extends React.Component {
     return tier.type === 'TICKET' ? (
       <FormattedMessage
         id="contributeFlow.successMessageTicket"
-        defaultMessage="{fromCollectiveName, select, anonymous {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})"
+        defaultMessage="{fromCollectiveName, select, incognito {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})"
         values={{
           fromCollectiveName: fromCollective.name,
           eventName: <strong>{collective.name}</strong>,
@@ -167,7 +169,7 @@ class OrderSuccessPage extends React.Component {
     ) : (
       <FormattedMessage
         id="contributeFlow.successMessage"
-        defaultMessage="{fromCollectiveName, select, anonymous {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
+        defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
         values={{
           fromCollectiveName: fromCollective.name,
           collectiveName: <strong>{collective.name}</strong>,
@@ -220,16 +222,18 @@ class OrderSuccessPage extends React.Component {
             <OrderSuccessContributorCardWithData order={order} fromCollective={fromCollective} />
           </Box>
 
-          <Flex flexWrap="wrap" justifyContent="center" mt={2}>
-            <ShareLink href={tweetURL({ url: referralURL, text: message })}>
-              <Twitter size="1.2em" color="#38A1F3" />
-              <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-            </ShareLink>
-            <ShareLink href={facebooKShareURL({ u: referralURL })}>
-              <Facebook size="1.2em" color="#3c5a99" />
-              <FormattedMessage id="shareIt" defaultMessage="Share it" />
-            </ShareLink>
-          </Flex>
+          {!fromCollective.isIncognito && (
+            <Flex flexWrap="wrap" justifyContent="center" mt={2}>
+              <ShareLink href={tweetURL({ url: referralURL, text: message })}>
+                <Twitter size="1.2em" color="#38A1F3" />
+                <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
+              </ShareLink>
+              <ShareLink href={facebooKShareURL({ u: referralURL })}>
+                <Facebook size="1.2em" color="#3c5a99" />
+                <FormattedMessage id="shareIt" defaultMessage="Share it" />
+              </ShareLink>
+            </Flex>
+          )}
           <Box width={64} my={4} bg="black.300" css={{ height: '1px' }} />
           {collective.tags && (
             <Flex flexDirection="column" alignItems="center" mb={4}>
@@ -250,9 +254,9 @@ class OrderSuccessPage extends React.Component {
               </Flex>
             </Flex>
           )}
-          {!LoggedInUser && this.renderUserProfileBtn(true)}
-          {LoggedInUser && !loggedInUserLoading && (
-            <Link route="collective" params={{ slug: get(LoggedInUser, 'collective.slug', '') }} passHref>
+          {!fromCollective.isIncognito && !LoggedInUser && this.renderUserProfileBtn(true)}
+          {!fromCollective.isIncognito && LoggedInUser && !loggedInUserLoading && (
+            <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
               {this.renderUserProfileBtn()}
             </Link>
           )}

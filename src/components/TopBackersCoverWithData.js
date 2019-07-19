@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import Link from './Link';
+import LinkCollective from './LinkCollective';
 import { formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
 
@@ -63,9 +64,9 @@ class TopBackersCoverWithData extends React.Component {
               }
             `}
           </style>
-          <Link route="collective" params={{ slug: org.slug }} title={this.renderMemberTitle(member)} passHref>
+          <LinkCollective collective={org} title={this.renderMemberTitle(member)} passHref>
             <Logo collective={org} height={36} />
-          </Link>
+          </LinkCollective>
         </div>
       </div>
     );
@@ -77,9 +78,9 @@ class TopBackersCoverWithData extends React.Component {
     const className = index >= 5 ? 'desktopOnly' : '';
     return (
       <div key={`topBacker-${index}`} className={`user backer ${className}`}>
-        <Link route="collective" params={{ slug: user.slug }} title={this.renderMemberTitle(member)} passHref>
+        <LinkCollective collective={user} title={this.renderMemberTitle(member)} passHref>
           <Avatar collective={user} radius={48} size={[30, null, 48]} className="noFrame" />
-        </Link>
+        </LinkCollective>
       </div>
     );
   }
@@ -198,6 +199,7 @@ const getTopBackersQuery = gql`
       member {
         id
         type
+        isIncognito
         name
         company
         description

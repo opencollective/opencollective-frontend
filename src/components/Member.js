@@ -6,7 +6,7 @@ import { Flex } from '@rebass/grid';
 
 import colors from '../constants/colors';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
-import Link from './Link';
+import LinkCollective from './LinkCollective';
 import CollectiveCard from './CollectiveCard';
 import Avatar from './Avatar';
 
@@ -131,7 +131,7 @@ ${totalDonationsStr}`;
         </style>
         <div>
           {viewMode === 'USER' && (
-            <Link route={'collective'} params={{ slug: this.props.member.member.slug }} target="_top" title={title}>
+            <LinkCollective collective={this.props.member.member} target="_top" title={title}>
               <Flex mt={2}>
                 <Avatar collective={member} radius={45} className="noFrame" />
                 <div className="bubble">
@@ -149,7 +149,7 @@ ${totalDonationsStr}`;
                   )}
                 </div>
               </Flex>
-            </Link>
+            </LinkCollective>
           )}
           {viewMode === 'ORGANIZATION' && <CollectiveCard collective={member} membership={membership} />}
         </div>

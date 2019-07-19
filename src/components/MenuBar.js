@@ -427,12 +427,14 @@ class MenuBar extends React.Component {
               </div>
             )}
             <div className="separator" />
-            <div className="item editCollective">
-              <Link route={`${collective.path}/edit`}>
-                <PencilIcon size="1.75em" />
-                {intl.formatMessage(this.messages[`menu.edit.${collective.type.toLowerCase()}`])}
-              </Link>
-            </div>
+            {!collective.isIncognito && (
+              <div className="item editCollective">
+                <Link route={`${collective.path}/edit`}>
+                  <PencilIcon size="1.75em" />
+                  {intl.formatMessage(this.messages[`menu.edit.${collective.type.toLowerCase()}`])}
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

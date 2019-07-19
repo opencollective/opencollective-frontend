@@ -6,6 +6,7 @@ import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
 import { getCollectiveImage } from '../lib/utils';
+import { defaultImage } from '../constants/collectives';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
@@ -24,6 +25,8 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   font-weight: bold;
   justify-content: center;
   overflow: hidden;
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
   ${space}
   ${layout}
@@ -34,7 +37,11 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
   if (collective) {
     type = collective.type;
     name = collective.name;
-    src = getCollectiveImage(collective);
+    if (collective.isIncognito) {
+      src = defaultImage['ANONYMOUS'];
+    } else {
+      src = getCollectiveImage(collective);
+    }
   }
   return (
     <StyledAvatar size={radius} type={type} src={src} {...styleProps}>
@@ -45,7 +52,13 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
 
 Avatar.propTypes = {
   /** Collective object */
-  collective: PropTypes.object,
+  collective: PropTypes.shape({
+    type: PropTypes.string,
+    name: PropTypes.string,
+    slug: PropTypes.string,
+    image: PropTypes.string,
+    isIncognito: PropTypes.bool,
+  }),
   /** Collective name */
   name: PropTypes.string,
   /** Collective image url */

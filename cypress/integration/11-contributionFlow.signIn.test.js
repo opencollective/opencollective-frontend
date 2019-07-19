@@ -29,7 +29,7 @@ describe('Contribution Flow: Sign In', () => {
 
     // Test user are logged in directly
     cy.contains('Contribute As');
-    cy.contains('anonymous');
+    cy.contains('Incognito');
     cy.contains('TestOrg');
   });
 });
