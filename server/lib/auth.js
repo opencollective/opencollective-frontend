@@ -10,7 +10,7 @@ const daysToSeconds = days => moment.duration({ days }).asSeconds();
 const minutesToSeconds = minutes => moment.duration({ minutes }).asSeconds();
 
 /* Constants that determin token expiration */
-export const TOKEN_EXPIRATION_LOGIN = minutesToSeconds(15);
+export const TOKEN_EXPIRATION_LOGIN = minutesToSeconds(75);
 export const TOKEN_EXPIRATION_CONNECTED_ACCOUNT = daysToSeconds(1);
 export const TOKEN_EXPIRATION_SESSION = daysToSeconds(90);
 
