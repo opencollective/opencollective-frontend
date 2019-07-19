@@ -49,7 +49,11 @@ class SignInOrJoinFree extends React.Component {
   };
 
   getRedirectURL() {
-    return encodeURIComponent(this.props.redirect || window.location.pathname || '/');
+    let currentPath = window.location.pathname;
+    if (window.location.search) {
+      currentPath = currentPath + window.location.search;
+    }
+    return encodeURIComponent(this.props.redirect || currentPath || '/');
   }
 
   signIn = async email => {
