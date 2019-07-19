@@ -61,7 +61,6 @@ const claimCollective = async (collectiveId, userId) => {
 
   // send complete-pledge emails to pledges
   const emails = pledges.map(pledge => {
-    console.log(pledge);
     const { collective, createdByUser, fromCollective, Subscription } = pledge;
     return emailLib.send('pledge.complete', createdByUser.email, {
       collective: collective.info,
