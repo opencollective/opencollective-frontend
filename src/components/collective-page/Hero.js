@@ -68,7 +68,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
         <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
             <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%">
-              <Avatar borderRadius="25%" collective={collective} radius={128} />
+              <Avatar collective={collective} radius={128} />
             </Container>
           </LinkCollective>
           {isAdmin && (

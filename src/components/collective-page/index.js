@@ -5,6 +5,7 @@ import { get, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
+import { CollectiveType } from '../../constants/collectives';
 import Container from '../Container';
 import CollectiveNavbar from '../CollectiveNavbar';
 
@@ -16,6 +17,8 @@ import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
 import SectionUpdates from './SectionUpdates';
+import SectionCollectives from './SectionCollectives';
+import SectionTransactions from './SectionTransactions';
 
 /** A mutation used by child components to update the collective */
 const EditCollectiveMutation = gql`
@@ -90,6 +93,21 @@ class CollectivePage extends Component {
       if (!collective.longDescription) {
         sectionsToRemove.add(Sections.ABOUT);
       }
+    }
+
+    // Adapt the sections depending on collective type
+    if (collective.type === CollectiveType.USER) {
+      sectionsToRemove.add(Sections.CONTRIBUTORS);
+      sectionsToRemove.add(Sections.CONTRIBUTE);
+      sectionsToRemove.add(Sections.UPDATES);
+      sectionsToRemove.add(Sections.BUDGET);
+    } else if (collective.type === CollectiveType.ORGANIZATION) {
+      sectionsToRemove.add(Sections.CONTRIBUTE);
+      sectionsToRemove.add(Sections.UPDATES);
+      sectionsToRemove.add(Sections.BUDGET);
+    } else {
+      sectionsToRemove.add(Sections.COLLECTIVES);
+      sectionsToRemove.add(Sections.TRANSACTIONS);
     }
 
     return sections.filter(section => !sectionsToRemove.has(section));
@@ -184,6 +202,10 @@ class CollectivePage extends Component {
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
+      case Sections.COLLECTIVES:
+        return <SectionCollectives collective={this.props.collective} />;
+      case Sections.TRANSACTIONS:
+        return <SectionTransactions collective={this.props.collective} />;
       default:
         return null;
     }
