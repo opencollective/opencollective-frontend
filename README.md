@@ -60,7 +60,8 @@ You can run the tests using `npm test` or more specifically:
 To update:
 
 - Jest snapshots: run `npm run test:update`
-- GraphQL schema for ESLint: run `npm run graphql:get-schema`
+- Translation files: run `npm run langs:update`
+- GraphQL schema for ESLint: run `npm run graphql:update`
 
 ## Styleguide
 
