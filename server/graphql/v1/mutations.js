@@ -20,7 +20,6 @@ import {
   addFundsToCollective,
   completePledge,
   markOrderAsPaid,
-  updateOrderInfo,
 } from './mutations/orders';
 import { createMember, removeMember, editMembership } from './mutations/members';
 import { editTiers, editTier } from './mutations/tiers';
@@ -415,24 +414,6 @@ const mutations = {
     },
     resolve(_, args, req) {
       return completePledge(req.remoteUser, args.order);
-    },
-  },
-  updateOrderInfo: {
-    type: OrderType,
-    description: 'Update the non-sensitive information of an order, like the public message',
-    deprecationReason: '2019-07-03: The public message is now stored at the Member level',
-    args: {
-      id: {
-        type: new GraphQLNonNull(GraphQLInt),
-        description: 'ID of the order to update',
-      },
-      publicMessage: {
-        type: GraphQLString,
-        description: 'Public message to motivate others to contribute',
-      },
-    },
-    resolve: async (_, args, req) => {
-      return updateOrderInfo(req, args);
     },
   },
   createUpdate: {
