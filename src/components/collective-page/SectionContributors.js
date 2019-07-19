@@ -7,7 +7,7 @@ import memoizeOne from 'memoize-one';
 
 import Container from '../Container';
 import { P, H2, H3, Span } from '../Text';
-import ContributorsGrid from '../ContributorsGrid';
+import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../ContributorsGrid';
 import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
 
 import { Dimensions } from './_constants';
@@ -40,6 +40,7 @@ export default class SectionContributors extends React.PureComponent {
         isCore: PropTypes.bool.isRequired,
         isBacker: PropTypes.bool.isRequired,
         isFundraiser: PropTypes.bool.isRequired,
+        totalAmountDonated: PropTypes.number.isRequired,
       }),
     ),
   };
@@ -58,6 +59,19 @@ export default class SectionContributors extends React.PureComponent {
   // Memoize filtering functions as they can get expensive if there are a lot of contributors
   getContributorsFilters = memoizeOne(getContributorsFilters);
   filterContributors = memoizeOne(filterContributors);
+  sortContributors = memoizeOne(contributors => {
+    // Sort contributors: core contributors are always first, then we sort by total amount donated
+    // We make a copy of the array because mutation could break memoization for future renderings
+    return [...contributors].sort((c1, c2) => {
+      if ((c1.isCore && !c2.isCore) || c1.totalAmountDonated > c2.totalAmountDonated) {
+        return -1;
+      } else if ((!c1.isCore && c2.isCore) || c1.totalAmountDonated < c2.totalAmountDonated) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  });
 
   render() {
     const { collectiveName, contributors } = this.props;
@@ -65,6 +79,7 @@ export default class SectionContributors extends React.PureComponent {
     const hasFilters = contributors.length >= SectionContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
     const filters = hasFilters && this.getContributorsFilters(contributors);
     const filteredContributors = hasFilters ? this.filterContributors(contributors, filter) : contributors;
+    const sortedContributors = this.sortContributors(filteredContributors);
 
     return (
       <MainContainer py={[4, 5]}>
@@ -103,7 +118,7 @@ export default class SectionContributors extends React.PureComponent {
         )}
         <Box mb={4}>
           <ContributorsGrid
-            contributors={filteredContributors}
+            contributors={sortedContributors}
             getPaddingLeft={({ width, rowWidth, nbRows }) => {
               if (width < Dimensions.MAX_SECTION_WIDTH) {
                 // No need for padding on screens small enough so they don't have padding
@@ -111,14 +126,16 @@ export default class SectionContributors extends React.PureComponent {
               } else if (nbRows > 1) {
                 if (rowWidth <= width) {
                   // If multiline and possible center contributors cards
-                  return (width - rowWidth) / 2;
+                  const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
+                  return (width - rowWidth) / 2 - cardsLeftOffset;
                 } else {
                   // Otherwise if multiline and the grid is full, just use the full screen
                   return 0;
                 }
               } else {
                 // Otherwise add a normal section padding on the left
-                return (width - Dimensions.MAX_SECTION_WIDTH) / 2;
+                const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
+                return (width - Dimensions.MAX_SECTION_WIDTH) / 2 - cardsLeftOffset;
               }
             }}
           />
