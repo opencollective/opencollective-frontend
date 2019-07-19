@@ -1077,49 +1077,6 @@ export const NotificationType = new GraphQLObjectType({
   },
 });
 
-export const MembersStatsType = new GraphQLObjectType({
-  name: 'MembersStatsType',
-  description: 'Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
-  deprecationReason: `
-  2019/06/20 - This endpoint was used for the new tier page and has been replaced
-  by "ContributorsStatsType". It can be deleted as soon as the migration's completed
-  as well as the "members.findByTierId" loader.
-`,
-  fields: () => {
-    return {
-      id: {
-        type: GraphQLInt,
-        description: "We always have to return an id for apollo's caching",
-      },
-      all: {
-        type: GraphQLInt,
-        description: 'Total number of contributors',
-      },
-      users: {
-        type: GraphQLInt,
-        description: 'Number of individuals',
-        resolve(stats) {
-          return stats.USER;
-        },
-      },
-      organizations: {
-        type: GraphQLInt,
-        description: 'Number of organizations',
-        resolve(stats) {
-          return stats.ORGANIZATION;
-        },
-      },
-      collectives: {
-        type: GraphQLInt,
-        description: 'Number of collectives',
-        resolve(stats) {
-          return stats.COLLECTIVE;
-        },
-      },
-    };
-  },
-});
-
 export const ContributorsStatsType = new GraphQLObjectType({
   name: 'ContributorsStats',
   description: 'Breakdown of contributors per type (ANY/USER/ORGANIZATION/COLLECTIVE)',
@@ -1168,18 +1125,6 @@ export const TierStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier) {
           return tier.id;
-        },
-      },
-      members: {
-        type: MembersStatsType,
-        deprecationReason: `
-          2019/06/20 - This endpoint was used for the new tier page and has been replaced
-          by "contributors". It can be deleted as soon as the migration's completed
-          as well as the "members.findByTierId" loader.
-        `,
-        description: 'Breakdown of all the members that belongs to this tier.',
-        resolve(tier, args, req) {
-          return req.loaders.tiers.contributorsStats.load(tier.id);
         },
       },
       contributors: {
@@ -1414,26 +1359,6 @@ export const TierType = new GraphQLObjectType({
             }
           }
           return tier.getOrders(query);
-        },
-      },
-      members: {
-        type: new GraphQLList(MemberType),
-        description: 'Returns a list of all the members that contributed to this tier',
-        deprecationReason: `
-          2019/06/20 - This endpoint was used for the new tier page and has been replaced
-          by "contributors". It can be deleted as soon as the migration's completed
-          as well as the "members.findByTierId" loader.
-        `,
-        args: {
-          limit: {
-            type: GraphQLInt,
-            description: 'Maximum number of entries to return',
-            defaultValue: 5000,
-          },
-        },
-        async resolve(tier, args, req) {
-          const members = await req.loaders.members.findByTierId.load(tier.id);
-          return members.slice(0, args.limit);
         },
       },
       contributors: {
