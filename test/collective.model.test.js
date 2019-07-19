@@ -203,6 +203,13 @@ describe('Collective model', () => {
       });
   });
 
+  it('creates a unique slug for incognito profile', () => {
+    return Collective.create({ isIncognito: true }).tap(collective => {
+      expect(collective.slug).to.contain('incognito-');
+      expect(collective.slug.length).to.equal(18);
+    });
+  });
+
   it('does not create collective with a blacklisted slug', () => {
     return Collective.create({ name: 'learn more' }).then(collective => {
       // `https://host/learn-more` is a protected page.

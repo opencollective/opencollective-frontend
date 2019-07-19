@@ -332,7 +332,7 @@ describe('opencollective.virtualcard', () => {
           CollectiveId: collective1.id,
           role: 'ADMIN',
         }).then(() => {
-          user1.populateRoles();
+          return user1.populateRoles();
         });
       });
 

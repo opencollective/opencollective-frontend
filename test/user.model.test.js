@@ -83,10 +83,10 @@ describe('user.models.test.js', () => {
   });
 
   describe('#createUserWithCollective', () => {
-    it('uses "anonymous" slug if name is not provided', () => {
+    it('uses "incognito" slug if name is not provided', () => {
       const userParams = { email: 'frank@zappa.com' };
       return User.createUserWithCollective(userParams).then(user => {
-        expect(user.collective.slug.startsWith('anonymous')).to.equal(true);
+        expect(user.collective.slug.startsWith('incognito')).to.equal(true);
       });
     });
 

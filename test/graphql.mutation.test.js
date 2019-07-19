@@ -1214,7 +1214,7 @@ describe('Mutation Tests', () => {
           await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
           expect(emailSendMessageSpy.callCount).to.equal(1);
           expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user1.email);
-          expect(emailSendMessageSpy.firstCall.args[1]).to.contain('anonymous joined January meetup as backer');
+          expect(emailSendMessageSpy.firstCall.args[1]).to.contain('incognito joined January meetup as backer');
         });
       });
     });

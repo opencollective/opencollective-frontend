@@ -179,10 +179,16 @@ const TransactionFields = () => {
     },
     createdByUser: {
       type: UserType,
-      resolve(transaction) {
-        // If it's a sequelize model transaction, it means it has the method getCreatedByUser
-        // otherwise we return null
+      async resolve(transaction, args, req) {
+        // We don't return the user if the transaction has been created by someone who wanted to remain incognito
+        // This is very suboptimal. We should probably record the CreatedByCollectiveId (or better CreatedByProfileId) instead of the User.
         if (transaction && transaction.getCreatedByUser) {
+          const fromCollective = await transaction.getFromCollective();
+          if (fromCollective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.CollectiveId)))
+            return {};
+          const collective = await transaction.getCollective();
+          if (collective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.FromCollectiveId)))
+            return {};
           return transaction.getCreatedByUser();
         }
         return null;

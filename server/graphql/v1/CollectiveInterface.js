@@ -552,6 +552,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       slug: { type: GraphQLString },
       path: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
+      isIncognito: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
       isArchived: { type: GraphQLBoolean },
       isDeletable: { type: GraphQLBoolean },
@@ -744,7 +745,12 @@ const CollectiveFields = () => {
     },
     createdByUser: {
       type: UserType,
-      resolve(collective) {
+      resolve(collective, args, req) {
+        if (
+          collective.isIncognito &&
+          (!req.remoteUser || !req.remoteUser.isAdmin(collective.inTheContextOfCollectiveId))
+        )
+          return {};
         return models.User.findByPk(collective.CreatedByUserId);
       },
     },
@@ -943,6 +949,13 @@ const CollectiveFields = () => {
       type: GraphQLBoolean,
       resolve(collective) {
         return Boolean(collective.settings && collective.settings.apply);
+      },
+    },
+    isIncognito: {
+      description: 'Returns whether this collective is incognito',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return collective.isIncognito;
       },
     },
     isArchived: {
