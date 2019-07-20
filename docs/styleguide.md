@@ -10,7 +10,7 @@ npm run styleguide:dev
 
 ## Create a new component:
 
-Only components with a matching example markdown file in the `styleguide/examples/` directory will appear in the styleguide. After creating a new component in the `src/components/` directory (i.e. `src/components/NewComponent.js`), make an example markdown file to go with it (i.e. `styleguide/examples/NewComponent.md`).
+Only components with a matching example markdown file in the `styleguide/examples/` directory will appear in the styleguide. After creating a new component in the `components/` directory (i.e. `components/NewComponent.js`), make an example markdown file to go with it (i.e. `styleguide/examples/NewComponent.md`).
 
 If you are creating a styled-component, you will need to annotate the export statement for React-Styleguidist to recognize it:
 
