@@ -7,7 +7,7 @@ cd -- "$(dirname $0)/.."
 npm run build:langs
 
 #Check if language files changed
-CHANGED=$(git status --porcelain | grep src/lang)
+CHANGED=$(git status --porcelain | grep lang)
 if [ -n "${CHANGED}" ] ; then
   echo "Language files are not up to date, Please run 'npm run build:langs'"
   echo "-------- FILES --------"

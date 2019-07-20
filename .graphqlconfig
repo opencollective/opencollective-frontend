@@ -1,7 +1,7 @@
 {
   "projects": {
     "opencollective": {
-      "schemaPath": "src/graphql/schema.graphql",
+      "schemaPath": "lib/graphql/schema.graphql",
       "extensions": {
         "endpoints": {
           "dev": "http://localhost:3000/api/graphql",
