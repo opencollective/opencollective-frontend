@@ -254,7 +254,7 @@ class EditWebhooks extends React.Component {
 
         <Box width={[0.9, 0.75]} mx={['auto', 0]} my={3}>
           <StyledButton
-            width={1}
+            width={[1]}
             px={[0, 3, 0]}
             borderRadius={6}
             buttonSize="medium"
