@@ -545,20 +545,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
   }
 }
 
-/**
- * Update the non-sensitive information of an order, like the public message
- * @deprecated: '2019-07-03: Public message is now stored at the Member level'
- */
-export async function updateOrderInfo(req, orderParams) {
-  const order = await models.Order.findByPk(orderParams.id);
-  if (!order || !req.remoteUser || !req.remoteUser.isAdmin(order.FromCollectiveId)) {
-    throw Error("This order does not exists or you don't have the permission to edit it");
-  }
-
-  // Update order with a field whitelist
-  return order.update(pick(orderParams, ['publicMessage']));
-}
-
 export async function completePledge(remoteUser, order) {
   if (!remoteUser) {
     throw new errors.Unauthorized({
