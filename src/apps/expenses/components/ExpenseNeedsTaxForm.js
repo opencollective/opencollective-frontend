@@ -64,17 +64,15 @@ class ExpenseNeedsTaxForm extends React.Component {
     return (
       userTaxFormRequiredBeforePayment && (
         <span>
-          <style jsx>
-            {`
-              .taxFormRequired {
-                background: #e21a60;
-                color: white;
-                text-transform: uppercase;
-              }
-            `}
-          </style>
-          <span className="taxFormRequired" data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
-            {message}
+          <style jsx>{`
+            a {
+              text-transform: uppercase;
+            }
+          `}</style>
+          <span className="taxFormRequired " data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
+            <a className="btn btn-warning btn-xs" href="https://docs.opencollective.com/help/expenses/tax-information">
+              {message}
+            </a>
           </span>
           {' | '}
         </span>
