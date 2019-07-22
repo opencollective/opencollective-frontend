@@ -116,7 +116,6 @@ const processCollective = collective => {
     collective.getBackersStats(startDate, endDate),
     collective.getBackersCount({ since: startDate, until: endDate }),
     collective.getTopExpenseCategories(startDate, endDate),
-    collective.getTopVendors(startDate, endDate),
   ];
 
   return Promise.all(promises)
@@ -132,7 +131,6 @@ const processCollective = collective => {
       data.collective.stats.totalReceived = results[3];
       data.collective.stats.totalSpent = results[4];
       data.collective.stats.topExpenseCategories = results[7];
-      data.collective.stats.topVendors = results[8];
       return data;
     })
     .then(data => sendTweet(collective.twitterAccount, data))

@@ -193,11 +193,12 @@ const getTopDonorsForCollective = (CollectiveId, options = {}) => {
 };
 
 /**
- * Returns an array with the top (default 3) vendors for a given CollectiveId (where the money goes)
+ * Returns an array with the top (default 3) expense submitters by amount for
+ * a given CollectiveId.
  * @param {*} CollectiveId
  * @param {*} options
  */
-const getTopVendorsForCollective = (CollectiveId, options = {}) => {
+const getTopExpenseSubmitters = (CollectiveId, options = {}) => {
   options.limit = options.limit || 3;
   const since = options.since ? `AND t."createdAt" >= '${options.since.toISOString()}'` : '';
   const until = options.until ? `AND t."createdAt" < '${options.until.toISOString()}'` : '';
@@ -208,6 +209,7 @@ const getTopVendorsForCollective = (CollectiveId, options = {}) => {
     WHERE t."CollectiveId"=:CollectiveId
       AND t.type='DEBIT'
       AND t."deletedAt" IS NULL
+      AND t."ExpenseId" IS NOT NULL
       ${since} ${until}
     GROUP BY c.id ORDER BY "totalExpenses" ASC LIMIT :limit
   `,
@@ -905,7 +907,7 @@ const queries = {
   getTotalDonationsByCollectiveType,
   getTotalAnnualBudgetForHost,
   getTopDonorsForCollective,
-  getTopVendorsForCollective,
+  getTopExpenseSubmitters,
   getTopExpenseCategories,
   getTotalAnnualBudget,
   getMembersOfCollectiveWithRole,
