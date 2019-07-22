@@ -37,7 +37,21 @@ class NewCollectivePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      Collective: PropTypes.object,
+      Collective: PropTypes.shape({
+        name: PropTypes.string,
+        description: PropTypes.string,
+        twitterHandle: PropTypes.string,
+        image: PropTypes.string,
+        parentCollective: PropTypes.shape({ image: PropTypes.string }),
+        host: PropTypes.object,
+        stats: PropTypes.object,
+        contributors: PropTypes.arrayOf(PropTypes.object),
+        tiers: PropTypes.arrayOf(PropTypes.object),
+        events: PropTypes.arrayOf(PropTypes.object),
+        transactions: PropTypes.arrayOf(PropTypes.object),
+        expenses: PropTypes.arrayOf(PropTypes.object),
+        updates: PropTypes.arrayOf(PropTypes.object),
+      }),
     }).isRequired, // from withData
   };
 
