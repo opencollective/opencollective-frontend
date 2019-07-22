@@ -443,7 +443,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
         resolve(collective) {
           return Promise.all([
             queries.getTopExpenseCategories(collective.id),
-            queries.getTopVendorsForCollective(collective.id),
+            queries.getTopExpenseSubmitters(collective.id),
           ]).then(results => {
             const res = {
               byCategory: results[0],
