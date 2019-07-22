@@ -142,6 +142,7 @@ const getCollective = graphql(gql`
       currency
       settings
       isArchived
+      image
       stats {
         id
         balance
