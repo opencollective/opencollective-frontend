@@ -184,7 +184,6 @@ class EditWebhooks extends React.Component {
         px={[0, 3, 0]}
         flexWrap="wrap"
         flexDirection="row-reverse"
-        bg={['red', 'blue', 'green']}
         justifyContent="space-between"
       >
         <Box my={[0, 4]}>
