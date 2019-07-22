@@ -118,6 +118,7 @@ const archiveCollectiveQuery = gql`
     archiveCollective(id: $id) {
       id
       isArchived
+      isApproved
     }
   }
 `;
@@ -127,6 +128,7 @@ const unarchiveCollectiveQuery = gql`
     unarchiveCollective(id: $id) {
       id
       isArchived
+      isApproved
     }
   }
 `;

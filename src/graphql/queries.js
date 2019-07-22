@@ -233,6 +233,7 @@ export const getCollectiveToEditQueryFields = `
   isHost
   hostFeePercent
   expensePolicy
+  isApproved
   stats {
     id
     yearlyBudget
