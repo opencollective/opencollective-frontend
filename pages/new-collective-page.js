@@ -49,7 +49,7 @@ class NewCollectivePage extends React.Component {
     if (collective) {
       return {
         title: collective.name,
-        description: collective.description || collective.longDescription,
+        description: collective.description,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
         image: collective.image || get(collective, 'parentCollective.image'),
       };
