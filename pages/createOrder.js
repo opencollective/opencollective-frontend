@@ -697,13 +697,13 @@ class CreateOrderPage extends React.Component {
 
   renderStep(step) {
     const { data } = this.props;
-    const { stepDetails, stepPayment, customData } = this.state;
+    const { stepProfile, stepDetails, stepPayment, customData } = this.state;
     const [personal, profiles] = this.getProfiles();
     const tier = this.props.data.Tier;
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
-    const isIncognito = get(this.state, 'stepProfile.isIncognito');
+    const isIncognito = get(stepProfile, 'isIncognito');
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
@@ -810,7 +810,7 @@ class CreateOrderPage extends React.Component {
             </H5>
             <ContributePayment
               onChange={stepPayment => this.setState({ stepPayment })}
-              collective={this.state.stepProfile}
+              collective={stepProfile}
               defaultValue={stepPayment}
               onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
               withPaypal={this.hasPaypal()}
@@ -842,13 +842,18 @@ class CreateOrderPage extends React.Component {
               currency={this.getCurrency()}
               hostFeePercent={get(data, 'Collective.hostFeePercent')}
               paymentMethod={get(stepPayment, 'paymentMethod')}
-              userTaxInfo={this.state.stepSummary || { countryISO: this.getContributingProfileCountry() }}
               onChange={stepSummary => this.setState({ stepSummary })}
               showFees={false}
               tierType={get(tier, 'type')}
               hostCountry={get(data.Collective, 'host.location.country')}
               collectiveCountry={get(data.Collective, 'location.country')}
-              applyTaxes
+              applyTaxes={true}
+              userTaxInfo={
+                this.state.stepSummary || {
+                  countryISO: this.getContributingProfileCountry(),
+                  number: get(stepProfile, 'settings.VAT.number'),
+                }
+              }
             />
           </Container>
           {this.renderTierDetails(tier)}
