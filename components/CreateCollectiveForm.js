@@ -316,7 +316,7 @@ class CreateCollectiveForm extends React.Component {
             .FormInputs {
               max-width: 700px;
               margin: 0 auto;
-              overflow: hidden;
+              overflow-x: hidden;
             }
 
             .actions {

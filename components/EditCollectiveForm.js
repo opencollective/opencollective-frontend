@@ -488,7 +488,7 @@ class EditCollectiveForm extends React.Component {
             }
 
             .FormInputs {
-              overflow: hidden;
+              overflow-x: hidden;
             }
 
             .EditCollectiveForm :global(textarea[name='longDescription']) {
