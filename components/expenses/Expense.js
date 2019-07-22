@@ -332,7 +332,7 @@ class Expense extends React.Component {
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
-                <ExpenseNeedsTaxForm id={expense.id} message={intl.formatMessage(this.messages.taxFormRequired)} />
+                <ExpenseNeedsTaxForm id={expense.id} intl={intl} />
               )}
               <span className="metaItem">
                 <Link

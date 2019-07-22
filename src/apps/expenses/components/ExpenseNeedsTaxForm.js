@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -20,11 +20,20 @@ class ExpenseNeedsTaxForm extends React.Component {
   static propTypes = {
     id: PropTypes.number,
     data: PropTypes.object,
-    message: PropTypes.string,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
+
+    this.messages = defineMessages({
+      hover: {
+        id: 'expenseNeedsTaxForm.hover',
+        defaultMessage:
+          "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks with a link to the form you need to submit. Need help? Contact support@opencollective.com",
+      },
+      taxFormRequired: { id: 'expenseNeedsTaxForm.taxFormRequired', defaultMessage: 'tax form required' },
+    });
   }
 
   render() {
@@ -43,11 +52,14 @@ class ExpenseNeedsTaxForm extends React.Component {
     }
 
     const {
+      intl,
       data: {
         Expense: { userTaxFormRequiredBeforePayment },
       },
-      message,
     } = this.props;
+
+    const message = intl.formatMessage(this.messages.taxFormRequired);
+    const hoverMessage = intl.formatMessage(this.messages.hover);
 
     return (
       userTaxFormRequiredBeforePayment && (
@@ -61,7 +73,9 @@ class ExpenseNeedsTaxForm extends React.Component {
               }
             `}
           </style>
-          <span className="taxFormRequired">{message}</span>
+          <span className="taxFormRequired" data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
+            {message}
+          </span>
           {' | '}
         </span>
       )
