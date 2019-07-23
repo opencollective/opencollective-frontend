@@ -36,19 +36,6 @@ const CoverImage = styled.div`
   padding: 16px;
 `;
 
-/** A tag to describe the type of contribution (one time, recurring...etc) */
-const ContributionTypeTag = styled(StyledTag).attrs({
-  color: 'blue.500',
-  fontSize: 'Tiny',
-  lineHeight: 'Tiny',
-})`
-  padding: 4px 8px;
-  font-weight: bold;
-  border: 1px solid #99cfff;
-  border-radius: 100px;
-  background: white;
-`;
-
 /** Translations */
 const I18nContributionType = defineMessages({
   [ContributionTypes.FINANCIAL_CUSTOM]: {
@@ -107,8 +94,8 @@ const ContributeCard = ({ intl, contribution }) => {
       <CoverImage />
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <div>
-          <Box mb={2}>
-            <ContributionTypeTag>{intl.formatMessage(I18nContributionType[type])}</ContributionTypeTag>
+          <Box mb={3}>
+            <StyledTag>{intl.formatMessage(I18nContributionType[type])}</StyledTag>
           </Box>
           {title && (
             <P fontSize="H5" mt={1} mb={3} fontWeight="bold" textTransform="capitalize">
