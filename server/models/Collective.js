@@ -1647,7 +1647,7 @@ export default function(Sequelize, DataTypes) {
       .then(() => this.getTiers());
   };
 
-  Collective.prototype.getExpenses = function(status, startDate, endDate = new Date(), createdByUserId) {
+  Collective.prototype.getExpenses = function(status, startDate, endDate = new Date(), createdByUserId, excludedTypes) {
     const where = {
       createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id,
@@ -1655,6 +1655,7 @@ export default function(Sequelize, DataTypes) {
     if (status) where.status = status;
     if (startDate) where.createdAt[Op.gte] = startDate;
     if (createdByUserId) where.UserId = createdByUserId;
+    if (excludedTypes) where.type = { [Op.or]: [{ [Op.eq]: null }, { [Op.notIn]: excludedTypes }] };
 
     return models.Expense.findAll({
       where,
@@ -2143,7 +2144,8 @@ export default function(Sequelize, DataTypes) {
     const since = moment({ year });
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
-    const expenses = await this.getExpenses(status, since, until, UserId);
+    const excludedType = ['RECEIPT'];
+    const expenses = await this.getExpenses(status, since, until, UserId, excludedType);
 
     const userTotal = sumBy(expenses, 'amount');
 
@@ -2155,7 +2157,8 @@ export default function(Sequelize, DataTypes) {
     const since = moment({ year });
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
-    const expenses = await this.getExpenses(status, since, until);
+    const excludedType = ['RECEIPT'];
+    const expenses = await this.getExpenses(status, since, until, null, excludedType);
 
     const userTotals = expenses.reduce((totals, expense) => {
       const { UserId } = expense;

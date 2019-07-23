@@ -26,6 +26,7 @@ import models, { Op, sequelize } from '../../models';
 import { getContributorsForTier } from '../../lib/contributors';
 import { strip_tags } from '../../lib/utils';
 import status from '../../constants/expense_status';
+import expenseType from '../../constants/expense_type';
 import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
@@ -641,6 +642,12 @@ export const ExpenseType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(expense) {
           return expense.status;
+        },
+      },
+      type: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.type;
         },
       },
       payoutMethod: {

@@ -46,7 +46,7 @@ describe('lib.taxForms', () => {
     year: moment().year(),
   };
 
-  function ExpenseOverThreshold({ incurredAt, UserId, CollectiveId, amount }) {
+  function ExpenseOverThreshold({ incurredAt, UserId, CollectiveId, amount, type }) {
     return {
       description: 'pizza',
       amount: amount || US_TAX_FORM_THRESHOLD + 100e2,
@@ -56,6 +56,7 @@ describe('lib.taxForms', () => {
       incurredAt,
       createdAt: incurredAt,
       CollectiveId,
+      type,
     };
   }
 
@@ -136,6 +137,15 @@ describe('lib.taxForms', () => {
         UserId: users[0].id,
         CollectiveId: hostCollectives[0].id,
         incurredAt: moment(),
+      }),
+    );
+    // An expense from this year over the threshold BUT it's of type receipt so it should not be counted
+    await Expense.create(
+      ExpenseOverThreshold({
+        UserId: users[2].id,
+        CollectiveId: hostCollectives[0].id,
+        incurredAt: moment(),
+        type: 'RECEIPT',
       }),
     );
     // An expense from this year over the threshold
