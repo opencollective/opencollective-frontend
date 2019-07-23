@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import withIntl from '../../../lib/withIntl';
-import Error from '../../../components/Error';
+import Error from '../Error';
 
 const getIsTaxFormRequiredQuery = gql`
   query Expense($id: Int!) {
@@ -82,4 +81,4 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
 }
 
 const addExpenseData = graphql(getIsTaxFormRequiredQuery);
-export default addExpenseData(withIntl(ExpenseNeedsTaxFormBadge));
+export default addExpenseData(injectIntl(ExpenseNeedsTaxFormBadge));

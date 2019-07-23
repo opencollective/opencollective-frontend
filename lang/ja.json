@@ -510,7 +510,6 @@
   "expense.reject.btn": "リジェクト",
   "expense.rejected": "拒否されました",
   "expense.save": "保存",
-  "expense.userTaxFormRequiredBeforePayment": "tax form required",
   "expense.viewDetails": "詳細を見る",
   "expenseNeedsTaxForm.hover": "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks with a link to the form you need to submit. Need help? Contact support@opencollective.com",
   "expenseNeedsTaxForm.taxFormRequired": "tax form required",

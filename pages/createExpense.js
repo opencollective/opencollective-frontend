@@ -8,7 +8,7 @@ import { pick } from 'lodash';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
-import ExpenseNeedsTaxFormMessage from '../apps/expenses/components/ExpenseNeedsTaxFormMessage';
+import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
