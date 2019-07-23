@@ -48,7 +48,7 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
     const {
       intl,
       data: {
-        isLoading,
+        loading,
         Expense: { userTaxFormRequiredBeforePayment },
       },
     } = this.props;
@@ -56,9 +56,9 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
     const message = intl.formatMessage(this.messages.message);
 
     return (
-      !isLoading &&
+      !loading &&
       userTaxFormRequiredBeforePayment && (
-        <MessageBox isLoading={data.isLoading} type="warning" withIcon={true}>
+        <MessageBox isLoading={loading} type="warning" withIcon={true}>
           {message}
         </MessageBox>
       )
