@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jun 20 2019 10:18:57 GMT+1200 (New Zealand Standard Time)
+# timestamp: Tue Jul 23 2019 15:07:45 GMT+1200 (New Zealand Standard Time)
 
 """
 Application model
@@ -189,7 +189,7 @@ type Collective implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -419,7 +419,7 @@ interface CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -957,7 +957,7 @@ type Event implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -1329,36 +1329,6 @@ input MemberInputType {
   role: String
   description: String
   since: DateString
-}
-
-"""
-Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
-"""
-type MembersStatsType {
-  """
-  We always have to return an id for apollo's caching
-  """
-  id: Int
-
-  """
-  Total number of contributors
-  """
-  all: Int
-
-  """
-  Number of individuals
-  """
-  users: Int
-
-  """
-  Number of organizations
-  """
-  organizations: Int
-
-  """
-  Number of collectives
-  """
-  collectives: Int
 }
 
 """
@@ -2063,7 +2033,7 @@ type Organization implements CollectiveInterface {
   twitterHandle: String
   githubHandle: String
   website: String
-  updates(limit: Int, offset: Int): [Event]
+  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
     limit: Int
     offset: Int
@@ -2972,22 +2942,6 @@ type User implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-  events(
-    limit: Int
-    offset: Int
-
-    """
-    Include past events
-    """
-    includePastEvents: Boolean = false
-
-    """
-    Include inactive events
-    """
-    includeInactive: Boolean = false
-  ): [Event]
-  updates(limit: Int, offset: Int): [Event]
-  events(limit: Int, offset: Int): [Event]
   events(
     limit: Int
     offset: Int
