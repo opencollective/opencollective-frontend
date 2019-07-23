@@ -77,7 +77,6 @@ class Expense extends React.Component {
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
       approved: { id: 'expense.approved', defaultMessage: 'approved' },
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
-      taxFormRequired: { id: 'expense.userTaxFormRequiredBeforePayment', defaultMessage: 'tax form required' },
       closeDetails: {
         id: 'expense.closeDetails',
         defaultMessage: 'Close Details',
