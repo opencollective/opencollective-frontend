@@ -331,7 +331,7 @@ class Expense extends React.Component {
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
-                <ExpenseNeedsTaxFormBadge id={expense.id} intl={intl} />
+                <ExpenseNeedsTaxFormBadge id={expense.id} />
               )}
               <span className="metaItem">
                 <Link
