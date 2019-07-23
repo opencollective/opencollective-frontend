@@ -522,6 +522,12 @@ class CreateOrderPage extends React.Component {
       return false;
     }
 
+    // Don't apply VAT if not configured (default)
+    const vatType = get(Collective, 'settings.VAT.type');
+    if (!vatType) {
+      return false;
+    }
+
     const hostCountry = get(Collective, 'host.location.country');
     const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.location.country);
     return LibTaxes.vatMayApply(Tier.type, country);
