@@ -509,14 +509,13 @@
   "expense.privateNote": "private note",
   "expense.reject.btn": "reject",
   "expense.rejected": "rejected",
-<<<<<<< HEAD:lang/zh.json
-  "expense.save": "保存",
-=======
   "expense.save": "save",
   "expense.userTaxFormRequiredBeforePayment": "tax form required",
->>>>>>> Build langs:src/lang/zh.json
   "expense.viewDetails": "View Details",
   "expenses.all": "全部",
+  "expenseNeedsTaxForm.hover": "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks with a link to the form you need to submit. Need help? Contact support@opencollective.com",
+  "expenseNeedsTaxForm.taxFormRequired": "tax form required",
+  "expenseNeedsTaxFormMessage.message": "We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. If you have not received the email within 24 hours, or you have any questions, please contact support@opencollective.com. For more info, see our help docs about taxes.",
   "expenses.allCollectives": "All Collectives",
   "expenses.approved": "approved",
   "expenses.badge.tooltip.approved": "{approved} {approved, plural, one {expense} other {expenses}} ready to be paid",
