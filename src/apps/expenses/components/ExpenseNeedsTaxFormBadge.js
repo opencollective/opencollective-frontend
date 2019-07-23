@@ -46,7 +46,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
     if (data.loading) {
       return (
         <div>
-          <FormattedMessage id="loading" defaultMessage="checking if tax form required..." />
+          <FormattedMessage id="taxformbadge.loading" defaultMessage="checking if tax form required..." />
         </div>
       );
     }

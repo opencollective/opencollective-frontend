@@ -929,6 +929,7 @@
   "tax.vat": "Taxe sur la valeur ajoutée (TVA)",
   "tax.vat.description": "Utilisez ce type pour vous conformez à la réglementation pour la TVA en Europe.",
   "tax.vatShort": "TVA",
+  "taxformbadge.loading": "checking if tax form required...",
   "TicketsConfirmed.ConfirmationSent": "Un email de confirmation a été envoyé à votre adresse email {email}",
   "TicketsConfirmed.SeeYouSoon": "A bientôt!",
   "TicketsConfirmed.tickets": "{quantity} {quantity, plural, one {ticket} other {tickets}}",

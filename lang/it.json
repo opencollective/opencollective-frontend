@@ -929,6 +929,7 @@
   "tax.vat": "Value-added tax (VAT)",
   "tax.vat.description": "Use this tier type to conform with legislation on VAT in Europe.",
   "tax.vatShort": "VAT",
+  "taxformbadge.loading": "checking if tax form required...",
   "TicketsConfirmed.ConfirmationSent": "A confirmation email has been sent to your address {email}",
   "TicketsConfirmed.SeeYouSoon": "See you soon!",
   "TicketsConfirmed.tickets": "{quantity} {quantity, plural, one {ticket} other {tickets}}",
