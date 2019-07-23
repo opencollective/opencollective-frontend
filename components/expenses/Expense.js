@@ -13,7 +13,7 @@ import SmallButton from '../SmallButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
-import ExpenseNeedsTaxForm from './ExpenseNeedsTaxForm';
+import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
@@ -332,7 +332,7 @@ class Expense extends React.Component {
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
-                <ExpenseNeedsTaxForm id={expense.id} intl={intl} />
+                <ExpenseNeedsTaxFormBadge id={expense.id} intl={intl} />
               )}
               <span className="metaItem">
                 <Link

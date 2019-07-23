@@ -16,7 +16,7 @@ const getIsTaxFormRequiredQuery = gql`
   }
 `;
 
-class ExpenseNeedsTaxForm extends React.Component {
+class ExpenseNeedsTaxFormBadge extends React.Component {
   static propTypes = {
     id: PropTypes.number,
     data: PropTypes.object,
@@ -82,4 +82,4 @@ class ExpenseNeedsTaxForm extends React.Component {
 }
 
 const addExpenseData = graphql(getIsTaxFormRequiredQuery);
-export default addExpenseData(withIntl(ExpenseNeedsTaxForm));
+export default addExpenseData(withIntl(ExpenseNeedsTaxFormBadge));
