@@ -349,7 +349,7 @@ class EditCollectiveForm extends React.Component {
     const type = collective.type.toLowerCase();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
-    console.log(collective, this.state.collective);
+
     this.fields = {
       info: [
         {
@@ -422,8 +422,12 @@ class EditCollectiveForm extends React.Component {
               return false;
             }
 
-            const country = get(this.state.collective, 'location.country');
-            return country && isMemberOfTheEuropeanUnion(country);
+            const collectiveCountry = get(this.state.collective, 'location.country');
+            const hostCountry = get(this.state.collective.host, 'location.country');
+            return (
+              (hostCountry && isMemberOfTheEuropeanUnion(hostCountry)) ||
+              (collectiveCountry && isMemberOfTheEuropeanUnion(collectiveCountry))
+            );
           },
           options: [
             {
@@ -447,12 +451,19 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'settings.VAT.number'),
           when: () => {
             if (this.state.collective.type === CollectiveType.COLLECTIVE) {
-              // Collectives can set a VAT number if it's
-              return get(this.state.collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
+              // Collectives can set a VAT number if configured
+              const collectiveCountry = get(this.state.collective, 'location.country');
+              const hostCountry = get(this.state.collective.host, 'location.country');
+              if (
+                (hostCountry && isMemberOfTheEuropeanUnion(hostCountry)) ||
+                (collectiveCountry && isMemberOfTheEuropeanUnion(collectiveCountry))
+              ) {
+                return get(this.state.collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
+              }
             } else {
               // Organizations and users can set a VAT number if they're located in the EU
               const country = get(this.state.collective, 'location.country');
-              return isMemberOfTheEuropeanUnion(country);
+              return country && isMemberOfTheEuropeanUnion(country);
             }
           },
         },
