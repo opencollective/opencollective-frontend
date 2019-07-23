@@ -1146,6 +1146,7 @@
   "virtualCards.viewDetails": "View Details",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",
+  "webhooks.save": "Save {count} webhooks",
   "webhooks.types.label": "Activities",
   "webhooks.url.label": "URL",
   "widget.becomeBacker": "Become a backer",
