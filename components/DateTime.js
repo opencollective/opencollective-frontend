@@ -15,7 +15,7 @@ class DateTime extends React.Component {
     const { date, timezone } = props;
     const value = momentTimezone.tz(new Date(date), timezone);
 
-    return <ReactDateTime value={value} {...props} />;
+    return <ReactDateTime value={value} utc={timezone === 'utc'} {...props} />;
   }
 }
 
