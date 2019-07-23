@@ -1066,6 +1066,7 @@ input ExpenseInputType {
   description: String
   category: String
   status: String
+  type: String
 
   """
   Can be paypal, donation, manual, other
@@ -1128,6 +1129,7 @@ type ExpenseType {
   description: String
   category: String
   status: String
+  type: String
   payoutMethod: String
   privateMessage: String
   attachment: String
