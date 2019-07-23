@@ -502,6 +502,7 @@
   "expense.reject.btn": "reject",
   "expense.rejected": "rejected",
   "expense.save": "保存",
+  "expense.type": "type",
   "expense.viewDetails": "View Details",
   "expenses.all": "全部",
   "expenses.allCollectives": "All Collectives",
