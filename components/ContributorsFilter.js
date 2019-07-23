@@ -1,10 +1,8 @@
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
 
-import StyledButton from './StyledButton';
-import { Span } from './Text';
+import StyledFilters from './StyledFilters';
 
 export const CONTRIBUTOR_FILTERS = {
   ALL: 'ALL',
@@ -94,25 +92,14 @@ export const filterContributors = (contributors, filter) => {
  * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */
 const ContributorsFilter = ({ intl, selected, onChange, filters, selectedButtonStyle }) => {
-  const activeFilter = selected || CONTRIBUTOR_FILTERS.ALL;
   return (
-    <Flex css={{ overflowX: 'auto' }}>
-      {filters.map(filter => {
-        const isSelected = filter === activeFilter;
-        return (
-          <StyledButton
-            key={filter}
-            onClick={isSelected ? undefined : () => onChange(filter)}
-            buttonStyle={isSelected ? selectedButtonStyle : 'standard'}
-            mx={2}
-          >
-            <Span textTransform="capitalize" whiteSpace="nowrap">
-              {intl.formatMessage(Translations[filter])}
-            </Span>
-          </StyledButton>
-        );
-      })}
-    </Flex>
+    <StyledFilters
+      filters={filters}
+      getLabel={filter => intl.formatMessage(Translations[filter])}
+      onChange={onChange}
+      selected={selected || CONTRIBUTOR_FILTERS.ALL}
+      selectedButtonStyle={selectedButtonStyle}
+    />
   );
 };
 
