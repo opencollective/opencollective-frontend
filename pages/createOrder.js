@@ -12,6 +12,7 @@ import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
 import { Router } from '../server/pages';
+import { VAT_OPTIONS } from '../lib/constants/vat';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency, getEnvVar, parseToBoolean } from '../lib/utils';
 import { getPaypal } from '../lib/paypal';
@@ -523,14 +524,19 @@ class CreateOrderPage extends React.Component {
     }
 
     // Don't apply VAT if not configured (default)
-    const vatType = get(Collective, 'settings.VAT.type');
+    const vatType = get(Collective, 'settings.VAT.type') || get(Collective, 'parentCollective.settings.VAT.type');
+    const hostCountry = get(Collective, 'host.location.country');
+    const collectiveCountry = get(Collective, 'location.country');
+    const parentCountry = get(Collective, 'parentCollective.location.country');
+    const country = collectiveCountry || parentCountry || hostCountry;
+
     if (!vatType) {
       return false;
+    } else if (vatType === VAT_OPTIONS.OWN) {
+      return LibTaxes.getVatOriginCountry(Tier.type, country, country);
+    } else {
+      return LibTaxes.getVatOriginCountry(Tier.type, hostCountry, country);
     }
-
-    const hostCountry = get(Collective, 'host.location.country');
-    const country = LibTaxes.getVatOriginCountry(Tier.type, hostCountry, Collective.location.country);
-    return LibTaxes.vatMayApply(Tier.type, country);
   }
 
   /** Returns the steps list */
@@ -852,8 +858,10 @@ class CreateOrderPage extends React.Component {
               showFees={false}
               tierType={get(tier, 'type')}
               hostCountry={get(data.Collective, 'host.location.country')}
-              collectiveCountry={get(data.Collective, 'location.country')}
               applyTaxes={true}
+              collectiveCountry={
+                get(data.Collective, 'location.country') || get(data.Collective, 'parentCollective.location.country')
+              }
               userTaxInfo={
                 this.state.stepSummary || {
                   countryISO: this.getContributingProfileCountry(),
@@ -1026,6 +1034,7 @@ const collectiveFields = `
   currency
   hostFeePercent
   tags
+  settings
   location {
     country
   }
@@ -1039,6 +1048,10 @@ const collectiveFields = `
   }
   parentCollective {
     image
+    settings
+    location {
+      country
+    }
   }
 `;
 

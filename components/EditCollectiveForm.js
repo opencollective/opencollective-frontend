@@ -431,7 +431,7 @@ class EditCollectiveForm extends React.Component {
           },
           options: [
             {
-              value: null,
+              value: '',
               label: intl.formatMessage(this.messages['VAT.None']),
             },
             {
