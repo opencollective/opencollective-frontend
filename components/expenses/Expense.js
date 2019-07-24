@@ -20,9 +20,33 @@ import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 
 class Expense extends React.Component {
   static propTypes = {
+    expense: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      status: PropTypes.string.isRequired,
+      updatedAt: PropTypes.string.isRequired,
+      amount: PropTypes.number.isRequired,
+      currency: PropTypes.string.isRequired,
+      incurredAt: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+      payoutMethod: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      fromCollective: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        slug: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+      }),
+      collective: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        slug: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        currency: PropTypes.string.isRequired,
+        stats: PropTypes.shape({
+          balance: PropTypes.number,
+        }).isRequired,
+      }),
+    }).isRequired,
     collective: PropTypes.object,
     host: PropTypes.object,
-    expense: PropTypes.object,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
