@@ -145,12 +145,8 @@ export const NotificationInputType = new GraphQLInputObjectType({
   description: 'Input type for NotificationType',
   fields: () => ({
     id: { type: GraphQLInt },
-    channel: { type: GraphQLString },
-    type: { type: GraphQLString },
-    active: { type: GraphQLBoolean },
+    type: { type: new GraphQLNonNull(GraphQLString) },
     webhookUrl: { type: GraphQLString },
-    UserId: { type: GraphQLInt },
-    CollectiveId: { type: GraphQLInt },
   }),
 });
 

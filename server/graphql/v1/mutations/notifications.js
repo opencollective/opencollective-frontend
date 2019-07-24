@@ -1,8 +1,10 @@
 import Promise from 'bluebird';
-import { values } from 'lodash';
+import { pick } from 'lodash';
 import config from 'config';
+
 import models, { Op } from '../../../models';
-import { activities, channels } from '../../../constants';
+import { channels } from '../../../constants';
+import { diffDBEntries } from '../../../lib/data';
 
 import { Forbidden, NotFound, Unauthorized } from '../../errors';
 
@@ -20,42 +22,59 @@ const MaxWebhooksExceededError = new Forbidden({
 export async function editWebhooks(args, remoteUser) {
   if (!(remoteUser && remoteUser.isAdmin(args.collectiveId))) {
     throw NotificationPermissionError;
+  } else if (!args.notifications) {
+    return Promise.resolve();
   }
 
-  if (!args.notifications) return Promise.resolve();
+  const getAllWebhooks = async () => {
+    return await models.Notification.findAll({
+      where: { CollectiveId: args.collectiveId, channel: channels.WEBHOOK },
+      order: [['createdAt', 'ASC']],
+    });
+  };
 
-  const oldNotifications = await models.Notification.findAll({
-    where: { CollectiveId: args.collectiveId, UserId: null, channel: channels.WEBHOOK },
-  });
+  const allowedFields = ['type', 'webhookUrl'];
+  const oldNotifications = await getAllWebhooks();
+  const [toCreate, toRemove, toUpdate] = diffDBEntries(oldNotifications, args.notifications, allowedFields);
+  const promises = [];
 
-  const toDelete = oldNotifications
-    .filter(
-      oldNotification =>
-        !args.notifications.some(newNotification => {
-          return (
-            newNotification.type === oldNotification.type && newNotification.webhookUrl === oldNotification.webhookUrl
-          );
-        }),
-    )
-    .map(x => x.id);
-
-  const toCreate = args.notifications.filter(
-    newNotification =>
-      !oldNotifications.some(oldNotification => {
-        return (
-          oldNotification.type === newNotification.type && oldNotification.webhookUrl === newNotification.webhookUrl
-        );
+  // Delete old
+  if (toRemove.length > 0) {
+    promises.push(
+      models.Notification.destroy({
+        where: { id: { [Op.in]: toRemove.map(n => n.id) } },
       }),
-  );
+    );
+  }
 
-  models.Notification.destroy({ where: { id: { [Op.in]: toDelete } } });
+  // Create
+  if (toCreate.length > 0) {
+    promises.push(
+      models.Notification.bulkCreate(
+        toCreate.map(notification => {
+          return {
+            ...pick(notification, allowedFields),
+            CollectiveId: args.collectiveId,
+            UserId: remoteUser.id,
+            channel: channels.WEBHOOK,
+          };
+        }),
+      ),
+    );
+  }
 
-  return Promise.map(toCreate, notification => {
-    if (!(values(activities).includes(notification.type) && notification.channel === channels.WEBHOOK)) return;
+  // Update existing
+  if (toUpdate.length > 0) {
+    promises.push(
+      ...toUpdate.map(notification => {
+        return models.Notification.update(pick(notification, allowedFields), {
+          where: { id: notification.id, CollectiveId: args.collectiveId },
+        });
+      }),
+    );
+  }
 
-    notification.CollectiveId = args.collectiveId;
-    return models.Notification.create(notification);
-  });
+  return Promise.all(promises).then(getAllWebhooks);
 }
 
 /**
@@ -66,24 +85,23 @@ export async function createWebhook(args, remoteUser) {
     throw new Unauthorized({ message: 'You need to be logged in to create a webhook.' });
   }
 
+  // Load collective
   const collective = await models.Collective.findOne({ where: { slug: args.collectiveSlug } });
   if (!collective) {
     throw new NotFound({ message: `Collective with slug: ${args.collectiveSlug} not found.` });
-  }
-
-  if (!remoteUser.isAdmin(collective.id)) {
+  } else if (!remoteUser.isAdmin(collective.id)) {
     throw new Unauthorized({ message: 'You do not have permissions to create webhooks for this collective.' });
   }
 
+  // Check limits
   const { maxWebhooksPerUserPerCollective } = config.limits;
-  const userWebhooksCount = await models.Notification.countRegisteredWebhooks(remoteUser.id, collective.id);
-
-  if (userWebhooksCount >= maxWebhooksPerUserPerCollective) {
+  const webhooksCount = await models.Notification.countRegisteredWebhooks(collective.id);
+  if (webhooksCount >= maxWebhooksPerUserPerCollective) {
     throw MaxWebhooksExceededError;
   }
 
+  // Create webhook
   const { webhookUrl, type } = args.notification;
-
   return models.Notification.create({
     UserId: remoteUser.id,
     CollectiveId: collective.id,
@@ -106,10 +124,6 @@ export async function deleteNotification(args, remoteUser) {
     throw new NotFound({ message: `Notification with ID ${args.id} not found.` });
   } else if (!remoteUser.isAdmin(notification.CollectiveId)) {
     throw new Unauthorized({ message: 'You need to be logged in as admin to delete this notification.' });
-  }
-
-  if (!(remoteUser.id === notification.UserId || remoteUser.isAdmin(notification.CollectiveId))) {
-    throw NotificationPermissionError;
   }
 
   await notification.destroy();

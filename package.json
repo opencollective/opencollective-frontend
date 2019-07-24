@@ -151,6 +151,7 @@
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
     "test": "TZ=UTC nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:watch": "TZ=UTC nyc mocha --watch",
     "test:coverage": "nyc report --reporter=text-lcov | coveralls",
     "test:clean": "rm -rf .nyc_output coverage",
     "db:clean": "babel-node ./scripts/replace_stripe_accounts.js",
