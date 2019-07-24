@@ -1185,7 +1185,13 @@ const CollectiveFields = () => {
         type: { type: GraphQLString },
         active: { type: GraphQLBoolean },
       },
-      resolve(collective, args) {
+      resolve(collective, args, req) {
+        // There's no reason for other people than admins to know about this.
+        // Also the webhooks URL are supposed to be private (can contain tokens).
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+          return [];
+        }
+
         const where = { CollectiveId: collective.id };
 
         if (args.channel) {
