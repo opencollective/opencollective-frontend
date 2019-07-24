@@ -84,7 +84,7 @@ export default function(Sequelize, DataTypes) {
       status: {
         type: DataTypes.STRING,
         defaultValue: status.PENDING,
-        allowNull: true,
+        allowNull: false,
         validate: {
           isIn: {
             args: [Object.keys(status)],
