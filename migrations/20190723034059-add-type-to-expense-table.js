@@ -3,10 +3,13 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.addColumn('Expenses', 'type', {
-      type: Sequelize.STRING(),
+      type: Sequelize.ENUM('RECEIPT', 'INVOICE', 'UNCLASSIFIED'),
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('Expenses', 'type');
+    return Promise.all([
+      queryInterface.removeColumn('Expenses', 'type'),
+      queryInterface.sequelize.query('DROP TYPE "enum_Expenses_type";'),
+    ]);
   },
 };
