@@ -24,6 +24,7 @@ import StyledLink from '../components/StyledLink';
 import Loading from '../components/Loading';
 import OrderSuccessContributorCardWithData from '../components/OrderSuccessContributorCardWithData';
 import MessageBox from '../components/MessageBox';
+import LinkCollective from '../components/LinkCollective';
 
 const OrderSuccessContainer = styled(Flex)`
   background: white url(${orderSuccessBackgroundUrl}) 0 0/100% no-repeat;
@@ -77,6 +78,7 @@ const GetOrderQuery = gql`
         name
         tags
         path
+        type
       }
       tier {
         id
@@ -143,6 +145,12 @@ class OrderSuccessPage extends React.Component {
   }
 
   renderContributionSummary(tier, collective, fromCollective) {
+    const collectiveLink = (
+      <strong>
+        <LinkCollective collective={collective} />
+      </strong>
+    );
+
     if (!tier) {
       return (
         <FormattedMessage
@@ -150,7 +158,7 @@ class OrderSuccessPage extends React.Component {
           defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!"
           values={{
             fromCollectiveName: fromCollective.name,
-            collectiveName: collective.name,
+            collectiveName: collectiveLink,
           }}
         />
       );
@@ -162,7 +170,7 @@ class OrderSuccessPage extends React.Component {
         defaultMessage="{fromCollectiveName, select, incognito {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})"
         values={{
           fromCollectiveName: fromCollective.name,
-          eventName: <strong>{collective.name}</strong>,
+          eventName: collectiveLink,
           tierName: get(tier, 'name', 'ticket'),
         }}
       />
@@ -172,7 +180,7 @@ class OrderSuccessPage extends React.Component {
         defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
         values={{
           fromCollectiveName: fromCollective.name,
-          collectiveName: <strong>{collective.name}</strong>,
+          collectiveName: collectiveLink,
           tierName: get(tier, 'name', 'backer'),
         }}
       />
