@@ -8,10 +8,10 @@ import { truncate, size } from 'lodash';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency } from '../../lib/utils';
 import withViewport from '../../lib/withViewport';
-import Link from '../Link';
 import { H4, P, Span } from '../Text';
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
+import LinkContributor from '../LinkContributor';
 
 /** The container for Top Contributors view */
 const TopContributorsContainer = styled.div`
@@ -85,38 +85,39 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
         </P>
       )}
       <ContributorsList justifyContent={isFillingFullscreen ? [null, null, null, null, 'space-between'] : 'flex-start'}>
-        {contributors.map((contributor, idx) => {
-          const route = contributor.type === CollectiveType.COLLECTIVE ? 'new-collective-page' : 'collective';
-          return (
-            <ContributorItem key={contributor.id}>
-              <AvatarWithRank>
-                <span>{idx + 1}</span>
-                <Link route={route} params={{ slug: contributor.collectiveSlug }}>
-                  <ContributorAvatar contributor={contributor} radius={32} />
-                </Link>
-              </AvatarWithRank>
-              <div>
-                <Link route={route} params={{ slug: contributor.collectiveSlug }}>
-                  <P fontSize="Caption" lineHeight="Caption" fontWeight="bold" color="black.700">
-                    {truncate(contributor.name, { length: 20 })}
-                  </P>
-                </Link>
-                <P color="black.500" fontSize="Tiny" lineHeight="Tiny">
-                  <FormattedMessage
-                    id="TotalDonatedSince"
-                    defaultMessage="{totalDonated} since {date}"
-                    values={{
-                      totalDonated: (
-                        <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>
-                      ),
-                      date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
-                    }}
-                  />
+        {contributors.map((contributor, idx) => (
+          <ContributorItem key={contributor.id}>
+            <AvatarWithRank>
+              <span>{idx + 1}</span>
+              <LinkContributor contributor={contributor}>
+                <ContributorAvatar contributor={contributor} radius={32} />
+              </LinkContributor>
+            </AvatarWithRank>
+            <div>
+              <LinkContributor contributor={contributor}>
+                <P fontSize="Caption" lineHeight="Caption" fontWeight="bold" color="black.700">
+                  {contributor.isIncognito ? (
+                    <FormattedMessage id="profile.incognito" defaultMessge="Incognito" />
+                  ) : (
+                    truncate(contributor.name, { length: 20 })
+                  )}
                 </P>
-              </div>
-            </ContributorItem>
-          );
-        })}
+              </LinkContributor>
+              <P color="black.500" fontSize="Tiny" lineHeight="Tiny">
+                <FormattedMessage
+                  id="TotalDonatedSince"
+                  defaultMessage="{totalDonated} since {date}"
+                  values={{
+                    totalDonated: (
+                      <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>
+                    ),
+                    date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
+                  }}
+                />
+              </P>
+            </div>
+          </ContributorItem>
+        ))}
       </ContributorsList>
     </Box>
   );
@@ -135,6 +136,7 @@ ContributorsBlock.propTypes = {
       collectiveSlug: PropTypes.string.isRequired,
       totalAmountDonated: PropTypes.number.isRequired,
       since: PropTypes.string.isRequired,
+      isIncognito: PropTypes.bool,
     }).isRequired,
   ),
 };

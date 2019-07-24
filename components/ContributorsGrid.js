@@ -4,19 +4,19 @@ import { Flex } from '@rebass/grid';
 import { FixedSizeGrid } from 'react-window';
 import { truncate } from 'lodash';
 import styled from 'styled-components';
-import { injectIntl } from 'react-intl';
+import { injectIntl, FormattedMessage } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n-member-role';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
+import { CollectiveType } from '../lib/constants/collectives';
 
-import Link from './Link';
 import { P } from './Text';
 import Container from './Container';
 import { ContributorAvatar } from './Avatar';
 import { fadeIn } from './StyledKeyframes';
-import { CollectiveType } from '../lib/constants/collectives';
+import LinkContributor from './LinkContributor';
 
 // Define static dimensions
 export const COLLECTIVE_CARD_MARGIN_X = 32;
@@ -154,6 +154,7 @@ class ContributorCard extends React.PureComponent {
       description: PropTypes.string,
       publicMessage: PropTypes.string,
       collectiveSlug: PropTypes.string,
+      isIncognito: PropTypes.bool,
     }).isRequired,
     left: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
@@ -161,29 +162,25 @@ class ContributorCard extends React.PureComponent {
 
   render() {
     const { left, top, contributor, intl } = this.props;
-    const { collectiveSlug, name, description, publicMessage } = contributor;
-
-    // Collective slug is optional, for example Github contributors won't have
-    // a collective slug. This helper renders the link only if needed
-    const withCollectiveLink = !collectiveSlug
-      ? children => children
-      : children => (
-          <Link route="collective" params={{ slug: collectiveSlug }}>
-            {children}
-          </Link>
-        );
+    const { name, description, publicMessage, isIncognito } = contributor;
 
     return (
       <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
         <Flex justifyContent="center" mb={3}>
-          {withCollectiveLink(<ContributorAvatar contributor={contributor} radius={56} />)}
+          <LinkContributor contributor={contributor}>
+            <ContributorAvatar contributor={contributor} radius={56} />
+          </LinkContributor>
         </Flex>
         <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
-          {withCollectiveLink(
+          <LinkContributor contributor={contributor}>
             <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900" title={name}>
-              {truncate(name, { length: 18 })}
-            </P>,
-          )}
+              {isIncognito ? (
+                <FormattedMessage id="profile.incognito" defaultMessge="Incognito" />
+              ) : (
+                truncate(name, { length: 18 })
+              )}
+            </P>
+          </LinkContributor>
           <P fontSize="Tiny" lineHeight="Caption" color="black.500">
             {getRole(contributor, intl)}
           </P>

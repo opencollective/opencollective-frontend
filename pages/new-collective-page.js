@@ -187,6 +187,7 @@ const getCollective = graphql(gql`
         totalAmountDonated
         type
         publicMessage
+        isIncognito
       }
       tiers {
         id

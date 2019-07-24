@@ -728,6 +728,11 @@ type Contributor {
   type: String!
 
   """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+
+  """
   Description of how the member contribute. Will usually be a tier name, or "design" or "code".
   """
   description: String
