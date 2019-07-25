@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get, pick } from 'lodash';
+import { get, pick, difference } from 'lodash';
 import { compose, graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { isURL } from 'validator';
 import { Close } from 'styled-icons/material/Close';
+import memoizeOne from 'memoize-one';
 
 import events from '../lib/constants/notificationEvents';
-import Loading from './Loading';
+import { CollectiveType } from '../lib/constants/collectives';
 
+import Loading from './Loading';
 import { Span } from './Text';
 import StyledHr from './StyledHr';
 import MessageBox from './MessageBox';
@@ -18,6 +20,29 @@ import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
 import { Add } from 'styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
+
+const messages = defineMessages({
+  'webhooks.url.label': {
+    id: 'webhooks.url.label',
+    defaultMessage: 'URL',
+  },
+  'webhooks.types.label': {
+    id: 'webhooks.types.label',
+    defaultMessage: 'Activity',
+  },
+  'webhooks.add': {
+    id: 'webhooks.add',
+    defaultMessage: 'Add another webhook',
+  },
+  'webhooks.remove': {
+    id: 'webhooks.remove',
+    defaultMessage: 'Remove webhook',
+  },
+  'webhooks.save': {
+    id: 'webhooks.save',
+    defaultMessage: 'Save {count} webhooks',
+  },
+});
 
 class EditWebhooks extends React.Component {
   static propTypes = {
@@ -32,8 +57,6 @@ class EditWebhooks extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl } = props;
-
     this.state = {
       modified: false,
       webhooks: this.getWebhooksFromProps(props),
@@ -41,49 +64,6 @@ class EditWebhooks extends React.Component {
       status: null,
       error: '',
     };
-
-    this.messages = defineMessages({
-      'webhooks.url.label': {
-        id: 'webhooks.url.label',
-        defaultMessage: 'URL',
-      },
-      'webhooks.types.label': {
-        id: 'webhooks.types.label',
-        defaultMessage: 'Activity',
-      },
-      'webhooks.add': {
-        id: 'webhooks.add',
-        defaultMessage: 'Add another webhook',
-      },
-      'webhooks.remove': {
-        id: 'webhooks.remove',
-        defaultMessage: 'Remove webhook',
-      },
-      'webhooks.save': {
-        id: 'webhooks.save',
-        defaultMessage: 'Save {count} webhooks',
-      },
-    });
-
-    this.fields = [
-      {
-        name: 'webhookUrl',
-        maxLength: 255,
-        type: 'url',
-        label: intl.formatMessage(this.messages['webhooks.url.label']),
-        required: true,
-        defaultValue: '',
-      },
-      {
-        name: 'type',
-        type: 'select',
-        label: intl.formatMessage(this.messages['webhooks.types.label']),
-        options: events,
-        multiple: true,
-        defaultValue: [],
-        required: true,
-      },
-    ];
   }
 
   componentDidUpdate(oldProps) {
@@ -104,6 +84,38 @@ class EditWebhooks extends React.Component {
     return value ? value.trim().replace(/https?:\/\//, '') : '';
   };
 
+  getEventTypes = memoizeOne((collectiveType, isHost) => {
+    const removeList = [];
+
+    if (collectiveType !== CollectiveType.COLLECTIVE) {
+      removeList.push(
+        'collective.comment.created',
+        'collective.expense.created',
+        'collective.expense.deleted',
+        'collective.expense.updated',
+        'collective.expense.rejected',
+        'collective.expense.approved',
+        'collective.expense.paid',
+        'collective.monthly',
+        'collective.transaction.created',
+        'collective.transaction.paid',
+        'collective.update.created',
+        'collective.update.published',
+      );
+    }
+    if (collectiveType !== CollectiveType.ORGANIZATION) {
+      removeList.push('organization.collective.created', 'user.created');
+    }
+    if (collectiveType !== CollectiveType.EVENT) {
+      removeList.push('ticket.confirmed');
+    }
+    if (!isHost) {
+      removeList.push('collective.apply', 'collective.approved', 'collective.created');
+    }
+
+    return difference(events, removeList);
+  });
+
   editWebhook = (index, fieldname, value) => {
     const { webhooks, status } = this.state;
     let newStatus = status;
@@ -121,7 +133,7 @@ class EditWebhooks extends React.Component {
 
   addWebhook = () => {
     const { webhooks } = this.state;
-    webhooks.push({ webhookUrl: '', type: events[0] });
+    webhooks.push({ webhookUrl: '', type: 'all' });
     this.setState({ webhooks, modified: true });
   };
 
@@ -157,9 +169,7 @@ class EditWebhooks extends React.Component {
   };
 
   renderWebhook = (webhook, index) => {
-    const { intl } = this.props;
-    const [url, activity] = this.fields;
-    const webhookUrl = get(webhook, url.name);
+    const { intl, data } = this.props;
 
     return (
       <Flex
@@ -183,34 +193,33 @@ class EditWebhooks extends React.Component {
           >
             <Close size="1.2em" />
             {'  '}
-            {intl.formatMessage(this.messages['webhooks.remove'])}
+            {intl.formatMessage(messages['webhooks.remove'])}
           </StyledButton>
         </Box>
 
         <Box width={[1, 0.75]}>
           <Box mb={4}>
             <Span fontSize="Paragraph" mb={1}>
-              {url.label}
+              {intl.formatMessage(messages['webhooks.url.label'])}
             </Span>
             <Span fontSize="3rem" color="#D7D9E0" css={'transform: translate(-60px, 23px); position: absolute;'}>
               {index + 1}
             </Span>
             <StyledInputGroup
-              type={url.type}
-              name={url.name}
-              label={url.label}
+              type="type"
+              name="webhookUrl"
               prepend="https://"
-              error={!this.validateWebhookUrl(webhookUrl)}
-              value={this.cleanWebhookUrl(webhookUrl)}
-              onChange={({ target }) => this.editWebhook(index, url.name, target.value)}
+              error={!this.validateWebhookUrl(webhook.webhookUrl)}
+              value={this.cleanWebhookUrl(webhook.webhookUrl)}
+              onChange={({ target }) => this.editWebhook(index, 'webhookUrl', target.value)}
             />
           </Box>
           <Box>
-            <Span fontSize="Paragraph">{activity.label}</Span>
+            <Span fontSize="Paragraph">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
             <StyledSelect
-              options={activity.options}
-              value={get(webhook, activity.name)}
-              onChange={({ value }) => this.editWebhook(index, activity.name, value)}
+              options={this.getEventTypes(data.Collective.type, data.Collective.isHost)}
+              value={webhook.type}
+              onChange={({ value }) => this.editWebhook(index, 'type', value)}
             />
           </Box>
         </Box>
@@ -223,9 +232,11 @@ class EditWebhooks extends React.Component {
     const { intl, data } = this.props;
     const webhooksCount = webhooks.length;
 
-    return data.loading ? (
-      <Loading />
-    ) : (
+    if (data.loading) {
+      return <Loading />;
+    }
+
+    return (
       <div>
         <h2>{this.props.title}</h2>
         <StyledHr />
@@ -246,7 +257,7 @@ class EditWebhooks extends React.Component {
           >
             <Add size="1.2em" />
             {'  '}
-            {intl.formatMessage(this.messages['webhooks.add'])}
+            {intl.formatMessage(messages['webhooks.add'])}
           </StyledButton>
         </Box>
 
@@ -289,6 +300,7 @@ const getCollectiveWithNotificationsQuery = gql`
       id
       type
       slug
+      isHost
       notifications(channel: "webhook") {
         id
         type
