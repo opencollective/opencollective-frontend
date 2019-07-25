@@ -425,6 +425,10 @@ export const ContributorType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString),
       description: 'Wether the contributor is an individual, an organization...',
     },
+    isIncognito: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'Defines if the contributors wants to be incognito (name not displayed)',
+    },
     description: {
       type: GraphQLString,
       description: 'Description of how the member contribute. Will usually be a tier name, or "design" or "code".',
@@ -432,6 +436,10 @@ export const ContributorType = new GraphQLObjectType({
     collectiveSlug: {
       type: GraphQLString,
       description: 'If the contributor has a page on Open Collective, this is the slug to link to it',
+      resolve(contributor) {
+        // Don't return the collective slug if the contributor wants to be incognito
+        return contributor.isIncognito ? null : contributor.collectiveSlug;
+      },
     },
     image: {
       type: GraphQLString,
