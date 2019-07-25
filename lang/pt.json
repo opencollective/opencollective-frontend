@@ -424,6 +424,7 @@
   "EditUserEmailForm.submit": "Confirm new email",
   "EditUserEmailForm.success": "An email with a confirmation link has been sent to {email}.",
   "EditUserEmailForm.title": "Email address",
+  "EditWebhooks.ZapierAd": "NEW! You can now use the Beta {zapierLink} app to manage your integrations.",
   "error.addOnGithub": "Add an issue on Github",
   "error.code.invalid": "Invalid Gift Card code",
   "error.contactSupport": "Contact support",
@@ -1147,7 +1148,7 @@
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",
   "webhooks.save": "Save {count} webhooks",
-  "webhooks.types.label": "Activities",
+  "webhooks.types.label": "Activity",
   "webhooks.url.label": "URL",
   "widget.becomeBacker": "Become a backer",
   "widget.becomeSponsor": "Become a sponsor"
