@@ -18,6 +18,7 @@ export const TransactionsAndExpensesFragment = gql`
         name
         image
         type
+        isIncognito
       }
       usingVirtualCardFromCollective {
         id
