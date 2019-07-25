@@ -16,7 +16,7 @@ describe('create a collective', () => {
     cy.get('.actions button').click();
     cy.get('.result').contains('Collective created successfully');
     cy.wait(800);
-    cy.get('#createHost input[type="radio"]').click();
+    cy.get('#createHost input[type="radio"]', { timeout: 20000 }).click();
     cy.get('#createHost .CreateHostForm');
     cy.get('select[name="hostType"]').select('organization');
     cy.fillInputField('organization_name', 'new org');

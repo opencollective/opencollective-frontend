@@ -8,7 +8,6 @@ import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
-import { getEnvVar, parseToBoolean } from '../lib/utils';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import { Router } from '../server/pages';
 
@@ -48,8 +47,6 @@ const MenuItem = styled(Link)`
   }
   ${({ selected }) => selected && selectedStyle};
 `;
-
-const webhooksEnabled = parseToBoolean(getEnvVar('ENABLE_WEBHOOKS'));
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -634,16 +631,14 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
             </MenuItem>
-            {(webhooksEnabled || get(collective, 'settings.enableWebhooks')) && (
-              <MenuItem
-                selected={this.state.section === 'webhooks'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'webhooks' }}
-                className="MenuItem webhooks"
-              >
-                <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
-              </MenuItem>
-            )}
+            <MenuItem
+              selected={this.state.section === 'webhooks'}
+              route="editCollective"
+              params={{ slug: collective.slug, section: 'webhooks' }}
+              className="MenuItem webhooks"
+            >
+              <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
+            </MenuItem>
             {collective.type === 'COLLECTIVE' && (
               <MenuItem
                 selected={this.state.section === 'export'}
