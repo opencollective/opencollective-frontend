@@ -66,7 +66,7 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
       >
         <ModalHeader>
           <FormattedMessage
-            id="collective.archive.modal.header"
+            id="collective.emptyBalance.header"
             values={{ action: modal.type }}
             defaultMessage={'{action} Balance'}
           />
@@ -74,7 +74,7 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
         <ModalBody>
           <P>
             <FormattedMessage
-              id="collective.archive.modal.body"
+              id="collective.emptyBalance.body"
               values={{ collective: collective.host.hostCollective.name, action: modal.type.toLowerCase() }}
               defaultMessage={'Are you sure you want to {action} to {collective}?'}
             />
