@@ -36,6 +36,14 @@ export default function(Sequelize, DataTypes) {
         validate: {
           isUrl: true,
         },
+        set(url) {
+          if (!url) {
+            this.setDataValue('webhookUrl', null);
+          } else {
+            // Enforce 'https://`
+            this.setDataValue('webhookUrl', `https://${url.replace(/https?:\/\//, '')}`);
+          }
+        },
       },
     },
     {
@@ -174,8 +182,8 @@ export default function(Sequelize, DataTypes) {
    * @param {number} CollectiveId
    * @returns {Promise<number>} count
    */
-  Notification.countRegisteredWebhooks = (UserId, CollectiveId) => {
-    return models.Notification.count({ where: { UserId, CollectiveId, channel: channels.WEBHOOK } });
+  Notification.countRegisteredWebhooks = CollectiveId => {
+    return models.Notification.count({ where: { CollectiveId, channel: channels.WEBHOOK } });
   };
 
   return Notification;

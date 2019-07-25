@@ -1208,6 +1208,7 @@ const CollectiveFields = () => {
           where: where,
           limit: args.limit,
           offset: args.offset,
+          order: [['createdAt', 'ASC']],
         });
       },
     },

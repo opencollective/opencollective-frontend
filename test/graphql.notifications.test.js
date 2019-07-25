@@ -47,7 +47,6 @@ describe('graphql.notifications.test', () => {
     `;
 
     const notification = () => ({
-      channel: channels.WEBHOOK,
       type: activities.COLLECTIVE_EXPENSE_CREATED,
       webhookUrl: randUrl(),
     });
@@ -106,7 +105,6 @@ describe('graphql.notifications.test', () => {
 
     it('creates webhook notification', async () => {
       const notification = {
-        channel: channels.WEBHOOK,
         type: activities.COLLECTIVE_EXPENSE_CREATED,
         webhookUrl: randUrl(),
       };
@@ -125,7 +123,7 @@ describe('graphql.notifications.test', () => {
       const newWebhook = await models.Notification.findByPk(createWebhook.id);
 
       expect(newWebhook.webhookUrl).to.equal(notification.webhookUrl);
-      expect(newWebhook.channel).to.equal(notification.channel);
+      expect(newWebhook.channel).to.equal(channels.WEBHOOK);
       expect(newWebhook.active).to.equal(true);
       expect(newWebhook.UserId).to.equal(user1.id);
       expect(newWebhook.CollectiveId).to.equal(collective1.id);
