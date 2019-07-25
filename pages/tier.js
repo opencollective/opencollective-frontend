@@ -152,6 +152,7 @@ const getCollective = graphql(gql`
         publicMessage
         collectiveSlug
         type
+        isIncognito
       }
     }
   }
