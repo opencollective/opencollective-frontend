@@ -2,9 +2,16 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Expenses', 'type', {
-      type: Sequelize.ENUM('RECEIPT', 'INVOICE', 'UNCLASSIFIED'),
-    });
+    return Promise.all([
+      queryInterface.addColumn('Expenses', 'type', {
+        type: Sequelize.ENUM('RECEIPT', 'INVOICE', 'UNCLASSIFIED'),
+      }),
+      queryInterface.sequelize.query(`
+        UPDATE "Expenses"
+          SET "type" = 'UNCLASSIFIED'
+        WHERE "type" IS NULL
+      `),
+    ]);
   },
   down: (queryInterface, Sequelize) => {
     return Promise.all([

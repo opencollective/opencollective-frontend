@@ -11,6 +11,8 @@ import {
   isUserTaxFormRequiredBeforePayment,
 } from '../server/lib/taxForms';
 
+import { RECEIPT, INVOICE } from '../server/constants/expense_type';
+
 const { RequiredLegalDocument, LegalDocument, Collective, User, Expense } = models;
 const {
   documentType: { US_TAX_FORM },
@@ -56,7 +58,7 @@ describe('lib.taxForms', () => {
       incurredAt,
       createdAt: incurredAt,
       CollectiveId,
-      type,
+      type: type || INVOICE,
     };
   }
 
@@ -145,7 +147,7 @@ describe('lib.taxForms', () => {
         UserId: users[2].id,
         CollectiveId: hostCollectives[0].id,
         incurredAt: moment(),
-        type: 'RECEIPT',
+        type: RECEIPT,
       }),
     );
     // An expense from this year over the threshold

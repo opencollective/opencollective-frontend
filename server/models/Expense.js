@@ -94,13 +94,9 @@ export default function(Sequelize, DataTypes) {
       },
 
       type: {
-        type: DataTypes.STRING,
-        validate: {
-          isIn: {
-            args: [Object.keys(expenseType)],
-            msg: `Must be in ${Object.keys(expenseType)}`,
-          },
-        },
+        type: DataTypes.ENUM(Object.keys(expenseType)),
+        defaultValue: expenseType.UNCLASSIFIED,
+        allowNull: false,
       },
 
       incurredAt: {
