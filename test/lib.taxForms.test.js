@@ -11,7 +11,8 @@ import {
   isUserTaxFormRequiredBeforePayment,
 } from '../server/lib/taxForms';
 
-import { RECEIPT, INVOICE } from '../server/constants/expense_type';
+import expenseTypes from '../server/constants/expense_type';
+const { RECEIPT, INVOICE } = expenseTypes;
 
 const { RequiredLegalDocument, LegalDocument, Collective, User, Expense } = models;
 const {
