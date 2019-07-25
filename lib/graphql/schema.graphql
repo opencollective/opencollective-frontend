@@ -1,5 +1,5 @@
-# source: https://opencollective.com/api/graphql
-# timestamp: Wed Jul 17 2019 10:42:57 GMT+0200 (Central European Summer Time)
+# source: http://localhost:3000/api/graphql
+# timestamp: Thu Jul 25 2019 12:22:34 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -76,7 +76,6 @@ type Collective implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """
   Name, address, lat, long of the location.
@@ -249,7 +248,6 @@ input CollectiveAttributesInputType {
   twitterHandle: String
   githubHandle: String
   location: LocationInputType
-  countryISO: String
   startsAt: String
   endsAt: String
   timezone: String
@@ -276,7 +274,6 @@ input CollectiveInputType {
   longDescription: String
   expensePolicy: String
   location: LocationInputType
-  countryISO: String
   startsAt: String
   endsAt: String
   timezone: String
@@ -315,7 +312,6 @@ interface CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """
   Name, address, country, lat, long of the location.
@@ -843,7 +839,6 @@ type Event implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """
   Name, address, lat, long of the location.
@@ -1332,36 +1327,6 @@ input MemberInputType {
 }
 
 """
-Breakdown of members per type (ANY/USER/ORGANIZATION/COLLECTIVE)
-"""
-type MembersStatsType {
-  """
-  We always have to return an id for apollo's caching
-  """
-  id: Int
-
-  """
-  Total number of contributors
-  """
-  all: Int
-
-  """
-  Number of individuals
-  """
-  users: Int
-
-  """
-  Number of organizations
-  """
-  organizations: Int
-
-  """
-  Number of collectives
-  """
-  collectives: Int
-}
-
-"""
 This is the root mutation
 """
 type Mutation {
@@ -1466,21 +1431,6 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
-
-  """
-  Update the non-sensitive information of an order, like the public message
-  """
-  updateOrderInfo(
-    """
-    ID of the order to update
-    """
-    id: Int!
-
-    """
-    Public message to motivate others to contribute
-    """
-    publicMessage: String
-  ): OrderType @deprecated(reason: "2019-07-03: The public message is now stored at the Member level")
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!): UpdateType
@@ -1655,12 +1605,8 @@ Input type for NotificationType
 """
 input NotificationInputType {
   id: Int
-  channel: String
-  type: String
-  active: Boolean
+  type: String!
   webhookUrl: String
-  UserId: Int
-  CollectiveId: Int
 }
 
 """
@@ -1969,7 +1915,6 @@ type Organization implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """
   Name, address, lat, long of the location.
@@ -2465,7 +2410,6 @@ type Query {
     """
     isArchived: Boolean
   ): [CollectiveInterface]
-  ocPaymentMethod(token: String!): PaymentMethodType
   PaymentMethod(id: Int, code: String): PaymentMethodType
   search(
     """
@@ -2610,19 +2554,6 @@ type Tier {
   ): [OrderType]
 
   """
-  Returns a list of all the members that contributed to this tier
-  """
-  members(
-    """
-    Maximum number of entries to return
-    """
-    limit: Int = 5000
-  ): [Member]
-    @deprecated(
-      reason: "\n          2019/06/20 - This endpoint was used for the new tier page and has been replaced\n          by \"contributors\". It can be deleted as soon as the migration's completed\n          as well as the \"members.findByTierId\" loader.\n        "
-    )
-
-  """
   Returns a list of all the contributors for this tier
   """
   contributors(
@@ -2693,14 +2624,6 @@ Stats about a tier
 """
 type TierStatsType {
   id: Int
-
-  """
-  Breakdown of all the members that belongs to this tier.
-  """
-  members: MembersStatsType
-    @deprecated(
-      reason: "\n          2019/06/20 - This endpoint was used for the new tier page and has been replaced\n          by \"contributors\". It can be deleted as soon as the migration's completed\n          as well as the \"members.findByTierId\" loader.\n        "
-    )
 
   """
   Breakdown of all the contributors that belongs to this tier.
@@ -2900,7 +2823,6 @@ type User implements CollectiveInterface {
   expensePolicy: String
   mission: String
   tags: [String]
-  countryISO: String @deprecated(reason: "From 03/20/2019 - use `location.country` instead")
 
   """
   Name, address, lat, long of the location.
