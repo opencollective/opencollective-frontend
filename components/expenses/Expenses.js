@@ -36,6 +36,7 @@ class Expenses extends React.Component {
   render() {
     const {
       collective,
+      host,
       expenses,
       LoggedInUser,
       editable,
