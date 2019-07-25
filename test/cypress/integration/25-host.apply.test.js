@@ -23,7 +23,8 @@ describe('apply to host', () => {
       const CollectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       return cy.visit(`/brusselstogetherasbl/collectives/${CollectiveId}/approve`);
     });
-    cy.get('.error .message').contains(
+    cy.get('[data-cy="error-message"]').contains('Failed to approve collective for brusselstogetherasbl');
+    cy.get('[data-cy="error-message"]').contains(
       'You need to be logged in as an admin of the host of this collective to approve it',
     );
   });
