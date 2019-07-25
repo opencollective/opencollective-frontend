@@ -1,12 +1,15 @@
 const fs = require('fs');
 const path = require('path');
+
+// eslint-disable-next-line  node/no-unpublished-require
 const fileExistsCaseInsensitive = require('react-styleguidist/lib/scripts/utils/findFileCaseInsensitive');
 
 module.exports = {
   assetsDir: 'styleguide',
+  require: [path.join(__dirname, 'static/styles/app.css')],
   getExampleFilename(componentPath) {
     const parsedPath = path.parse(componentPath);
-    const parentDirName = parsedPath.dir.split('src/components/')[1] || '';
+    const parentDirName = parsedPath.dir.split('components/')[1] || '';
     const parentDirPath = path.join(__dirname, 'styleguide', 'examples', parentDirName);
 
     if (!fs.existsSync(parentDirPath)) {
@@ -18,28 +21,28 @@ module.exports = {
   },
   pagePerSection: true,
   moduleAliases: {
-    components: path.resolve(__dirname, 'src/components'),
+    components: path.resolve(__dirname, 'components'),
   },
   sections: [
     {
       name: 'Atoms',
-      components: 'src/components/Styled*.js',
+      components: 'components/Styled*.js',
       description: 'Base design atoms.',
     },
     {
       name: 'UI',
       content: 'styleguide/pages/UI.md',
-      components: 'src/components/*.js',
-      ignore: ['src/components/Contribute*.js', 'src/components/Styled*.js', 'src/components/collective-page/*.js'],
+      components: 'components/*.js',
+      ignore: ['components/Contribute*.js', 'components/Styled*.js', 'components/collective-page/*.js'],
     },
     {
       name: 'Collective Page',
-      components: 'src/components/collective-page/*.js',
+      components: 'components/collective-page/*.js',
       description: 'These components are used on the donate/contribute flow.',
     },
     {
       name: 'Contribution Flow',
-      components: 'src/components/Contribute*.js',
+      components: 'components/Contribute*.js',
       description: 'These components are used on the donate/contribute flow.',
     },
     {
@@ -90,6 +93,10 @@ module.exports = {
               limit: 1000000,
             },
           },
+        },
+        {
+          test: /\.(css)$/,
+          use: ['style-loader', 'css-loader'],
         },
       ],
     },

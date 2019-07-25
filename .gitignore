@@ -6,8 +6,8 @@ npm-debug.log.*
 yarn.lock
 .DS_Store
 build
-cypress/screenshots
-cypress/videos
+test/cypress/screenshots
+test/cypress/videos
 dist
 stage
 *.swp
