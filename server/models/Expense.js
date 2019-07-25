@@ -96,7 +96,6 @@ export default function(Sequelize, DataTypes) {
       type: {
         type: DataTypes.ENUM(Object.keys(expenseType)),
         defaultValue: expenseType.UNCLASSIFIED,
-        allowNull: false,
       },
 
       incurredAt: {
