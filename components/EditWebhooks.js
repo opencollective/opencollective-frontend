@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get, pick, isEmpty } from 'lodash';
+import { get, pick } from 'lodash';
 import { compose, graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { isURL } from 'validator';
+import { Close } from 'styled-icons/material/Close';
 
 import events from '../lib/constants/notificationEvents';
 import Loading from './Loading';
@@ -16,8 +18,6 @@ import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
 import { Add } from 'styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
-import { Close } from 'styled-icons/material/Close';
-import { isEmpty as visEmpty, isLength } from 'validator';
 
 class EditWebhooks extends React.Component {
   static propTypes = {
@@ -30,31 +30,13 @@ class EditWebhooks extends React.Component {
     intl: PropTypes.object.isRequired,
   };
 
-  static getDerivedStateFromProps(props, state) {
-    const webhooks = {};
-
-    if (!state.isLoaded && !isEmpty(props.data.Collective)) {
-      get(props, 'data.Collective.notifications', []).forEach(x => {
-        if (!(x.webhookUrl in webhooks)) {
-          webhooks[x.webhookUrl] = pick(x, ['webhookUrl']);
-          webhooks[x.webhookUrl].activities = [];
-        }
-        webhooks[x.webhookUrl].activities.push(x.type);
-      });
-
-      return { webhooks: Object.values(webhooks), isLoaded: true };
-    }
-
-    return null;
-  }
-
   constructor(props) {
     super(props);
     const { intl } = props;
 
     this.state = {
       modified: false,
-      webhooks: {},
+      webhooks: this.getWebhooksFromProps(props),
       isLoaded: false,
       status: null,
       error: '',
@@ -67,7 +49,7 @@ class EditWebhooks extends React.Component {
       },
       'webhooks.types.label': {
         id: 'webhooks.types.label',
-        defaultMessage: 'Activities',
+        defaultMessage: 'Activity',
       },
       'webhooks.add': {
         id: 'webhooks.add',
@@ -93,10 +75,10 @@ class EditWebhooks extends React.Component {
         defaultValue: '',
       },
       {
-        name: 'activities',
+        name: 'type',
         type: 'select',
         label: intl.formatMessage(this.messages['webhooks.types.label']),
-        options: events.sort(),
+        options: events,
         multiple: true,
         defaultValue: [],
         required: true,
@@ -104,28 +86,42 @@ class EditWebhooks extends React.Component {
     ];
   }
 
-  validate = index => {
-    const { webhooks, status } = this.state;
-    const filtered = webhooks.filter(
-      ({ webhookUrl }) => visEmpty(webhookUrl, { ignore_whitespace: true }) || !isLength(webhookUrl, { min: 3 }),
-    );
-    filtered.length > 0 && status === null
-      ? this.setState({ status: 'invalid' })
-      : filtered.length == 0 && status === 'invalid'
-      ? this.setState({ status: null })
-      : null;
-    return status === 'invalid' && !webhooks[index].webhookUrl ? true : false;
+  componentDidUpdate(oldProps) {
+    if (this.getWebhooksFromProps(oldProps) !== this.getWebhooksFromProps(this.props)) {
+      this.setState({ webhooks: this.getWebhooksFromProps(this.props) });
+    }
+  }
+
+  getWebhooksFromProps = props => {
+    return get(props, 'data.Collective.notifications', []);
+  };
+
+  validateWebhookUrl = value => {
+    return isURL(value);
+  };
+
+  cleanWebhookUrl = value => {
+    return value ? value.trim().replace(/https?:\/\//, '') : '';
   };
 
   editWebhook = (index, fieldname, value) => {
-    const { webhooks } = this.state;
-    webhooks[index][fieldname] = value;
-    this.setState({ webhooks, modified: true });
+    const { webhooks, status } = this.state;
+    let newStatus = status;
+
+    if (fieldname === 'webhookUrl') {
+      const cleanValue = this.cleanWebhookUrl(value);
+      webhooks[index][fieldname] = cleanValue;
+      const isValid = webhooks.every(webhook => this.validateWebhookUrl(webhook.webhookUrl));
+      newStatus = isValid ? null : 'invalid';
+    } else {
+      webhooks[index][fieldname] = value;
+    }
+    this.setState({ webhooks, modified: true, status: newStatus });
   };
 
   addWebhook = () => {
     const { webhooks } = this.state;
-    webhooks.push({ webhookUrl: '', activities: [] });
+    webhooks.push({ webhookUrl: '', type: events[0] });
     this.setState({ webhooks, modified: true });
   };
 
@@ -139,41 +135,31 @@ class EditWebhooks extends React.Component {
   handleSubmit = async () => {
     this.setState({ status: 'loading' });
     const { webhooks } = this.state;
-    const notifications = [];
-    for (const notification of webhooks) {
-      if (!(notification.webhookUrl && notification.activities)) continue;
-
-      for (const activity of notification.activities) {
-        if (!activity) continue;
-
-        notifications.push({
-          id: notification.id,
-          channel: 'webhook',
-          type: activity,
-          active: true,
-          webhookUrl: notification.webhookUrl,
-        });
-      }
-    }
+    const notifications = webhooks.map(webhook => pick(webhook, ['type', 'webhookUrl', 'id']));
 
     try {
       await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
-
       this.setState({ modified: false, status: 'saved' });
       setTimeout(() => {
         this.setState({ status: null });
       }, 3000);
     } catch (e) {
-      if (e && e.graphQLErrors) {
-        const { message } = e.graphQLErrors[0];
-        this.setState({ status: 'error', error: message });
+      let message = '';
+      if (e && e.errors) {
+        message = e.errors[0].message;
+      } else if (e && e.graphQLErrors && e.graphQLErrors.length > 0) {
+        message = e.graphQLErrors[0].message;
+      } else {
+        message = e.message;
       }
+      this.setState({ status: 'error', error: message });
     }
   };
 
   renderWebhook = (webhook, index) => {
     const { intl } = this.props;
     const [url, activity] = this.fields;
+    const webhookUrl = get(webhook, url.name);
 
     return (
       <Flex
@@ -206,7 +192,7 @@ class EditWebhooks extends React.Component {
             <Span fontSize="Paragraph" mb={1}>
               {url.label}
             </Span>
-            <Span fontSize="3rem" color="#D7D9E0" css={'transform: translate(-50px, 23px); position: absolute;'}>
+            <Span fontSize="3rem" color="#D7D9E0" css={'transform: translate(-60px, 23px); position: absolute;'}>
               {index + 1}
             </Span>
             <StyledInputGroup
@@ -214,8 +200,8 @@ class EditWebhooks extends React.Component {
               name={url.name}
               label={url.label}
               prepend="https://"
-              error={this.validate(index)}
-              value={get(webhook, url.name)}
+              error={!this.validateWebhookUrl(webhookUrl)}
+              value={this.cleanWebhookUrl(webhookUrl)}
               onChange={({ target }) => this.editWebhook(index, url.name, target.value)}
             />
           </Box>
@@ -224,7 +210,7 @@ class EditWebhooks extends React.Component {
             <StyledSelect
               options={activity.options}
               value={get(webhook, activity.name)}
-              onChange={({ value }) => this.editWebhook(index, activity.name, [value])}
+              onChange={({ value }) => this.editWebhook(index, activity.name, value)}
             />
           </Box>
         </Box>
@@ -234,13 +220,10 @@ class EditWebhooks extends React.Component {
 
   render() {
     const { webhooks, status, error } = this.state;
-    const {
-      intl,
-      data: { loading },
-    } = this.props;
+    const { intl, data } = this.props;
     const webhooksCount = webhooks.length;
 
-    return loading ? (
+    return data.loading ? (
       <Loading />
     ) : (
       <div>
@@ -280,13 +263,19 @@ class EditWebhooks extends React.Component {
             buttonStyle="primary"
             onClick={this.handleSubmit}
             loading={status == 'loading'}
-            disabled={loading || !this.state.modified || status == 'invalid'}
+            disabled={data.loading || !this.state.modified || status === 'invalid'}
           >
-            <FormattedMessage
-              id="webhooks.save"
-              defaultMessage="Save {count} webhooks"
-              values={{ count: webhooksCount }}
-            />
+            {status === 'saved' ? (
+              <Span textTransform="capitalize">
+                <FormattedMessage id="saved" defaultMessage="saved" />
+              </Span>
+            ) : (
+              <FormattedMessage
+                id="webhooks.save"
+                defaultMessage="Save {count} webhooks"
+                values={{ count: webhooksCount }}
+              />
+            )}
           </StyledButton>
         </Box>
       </div>
@@ -294,13 +283,12 @@ class EditWebhooks extends React.Component {
   }
 }
 
-const getCollectiveWithNotifications = gql`
-  query Collective($collectiveSlug: String) {
+const getCollectiveWithNotificationsQuery = gql`
+  query CollectiveNotifications($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       type
       slug
-      currency
       notifications(channel: "webhook") {
         id
         type
@@ -311,13 +299,14 @@ const getCollectiveWithNotifications = gql`
   }
 `;
 
-const getWebhooks = graphql(getCollectiveWithNotifications);
-
 const editWebhooks = graphql(
   gql`
     mutation editWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
       editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
         id
+        type
+        active
+        webhookUrl
       }
     }
   `,
@@ -326,19 +315,23 @@ const editWebhooks = graphql(
       editWebhooks: variables =>
         mutate({
           variables,
-          refetchQueries: [
-            {
-              query: getCollectiveWithNotifications,
+          update: (cache, { data: { editWebhooks } }) => {
+            const { Collective } = cache.readQuery({
+              query: getCollectiveWithNotificationsQuery,
               variables: { collectiveSlug: ownProps.collectiveSlug },
-            },
-          ],
+            });
+            cache.writeQuery({
+              query: getCollectiveWithNotificationsQuery,
+              data: { Collective: { ...Collective, notifications: editWebhooks } },
+            });
+          },
         }),
     }),
   },
 );
 
 const addData = compose(
-  getWebhooks,
+  graphql(getCollectiveWithNotificationsQuery),
   editWebhooks,
 );
 
