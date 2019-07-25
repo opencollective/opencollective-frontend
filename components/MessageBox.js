@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { display, height, maxHeight, maxWidth, minHeight, minWidth, typography } from 'styled-system';
+import { display, height, maxHeight, maxWidth, minHeight, minWidth, typography, shadow } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import tag from 'clean-tag';
 import { Box } from '@rebass/grid';
@@ -21,6 +21,7 @@ const Message = styled(Box)`
   border-radius: 8px;
   padding: ${themeGet('space.3')}px;
 
+  ${shadow}
   ${display}
   ${height}
   ${maxHeight}
