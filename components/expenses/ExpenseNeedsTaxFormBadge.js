@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import MessageBox from '../MessageBox';
+import StyledLink from '../StyledLink';
 import Error from '../Error';
 
 const getIsTaxFormRequiredQuery = gql`
@@ -29,7 +31,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
       hover: {
         id: 'expenseNeedsTaxForm.hover',
         defaultMessage:
-          "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks with a link to the form you need to submit. Need help? Contact support@opencollective.com",
+          "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com",
       },
       taxFormRequired: { id: 'expenseNeedsTaxForm.taxFormRequired', defaultMessage: 'tax form required' },
     });
@@ -42,13 +44,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
       return <Error message="GraphQL error" />;
     }
 
-    if (data.loading) {
-      return (
-        <div>
-          <FormattedMessage id="taxformbadge.loading" defaultMessage="checking if tax form required..." />
-        </div>
-      );
-    }
+    if (data.loading) return null;
 
     const {
       intl,
@@ -63,15 +59,15 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
     return (
       userTaxFormRequiredBeforePayment && (
         <span>
-          <style jsx>{`
-            a {
-              text-transform: uppercase;
-            }
-          `}</style>
           <span className="taxFormRequired " data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
-            <a className="btn btn-warning btn-xs" href="https://docs.opencollective.com/help/expenses/tax-information">
-              {message}
-            </a>
+            <MessageBox type="warning" display="inline" css={{ padding: '4px', borderRadius: '5px' }} withIcon={true}>
+              <StyledLink
+                css={{ textTransform: 'uppercase' }}
+                href="https://docs.opencollective.com/help/expenses/tax-information"
+              >
+                {message}
+              </StyledLink>
+            </MessageBox>
           </span>
           {' | '}
         </span>

@@ -197,7 +197,6 @@ class Expense extends React.Component {
               margin-right: 1.6rem;
             }
             .body {
-              overflow: hidden;
               font-size: 1.4rem;
               width: 100%;
             }
