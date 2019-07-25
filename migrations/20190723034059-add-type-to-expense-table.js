@@ -5,6 +5,7 @@ module.exports = {
     return Promise.all([
       queryInterface.addColumn('Expenses', 'type', {
         type: Sequelize.ENUM('RECEIPT', 'INVOICE', 'UNCLASSIFIED'),
+        defaultValue: 'UNCLASSIFIED',
       }),
       queryInterface.sequelize.query(`
         UPDATE "Expenses"
