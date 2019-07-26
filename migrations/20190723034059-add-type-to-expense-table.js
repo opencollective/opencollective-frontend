@@ -13,6 +13,11 @@ module.exports = {
           SET "type" = 'UNCLASSIFIED'
         WHERE "type" IS NULL
       `);
+    await queryInterface.sequelize.query(`
+        UPDATE "ExpenseHistories"
+          SET "type" = 'UNCLASSIFIED'
+        WHERE "type" IS NULL
+      `);
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('Expenses', 'type');
