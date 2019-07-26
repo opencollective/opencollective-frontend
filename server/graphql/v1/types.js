@@ -318,7 +318,9 @@ export const MemberType = new GraphQLObjectType({
         resolve(member, args, req) {
           const memberCollective =
             member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
-          memberCollective.inTheContextOfCollectiveId = member.CollectiveId;
+          if (memberCollective) {
+            memberCollective.inTheContextOfCollectiveId = member.CollectiveId;
+          }
           return memberCollective;
         },
       },
@@ -1517,7 +1519,9 @@ export const OrderType = new GraphQLObjectType({
             return null;
           }
           const fromCollective = await req.loaders.collective.findById.load(order.FromCollectiveId);
-          fromCollective.inTheContextOfCollectiveId = order.CollectiveId;
+          if (fromCollective) {
+            fromCollective.inTheContextOfCollectiveId = order.CollectiveId;
+          }
           return fromCollective;
         },
       },
