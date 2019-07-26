@@ -1,6 +1,6 @@
 import debug from 'debug';
 import slugify from 'limax';
-import { get, omit } from 'lodash';
+import { get, omit, truncate } from 'lodash';
 import { map } from 'bluebird';
 
 import models, { Op } from '../../../models';
@@ -253,7 +253,8 @@ export async function createCollectiveFromGithub(_, args, req) {
     }
     collectiveData.tags = repo.topics || [];
     collectiveData.tags.push('open source');
-    collectiveData.description = repo.description;
+    collectiveData.description = truncate(repo.description, { length: 255 });
+    collectiveData.longDescription = repo.description;
     collectiveData.settings = {
       githubRepo: githubHandle,
     };
