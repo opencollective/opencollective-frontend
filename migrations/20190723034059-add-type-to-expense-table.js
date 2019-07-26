@@ -1,23 +1,23 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return Promise.all([
-      queryInterface.addColumn('Expenses', 'type', {
-        type: Sequelize.ENUM('RECEIPT', 'INVOICE', 'UNCLASSIFIED'),
-        defaultValue: 'UNCLASSIFIED',
-      }),
-      queryInterface.sequelize.query(`
+  up: async (queryInterface, Sequelize) => {
+    const colParams = {
+      type: Sequelize.ENUM('RECEIPT', 'INVOICE', 'UNCLASSIFIED'),
+      defaultValue: 'UNCLASSIFIED',
+    };
+    await queryInterface.addColumn('Expenses', 'type', colParams);
+    await queryInterface.addColumn('ExpenseHistories', 'type', colParams);
+    await queryInterface.sequelize.query(`
         UPDATE "Expenses"
           SET "type" = 'UNCLASSIFIED'
         WHERE "type" IS NULL
-      `),
-    ]);
+      `);
   },
-  down: (queryInterface, Sequelize) => {
-    return Promise.all([
-      queryInterface.removeColumn('Expenses', 'type'),
-      queryInterface.sequelize.query('DROP TYPE "enum_Expenses_type";'),
-    ]);
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeColumn('Expenses', 'type');
+    await queryInterface.removeColumn('ExpenseHistories', 'type');
+    await queryInterface.sequelize.query('DROP TYPE "enum_Expenses_type";');
+    await queryInterface.sequelize.query('DROP TYPE "enum_ExpenseHistories_type";');
   },
 };
