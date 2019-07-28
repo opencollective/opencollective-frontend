@@ -62,7 +62,7 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
     return (
       !loading &&
       userTaxFormRequiredBeforePayment && (
-        <MessageBox isLoading={loading} type="warning" css={{ color: '#333' }} withIcon={true}>
+        <MessageBox isLoading={loading} type="warning" withIcon={true}>
           {message}{' '}
           <StyledLink href="https://docs.opencollective.com/help/expenses/tax-information">
             {helpDocsAboutTaxes}
