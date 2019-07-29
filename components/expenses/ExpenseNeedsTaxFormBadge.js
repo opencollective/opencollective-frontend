@@ -31,7 +31,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
     const hoverMessage = intl.formatMessage(this.messages.hover);
 
     return (
-      isTaxFormRequired && (
+      !!isTaxFormRequired && (
         <span>
           <span className="taxFormRequired " data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
             <MessageBox type="warning" display="inline" css={{ padding: '4px', borderRadius: '5px' }} withIcon={true}>
