@@ -22,6 +22,7 @@ import StyledTag from '../StyledTag';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
+import CollectiveCallsToAction from '../CollectiveCallsToAction';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import HeroBackground from './HeroBackground';
@@ -137,6 +138,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
         )}
       </Flex>
       <StyledShortDescription>{collective.description}</StyledShortDescription>
+      <CollectiveCallsToAction display={['flex', 'none']} mt={3} collectiveSlug={collective.slug} hasContact />
     </ContainerSectionContent>
   </Container>
 );

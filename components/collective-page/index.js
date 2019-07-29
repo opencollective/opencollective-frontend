@@ -111,7 +111,9 @@ class CollectivePage extends Component {
   }, 100);
 
   onSectionClick = sectionName => {
-    window.scrollTo(0, this.sectionsRefs[sectionName].offsetTop - 50);
+    // Need to take into account the mobile menu
+    const scrollOffset = window.innerHeight < 640 ? 5 : -50;
+    window.scrollTo(0, this.sectionsRefs[sectionName].offsetTop + scrollOffset);
     // Changing hash directly tends to make the page jump to the section without respect for
     // the smooth scroll behaviour, so we try to use `history.pushState` if available
     if (window.history.pushState) {
@@ -186,7 +188,7 @@ class CollectivePage extends Component {
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
       >
         <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
-        <Container mt={-30} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
+        <Container mt={[0, -30]} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
           <CollectiveNavbar
             collective={collective}
             sections={sections}
@@ -194,12 +196,10 @@ class CollectivePage extends Component {
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
             hideInfos={!isFixed}
-            hideButtonsOnMobile={true}
             isAnimated={true}
-            isSmall={true}
             onSectionClick={this.onSectionClick}
-            LinkComponent={({ section, label }) => (
-              <a href={`#section-${section}`} onClick={e => e.preventDefault()}>
+            LinkComponent={({ section, label, ...props }) => (
+              <a href={`#section-${section}`} onClick={e => e.preventDefault()} {...props}>
                 {label}
               </a>
             )}

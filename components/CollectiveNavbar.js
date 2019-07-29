@@ -4,51 +4,71 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
+import { Flex } from '@rebass/grid';
 
-import { Mail } from 'styled-icons/feather/Mail';
+import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 import { Cog } from 'styled-icons/typicons/Cog';
-import { FileText as ExpenseIcon } from 'styled-icons/feather/FileText';
+import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import Container from './Container';
-import StyledButton from './StyledButton';
-import { Span, H1 } from './Text';
-
 import { Sections, AllSectionsNames, Dimensions } from './collective-page/_constants';
 import LinkCollective from './LinkCollective';
 import Avatar from './Avatar';
 import Link from './Link';
 import StyledRoundButton from './StyledRoundButton';
+import CollectiveCallsToAction from './CollectiveCallsToAction';
 
-const MenuLinkContainer = styled.div`
-  padding: 3px 16px 0px 16px;
+/** Main container for the entire component */
+const MainContainer = styled.div`
+  border-bottom: 1px solid #e6e8eb;
+  background: white;
+  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.7);
+
+  /** Everything's inside cannot be larger than max section width */
+  & > * {
+    max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
+    margin: 0 auto;
+  }
+`;
+
+/** A single menu link */
+const MenuLink = styled.a`
+  display: block;
   color: #71757a;
-  display: flex;
-  align-items: center;
-  border-bottom: 3px solid rgb(0, 0, 0, 0);
-  cursor: pointer;
   font-size: 16px;
   line-height: 24px;
   letter-spacing: -0.2px;
   text-decoration: none;
   white-space: nowrap;
+  padding: 8px 16px 16px;
 
-  // Override global link styles
-  a {
-    color: #71757a;
-  }
-
-  &:focus,
-  &:focus a {
+  &:focus {
     color: ${themeGet('colors.primary.700')};
     text-decoration: none;
   }
 
   &:hover {
-    border-bottom: 3px solid ${themeGet('colors.primary.300')};
-    a {
-      color: ${themeGet('colors.primary.400')};
-    }
+    color: ${themeGet('colors.primary.400')};
+    text-decoration: none;
+  }
+
+  @media (max-width: 40em) {
+    padding: 16px;
+  }
+`;
+
+const MenuLinkContainer = styled.div`
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 3px;
+    background: ${themeGet('colors.primary.500')};
+    transition: width 0.2s;
+    float: right;
   }
 
   ${props =>
@@ -56,21 +76,51 @@ const MenuLinkContainer = styled.div`
     css`
       color: #090a0a;
       font-weight: 500;
-      border-bottom: 3px solid ${themeGet('colors.primary.500')};
-
-      a {
+      ${MenuLink} {
         color: #090a0a;
       }
+      @media (min-width: 40em) {
+        &::after {
+          width: 100%;
+          float: left;
+        }
+      }
     `}
+
+  ${props =>
+    props.mobileOnly &&
+    css`
+      @media (min-width: 40em) {
+        display: none;
+      }
+    `}
+
+  @media (max-width: 40em) {
+    border-top: 1px solid #e1e1e1;
+    &::after {
+      display: none;
+    }
+    ${props =>
+      props.isSelected &&
+      css`
+        text-decoration: underline;
+      `}
+  }
 `;
 
 const InfosContainer = styled(Container)`
+  padding: 16px 24px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
+
+  @media (max-width: 40em) {
+    padding: 12px 16px;
+  }
 
   /** Hidden state */
   ${props =>
@@ -80,6 +130,44 @@ const InfosContainer = styled(Container)`
       opacity: 0;
       transform: translateY(-20px);
     `}
+`;
+
+/** Displayed on mobile to toggle the menu */
+const ExpandMenuIcon = styled(ChevronDown).attrs({ size: 28 })`
+  cursor: pointer;
+  padding-top: 4px;
+  margin-rigth: 4px;
+  flex: 0 0 28px;
+
+  @media (min-width: 40em) {
+    display: none;
+  }
+
+  &:hover {
+    color: ${themeGet('colors.primary.300')};
+  }
+`;
+
+const CollectiveName = styled.h1`
+  margin: 0 8px;
+  padding: 8px 0;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: center;
+  letter-spacing: -1.2px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+
+  a:not(:hover) {
+    color: #313233;
+  }
+
+  @media (min-width: 40em) {
+    text-align: center;
+  }
 `;
 
 const i18nSection = defineMessages({
@@ -177,37 +265,32 @@ const CollectiveNavbar = ({
   collective,
   isAdmin,
   showEdit,
-  hasSubmitExpenseBtn,
   sections,
   selected,
   LinkComponent,
   onCollectiveClick,
   onSectionClick,
   hideInfos,
-  hideButtonsOnMobile,
+  callsToAction,
   isAnimated,
-  isSmall,
   intl,
 }) => {
-  const navbarItemsHeight = isSmall ? [50, null, 65] : [60, null, 75];
-  const infoPt = isSmall ? ['8px', 16, 18] : [16, 22, 24];
+  const [isExpended, setExpended] = React.useState(false);
   sections = sections || getSectionsForCollective(collective, isAdmin);
 
   return (
-    <Container borderBottom="1px solid #E6E8EB" background="white">
-      <Container margin="0 auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-        {/** Collective infos */}
-        <InfosContainer isHidden={hideInfos} isAnimated={isAnimated} px={Dimensions.PADDING_X} pt={infoPt}>
+    <MainContainer>
+      {/** Collective infos */}
+      <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
+        <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
             <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%" mr={2}>
               <Avatar collective={collective} radius={40} />
             </Container>
           </LinkCollective>
-          <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-            <H1 mx={2} py={2} color="black.800" fontSize={'H5'} lineHeight={'H5'} textAlign={['center', 'left']}>
-              {collective.name || collective.slug}
-            </H1>
-          </LinkCollective>
+          <CollectiveName>
+            <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion />
+          </CollectiveName>
           {isAdmin && showEdit && (
             <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">
               <StyledRoundButton size={24} bg="#F0F2F5" color="#4B4E52">
@@ -215,62 +298,65 @@ const CollectiveNavbar = ({
               </StyledRoundButton>
             </Link>
           )}
-        </InfosContainer>
+        </Flex>
+        <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />
+      </InfosContainer>
 
-        {/** Navbar items and buttons */}
-        <Container display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap-reverse">
-          <Container
-            flex="2 1 600px"
-            display="flex"
-            css={{ overflowX: 'auto' }}
-            px={Dimensions.PADDING_X}
-            data-cy="CollectivePage.NavBar"
-            height={navbarItemsHeight}
-          >
-            {sections.map(section => (
-              <MenuLinkContainer
-                key={section}
-                isSelected={section === selected}
-                onClick={onSectionClick ? () => onSectionClick(section) : undefined}
-              >
-                <LinkComponent
-                  collectivePath={collective.path}
-                  section={section}
-                  label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
-                />
-              </MenuLinkContainer>
-            ))}
-          </Container>
-          <Container
-            flex="1"
-            display={hideButtonsOnMobile ? ['none', null, 'flex'] : 'flex'}
-            minHeight={navbarItemsHeight}
-            alignItems="center"
-            whiteSpace="nowrap"
-            justifyContent="center"
-          >
-            <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
-              <StyledButton mx={2}>
-                <Span mr="5px">
-                  <Mail size="1.1em" style={{ verticalAlign: 'sub' }} />
-                </Span>
-                <FormattedMessage id="Contact" defaultMessage="Contact" />
-              </StyledButton>
-            </a>
-            {hasSubmitExpenseBtn && (
-              <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton mx={2}>
-                  <Span mr="5px">
-                    <ExpenseIcon size="1.5em" />
-                  </Span>
-                  <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-                </StyledButton>
-              </Link>
-            )}
-          </Container>
+      {/** Navbar items and buttons */}
+      <Container
+        position={['absolute', 'relative']}
+        display="flex"
+        justifyContent="space-between"
+        px={[0, 24]}
+        width="100%"
+        background="white"
+      >
+        <Container
+          flex="2 1 600px"
+          display={isExpended ? 'flex' : ['none', 'flex']}
+          css={{ overflowX: 'auto' }}
+          data-cy="CollectivePage.NavBar"
+          flexDirection={['column', 'row']}
+          height="100%"
+          borderBottom={['1px solid #e6e8eb', 'none']}
+        >
+          {sections.map(section => (
+            <MenuLinkContainer
+              key={section}
+              isSelected={section === selected}
+              onClick={() => {
+                if (isExpended) setExpended(false);
+                if (onSectionClick) onSectionClick(section);
+              }}
+            >
+              <MenuLink
+                as={LinkComponent}
+                collectivePath={collective.path}
+                section={section}
+                label={intl.formatMessage(i18nSection[section])}
+              />
+            </MenuLinkContainer>
+          ))}
+          {callsToAction.hasSubmitExpense && (
+            <MenuLinkContainer mobileOnly>
+              <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+              </MenuLink>
+            </MenuLinkContainer>
+          )}
+          {callsToAction.hasContact && (
+            <MenuLinkContainer mobileOnly>
+              <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
+                <ExternalLinkAlt size="1em" /> <FormattedMessage id="Contact" defaultMessage="Contact" />
+              </MenuLink>
+            </MenuLinkContainer>
+          )}
         </Container>
+        <div>
+          <CollectiveCallsToAction display={['none', 'flex']} collectiveSlug={collective.slug} {...callsToAction} />
+        </div>
       </Container>
-    </Container>
+    </MainContainer>
   );
 };
 
@@ -284,6 +370,11 @@ CollectiveNavbar.propTypes = {
     isArchived: PropTypes.bool,
     host: PropTypes.object,
   }).isRequired,
+  /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
+  callsToAction: PropTypes.shape({
+    hasContact: PropTypes.bool,
+    hasSubmitExpense: PropTypes.bool,
+  }),
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,
   /** Wether we want to display the "/edit" button */
@@ -293,7 +384,7 @@ CollectiveNavbar.propTypes = {
   /** An optionnal function to build links URLs. Usefull to override behaviour in test/styleguide envs. */
   LinkComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
-  sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)).isRequired,
+  sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
   /** Called when users click the collective logo or name */
   onCollectiveClick: PropTypes.func,
   /** Currently selected section */
@@ -306,8 +397,6 @@ CollectiveNavbar.propTypes = {
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,
-  /** If true, a `Submit expense` button will be displayed among the calls to action */
-  hasSubmitExpenseBtn: PropTypes.bool,
   /** @ignore From injectIntl */
   intl: PropTypes.object,
 };
@@ -315,9 +404,16 @@ CollectiveNavbar.propTypes = {
 CollectiveNavbar.defaultProps = {
   hideInfos: false,
   isAnimated: false,
+  callsToAction: {
+    hasContact: true,
+  },
   // eslint-disable-next-line react/prop-types
-  LinkComponent: function DefaultNavbarLink({ section, label, collectivePath }) {
-    return <Link route={`${collectivePath}/v2#section-${section}`}>{label}</Link>;
+  LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, ...props }) {
+    return (
+      <Link route={`${collectivePath}/v2#section-${section}`} {...props}>
+        {label}
+      </Link>
+    );
   },
 };
 

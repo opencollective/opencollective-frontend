@@ -75,8 +75,11 @@ class CollectiveCover extends React.Component {
         name: PropTypes.string,
       }),
     }).isRequired,
-    /** Wether we should display the `Submit Expense` button. Only for new navbar */
-    hasSubmitExpenseBtn: PropTypes.bool,
+    /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
+    callsToAction: PropTypes.shape({
+      hasContact: PropTypes.bool,
+      hasSubmitExpense: PropTypes.bool,
+    }).isRequired,
     href: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
@@ -174,7 +177,7 @@ ${description}`;
           <CollectiveNavbar
             collective={collective}
             isAdmin={canEdit}
-            hasSubmitExpenseBtn={this.props.hasSubmitExpenseBtn}
+            callsToAction={this.props.callsToAction}
             showEdit
           />
         </Container>
