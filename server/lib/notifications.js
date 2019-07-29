@@ -1,17 +1,15 @@
 import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
-import { get, set, template } from 'lodash';
+import { get } from 'lodash';
 
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
-import { W9_BOT_SLUG } from '../constants/collectives';
 import models from '../models';
 import debugLib from 'debug';
-import { formatCurrency } from './utils';
 import { channels } from '../constants';
 import { sanitizeActivity } from './webhooks';
 
