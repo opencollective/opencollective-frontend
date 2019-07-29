@@ -58,7 +58,7 @@
   "collective.archive.description": "Esto marcará este {type} como archivado.",
   "collective.archive.modal.body": "¿Estás seguro que quieres {action} este {type}?",
   "collective.archive.modal.header": "{action} {name}",
-  "collective.archive.subscriptions": "Recurring financial contributions will be automatically canceled.",
+  "collective.archive.subscriptions": "Las contribuciones económicas recurrentes serán automáticamente canceladas.",
   "collective.archive.title": "Archivar este {type}",
   "collective.backgroundImage.label": "Imagen de portada",
   "collective.balance.description": "Transfiere el saldo restante al anfitrión fiscal. El saldo colectivo debe ser cero para archivarlo o cambiar hosts. Alternativamente, puede enviar un gasto o donar a otro Colectivo.",
