@@ -1,26 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 
 import MessageBox from '../MessageBox';
 import StyledLink from '../StyledLink';
-import Error from '../Error';
-
-const getIsTaxFormRequiredQuery = gql`
-  query Expense($id: Int!) {
-    Expense(id: $id) {
-      id
-      userTaxFormRequiredBeforePayment
-    }
-  }
-`;
 
 class ExpenseNeedsTaxFormBadge extends React.Component {
   static propTypes = {
-    id: PropTypes.number,
-    data: PropTypes.object,
+    isTaxFormRequired: PropTypes.bool,
     intl: PropTypes.object.isRequired,
   };
 
@@ -38,26 +25,13 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
-
-    if (data.error) {
-      return <Error message="GraphQL error" />;
-    }
-
-    if (data.loading) return null;
-
-    const {
-      intl,
-      data: {
-        Expense: { userTaxFormRequiredBeforePayment },
-      },
-    } = this.props;
+    const { intl, isTaxFormRequired } = this.props;
 
     const message = intl.formatMessage(this.messages.taxFormRequired);
     const hoverMessage = intl.formatMessage(this.messages.hover);
 
     return (
-      userTaxFormRequiredBeforePayment && (
+      isTaxFormRequired && (
         <span>
           <span className="taxFormRequired " data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
             <MessageBox type="warning" display="inline" css={{ padding: '4px', borderRadius: '5px' }} withIcon={true}>
@@ -76,5 +50,4 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
   }
 }
 
-const addExpenseData = graphql(getIsTaxFormRequiredQuery);
-export default addExpenseData(injectIntl(ExpenseNeedsTaxFormBadge));
+export default injectIntl(ExpenseNeedsTaxFormBadge);

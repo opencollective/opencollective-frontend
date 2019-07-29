@@ -93,6 +93,7 @@ const getExpensesQuery = gql`
       currency
       payoutMethod
       privateMessage
+      userTaxFormRequiredBeforePayment
       attachment
       collective {
         id

@@ -31,6 +31,7 @@ class Expense extends React.Component {
       category: PropTypes.string.isRequired,
       payoutMethod: PropTypes.string.isRequired,
       description: PropTypes.string,
+      userTaxFormRequiredBeforePayment: PropTypes.bool,
       fromCollective: PropTypes.shape({
         id: PropTypes.number.isRequired,
         slug: PropTypes.string.isRequired,
@@ -330,7 +331,7 @@ class Expense extends React.Component {
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
-                <ExpenseNeedsTaxFormBadge id={expense.id} />
+                <ExpenseNeedsTaxFormBadge isTaxFormRequired={expense.userTaxFormRequiredBeforePayment} />
               )}
               <span className="metaItem">
                 <Link
