@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { get, isEmpty, throttle } from 'lodash';
+import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
-import { CollectiveType } from '../../lib/constants/collectives';
 import Container from '../Container';
-import CollectiveNavbar from '../CollectiveNavbar';
+import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
 
 // Collective page imports
-import { AllSectionsNames, Sections } from './_constants';
+import { Sections } from './_constants';
 import Hero from './Hero';
 import SectionAbout from './SectionAbout';
 import SectionBudget from './SectionBudget';
@@ -53,6 +52,7 @@ class CollectivePage extends Component {
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
+      updates: PropTypes.number.isRequired,
     }),
   };
 
@@ -73,44 +73,7 @@ class CollectivePage extends Component {
   }
 
   getSections = memoizeOne(props => {
-    const { collective, host, stats, updates, transactions, expenses, isAdmin } = props;
-    const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
-    const sectionsToRemove = new Set([]);
-
-    // Can't contribute anymore if the collective is archived or has no host
-    if (collective.isArchived || !host) {
-      sectionsToRemove.add(Sections.CONTRIBUTE);
-    }
-
-    // Some sections are hidden for non-admins (usually when there's no data)
-    if (!isAdmin) {
-      if (isEmpty(updates)) {
-        sectionsToRemove.add(Sections.UPDATES);
-      }
-      if (isEmpty(transactions) && isEmpty(expenses) && stats.balance === 0) {
-        sectionsToRemove.add(Sections.BUDGET);
-      }
-      if (!collective.longDescription) {
-        sectionsToRemove.add(Sections.ABOUT);
-      }
-    }
-
-    // Adapt the sections depending on collective type
-    if (collective.type === CollectiveType.USER) {
-      sectionsToRemove.add(Sections.CONTRIBUTORS);
-      sectionsToRemove.add(Sections.CONTRIBUTE);
-      sectionsToRemove.add(Sections.UPDATES);
-      sectionsToRemove.add(Sections.BUDGET);
-    } else if (collective.type === CollectiveType.ORGANIZATION) {
-      sectionsToRemove.add(Sections.CONTRIBUTE);
-      sectionsToRemove.add(Sections.UPDATES);
-      sectionsToRemove.add(Sections.BUDGET);
-    } else {
-      sectionsToRemove.add(Sections.COLLECTIVES);
-      sectionsToRemove.add(Sections.TRANSACTIONS);
-    }
-
-    return sections.filter(section => !sectionsToRemove.has(section));
+    return getSectionsForCollective(props.collective, props.idAdmin);
   });
 
   onScroll = throttle(() => {
@@ -227,10 +190,13 @@ class CollectivePage extends Component {
           <CollectiveNavbar
             collective={collective}
             sections={sections}
+            isAdmin={isAdmin}
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
             hideInfos={!isFixed}
+            hideButtonsOnMobile={true}
             isAnimated={true}
+            isSmall={true}
             onSectionClick={this.onSectionClick}
             LinkComponent={({ section, label }) => (
               <a href={`#section-${section}`} onClick={e => e.preventDefault()}>

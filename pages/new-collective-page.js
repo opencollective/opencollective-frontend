@@ -86,11 +86,11 @@ class NewCollectivePage extends React.Component {
             800: darken(0.1, primaryColor),
             700: darken(0.05, primaryColor),
             500: primaryColor,
-            400: lighten(0.05, primaryColor),
-            300: lighten(0.1, primaryColor),
-            200: lighten(0.15, primaryColor),
-            100: lighten(0.2, primaryColor),
-            50: lighten(0.25, primaryColor),
+            400: lighten(0.1, primaryColor),
+            300: lighten(0.2, primaryColor),
+            200: lighten(0.3, primaryColor),
+            100: lighten(0.4, primaryColor),
+            50: lighten(0.6, primaryColor),
           },
         },
       });
@@ -161,6 +161,7 @@ const getCollective = graphql(gql`
         id
         balance
         yearlyBudget
+        updates
       }
       parentCollective {
         id

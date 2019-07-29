@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import tag from 'clean-tag';
 import { background, border, flexbox, shadow, color, position, layout, space, typography } from 'styled-system';
-import { cursor, clear, float, overflow, pointerEvents } from '../lib/styled_system_custom';
+import { cursor, clear, float, overflow, pointerEvents, whiteSpace } from '../lib/styled_system_custom';
 import propTypes from '@styled-system/prop-types';
 
 const Container = styled(tag)`
@@ -21,6 +21,7 @@ const Container = styled(tag)`
   ${layout}
   ${space}
   ${typography}
+  ${whiteSpace}
   ${props =>
     props.clearfix &&
     `

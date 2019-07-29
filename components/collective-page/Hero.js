@@ -72,7 +72,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
             </Container>
           </LinkCollective>
           {isAdmin && (
-            <Container position="absolute" right={-10} bottom={-5}>
+            <Container position="absolute" right={-10} bottom={-5} color="#4B4E52">
               <Link
                 route="editCollective"
                 params={{ slug: collective.slug }}
