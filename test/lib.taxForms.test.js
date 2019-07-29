@@ -277,7 +277,7 @@ describe('lib.taxForms', () => {
       sinon.restore();
     });
 
-    it('sets updates the documents status to requested when the client request succeeds', async () => {
+    it('updates the documents status to requested when the client request succeeds', async () => {
       const legalDoc = Object.assign({}, documentData, {
         CollectiveId: userCollective.id,
       });
