@@ -643,6 +643,12 @@ export const ExpenseType = new GraphQLObjectType({
           return expense.status;
         },
       },
+      type: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.type;
+        },
+      },
       payoutMethod: {
         type: GraphQLString,
         resolve(expense) {

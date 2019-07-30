@@ -3,6 +3,7 @@ import Historical from 'sequelize-historical';
 import { TransactionTypes } from '../constants/transactions';
 import activities from '../constants/activities';
 import status from '../constants/expense_status';
+import expenseType from '../constants/expense_type';
 import CustomDataTypes from '../models/DataTypes';
 import { reduceArrayToCurrency } from '../lib/currency';
 import models, { Op } from './';
@@ -90,6 +91,11 @@ export default function(Sequelize, DataTypes) {
             msg: `Must be in ${Object.keys(status)}`,
           },
         },
+      },
+
+      type: {
+        type: DataTypes.ENUM(Object.keys(expenseType)),
+        defaultValue: expenseType.UNCLASSIFIED,
       },
 
       incurredAt: {
