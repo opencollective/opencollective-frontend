@@ -5,6 +5,7 @@ import * as stripe from '../server/paymentProviders/stripe/gateway';
 import Promise from 'bluebird';
 import * as utils from './utils';
 import models from '../server/models';
+import { VAT_OPTIONS } from '../server/constants/vat';
 
 describe('graphql.tiers.test', () => {
   let user1, user2, host, collective1, collective2, tier1, tierWithCustomFields, tierProduct, paymentMethod1;
@@ -38,7 +39,12 @@ describe('graphql.tiers.test', () => {
   );
 
   // Create test collectives
-  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective1 = g)));
+  beforeEach(() =>
+    models.Collective.create({
+      ...utils.data('collective1'),
+      settings: { VAT: { type: VAT_OPTIONS.HOST } },
+    }).tap(g => (collective1 = g)),
+  );
   beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => (collective2 = g)));
 
   // Create tiers

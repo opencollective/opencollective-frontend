@@ -20,6 +20,7 @@ import roles from '../../../constants/roles';
 import status from '../../../constants/order_status';
 import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
+import { VAT_OPTIONS } from '../../../constants/vat';
 
 const oneHourInSeconds = 60 * 60;
 
@@ -326,23 +327,37 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     // ---- Taxes (VAT) ----
     let taxFromCountry = null;
     let taxPercent = 0;
+    let vatSettings = {};
 
     // Load tax info from DB, ignore if amount is 0
     if (order.totalAmount !== 0 && tier && LibTaxes.isTierTypeSubjectToVAT(tier.type)) {
       let hostCollective = null;
+      let parentCollective = null;
 
-      // Load host
+      // Load host and parent collective
       if (collective.HostCollectiveId) {
         hostCollective = await loaders.collective.findById.load(collective.HostCollectiveId);
-      } else if (collective.ParentCollectiveId) {
-        const parentCollective = await loaders.collective.findById.load(collective.ParentCollectiveId);
-        if (parentCollective) {
+      }
+
+      if (collective.ParentCollectiveId) {
+        parentCollective = await loaders.collective.findById.load(collective.ParentCollectiveId);
+        if (parentCollective && !hostCollective) {
           hostCollective = await loaders.collective.findById.load(parentCollective.HostCollectiveId);
         }
       }
 
-      const hostCountry = get(hostCollective, 'countryISO');
-      taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, hostCountry, collective.countryISO);
+      // Check if VAT is enabled
+      const vatType = get(collective, 'settings.VAT.type') || get(parentCollective, 'settings.VAT.type');
+      const baseCountry = collective.countryISO || get(parentCollective, 'countryISO');
+      if (vatType === VAT_OPTIONS.OWN) {
+        taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, baseCountry, baseCountry);
+        vatSettings = { ...get(parentCollective, 'settings.VAT'), ...get(collective, 'settings.VAT') };
+      } else {
+        const hostCountry = get(hostCollective, 'countryISO');
+        taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, hostCountry, baseCountry);
+        vatSettings = get(hostCollective, 'settings.VAT') || {};
+      }
+
       // Adapt tax based on country / tax ID number
       if (taxFromCountry) {
         if (!order.countryISO) {
@@ -435,6 +450,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
           taxedCountry: order.countryISO,
           percentage: taxPercent,
           taxIDNumber: order.taxIDNumber,
+          taxIDNumberFrom: vatSettings.number,
         },
         customData: order.customData,
       },

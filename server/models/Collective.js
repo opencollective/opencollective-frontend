@@ -20,7 +20,12 @@ import userlib from '../lib/userlib';
 import emailLib from '../lib/email';
 import queries from '../lib/queries';
 import { convertToCurrency } from '../lib/currency';
-import { isBlacklistedCollectiveSlug, collectiveSlugBlacklist } from '../lib/collectivelib';
+import {
+  isBlacklistedCollectiveSlug,
+  collectiveSlugBlacklist,
+  whitelistSettings,
+  validateSettings,
+} from '../lib/collectivelib';
 import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5, strip_tags } from '../lib/utils';
 
 import roles from '../constants/roles';
@@ -286,6 +291,17 @@ export default function(Sequelize, DataTypes) {
 
       settings: {
         type: DataTypes.JSON,
+        set(value) {
+          this.setDataValue('settings', whitelistSettings(value));
+        },
+        validate: {
+          validate(settings) {
+            const error = validateSettings(settings);
+            if (error) {
+              throw new Error(error);
+            }
+          },
+        },
       },
 
       isPledged: {
