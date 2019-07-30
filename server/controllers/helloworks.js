@@ -83,7 +83,7 @@ function UploadToS3({ id, year, documentType }) {
     }
 
     return new Promise((resolve, reject) => {
-      s3.upload({ Body: buffer, bucket, key }, (err, data) => {
+      s3.upload({ Body: buffer, Bucket: bucket, Key: key }, (err, data) => {
         if (err) {
           logger.error('error uploading file to s3: ', err);
           reject();
