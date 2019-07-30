@@ -5,6 +5,7 @@ import s3 from '../lib/awsS3';
 import models from '../models';
 import fs from 'fs';
 import logger from '../lib/logger';
+import { encrypt } from '../lib/encryption';
 
 const { User, LegalDocument, RequiredLegalDocument } = models;
 const {
@@ -19,6 +20,7 @@ const HELLO_WORKS_SECRET = get(config, 'helloworks.secret');
 const HELLO_WORKS_WORKFLOW_ID = get(config, 'helloworks.workflowId');
 
 const HELLO_WORKS_S3_BUCKET = get(config, 'helloworks.aws.s3.bucket');
+const ENCRYPTION_KEY = get(config, 'helloworks.documentEncryptionKey');
 
 const client = new HelloWorks({
   apiKeyId: HELLO_WORKS_KEY,
@@ -39,6 +41,9 @@ async function callback(req, res) {
         email,
       },
     });
+
+    const userCollectiveName = await user.username;
+
     const doc = await LegalDocument.findByTypeYearUser({ year, documentType: US_TAX_FORM, user });
 
     client.workflowInstances
@@ -46,7 +51,8 @@ async function callback(req, res) {
         instanceId: id,
         documentId,
       })
-      .then(UploadToS3({ id: user.id, year, documentType: US_TAX_FORM }))
+      .then(buff => Promise.resolve(encrypt(buff, ENCRYPTION_KEY)))
+      .then(UploadToS3({ id: userCollectiveName, year, documentType: US_TAX_FORM }))
       .then(({ Location: location }) => {
         doc.requestStatus = RECEIVED;
         doc.documentLink = location;

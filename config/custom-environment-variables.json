@@ -138,6 +138,7 @@
   },
   "helloworks": {
     "key": "HELLO_WORKS_KEY",
-    "secret": "HELLO_WORKS_SECRET"
+    "secret": "HELLO_WORKS_SECRET",
+    "documentEncryptionKey": "HELLO_WORKS_DOCUMENT_ENCRYPTION_KEY"
   }
 }
