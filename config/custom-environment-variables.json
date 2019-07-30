@@ -139,6 +139,11 @@
   "helloworks": {
     "key": "HELLO_WORKS_KEY",
     "secret": "HELLO_WORKS_SECRET",
-    "documentEncryptionKey": "HELLO_WORKS_DOCUMENT_ENCRYPTION_KEY"
+    "documentEncryptionKey": "HELLO_WORKS_DOCUMENT_ENCRYPTION_KEY",
+    "aws": {
+      "s3": {
+        "bucket": "HELLO_WORKS_AWS_S3_BUCKET"
+      }
+    }
   }
 }
