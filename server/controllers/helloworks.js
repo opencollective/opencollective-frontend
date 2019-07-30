@@ -36,6 +36,7 @@ async function callback(req, res) {
     const { email, year } = metadata;
     const documentId = Object.keys(data)[0];
 
+    logger.info('Completed Tax form. Metadata:', metadata);
     const user = await User.findOne({
       where: {
         email,
