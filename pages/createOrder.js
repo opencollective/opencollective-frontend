@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, FormattedDate } from 'react-intl';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { debounce, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
-import moment from 'moment';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
 import { Router } from '../server/pages';
 import { VAT_OPTIONS } from '../lib/constants/vat';
+import { getNextChargeDate } from '../lib/date-utils';
 import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency, getEnvVar, parseToBoolean } from '../lib/utils';
 import { getPaypal } from '../lib/paypal';
@@ -695,10 +695,12 @@ class CreateOrderPage extends React.Component {
                 <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />
               </strong>{' '}
               <Span color="primary.500">
-                {moment()
-                  .add(1, interval)
-                  .date(1)
-                  .format('MMM D, YYYY')}
+                <FormattedDate
+                  value={getNextChargeDate(new Date(), interval)}
+                  day="numeric"
+                  month="short"
+                  year="numeric"
+                />
               </Span>
             </React.Fragment>
           )}

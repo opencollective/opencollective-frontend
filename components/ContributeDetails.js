@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
@@ -14,6 +13,7 @@ import { P, Span } from './Text';
 import Currency from './Currency';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInput from './StyledInput';
+import { getNextChargeDate } from '../lib/date-utils';
 
 const FrequenciesI18n = defineMessages({
   oneTime: {
@@ -200,10 +200,12 @@ const ContributeDetails = ({
                   <br />
                   <FormattedMessage id="contribution.subscription.next.label" defaultMessage="Next charge:" />{' '}
                   <Span color="primary.500">
-                    {moment()
-                      .add(1, interval)
-                      .date(1)
-                      .format('MMM D, YYYY')}
+                    <FormattedDate
+                      value={getNextChargeDate(new Date(), interval)}
+                      day="numeric"
+                      month="short"
+                      year="numeric"
+                    />
                   </Span>
                 </P>
               )}
