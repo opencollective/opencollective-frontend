@@ -295,8 +295,11 @@ class EditTiers extends React.Component {
     const hostCountry = get(collective, 'host.location.country');
     const collectiveCountry =
       get(collective, 'location.country') || get(collective, 'parentCollective.location.country');
-    const vatOriginCountry = getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
-    const vatPercentage = getStandardVatRate(tier.type, vatOriginCountry);
+
+    const hasVat = Boolean(get(collective, 'settings.VAT.type'));
+    const vatOriginCountry = hasVat && getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
+    const vatPercentage = hasVat ? getStandardVatRate(tier.type, vatOriginCountry) : 0;
+
     if (!tier.amountType) {
       tier.amountType = tier.presets ? 'FLEXIBLE' : 'FIXED';
     }
