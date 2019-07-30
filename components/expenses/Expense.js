@@ -13,6 +13,7 @@ import SmallButton from '../SmallButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
+import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
@@ -30,6 +31,7 @@ class Expense extends React.Component {
       category: PropTypes.string.isRequired,
       payoutMethod: PropTypes.string.isRequired,
       description: PropTypes.string,
+      userTaxFormRequiredBeforePayment: PropTypes.bool,
       fromCollective: PropTypes.shape({
         id: PropTypes.number.isRequired,
         slug: PropTypes.string.isRequired,
@@ -196,7 +198,6 @@ class Expense extends React.Component {
               margin-right: 1.6rem;
             }
             .body {
-              overflow: hidden;
               font-size: 1.4rem;
               width: 100%;
             }
@@ -229,6 +230,7 @@ class Expense extends React.Component {
             .rejected .status {
               color: #e21a60;
             }
+
             .approved .status {
               color: #72ce00;
             }
@@ -328,6 +330,9 @@ class Expense extends React.Component {
               )}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
               {' | '}
+              {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
+                <ExpenseNeedsTaxFormBadge isTaxFormRequired={expense.userTaxFormRequiredBeforePayment} />
+              )}
               <span className="metaItem">
                 <Link
                   route="expenses"

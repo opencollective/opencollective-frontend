@@ -8,6 +8,7 @@ import { pick } from 'lodash';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
+import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
@@ -33,7 +34,9 @@ class CreateExpensePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { expenseCreated: false };
+    this.state = {
+      expenseCreated: false,
+    };
   }
 
   createExpense = async expense => {
@@ -108,6 +111,7 @@ class CreateExpensePage extends React.Component {
                       />
                     )}
                   </p>
+                  <ExpenseNeedsTaxFormMessage id={expenseCreated.id} />
                   <Flex justifyContent="center" mt={4} flexWrap="wrap">
                     <Button
                       className="blue"
