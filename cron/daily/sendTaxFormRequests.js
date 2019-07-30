@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../../server/env';
 
 import config from 'config';
 import HelloWorks from 'helloworks-sdk';
