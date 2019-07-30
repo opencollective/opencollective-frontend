@@ -419,12 +419,14 @@ class InputField extends React.Component {
         break;
 
       case 'select': {
-        const firstOptionValue =
-          field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
-        if (field.options.length <= 1) {
-          console.warn('>>> InputField: options.length needs to be > 1', field.options);
+        if (!field.options || field.options.length === 0) {
+          console.warn('>>> InputField: options.length needs to be >= 1', field.options);
           return null;
         }
+
+        const firstOptionValue =
+          field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
+
         this.input = (
           <FieldGroup
             key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
