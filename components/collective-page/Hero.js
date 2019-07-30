@@ -22,6 +22,7 @@ import StyledTag from '../StyledTag';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
+import CollectiveCallsToAction from '../CollectiveCallsToAction';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import HeroBackground from './HeroBackground';
@@ -72,7 +73,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
             </Container>
           </LinkCollective>
           {isAdmin && (
-            <Container position="absolute" right={-10} bottom={-5}>
+            <Container position="absolute" right={-10} bottom={-5} color="#4B4E52">
               <Link
                 route="editCollective"
                 params={{ slug: collective.slug }}
@@ -137,6 +138,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => (
         )}
       </Flex>
       <StyledShortDescription>{collective.description}</StyledShortDescription>
+      <CollectiveCallsToAction display={['flex', 'none']} mt={3} collectiveSlug={collective.slug} hasContact />
     </ContainerSectionContent>
   </Container>
 );

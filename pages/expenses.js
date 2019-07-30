@@ -106,6 +106,7 @@ class ExpensesPage extends React.Component {
             collective={collective}
             LoggedInUser={LoggedInUser}
             displayContributeLink={collective.isActive && collective.host ? true : false}
+            callsToAction={{ hasContact: true, hasSubmitExpense: true }}
           />
 
           <div className="content">
