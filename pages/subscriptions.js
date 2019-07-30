@@ -18,7 +18,7 @@ class SubscriptionsPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string,
-    LoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object, // from withLoggedInUser
   };
 
   render() {

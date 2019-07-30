@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
+import { get, isEmpty } from 'lodash';
+
 import InputField from './InputField';
 import { getStripeToken } from '../lib/stripe';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
@@ -10,8 +12,8 @@ import SmallButton from './SmallButton';
 
 class PaymentMethodChooser extends React.Component {
   static propTypes = {
-    paymentMethodInUse: PropTypes.object.isRequired,
-    paymentMethodsList: PropTypes.arrayOf(PropTypes.object),
+    paymentMethodsList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    paymentMethodInUse: PropTypes.object,
     editMode: PropTypes.bool,
     onSubmit: PropTypes.func,
     onCancel: PropTypes.func,
@@ -27,13 +29,14 @@ class PaymentMethodChooser extends React.Component {
     this.validate = this.validate.bind(this);
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
+
     this.state = {
       modified: false,
       showSelector: false,
-      showNewCreditCardForm: false,
+      showNewCreditCardForm: isEmpty(props.paymentMethodsList),
       result: {},
       card: {},
-      showUnknownPaymentMethodHelp: Boolean(!this.props.paymentMethodInUse.name), // check for premigration payment methods
+      showUnknownPaymentMethodHelp: !get(this.props, 'paymentMethodInUse.name'), // check for premigration payment methods
     };
 
     this.messages = defineMessages({
@@ -73,7 +76,7 @@ class PaymentMethodChooser extends React.Component {
     const { paymentMethodInUse, paymentMethodsList, editMode } = this.props;
 
     if (!prevProps.paymentMethodsList && paymentMethodsList) {
-      if (!paymentMethodInUse.name) {
+      if (!paymentMethodInUse || !paymentMethodInUse.name) {
         // set state to modified
         this.setState({ modified: true });
         // If there was an existing card, select that
@@ -89,6 +92,10 @@ class PaymentMethodChooser extends React.Component {
 
       // handles the case where there are no existing credit cards
       if (paymentMethodsList.length === 0 && editMode) {
+        this.setState({ showNewCreditCardForm: true });
+      }
+    } else if (!prevProps.editMode && editMode) {
+      if (isEmpty(paymentMethodsList) && !this.state.showNewCreditCardForm) {
         this.setState({ showNewCreditCardForm: true });
       }
     }
@@ -118,7 +125,7 @@ class PaymentMethodChooser extends React.Component {
     const newUuid = value && value.uuid;
 
     // determine if anything has changed
-    if (this.props.paymentMethodInUse.uuid !== newUuid) {
+    if (!this.props.paymentMethodInUse || this.props.paymentMethodInUse.uuid !== newUuid) {
       this.setState({ modified: true });
     } else {
       this.setState({ modified: false });
@@ -201,9 +208,9 @@ class PaymentMethodChooser extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, paymentMethodInUse } = this.props;
 
-    const paymentMethodString = paymentMethodLabelWithIcon(intl, this.props.paymentMethodInUse);
+    const paymentMethodString = paymentMethodInUse ? paymentMethodLabelWithIcon(intl, paymentMethodInUse) : '';
 
     const paymentMethodsOptions = this.populatePaymentMethods();
 
@@ -278,7 +285,7 @@ class PaymentMethodChooser extends React.Component {
             name="creditcardSelector"
             onChange={uuid => this.handleChange({ uuid })}
             options={paymentMethodsOptions}
-            defaultValue={this.props.paymentMethodInUse.uuid}
+            defaultValue={get(this.props, 'paymentMethodInUse.uuid')}
           />
         )}
 
