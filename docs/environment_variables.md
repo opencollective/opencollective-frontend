@@ -49,3 +49,4 @@
 | HELLO_WORKS_WORKFLOW_ID             | .helloworks.workflowId                 | hello works workflow id                                                           |
 | HELLO_WORKS_CALLBACK_PATH           | .helloworks.callbackPath               | hello works callback path to be appended to the api url, eg. /helloworks/callback |
 | HELLO_WORKS_DOCUMENT_ENCRYPTION_KEY | .helloworks.documentEncryptionKey      | base64 encoded secret key for encrypting document before storage.                 |
+| HELLO_WORKS_AWS_S3_BUCKET           | .helloworks.aws.s3.bucket              | the bucket where tax forms will be uploaded                                       |
