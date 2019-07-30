@@ -916,6 +916,7 @@
   "subscription.updated": "Sauvegardé!",
   "subscription.whyPastDueText": "Nous n'avons pas pu exécuter votre dernier paiement. Merci de mettre à jour votre moyen de paiement pour poursuivre cette contribution.",
   "subscription.whyPastDueTitle": "Mettre à jour le moyen de paiement",
+  "Subscriptions.Title": "{collectiveName}'s recurring financial contributions",
   "Tags.ASSOCIATION": "Association",
   "Tags.COLLECTIVE": "Collectif",
   "Tags.CONFERENCE": "Conférence",
