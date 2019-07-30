@@ -73,7 +73,7 @@ class CollectivePage extends Component {
   }
 
   getSections = memoizeOne(props => {
-    return getSectionsForCollective(props.collective, props.idAdmin);
+    return getSectionsForCollective(props.collective, props.isAdmin);
   });
 
   onScroll = throttle(() => {
