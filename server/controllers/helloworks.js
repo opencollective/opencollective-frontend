@@ -36,6 +36,7 @@ async function callback(req, res) {
     const { email, year } = metadata;
     const documentId = Object.keys(data)[0];
 
+    logger.info('Completed Tax form. Metadata:', metadata);
     const user = await User.findOne({
       where: {
         email,
@@ -83,7 +84,7 @@ function UploadToS3({ id, year, documentType }) {
     }
 
     return new Promise((resolve, reject) => {
-      s3.upload({ Body: buffer, bucket, key }, (err, data) => {
+      s3.upload({ Body: buffer, Bucket: bucket, Key: key }, (err, data) => {
         if (err) {
           logger.error('error uploading file to s3: ', err);
           reject();
