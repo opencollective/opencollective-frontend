@@ -67,7 +67,7 @@ describe('Contribution Flow: Order', () => {
       cy.contains('.step-details', '$500.00 per month');
 
       // Frequency must be disabled
-      cy.get('#interval[disabled]').should('exist');
+      cy.get('#interval input[disabled]').should('exist');
       cy.contains('Next charge: Jun 1, 2042');
       cy.contains('Next step').click();
 
@@ -107,7 +107,7 @@ describe('Contribution Flow: Order', () => {
         cy.contains('Next step').click();
 
         cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
-        cy.get('#interval[disabled]').should('exist');
+        cy.get('#interval input[disabled]').should('exist');
         cy.contains('Next charge: Jun 1, 2042');
         cy.contains('Next step').click();
         cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
