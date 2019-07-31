@@ -8,7 +8,7 @@ import Container from './Container';
 import { Flex } from '@rebass/grid';
 import StyledButtonSet from './StyledButtonSet';
 import StyledInputField from './StyledInputField';
-import StyledSelect from './StyledSelect';
+import StyledSelect from './DeprecatedStyledSelect';
 import { P, Span } from './Text';
 import Currency from './Currency';
 import StyledInputAmount from './StyledInputAmount';

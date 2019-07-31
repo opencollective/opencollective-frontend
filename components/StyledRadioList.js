@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { find } from 'lodash';
 
 import { Box } from '@rebass/grid';
-import { getItems, getKeyExtractor } from './StyledSelect';
+import { getItems, getKeyExtractor } from './DeprecatedStyledSelect';
 import Container from './Container';
 
 /**
