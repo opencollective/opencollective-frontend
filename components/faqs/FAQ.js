@@ -17,7 +17,7 @@ const MainContainer = styled(Box)`
 const EntryContainer = styled(Box)``;
 
 /** Main entry container */
-const Entry = styled.details`
+export const Entry = styled.details`
   &[open] {
     summary::after {
       content: '−';
@@ -58,17 +58,17 @@ const Entry = styled.details`
 `;
 
 /** Entry title */
-const Title = styled.summary``;
+export const Title = styled.summary``;
 
 /** Entry content (hidden by default) */
-const Content = styled(Box)``;
+export const Content = styled(Box)``;
 Content.defaultProps = {
   mb: 1,
   fontSize: '13px',
   color: 'black.600',
 };
 
-const Separator = styled.hr`
+export const Separator = styled.hr`
   background: ${themeGet('colors.black.400')};
   width: 100%;
 `;
@@ -78,16 +78,7 @@ const Separator = styled.hr`
  */
 export default class FAQ extends Component {
   static propTypes = {
-    /**
-     * A render func that is given an object with the following entries:
-     *
-     * - `Container`: A simple container to group entries. Accept all `Box` properties.
-     * - `Entry`: Use this to wrap each individual FAQ entry
-     * - `Title`: A simple wrapper arround `summary`. Using a regular `summary` tag will have the same effect.
-     * - `Content`: The content, initially hidden.
-     * - `Separator`: A helper to add a full-width separator in the FAQ.
-     * */
-    children: PropTypes.func.isRequired,
+    children: PropTypes.node,
     /** The title to display above entries */
     title: PropTypes.string,
     /** All properties from `Box` */
@@ -105,7 +96,7 @@ export default class FAQ extends Component {
         <P fontWeight="bold" mb={1}>
           {title}
         </P>
-        {children({ Container: EntryContainer, Entry, Title, Content, Separator })}
+        <EntryContainer>{children}</EntryContainer>
       </MainContainer>
     );
   }
