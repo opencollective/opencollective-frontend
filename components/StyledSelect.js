@@ -68,6 +68,7 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
     menu: baseStyles => ({
       ...baseStyles,
       overflow: 'hidden', // for children border-radius to apply
+      zIndex: 3,
     }),
     menuList: baseStyles => ({
       ...baseStyles,

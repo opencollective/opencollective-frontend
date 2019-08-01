@@ -3,8 +3,36 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get, groupBy } from 'lodash';
+import { defineMessages, injectIntl } from 'react-intl';
+import { get, groupBy, sortBy } from 'lodash';
+import memoizeOne from 'memoize-one';
+import StyledSelect from './StyledSelect';
+
+const CollectiveTypesI18n = defineMessages({
+  collective: {
+    id: 'collective.types.collective',
+    defaultMessage: '{n, plural, one {collective} other {collectives}}',
+  },
+  organization: {
+    id: 'collective.types.organization',
+    defaultMessage: '{n, plural, one {organization} other {organizations}}',
+  },
+  user: {
+    id: 'collective.types.user',
+    defaultMessage: '{n, plural, one {people} other {people}}',
+  },
+});
+
+const messages = defineMessages({
+  addFundsFromHost: {
+    id: 'addfunds.fromCollective.host',
+    defaultMessage: 'Host ({host})',
+  },
+  addFundsFromOther: {
+    id: 'addfunds.fromCollective.other',
+    defaultMessage: 'other (please specify)',
+  },
+});
 
 class AddFundsSourcePicker extends React.Component {
   static propTypes = {
@@ -16,97 +44,59 @@ class AddFundsSourcePicker extends React.Component {
     data: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.onChange = this.onChange.bind(this);
-    this.messages = defineMessages({
-      collective: {
-        id: 'collective.types.collective',
-        defaultMessage: '{n, plural, one {collective} other {collectives}}',
-      },
-      organization: {
-        id: 'collective.types.organization',
-        defaultMessage: '{n, plural, one {organization} other {organizations}}',
-      },
-      user: {
-        id: 'collective.types.user',
-        defaultMessage: '{n, plural, one {people} other {people}}',
-      },
-    });
-  }
-
-  onChange(e) {
-    const FromCollectiveId = e.target.value;
+  onChange = option => {
+    const FromCollectiveId = option.value;
     this.props.onChange(FromCollectiveId);
-  }
+  };
 
-  getGroupLabel(type) {
-    const { intl } = this.props;
+  getSelectOptions = memoizeOne((intl, host, PaymentMethod) => {
+    if (!host || !PaymentMethod) {
+      return [];
+    }
 
-    return intl
-      .formatMessage(this.messages[type.toLowerCase()], {
-        n: this.fromCollectivesByType[type].length,
-      })
-      .toUpperCase();
-  }
+    const fromCollectives = get(PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id);
+    const collectivesByTypes = groupBy(fromCollectives, m => get(m, 'type'));
+    const sortedActiveTypes = Object.keys(collectivesByTypes).sort();
 
-  renderSourceEntry(fromCollective) {
-    return (
-      <option key={`${fromCollective.type}-${fromCollective.id}`} value={fromCollective.id}>
-        {fromCollective.name}
-      </option>
-    );
-  }
+    return [
+      // Add funds from host
+      {
+        value: host.id,
+        label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }),
+      },
+      // Add funds from given collectives
+      ...sortedActiveTypes.map(type => {
+        const sortedCollectives = sortBy(collectivesByTypes[type], 'name');
+        const sectionI18n = CollectiveTypesI18n[type.toLowerCase()];
+        const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, { n: sortedCollectives.length }) : type;
+        return {
+          label: sectionLabel,
+          options: sortedCollectives.map(collective => ({
+            value: collective.id,
+            label: collective.name,
+          })),
+        };
+      }),
+      // Other
+      {
+        value: 'other',
+        label: intl.formatMessage(messages.addFundsFromOther),
+      },
+    ];
+  });
 
   render() {
-    const {
-      host,
-      data: { loading, PaymentMethod },
-    } = this.props;
-    if (loading) return <div />;
-    const fromCollectives = get(PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id);
-    this.fromCollectivesByType = {
-      ORGANIZATION: [],
-      COLLECTIVE: [],
-      USER: [],
-      ...groupBy(fromCollectives, m => get(m, 'type')),
-    };
+    const { intl, host, data } = this.props;
+
     return (
-      <FormControl
+      <StyledSelect
         id="sourcePicker"
-        name="template"
-        componentClass="select"
-        placeholder="select"
+        isLoading={data.loading}
+        disabled={!data.PaymentMethod}
+        options={this.getSelectOptions(intl, host, data.PaymentMethod)}
         onChange={this.onChange}
-      >
-        <FormattedMessage id="addfunds.fromCollective.host" values={{ host: host.name }} defaultMessage="Host ({host})">
-          {message => <option value={host.id}>{message}</option>}
-        </FormattedMessage>
-
-        {this.fromCollectivesByType['COLLECTIVE'].length > 0 && (
-          <optgroup label={this.getGroupLabel('COLLECTIVE')}>
-            {this.fromCollectivesByType['COLLECTIVE'].map(this.renderSourceEntry)}
-          </optgroup>
-        )}
-
-        {this.fromCollectivesByType['ORGANIZATION'].length > 0 && (
-          <optgroup label={this.getGroupLabel('ORGANIZATION')}>
-            {this.fromCollectivesByType['ORGANIZATION'].map(this.renderSourceEntry)}
-          </optgroup>
-        )}
-
-        {this.fromCollectivesByType['USER'].length > 0 && (
-          <optgroup label={this.getGroupLabel('USER')}>
-            {this.fromCollectivesByType['USER'].map(this.renderSourceEntry)}
-          </optgroup>
-        )}
-
-        <optgroup label="OTHER">
-          <FormattedMessage id="addfunds.fromCollective.other" defaultMessage="other (please specify)">
-            {message => <option value="other">{message}</option>}
-          </FormattedMessage>
-        </optgroup>
-      </FormControl>
+        maxMenuHeight={200}
+      />
     );
   }
 }
