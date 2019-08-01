@@ -605,7 +605,7 @@ const queries = {
       if (args.category) query.where.category = { [Op.iLike]: args.category };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [['id', 'DESC']];
+      query.order = [['createdAt', 'DESC'], ['id', 'DESC']];
       const getCollectiveIds = () => {
         // if is host, we get all the orders across all the hosted collectives
         if (args.includeHostedCollectives) {
