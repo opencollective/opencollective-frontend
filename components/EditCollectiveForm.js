@@ -70,6 +70,10 @@ class EditCollectiveForm extends React.Component {
 
     const collective = { ...(props.collective || {}) };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
+    collective.tos = get(collective, 'settings.tos');
+    collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
+    collective.goals = get(collective, 'settings.goals');
+    collective.markdown = get(collective, 'settings.markdown');
 
     this.state = {
       modified: false,
