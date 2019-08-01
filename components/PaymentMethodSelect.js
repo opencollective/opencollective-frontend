@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
 
-import StyledSelect from './StyledSelect';
+import StyledSelect from './DeprecatedStyledSelect';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 
 const PaymentMethodSelect = ({ intl, paymentMethods, defaultPaymentMethod, ...props }) => {

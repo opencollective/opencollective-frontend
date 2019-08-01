@@ -6,7 +6,7 @@ import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
 import { FixedSizeList } from 'react-window';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import StyledSelect from './StyledSelect';
+import StyledSelect from './DeprecatedStyledSelect';
 
 class InputTypeCountry extends Component {
   static propTypes = {

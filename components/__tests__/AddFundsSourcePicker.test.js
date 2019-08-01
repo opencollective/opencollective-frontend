@@ -1,9 +1,10 @@
 import React from 'react';
+import { ThemeProvider } from 'styled-components';
 import 'jest-styled-components';
 
+import theme from '../../lib/constants/theme';
 import { MockAddFundsSourcePicker, MockAddFundsSourcePickerForUser } from '../AddFundsSourcePicker';
 import { snapshotI18n } from '../../test/snapshot-helpers';
-import { mountWithIntl } from '../../test/intlHelper';
 
 describe('AddFundsSourcePicker component', () => {
   const defaultProps = {
@@ -15,7 +16,11 @@ describe('AddFundsSourcePicker component', () => {
   };
 
   it('renders default options', () => {
-    snapshotI18n(<MockAddFundsSourcePicker {...defaultProps} />);
+    snapshotI18n(
+      <ThemeProvider theme={theme}>
+        <MockAddFundsSourcePicker {...defaultProps} />
+      </ThemeProvider>,
+    );
   });
 
   it('renders loading state', () => {
@@ -25,7 +30,11 @@ describe('AddFundsSourcePicker component', () => {
         loading: true,
       },
     };
-    snapshotI18n(<MockAddFundsSourcePicker {...props} />);
+    snapshotI18n(
+      <ThemeProvider theme={theme}>
+        <MockAddFundsSourcePicker {...props} />
+      </ThemeProvider>,
+    );
   });
 
   it('renders host name as first option', () => {
@@ -37,7 +46,11 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    snapshotI18n(<MockAddFundsSourcePicker {...props} />);
+    snapshotI18n(
+      <ThemeProvider theme={theme}>
+        <MockAddFundsSourcePicker {...props} />
+      </ThemeProvider>,
+    );
   });
 
   it('renders fromCollectives by type in optgroup', () => {
@@ -68,21 +81,11 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    snapshotI18n(<MockAddFundsSourcePicker {...props} />);
-  });
-
-  it('calls onChange prop function when selection changes', () => {
-    const onChange = jest.fn();
-    const props = {
-      ...defaultProps,
-      onChange,
-    };
-
-    const component = mountWithIntl(<MockAddFundsSourcePicker {...props} />);
-
-    component.find('select').simulate('change', { target: { value: 'test' } });
-
-    expect(onChange).toHaveBeenCalledWith('test');
+    snapshotI18n(
+      <ThemeProvider theme={theme}>
+        <MockAddFundsSourcePicker {...props} />
+      </ThemeProvider>,
+    );
   });
 });
 
@@ -95,7 +98,11 @@ describe('AddFundsSourcePickerForUser component', () => {
   };
 
   it('renders default options', () => {
-    snapshotI18n(<MockAddFundsSourcePickerForUser {...defaultProps} />);
+    snapshotI18n(
+      <ThemeProvider theme={theme}>
+        <MockAddFundsSourcePickerForUser {...defaultProps} />
+      </ThemeProvider>,
+    );
   });
 
   it('render host options', () => {
@@ -111,6 +118,10 @@ describe('AddFundsSourcePickerForUser component', () => {
       },
     };
 
-    snapshotI18n(<MockAddFundsSourcePickerForUser {...props} />);
+    snapshotI18n(
+      <ThemeProvider theme={theme}>
+        <MockAddFundsSourcePickerForUser {...props} />
+      </ThemeProvider>,
+    );
   });
 });

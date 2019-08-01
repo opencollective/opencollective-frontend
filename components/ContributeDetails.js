@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
+import { Flex } from '@rebass/grid';
+import memoizeOne from 'memoize-one';
 
 import Container from './Container';
-import { Flex } from '@rebass/grid';
 import StyledButtonSet from './StyledButtonSet';
 import StyledInputField from './StyledInputField';
 import StyledSelect from './StyledSelect';
@@ -14,11 +15,31 @@ import Currency from './Currency';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInput from './StyledInput';
 
-const frequencyOptions = {
-  oneTime: 'One time',
-  month: 'Monthly',
-  year: 'Yearly',
+const FrequenciesI18n = defineMessages({
+  oneTime: {
+    id: 'Frequency.OneTime',
+    defaultMessage: 'One time',
+  },
+  month: {
+    id: 'Frequency.Monthly',
+    defaultMessage: 'Monthly',
+  },
+  year: {
+    id: 'Frequency.Year',
+    defaultMessage: 'Yearly',
+  },
+});
+
+const getOption = (intl, interval) => {
+  return {
+    value: interval,
+    label: intl.formatMessage(FrequenciesI18n[interval]),
+  };
 };
+
+const generateOptions = memoizeOne(intl => {
+  return Object.keys(FrequenciesI18n).map(interval => getOption(intl, interval));
+});
 
 const getChangeFromState = state => ({
   amount: state.amount,
@@ -61,12 +82,13 @@ const ContributeDetails = ({
   customData,
   onChange,
   onCustomFieldsChange,
+  intl,
 }) => {
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
   const dispatchChange = values => onChange(getChangeFromState({ amount, interval, quantity, ...values }));
-
-  interval = interval || Object.keys(frequencyOptions)[0];
+  const intervalOptions = generateOptions(intl);
+  interval = interval || 'oneTime';
 
   return (
     <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap">
@@ -157,18 +179,18 @@ const ContributeDetails = ({
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
           htmlFor="interval"
-          disabled={disabledInterval}
         >
-          {fieldProps => (
+          {({ id }) => (
             <Flex alignItems="center">
               <StyledSelect
-                {...fieldProps}
-                options={frequencyOptions}
-                defaultValue={frequencyOptions[interval]}
-                onChange={({ key }) => dispatchChange({ interval: key })}
-              >
-                {({ value }) => <Container minWidth={100}>{value}</Container>}
-              </StyledSelect>
+                id={id}
+                options={intervalOptions}
+                value={getOption(intl, interval)}
+                onChange={({ value }) => dispatchChange({ interval: value })}
+                isSearchable={false}
+                minWidth={150}
+                disabled={disabledInterval}
+              />
               {interval !== 'oneTime' && (
                 <P color="black.500" ml={3}>
                   <FormattedMessage id="contribution.subscription.first.label" defaultMessage="First charge:" />{' '}
@@ -243,6 +265,7 @@ ContributeDetails.propTypes = {
   /** Enable the customFields inputs */
   customFields: PropTypes.array,
   customData: PropTypes.object,
+  intl: PropTypes.object,
   onCustomFieldsChange: PropTypes.func,
 };
 
@@ -257,4 +280,4 @@ ContributeDetails.defaultProps = {
   quantity: 1,
 };
 
-export default ContributeDetails;
+export default injectIntl(ContributeDetails);
