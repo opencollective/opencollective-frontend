@@ -22,7 +22,7 @@ class Header extends React.Component {
     super(props);
     const { description, image, twitterHandle, title } = props;
     const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
-    const defaultImage = 'https://opencollective.com/static/images/opencollectiveicon-240x240@2x.png';
+    const defaultImage = 'https://opencollective.com/static/images/opencollective-og-default.jpg';
     const meta = {
       'twitter:site': '@opencollect',
       'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
