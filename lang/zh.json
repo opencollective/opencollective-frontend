@@ -1,6 +1,6 @@
 {
-  "action.approveCollective.Error": "{host}",
-  "action.collective.Approved": "{collective}",
+  "action.approveCollective.Error": "Failed to approve collective for {host}",
+  "action.collective.Approved": "Collective {collective} has been approved to be hosted by {host}",
   "action.expense.approved": "Expense approved",
   "action.expense.rejected": "Expense rejected",
   "action.Invalid": "Invalid confirmation link",
