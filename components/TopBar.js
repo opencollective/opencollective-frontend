@@ -60,8 +60,7 @@ class TopBar extends React.Component {
   };
 
   render() {
-    const { className, loadingLoggedInUser, showSearch } = this.props;
-    const shouldAnimate = (Array.isArray(className) && className.includes('loading')) || loadingLoggedInUser;
+    const { showSearch } = this.props;
 
     return (
       <Flex
@@ -74,7 +73,7 @@ class TopBar extends React.Component {
       >
         <Link route="home" passHref>
           <Flex as="a" alignItems="center">
-            <Logo width="24" height="24" animate={shouldAnimate} />
+            <Logo width="24" height="24" />
             <Hide xs>
               <Box mx={2}>
                 <img height="16px" src="/static/images/logotype.svg" />
