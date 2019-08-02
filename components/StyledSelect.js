@@ -33,7 +33,7 @@ const customComponents = { Option };
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
-const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled, isDisabled }) => ({
+const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled, isDisabled, error }) => ({
   isDisabled: disabled || isDisabled,
   placeholder: placeholder || intl.formatMessage(Messages.placeholder),
   loadingMessage: () => intl.formatMessage(Messages.loading),
@@ -43,7 +43,10 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
     control: (baseStyles, state) => {
       const customStyles = { borderColor: theme.colors.black[400] };
 
-      if (!state.isFocused) {
+      if (error) {
+        customStyles.borderColor = theme.colors.red[500];
+        customStyles['&:hover'] = { borderColor: theme.colors.red[300] };
+      } else if (!state.isFocused) {
         customStyles['&:hover'] = { borderColor: theme.colors.primary[300] };
       } else {
         customStyles.borderColor = theme.colors.primary[500];
