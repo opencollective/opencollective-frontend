@@ -96,9 +96,13 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 const NewCreditCardFormWithStripe = injectStripe(NewCreditCardFormWithoutStripe);
 
 const NewCreditCardForm = props => (
-  <Elements>
+  <Elements locale={props.intl.locale || 'en'}>
     <NewCreditCardFormWithStripe {...props} />
   </Elements>
 );
+
+NewCreditCardForm.propTypes = {
+  intl: PropTypes.object,
+};
 
 export default injectIntl(NewCreditCardForm);
