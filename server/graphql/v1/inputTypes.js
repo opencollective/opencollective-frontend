@@ -48,7 +48,7 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     service: { type: GraphQLString },
     type: {
       type: GraphQLString,
-      description: 'creditcard, bitcoin, prepaid, manual',
+      description: 'creditcard, virtualcard, prepaid, manual...',
     },
     customerId: { type: GraphQLString },
     data: { type: GraphQLJSON },
