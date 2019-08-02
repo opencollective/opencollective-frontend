@@ -37,7 +37,7 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
   isDisabled: disabled || isDisabled,
   placeholder: placeholder || intl.formatMessage(Messages.placeholder),
   loadingMessage: () => intl.formatMessage(Messages.loading),
-  noOptionsMessage: () => intl.formatMessage(Messages.loading),
+  noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
   components: customComponents,
   styles: {
     control: (baseStyles, state) => {
