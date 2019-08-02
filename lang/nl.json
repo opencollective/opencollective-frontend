@@ -139,7 +139,7 @@
   "collective.githubHandle.label": "Github",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
   "collective.host.cancelanytime": "Je kan op elk moment annuleren.",
-  "collective.host.disclaimer": "Door bovenaan te klikken laat je toe om ({hostname}) {amount} {interval, select, month {per maand} year {per jaar} other {}} af te staan aan de beheerder ten voordele van {collective}.",
+  "collective.host.disclaimer": "Door bovenaan te klikken beloof je om ({hostname}) {amount} {interval, select, month {per maand} year {per jaar} other {}} af te staan aan de beheerder ten voordele van {collective}.",
   "collective.hostFeePercent.description": "Commissies op alle donaties die worden ontvangen door de collectieven die je beheerd om de administratieve kosten te dekken.",
   "collective.hostFeePercent.label": "Beheerderskosten",
   "collective.image.label": "Avatar",
