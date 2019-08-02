@@ -3,10 +3,15 @@ import PropTypes from 'prop-types';
 import { orderBy, truncate } from 'lodash';
 import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
 import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
-import { FixedSizeList } from 'react-window';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import memoizeOne from 'memoize-one';
 
-import StyledSelect from './DeprecatedStyledSelect';
+import StyledSelect from './StyledSelect';
+
+const CountriesI18n = {
+  fr: countriesFR,
+  en: countriesEN,
+};
 
 class InputTypeCountry extends Component {
   static propTypes = {
@@ -15,8 +20,6 @@ class InputTypeCountry extends Component {
     defaultValue: PropTypes.string,
     /** Use this to control the component state */
     value: PropTypes.string,
-    /** Placeholder */
-    labelBuilder: PropTypes.func,
     /** Switch between display modes */
     mode: PropTypes.oneOf(['select', 'underlined']),
     /** From injectIntl */
@@ -25,109 +28,41 @@ class InputTypeCountry extends Component {
     required: PropTypes.bool,
   };
 
-  static defaultProps = {
-    name: 'country',
-    labelBuilder: ({ code, name }) => `${name} - ${code}`,
-  };
+  static defaultProps = { name: 'country' };
 
-  static sortedCountryCodes = Object.keys(countriesEN).sort();
+  getOptions = memoizeOne(locale => {
+    const countries = CountriesI18n[locale] || CountriesI18n.en;
 
-  state = {
-    error: false,
-    countries: this.prepareCountryList(countriesEN),
-  };
+    const options = Object.keys(countries).map(code => ({
+      value: code,
+      label: `${truncate(countries[code] || countriesEN[code], { length: 30 })} - ${code}`,
+    }));
 
-  componentDidMount() {
-    this.setLocale();
-  }
+    return orderBy(options, 'label');
+  });
 
-  componentDidUpdate(oldProps) {
-    if (this.props.intl.locale !== oldProps.intl.locale) {
-      this.setLocale();
-    }
-  }
-
-  setLocale() {
-    if (this.props.intl.locale === 'fr') {
-      this.setState({ countries: this.prepareCountryList(countriesFR) });
-    } else if (this.state.countries !== countriesEN) {
-      this.setState({ countries: this.prepareCountryList(countriesEN) });
-    }
-  }
-
-  prepareCountry(countries, code) {
-    const name = truncate(countries[code] || countriesEN[code], { length: 30 });
-    return { code, name };
-  }
-
-  prepareCountryList(countries) {
-    const countryList = Object.keys(countries).map(code => this.prepareCountry(countries, code));
-    return orderBy(countryList, 'name');
-  }
-
-  handleChange = ({ value }) => {
-    if (value === null) {
-      this.setState({
-        error: true,
-      });
-    } else {
-      this.setState({
-        error: false,
-      });
-      this.props.onChange(value);
-    }
-  };
-
-  ItemsListRenderer({ StyledListItem, items, selectedItem, highlightedIndex, getItemProps, children }) {
-    return (
-      <FixedSizeList height={150} itemCount={items.length} itemSize={32} width={300}>
-        {({ index, style }) => {
-          const item = items[index];
-          return (
-            <div style={style} key={item.key}>
-              <StyledListItem
-                isSelected={selectedItem && selectedItem.key === item.key}
-                isHighlighted={highlightedIndex === index}
-                {...getItemProps({ index, item })}
-              >
-                {children(item)}
-              </StyledListItem>
-            </div>
-          );
-        }}
-      </FixedSizeList>
-    );
-  }
-
-  getValue(countries, value) {
-    if (value === undefined) {
-      return undefined;
-    }
-
-    return value && this.prepareCountry(countries, value);
-  }
+  getSelectedOption = memoizeOne((locale, country) => {
+    const code = country && country.toUpperCase();
+    const countries = CountriesI18n[locale] || CountriesI18n.en;
+    return {
+      value: code,
+      label: `${truncate(countries[code] || countriesEN[code], { length: 30 })} - ${code}`,
+    };
+  });
 
   render() {
-    const { error, countries } = this.state;
-    const { name, defaultValue, value, mode } = this.props;
-    const defaultCountry = defaultValue && defaultValue.toUpperCase();
-
+    const { defaultValue, value, intl, onChange, ...props } = this.props;
     return (
       <StyledSelect
         name={name}
-        options={countries}
-        keyGetter={({ code }) => code}
-        value={this.getValue(countries, value)}
-        defaultValue={defaultCountry && this.prepareCountry(countries, defaultCountry)}
-        onChange={this.handleChange}
-        error={error}
-        mode={mode}
-        ItemsListRenderer={this.ItemsListRenderer}
+        minWidth={150}
+        options={this.getOptions(intl.locale, defaultValue)}
+        onChange={({ value }) => onChange(value)}
+        value={value ? this.getSelectedOption(intl.locale, value) : undefined}
+        defaultValue={defaultValue ? this.getSelectedOption(intl.locale, defaultValue) : undefined}
         placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
-        required={this.props.required}
-      >
-        {({ value }) => this.props.labelBuilder(value)}
-      </StyledSelect>
+        {...props}
+      />
     );
   }
 }

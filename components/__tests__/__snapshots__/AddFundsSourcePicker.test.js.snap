@@ -7,6 +7,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
 
 <div
   className="c0 css-14jk2my-container"
+  data-cy="select"
   id="sourcePicker"
   onKeyDown={[Function]}
 >
@@ -118,6 +119,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
 
 <div
   className="c0 css-2b097c-container"
+  data-cy="select"
   id="sourcePicker"
   onKeyDown={[Function]}
 >
@@ -229,6 +231,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
 
 <div
   className="c0 css-14jk2my-container"
+  data-cy="select"
   id="sourcePicker"
   onKeyDown={[Function]}
 >
@@ -340,6 +343,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
 
 <div
   className="c0 css-14jk2my-container"
+  data-cy="select"
   id="sourcePicker"
   onKeyDown={[Function]}
 >
