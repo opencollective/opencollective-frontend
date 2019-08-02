@@ -18,7 +18,7 @@ async function checkCharge(charge) {
     return;
   }
 
-  const transaction = await models.Transaction.findOne({
+  let transaction = await models.Transaction.findOne({
     where: { data: { charge: { id: charge.id } } },
     order: [['id', 'DESC']],
     // The JOIN is only here to optimize the query as searching in a JSON for thousands
@@ -37,9 +37,19 @@ async function checkCharge(charge) {
   });
 
   if (!transaction) {
-    console.error(`🚨️ Missing transaction for stripe charge ${charge.id}`);
-  } else {
-    console.log('.');
+    console.warn(
+      `...Did not find any transaction for ${charge.id} matching the customer_id. Starting extensive search...`,
+    );
+
+    // This is an expensive query, we only run it if the above fails
+    transaction = await models.Transaction.findOne({
+      where: { data: { charge: { id: charge.id } } },
+      order: [['id', 'DESC']],
+    });
+
+    if (!transaction) {
+      console.error(`🚨️ Missing transaction for stripe charge ${charge.id}`);
+    }
   }
 }
 
