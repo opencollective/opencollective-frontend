@@ -341,14 +341,24 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <InputTypeCountry {...field} onChange={({ code }) => this.handleChange(code)} />
+                  <InputTypeCountry
+                    name={field.name}
+                    value={field.value}
+                    defaultValue={field.defaultValue}
+                    onChange={this.handleChange}
+                  />
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
                 {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeCountry {...field} onChange={({ code }) => this.handleChange(code)} />
+                <InputTypeCountry
+                  name={field.name}
+                  value={field.value}
+                  defaultValue={field.defaultValue}
+                  onChange={this.handleChange}
+                />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}

@@ -6,7 +6,7 @@ import { creditCard } from '../mocks/payment_methods';
 ### Don't show payment method fees (contribution flow's default)
 
 ```js
-initialState = { countryISO: 'BE' };
+initialState = { countryISO: null };
 <div>
   <ContributionBreakdown
     amount={500000}
@@ -35,7 +35,7 @@ Folowing example is resizable.
 
 ```js
 import { creditCard } from '../mocks/payment_methods';
-initialState = { countryISO: 'FR' };
+initialState = { countryISO: 'BE' };
 <div
   style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', minWidth: '100px', maxWidth: '95%' }}
 >
@@ -48,9 +48,7 @@ initialState = { countryISO: 'FR' };
     collectiveTaxInfo={state}
     onChange={setState}
     applyTaxes
-    userTaxInfo={{
-      countryISO: 'FR',
-    }}
+    userTaxInfo={state}
   />
 </div>;
 ```

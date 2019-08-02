@@ -226,18 +226,19 @@ const ContributionBreakdown = ({
           <AmountLine my={3}>
             <Flex flexDirection="column">
               <Container display="flex" alignItems="center">
-                <Span fontSize="Paragraph" fontWeight="bold" mr={1}>
+                <Span fontSize="Paragraph" fontWeight="bold" mr={2}>
                   <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />
                 </Span>
                 <InputTypeCountry
-                  mode="underlined"
+                  minWidth={250}
+                  maxMenuHeight={100}
+                  onChange={code => dispatchChange({ countryISO: code, number: null })}
                   value={taxInfo.countryISO}
-                  onChange={({ code }) => dispatchChange({ countryISO: code, number: null })}
-                  required
+                  error={!taxInfo.countryISO}
                 />
               </Container>
               {taxInfo.countryISO && (
-                <Box mt={2}>
+                <Box mt={3}>
                   {hasConfirmedTaxID && !formState.isEnabled ? (
                     <Flex>
                       <Span mr={3}>{taxInfo.number}</Span>
@@ -341,7 +342,9 @@ const ContributionBreakdown = ({
                 </Box>
               )}
             </Flex>
-            <Span fontSize="LeadParagraph">{taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}</Span>
+            <Span fontSize="LeadParagraph" pt={2}>
+              {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}
+            </Span>
           </AmountLine>
         </React.Fragment>
       )}

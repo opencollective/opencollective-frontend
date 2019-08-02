@@ -24,26 +24,34 @@ const Option = ({ innerProps, ...props }) => (
   <components.Option {...props} innerProps={{ ...innerProps, 'data-cy': 'select-option' }} />
 );
 
+// eslint-disable-next-line react/prop-types
+const SelectContainer = ({ innerProps, ...props }) => (
+  <components.SelectContainer {...props} innerProps={{ ...innerProps, 'data-cy': 'select' }} />
+);
+
 /**
  * A map to override the default components of reac-select
  */
-const customComponents = { Option };
+const customComponents = { SelectContainer, Option };
 
 /**
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
-const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled, isDisabled }) => ({
+const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled, isDisabled, error }) => ({
   isDisabled: disabled || isDisabled,
   placeholder: placeholder || intl.formatMessage(Messages.placeholder),
   loadingMessage: () => intl.formatMessage(Messages.loading),
-  noOptionsMessage: () => intl.formatMessage(Messages.loading),
+  noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
   components: customComponents,
   styles: {
     control: (baseStyles, state) => {
       const customStyles = { borderColor: theme.colors.black[400] };
 
-      if (!state.isFocused) {
+      if (error) {
+        customStyles.borderColor = theme.colors.red[500];
+        customStyles['&:hover'] = { borderColor: theme.colors.red[300] };
+      } else if (!state.isFocused) {
         customStyles['&:hover'] = { borderColor: theme.colors.primary[300] };
       } else {
         customStyles.borderColor = theme.colors.primary[500];
