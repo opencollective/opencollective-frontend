@@ -58,9 +58,9 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
       if (state.isSelected) {
         customStyles.backgroundColor = state.isFocused ? theme.colors.primary[400] : theme.colors.primary[500];
       } else if (state.isFocused) {
-        customStyles.backgroundColor = theme.colors.primary[50];
+        customStyles.backgroundColor = theme.colors.primary[100];
       } else {
-        customStyles['&:hover'] = { backgroundColor: theme.colors.primary[50] };
+        customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
       }
 
       return { ...baseStyles, ...customStyles };
