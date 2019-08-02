@@ -13,11 +13,33 @@ const NB_CHARGES_PER_QUERY = 100; // Max allowed by Stripe
 const NB_PAGES = NB_CHARGES_TO_CHECK / NB_CHARGES_PER_QUERY;
 
 async function checkCharge(charge) {
-  const nbTransactions = await models.Transaction.count({ where: { data: { charge: { id: charge.id } } } });
-  if (nbTransactions === 0) {
+  if (charge.failure_code) {
+    // Ignore failed transaction
+    return;
+  }
+
+  const transaction = await models.Transaction.findOne({
+    where: { data: { charge: { id: charge.id } } },
+    order: [['id', 'DESC']],
+    // The JOIN is only here to optimize the query as searching in a JSON for thousands
+    // of transaction can be pretty expensive.
+    include: [
+      {
+        model: models.PaymentMethod,
+        as: 'PaymentMethod',
+        required: true,
+        where: {
+          customerId: charge.customer,
+          service: 'stripe',
+        },
+      },
+    ],
+  });
+
+  if (!transaction) {
     console.error(`🚨️ Missing transaction for stripe charge ${charge.id}`);
-  } else if (nbTransactions % 2 !== 0) {
-    console.error(`🚨️ The number of transactions for ${charge.id} is odd: ${nbTransactions}`);
+  } else {
+    console.log('.');
   }
 }
 
