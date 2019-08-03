@@ -1,5 +1,5 @@
 {
-  "action.approveCollective.Error": "Failed to approve collective for {host}",
+  "action.approveCollective.Error": "No se pudo aprobar el colectivo a {host}",
   "action.collective.Approved": "Collective {collective} has been approved to be hosted by {host}",
   "action.expense.approved": "Enviar gasto",
   "action.expense.rejected": "Gasto rechazado",
