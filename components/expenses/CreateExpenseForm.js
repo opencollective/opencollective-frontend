@@ -385,13 +385,13 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage id="expense.amount" defaultMessage="amount" />
+                <FormattedMessage id="expense.amount.dollars" defaultMessage="amount in US dollar" />
               </label>
               <div className="amountDetails">
                 <span className="amount">
                   <InputField
                     defaultValue={expense.amount}
-                    pre={getCurrencySymbol(collective.currency)}
+                    pre={`US${getCurrencySymbol(collective.currency)}`}
                     type="currency"
                     name="amount"
                     className="amountField"
