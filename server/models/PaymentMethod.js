@@ -24,7 +24,7 @@ export default function(Sequelize, DataTypes) {
 
   const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
 
-  const payoutTypes = ['creditcard', 'prepaid', 'payment', 'collective', 'adaptive', 'bitcoin', 'virtualcard'];
+  const payoutTypes = ['creditcard', 'prepaid', 'payment', 'collective', 'adaptive', 'virtualcard'];
 
   const PaymentMethod = Sequelize.define(
     'PaymentMethod',

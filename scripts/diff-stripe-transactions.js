@@ -13,6 +13,7 @@ const NB_CHARGES_PER_QUERY = 100; // Max allowed by Stripe
 const NB_PAGES = NB_CHARGES_TO_CHECK / NB_CHARGES_PER_QUERY;
 
 async function checkCharge(charge) {
+  console.log(charge);
   if (charge.failure_code) {
     // Ignore failed transaction
     return;

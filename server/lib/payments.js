@@ -48,7 +48,7 @@ export function isProvider(fqn, paymentMethod) {
  * @param {models.PaymentMethod} paymentMethod This must point to a row in the
  *  `PaymentMethods` table. That information is retrieved and the
  *  fields `service' & `type' are used to figure out which payment
- *  {service: 'stripe', type: 'bitcoin'}.
+ *  {service: 'stripe', type: 'creditcard'}.
  * @return the payment method's JS module.
  */
 export function findPaymentMethodProvider(paymentMethod) {
