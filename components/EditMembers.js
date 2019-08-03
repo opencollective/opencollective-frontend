@@ -129,9 +129,20 @@ class EditMembers extends React.Component {
   removeMember(index) {
     const members = this.state.members;
     if (index < 0 || index > members.length) return;
-    members.splice(index, 1);
-    this.setState({ members });
-    this.onChange({ members });
+    const member = members[index];
+    const result = this.confirmRemoveMember(member);
+    if (result === true) {
+      members.splice(index, 1);
+      this.setState({ members });
+      this.onChange({ members });
+    }
+  }
+
+  confirmRemoveMember({ member }) {
+    const response = window.confirm(
+      `Do you really want to remove ${member.name} (${member.email}) from the core contributors of the collective?`,
+    );
+    return response;
   }
 
   renderMember(member, index) {
