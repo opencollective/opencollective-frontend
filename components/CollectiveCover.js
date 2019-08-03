@@ -137,6 +137,7 @@ class CollectiveCover extends React.Component {
                   weekday="short"
                   day="numeric"
                   month="long"
+                  year="numeric"
                 />
                 , &nbsp;
                 <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
@@ -201,12 +202,15 @@ ${description}`;
     let cta;
     if (this.props.cta) {
       if (this.props.cta.href) {
-        const label = this.props.cta.label;
-        cta = (
-          <ContributeLink href={this.props.cta.href}>
-            {this.messages[label] ? intl.formatMessage(this.messages[label]) : label}
-          </ContributeLink>
-        );
+        const isDatePassed = Date.now() > Date.parse(this.props.collective.endsAt);
+        if (!isDatePassed) {
+          const label = this.props.cta.label;
+          cta = (
+            <ContributeLink href={this.props.cta.href}>
+              {this.messages[label] ? intl.formatMessage(this.messages[label]) : label}
+            </ContributeLink>
+          );
+        }
       } else {
         cta = this.props.cta;
       }
