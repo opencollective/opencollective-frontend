@@ -129,10 +129,6 @@ class OrderForm extends React.Component {
         id: 'paymentMethod.creditcardOrGiftcard',
         defaultMessage: 'Credit Card / Gift Card',
       },
-      'paymentMethod.bitcoin': {
-        id: 'paymentMethod.bitcoin',
-        defaultMessage: 'bitcoin',
-      },
       'paymentMethod.paypal': {
         id: 'paymentMethod.paypal',
         defaultMessage: 'Paypal',
