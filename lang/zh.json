@@ -687,6 +687,7 @@
   "members.members": "members",
   "members.paid": "backers",
   "members.remove": "remove Core Contributor",
+  "members.remove.confirm": "Do you really want to remove this contributor?",
   "members.role.label": "角色",
   "membership.description": "{role, select, ADMIN {Core Contributor} MEMBER {Contributor} BACKER {Backer}} since {date}",
   "membership.role.host": "host",

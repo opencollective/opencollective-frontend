@@ -687,6 +687,7 @@
   "members.members": "メンバー",
   "members.paid": "支援者",
   "members.remove": "remove Core Contributor",
+  "members.remove.confirm": "Do you really want to remove this contributor?",
   "members.role.label": "役割",
   "membership.description": "{date}から{role, select, ADMIN {コアコントリビューター} MEMBER {コントリビューター} BACKER {バッカー}}",
   "membership.role.host": "ホスト",

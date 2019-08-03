@@ -51,6 +51,10 @@ class EditMembers extends React.Component {
       },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'user.since.label': { id: 'user.since.label', defaultMessage: 'since' },
+      'members.remove.confirm': {
+        id: 'members.remove.confirm',
+        defaultMessage: 'Do you really want to remove this contributor?',
+      },
     });
 
     const getOptions = arr => {
@@ -127,6 +131,11 @@ class EditMembers extends React.Component {
   }
 
   removeMember(index) {
+    const message = this.props.intl.formatMessage(this.messages['members.remove.confirm']);
+    const r = confirm(message);
+    if (!r) {
+      return;
+    }
     const members = this.state.members;
     if (index < 0 || index > members.length) return;
     members.splice(index, 1);
