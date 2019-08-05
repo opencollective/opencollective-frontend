@@ -4,7 +4,7 @@
 amountOptions = [500, 1000, 2000, 5000, 10000];
 initialState = { amount: 500, quantity: 1, totalAmount: 500, interval: null };
 <div>
-  <ContributeDetails onChange={setState} amountOptions={amountOptions} currency="USD" showQuantity {...state} />
+  <StepDetails onChange={setState} amountOptions={amountOptions} currency="USD" showQuantity {...state} />
   <br />
   <hr />
   <div style={{ margin: 24, maxWidth: 300 }}>
@@ -19,7 +19,7 @@ initialState = { amount: 500, quantity: 1, totalAmount: 500, interval: null };
 ```js
 amountOptions = [500, 1000, 2000, 5000, 10000];
 initialState = { amount: 500, quantity: 1, totalAmount: 500, interval: null };
-<ContributeDetails onChange={setState} amountOptions={amountOptions} currency="EUR" {...state} />;
+<StepDetails onChange={setState} amountOptions={amountOptions} currency="EUR" {...state} />;
 ```
 
 ### Set with min amount (`$42`)
@@ -27,14 +27,14 @@ initialState = { amount: 500, quantity: 1, totalAmount: 500, interval: null };
 ```js
 amountOptions = [5000, 10000, 50000, 75000];
 initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
-<ContributeDetails onChange={setState} amountOptions={amountOptions} currency="USD" minAmount={4200} {...state} />;
+<StepDetails onChange={setState} amountOptions={amountOptions} currency="USD" minAmount={4200} {...state} />;
 ```
 
 ### Without presets
 
 ```js
 initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
-<ContributeDetails onChange={setState} currency="USD" {...state} />;
+<StepDetails onChange={setState} currency="USD" {...state} />;
 ```
 
 ### Disabled interval:
@@ -42,12 +42,12 @@ initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
 ```js
 amountOptions = [500, 1000, 2000, 5000, 10000];
 initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
-<ContributeDetails onChange={setState} amountOptions={amountOptions} currency="USD" disabledInterval {...state} />;
+<StepDetails onChange={setState} amountOptions={amountOptions} currency="USD" disabledInterval {...state} />;
 ```
 
 ### Force value (disabledAmount):
 
 ```js
 initialState = { amount: 5000, quantity: 1, totalAmount: 500, interval: null };
-<ContributeDetails onChange={setState} currency="USD" defaultAmount={500} disabledInterval disabledAmount {...state} />;
+<StepDetails onChange={setState} currency="USD" defaultAmount={500} disabledInterval disabledAmount {...state} />;
 ```

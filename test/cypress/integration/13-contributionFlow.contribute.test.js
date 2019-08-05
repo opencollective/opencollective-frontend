@@ -34,7 +34,7 @@ describe('Contribution Flow: Order', () => {
       cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
       cy.contains("Contribute to 'Sponsors' tier");
       cy.contains('button', 'Next').click();
-      cy.location('pathname').should('eq', '/apex/contribute/a-multipart-420-470/checkout/details');
+      cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/details');
     });
   });
 

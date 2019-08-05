@@ -1,6 +1,6 @@
 ```jsx noeditor
 // See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { creditCard } from '../mocks/payment_methods';
+import { creditCard } from '../../mocks/payment_methods';
 ```
 
 ### Don't show payment method fees (contribution flow's default)
@@ -8,7 +8,7 @@ import { creditCard } from '../mocks/payment_methods';
 ```js
 initialState = { countryISO: null };
 <div>
-  <ContributionBreakdown
+  <StepBreakdown
     amount={500000}
     currency="USD"
     hostFeePercent={5}
@@ -34,12 +34,12 @@ initialState = { countryISO: null };
 Folowing example is resizable.
 
 ```js
-import { creditCard } from '../mocks/payment_methods';
+import { creditCard } from '../../mocks/payment_methods';
 initialState = { countryISO: 'BE' };
 <div
   style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', minWidth: '100px', maxWidth: '95%' }}
 >
-  <ContributionBreakdown
+  <StepBreakdown
     quantity={5}
     amount={500000}
     currency="USD"
@@ -56,8 +56,8 @@ initialState = { countryISO: 'BE' };
 ### Without tax
 
 ```js
-import { creditCard } from '../mocks/payment_methods';
-<ContributionBreakdown amount={500000} currency="USD" hostFeePercent={5} paymentMethod={creditCard} />;
+import { creditCard } from '../../mocks/payment_methods';
+<StepBreakdown amount={500000} currency="USD" hostFeePercent={5} paymentMethod={creditCard} />;
 ```
 
 ### Simple version
@@ -65,7 +65,7 @@ import { creditCard } from '../mocks/payment_methods';
 No tax, no host fee, no payment processor fee ☮️
 
 ```js
-<ContributionBreakdown amount={500000} currency="USD" />
+<StepBreakdown amount={500000} currency="USD" />
 ```
 
 ### Paypal
@@ -74,6 +74,6 @@ Paypal fee cannot be guessed in advance, so we prepend a `~` to the amount to sh
 the user that we're not sure about this one.
 
 ```js
-import { paypal } from '../mocks/payment_methods';
-<ContributionBreakdown amount={500000} currency="USD" paymentMethod={paypal} />;
+import { paypal } from '../../mocks/payment_methods';
+<StepBreakdown amount={500000} currency="USD" paymentMethod={paypal} />;
 ```

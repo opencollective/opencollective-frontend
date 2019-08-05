@@ -5,15 +5,15 @@ import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
-import Container from './Container';
-import StyledButtonSet from './StyledButtonSet';
-import StyledInputField from './StyledInputField';
-import StyledSelect from './StyledSelect';
-import { P, Span } from './Text';
-import Currency from './Currency';
-import StyledInputAmount from './StyledInputAmount';
-import StyledInput from './StyledInput';
-import { getNextChargeDate } from '../lib/date-utils';
+import Container from '../Container';
+import StyledButtonSet from '../StyledButtonSet';
+import StyledInputField from '../StyledInputField';
+import StyledSelect from '../StyledSelect';
+import { P, Span } from '../Text';
+import Currency from '../Currency';
+import StyledInputAmount from '../StyledInputAmount';
+import StyledInput from '../StyledInput';
+import { getNextChargeDate } from '../../lib/date-utils';
 
 const FrequenciesI18n = defineMessages({
   oneTime: {
@@ -66,7 +66,7 @@ const buildDisplayMap = options => {
   }, {});
 };
 
-const ContributeDetails = ({
+const StepDetails = ({
   amountOptions,
   currency,
   disabledInterval,
@@ -236,7 +236,7 @@ const ContributeDetails = ({
   );
 };
 
-ContributeDetails.propTypes = {
+StepDetails.propTypes = {
   /**
    * The list of amounts that user can pick directly. If not provided, only the
    * custom input will be shown. Note that the number of items actually displayed
@@ -271,7 +271,7 @@ ContributeDetails.propTypes = {
   onCustomFieldsChange: PropTypes.func,
 };
 
-ContributeDetails.defaultProps = {
+StepDetails.defaultProps = {
   onChange: () => {},
   disabledInterval: false,
   disabledAmount: false,
@@ -282,4 +282,4 @@ ContributeDetails.defaultProps = {
   quantity: 1,
 };
 
-export default injectIntl(ContributeDetails);
+export default injectIntl(StepDetails);

@@ -87,6 +87,7 @@ describe('event.createOrder page', () => {
       cy.contains('.breakdown-line', 'Item price').contains('$10.00');
       cy.contains('.breakdown-line', 'Quantity').contains('8');
       cy.contains('.breakdown-line', 'Your contribution').contains('$80.00');
+      cy.wait(1000);
 
       // Algeria should not have taxes
       cy.contains('[data-cy="select"]', 'Please select your country').click();
