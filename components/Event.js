@@ -256,7 +256,7 @@ class Event extends React.Component {
                   <div className="eventDescription">
                     <Markdown source={event.longDescription || event.description} escapeHtml={false} />
                   </div>
-                  {isEventOver ? null : (
+                  {isEventOver && event.endsAt ? null : (
                     <section id="tickets">
                       <SectionTitle
                         section="tickets"
