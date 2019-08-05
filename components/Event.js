@@ -256,32 +256,33 @@ class Event extends React.Component {
                   <div className="eventDescription">
                     <Markdown source={event.longDescription || event.description} escapeHtml={false} />
                   </div>
+                  {isEventOver ? null : (
+                    <section id="tickets">
+                      <SectionTitle
+                        section="tickets"
+                        action={
+                          LoggedInUser && LoggedInUser.canEditCollective(event)
+                            ? {
+                                label: intl.formatMessage(this.messages['event.tickets.edit']),
+                                href: `${event.path}/edit#tiers`,
+                              }
+                            : null
+                        }
+                      />
 
-                  <section id="tickets">
-                    <SectionTitle
-                      section="tickets"
-                      action={
-                        LoggedInUser && LoggedInUser.canEditCollective(event)
-                          ? {
-                              label: intl.formatMessage(this.messages['event.tickets.edit']),
-                              href: `${event.path}/edit#tiers`,
-                            }
-                          : null
-                      }
-                    />
-
-                    <div className="ticketsGrid">
-                      {event.tiers.map(tier => (
-                        <Tier
-                          key={tier.id}
-                          tier={tier}
-                          values={this.state.tierInfo[tier.id] || {}}
-                          onChange={response => this.updateOrder(response)}
-                          onClick={response => this.handleOrderTier(response)}
-                        />
-                      ))}
-                    </div>
-                  </section>
+                      <div className="ticketsGrid">
+                        {event.tiers.map(tier => (
+                          <Tier
+                            key={tier.id}
+                            tier={tier}
+                            values={this.state.tierInfo[tier.id] || {}}
+                            onChange={response => this.updateOrder(response)}
+                            onClick={response => this.handleOrderTier(response)}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )}
                 </div>
 
                 {get(event, 'location.name') && <Location location={event.location} />}
