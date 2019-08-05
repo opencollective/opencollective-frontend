@@ -687,6 +687,7 @@
   "members.members": "miembros",
   "members.paid": "patrocinadores",
   "members.remove": "remove Core Contributor",
+  "members.remove.confirm": "Do you really want to remove {name} ({email}) from the core contributors of the collective?",
   "members.role.label": "rol",
   "membership.description": "{role, select, ADMIN {Core Contributor} MEMBER {Contributor} BACKER {Backer}} since {date}",
   "membership.role.host": "host",
