@@ -87,13 +87,15 @@ class AddFundsSourcePicker extends React.Component {
 
   render() {
     const { intl, host, data } = this.props;
+    const options = this.getSelectOptions(intl, host, data.PaymentMethod);
 
     return (
       <StyledSelect
         id="sourcePicker"
         isLoading={data.loading}
         disabled={!data.PaymentMethod}
-        options={this.getSelectOptions(intl, host, data.PaymentMethod)}
+        options={options}
+        defaultValue={options[0]}
         onChange={this.onChange}
         maxMenuHeight={200}
       />

@@ -132,9 +132,9 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
       className=" css-1hwfws3"
     >
       <div
-        className=" css-1wa3eu0-placeholder"
+        className=" css-1uccc91-singleValue"
       >
-        No selection
+        Host ()
       </div>
       <div
         className="css-1g6gooi"
