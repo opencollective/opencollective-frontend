@@ -5,7 +5,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 import titleCase from 'title-case';
 
-import { getCurrencySymbol } from '../../lib/utils';
 import categories from '../../lib/constants/categories';
 import expenseTypes from '../../lib/constants/expenseTypes';
 
@@ -385,13 +384,13 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage id="expense.amount.dollars" defaultMessage="amount in US dollar" />
+                <FormattedMessage id="expense.amount" defaultMessage="amount" />
               </label>
               <div className="amountDetails">
                 <span className="amount">
                   <InputField
                     defaultValue={expense.amount}
-                    pre={`US${getCurrencySymbol(collective.currency)}`}
+                    pre={collective.currency}
                     type="currency"
                     name="amount"
                     className="amountField"

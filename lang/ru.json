@@ -483,7 +483,7 @@
   "events.widget.createEvent": "Создать событие",
   "events.widget.noEventScheduled": "Нет событий в расписании.",
   "EventSponsorCard.since": "с {date}",
-  "expense.amount": "сумма",
+  "expense.amount": "amount in US dollar",
   "expense.approve.btn": "одобрить",
   "expense.approved": "одобрено",
   "expense.attachment.description": "Upload receipt or invoice (photo or PDF)",
