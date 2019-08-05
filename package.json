@@ -157,7 +157,7 @@
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "commitizen": "^4.0.3",
     "cross-env": "^5.2.0",
-    "cypress": "^3.4.0",
+    "cypress": "^3.4.1",
     "cz-conventional-changelog": "^3.0.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
