@@ -49,6 +49,19 @@ class Collective extends React.Component {
         defaultMessage:
           'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
       },
+      'collective.approved.description': {
+        id: 'collective.approved.description',
+        defaultMessage: 'Your collective has been approved by your host ({host}).',
+      },
+      'collective.pending': {
+        id: 'collective.pending',
+        defaultMessage: 'Your collective is pending approval.',
+      },
+      'collective.pending.description': {
+        id: 'collective.pending.description',
+        defaultMessage:
+          'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
+      },
       'collective.isArchived': {
         id: 'collective.isArchived',
         defaultMessage: '{name} has been archived.',
@@ -142,15 +155,26 @@ class Collective extends React.Component {
     const notification = {};
     if (status === 'collectiveCreated') {
       notification.title = intl.formatMessage(this.messages['collective.created']);
-      notification.description = intl.formatMessage(this.messages['collective.created.description'], {
-        host: collective.host.name,
-      });
+      if (collective.isApproved) {
+        notification.description = intl.formatMessage(this.messages['collective.approved.description'], {
+          host: collective.host.name,
+        });
+      } else {
+        notification.description = intl.formatMessage(this.messages['collective.pending.description'], {
+          host: collective.host.name,
+        });
+      }
     } else if (status === 'collectiveArchived' || collective.isArchived) {
       notification.title = intl.formatMessage(this.messages['collective.isArchived'], {
         name: collective.name,
       });
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
+    } else if (!collective.isApproved && collective.host) {
+      notification.title = intl.formatMessage(this.messages['collective.pending']);
+      notification.description = intl.formatMessage(this.messages['collective.pending.description'], {
+        host: collective.host.name,
+      });
     }
 
     const contributorsStats = { ...get(collective, 'stats.backers') };
