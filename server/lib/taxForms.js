@@ -1,5 +1,9 @@
-import models from '../models';
+import config from 'config';
 import { uniqBy } from 'lodash';
+import models from '../models';
+import logger from './logger';
+import { isEmailInternal } from './utils';
+
 const { RequiredLegalDocument, LegalDocument, Collective, User } = models;
 const {
   documentType: { US_TAX_FORM },
@@ -64,31 +68,37 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
     };
 
     const userCollective = await user.getCollective();
-
-    return client.workflowInstances
-      .createInstance({
-        callbackUrl,
-        workflowId,
-        documentDelivery: true,
-        participants,
-        metadata: {
-          email: user.email,
-          year,
-        },
-      })
-      .then(() =>
-        LegalDocument.findOrCreate({ where: { documentType: US_TAX_FORM, year, CollectiveId: userCollective.id } }),
-      )
-      .then(([doc]) => {
-        doc.requestStatus = LegalDocument.requestStatus.REQUESTED;
+    const saveDocumentStatus = status => {
+      return LegalDocument.findOrCreate({
+        where: { documentType: US_TAX_FORM, year, CollectiveId: userCollective.id },
+      }).then(([doc]) => {
+        doc.requestStatus = status;
         return doc.save();
-      })
-      .catch(async () => {
-        const [doc] = await LegalDocument.findOrCreate({
-          where: { documentType: US_TAX_FORM, year, CollectiveId: userCollective.id },
-        });
-        doc.requestStatus = LegalDocument.requestStatus.ERROR;
-        await doc.save();
       });
+    };
+
+    try {
+      // Don't send emails on dev/staging environments to ensure we never trigger a notification
+      // from HelloWorks for users when we shouldn't.
+      if (config.env === 'production' || isEmailInternal(user.email)) {
+        await client.workflowInstances.createInstance({
+          callbackUrl,
+          workflowId,
+          documentDelivery: true,
+          participants,
+          metadata: {
+            email: user.email,
+            year,
+          },
+        });
+      } else {
+        logger.info(`${user.email} is an external email address, skipping HelloWorks in development environment`);
+      }
+
+      return saveDocumentStatus(LegalDocument.requestStatus.REQUESTED);
+    } catch (error) {
+      logger.error(`Failed to initialize tax form`, user, error);
+      return saveDocumentStatus(LegalDocument.requestStatus.ERROR);
+    }
   };
 }
