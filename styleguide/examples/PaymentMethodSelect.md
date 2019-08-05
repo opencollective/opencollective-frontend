@@ -48,5 +48,6 @@
       expiryDate: 'Sun Mar 03 2019 13:10:53 GMT+0100 (Central European Standard Time)',
     },
   ]}
+  onChange={console.log}
 />
 ```
