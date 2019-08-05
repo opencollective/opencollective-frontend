@@ -53,7 +53,7 @@ class EditMembers extends React.Component {
       'user.since.label': { id: 'user.since.label', defaultMessage: 'since' },
       'members.remove.confirm': {
         id: 'members.remove.confirm',
-        defaultMessage: `Do you really want to remove {nam1e} ({email}) from the core contributors of the collective?`,
+        defaultMessage: `Do you really want to remove {name} ({email}) from the core contributors of the collective?`,
       },
     });
 
