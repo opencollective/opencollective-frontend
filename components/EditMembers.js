@@ -51,13 +51,9 @@ class EditMembers extends React.Component {
       },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'user.since.label': { id: 'user.since.label', defaultMessage: 'since' },
-      'members.remove.confirm.messageBegin': {
-        id: 'members.remove.confirm.messageBegin',
-        defaultMessage: 'Do you really want to remove',
-      },
-      'members.remove.confirm.messageEnd': {
-        id: 'members.remove.confirm.messageEnd',
-        defaultMessage: 'from the core contributors of the collective?',
+      'members.remove.confirm': {
+        id: 'members.remove.confirm',
+        defaultMessage: `Do you really want to remove {nam1e} ({email}) from the core contributors of the collective?`,
       },
     });
 
@@ -147,10 +143,11 @@ class EditMembers extends React.Component {
   }
 
   confirmRemoveMember({ member }) {
-    const messageBegin = this.props.intl.formatMessage(this.messages['members.remove.confirm.messageBegin']);
-    const messageEnd = this.props.intl.formatMessage(this.messages['members.remove.confirm.messageEnd']);
-    const message = `${messageBegin} ${member.name} (${member.email}) ${messageEnd}`;
-    const response = window.confirm(message);
+    const confirmMessage = this.props.intl.formatMessage(this.messages['members.remove.confirm'], {
+      name: member.name,
+      email: member.email,
+    });
+    const response = window.confirm(confirmMessage);
     return response;
   }
 
