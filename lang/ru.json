@@ -687,6 +687,7 @@
   "members.members": "члены",
   "members.paid": "попечители",
   "members.remove": "remove Core Contributor",
+  "members.remove.confirm": "Do you really want to remove {name} ({email}) from the core contributors of the collective?",
   "members.role.label": "роль",
   "membership.description": "{role, select, ADMIN {Core Contributor} MEMBER {Contributor} BACKER {Backer}} с {date}",
   "membership.role.host": "представитель",

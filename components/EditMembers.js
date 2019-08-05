@@ -51,6 +51,10 @@ class EditMembers extends React.Component {
       },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'user.since.label': { id: 'user.since.label', defaultMessage: 'since' },
+      'members.remove.confirm': {
+        id: 'members.remove.confirm',
+        defaultMessage: `Do you really want to remove {name} ({email}) from the core contributors of the collective?`,
+      },
     });
 
     const getOptions = arr => {
@@ -129,9 +133,22 @@ class EditMembers extends React.Component {
   removeMember(index) {
     const members = this.state.members;
     if (index < 0 || index > members.length) return;
-    members.splice(index, 1);
-    this.setState({ members });
-    this.onChange({ members });
+    const member = members[index];
+    const result = this.confirmRemoveMember(member);
+    if (result === true) {
+      members.splice(index, 1);
+      this.setState({ members });
+      this.onChange({ members });
+    }
+  }
+
+  confirmRemoveMember({ member }) {
+    const confirmMessage = this.props.intl.formatMessage(this.messages['members.remove.confirm'], {
+      name: member.name,
+      email: member.email,
+    });
+    const response = window.confirm(confirmMessage);
+    return response;
   }
 
   renderMember(member, index) {
