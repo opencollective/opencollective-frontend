@@ -35,6 +35,7 @@ class AddFundsForm extends React.Component {
       form: {
         totalAmount: 0,
         hostFeePercent: get(props, 'collective.hostFeePercent'),
+        platformFeePercent: 0,
       },
       result: {},
     };
@@ -134,6 +135,7 @@ class AddFundsForm extends React.Component {
       {
         name: 'hostFeePercent',
         when: () => !this.isAddFundsToOrg,
+        defaultValue: props.collective.hostFeePercent,
         type: 'number',
         post: '%',
       },
@@ -182,13 +184,14 @@ class AddFundsForm extends React.Component {
     const { host } = this.props;
 
     const newState = { ...this.state };
+
     if (value !== undefined) {
       newState[obj][attr] = value;
     } else {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
 
-    if (attr === 'FromCollectiveId') {
+    if (attr === 'FromCollectiveId' && value !== 'other') {
       value = Number(value);
       if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
@@ -198,7 +201,6 @@ class AddFundsForm extends React.Component {
            receiving funds and the right host must be pulled from
            GraphQL when the user chooses an option in the combo. */
         newState[obj].hostFeePercent = await this.retrieveHostFeePercent(value);
-        newState[obj].platformFeePercent = 5;
       }
     }
 
@@ -365,7 +367,7 @@ class AddFundsForm extends React.Component {
                               <td className="amount">{hostFeeAmount}</td>
                             </tr>
                           )}
-                          {platformFeePercent > 0 && !this.isAddFundsToOrg && (
+                          {!this.isAddFundsToOrg && (
                             <tr>
                               <td>
                                 <FormattedMessage
