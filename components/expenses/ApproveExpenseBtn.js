@@ -9,6 +9,7 @@ import SmallButton from '../SmallButton';
 class ApproveExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
+    approveExpense: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -48,9 +49,5 @@ const addMutation = graphql(approveExpenseQuery, {
     },
   }),
 });
-
-ApproveExpenseBtn.propTypes = {
-  approveExpense: PropTypes.bool,
-};
 
 export default addMutation(ApproveExpenseBtn);

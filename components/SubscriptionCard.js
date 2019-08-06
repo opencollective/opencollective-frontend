@@ -540,7 +540,6 @@ class SubscriptionCard extends React.Component {
 
           {(this.state.visibleState === this.stateConstants.normal ||
             this.state.visibleState === this.stateConstants.editPaymentMethod) &&
-            subscription.paymentMethod &&
             canEditSubscription && (
               <div className="paymentMethod">
                 <PaymentMethodChooser
@@ -626,10 +625,13 @@ const updateSubscriptionQuery = gql`
       paymentMethod {
         id
         uuid
+        currency
+        name
         service
         type
         data
-        name
+        balance
+        expiryDate
       }
     }
   }

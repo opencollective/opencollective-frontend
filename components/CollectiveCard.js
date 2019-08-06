@@ -94,7 +94,7 @@ class CollectiveCard extends React.Component {
                 position: relative;
                 box-sizing: border-box;
                 width: 215px;
-                height: 380px;
+                min-height: 380px;
                 border-radius: 15px;
                 background-color: #ffffff;
                 box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);

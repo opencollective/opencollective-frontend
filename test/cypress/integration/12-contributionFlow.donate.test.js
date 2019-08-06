@@ -34,14 +34,14 @@ describe('Contribution Flow: Donate', () => {
 
       // Change frequency - monthly
       cy.get('#interval').click();
-      cy.contains('li', 'Monthly').click();
+      cy.contains('[data-cy="select-option"]', 'Monthly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per month');
       cy.contains('Next charge: Jun 1, 2042');
 
       // Change frequency - yearly
       cy.get('#interval').click();
-      cy.contains('li', 'Yearly').click();
+      cy.contains('[data-cy="select-option"]', 'Yearly').click();
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$1,337.00 per year');
       cy.contains('Next charge: May 1, 2043');
@@ -124,8 +124,8 @@ describe('Contribution Flow: Donate', () => {
       cy.fillStripeInput();
       cy.contains('Next step').click();
 
-      // Should display the tier details
-      cy.contains('Tier details:');
+      // Should display the contribution details
+      cy.contains('Contribution details:');
       cy.contains('You’ll contribute with the amount of $42.00 yearly.');
       cy.contains('First charge: Today');
       cy.contains('Next charge: May 1, 2043');

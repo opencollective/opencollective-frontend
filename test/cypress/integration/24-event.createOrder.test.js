@@ -59,87 +59,100 @@ describe('event.createOrder page', () => {
   });
 
   it('makes an order for tickets with VAT', () => {
-    cy.signup({ redirect: '/brusselstogether/events/meetup-2/order/2' });
-    cy.contains('button', 'Next step').click();
-    cy.get('input[type=number][name=quantity]').type('{selectall}8');
-    cy.contains('button', 'Next step').click();
-    cy.useAnyPaymentMethod();
-    cy.contains('button', 'Next step').click();
+    cy.login();
+    cy.createHostedCollective().then(({ slug }) => {
+      // Activate VAT for collective
+      cy.visit(`${slug}/edit`);
+      cy.contains('[data-cy="select"]', 'Please select your country').click();
+      cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
+      cy.get('select[name="VAT"]').select('OWN');
+      cy.contains('button', 'save').click();
 
-    // Check step summary
-    cy.contains('.breakdown-line', 'Item price').contains('€10.00');
-    cy.contains('.breakdown-line', 'Quantity').contains('8');
-    cy.contains('.breakdown-line', 'Your contribution').contains('€80.00');
+      // Create event
+      cy.visit(`${slug}/events/new`);
+      cy.get('.inputs input[name="name"]').type('Test Event with VAT');
+      cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');
+      cy.get('.EditTiers input[name="amount"]').type('10');
+      cy.contains('button', 'Create Event').click();
 
-    // Algeria should not have taxes
-    cy.wait(500);
-    cy.get('div[name=country]').click();
-    cy.wait(250);
-    cy.contains('ul[role=listbox] li', 'Algeria').click();
-    cy.contains('.breakdown-line', 'VAT').contains('+ €0.00');
-    cy.contains('.breakdown-line', 'TOTAL').contains('€80.00');
-    cy.contains('button', 'Make contribution').should('not.be.disabled');
+      // Go to the contribution flow
+      cy.contains('button', 'get ticket').click();
+      cy.contains('button', 'Next step').click();
+      cy.get('input[type=number][name=quantity]').type('{selectall}8');
+      cy.contains('button', 'Next step').click();
+      cy.useAnyPaymentMethod();
+      cy.contains('button', 'Next step').click();
 
-    // French should have taxes
-    cy.get('div[name=country]').click();
-    cy.wait(250);
-    cy.get('ul[role=listbox] > div').scrollTo(0, 2250);
-    cy.contains('ul[role=listbox] li', 'France - FR').click();
-    cy.contains('.breakdown-line', 'VAT').contains('+ €16.80');
-    cy.contains('.breakdown-line', 'TOTAL').contains('€96.80');
-    cy.contains('button', 'Make contribution').should('not.be.disabled');
+      // Check step summary
+      cy.contains('.breakdown-line', 'Item price').contains('$10.00');
+      cy.contains('.breakdown-line', 'Quantity').contains('8');
+      cy.contains('.breakdown-line', 'Your contribution').contains('$80.00');
+      cy.wait(1000);
 
-    // ...except if they can provide a valid VAT number
-    cy.contains('div', 'Enter VAT number (if you have one)').click();
+      // Algeria should not have taxes
+      cy.contains('[data-cy="select"]', 'Please select your country').click();
+      cy.contains('[data-cy="select-option"]', 'Algeria').click();
+      cy.contains('.breakdown-line', 'VAT').contains('+ $0.00');
+      cy.contains('.breakdown-line', 'TOTAL').contains('$80.00');
+      cy.contains('button', 'Make contribution').should('not.be.disabled');
 
-    // Submit is disabled while form is active
-    cy.contains('button', 'Make contribution').should('be.disabled');
-    cy.get('.cf-tax-form .close').click();
-    cy.contains('button', 'Make contribution').should('not.be.disabled');
+      // French should have taxes
+      cy.get('[data-cy="select"]').click();
+      cy.contains('[data-cy="select-option"]', 'France - FR').click();
+      cy.contains('.breakdown-line', 'VAT').contains('+ $16.80');
+      cy.contains('.breakdown-line', 'TOTAL').contains('$96.80');
+      cy.contains('button', 'Make contribution').should('not.be.disabled');
 
-    // Must provide a valid VAT number
-    cy.contains('div', 'Enter VAT number (if you have one)').click();
-    cy.contains('.cf-tax-form button', 'Done').should('be.disabled');
-    cy.get('input[name=taxIndentificationNumber]').type('424242');
-    cy.contains('.cf-tax-form button', 'Done').click();
-    cy.contains('Invalid VAT number');
-    cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX999999999');
-    cy.contains('.cf-tax-form button', 'Done').click();
+      // ...except if they can provide a valid VAT number
+      cy.contains('div', 'Enter VAT number (if you have one)').click();
 
-    // Values should be updated
-    cy.contains('button', 'Make contribution').should('not.be.disabled');
-    cy.contains('FRXX999999999'); // Number is properly formatted
-    cy.contains('.breakdown-line', 'VAT').contains('+ €0.00');
-    cy.contains('.breakdown-line', 'TOTAL').contains('€80.00');
+      // Submit is disabled while form is active
+      cy.contains('button', 'Make contribution').should('be.disabled');
+      cy.get('.cf-tax-form .close').click();
+      cy.contains('button', 'Make contribution').should('not.be.disabled');
 
-    // User can update the number
-    cy.contains('div', 'Change VAT number').click();
-    cy.get('input[name=taxIndentificationNumber]').should('have.value', 'FRXX999999999');
-    cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX-999999998');
-    cy.contains('.cf-tax-form button', 'Done').click();
-    cy.contains('FRXX999999998'); // Number is properly formatted
+      // Must provide a valid VAT number
+      cy.contains('div', 'Enter VAT number (if you have one)').click();
+      cy.contains('.cf-tax-form button', 'Done').should('be.disabled');
+      cy.get('input[name=taxIndentificationNumber]').type('424242');
+      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.contains('Invalid VAT number');
+      cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX999999999');
+      cy.contains('.cf-tax-form button', 'Done').click();
 
-    // However if it's the same country than the collective than VAT should still apply,
-    // even if the contributor is an organization
-    cy.get('div[name=country]').click();
-    cy.wait(250);
-    cy.get('ul[role=listbox] > div').scrollTo(0, 500);
-    cy.contains('ul[role=listbox] li', 'Belgium - BE').click();
-    cy.contains('.breakdown-line', 'VAT').contains('+ €16.80');
-    cy.contains('.breakdown-line', 'TOTAL').contains('€96.80');
-    cy.contains('div', 'Enter VAT number (if you have one)').click();
-    cy.get('input[name=taxIndentificationNumber]').type('FRXX999999998');
-    cy.contains('.cf-tax-form button', 'Done').click();
-    // Tried to use a french VAT number with Belgium
-    cy.contains("The VAT number doesn't match the country");
-    cy.get('input[name=taxIndentificationNumber]').type('{selectall}BE-0414445663');
-    cy.contains('.cf-tax-form button', 'Done').click();
-    cy.contains('BE0414445663'); // Number is properly formatted
-    cy.contains('.breakdown-line', 'VAT').contains('+ €16.80');
-    cy.contains('.breakdown-line', 'TOTAL').contains('€96.80');
+      // Values should be updated
+      cy.contains('button', 'Make contribution').should('not.be.disabled');
+      cy.contains('FRXX999999999'); // Number is properly formatted
+      cy.contains('.breakdown-line', 'VAT').contains('+ $0.00');
+      cy.contains('.breakdown-line', 'TOTAL').contains('$80.00');
 
-    // Let's submit this order!
-    cy.contains('button', 'Make contribution').click();
-    cy.contains("You've registered for the event BrusselsTogether Meetup 2 (donate)");
+      // User can update the number
+      cy.contains('div', 'Change VAT number').click();
+      cy.get('input[name=taxIndentificationNumber]').should('have.value', 'FRXX999999999');
+      cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX-999999998');
+      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.contains('FRXX999999998'); // Number is properly formatted
+
+      // However if it's the same country than the collective than VAT should still apply,
+      // even if the contributor is an organization
+      cy.get('[data-cy="select"]').click();
+      cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
+      cy.contains('.breakdown-line', 'VAT').contains('+ $16.80');
+      cy.contains('.breakdown-line', 'TOTAL').contains('$96.80');
+      cy.contains('div', 'Enter VAT number (if you have one)').click();
+      cy.get('input[name=taxIndentificationNumber]').type('FRXX999999998');
+      cy.contains('.cf-tax-form button', 'Done').click();
+      // Tried to use a french VAT number with Belgium
+      cy.contains("The VAT number doesn't match the country");
+      cy.get('input[name=taxIndentificationNumber]').type('{selectall}BE-0414445663');
+      cy.contains('.cf-tax-form button', 'Done').click();
+      cy.contains('BE0414445663'); // Number is properly formatted
+      cy.contains('.breakdown-line', 'VAT').contains('+ $16.80');
+      cy.contains('.breakdown-line', 'TOTAL').contains('$96.80');
+
+      // Let's submit this order!
+      cy.contains('button', 'Make contribution').click();
+      cy.contains('Test User Admin has registered for the event Test Event with VAT (Ticket with VAT)');
+    });
   });
 });

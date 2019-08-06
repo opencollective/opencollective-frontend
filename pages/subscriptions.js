@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -17,7 +18,7 @@ class SubscriptionsPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string,
-    LoggedInUser: PropTypes.func.isRequired, // from withLoggedInUser
+    LoggedInUser: PropTypes.object, // from withLoggedInUser
   };
 
   render() {
@@ -25,7 +26,7 @@ class SubscriptionsPage extends React.Component {
     return (
       <div className="SubscriptionsPage">
         <Header
-          title={'Subscriptions'}
+          title={'Recurring financial contributions'}
           description="All the collectives that you are giving money to"
           LoggedInUser={LoggedInUser}
         />
@@ -69,8 +70,11 @@ class SubscriptionsPage extends React.Component {
             <div className="content">
               <div className="Subscriptions-header">
                 <div className="Subscriptions-title">
-                  {slug}
-                  &apos;s subscriptions
+                  <FormattedMessage
+                    id="Subscriptions.Title"
+                    defaultMessage="{collectiveName}'s recurring financial contributions"
+                    values={{ collectiveName: slug }}
+                  />
                 </div>
               </div>
 

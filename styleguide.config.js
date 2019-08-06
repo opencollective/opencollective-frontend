@@ -36,13 +36,18 @@ module.exports = {
       ignore: ['components/Contribute*.js', 'components/Styled*.js', 'components/collective-page/*.js'],
     },
     {
+      name: 'FAQs',
+      components: 'components/faqs/*.js',
+      description: 'FAQs.',
+    },
+    {
       name: 'Collective Page',
       components: 'components/collective-page/*.js',
       description: 'These components are used on the donate/contribute flow.',
     },
     {
       name: 'Contribution Flow',
-      components: 'components/Contribute*.js',
+      components: 'components/contribution-flow/*.js',
       description: 'These components are used on the donate/contribute flow.',
     },
     {

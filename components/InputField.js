@@ -341,14 +341,24 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <InputTypeCountry {...field} onChange={({ code }) => this.handleChange(code)} />
+                  <InputTypeCountry
+                    name={field.name}
+                    value={field.value}
+                    defaultValue={field.defaultValue}
+                    onChange={this.handleChange}
+                  />
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
                 {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeCountry {...field} onChange={({ code }) => this.handleChange(code)} />
+                <InputTypeCountry
+                  name={field.name}
+                  value={field.value}
+                  defaultValue={field.defaultValue}
+                  onChange={this.handleChange}
+                />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
               </div>
             )}
@@ -419,12 +429,14 @@ class InputField extends React.Component {
         break;
 
       case 'select': {
-        const firstOptionValue =
-          field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
-        if (field.options.length <= 1) {
-          console.warn('>>> InputField: options.length needs to be > 1', field.options);
+        if (!field.options || field.options.length === 0) {
+          console.warn('>>> InputField: options.length needs to be >= 1', field.options);
           return null;
         }
+
+        const firstOptionValue =
+          field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
+
         this.input = (
           <FieldGroup
             key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes

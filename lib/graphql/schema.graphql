@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Thu Jul 25 2019 12:22:34 GMT+0200 (GMT+02:00)
+# timestamp: Fri Aug 01 2019 14:13:16 GMT+1200 (New Zealand Standard Time)
 
 """
 Application model
@@ -1066,6 +1066,7 @@ input ExpenseInputType {
   description: String
   category: String
   status: String
+  type: String
 
   """
   Can be paypal, donation, manual, other
@@ -1128,6 +1129,7 @@ type ExpenseType {
   description: String
   category: String
   status: String
+  type: String
   payoutMethod: String
   privateMessage: String
   attachment: String
@@ -2134,7 +2136,7 @@ input PaymentMethodInputType {
   service: String
 
   """
-  creditcard, bitcoin, prepaid, manual
+  creditcard, virtualcard, prepaid, manual...
   """
   type: String
   customerId: String

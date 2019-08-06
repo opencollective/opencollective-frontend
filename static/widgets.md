@@ -60,18 +60,15 @@ Example:
 
 <script src="https://opencollective.com/brusselstogether/events.js" width="500"></script>
 
-## For backers and sponsors
+## For backers, sponsors and core contributors
 
-To show the list of collectives that you are backing on your website, just add this script:
+To show the list of collectives that you are backing or managing on your website, just add this script:
 
-    <script src="https://opencollective.com/:username/collectives.js?role=backer"></script>
+    <script src="https://opencollective.com/:username/collectives.js"></script>
 
-You can replace `backer` by `admin` (core contributor), `member` (contributor) or `host`.
-Leave it empty or remove it to show all the collectives that you are a member of irrespective of the role.
+E.g. https://opencollective.com/opencollective/collectives.js
 
-E.g. http://polycode.co.uk
-
-![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
+<script src="https://opencollective.com/opencollective/collectives.js"></script>
 
 ## Feedback
 

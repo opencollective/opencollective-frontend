@@ -8,19 +8,19 @@ import { checkVATNumberFormat, getVatPercentage, getVatOriginCountry } from '@op
 
 import { Close } from 'styled-icons/material/Close';
 
-import tiersTypes from '../lib/constants/tiers-types';
-import { propTypeCountry } from '../lib/custom-prop-types';
-import { formatCurrency, capitalize } from '../lib/utils';
-import getPaymentMethodFees from '../lib/fees';
-import fetchGeoLocation from '../lib/geolocation_api';
-import StyledCard from './StyledCard';
-import { Span } from './Text';
-import StyledHr from './StyledHr';
-import ExternalLinkNewTab from './ExternalLinkNewTab';
-import InputTypeCountry from './InputTypeCountry';
-import Container from './Container';
-import StyledButton from './StyledButton';
-import StyledInput from './StyledInput';
+import tiersTypes from '../../lib/constants/tiers-types';
+import { propTypeCountry } from '../../lib/custom-prop-types';
+import { formatCurrency, capitalize } from '../../lib/utils';
+import getPaymentMethodFees from '../../lib/fees';
+import fetchGeoLocation from '../../lib/geolocation_api';
+import StyledCard from '../StyledCard';
+import { Span } from '../Text';
+import StyledHr from '../StyledHr';
+import ExternalLinkNewTab from '../ExternalLinkNewTab';
+import InputTypeCountry from '../InputTypeCountry';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import StyledInput from '../StyledInput';
 
 const AmountLine = styled(Flex)``;
 AmountLine.defaultProps = {
@@ -137,7 +137,7 @@ const getTaxPerentageForProfile = (tierType, hostCountry, collectiveCountry, pro
 /**
  * Breakdowns a total amount to show the user where the money goes.
  */
-const ContributionBreakdown = ({
+const StepBreakdown = ({
   amount,
   quantity,
   currency,
@@ -226,18 +226,19 @@ const ContributionBreakdown = ({
           <AmountLine my={3}>
             <Flex flexDirection="column">
               <Container display="flex" alignItems="center">
-                <Span fontSize="Paragraph" fontWeight="bold" mr={1}>
+                <Span fontSize="Paragraph" fontWeight="bold" mr={2}>
                   <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />
                 </Span>
                 <InputTypeCountry
-                  mode="underlined"
+                  minWidth={250}
+                  maxMenuHeight={100}
+                  onChange={code => dispatchChange({ countryISO: code, number: null })}
                   value={taxInfo.countryISO}
-                  onChange={({ code }) => dispatchChange({ countryISO: code, number: null })}
-                  required
+                  error={!taxInfo.countryISO}
                 />
               </Container>
               {taxInfo.countryISO && (
-                <Box mt={2}>
+                <Box mt={3}>
                   {hasConfirmedTaxID && !formState.isEnabled ? (
                     <Flex>
                       <Span mr={3}>{taxInfo.number}</Span>
@@ -341,7 +342,9 @@ const ContributionBreakdown = ({
                 </Box>
               )}
             </Flex>
-            <Span fontSize="LeadParagraph">{taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}</Span>
+            <Span fontSize="LeadParagraph" pt={2}>
+              {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}
+            </Span>
           </AmountLine>
         </React.Fragment>
       )}
@@ -358,7 +361,7 @@ const ContributionBreakdown = ({
   );
 };
 
-ContributionBreakdown.propTypes = {
+StepBreakdown.propTypes = {
   /** The total amount without tax in cents */
   amount: PropTypes.number.isRequired,
   /** The currency used for the transaction */
@@ -403,10 +406,10 @@ ContributionBreakdown.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-ContributionBreakdown.defaultProps = {
+StepBreakdown.defaultProps = {
   platformFeePercent: 5,
   hostFeePercent: 0,
   showFees: true,
 };
 
-export default ContributionBreakdown;
+export default StepBreakdown;

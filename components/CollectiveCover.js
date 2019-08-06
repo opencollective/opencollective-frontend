@@ -18,6 +18,8 @@ import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
 import UserCompany from './UserCompany';
+import CollectiveNavbar from './CollectiveNavbar';
+import Container from './Container';
 
 const ContributeLink = styled(Link)`
   --webkit-appearance: none;
@@ -41,7 +43,43 @@ const ContributeLink = styled(Link)`
 
 class CollectiveCover extends React.Component {
   static propTypes = {
-    collective: PropTypes.object.isRequired,
+    collective: PropTypes.shape({
+      id: PropTypes.number,
+      type: PropTypes.string,
+      path: PropTypes.string,
+      slug: PropTypes.string,
+      name: PropTypes.string,
+      currency: PropTypes.string,
+      backgroundImage: PropTypes.string,
+      isHost: PropTypes.bool,
+      isActive: PropTypes.bool,
+      isArchived: PropTypes.bool,
+      startsAt: PropTypes.string,
+      endsAt: PropTypes.string,
+      timezone: PropTypes.string,
+      company: PropTypes.string,
+      website: PropTypes.string,
+      twitterHandle: PropTypes.string,
+      githubHandle: PropTypes.string,
+      description: PropTypes.string,
+      stats: PropTypes.shape({
+        totalAmountSpent: PropTypes.number,
+        totalAmountRaised: PropTypes.number,
+      }),
+      host: PropTypes.shape({
+        slug: PropTypes.string,
+        name: PropTypes.string,
+      }),
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string,
+        name: PropTypes.string,
+      }),
+    }).isRequired,
+    /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
+    callsToAction: PropTypes.shape({
+      hasContact: PropTypes.bool,
+      hasSubmitExpense: PropTypes.bool,
+    }).isRequired,
     href: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
@@ -129,8 +167,22 @@ ${description}`;
 
   render() {
     const { collective, context, className, LoggedInUser, intl } = this.props;
-
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const useNewCollectiveNavbar = get(collective, 'settings.collectivePage.useV2', false);
+
+    if (useNewCollectiveNavbar) {
+      return (
+        <Container borderTop="1px solid #E6E8EB" mb={4}>
+          <CollectiveNavbar
+            collective={collective}
+            isAdmin={canEdit}
+            callsToAction={this.props.callsToAction}
+            showEdit
+          />
+        </Container>
+      );
+    }
 
     const href = this.props.href || collective.path || `/${collective.slug}`;
     const title = this.props.title || collective.name;
@@ -408,22 +460,19 @@ ${description}`;
                         </label>
                       </div>
                     )}
-                    {collective.host &&
-                      !collective.isActive &&
-                      LoggedInUser &&
-                      LoggedInUser.canEditCollective(collective) && (
-                        <div className="host">
-                          <label>
-                            <FormattedMessage
-                              id="collective.cover.pendingApprovalFrom"
-                              defaultMessage="Pending approval from {host}"
-                              values={{
-                                host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
-                              }}
-                            />
-                          </label>
-                        </div>
-                      )}
+                    {collective.host && !collective.isActive && canEdit && (
+                      <div className="host">
+                        <label>
+                          <FormattedMessage
+                            id="collective.cover.pendingApprovalFrom"
+                            defaultMessage="Pending approval from {host}"
+                            values={{
+                              host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                            }}
+                          />
+                        </label>
+                      </div>
+                    )}
                     {twitterHandle && (
                       <div className="twitterHandle">
                         <a href={`https://twitter.com/${twitterHandle}`} target="_blank" rel="noopener noreferrer">

@@ -9,23 +9,23 @@ import { uniqBy, get } from 'lodash';
 import { MoneyCheck } from 'styled-icons/fa-solid/MoneyCheck';
 import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt';
 
-import { withStripeLoader } from './StripeProvider';
-import Container from './Container';
-import Link from './Link';
-import { P } from './Text';
-import StyledCard from './StyledCard';
-import MessageBox from './MessageBox';
-import StyledRadioList from './StyledRadioList';
-import { getPaymentMethodName, paymentMethodExpiration } from '../lib/payment_method_label';
-import { CollectiveType } from '../lib/constants/collectives';
-import { formatCurrency } from '../lib/utils';
+import { withStripeLoader } from '../StripeProvider';
+import Container from '../Container';
+import Link from '../Link';
+import { P } from '../Text';
+import StyledCard from '../StyledCard';
+import MessageBox from '../MessageBox';
+import StyledRadioList from '../StyledRadioList';
+import { getPaymentMethodName, paymentMethodExpiration } from '../../lib/payment_method_label';
+import { CollectiveType } from '../../lib/constants/collectives';
+import { formatCurrency } from '../../lib/utils';
 
-import CreditCard from './icons/CreditCard';
-import GiftCard from './icons/GiftCard';
-import PayPal from './icons/PayPal';
-import CreditCardInactive from './icons/CreditCardInactive';
-import Avatar from './Avatar';
-import NewCreditCardForm from './NewCreditCardForm';
+import CreditCard from '../icons/CreditCard';
+import GiftCard from '../icons/GiftCard';
+import PayPal from '../icons/PayPal';
+import CreditCardInactive from '../icons/CreditCardInactive';
+import Avatar from '../Avatar';
+import NewCreditCardForm from '../NewCreditCardForm';
 
 const PaymentEntryContainer = styled(Container)`
   display: flex;
@@ -98,7 +98,7 @@ const getPaymentMethodMetadata = pm => {
 /**
  * A radio list to select a payment method.
  */
-class ContributePayment extends React.Component {
+class StepPayment extends React.Component {
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
@@ -171,7 +171,7 @@ class ContributePayment extends React.Component {
     const { collective, defaultValue, withPaypal, manual } = this.props;
 
     // Add collective payment methods
-    const paymentMethodsOptions = get(collective, 'paymentMethods', []).map(pm => ({
+    const paymentMethodsOptions = (collective.paymentMethods || []).map(pm => ({
       key: `pm-${pm.id}`,
       title: getPaymentMethodName(pm),
       subtitle: getPaymentMethodMetadata(pm),
@@ -319,8 +319,8 @@ class ContributePayment extends React.Component {
   }
 }
 
-ContributePayment.propTypes = {
-  /** An optional collective to get payment methods from */
+StepPayment.propTypes = {
+  /** A collective to get payment methods from */
   collective: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
     name: PropTypes.string.isRequired,
@@ -350,10 +350,9 @@ ContributePayment.propTypes = {
   disabled: PropTypes.bool,
 };
 
-ContributePayment.defaultProps = {
+StepPayment.defaultProps = {
   withPaypal: false,
-  collective: null,
   hideCreditCardPostalCode: false,
 };
 
-export default withStripeLoader(ContributePayment);
+export default withStripeLoader(StepPayment);

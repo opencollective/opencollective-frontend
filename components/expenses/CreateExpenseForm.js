@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
+import titleCase from 'title-case';
 
 import { getCurrencySymbol } from '../../lib/utils';
 import categories from '../../lib/constants/categories';
+import expenseTypes from '../../lib/constants/expenseTypes';
 
 import InputField from '../InputField';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -69,10 +71,15 @@ class CreateExpenseForm extends React.Component {
       return { [category]: category };
     });
 
+    this.expenseTypes = Object.keys(expenseTypes).map(t => {
+      return { [t]: titleCase(t) };
+    });
+
     this.state = {
       modified: false,
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
+        type: expenseTypes.RECEIPT,
         payoutMethod: 'paypal',
         paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || undefined,
       },
@@ -424,6 +431,24 @@ class CreateExpenseForm extends React.Component {
                     name="category"
                     className="categoryField"
                     onChange={category => this.handleChange('category', category)}
+                  />
+                </span>
+              </div>
+            </div>
+
+            <div className="col">
+              <label>
+                <FormattedMessage id="expense.type" defaultMessage="type" />
+              </label>
+              <div className="expenseType">
+                <span className="expenseType">
+                  <InputField
+                    type="select"
+                    options={this.expenseTypes}
+                    defaultValue={expenseTypes.RECEIPT}
+                    name="type"
+                    className="expenseField"
+                    onChange={expenseType => this.handleChange('type', expenseType)}
                   />
                 </span>
               </div>
