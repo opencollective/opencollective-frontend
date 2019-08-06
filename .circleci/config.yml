@@ -272,3 +272,8 @@ workflows:
           requires:
             - build
             - build-api
+      - test-e2e-3:
+          filters: { branches: { ignore: [*crowdin_branch] } }
+          requires:
+            - build
+            - build-api
