@@ -6,7 +6,8 @@ describe('Archive Collective', () => {
         const collectiveSlug = collective.slug;
         cy.visit(`/${collectiveSlug}`);
         cy.wait(1000);
-        cy.contains('button', 'edit organization').click();
+        cy.get('[data-cy=editBtn]').click();
+        cy.wait(300);
         cy.contains('a', 'Advanced').click();
         cy.contains('button', 'Archive this organization').click();
         cy.get('[data-cy=action]').click();

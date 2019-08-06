@@ -6,7 +6,7 @@ describe('Unarchive collective', () => {
         const collectiveSlug = collective.slug;
         cy.visit(`/${collectiveSlug}`);
         cy.wait(1000);
-        cy.contains('button', 'edit organization').click();
+        cy.get('[data-cy=editBtn]').click();
         cy.contains('a', 'Advanced').click();
         // Archive the collective
         cy.contains('button', 'Archive this organization').click();
