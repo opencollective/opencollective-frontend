@@ -394,11 +394,18 @@ export const ContributorType = new GraphQLObjectType({
       description: 'All the roles for a given contributor',
       defaultValue: [roles.CONTRIBUTOR],
     },
-    isCore: {
+    isAdmin: {
       type: new GraphQLNonNull(GraphQLBoolean),
-      description: 'True if the contributor is a core contributor (admin)',
+      description: 'True if the contributor is a collective admin',
       resolve(contributor) {
         return contributor.roles.includes(roles.ADMIN);
+      },
+    },
+    isCore: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      description: 'True if the contributor is a core contributor',
+      resolve(contributor) {
+        return contributor.roles.includes(roles.CONTRIBUTOR);
       },
     },
     isBacker: {
