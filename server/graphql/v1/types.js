@@ -405,7 +405,7 @@ export const ContributorType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLBoolean),
       description: 'True if the contributor is a core contributor',
       resolve(contributor) {
-        return contributor.roles.includes(roles.CONTRIBUTOR);
+        return contributor.roles.some(role => role === roles.MEMBER || role === roles.ADMIN);
       },
     },
     isBacker: {
