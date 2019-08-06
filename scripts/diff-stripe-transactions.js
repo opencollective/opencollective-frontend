@@ -4,11 +4,13 @@ import { get, last } from 'lodash';
 import { listCharges } from '../server/paymentProviders/stripe/gateway';
 import models from '../server/models';
 
-/**
-  Usage: ./scripts/diff-stripe-transactions.js [NB_CHARGES_TO_CHECK=100]
-*/
+if (process.argv.length < 3) {
+  console.error('Usage: ./scripts/diff-stripe-transactions.js STRIPE_ACCOUNT_ID [NB_CHARGES_TO_CHECK=100]');
+  process.exit(1);
+}
 
-const NB_CHARGES_TO_CHECK = parseInt(process.argv[2]) || 100;
+const STRIPE_ACCOUNT = process.argv[2];
+const NB_CHARGES_TO_CHECK = parseInt(process.argv[3]) || 100;
 const NB_CHARGES_PER_QUERY = 100; // Max allowed by Stripe
 const NB_PAGES = NB_CHARGES_TO_CHECK / NB_CHARGES_PER_QUERY;
 
@@ -61,7 +63,7 @@ async function main() {
     console.info(`🔎️ Checking transactions ${totalAlreadyChecked} to ${totalAlreadyChecked + nbToCheckInThisPage}`);
 
     // Retrieve the list and check all charges
-    const charges = await listCharges({ limit: nbToCheckInThisPage, starting_after: lastChargeId });
+    const charges = await listCharges(STRIPE_ACCOUNT, { limit: nbToCheckInThisPage, starting_after: lastChargeId });
     for (let idx = 0; idx < charges.data.length; idx++) {
       await checkCharge(charges.data[idx]);
       totalAlreadyChecked += 1;
