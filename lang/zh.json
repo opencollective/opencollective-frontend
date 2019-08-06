@@ -355,7 +355,7 @@
   "cover.budget.text": "由于你们的财政捐助, 我们的年度预算估计为 {yearlyBudget}",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one {and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
   "createAccount.alreadyLoggedIn": "您似乎已经以 “{email}” 的身份登录。如果您想创建一个新帐户, 请先注销。",
-  "createOrder.": "This collective doesn't have a host and can't accept donations",
+  "createOrder.missingHost": "This collective doesn't have a host and can't accept financial contributions",
   "CreateOrder.Title": "Contribute to {collective}",
   "CreateOrder.TitleForEvent": "Order tickets for {event}",
   "createPledge.collectiveDetails": "新集体的细节：",
