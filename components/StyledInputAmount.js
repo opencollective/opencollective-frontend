@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { clamp, isNil } from 'lodash';
 
 import StyledInputGroup from './StyledInputGroup';
+import { getCurrencySymbol } from '../lib/utils';
 
 /**
  * An input for amount inputs. Accepts all props from [StyledInputGroup](/#!/StyledInputGroup).
@@ -18,7 +19,7 @@ const StyledInputAmount = ({ currency, min, max, value, onChange, ...props }) =>
       min={min}
       max={max}
       value={isNil(value) || value === '' ? '' : clamp(value, !min ? 0 : 1, max)}
-      prepend={currency}
+      prepend={props.pre || getCurrencySymbol(currency)}
       onChange={e => {
         // We don't cap on min because we want the user to be able to erase the input
         // and to progressively type the number without forcing a value.
