@@ -1752,6 +1752,7 @@ export default function(Sequelize, DataTypes) {
         LEFT JOIN "Orders" d ON d.id = t."OrderId"
         LEFT JOIN "Subscriptions" s ON s.id = d."SubscriptionId"
         WHERE t."CollectiveId"=:CollectiveId
+          AND t."RefundTransactionId" IS NULL
           AND s."isActive" IS TRUE
           AND s.interval = 'month'
           AND s."deletedAt" IS NULL
@@ -1765,6 +1766,7 @@ export default function(Sequelize, DataTypes) {
           LEFT JOIN "Orders" d ON t."OrderId" = d.id
           LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
           WHERE t."CollectiveId" = :CollectiveId
+            AND t."RefundTransactionId" IS NULL
             AND t.type = 'CREDIT'
             AND t."deletedAt" IS NULL
             AND t."createdAt" > (current_date - INTERVAL '12 months')
@@ -1775,6 +1777,7 @@ export default function(Sequelize, DataTypes) {
           LEFT JOIN "Orders" d ON t."OrderId" = d.id
           LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
           WHERE t."CollectiveId" = :CollectiveId
+            AND t."RefundTransactionId" IS NULL
             AND t.type = 'CREDIT'
             AND t."deletedAt" IS NULL
             AND t."createdAt" > (current_date - INTERVAL '12 months')
