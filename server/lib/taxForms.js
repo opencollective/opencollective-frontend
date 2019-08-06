@@ -97,7 +97,7 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
 
       return saveDocumentStatus(LegalDocument.requestStatus.REQUESTED);
     } catch (error) {
-      logger.error(`Failed to initialize tax form`, user, error);
+      logger.error(`Failed to initialize tax form for user #${user.id} (${user.email})`, error);
       return saveDocumentStatus(LegalDocument.requestStatus.ERROR);
     }
   };
