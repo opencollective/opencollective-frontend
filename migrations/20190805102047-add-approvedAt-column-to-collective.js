@@ -9,6 +9,11 @@ module.exports = {
     };
     await queryInterface.addColumn('Collectives', colName, colParms);
     await queryInterface.addColumn('CollectiveHistories', colName, colParms);
+    return queryInterface.sequelize.query(`
+      UPDATE "Collectives" c
+        SET "approvedAt" = '2019-08-06'
+      WHERE c."isActive" IS TRUE
+    `);
   },
 
   down: async (queryInterface, Sequelize) => {
