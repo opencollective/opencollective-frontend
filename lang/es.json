@@ -355,7 +355,7 @@
   "cover.budget.text": "Gracias a sus aportes estamos operando con un presupuesto anual estimado de {yearlyBudget}",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
   "createAccount.alreadyLoggedIn": "Parece que ya está conectado como '{email}'. Si desea crear una nueva cuenta, por favor cierre sesión primero.",
-  "createOrder.": "This collective doesn't have a host and can't accept donations",
+  "createOrder.missingHost": "This collective doesn't have a host and can't accept financial contributions",
   "CreateOrder.Title": "Contribute to {collective}",
   "CreateOrder.TitleForEvent": "Order tickets for {event}",
   "createPledge.collectiveDetails": "Detalles del nuevo colectivo:",
