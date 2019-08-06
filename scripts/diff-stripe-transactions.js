@@ -1,6 +1,6 @@
 #!/usr/bin/env ./node_modules/.bin/babel-node
-import { get, last } from 'lodash';
 import '../server/env';
+import { get, last } from 'lodash';
 import { listCharges } from '../server/paymentProviders/stripe/gateway';
 import models from '../server/models';
 
@@ -13,9 +13,9 @@ const NB_CHARGES_PER_QUERY = 100; // Max allowed by Stripe
 const NB_PAGES = NB_CHARGES_TO_CHECK / NB_CHARGES_PER_QUERY;
 
 async function checkCharge(charge) {
-  console.log(charge);
   if (charge.failure_code) {
     // Ignore failed transaction
+    console.log(`Ignoring ${charge.id} (failed transaction)`);
     return;
   }
 
@@ -38,10 +38,6 @@ async function checkCharge(charge) {
   });
 
   if (!transaction) {
-    console.warn(
-      `...Did not find any transaction for ${charge.id} matching the customer_id. Starting extensive search...`,
-    );
-
     // This is an expensive query, we only run it if the above fails
     transaction = await models.Transaction.findOne({
       where: { data: { charge: { id: charge.id } } },
@@ -74,8 +70,8 @@ async function main() {
       }
     }
 
-    // If list length is less than NB_CHARGES_PER_QUERY, we reached the end
-    if (charges.data.length < NB_CHARGES_PER_QUERY) {
+    // We reached the end
+    if (!charges.has_more) {
       break;
     }
 
