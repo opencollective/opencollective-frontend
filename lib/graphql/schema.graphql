@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Mon Aug 05 2019 17:43:49 GMT+0100 (West Africa Standard Time)
+# timestamp: Tue Aug 06 2019 12:40:23 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -704,7 +704,12 @@ type Contributor {
   roles: [ContributorRole]
 
   """
-  True if the contributor is a core contributor (admin)
+  True if the contributor is a collective admin
+  """
+  isAdmin: Boolean!
+
+  """
+  True if the contributor is a core contributor
   """
   isCore: Boolean!
 

@@ -42,8 +42,8 @@ class EditMembers extends React.Component {
         id: 'members.remove',
         defaultMessage: 'remove Core Contributor',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Admin' },
-      MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
+      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
+      MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
       'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
       'user.description.label': {
         id: 'user.description.label',
