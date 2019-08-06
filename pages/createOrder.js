@@ -121,8 +121,8 @@ class CreateOrderPage extends React.Component {
         <Flex py={5} justifyContent="center">
           <MessageBox type="info" withIcon>
             <FormattedMessage
-              id="createOrder."
-              defaultMessage="This collective doesn't have a host and can't accept donations"
+              id="createOrder.missingHost"
+              defaultMessage="This collective doesn't have a host and can't accept financial contributions"
             />
           </MessageBox>
         </Flex>
