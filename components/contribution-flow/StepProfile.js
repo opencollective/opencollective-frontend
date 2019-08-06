@@ -8,22 +8,22 @@ import { Box, Flex } from '@rebass/grid';
 
 import { Search } from 'styled-icons/octicons/Search';
 
-import { escapeInput } from '../lib/utils';
-import Avatar from './Avatar';
-import Container from './Container';
-import Logo from './Logo';
-import { P } from './Text';
-import StyledCard from './StyledCard';
-import StyledRadioList from './StyledRadioList';
-import StyledInputField from './StyledInputField';
-import StyledInputGroup from './StyledInputGroup';
-import StyledInput from './StyledInput';
+import { escapeInput } from '../../lib/utils';
+import Avatar from '../Avatar';
+import Container from '../Container';
+import Logo from '../Logo';
+import { P } from '../Text';
+import StyledCard from '../StyledCard';
+import StyledRadioList from '../StyledRadioList';
+import StyledInputField from '../StyledInputField';
+import StyledInputGroup from '../StyledInputGroup';
+import StyledInput from '../StyledInput';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
 `;
 
-const ContributeAsEntryContainer = styled(Container)`
+const ProfileContainer = styled(Container)`
   cursor: pointer;
 `;
 
@@ -126,7 +126,7 @@ const useForm = ({ onProfileChange }) => {
 /**
  * Search is displayed if 5 or more profiles are passed in.
  */
-const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
+const StepProfile = ({ intl, onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
   const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ onProfileChange });
   if (state.search) {
     const test = new RegExp(escapeInput(state.search), 'i');
@@ -170,7 +170,7 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
         onChange={onChange}
       >
         {({ key, value, radio, checked, index }) => (
-          <ContributeAsEntryContainer
+          <ProfileContainer
             display="flex"
             alignItems="center"
             px={4}
@@ -273,16 +273,14 @@ const ContributeAs = ({ intl, onProfileChange, personal, profiles, defaultSelect
                 </Box>
               </Container>
             )}
-          </ContributeAsEntryContainer>
+          </ProfileContainer>
         )}
       </StyledRadioList>
     </StyledCard>
   );
 };
 
-ContributeAs.displayName = 'ContributeAs';
-
-ContributeAs.propTypes = {
+StepProfile.propTypes = {
   /**
    * emits latest selected profile
    *
@@ -314,8 +312,8 @@ ContributeAs.propTypes = {
   ),
 };
 
-ContributeAs.defaultProps = {
+StepProfile.defaultProps = {
   onProfileChange: () => {}, // noop
 };
 
-export default injectIntl(ContributeAs);
+export default injectIntl(StepProfile);

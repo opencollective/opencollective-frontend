@@ -1,17 +1,20 @@
 ```jsx noeditor
 // See https://github.com/styleguidist/react-styleguidist/issues/1278
-import paymentMethods from '../mocks/payment_methods';
+import paymentMethods from '../../mocks/payment_methods';
+import { personalProfile } from '../../mocks/profiles';
 ```
 
 ### With PayPal and Manual
 
 ```js
-import paymentMethods from '../mocks/payment_methods';
+import paymentMethods from '../../mocks/payment_methods';
+import { personalProfile } from '../../mocks/profiles';
 
 initialState = { disabled: false, values: null };
 <div>
-  <ContributePayment
+  <StepPayment
     withPaypal
+    collective={personalProfile}
     disabled={state.disabled}
     onChange={values => setState({ values })}
     paymentMethods={paymentMethods}

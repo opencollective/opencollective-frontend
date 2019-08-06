@@ -1,13 +1,13 @@
 ```jsx noeditor
 // See https://github.com/styleguidist/react-styleguidist/issues/1278
-import profiles, { personalProfile } from '../mocks/profiles';
+import profiles, { personalProfile } from '../../mocks/profiles';
 ```
 
 ```js
-import profiles, { personalProfile } from '../mocks/profiles';
+import profiles, { personalProfile } from '../../mocks/profiles';
 initialState = null;
 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-  <ContributeAs
+  <StepProfile
     onProfileChange={setState}
     profiles={profiles}
     personal={personalProfile}
