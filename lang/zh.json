@@ -50,6 +50,8 @@
   "collective.addHostBtn": "Add a host",
   "collective.address.label": "地址",
   "collective.amount.label": "数量",
+  "collective.application.description": "Enable application from collectives",
+  "collective.application.label": "Application",
   "collective.archive.archivedConfirmMessage": "{message}。",
   "collective.archive.availableBalance": "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option.",
   "collective.archive.button": "存档此 {type}",

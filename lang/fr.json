@@ -50,6 +50,8 @@
   "collective.addHostBtn": "Ajoutez un hôte",
   "collective.address.label": "Adresse",
   "collective.amount.label": "montant",
+  "collective.application.description": "Enable application from collectives",
+  "collective.application.label": "Application",
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Seuls les collectifs avec un solde à zéro peuvent être archivés. Pour avoir un solde à zéro, soumettez une dépense, donnez à un autre collectif ou envoyez les fonds à votre hôte fiscal en utilisant la fonctionnalité \"Solder le compte\".",
   "collective.archive.button": "Archiver ce {type}",
