@@ -483,7 +483,7 @@
   "events.widget.createEvent": "Créer un événement",
   "events.widget.noEventScheduled": "Aucun événement n'a encore été programmé.",
   "EventSponsorCard.since": "depuis {date}",
-  "expense.amount": "amount",
+  "expense.amount": "montant",
   "expense.approve.btn": "approuver",
   "expense.approved": "approuvé",
   "expense.attachment.description": "Attacher un reçu ou une facture (photo ou PDF)",

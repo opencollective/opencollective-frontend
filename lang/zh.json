@@ -483,7 +483,7 @@
   "events.widget.createEvent": "Create an Event",
   "events.widget.noEventScheduled": "No event has been scheduled yet.",
   "EventSponsorCard.since": "自{date} 起",
-  "expense.amount": "amount",
+  "expense.amount": "合计",
   "expense.approve.btn": "批准",
   "expense.approved": "已批准",
   "expense.attachment.description": "Upload receipt or invoice (photo or PDF)",
