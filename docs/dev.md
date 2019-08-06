@@ -75,7 +75,4 @@ There are many admin scripts in [`/scripts` directory](https://github.com/openco
 ```
 # Local development (without Docker)
 $ npx babel-node ./scripts/populate_usernames.js
-
-# Docker
-$ docker-compose exec api npx babel-node ./scripts/populate_usernames.js
 ```
