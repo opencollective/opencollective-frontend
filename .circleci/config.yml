@@ -71,7 +71,6 @@ jobs:
       - run: npm run db:setup
       - <<: *persist_cache
       - run: npm run test
-      - run: npm run test:coverage
       - store_test_results:
           path: /tmp/circleci-test-results
 
