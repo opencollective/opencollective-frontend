@@ -73,12 +73,14 @@ class EditCollective extends React.Component {
       goals: CollectiveInputType.goals,
       editor: CollectiveInputType.markdown ? 'markdown' : 'html',
       sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail,
+      apply: CollectiveInputType.application,
       tos: CollectiveInputType.tos,
     };
     delete CollectiveInputType.goals;
     delete CollectiveInputType.markdown;
     delete CollectiveInputType.sendInvoiceByEmail;
     delete CollectiveInputType.tos;
+    delete CollectiveInputType.application;
 
     return CollectiveInputType;
   }
