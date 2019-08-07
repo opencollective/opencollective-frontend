@@ -51,16 +51,15 @@ class Collective extends React.Component {
       },
       'collective.approved.description': {
         id: 'collective.approved.description',
-        defaultMessage: 'Your collective has been approved by your host ({host}).',
+        defaultMessage: 'Your collective is already approved by the host ({host}).',
       },
       'collective.pending': {
         id: 'collective.pending',
-        defaultMessage: 'Your collective is pending approval.',
+        defaultMessage: 'Collective pending approval.',
       },
       'collective.pending.description': {
         id: 'collective.pending.description',
-        defaultMessage:
-          'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
+        defaultMessage: 'This collective is pending approval from the host ({host}).',
       },
       'collective.isArchived': {
         id: 'collective.isArchived',
@@ -160,7 +159,7 @@ class Collective extends React.Component {
           host: collective.host.name,
         });
       } else {
-        notification.description = intl.formatMessage(this.messages['collective.pending.description'], {
+        notification.description = intl.formatMessage(this.messages['collective.created.description'], {
           host: collective.host.name,
         });
       }
