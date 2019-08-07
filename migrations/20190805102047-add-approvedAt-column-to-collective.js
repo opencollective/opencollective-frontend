@@ -13,6 +13,8 @@ module.exports = {
       UPDATE "Collectives" c
         SET "approvedAt" = '2019-08-06'
       WHERE c."isActive" IS TRUE
+      AND c."type" = 'COLLECTIVE'
+      AND c."HostCollectiveId" IS NOT NULL
     `);
   },
 
