@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Aug 01 2019 14:13:16 GMT+1200 (New Zealand Standard Time)
+# timestamp: Mon Aug 05 2019 17:43:49 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -121,6 +121,11 @@ type Collective implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 
   """
   Returns whether this collective is deletable
@@ -341,6 +346,7 @@ interface CollectiveInterface {
   isIncognito: Boolean
   canApply: Boolean
   isArchived: Boolean
+  isApproved: Boolean
   isDeletable: Boolean
   host: CollectiveInterface
   hostCollective: CollectiveInterface
@@ -889,6 +895,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 
   """
   Returns whether this collective is deletable
@@ -1969,6 +1980,11 @@ type Organization implements CollectiveInterface {
   isArchived: Boolean
 
   """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
+
+  """
   Returns whether this collective is deletable
   """
   isDeletable: Boolean
@@ -2875,6 +2891,11 @@ type User implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 
   """
   Returns whether this collective is deletable
