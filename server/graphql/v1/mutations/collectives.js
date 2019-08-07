@@ -424,6 +424,7 @@ export function editCollective(_, args, req) {
     .then(() =>
       collective.editMembers(args.collective.members, {
         CreatedByUserId: req.remoteUser.id,
+        remoteUserCollectiveId: req.remoteUser.CollectiveId,
       }),
     )
     .then(() => {
