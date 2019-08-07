@@ -915,7 +915,6 @@
   "signin.noAccount": "アカウントを持っていませんか?",
   "signin.unknownEmail": "このメールアドレスを使っているユーザーはいません。",
   "signin.usingEmail": "あなたは次のメールアドレスを使ってログインしています:",
-  "SinceDate": "Since {date}",
   "subscription.amountToDate": "contributed to date",
   "subscription.cancel.btn": "はい",
   "subscription.cancel.no.btn": "いいえ",
