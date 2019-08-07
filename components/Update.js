@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Lock } from 'styled-icons/fa-solid';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { formatDate } from '../lib/utils';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 import ReactTooltip from 'react-tooltip';
+
+import { compose, formatDate } from '../lib/utils';
+
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';

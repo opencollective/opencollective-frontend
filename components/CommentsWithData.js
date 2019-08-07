@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
-import Comments from './Comments';
-import CommentForm from './CommentForm';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
+
+import { compose } from '../lib/utils';
+
+import Error from './Error';
+import Comments from './Comments';
+import CommentForm from './CommentForm';
 import LoginBtn from './LoginBtn';
 
 class CommentsWithData extends React.Component {

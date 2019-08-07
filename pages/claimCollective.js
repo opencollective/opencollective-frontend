@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { get } from 'lodash';
@@ -8,7 +8,7 @@ import { Flex } from '@rebass/grid';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { URLSearchParams } from 'universal-url';
 
-import { getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
+import { compose, getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 
 import { Router, Link } from '../server/pages';
 

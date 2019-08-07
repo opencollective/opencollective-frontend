@@ -1,14 +1,15 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-
 import { Add } from 'styled-icons/material/Add';
 
+import { compose, getErrorFromGraphqlException } from '../lib/utils';
 import { paymentMethodLabel } from '../lib/payment_method_label';
+import { stripeTokenToPaymentMethod } from '../lib/stripe';
 import { H3, Span } from './Text';
 import Link from './Link';
 import Loading from './Loading';
@@ -18,8 +19,6 @@ import Container from './Container';
 import { withStripeLoader } from './StripeProvider';
 import NewCreditCardForm from './NewCreditCardForm';
 import MessageBox from './MessageBox';
-import { stripeTokenToPaymentMethod } from '../lib/stripe';
-import { getErrorFromGraphqlException } from '../lib/utils';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
