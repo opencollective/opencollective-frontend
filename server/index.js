@@ -30,8 +30,6 @@ app.prepare().then(() => {
   server.use(cookieParser());
 
   server.use((req, res, next) => {
-    const accept = accepts(req);
-
     if (req.query.language && languages.includes(req.query.language)) {
       // Detect language as query string in the URL
       req.language = req.query.language;
@@ -40,7 +38,7 @@ app.prepare().then(() => {
       req.language = req.cookies.language;
     }
 
-    req.locale = req.language || accept.language(languages) || 'en';
+    req.locale = req.language || accepts(req).language(languages) || 'en';
     logger.debug('url %s locale %s', req.url, req.locale);
     req.localeDataScript = getLocaleDataScript(req.locale);
     req.messages = getMessages(req.locale);
