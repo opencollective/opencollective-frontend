@@ -120,7 +120,7 @@ const StepDetails = ({
             )}
           </StyledInputField>
         )}
-        <Container minWidth={100} maxWidth={120} mr={!hasOptions && 3}>
+        <Container minWidth={100} maxWidth={120} mr={!hasOptions ? 3 : undefined}>
           <StyledInputField
             label={
               hasOptions ? (

@@ -14,7 +14,7 @@ import orderSuccessBackgroundUrl from '../static/images/order-success-background
 
 import { tweetURL, facebooKShareURL, objectToQueryString } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';
-import { Link } from '../server/pages';
+import Link from '../components/Link';
 import { withUser } from '../components/UserProvider';
 import { H3, P, Span } from '../components/Text';
 import ErrorPage from '../components/ErrorPage';
@@ -43,6 +43,7 @@ const ShareLink = styled(StyledLink)`
     margin-right: 8px;
   }
 `;
+
 ShareLink.defaultProps = {
   width: 160,
   buttonStyle: 'standard',
@@ -253,20 +254,25 @@ class OrderSuccessPage extends React.Component {
               </Span>
               <Flex mt={1} flexWrap="wrap" justifyContent="center" css={{ maxWidth: 500 }}>
                 {collective.tags.map(tag => (
-                  <Link key={tag} route="search" params={{ q: tag }} passHref>
-                    <StyledLink fontSize="Paragraph" lineHeight="Caption" mr={1} textAlign="center">
-                      #{tag}
-                    </StyledLink>
-                  </Link>
+                  <StyledLink
+                    as={Link}
+                    key={tag}
+                    route="search"
+                    params={{ q: tag }}
+                    fontSize="Paragraph"
+                    lineHeight="Caption"
+                    mr={1}
+                    textAlign="center"
+                  >
+                    #{tag}
+                  </StyledLink>
                 ))}
               </Flex>
             </Flex>
           )}
           {!fromCollective.isIncognito && !LoggedInUser && this.renderUserProfileBtn(true)}
           {!fromCollective.isIncognito && LoggedInUser && !loggedInUserLoading && (
-            <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-              {this.renderUserProfileBtn()}
-            </Link>
+            <LinkCollective collective={fromCollective}>{this.renderUserProfileBtn()}</LinkCollective>
           )}
         </OrderSuccessContainer>
       </Page>
