@@ -41,10 +41,6 @@ const Hide = styled(Box)`
   ${top}
 `;
 
-Hide.defaultProps = {
-  omitProps: ['xs', 'sm', 'md', 'lg'],
-};
-
 Hide.propTypes = {
   xs: PropTypes.bool,
   sm: PropTypes.bool,

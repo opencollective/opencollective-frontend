@@ -52,7 +52,6 @@ ShareLink.defaultProps = {
   mx: 2,
   mb: 2,
   target: '_blank',
-  omitProps: StyledLink.defaultProps.omitProps,
 };
 
 const GetOrderQuery = gql`

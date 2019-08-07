@@ -40,10 +40,6 @@ StyledButtonItem.propTypes = {
   combo: PropTypes.bool,
 };
 
-StyledButtonItem.defaultProps = {
-  omitProps: StyledButton.defaultProps.omitProps.concat('combo'),
-};
-
 const StyledButtonSet = ({
   size,
   items,

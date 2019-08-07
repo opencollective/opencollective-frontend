@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { CaretDown } from 'styled-icons/fa-solid/CaretDown';
 import { Box } from '@rebass/grid';
-import tag from 'clean-tag';
 
 import { getInputBorderColor } from '../lib/styled_components_utils';
 import Container from './Container';
@@ -84,10 +83,6 @@ const SelectContainer = styled(Container)`
         `}
 `;
 
-SelectContainer.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('mode'),
-};
-
 const SelectPopupContainer = styled(Container)`
   position: absolute;
   z-index: 10;
@@ -95,7 +90,7 @@ const SelectPopupContainer = styled(Container)`
   box-shadow: 0px 4px 14px rgba(20, 20, 20, 0.16);
 `;
 
-const StyledListItem = styled(tag.li)`
+const StyledListItem = styled.li`
   list-style: none;
   cursor: pointer;
   padding: 8px;
@@ -122,10 +117,6 @@ const StyledListItem = styled(tag.li)`
     }
   }}
 `;
-
-StyledListItem.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('isHighlighted', 'isSelected'),
-};
 
 const Icon = styled(CaretDown)`
   color: ${themeGet('colors.black.400')};
