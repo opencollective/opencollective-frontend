@@ -50,6 +50,8 @@
   "collective.addHostBtn": "Host hinzufügen",
   "collective.address.label": "Adresse",
   "collective.amount.label": "Betrag",
+  "collective.application.description": "Enable application from collectives",
+  "collective.application.label": "Application",
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Es können nur Kollektive mit einer Bilanz von Null archiviert werden. Um das Guthaben auszuzahlen, erstelle eine Ausgabe, spende an ein anderes Kollektiv oder sende das Guthaben an Deinen steuerlichen Host, indem du die Option \"Guthaben ausleeren\" nutzt.",
   "collective.archive.button": "Archiviere {type}",
