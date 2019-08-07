@@ -627,7 +627,7 @@ export default function() {
     );
 
   nock('https://api.stripe.com:443', { encodedQueryParams: true })
-    .get('/v1/balance/history/txn_1E9DUsLzdXg9xKNSq6ZH6bmn')
+    .get('/v1/balance_transactions/txn_1E9DUsLzdXg9xKNSq6ZH6bmn')
     .reply(
       200,
       {
@@ -1097,7 +1097,7 @@ export default function() {
     );
 
   nock('https://api.stripe.com:443', { encodedQueryParams: true })
-    .get('/v1/balance/history/txn_1E9DUvLzdXg9xKNSBcnZk66x')
+    .get('/v1/balance_transactions/txn_1E9DUvLzdXg9xKNSBcnZk66x')
     .reply(
       200,
       {
@@ -1769,7 +1769,7 @@ export default function() {
     );
 
   nock('https://api.stripe.com:443', { encodedQueryParams: true })
-    .get('/v1/balance/history/txn_1E9DV0LzdXg9xKNSK1tPVLvb')
+    .get('/v1/balance_transactions/txn_1E9DV0LzdXg9xKNSK1tPVLvb')
     .reply(
       200,
       {
@@ -2239,7 +2239,7 @@ export default function() {
     );
 
   nock('https://api.stripe.com:443', { encodedQueryParams: true })
-    .get('/v1/balance/history/txn_1E9DV3LzdXg9xKNSdASDiKeA')
+    .get('/v1/balance_transactions/txn_1E9DV3LzdXg9xKNSdASDiKeA')
     .reply(
       200,
       {
