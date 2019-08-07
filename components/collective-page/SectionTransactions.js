@@ -8,7 +8,7 @@ import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
 import { formatCurrency } from '../../lib/utils';
-import { H3, P, Span } from '../Text';
+import { H2, H3, P, Span } from '../Text';
 import Container from '../Container';
 import MessageBox from '../MessageBox';
 import Avatar from '../Avatar';
@@ -52,7 +52,7 @@ class SectionTransactions extends React.Component {
       creditTransactions: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
-          amount: PropTypes.number.isRequired,
+          netAmountInCollectiveCurrency: PropTypes.number.isRequired,
           createdAt: PropTypes.string.isRequired,
           type: PropTypes.string.isRequired,
           fromcollective: PropTypes.shape({
@@ -66,7 +66,7 @@ class SectionTransactions extends React.Component {
       debitTransactions: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
-          amount: PropTypes.number.isRequired,
+          netAmountInCollectiveCurrency: PropTypes.number.isRequired,
           createdAt: PropTypes.string.isRequired,
           type: PropTypes.string.isRequired,
           collective: PropTypes.shape({
@@ -119,9 +119,9 @@ class SectionTransactions extends React.Component {
     const transactions = this.getAllTransactions(data.creditTransactions, data.debitTransactions, filter);
     return (
       <ContainerSectionContent pt={5} pb={6}>
-        <H3 mb={4} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+        <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-        </H3>
+        </H2>
         {showFilters && (
           <Box mb={3}>
             <StyledFilters
@@ -202,6 +202,7 @@ export default React.memo(
             id
             name
             slug
+            type
           }
         }
         debitTransactions: allTransactions(CollectiveId: $id, type: "DEBIT", limit: 10) {
@@ -215,6 +216,7 @@ export default React.memo(
             id
             name
             slug
+            type
           }
         }
       }
