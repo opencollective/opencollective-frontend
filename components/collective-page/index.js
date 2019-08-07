@@ -11,6 +11,7 @@ import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar'
 // Collective page imports
 import { Sections } from './_constants';
 import Hero from './Hero';
+import CollectiveColorPicker from './CollectiveColorPicker';
 import SectionAbout from './SectionAbout';
 import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
@@ -49,6 +50,7 @@ class CollectivePage extends Component {
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
+    onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
@@ -60,12 +62,14 @@ class CollectivePage extends Component {
     super(props);
     this.sectionsRefs = {}; // This will store a map of sectionName => sectionRef
     this.navbarRef = React.createRef();
-    this.state = { isFixed: false, selectedSection: null };
+    this.state = { isFixed: false, selectedSection: null, hasColorPicker: false };
   }
 
   componentDidMount() {
     window.addEventListener('scroll', this.onScroll);
     this.onScroll(); // First tick in case scroll is restored when page loads
+    // Temporary hack while design team figure out how they want to implement this trigger
+    window.showColorPicker = () => this.setState({ hasColorPicker: true });
   }
 
   componentWillUnmount() {
@@ -177,8 +181,8 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, isAdmin } = this.props;
-    const { isFixed, selectedSection } = this.state;
+    const { collective, host, isAdmin, onPrimaryColorChange } = this.props;
+    const { isFixed, selectedSection, hasColorPicker } = this.state;
     const sections = this.getSections(this.props);
 
     return (
@@ -210,6 +214,15 @@ class CollectivePage extends Component {
             {this.renderSection(section)}
           </div>
         ))}
+        {hasColorPicker && (
+          <Container position="fixed" bottom={30} right={30} zIndex={99999}>
+            <CollectiveColorPicker
+              collective={collective}
+              onChange={onPrimaryColorChange}
+              onClose={() => this.setState({ hasColorPicker: false })}
+            />
+          </Container>
+        )}
       </Container>
     );
   }

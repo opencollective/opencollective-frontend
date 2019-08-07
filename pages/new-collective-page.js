@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { get, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { lighten, darken } from 'polished';
@@ -59,6 +59,8 @@ class NewCollectivePage extends React.Component {
     return { slug, status };
   }
 
+  state = { newPrimaryColor: null };
+
   getPageMetaData(collective) {
     if (collective) {
       return {
@@ -97,6 +99,10 @@ class NewCollectivePage extends React.Component {
     }
   });
 
+  onPrimaryColorChange = throttle(newPrimaryColor => {
+    this.setState({ newPrimaryColor });
+  }, 2000);
+
   render() {
     const { data, LoggedInUser, status } = this.props;
 
@@ -112,11 +118,12 @@ class NewCollectivePage extends React.Component {
 
     const collective = data.Collective;
     const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+    const primaryColor = this.state.newPrimaryColor || getCollectivePrimaryColor(collective);
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
-        <ThemeProvider theme={this.getTheme(getCollectivePrimaryColor(collective))}>
+        <ThemeProvider theme={this.getTheme(primaryColor)}>
           <CollectivePage
             collective={collective}
             host={collective.host}
@@ -130,6 +137,7 @@ class NewCollectivePage extends React.Component {
             LoggedInUser={LoggedInUser}
             isAdmin={isAdmin}
             status={status}
+            onPrimaryColorChange={this.onPrimaryColorChange}
           />
         </ThemeProvider>
       </Page>
@@ -152,10 +160,12 @@ const getCollective = graphql(gql`
       githubHandle
       website
       tags
+      company
       type
       currency
       settings
       isArchived
+      isHost
       image
       stats {
         id
