@@ -50,6 +50,8 @@
   "collective.addHostBtn": "Voeg een beheerder toe",
   "collective.address.label": "Adres",
   "collective.amount.label": "aantal",
+  "collective.application.description": "Enable application from collectives",
+  "collective.application.label": "Application",
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Enkel Collectieven met een balans van nul kunnen gearchiveerd worden. Om het geld uit te betalen, dien een onkostennota in, doneer aan een ander Collectief of verzend het geld naar je fiscaal beheerder met behulp van een 'rekening leeghalen' optie.",
   "collective.archive.button": "Archiveer deze {type}",
