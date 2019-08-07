@@ -551,6 +551,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       isIncognito: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
       isArchived: { type: GraphQLBoolean },
+      isApproved: { type: GraphQLBoolean },
       isDeletable: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
       hostCollective: { type: CollectiveInterfaceType },
@@ -952,6 +953,13 @@ const CollectiveFields = () => {
       type: GraphQLBoolean,
       resolve(collective) {
         return Boolean(collective.deactivatedAt && !collective.isActive);
+      },
+    },
+    isApproved: {
+      description: 'Returns whether this collective is approved',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return Boolean(collective.isActive && collective.approvedAt);
       },
     },
     isDeletable: {

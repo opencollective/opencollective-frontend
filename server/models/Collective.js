@@ -347,6 +347,10 @@ export default function(Sequelize, DataTypes) {
         defaultValue: false,
       },
 
+      approvedAt: {
+        type: DataTypes.DATE,
+      },
+
       twitterHandle: {
         type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
         set(twitterHandle) {
@@ -1566,6 +1570,7 @@ export default function(Sequelize, DataTypes) {
     }
     this.HostCollectiveId = null;
     this.isActive = false; // we should rename isActive to isApproved (by the host)
+    this.approvedAt = null;
     if (newHostCollectiveId) {
       const newHostCollective = await models.Collective.findByPk(newHostCollectiveId);
       if (!newHostCollective) {
