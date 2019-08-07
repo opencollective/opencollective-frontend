@@ -137,8 +137,6 @@
   },
   "scripts": {
     "start": "node ./dist/index.js",
-    "predocker:dev": "npm install && npm run db:setup && babel-node ./scripts/db_restore.js opencollective_dvl",
-    "docker:dev": "npm run dev",
     "build": "npm run build:clean && npm run build:updates && npm run build:server",
     "build:clean": "rm -rf dist && mkdir dist",
     "build:updates": "npm --prefix node_modules/cloudflare-ip run update-list",
