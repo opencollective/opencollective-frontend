@@ -174,6 +174,7 @@ class Collective extends React.Component {
       notification.description = intl.formatMessage(this.messages['collective.pending.description'], {
         host: collective.host.name,
       });
+      notification.status = 'collectivePending';
     }
 
     const contributorsStats = { ...get(collective, 'stats.backers') };
