@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Link from './Link';
 
-const UserCompany = ({ company }) => {
+const UserCompany = ({ company, ...props }) => {
   if (!company || company[0] !== '@') {
     return company;
   }
@@ -11,8 +11,8 @@ const UserCompany = ({ company }) => {
   // By splitting on `/` we limit that risk.
   const companySlug = company.split('/')[0].slice(1);
   return (
-    <Link route="collective" params={{ slug: companySlug }}>
-      {companySlug}
+    <Link route="collective" params={{ slug: companySlug }} {...props}>
+      @{companySlug}
     </Link>
   );
 };
