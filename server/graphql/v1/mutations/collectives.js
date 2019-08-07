@@ -646,7 +646,7 @@ export async function archiveCollective(_, args, req) {
     membership.destroy();
   }
 
-  return collective.update({ isActive: false, deactivatedAt: Date.now(), approvedAt: null });
+  return collective.update({ isActive: false, deactivatedAt: Date.now(), approvedAt: null, HostCollectiveId: null });
 }
 
 export async function unarchiveCollective(_, args, req) {
