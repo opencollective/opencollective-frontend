@@ -179,7 +179,7 @@ class OpenSourceApplyPage extends Component {
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description.p2"
-            defaultMessage="We have created the {osclink}), a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}."
+            defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}."
             values={{
               osclink: <a href="https://opencollective.com/opensource">Open Source Collective 501c6</a>,
               communityguidelineslink: (
