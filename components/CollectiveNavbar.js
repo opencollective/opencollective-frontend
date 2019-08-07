@@ -408,9 +408,9 @@ CollectiveNavbar.defaultProps = {
     hasContact: true,
   },
   // eslint-disable-next-line react/prop-types
-  LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, ...props }) {
+  LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (
-      <Link route={`${collectivePath}/v2#section-${section}`} {...props}>
+      <Link route={`${collectivePath}/v2#section-${section}`} className={className}>
         {label}
       </Link>
     );

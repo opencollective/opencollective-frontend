@@ -198,8 +198,8 @@ class CollectivePage extends Component {
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
-            LinkComponent={({ section, label, ...props }) => (
-              <a href={`#section-${section}`} onClick={e => e.preventDefault()} {...props}>
+            LinkComponent={({ section, label, className }) => (
+              <a href={`#section-${section}`} className={className} onClick={e => e.preventDefault()}>
                 {label}
               </a>
             )}
