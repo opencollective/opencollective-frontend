@@ -47,7 +47,7 @@ StyledLink.propTypes = {
   buttonStyle: PropTypes.oneOf(['primary', 'standard']),
   /**
    * styled-system prop: accepts any css 'color' value or theme alias
-   * See lib/theme.js for the list of theme colors
+   * See lib/theme/colors.js for the list of theme colors
    */
   color: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'display' value */
