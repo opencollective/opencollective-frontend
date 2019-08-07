@@ -50,6 +50,8 @@
   "collective.addHostBtn": "Adicionar um organizador",
   "collective.address.label": "Endereço",
   "collective.amount.label": "quantia",
+  "collective.application.description": "Enable application from collectives",
+  "collective.application.label": "Application",
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option.",
   "collective.archive.button": "Arquive esse {type}",
