@@ -1,9 +1,8 @@
-import tag from 'clean-tag';
 import styled from 'styled-components';
 import { background, borderRadius, color, space, border, fontSize, fontWeight, lineHeight } from 'styled-system';
 
 /** Simple tag to display a short string */
-const StyledTag = styled(tag.span)`
+const StyledTag = styled.span`
   border-radius: 4px;
   padding: 8px 6px;
   font-size: 8px;

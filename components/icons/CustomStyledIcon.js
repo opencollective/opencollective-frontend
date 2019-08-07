@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { alignSelf, height, width } from 'styled-system';
-import tag from 'clean-tag';
 
 import { cursor } from '../../lib/styled_system_custom';
 
-const StyledSVG = styled(tag.svg)`
+const StyledSVG = styled.svg`
   display: inline-block;
   vertical-align: middle;
   overflow: hidden;
@@ -16,10 +15,6 @@ const StyledSVG = styled(tag.svg)`
   ${width};
   ${cursor};
 `;
-
-StyledSVG.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('cursor'),
-};
 
 /**
  * A simple wrapper to export custom icons as styled icons. It mostly mimics the
