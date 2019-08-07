@@ -367,7 +367,7 @@ class UserCollective extends React.Component {
                   {isProfileEmpty && canEditCollective && (
                     <div className="message">
                       <div className="editBtn">
-                        <Button onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>
+                        <Button data-cy="editBtn" onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>
                           {intl.formatMessage(this.messages[`${type}.collective.edit`])}
                         </Button>
                       </div>
