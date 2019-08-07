@@ -50,6 +50,8 @@
   "collective.addHostBtn": "Añade un host",
   "collective.address.label": "Dirección",
   "collective.amount.label": "monto",
+  "collective.application.description": "Enable application from collectives",
+  "collective.application.label": "Application",
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Solo se pueden archivar los Colectivos con balance igual a cero. Para pagar los fondos, envíe un gasto, done su remanente a otro Colectivo o envíe fondos a su anfitrión fiscal utilizando la opción 'saldo vacío'.",
   "collective.archive.button": "Archive esto {type}",

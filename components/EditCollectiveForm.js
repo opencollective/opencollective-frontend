@@ -72,6 +72,7 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
     collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
+    collective.application = get(collective, 'settings.apply');
     collective.goals = get(collective, 'settings.goals');
     collective.markdown = get(collective, 'settings.markdown');
 
@@ -191,6 +192,14 @@ class EditCollectiveForm extends React.Component {
       'sendInvoiceByEmail.description': {
         id: 'collective.sendInvoiceByEmail.description',
         defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email',
+      },
+      'application.label': {
+        id: 'collective.application.label',
+        defaultMessage: 'Application',
+      },
+      'application.description': {
+        id: 'collective.application.description',
+        defaultMessage: 'Enable application from collectives',
       },
       'hostFeePercent.label': {
         id: 'collective.hostFeePercent.label',
@@ -515,6 +524,13 @@ class EditCollectiveForm extends React.Component {
         },
       ],
       advanced: [
+        {
+          name: 'application',
+          className: 'horizontal',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'settings.apply'),
+          when: () => this.state.section === 'advanced' && collective.isHost,
+        },
         {
           name: 'sendInvoiceByEmail',
           className: 'horizontal',
