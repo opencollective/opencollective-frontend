@@ -1,10 +1,12 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+
+import { compose } from '../lib/utils';
 
 import Button from './Button';
 import Link from './Link';

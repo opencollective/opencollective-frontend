@@ -2,13 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get, pick, difference } from 'lodash';
-import { compose, graphql } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { isURL } from 'validator';
 import { Close } from 'styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
 
 import events from '../lib/constants/notificationEvents';
+
+import { compose } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
 
 import Loading from './Loading';

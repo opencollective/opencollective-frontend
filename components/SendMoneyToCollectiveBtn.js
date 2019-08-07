@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
-import SmallButton from './SmallButton';
 import { get, pick } from 'lodash';
-import { formatCurrency } from '../lib/utils';
+
+import { compose, formatCurrency } from '../lib/utils';
+
+import SmallButton from './SmallButton';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {

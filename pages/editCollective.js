@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import { get } from 'lodash';
@@ -11,6 +10,7 @@ import EditCollective from '../components/EditCollective';
 import ErrorPage from '../components/ErrorPage';
 import MessageBox from '../components/MessageBox';
 
+import { compose } from '../lib/utils';
 import { addCollectiveToEditData } from '../lib/graphql/queries';
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
 

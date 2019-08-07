@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { debounce, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
@@ -14,7 +14,7 @@ import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
 import { stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { formatCurrency, getEnvVar, parseToBoolean } from '../../lib/utils';
+import { compose, formatCurrency, getEnvVar, parseToBoolean } from '../../lib/utils';
 import { getPaypal } from '../../lib/paypal';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';

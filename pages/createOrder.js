@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
+import { compose } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
 
 import ErrorPage from '../components/ErrorPage';

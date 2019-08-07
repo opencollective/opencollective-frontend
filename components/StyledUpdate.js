@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 import ReactTooltip from 'react-tooltip';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { Lock } from 'styled-icons/fa-solid';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+
+import { compose, formatDate } from '../lib/utils';
+import { Router } from '../server/pages';
 
 import Container from './Container';
 import Avatar from './Avatar';
@@ -19,8 +22,6 @@ import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import UpdateTextWithData from './UpdateTextWithData';
 import { H3 } from './Text';
-import { formatDate } from '../lib/utils';
-import { Router } from '../server/pages';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
