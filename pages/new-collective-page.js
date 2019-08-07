@@ -7,7 +7,7 @@ import memoizeOne from 'memoize-one';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { lighten, darken } from 'polished';
 
-import theme, { generateTheme } from '../lib/constants/theme';
+import theme, { generateTheme } from '../lib/theme';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';

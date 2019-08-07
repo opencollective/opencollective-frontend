@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { background, border, color, layout, flexbox, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import { overflow } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/constants/theme';
 import propTypes from '@styled-system/prop-types';
+import { overflow } from '../lib/styled_system_custom';
+import { buttonSize, buttonStyle } from '../lib/theme';
 
 const getBorderColor = ({ error, success }) => {
   if (error) {
