@@ -79,7 +79,7 @@ class CollectiveCover extends React.Component {
     callsToAction: PropTypes.shape({
       hasContact: PropTypes.bool,
       hasSubmitExpense: PropTypes.bool,
-    }).isRequired,
+    }),
     href: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
