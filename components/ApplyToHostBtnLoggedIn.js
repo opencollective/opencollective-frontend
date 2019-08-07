@@ -87,14 +87,6 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       );
     }
 
-    if (host && host.slug === 'opensource') {
-      return (
-        <Button className="blue" href={`/${host.slug}/apply`}>
-          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-        </Button>
-      );
-    }
-
     if (data.allCollectives.total > 0) {
       this.inactiveCollective = data.allCollectives.collectives[0];
     }
