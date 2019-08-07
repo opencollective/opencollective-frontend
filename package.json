@@ -17,7 +17,6 @@
     "@octokit/rest": "16.28.7",
     "@opencollective/taxes": "2.3.0",
     "algoliasearch": "3.33.0",
-    "amqplib": "0.5.5",
     "apollo-errors": "1.9.0",
     "apollo-server-express": "2.8.1",
     "argparse": "1.0.10",
