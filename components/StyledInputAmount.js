@@ -19,7 +19,7 @@ const StyledInputAmount = ({ currency, min, max, value, onChange, ...props }) =>
       min={min}
       max={max}
       value={isNil(value) || value === '' ? '' : clamp(value, !min ? 0 : 1, max)}
-      prepend={props.pre || getCurrencySymbol(currency)}
+      prepend={getCurrencySymbol(currency)}
       onChange={e => {
         // We don't cap on min because we want the user to be able to erase the input
         // and to progressively type the number without forcing a value.

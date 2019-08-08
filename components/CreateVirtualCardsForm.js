@@ -369,7 +369,7 @@ class CreateVirtualCardsForm extends Component {
             <StyledInputAmount
               id="virtualcard-amount"
               currency={this.props.currency}
-              pre={this.props.currency}
+              prepend={this.props.currency}
               onChange={e => this.onChange('amount', e.target.value)}
               error={this.getError('amount')}
               value={values.amount}
