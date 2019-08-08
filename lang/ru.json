@@ -915,7 +915,6 @@
   "signin.noAccount": "Don't have an account?",
   "signin.unknownEmail": "Нет пользователя с такой почтой.",
   "signin.usingEmail": "Авторизоваться по электронной почте:",
-  "SinceDate": "Since {date}",
   "subscription.amountToDate": "contributed to date",
   "subscription.cancel.btn": "да",
   "subscription.cancel.no.btn": "нет",

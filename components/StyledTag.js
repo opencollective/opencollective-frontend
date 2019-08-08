@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { background, borderRadius, color, space, border, fontSize, fontWeight, lineHeight } from 'styled-system';
+import { background, border, color, space, typography, layout } from 'styled-system';
 
 /** Simple tag to display a short string */
 const StyledTag = styled.span`
@@ -13,13 +13,12 @@ const StyledTag = styled.span`
   color: #71757A;
 
   ${background}
-  ${borderRadius}
+  ${border}
   ${color}
   ${space}
   ${border}
-  ${fontSize}
-  ${fontWeight}
-  ${lineHeight}
+  ${typography}
+  ${layout}
 `;
 
 /** @component */

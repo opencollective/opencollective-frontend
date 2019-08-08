@@ -915,7 +915,6 @@
   "signin.noAccount": "Don't have an account?",
   "signin.unknownEmail": "There is no user with this email address.",
   "signin.usingEmail": "Sign in using your email address:",
-  "SinceDate": "Since {date}",
   "subscription.amountToDate": "contributed to date",
   "subscription.cancel.btn": "yes",
   "subscription.cancel.no.btn": "no",
