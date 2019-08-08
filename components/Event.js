@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Markdown from 'react-markdown';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { uniqBy, get, union } from 'lodash';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -10,9 +13,7 @@ import NotificationBar from './NotificationBar';
 import Sponsors from './Sponsors';
 import Responses from './Responses';
 import { filterCollection, trimObject } from '../lib/utils';
-import Markdown from 'react-markdown';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { uniqBy, get, union } from 'lodash';
+import { canOrderTicketsFromEvent, moneyCanMoveFromEvent } from '../lib/events';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../lib/graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
@@ -120,8 +121,7 @@ class Event extends React.Component {
 
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = { sponsors: [] };
-
-    const isEventOver = new Date(event.endsAt).getTime() < new Date().getTime();
+    const canOrderTickets = canOrderTicketsFromEvent(event);
 
     const guests = {};
     guests.interested = [];
@@ -163,7 +163,7 @@ class Event extends React.Component {
 
     let notification = {};
     // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
-    if (isEventOver && get(this.props.event, 'stats.balance') > 0 && canEditEvent) {
+    if (canEditEvent && moneyCanMoveFromEvent(event)) {
       notification = {
         title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
         description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], {
@@ -251,7 +251,7 @@ class Event extends React.Component {
                 collective={event}
                 title={event.name}
                 LoggedInUser={LoggedInUser}
-                cta={{ label: 'tickets', href: '#tickets' }}
+                cta={canOrderTickets ? { label: 'tickets', href: '#tickets' } : null}
               />
 
               <div>
@@ -259,12 +259,12 @@ class Event extends React.Component {
                   <div className="eventDescription">
                     <Markdown source={event.longDescription || event.description} escapeHtml={false} />
                   </div>
-                  {isEventOver && event.endsAt ? null : (
+                  {!canOrderTickets ? null : (
                     <section id="tickets">
                       <SectionTitle
                         section="tickets"
                         action={
-                          LoggedInUser && LoggedInUser.canEditCollective(event)
+                          canEditEvent
                             ? {
                                 label: intl.formatMessage(this.messages['event.tickets.edit']),
                                 href: `${event.path}/edit#tiers`,
