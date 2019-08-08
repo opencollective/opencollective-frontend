@@ -1009,7 +1009,7 @@ export async function addFundsToCollective(order, remoteUser) {
   } catch (e) {
     // Don't save new card for user if order failed
     if (!order.paymentMethod.id && !order.paymentMethod.uuid) {
-      await orderCreated.paymentMethod.update({ CollectiveId: null });
+      await orderCreated.paymentMethod.destroy();
     }
     throw e;
   }

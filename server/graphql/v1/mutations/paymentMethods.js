@@ -182,7 +182,7 @@ export async function removePaymentMethod(paymentMethodId, remoteUser) {
     });
   }
 
-  return paymentMethod.update({ archivedAt: new Date() });
+  return paymentMethod.destroy();
 }
 
 /** Update payment method with given args */
