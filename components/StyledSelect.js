@@ -1,8 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { typography, layout, space } from 'styled-system';
 import Select, { components } from 'react-select';
 import { injectIntl, defineMessages } from 'react-intl';
+import propTypes from '@styled-system/prop-types';
 
 const Messages = defineMessages({
   loading: {
@@ -92,6 +94,20 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
   ${layout}
   ${space}
 `;
+
+StyledSelect.propTypes = {
+  placeholder: PropTypes.string,
+  /** Wether the component is disabled */
+  disabled: PropTypes.bool,
+  /** Alias for `disabled` */
+  isDisabled: PropTypes.bool,
+  /** @ignore from injectIntl */
+  intl: PropTypes.object,
+  // Styled-system
+  ...propTypes.typography,
+  ...propTypes.layout,
+  ...propTypes.space,
+};
 
 StyledSelect.defaultProps = {
   fontSize: 'Paragraph',
