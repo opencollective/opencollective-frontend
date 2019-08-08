@@ -6,15 +6,27 @@ import Button from './Button';
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
 import { get } from 'lodash';
 import HelpTooltip from './HelpTooltip';
+import { withUser } from './UserProvider';
 
 class ApplyToHostBtn extends React.Component {
   static propTypes = {
+    host: PropTypes.shape({
+      slug: PropTypes.string,
+      hostFeePercent: PropTypes.number,
+      settings: PropTypes.shape({
+        tos: PropTypes.string,
+      }),
+    }).isRequired,
     LoggedInUser: PropTypes.object,
-    host: PropTypes.object.isRequired,
+    showConditions: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    showConditions: true,
   };
 
   render() {
-    const { LoggedInUser, host } = this.props;
+    const { LoggedInUser, host, showConditions } = this.props;
 
     return (
       <div className="ApplyToHostBtn">
@@ -32,30 +44,32 @@ class ApplyToHostBtn extends React.Component {
           </Button>
         )}
         {LoggedInUser && <ApplyToHostBtnLoggedIn LoggedInUser={LoggedInUser} host={host} />}
-        <div className="hostConditions">
-          <FormattedMessage
-            id="transaction.hostFeeInHostCurrency"
-            defaultMessage="{percentage} host fee"
-            values={{ percentage: `${host.hostFeePercent || 0}%` }}
-          />
-          <HelpTooltip className="dark">
+        {showConditions && (
+          <div className="hostConditions">
             <FormattedMessage
-              id="host.hostFee.help"
-              defaultMessage="The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities."
+              id="transaction.hostFeeInHostCurrency"
+              defaultMessage="{percentage} host fee"
+              values={{ percentage: `${host.hostFeePercent || 0}%` }}
             />
-          </HelpTooltip>
-          {get(host, 'settings.tos') && (
-            <span>
-              &nbsp; - &nbsp;
-              <a href={get(host, 'settings.tos')}>
-                <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
-              </a>
-            </span>
-          )}
-        </div>
+            <HelpTooltip className="dark">
+              <FormattedMessage
+                id="host.hostFee.help"
+                defaultMessage="The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities."
+              />
+            </HelpTooltip>
+            {get(host, 'settings.tos') && (
+              <span>
+                &nbsp; - &nbsp;
+                <a href={host.settings.tos}>
+                  <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
+                </a>
+              </span>
+            )}
+          </div>
+        )}
       </div>
     );
   }
 }
 
-export default ApplyToHostBtn;
+export default withUser(ApplyToHostBtn);

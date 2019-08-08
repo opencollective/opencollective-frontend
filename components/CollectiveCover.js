@@ -519,7 +519,7 @@ ${description}`;
                   </div>
                   <FormattedMessage
                     id="collective.stats.totalAmountSpent.label"
-                    defaultMessage="Total amount donated"
+                    defaultMessage="Total amount contributed"
                   />
                 </div>
                 {stats.totalAmountRaised > 0 && (

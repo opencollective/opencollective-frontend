@@ -166,6 +166,7 @@ const getCollective = graphql(gql`
       settings
       isArchived
       isHost
+      hostFeePercent
       image
       stats {
         id
