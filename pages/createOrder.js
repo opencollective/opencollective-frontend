@@ -143,6 +143,7 @@ class CreateOrderPage extends React.Component {
           defaultQuantity={quantity}
           fixedInterval={interval}
           fixedAmount={totalAmount}
+          customData={this.props.customData}
         />
       );
     }
