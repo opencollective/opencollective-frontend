@@ -915,7 +915,6 @@
   "signin.noAccount": "Don't have an account?",
   "signin.unknownEmail": "No hay ningún usuario con esta dirección de correo electrónico.",
   "signin.usingEmail": "Inicia sesión con tu dirección de correo electrónico:",
-  "SinceDate": "Since {date}",
   "subscription.amountToDate": "contribuido hasta la fecha",
   "subscription.cancel.btn": "sí",
   "subscription.cancel.no.btn": "no",
