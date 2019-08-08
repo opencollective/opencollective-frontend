@@ -206,7 +206,7 @@ class CreateOrderPage extends React.Component {
       step: stepName === 'contributeAs' ? undefined : stepName,
       totalAmount: this.props.fixedAmount ? this.props.fixedAmount.toString() : undefined,
       interval: this.props.fixedInterval || undefined,
-      ...pick(this.props, ['interval', 'description', 'redirect', 'eventSlug']),
+      ...pick(this.props, ['interval', 'description', 'redirect']),
       ...routeParams,
     };
 
