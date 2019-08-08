@@ -62,7 +62,7 @@ const MemberCard = ({ role, since, collective, ...cardProps }) => (
       <Span textAlign="center" fontSize="Caption" color="black.600" mt={2} mb={2}>
         <FormattedMessage
           id="membership.description"
-          defaultMessage="{role, select, ADMIN {Core Contributor} MEMBER {Contributor} BACKER {Backer}} since {date}"
+          defaultMessage="{role, select, ADMIN {Collective Admin} MEMBER {Core Contributor} BACKER {Contributor}} since {date}"
           values={{ role, date: formatDate(since) }}
         />
       </Span>

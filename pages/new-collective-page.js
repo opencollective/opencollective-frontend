@@ -190,6 +190,7 @@ const getCollective = graphql(gql`
         id
         name
         roles
+        isAdmin
         isCore
         isBacker
         isFundraiser
