@@ -81,7 +81,7 @@ describe('stripe.creditcard', () => {
           balance_transaction: 'txn_1B5j92D8MNtzsDcgQzIcmfrn',
         });
       nock('https://api.stripe.com:443')
-        .get('/v1/balance/history/txn_1B5j92D8MNtzsDcgQzIcmfrn')
+        .get('/v1/balance_transactions/txn_1B5j92D8MNtzsDcgQzIcmfrn')
         .reply(200, { amount: 1000, fee: 0, fee_details: [] });
     });
 
