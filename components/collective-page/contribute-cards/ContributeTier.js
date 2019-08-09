@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box, Flex } from '@rebass/grid';
 import { truncate } from 'lodash';
 
 import { formatCurrency } from '../../../lib/utils';
@@ -50,70 +50,89 @@ const ContributeTier = ({ intl, collective, tier }) => {
 
   return (
     <Contribute
-      contributeRoute={`/${collective.slug}/contribute/${tier.slug}-${tier.id}`}
-      type={getContributionTypeFromTier(tier)}
+      route="orderCollectiveTierNew"
+      routeParams={{ collectiveSlug: collective.slug, verb: 'contribute', tierSlug: tier.slug, tierId: tier.id }}
       title={tier.name}
+      type={getContributionTypeFromTier(tier)}
+      buttonText={tier.button}
     >
-      {tier.goal && (
-        <Box mb={3}>
-          <P fontSize="Paragraph" color="black.500" mb={2}>
-            <FormattedMessage
-              id="TierPage.AmountGoal"
-              defaultMessage="{amountWithInterval} goal"
-              values={{
-                amountWithInterval: (
-                  <FormattedMoneyAmount
-                    fontWeight="bold"
-                    fontSize="H5"
-                    color="black.900"
-                    amount={tier.goal}
-                    interval={tier.interval}
-                    currency={currency}
-                  />
-                ),
-              }}
-            />
+      <Flex flexDirection="column" justifyContent="space-between" height="100%">
+        <div>
+          {tier.goal && (
+            <Box mb={3}>
+              <P fontSize="Paragraph" color="black.600" mb={2}>
+                <FormattedMessage
+                  id="TierPage.AmountGoal"
+                  defaultMessage="{amountWithInterval} goal"
+                  values={{
+                    amountWithInterval: (
+                      <FormattedMoneyAmount
+                        amount={tier.goal}
+                        interval={tier.interval}
+                        currency={currency}
+                        amountStyles={{ fontWeight: 'bold', fontSize: 'H5', color: 'black.900' }}
+                      />
+                    ),
+                  }}
+                />
+              </P>
+              <P fontSize="Caption" color="black.500">
+                <FormattedMessage
+                  id="TierPage.AmountRaised"
+                  defaultMessage="{amountWithInterval} raised"
+                  values={{
+                    amountWithInterval: (
+                      <FormattedMoneyAmount
+                        amountStyles={{ fontWeight: 'bold' }}
+                        amount={raised}
+                        currency={currency}
+                        interval={tier.interval}
+                      />
+                    ),
+                  }}
+                />
+                {tier.goal && ` (${Math.round((raised / tier.goal) * 100)}%)`}
+              </P>
+              <Box mt={1}>
+                <StyledProgressBar percentage={raised / tier.goal} />
+              </Box>
+            </Box>
+          )}
+          <P mb={4} mt={2}>
+            {description}{' '}
+            {tier.hasLongDescription && (
+              <Link
+                route="tier"
+                params={{
+                  collectiveSlug: collective.slug,
+                  verb: 'contribute',
+                  tierSlug: tier.slug,
+                  tierId: tier.id,
+                }}
+              >
+                <Span textTransform="capitalize" whiteSpace="nowrap">
+                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+                </Span>
+              </Link>
+            )}
           </P>
-          <P fontSize="Caption" color="black.500">
-            <FormattedMessage
-              id="TierPage.AmountRaised"
-              defaultMessage="{amountWithInterval} raised"
-              values={{
-                amountWithInterval: (
-                  <FormattedMoneyAmount
-                    fontWeight="bold"
-                    amount={raised}
-                    currency={currency}
-                    interval={tier.interval}
-                  />
-                ),
-              }}
-            />
-            {tier.goal && ` (${Math.round((raised / tier.goal) * 100)}%)`}
-          </P>
-          <Box mt={1}>
-            <StyledProgressBar percentage={raised / tier.goal} />
-          </Box>
-        </Box>
-      )}
-      <P mb={4} mt={2}>
-        {description}{' '}
-        {tier.hasLongDescription && (
-          <Link
-            route="orderCollectiveTierNew"
-            params={{
-              collectiveSlug: collective.slug,
-              verb: 'contribute',
-              tierSlug: tier.slug,
-              tierId: tier.id,
-            }}
-          >
-            <Span textTransform="capitalize" whiteSpace="nowrap">
-              <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-            </Span>
-          </Link>
+        </div>
+        {minAmount && (
+          <div>
+            <P fontSize="Tiny" color="black.600" textTransform="uppercase" mb={1}>
+              <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
+            </P>
+            <P color="black.700">
+              <FormattedMoneyAmount
+                amount={minAmount}
+                interval={tier.interval}
+                currency={currency}
+                amountStyles={{ fontSize: 'H5', fontWeight: 'bold', color: 'black.900' }}
+              />
+            </P>
+          </div>
         )}
-      </P>
+      </Flex>
     </Contribute>
   );
 };
@@ -132,6 +151,7 @@ ContributeTier.propTypes = {
     hasLongDescription: PropTypes.bool,
     interval: PropTypes.string,
     amountType: PropTypes.string,
+    button: PropTypes.string,
     goal: PropTypes.number,
     minAmount: PropTypes.number,
     amount: PropTypes.number,

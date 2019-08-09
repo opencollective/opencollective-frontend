@@ -69,25 +69,25 @@ const getContributeCTA = type => {
 /**
  * A contribute card with a "Contribute" call to action
  */
-const ContributeCard = ({ intl, title, type, contributeRoute, children }) => {
+const ContributeCard = ({ intl, title, type, route, routeParams, buttonText, children }) => {
   return (
     <StyledContributeCard>
       <CoverImage />
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
-        <div>
+        <Flex flexDirection="column" flex="1 1">
           <Box mb={3}>
             <StyledTag>{intl.formatMessage(I18nContributionType[type])}</StyledTag>
           </Box>
           <P fontSize="H5" mt={1} mb={3} fontWeight="bold" textTransform="capitalize">
             {title}
           </P>
-          <Box mb={4} mt={2}>
+          <Box py={2} height="100%" flex="1 1">
             {children}
           </Box>
-        </div>
-        <Link route={contributeRoute}>
+        </Flex>
+        <Link route={route} params={routeParams}>
           <StyledButton width={1} mb={2} mt={3}>
-            {getContributeCTA(type)}
+            {buttonText || getContributeCTA(type)}
           </StyledButton>
         </Link>
       </Flex>
@@ -102,6 +102,8 @@ ContributeCard.propTypes = {
   type: PropTypes.oneOf(Object.values(ContributionTypes)).isRequired,
   /** Route for the contribute button */
   route: PropTypes.string.isRequired,
+  /** A custom button text to override the default one */
+  buttonText: PropTypes.string,
   /** Params for the route */
   routeParams: PropTypes.object,
   /** The card body */

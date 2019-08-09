@@ -213,6 +213,7 @@ const getCollective = graphql(gql`
         currency
         amount
         minimumAmount
+        button
         stats {
           id
           totalDonated
