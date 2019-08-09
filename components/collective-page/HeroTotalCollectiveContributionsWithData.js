@@ -21,6 +21,8 @@ const TotalCollectiveContributionsQuery = gql`
   }
 `;
 
+const amountStyles = { fontSize: 'H5', fontWeight: 'bold' };
+
 /**
  * This component fetches its own data because we don't want to query these fields
  * for regular collective.
@@ -49,8 +51,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
           <FormattedMoneyAmount
             amount={data.Collective.stats.totalAmountSpent}
             currency={data.Collective.currency}
-            fontSize="H5"
-            fontWeight="bold"
+            amountStyles={amountStyles}
           />
         </Box>
       )}
@@ -62,8 +63,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
           <FormattedMoneyAmount
             amount={data.Collective.stats.totalAmountRaised}
             currency={data.Collective.currency}
-            fontSize="H5"
-            fontWeight="bold"
+            amountStyles={amountStyles}
           />
         </Box>
       )}

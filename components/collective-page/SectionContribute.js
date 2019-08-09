@@ -1,19 +1,22 @@
 import React from 'react';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { formatCurrency } from '../../lib/utils';
-import { H2 } from '../Text';
+import { H2, H3 } from '../Text';
 import StyledButton from '../StyledButton';
+import HorizontalScroller from '../HorizontalScroller';
 import Link from '../Link';
 
-import { ContributionTypes } from './_constants';
-import ContributeRow from './ContributeRow';
 import ContainerSectionContent from './ContainerSectionContent';
 import TopContributors from './TopContributors';
+import ContributeCardsContainer from './ContributeCardsContainer';
+
+import ContributeCustom from './contribute-cards/ContributeCustom';
+import ContributeTier from './contribute-cards/ContributeTier';
+import ContributeEvent from './contribute-cards/ContributeEvent';
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -21,133 +24,18 @@ import TopContributors from './TopContributors';
  */
 class SectionContribute extends React.PureComponent {
   static propTypes = {
+    tiers: PropTypes.arrayOf(PropTypes.object),
+    events: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
     }),
-    tiers: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        hasLongDescription: PropTypes.bool,
-        interval: PropTypes.string,
-        goal: PropTypes.number,
-        stats: PropTypes.shape({
-          totalRecurringDonations: PropTypes.number,
-          totalDonated: PropTypes.number,
-        }),
-      }),
-    ),
-    events: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        image: PropTypes.string,
-      }),
-    ),
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
       }),
     ),
-    intl: PropTypes.object,
   };
-
-  static messages = defineMessages({
-    customContribution: {
-      id: 'CollectivePage.Contribute.Custom',
-      defaultMessage: 'Custom contribution',
-    },
-    customContributionDetails: {
-      id: 'CollectivePage.Contribute.Custom.Description',
-      defaultMessage: 'Nothing there for you? Make a custom one time or recurring contribution.',
-    },
-    fallbackDescription: {
-      id: 'TierCard.DefaultDescription',
-      defaultMessage:
-        '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}} {minAmount, select, 0 {} other {for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!',
-    },
-  });
-
-  static getContributionTypeFromTier(tier) {
-    if (tier.goal) {
-      return ContributionTypes.FINANCIAL_GOAL;
-    }
-    return tier.interval ? ContributionTypes.FINANCIAL_RECURRING : ContributionTypes.FINANCIAL_ONE_TIME;
-  }
-
-  static getWayToContributeFromTier(collective, tier, intl) {
-    const tierRoute = `/${collective.slug}/contribute/${tier.slug}-${tier.id}`;
-    const currency = tier.currency || collective.currency;
-    let description = tier.description;
-    if (!description) {
-      const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minAmount : tier.amount;
-      description = intl.formatMessage(SectionContribute.messages.fallbackDescription, {
-        minAmount,
-        tierName: tier.name,
-        minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
-        interval: tier.interval,
-      });
-    }
-
-    return {
-      key: `tier-${tier.id}`,
-      type: SectionContribute.getContributionTypeFromTier(tier),
-      title: tier.name,
-      contributeRoute: `${tierRoute}/checkout`,
-      detailsRoute: tier.hasLongDescription ? tierRoute : null,
-      description,
-      interval: tier.interval,
-      goal: tier.goal,
-      raised: tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated,
-      currency,
-    };
-  }
-
-  static getWayToContributeFromEvent(collective, event) {
-    return {
-      key: `event-${event.id}`,
-      type: ContributionTypes.EVENT_PARTICIPATE,
-      title: event.name,
-      contributeRoute: `/${collective.slug}/events/${event.slug}`,
-      detailsRoute: `/${collective.slug}/events/${event.slug}`,
-      description: event.description,
-    };
-  }
-
-  /**
-   * Takes a list of tiers and return an array like [financialContributions, moreWaysToContribute]
-   * The returned contributions are properly formatted to be passed to `ContributeRow`.
-   */
-  getWaysToContribute = memoizeOne((collective, tiers, events) => {
-    const { intl } = this.props;
-
-    const financialContributions = [
-      // Static way to contribute: /donate
-      {
-        key: 'donate',
-        type: ContributionTypes.FINANCIAL_CUSTOM,
-        title: intl.formatMessage(SectionContribute.messages.customContribution),
-        description: intl.formatMessage(SectionContribute.messages.customContributionDetails),
-        contributeRoute: `/${collective.slug}/donate`,
-      },
-      // Add tiers as ways to contribute
-      ...(tiers || []).map(tier => {
-        return SectionContribute.getWayToContributeFromTier(collective, tier, intl);
-      }),
-    ];
-
-    // Add events as ways to contribute
-    const moreWaysToContribute = (events || []).map(event => {
-      return SectionContribute.getWayToContributeFromEvent(collective, event);
-    });
-
-    return [financialContributions, moreWaysToContribute];
-  });
 
   getTopContributors = memoizeOne(contributors => {
     const topOrgs = [];
@@ -189,7 +77,6 @@ class SectionContribute extends React.PureComponent {
 
   render() {
     const { collective, tiers, events, contributors } = this.props;
-    const [financialContributions, otherWaysToContribute] = this.getWaysToContribute(collective, tiers, events);
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
 
     return (
@@ -199,24 +86,67 @@ class SectionContribute extends React.PureComponent {
             <FormattedMessage id="CollectivePage.Contribute" defaultMessage="Contribute" />
           </H2>
         </ContainerSectionContent>
+
         <Box mb={4}>
-          <ContributeRow
-            contributionTypes={financialContributions}
-            title={
-              <FormattedMessage
-                id="CollectivePage.FinancialContributor"
-                defaultMessage="Become a financial contributor"
-              />
-            }
-          />
+          <HorizontalScroller>
+            {(ref, Chevrons) => (
+              <div>
+                <ContainerSectionContent>
+                  <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                    <H3 fontSize="H5" fontWeight="normal" color="black.900">
+                      <FormattedMessage
+                        id="CollectivePage.FinancialContributor"
+                        defaultMessage="Become a financial contributor"
+                      />
+                    </H3>
+                    <Box m={2} flex="0 0 50px">
+                      <Chevrons />
+                    </Box>
+                  </Flex>
+                </ContainerSectionContent>
+
+                <ContributeCardsContainer ref={ref}>
+                  <Box px={[3, 4]}>
+                    <ContributeCustom collective={collective} />
+                  </Box>
+                  {tiers.map(tier => (
+                    <Box key={tier.id} px={[3, 4]}>
+                      <ContributeTier collective={collective} tier={tier} />
+                    </Box>
+                  ))}
+                </ContributeCardsContainer>
+              </div>
+            )}
+          </HorizontalScroller>
         </Box>
-        {otherWaysToContribute.length > 0 && (
-          <ContributeRow
-            contributionTypes={otherWaysToContribute}
-            title={
-              <FormattedMessage id="CollectivePage.MoreWaysToContribute" defaultMessage="More ways to contribute" />
-            }
-          />
+        {events.length > 0 && (
+          <HorizontalScroller>
+            {(ref, Chevrons) => (
+              <div>
+                <ContainerSectionContent>
+                  <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                    <H3 fontSize="H5" fontWeight="normal" color="black.900">
+                      <FormattedMessage
+                        id="CollectivePage.MoreWaysToContribute"
+                        defaultMessage="More ways to contribute"
+                      />
+                    </H3>
+                    <Box m={2} flex="0 0 50px">
+                      <Chevrons />
+                    </Box>
+                  </Flex>
+                </ContainerSectionContent>
+
+                <ContributeCardsContainer ref={ref}>
+                  {events.map(event => (
+                    <Box key={event.id} px={[3, 4]}>
+                      <ContributeEvent collective={collective} event={event} />
+                    </Box>
+                  ))}
+                </ContributeCardsContainer>
+              </div>
+            )}
+          </HorizontalScroller>
         )}
         <ContainerSectionContent>
           <Link route="tiers" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
@@ -237,4 +167,4 @@ class SectionContribute extends React.PureComponent {
   }
 }
 
-export default injectIntl(SectionContribute);
+export default SectionContribute;
