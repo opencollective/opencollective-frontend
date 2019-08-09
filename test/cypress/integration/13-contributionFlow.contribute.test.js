@@ -81,7 +81,7 @@ describe('Contribution Flow: Order', () => {
       cy.contains('button', 'Make contribution').click();
 
       // ---- Final: Success ----
-      cy.get('#page-order-success', { timeout: 20000 }).contains('$500.00 per month');
+      cy.get('#page-order-success', { timeout: 20000 }).contains('$500.00 USD / mo.');
       cy.contains(`${user.firstName} ${user.lastName} is now a member of APEX's 'Sponsors' tier!`);
     });
   });
@@ -122,7 +122,7 @@ describe('Contribution Flow: Order', () => {
             cy.fillStripeInput();
             cy.contains('button', 'Make contribution').click();
           }
-          cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 per month');
+          cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 USD / mo.');
           // TestOrg is the name of the created organization.
           cy.contains("TestOrg is now a member of APEX's 'Sponsors' tier!");
         });

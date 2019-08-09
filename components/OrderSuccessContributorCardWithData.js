@@ -206,7 +206,6 @@ class OrderSuccessContributorCardWithData extends React.Component {
                     currency={currency}
                     interval={interval}
                     amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
-                    abbreviateAmount
                     abbreviateInterval
                   />
                 </Span>
