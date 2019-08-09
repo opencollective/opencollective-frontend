@@ -64,7 +64,7 @@ class CreateEvent extends React.Component {
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({
         status: 'idle',
-        result: { error: errorMsg }
+        result: { error: errorMsg },
       });
       throw new Error(errorMsg);
     }
