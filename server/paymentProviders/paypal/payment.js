@@ -100,15 +100,15 @@ export async function executePayment(order) {
 
 /** Create transaction in our database to reflect a PayPal charge */
 export async function createTransaction(order, paymentInfo) {
-  /* The `* 100` in the next lines convert from PayPal format in
-     dollars to Open Collective format in cents */
   const transaction = paymentInfo.transactions[0];
-  const amountFromPayPal = parseFloat(transaction.amount.total) * 100;
-  const paypalFee = parseFloat(get(transaction, 'related_resources.0.sale.transaction_fee.value', '0.0')) * 100;
+  const amountFromPayPal = parseFloat(transaction.amount.total);
+  const paypalFee = parseFloat(get(transaction, 'related_resources.0.sale.transaction_fee.value', '0.0'));
+  const amountFromPayPalInCents = Math.trunc(amountFromPayPal * 100);
+  const paypalFeeInCents = Math.trunc(paypalFee * 100);
   const currencyFromPayPal = transaction.amount.currency;
 
-  const hostFeeInHostCurrency = libpayments.calcFee(amountFromPayPal, order.collective.hostFeePercent);
-  const platformFeeInHostCurrency = libpayments.calcFee(amountFromPayPal, constants.OC_FEE_PERCENT);
+  const hostFeeInHostCurrency = libpayments.calcFee(amountFromPayPalInCents, order.collective.hostFeePercent);
+  const platformFeeInHostCurrency = libpayments.calcFee(amountFromPayPalInCents, constants.OC_FEE_PERCENT);
 
   const payload = {
     CreatedByUserId: order.createdByUser.id,
@@ -122,11 +122,11 @@ export async function createTransaction(order, paymentInfo) {
     amount: order.totalAmount,
     currency: order.currency,
     hostCurrency: currencyFromPayPal,
-    amountInHostCurrency: amountFromPayPal,
-    hostCurrencyFxRate: order.totalAmount / amountFromPayPal,
+    amountInHostCurrency: amountFromPayPalInCents,
+    hostCurrencyFxRate: order.totalAmount / amountFromPayPalInCents,
     hostFeeInHostCurrency,
     platformFeeInHostCurrency,
-    paymentProcessorFeeInHostCurrency: paypalFee,
+    paymentProcessorFeeInHostCurrency: paypalFeeInCents,
     taxAmount: order.taxAmount,
     description: order.description,
     data: paymentInfo,
