@@ -5,7 +5,7 @@ import { border, color, layout, typography, space } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/constants/theme';
+import { buttonSize, buttonStyle } from '../lib/theme';
 import StyledSpinner from './StyledSpinner';
 
 /**

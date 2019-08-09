@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/constants/theme';
+import { buttonSize, buttonStyle } from '../lib/theme';
 
 /**
  * styled-component anchor tag using styled-system
@@ -47,7 +47,7 @@ StyledLink.propTypes = {
   buttonStyle: PropTypes.oneOf(['primary', 'standard']),
   /**
    * styled-system prop: accepts any css 'color' value or theme alias
-   * See lib/constants/theme.js for the list of theme colors
+   * See lib/theme/colors.js for the list of theme colors
    */
   color: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'display' value */
