@@ -20,6 +20,7 @@ const CheckboxContainer = styled(Flex)`
   ${typography}
   height: ${props => props.size};
   align-items: center;
+  width: 100%;
 
   /* Hide the default checkbox */
   input {
