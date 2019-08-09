@@ -15,7 +15,7 @@
     "@opencollective/taxes": "2.3.0",
     "@rebass/grid": "6.1.0",
     "@styled-system/prop-types": "5.0.20",
-    "@styled-system/theme-get": "5.0.18",
+    "@styled-system/theme-get": "5.0.21",
     "@zeit/next-css": "0.2.1-canary.4",
     "accepts": "1.3.7",
     "apollo-cache-inmemory": "1.6.2",
