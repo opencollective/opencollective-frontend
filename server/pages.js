@@ -148,7 +148,11 @@ pages.add(
 
 // New collective page
 pages.add('new-collective-page', '/:slug/v2');
+// Hardcode some collectives for the beta program
+const collectivesBeta = process.env.NCP_BETA_COLLECTIVES || 'betree';
+pages.add('new-collective-page-beta', `/:slug(${collectivesBeta})`, 'new-collective-page');
 
+// Normal collective page
 pages.add('collective', '/:slug');
 
 export default pages;
