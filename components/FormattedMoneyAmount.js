@@ -3,48 +3,55 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Currency from './Currency';
-import { Span } from './Text';
 
 /**
- * A practical component to format amounts and their intervals., with proper
- * internationalization support. Accept all props from `Span`.
+ * A practical component to format amounts and their intervals with proper
+ * internationalization support.
  */
 const FormattedMoneyAmount = ({
-  abbreviate,
+  abbreviateAmount,
   abbreviateInterval,
   currency,
   precision,
   amount,
   interval,
-  ...spanProps
+  amountStyles,
 }) => {
-  if (!interval) {
-    return <Currency value={amount} currency={currency} precision={precision} abbreviate={abbreviate} {...spanProps} />;
-  }
+  const formattedAmount = (
+    <Currency
+      value={amount}
+      currency={currency}
+      precision={precision}
+      abbreviate={abbreviateAmount}
+      {...amountStyles}
+    />
+  );
 
-  return abbreviateInterval ? (
-    <Span {...spanProps}>
+  if (!interval) {
+    return (
+      <FormattedMessage
+        id="Amount"
+        defaultMessage="{amount} {currencyCode}"
+        values={{ amount: formattedAmount, currencyCode: currency }}
+      />
+    );
+  } else if (abbreviateInterval) {
+    return (
       <FormattedMessage
         id="AmountInterval"
-        defaultMessage="{amount} / {interval, select, month {mo.} year {yr.}}"
-        values={{
-          amount: <Currency value={amount} currency={currency} precision={precision} abbreviate={abbreviate} />,
-          interval: interval,
-        }}
+        defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.}}"
+        values={{ amount: formattedAmount, interval: interval, currencyCode: currency }}
       />
-    </Span>
-  ) : (
-    <Span {...spanProps}>
+    );
+  } else {
+    return (
       <FormattedMessage
         id="AmountIntervalLong"
-        defaultMessage="{amount} per {interval, select, month {month} year {year}}"
-        values={{
-          amount: <Currency value={amount} currency={currency} precision={precision} abbreviate={abbreviate} />,
-          interval: interval,
-        }}
+        defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year}}"
+        values={{ amount: formattedAmount, interval: interval, currencyCode: currency }}
       />
-    </Span>
-  );
+    );
+  }
 };
 
 FormattedMoneyAmount.propTypes = {
@@ -53,19 +60,21 @@ FormattedMoneyAmount.propTypes = {
   /** The currency (eg. `USD`, `EUR`...etc) */
   currency: PropTypes.string.isRequired,
   /** Abbreviate the name to display 100k instead of 100.000 */
-  abbreviate: PropTypes.bool,
+  abbreviateAmount: PropTypes.bool,
   /** Abbreviate the interval (eg. year => yr.) */
   abbreviateInterval: PropTypes.bool,
   /** How many numbers should we display after the comma */
   precision: PropTypes.number,
   /** An interval that goes with the amount */
   interval: PropTypes.oneOf(['month', 'year']),
+  /** Style for the amount (eg. `$10`). Doesn't apply on interval */
+  amountStyles: PropTypes.object,
 };
 
 FormattedMoneyAmount.defaultProps = {
   abbreviate: false,
+  abbreviateInterval: false,
   precision: 0,
-  abbreviateInterval: true,
 };
 
 export default FormattedMoneyAmount;

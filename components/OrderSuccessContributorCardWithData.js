@@ -196,19 +196,20 @@ class OrderSuccessContributorCardWithData extends React.Component {
           <Flex flexDirection="column" p={12} alignItems="center">
             {totalAmount !== 0 && (
               <React.Fragment>
-                <Span fontSize="10px">
+                <Span fontSize="Tiny">
                   <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
                 </Span>
-                <FormattedMoneyAmount
-                  fontWeight="bold"
-                  fontSize="Caption"
-                  color="black.900"
-                  abbreviateInterval={false}
-                  precision={2}
-                  amount={totalAmount}
-                  currency={currency}
-                  interval={interval}
-                />
+                <Span fontSize="Caption">
+                  <FormattedMoneyAmount
+                    precision={2}
+                    amount={totalAmount}
+                    currency={currency}
+                    interval={interval}
+                    amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                    abbreviateAmount
+                    abbreviateInterval
+                  />
+                </Span>
                 {member && member.publicMessage && (
                   <Container textAlign="center" color="black.600">
                     <PublicMessage onClick={this.showPopup}>“{member.publicMessage}”</PublicMessage>
