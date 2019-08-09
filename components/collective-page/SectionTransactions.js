@@ -19,6 +19,8 @@ import StyledFilters from '../StyledFilters';
 import ContainerSectionContent from './ContainerSectionContent';
 import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
+import StyledButton from '../StyledButton';
+import Link from '../Link';
 
 const FILTERS = { ALL: 'ALL', CREDIT: 'CREDIT', DEBIT: 'DEBIT' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -43,6 +45,7 @@ class SectionTransactions extends React.Component {
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
     }).isRequired,
 
     /** @ignore from withData */
@@ -95,7 +98,7 @@ class SectionTransactions extends React.Component {
   });
 
   render() {
-    const { data, intl } = this.props;
+    const { data, intl, collective } = this.props;
     const { filter } = this.state;
     let showFilters = true;
 
@@ -182,6 +185,11 @@ class SectionTransactions extends React.Component {
             );
           })}
         </DebitCreditList>
+        <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+          <StyledButton mt={3} width="100%">
+            <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
+          </StyledButton>
+        </Link>
       </ContainerSectionContent>
     );
   }
