@@ -124,6 +124,8 @@ describe('paypal.payment', () => {
     }); /* End of "#executePayment" */
 
     describe('#createTransaction', () => {
+      beforeEach(utils.resetTestDB);
+
       it('should create new transactions reflecting the PayPal charges', async () => {
         const { user } = await store.newUser('itsa-mi-mario');
 
@@ -182,6 +184,60 @@ describe('paypal.payment', () => {
         expect(tr.platformFeeInHostCurrency).to.equal(-250); // 5%
         expect(tr.paymentProcessorFeeInHostCurrency).to.equal(-175);
       });
-    });
+
+      it('works with float amounts', async () => {
+        const { user } = await store.newUser('iwantfloaats');
+        const { collective } = await store.newCollectiveWithHost('floating', 'USD', 'USD', 10);
+
+        const paymentMethod = await models.PaymentMethod.create({
+          name: 'test paypal',
+          service: 'paypal',
+          type: 'payment',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          CreatedByUserId: user.id,
+          uuid: uuidv4(),
+          token: 'EC-88888888888888888',
+        });
+
+        const order = await models.Order.create({
+          totalAmount: 5000,
+          currency: 'USD',
+          description: 'Donation to Hoodie',
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.collective.id,
+          CollectiveId: collective.id,
+          PaymentMethodId: paymentMethod.id,
+        });
+        order.createdByUser = user;
+        order.collective = collective;
+        order.paymentMethod = paymentMethod;
+
+        const genPaymentInfo = fee => ({
+          transactions: [
+            {
+              amount: { total: '50.00', currency: 'USD' },
+              related_resources: [
+                {
+                  sale: { transaction_fee: { value: fee } },
+                },
+              ],
+            },
+          ],
+        });
+
+        let tr = await paypalPayment.createTransaction(order, genPaymentInfo('0.28'));
+        expect(tr.paymentProcessorFeeInHostCurrency).to.equal(-28);
+
+        tr = await paypalPayment.createTransaction(order, genPaymentInfo('0.29'));
+        expect(tr.paymentProcessorFeeInHostCurrency).to.equal(-29);
+
+        tr = await paypalPayment.createTransaction(order, genPaymentInfo('0.56'));
+        expect(tr.paymentProcessorFeeInHostCurrency).to.equal(-56);
+
+        tr = await paypalPayment.createTransaction(order, genPaymentInfo('0.532'));
+        expect(tr.paymentProcessorFeeInHostCurrency).to.equal(-53);
+      });
+    }) /** End of #createTransaction */;
   }); /* End of "With PayPal auth" */
 });

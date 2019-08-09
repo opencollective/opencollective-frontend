@@ -7,6 +7,7 @@ import roles from '../../constants/roles';
 import * as constants from '../../constants/transactions';
 import * as libpayments from '../../lib/payments';
 import logger from '../../lib/logger';
+import { floatAmountToCents } from '../../lib/math';
 
 /** Build an URL for the PayPal API */
 export function paypalUrl(path) {
@@ -103,8 +104,8 @@ export async function createTransaction(order, paymentInfo) {
   const transaction = paymentInfo.transactions[0];
   const amountFromPayPal = parseFloat(transaction.amount.total);
   const paypalFee = parseFloat(get(transaction, 'related_resources.0.sale.transaction_fee.value', '0.0'));
-  const amountFromPayPalInCents = Math.trunc(amountFromPayPal * 100);
-  const paypalFeeInCents = Math.trunc(paypalFee * 100);
+  const amountFromPayPalInCents = floatAmountToCents(amountFromPayPal);
+  const paypalFeeInCents = floatAmountToCents(paypalFee);
   const currencyFromPayPal = transaction.amount.currency;
 
   const hostFeeInHostCurrency = libpayments.calcFee(amountFromPayPalInCents, order.collective.hostFeePercent);
