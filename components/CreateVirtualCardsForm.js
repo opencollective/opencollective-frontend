@@ -159,7 +159,7 @@ class CreateVirtualCardsForm extends Component {
         this.setState(state => ({ ...state, values: { ...state.values, amount: MIN_AMOUNT } }));
       }
     } else if (fieldName === 'paymentMethod') {
-      this.setState(state => ({ ...state, values: { ...state.values, PaymentMethodId: value.value.id } }));
+      this.setState(state => ({ ...state, values: { ...state.values, PaymentMethodId: value } }));
     } else if (fieldName === 'onlyOpensource') {
       this.setState(state => ({ ...state, values: { ...state.values, onlyOpensource: value } }));
     } else if (fieldName === 'customMessage') {

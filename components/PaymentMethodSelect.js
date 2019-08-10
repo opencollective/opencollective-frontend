@@ -35,7 +35,7 @@ class PaymentMethodSelect extends Component {
         name="paymentMethod"
         options={options}
         minWidth={300}
-        onChange={({ value }) => onChange && onChange(value)}
+        onChange={({ value }) => onChange(value)}
         value={value ? this.paymentMethodValueAndLabel(intl, value) : undefined}
         defaultValue={defaultPaymentMethod ? this.paymentMethodValueAndLabel(intl, defaultPaymentMethod) : options[0]}
         {...props}
