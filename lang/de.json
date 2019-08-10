@@ -59,7 +59,7 @@
   "collective.archive.button": "Archiviere {type}",
   "collective.archive.cancel.btn": "Abbrechen",
   "collective.archive.confirm.btn": "{action}",
-  "collective.archive.description": "Dies wird den/das {type} als archiviert markieren.",
+  "collective.archive.description": "Wird {type} als archiviert markieren.",
   "collective.archive.modal.body": "Bist Du Dir sicher, dass du dieses/diesen {type} {action} willst?",
   "collective.archive.modal.header": "{action} {name}",
   "collective.archive.subscriptions": "Wiederkehrende finanzielle Beiträge werden automatisch storniert.",
