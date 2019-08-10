@@ -15,9 +15,10 @@ import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import MessageBox from '../components/MessageBox';
-import StyledSelect from '../components/DeprecatedStyledSelect';
+import StyledSelect from '../components/StyledSelect';
 import { Link } from '../server/pages';
 import SearchForm from '../components/SearchForm';
+import { space } from 'styled-system';
 
 const DiscoverPageDataQuery = gql`
   query DiscoverPageDataQuery(
@@ -251,6 +252,7 @@ const DiscoverPage = ({ router, intl }) => {
                           setRouteParam('sort', selected && selected.key);
                         }
                       }}
+                      minWidth={space}
                     >
                       {({ value }) => intl.formatMessage(I18nSortLabels[value])}
                     </StyledSelect>
