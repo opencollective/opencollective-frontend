@@ -222,7 +222,7 @@ class EditHost extends React.Component {
                 >
                   <FormattedMessage id="collective.editHost.cancel.btn" defaultMessage={'Cancel'} />
                 </StyledButton>
-                <StyledButton buttonStyle="primary" onClick={() => this.changeHost()}>
+                <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
                   <FormattedMessage
                     id="collective.editHost.continue.btn"
                     values={{ action }}

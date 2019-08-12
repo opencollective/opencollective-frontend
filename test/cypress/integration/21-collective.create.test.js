@@ -52,6 +52,7 @@ describe('create a collective', () => {
     cy.get('.desktopOnly .editCollective a').click({ force: true });
     cy.get('.MenuItem.host', { timeout: 10000 }).click();
     cy.get('.removeHostBtn').click();
+    cy.get('[data-cy=continue]').click();
     cy.get('#noHost input:checked');
   });
 });
