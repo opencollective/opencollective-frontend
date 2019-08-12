@@ -120,14 +120,6 @@ export async function createCollective(_, args, req) {
     promises.push(collective.editTiers(collectiveData.tiers));
   }
 
-  if (collectiveData.paymentMethods) {
-    promises.push(
-      collective.editPaymentMethods(collectiveData.paymentMethods, {
-        CreatedByUserId: req.remoteUser.id,
-      }),
-    );
-  }
-
   if (collectiveData.HostCollectiveId) {
     promises.push(collective.addHost(hostCollective, req.remoteUser));
   }
