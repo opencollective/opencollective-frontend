@@ -16,7 +16,7 @@ export const encrypt = (buff, key) => {
   fullMessage.set(nonce);
   fullMessage.set(box, nonce.length);
 
-  return fullMessage;
+  return Buffer.from(fullMessage);
 };
 
 export const decrypt = (buffWithNonce, key) => {

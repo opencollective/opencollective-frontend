@@ -9,6 +9,8 @@ describe('lib.encryption', () => {
 
     const encrypted = encrypt(buff, key);
 
+    expect(Buffer.isBuffer(encrypted)).to.be.true;
+
     expect(encrypted).to.not.eq(message);
 
     const result = decrypt(encrypted, key);
