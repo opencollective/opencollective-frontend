@@ -22,12 +22,12 @@ const HELLO_WORKS_WORKFLOW_ID = get(config, 'helloworks.workflowId');
 const HELLO_WORKS_S3_BUCKET = get(config, 'helloworks.aws.s3.bucket');
 const ENCRYPTION_KEY = get(config, 'helloworks.documentEncryptionKey');
 
-const client = new HelloWorks({
-  apiKeyId: HELLO_WORKS_KEY,
-  apiKeySecret: HELLO_WORKS_SECRET,
-});
-
 async function callback(req, res) {
+  const client = new HelloWorks({
+    apiKeyId: HELLO_WORKS_KEY,
+    apiKeySecret: HELLO_WORKS_SECRET,
+  });
+
   const {
     body: { status, workflow_id: workflowId, data, id, metadata },
   } = req;
