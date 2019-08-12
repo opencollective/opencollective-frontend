@@ -1600,11 +1600,7 @@ export default function(Sequelize, DataTypes) {
     })
       .then(oldMembers => {
         // remove the members that are not present anymore
-        const diff = differenceBy(
-          oldMembers.map(t => ({ id: t.id, MemberCollectiveId: t.MemberCollectiveId })),
-          members.map(t => ({ id: t.id, MemberCollectiveId: t.MemberCollectiveId })),
-          'id',
-        );
+        const diff = differenceBy(oldMembers, members, 'id');
         if (diff.length === 0) {
           return null;
         } else {
