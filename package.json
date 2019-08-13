@@ -46,7 +46,7 @@
     "graphql": "14.4.2",
     "graphql-tag": "2.10.1",
     "html-pdf": "2.2.0",
-    "i18n-iso-countries": "4.2.1",
+    "i18n-iso-countries": "4.3.0",
     "intl": "1.2.5",
     "jsonwebtoken": "8.5.1",
     "load-script": "1.0.0",
