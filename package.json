@@ -21,7 +21,7 @@
     "apollo-server-express": "2.8.1",
     "argparse": "1.0.10",
     "async": "3.1.0",
-    "aws-sdk": "2.507.0",
+    "aws-sdk": "2.508.0",
     "axios": "0.19.0",
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-lodash": "3.3.4",
