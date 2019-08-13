@@ -810,18 +810,30 @@ export async function deleteUserCollective(_, args, req) {
     throw new Error('Can not delete user with paid expenses.');
   }
 
-  return models.Member.findAll({
+  const members = await models.Member.findAll({
     where: { MemberCollectiveId: userCollective.id },
-  })
-    .then(members => {
-      return map(
-        members,
-        member => {
-          return member.destroy();
-        },
-        { concurrency: 3 },
-      );
-    })
+    include: [{ model: models.Collective, as: 'collective' }],
+  });
+
+  const adminMembership = members.filter(m => m.role === roles.ADMIN);
+  if (adminMembership.length >= 1) {
+    for (const member of adminMembership) {
+      const admins = await member.collective.getAdmins();
+      if (admins.length === 1) {
+        throw new Error(
+          `Your account cannot be deleted, you're the only admin of ${member.collective.name}, please delete the collective or add a new admin.`,
+        );
+      }
+    }
+  }
+
+  return map(
+    members,
+    member => {
+      return member.destroy();
+    },
+    { concurrency: 3 },
+  )
     .then(() => debugDelete('deleteUserMemberships'))
     .then(async () => {
       const expenses = await models.Expense.findAll({ where: { UserId: user.id } });
