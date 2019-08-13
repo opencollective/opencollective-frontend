@@ -663,6 +663,13 @@ type CommentType {
 }
 
 """
+Input type for ConfirmOrderType
+"""
+input ConfirmOrderInputType {
+  id: Int
+}
+
+"""
 Input type for ConnectedAccountInputType
 """
 input ConnectedAccountInputType {
@@ -1452,6 +1459,7 @@ type Mutation {
   """
   editMembership(id: Int!, publicMessage: String): Member
   createOrder(order: OrderInputType!): OrderType
+  confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
@@ -1920,6 +1928,9 @@ type OrderType {
   Additional information on order: tax and custom fields
   """
   data: JSON
+  error: String
+  stripeAccount: String
+  stripeResponse: JSON
 }
 
 """

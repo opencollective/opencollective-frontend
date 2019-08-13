@@ -4,8 +4,8 @@
       "schemaPath": "lib/graphql/schema.graphql",
       "extensions": {
         "endpoints": {
-          "dev": "http://localhost:3000/api/graphql",
-          "prod": "https://opencollective.com/api/graphql"
+          "dev": "http://localhost:3060/graphql",
+          "prod": "https://api.opencollective.com/graphql"
         }
       }
     }
