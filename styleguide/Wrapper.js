@@ -6,7 +6,7 @@ import { IntlProvider } from 'react-intl';
 import StripeProvider from '../components/StripeProvider';
 import theme from '../lib/theme';
 
-const STRIPE_KEY = process.env.STRIPE_KEY || 'pk_test_5aBB887rPuzvWzbdRiSzV3QB';
+const STRIPE_KEY = process.env.STRIPE_KEY || 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8';
 
 export default class ThemeWrapper extends Component {
   static propTypes = {
