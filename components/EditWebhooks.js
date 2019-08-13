@@ -17,7 +17,7 @@ import StyledHr from './StyledHr';
 import MessageBox from './MessageBox';
 import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
-import StyledSelect from './StyledSelect';//change this to new styledselect dep
+import StyledSelect from './StyledSelect';
 import { Add } from 'styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
