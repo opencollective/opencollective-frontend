@@ -11,7 +11,6 @@ import * as errors from '../../errors';
 import cache from '../../../lib/cache';
 import * as github from '../../../lib/github';
 import recaptcha from '../../../lib/recaptcha';
-import slackLib from '../../../lib/slack';
 import * as libPayments from '../../../lib/payments';
 import { capitalize, pluralize, formatCurrency, md5 } from '../../../lib/utils';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount } from '../../../lib/subscriptions';
@@ -510,36 +509,72 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
     }
 
-    // Share suspicious transactions on Slack
-    if (recaptchaResponse && recaptchaResponse.score && recaptchaResponse.score <= 0.5) {
-      slackLib
-        .postActivityOnPublicChannel(
-          {
-            type: activities.ORDERS_SUSPICIOUS,
-            data: {
-              order,
-              user,
-              fromCollective,
-              collective,
-              recaptchaResponse,
-            },
-          },
-          config.slack.webhookUrl,
-          {
-            channel: config.slack.abuseChannel,
-          },
-        )
-        .catch(console.log);
-    }
-
     return order;
   } catch (error) {
-    debug('createOrder mutation error: ', error);
-    if (orderCreated && !orderCreated.processedAt) {
-      // TODO: Order should be updated with data JSON field to store the error to review later
-      orderCreated.update({ status: status.ERROR });
+    console.log(error);
+
+    if (orderCreated) {
+      if (!orderCreated.processedAt) {
+        // TODO: Order should be updated with data JSON field to store the error to review later
+        orderCreated.update({ status: status.ERROR });
+      }
+
+      orderCreated.error = error.message;
+
+      if (error.stripeAccount) {
+        orderCreated.stripeAccount = error.stripeAccount;
+      }
+      if (error.stripeResponse) {
+        orderCreated.stripeResponse = error.stripeResponse;
+      }
+
+      return orderCreated;
     }
+
     throw error;
+  }
+}
+
+export async function confirmOrder(order, remoteUser) {
+  if (!remoteUser) {
+    throw new errors.Unauthorized({ message: 'You need to be logged in to confirm an order' });
+  }
+
+  const existingOrder = await models.Order.findOne({
+    where: {
+      id: order.id,
+    },
+    include: [
+      { model: models.Collective, as: 'collective' },
+      { model: models.Collective, as: 'fromCollective' },
+      { model: models.PaymentMethod, as: 'paymentMethod' },
+    ],
+  });
+  if (!existingOrder) {
+    throw new errors.NotFound({ message: 'Order not found' });
+  }
+
+  if (!remoteUser.isAdmin(existingOrder.FromCollectiveId)) {
+    throw new errors.Unauthorized({ message: "You don't have permission to confirm this order" });
+  }
+
+  try {
+    await libPayments.executeOrder(remoteUser, existingOrder);
+
+    return existingOrder;
+  } catch (error) {
+    console.log(error);
+
+    existingOrder.error = error.message;
+
+    if (error.stripeAccount) {
+      existingOrder.stripeAccount = error.stripeAccount;
+    }
+    if (error.stripeResponse) {
+      existingOrder.stripeResponse = error.stripeResponse;
+    }
+
+    return existingOrder;
   }
 }
 

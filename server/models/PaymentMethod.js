@@ -173,7 +173,7 @@ export default function(Sequelize, DataTypes) {
             if (!instance.token) {
               throw new Error(`${instance.service} payment method requires a token`);
             }
-            if (instance.service === 'stripe' && !instance.token.match(/^(tok|src)_[a-zA-Z0-9]{24}/)) {
+            if (instance.service === 'stripe' && !instance.token.match(/^(tok|src|pm)_[a-zA-Z0-9]{24}/)) {
               if (process.env.NODE_ENV !== 'production' && stripe.isTestToken(instance.token)) {
                 // test token for end to end tests
               } else {
@@ -476,8 +476,15 @@ export default function(Sequelize, DataTypes) {
    * @param {*} paymentMethod { uuid } or { token, CollectiveId, ... } to create a new one and optionally attach it to CollectiveId
    * @post PaymentMethod { id, uuid, service, token, balance, CollectiveId }
    */
-  PaymentMethod.getOrCreate = (user, paymentMethod) => {
+  PaymentMethod.getOrCreate = async (user, paymentMethod) => {
     if (!paymentMethod.uuid) {
+      // If no UUID provided, we check if one with this token already exists
+      const paymentMethodWithToken = await models.PaymentMethod.findOne({
+        where: { token: paymentMethod.token },
+      });
+      if (paymentMethodWithToken) {
+        return paymentMethodWithToken;
+      }
       // If no UUID provided, we create a new paymentMethod
       const paymentMethodData = {
         ...paymentMethod,

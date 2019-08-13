@@ -53,6 +53,7 @@ export const createToken = (stripeAccount, customerId) => {
     'for customerId:',
     customerId,
   );
+
   return appStripe.tokens.create({ customer: customerId }, { stripe_account: stripeAccount.username });
 };
 

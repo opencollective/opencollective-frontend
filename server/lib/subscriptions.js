@@ -88,6 +88,13 @@ export async function processOrderWithSubscription(options, order) {
         transaction = await paymentsLib.processOrder(order);
         orderProcessedStatus = 'success';
       } catch (error) {
+        if (error.stripeResponse) {
+          if (error.stripeResponse.paymentIntent) {
+            // handle Payment Intent error
+            // Send an email to the user with a link to confirm the transaction
+            // await sendConfirmPaymentMethodEmail(order);
+          }
+        }
         orderProcessedStatus = 'failure';
         csvEntry.error = error.message;
       }

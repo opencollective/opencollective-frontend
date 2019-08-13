@@ -354,6 +354,14 @@ export const OrderInputType = new GraphQLInputObjectType({
   }),
 });
 
+export const ConfirmOrderInputType = new GraphQLInputObjectType({
+  name: 'ConfirmOrderInputType',
+  description: 'Input type for ConfirmOrderType',
+  fields: () => ({
+    id: { type: GraphQLInt },
+  }),
+});
+
 export const CommentInputType = new GraphQLInputObjectType({
   name: 'CommentInputType',
   description: 'Input type for CommentType',

@@ -1654,6 +1654,24 @@ export const OrderType = new GraphQLObjectType({
           return pick(order.data, ['tax', 'customData']) || null;
         },
       },
+      error: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.error;
+        },
+      },
+      stripeAccount: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.stripeAccount;
+        },
+      },
+      stripeResponse: {
+        type: GraphQLJSON,
+        resolve(order) {
+          return order.stripeResponse;
+        },
+      },
     };
   },
 });
