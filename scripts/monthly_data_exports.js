@@ -98,7 +98,7 @@ console.log('startDate', startDate, 'endDate', endDate);
 let month = startDate.getMonth() + 1;
 if (month < 10) month = `0${month}`;
 
-const path = `${GoogleDrivePath}/Data/${startDate.getFullYear()}-${month}`;
+const path = `${GoogleDrivePath}/Open Data/${startDate.getFullYear()}-${month}`;
 try {
   console.log('>>> mkdir', path);
   fs.mkdirSync(path);
