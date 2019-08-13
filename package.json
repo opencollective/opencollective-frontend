@@ -131,7 +131,7 @@
     "nyc": "^14.1.1",
     "prettier": "1.18.2",
     "react": "^16.9.0",
-    "react-dom": "^16.8.6",
+    "react-dom": "^16.9.0",
     "sinon": "^7.4.1",
     "supertest": "^4.0.2",
     "supertest-as-promised": "^4.0.2"
