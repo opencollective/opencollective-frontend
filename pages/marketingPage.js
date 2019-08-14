@@ -115,7 +115,7 @@ class MarketingPage extends React.Component {
       if (intl.locale != 'en' && languages[intl.locale]) {
         html = page.pageContents[`index.${intl.locale}.html`];
       }
-      html = html != null ? html : page.pageContents['index.html'];
+      html = html || page.pageContents['index.html'];
     }
 
     return (
