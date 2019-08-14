@@ -18,6 +18,8 @@ import StyledLink from './StyledLink';
 import StyledTooltip from './StyledTooltip';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
 
+import languages from '../src/constants/locales';
+
 const SocialLink = styled.a`
   align-items: center;
   border: 1px solid #9399a3;
@@ -72,14 +74,6 @@ const navigation = {
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',
   },
-};
-
-const languages = {
-  en: { name: 'English' },
-  fr: { name: 'French', nativeName: 'Français', completion: '66%' },
-  ja: { name: 'Japanese', nativeName: '日本語', completion: '37%' },
-  es: { name: 'Spanish', nativeName: 'Español', completion: '23%' },
-  ru: { name: 'Russian', nativeName: 'Русский', completion: '10%' },
 };
 
 const switchLanguage = (e, key) => {
