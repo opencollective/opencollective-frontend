@@ -49,6 +49,7 @@ export async function createCollective(_, args, req) {
   }
 
   collectiveData.isActive = false;
+
   if (args.collective.ParentCollectiveId) {
     parentCollective = await req.loaders.collective.findById.load(args.collective.ParentCollectiveId);
     if (!parentCollective) {
@@ -59,6 +60,7 @@ export async function createCollective(_, args, req) {
     collectiveData.HostCollectiveId = parentCollective.HostCollectiveId;
     if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
       collectiveData.isActive = true;
+      collectiveData.approvedAt = new Date();
     }
   }
 
@@ -72,6 +74,7 @@ export async function createCollective(_, args, req) {
 
     if (collectiveData.type === 'EVENT' || req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
       collectiveData.isActive = true;
+      // NOTE: events are not needing approvedAt
     } else if (!get(hostCollective, 'settings.apply')) {
       throw new errors.Unauthorized({
         message: 'This host does not accept applications for new collectives',
@@ -282,7 +285,7 @@ export async function createCollectiveFromGithub(_, args, req) {
   const promises = [
     collective.addUserWithRole(user, roles.ADMIN),
     collective.addHost(host, user, { skipCollectiveApplyActivity: true }),
-    collective.update({ isActive: true }),
+    collective.update({ isActive: true, approvedAt: new Date() }),
   ];
 
   await Promise.all(promises);
