@@ -1609,7 +1609,9 @@ export default function(Sequelize, DataTypes) {
           const diffMemberCollectiveIds = diff.map(m => m.MemberCollectiveId);
           const { remoteUserCollectiveId } = defaultAttributes;
           if (remoteUserCollectiveId && diffMemberCollectiveIds.indexOf(remoteUserCollectiveId) !== -1) {
-            throw new Error('You cannot remove yourself from collective, ask any other admin members to remove you.');
+            throw new Error(
+              'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
+            );
           }
           return models.Member.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diffMemberIds } } });
         }
