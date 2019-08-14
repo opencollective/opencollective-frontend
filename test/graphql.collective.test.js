@@ -816,7 +816,7 @@ describe('graphql.collective.test.js', () => {
       const adminMember = await models.User.findByPk(members[3].member.createdByUser.id);
       const res3 = await utils.graphqlQuery(query, { collective }, adminMember);
       expect(res3.errors[0].message).to.equal(
-        'You cannot remove yourself from collective, ask any other admin members to remove you.',
+        'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
       );
     });
 
