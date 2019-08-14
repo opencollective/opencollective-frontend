@@ -114,7 +114,7 @@ const getUpdatesQuery = gql`
         type
         name
         slug
-        image
+        imageUrl
       }
     }
   }

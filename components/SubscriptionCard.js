@@ -639,9 +639,9 @@ const updateSubscriptionQuery = gql`
         currency
         slug
         type
-        image
         description
         longDescription
+        imageUrl
         backgroundImage
       }
       fromCollective {

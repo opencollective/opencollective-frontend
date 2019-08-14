@@ -189,10 +189,9 @@ class CreateCollective extends React.Component {
         </style>
 
         <Header
+          collective={this.host}
           title={title}
           description={description}
-          twitterHandle={this.host.twitterHandle}
-          image={this.host.image || this.host.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
         />

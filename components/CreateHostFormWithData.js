@@ -84,7 +84,7 @@ const getConnectedAccountsQuery = gql`
           name
           isHost
           createdAt
-          image
+          imageUrl
           connectedAccounts {
             id
             service
@@ -119,7 +119,7 @@ const createCollectiveQuery = gql`
       id
       slug
       name
-      image
+      imageUrl
       createdAt
     }
   }

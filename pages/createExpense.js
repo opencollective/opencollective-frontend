@@ -206,10 +206,11 @@ const getCollectiveQuery = gql`
       path
       name
       currency
-      backgroundImage
       expensePolicy
       settings
       image
+      imageUrl
+      backgroundImage
       isHost
       isActive
       tags

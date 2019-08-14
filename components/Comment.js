@@ -233,7 +233,7 @@ const editCommentQuery = gql`
         type
         name
         slug
-        image
+        imageUrl
       }
     }
   }

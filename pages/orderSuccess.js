@@ -68,8 +68,8 @@ const GetOrderQuery = gql`
         type
         slug
         name
-        image
         path
+        imageUrl
         isIncognito
       }
       collective {

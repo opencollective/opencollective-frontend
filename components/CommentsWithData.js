@@ -151,7 +151,7 @@ const getCommentsQuery = gql`
         type
         name
         slug
-        image
+        imageUrl
       }
     }
   }
@@ -222,7 +222,7 @@ const createCommentQuery = gql`
         type
         name
         slug
-        image
+        imageUrl
       }
     }
   }

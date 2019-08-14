@@ -105,13 +105,7 @@ class HostDashboardPage extends React.Component {
     const host = data.Collective || {};
 
     return (
-      <Page
-        title={host.name || 'Host Dashboard'}
-        description={host.description}
-        twitterHandle={host.twitterHandle}
-        image={host.image || host.backgroundImage}
-        LoggedInUser={LoggedInUser}
-      >
+      <Page collective={host} title={host.name || 'Host Dashboard'} LoggedInUser={LoggedInUser}>
         {data.Collective && (
           <CollectiveCover
             collective={host}

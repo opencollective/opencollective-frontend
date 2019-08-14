@@ -88,10 +88,10 @@ const getOrderQuery = gql`
       fromCollective {
         id
         type
-        isIncognito
         name
         slug
-        image
+        imageUrl
+        isIncognito
       }
     }
   }

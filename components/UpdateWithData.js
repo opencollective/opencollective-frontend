@@ -65,7 +65,7 @@ const getUpdateQuery = gql`
         id
         slug
         name
-        image
+        imageUrl
       }
     }
   }
