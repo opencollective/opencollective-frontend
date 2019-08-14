@@ -765,6 +765,13 @@ describe('graphql.collective.test.js', () => {
               email: 'member1@hail.com',
             },
           },
+          {
+            role: 'ADMIN',
+            member: {
+              name: 'member2',
+              email: 'member2@hail.com',
+            },
+          },
         ],
         location: {},
       };
@@ -794,7 +801,7 @@ describe('graphql.collective.test.js', () => {
       res.errors && console.error(res.errors);
       expect(res.errors).to.not.exist;
       const members = res.data.editCollective.members;
-      expect(members.length).to.equal(3);
+      expect(members.length).to.equal(4);
       expect(members[2].role).to.equal('MEMBER');
       expect(members[2].member.name).to.equal('member1');
       expect(members[2].member.email).to.equal('member1@hail.com');
@@ -804,6 +811,12 @@ describe('graphql.collective.test.js', () => {
       expect(res2.errors).to.exist;
       expect(res2.errors[0].message).to.equal(
         'You must be logged in as an admin or as the host of this collective collective to edit it',
+      );
+
+      const adminMember = await models.User.findByPk(members[3].member.createdByUser.id);
+      const res3 = await utils.graphqlQuery(query, { collective }, adminMember);
+      expect(res3.errors[0].message).to.equal(
+        'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
       );
     });
 

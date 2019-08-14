@@ -8,7 +8,20 @@ import debugLib from 'debug';
 import fetch from 'isomorphic-fetch';
 import moment from 'moment';
 import * as ics from 'ics';
-import { get, difference, uniqBy, pick, pickBy, sumBy, keys, omit, defaults, includes, isNull } from 'lodash';
+import {
+  get,
+  difference,
+  differenceBy,
+  uniqBy,
+  pick,
+  pickBy,
+  sumBy,
+  keys,
+  omit,
+  defaults,
+  includes,
+  isNull,
+} from 'lodash';
 import uuid from 'uuid/v4';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
@@ -1592,12 +1605,20 @@ export default function(Sequelize, DataTypes) {
     })
       .then(oldMembers => {
         // remove the members that are not present anymore
-        const diff = difference(oldMembers.map(t => t.id), members.map(t => t.id));
+        const diff = differenceBy(oldMembers, members, 'id');
         if (diff.length === 0) {
           return null;
         } else {
           debug('editMembers', 'delete', diff);
-          return models.Member.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diff } } });
+          const diffMemberIds = diff.map(m => m.id);
+          const diffMemberCollectiveIds = diff.map(m => m.MemberCollectiveId);
+          const { remoteUserCollectiveId } = defaultAttributes;
+          if (remoteUserCollectiveId && diffMemberCollectiveIds.indexOf(remoteUserCollectiveId) !== -1) {
+            throw new Error(
+              'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
+            );
+          }
+          return models.Member.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diffMemberIds } } });
         }
       })
       .then(() => {
