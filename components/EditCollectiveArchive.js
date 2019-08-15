@@ -83,7 +83,9 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.description"
-            defaultMessage={'This will mark this {type} as archived.'}
+            defaultMessage={
+              'Archiving a {type} means it will visually appear inactive and no new activity will be allowed.'
+            }
           />
           &nbsp;
           {collective.type === 'COLLECTIVE' && (
