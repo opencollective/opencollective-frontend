@@ -191,15 +191,15 @@ class EditCollectiveForm extends React.Component {
       },
       'sendInvoiceByEmail.description': {
         id: 'collective.sendInvoiceByEmail.description',
-        defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email',
+        defaultMessage: 'Include a PDF of receipts with your monthly report email',
       },
       'application.label': {
         id: 'collective.application.label',
-        defaultMessage: 'Application',
+        defaultMessage: 'Applications',
       },
       'application.description': {
         id: 'collective.application.description',
-        defaultMessage: 'Enable application from collectives',
+        defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
       'hostFeePercent.label': {
         id: 'collective.hostFeePercent.label',
@@ -207,8 +207,7 @@ class EditCollectiveForm extends React.Component {
       },
       'hostFeePercent.description': {
         id: 'collective.hostFeePercent.description',
-        defaultMessage:
-          'Commission on all the donations received by the collectives that you are hosting to cover your administrative costs.',
+        defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
       },
       'location.label': {
         id: 'collective.location.label',
@@ -899,7 +898,7 @@ class EditCollectiveForm extends React.Component {
                   <Link route="collective" params={{ slug: collective.slug }}>
                     <FormattedMessage
                       id="collective.edit.backToProfile"
-                      defaultMessage="view the {type} page"
+                      defaultMessage="view {type} page"
                       values={{ type }}
                     />
                   </Link>
