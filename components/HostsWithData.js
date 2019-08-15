@@ -148,7 +148,6 @@ const getHostsQuery = gql`
         description
         longDescription
         currency
-        imageUrl
         backgroundImage
         stats {
           id

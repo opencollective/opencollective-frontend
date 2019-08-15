@@ -434,13 +434,15 @@ ${description}`;
           <div className="backgroundCover" style={style} />
 
           <div className="content">
-            <Link route={href} className="goBack">
-              {collective.type === 'USER' ? (
-                <Avatar collective={collective} className="logo" radius="10rem" />
-              ) : (
-                <Logo collective={collective} className="logo" height="10rem" />
-              )}
-            </Link>
+            {collective.slug && (
+              <Link route={href} className="goBack">
+                {collective.type === 'USER' ? (
+                  <Avatar collective={collective} className="logo" radius="10rem" />
+                ) : (
+                  <Logo collective={collective} className="logo" height="10rem" />
+                )}
+              </Link>
+            )}
             <h1>{title}</h1>
             {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
