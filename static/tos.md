@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated: 27th January 2017**
+**Last Updated: 16 August 2019**
 
 These Terms of Service ("**Terms**") apply to your access to and use of the websites, applications and other online products and services (collectively, our “**Platform**”) provided by Open Collective Inc. (“**Open Collective**” or “**we**”). **By creating an account or otherwise accessing the Platform, you agree to these Terms. If you do not agree to these Terms, including the mandatory arbitration provision and class action waiver in Section 18 that applies to residents of the United States, do not access or use our Platform.**
 
