@@ -1714,7 +1714,7 @@ export default function(Sequelize, DataTypes) {
           association: 'collective',
           include: [
             {
-              association: 'hostCollective',
+              association: 'HostCollective',
               where: { id: this.id },
             },
           ],
@@ -2404,7 +2404,7 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.LegalDocument);
     Collective.hasMany(m.RequiredLegalDocument, { foreignKey: 'HostCollectiveId' });
     Collective.hasMany(m.Collective, { as: 'hostedCollectives', foreignKey: 'HostCollectiveId' });
-    Collective.belongsTo(m.Collective, { as: 'hostCollective' });
+    Collective.belongsTo(m.Collective, { as: 'HostCollective' });
   };
 
   Historical(Collective, Sequelize);

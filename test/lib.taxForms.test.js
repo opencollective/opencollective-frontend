@@ -242,7 +242,7 @@ describe('lib.taxForms', () => {
       const result = await isUserTaxFormRequiredBeforePayment({
         invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
         year: moment().year(),
-        HostCollectiveId: hostCollective.id,
+        expenseCollectiveId: organisationCollectives[0].id,
         UserId: user.id,
       });
       expect(result).to.be.true;
@@ -257,7 +257,7 @@ describe('lib.taxForms', () => {
       const result = await isUserTaxFormRequiredBeforePayment({
         invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
         year: moment().year(),
-        HostCollectiveId: hostCollective.id,
+        expenseCollectiveId: organisationCollectives[0].id,
         UserId: user.id,
       });
       expect(result).to.be.false;
@@ -268,7 +268,7 @@ describe('lib.taxForms', () => {
       const result = await isUserTaxFormRequiredBeforePayment({
         invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
         year: moment().year(),
-        HostCollectiveId: hostCollective.id,
+        expenseCollectiveId: organisationCollectives[0].id,
         UserId: user.id,
       });
       expect(result).to.be.false;
@@ -279,7 +279,7 @@ describe('lib.taxForms', () => {
       const result = await isUserTaxFormRequiredBeforePayment({
         invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
         year: moment().year(),
-        HostCollectiveId: hostCollective.id,
+        expenseCollectiveId: organisationCollectives[0].id,
         UserId: user.id,
       });
       expect(result).to.be.false;

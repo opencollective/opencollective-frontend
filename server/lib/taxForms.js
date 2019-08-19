@@ -25,8 +25,15 @@ export async function findUsersThatNeedToBeSentTaxForm({ invoiceTotalThreshold, 
   return uniqBy(users, 'id');
 }
 
-export async function isUserTaxFormRequiredBeforePayment({ invoiceTotalThreshold, year, HostCollectiveId, UserId }) {
-  const host = await Collective.findByPk(HostCollectiveId);
+export async function isUserTaxFormRequiredBeforePayment({ invoiceTotalThreshold, year, expenseCollectiveId, UserId }) {
+  const collective = await Collective.findOne({
+    where: { id: expenseCollectiveId },
+    include: {
+      association: 'HostCollective',
+    },
+  });
+
+  const { HostCollective: host } = collective;
   const user = await User.findByPk(UserId);
   const requiredDocuments = await host.getRequiredLegalDocuments({
     where: {
