@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import tag from 'clean-tag';
 import { border, color, layout, typography, space } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/constants/theme';
+import { buttonSize, buttonStyle } from '../lib/theme';
 import StyledSpinner from './StyledSpinner';
 
 /**
@@ -14,7 +13,7 @@ import StyledSpinner from './StyledSpinner';
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledButtonContent = styled(tag.button)`
+const StyledButtonContent = styled.button`
   appearance: none;
   border: none;
   cursor: pointer;
@@ -58,8 +57,6 @@ const StyledButton = ({ loading, ...props }) =>
   );
 
 StyledButton.propTypes = {
-  /** @ignore */
-  omitProps: PropTypes.arrayOf(PropTypes.string),
   /**
    * Based on the design system theme
    */
@@ -106,7 +103,6 @@ StyledButton.propTypes = {
 };
 
 StyledButton.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'asLink', 'textTransform'),
   buttonSize: 'medium',
   buttonStyle: 'standard',
   loading: false,

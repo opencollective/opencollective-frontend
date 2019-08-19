@@ -80,12 +80,15 @@ class NotificationBar extends React.Component {
               }
             }
             .NotificationLine {
-              background: rgba(10, 200, 10, 0.9);
+              background: #009e4a;
               padding: 1rem;
               color: white;
               display: flex;
               align-items: center;
               flex-direction: column;
+            }
+            .collectivePending {
+              background: #ff8c00;
             }
             .NotificationLine h1 {
               font-size: 1.8rem;

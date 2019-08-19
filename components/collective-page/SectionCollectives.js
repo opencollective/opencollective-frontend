@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex } from '@rebass/grid';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
 import roles from '../../lib/constants/roles';
-import { H3, P } from '../Text';
+import { H2, P } from '../Text';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledMembershipCard from '../StyledMembershipCard';
 
@@ -90,19 +90,20 @@ class SectionCollectives extends React.PureComponent {
           </Flex>
         ) : (
           <React.Fragment>
-            <H3 mb={4} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+            <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
               <FormattedMessage id="CollectivePage.SectionCollectives.Title" defaultMessage="Collectives" />
-            </H3>
-            <Flex flexWrap="wrap">
+            </H2>
+            <Flex flexWrap="wrap" justifyContent={'space-evenly'}>
               {memberships.map(membership => (
-                <Box key={membership.id} mr={35} mb={40}>
-                  <StyledMembershipCard
-                    role={membership.role}
-                    description={membership.description}
-                    since={membership.since}
-                    toCollective={membership.collective}
-                  />
-                </Box>
+                <StyledMembershipCard
+                  key={membership.id}
+                  role={membership.role}
+                  description={membership.description}
+                  since={membership.since}
+                  toCollective={membership.collective}
+                  mb={40}
+                  mr={[1, 4]}
+                />
               ))}
             </Flex>
           </React.Fragment>
@@ -127,7 +128,13 @@ export default React.memo(
               id
               name
               slug
+              type
               description
+              backgroundImage
+              tags
+              host {
+                id
+              }
             }
           }
         }

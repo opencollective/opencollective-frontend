@@ -231,6 +231,16 @@ class StepPayment extends React.Component {
     return uniqBy(paymentMethodsOptions, 'key');
   }
 
+  getCursor(isDisabled, isSelected) {
+    if (isDisabled) {
+      return 'not-allowed';
+    } else if (!isSelected) {
+      return 'pointer';
+    } else {
+      return 'auto';
+    }
+  }
+
   render() {
     const { paymentMethodsOptions, errors, selectedOption } = this.state;
 
@@ -274,7 +284,7 @@ class StepPayment extends React.Component {
               borderBottom={index !== paymentMethodsOptions.length - 1 ? '1px solid' : 'none'}
               bg="white.full"
               borderColor="black.200"
-              cursor={this.props.disabled ? 'not-allowed' : 'pointer'}
+              cursor={this.getCursor(this.props.disabled, checked)}
             >
               <Flex alignItems="center">
                 <Box as="span" mr={[2, 21]} flexWrap="wrap">

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
+import { compose } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
 
 import ErrorPage from '../components/ErrorPage';
@@ -50,11 +51,9 @@ class CreateOrderPage extends React.Component {
 
     return {
       collectiveSlug: query.eventSlug || query.collectiveSlug,
-      eventSlug: query.eventSlug,
       totalAmount: parseInt(query.amount) * 100 || parseInt(query.totalAmount) || null,
       step: query.step || 'contributeAs',
       tierId: parseInt(query.tierId) || null,
-      tierSlug: query.tierSlug,
       quantity: parseInt(query.quantity) || 1,
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
@@ -67,8 +66,6 @@ class CreateOrderPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string, // for addData
-    eventSlug: PropTypes.string, // for addData
-    tierSlug: PropTypes.string,
     tierId: PropTypes.number,
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
@@ -81,11 +78,6 @@ class CreateOrderPage extends React.Component {
     referral: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from injectIntl
-    loadStripe: PropTypes.func.isRequired, // from withStripeLoader
-    LoggedInUser: PropTypes.object, // from withUser
-    loadingLoggedInUser: PropTypes.bool, // from withUser
-    createCollective: PropTypes.func,
-    refetchLoggedInUser: PropTypes.func,
   };
 
   getPageMetadata() {
@@ -128,20 +120,20 @@ class CreateOrderPage extends React.Component {
         </Flex>
       );
     } else {
-      const { verb, step, referral, redirect, description, quantity, interval, totalAmount } = this.props;
       return (
         <ContributionFlow
           collective={data.Collective}
           host={data.Collective.host}
           tier={data.Tier}
-          verb={verb}
-          step={step}
-          referral={referral}
-          redirect={redirect}
-          description={description}
-          defaultQuantity={quantity}
-          fixedInterval={interval}
-          fixedAmount={totalAmount}
+          verb={this.props.verb}
+          step={this.props.step}
+          referral={this.props.referral}
+          redirect={this.props.redirect}
+          description={this.props.description}
+          defaultQuantity={this.props.quantity}
+          fixedInterval={this.props.interval}
+          fixedAmount={this.props.totalAmount}
+          customData={this.props.customData}
         />
       );
     }

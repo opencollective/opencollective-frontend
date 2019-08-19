@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
-import { MediumM } from 'styled-icons/fa-brands/MediumM';
+import { Blog } from 'styled-icons/icomoon/Blog';
 import { Slack } from 'styled-icons/fa-brands/Slack';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Mail } from 'styled-icons/material/Mail';
@@ -68,7 +68,7 @@ const navigation = {
   },
   COMPANY: {
     About: 'https://docs.opencollective.com/help/about',
-    Blog: 'https://medium.com/open-collective',
+    Blog: 'https://blog.opencollective.com/',
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',
   },
@@ -164,8 +164,8 @@ class Footer extends React.Component {
             order={['2', null, '3']}
             maxWidth="300px"
           >
-            <SocialLink href="https://medium.com/open-collective">
-              <MediumM size={17} color="#9399A3" />
+            <SocialLink href="https://blog.opencollective.com/">
+              <Blog size={17} color="#9399A3" />
             </SocialLink>
             <SocialLink href="https://twitter.com/opencollect">
               <Twitter size={17} color="#9399A3" />

@@ -1,13 +1,8 @@
 require('./env');
 
 const withCSS = require('@zeit/next-css');
-const get = require('lodash/get');
 
 const nextConfig = {
-  onDemandEntries: {
-    // Make sure entries are not getting disposed.
-    maxInactiveAge: 1000 * 60 * 60,
-  },
   webpack: (config, { webpack }) => {
     config.plugins.push(
       // Ignore __tests__
@@ -97,14 +92,6 @@ const nextConfig = {
         },
       },
     });
-
-    // Disable the rule forcing react to be bundled in commons chunk
-    // Currently needed to skip the react-dom shipped by react-tag-input
-    if (get(config, 'optimization.splitChunks.cacheGroups.react')) {
-      delete config.optimization.splitChunks.cacheGroups.react;
-    }
-
-    config.optimization.minimize = false;
 
     return config;
   },

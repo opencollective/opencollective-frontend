@@ -52,7 +52,7 @@
   "collective.address.label": "Адрес",
   "collective.amount.label": "сумма",
   "collective.application.description": "Enable new Collectives to apply to join your Fiscal Host",
-  "collective.application.label": "Запросы",
+  "collective.application.label": "Applications",
   "collective.approved.description": "Your collective is already approved by the host ({host}).",
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option.",

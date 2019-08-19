@@ -1,10 +1,12 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+
+import { compose } from '../lib/utils';
 
 import Button from './Button';
 import Link from './Link';
@@ -80,14 +82,6 @@ class ApplyToHostBtnLoggedIn extends React.Component {
     if (data.loading) {
       return (
         <Button className="blue" disabled>
-          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-        </Button>
-      );
-    }
-
-    if (host && host.slug === 'opensource') {
-      return (
-        <Button className="blue" href={`/${host.slug}/apply`}>
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
         </Button>
       );

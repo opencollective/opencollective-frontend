@@ -1,34 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { display, height, maxHeight, maxWidth, minHeight, minWidth, typography, shadow } from 'styled-system';
+import { display, layout, space, typography, shadow, color, flexbox } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import tag from 'clean-tag';
-import { Box } from '@rebass/grid';
 
 import { InfoCircle } from 'styled-icons/fa-solid/InfoCircle';
 import { CheckCircle } from 'styled-icons/fa-solid/CheckCircle';
 import { ExclamationCircle } from 'styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from 'styled-icons/fa-solid/ExclamationTriangle';
 
-import { messageType } from '../lib/constants/theme';
+import { messageType } from '../lib/theme';
 import { Span } from './Text';
 import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';
 
-const Message = styled(Box)`
+const Message = styled.div`
   border: 1px solid;
   border-radius: 8px;
   padding: ${themeGet('space.3')}px;
 
   ${shadow}
   ${display}
-  ${height}
-  ${maxHeight}
-  ${maxWidth}
-  ${minHeight}
-  ${minWidth}
+  ${layout}
+  ${space}
   ${typography}
+  ${color}
+  ${flexbox}
 
   ${messageType}
 `;
@@ -63,8 +60,6 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
 };
 
 MessageBox.propTypes = {
-  /** @ignore */
-  omitProps: PropTypes.arrayOf(PropTypes.string),
   /** Type of the message */
   type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
   /** Weither icon should be hidden. Icons are only set for info, success, warning and error messages. */
@@ -80,7 +75,6 @@ MessageBox.propTypes = {
 MessageBox.defaultProps = {
   type: 'white',
   withIcon: false,
-  omitProps: tag.defaultProps.omitProps.concat('type'),
 };
 
 export default MessageBox;

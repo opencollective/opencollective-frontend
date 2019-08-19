@@ -8,7 +8,7 @@ import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
 import { formatCurrency } from '../../lib/utils';
-import { H3, P, Span } from '../Text';
+import { H2, H3, P, Span } from '../Text';
 import Container from '../Container';
 import MessageBox from '../MessageBox';
 import Avatar from '../Avatar';
@@ -19,6 +19,8 @@ import StyledFilters from '../StyledFilters';
 import ContainerSectionContent from './ContainerSectionContent';
 import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
+import StyledButton from '../StyledButton';
+import Link from '../Link';
 
 const FILTERS = { ALL: 'ALL', CREDIT: 'CREDIT', DEBIT: 'DEBIT' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -43,6 +45,7 @@ class SectionTransactions extends React.Component {
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
     }).isRequired,
 
     /** @ignore from withData */
@@ -52,7 +55,7 @@ class SectionTransactions extends React.Component {
       creditTransactions: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
-          amount: PropTypes.number.isRequired,
+          netAmountInCollectiveCurrency: PropTypes.number.isRequired,
           createdAt: PropTypes.string.isRequired,
           type: PropTypes.string.isRequired,
           fromcollective: PropTypes.shape({
@@ -66,7 +69,7 @@ class SectionTransactions extends React.Component {
       debitTransactions: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
-          amount: PropTypes.number.isRequired,
+          netAmountInCollectiveCurrency: PropTypes.number.isRequired,
           createdAt: PropTypes.string.isRequired,
           type: PropTypes.string.isRequired,
           collective: PropTypes.shape({
@@ -95,7 +98,7 @@ class SectionTransactions extends React.Component {
   });
 
   render() {
-    const { data, intl } = this.props;
+    const { data, intl, collective } = this.props;
     const { filter } = this.state;
     let showFilters = true;
 
@@ -119,9 +122,9 @@ class SectionTransactions extends React.Component {
     const transactions = this.getAllTransactions(data.creditTransactions, data.debitTransactions, filter);
     return (
       <ContainerSectionContent pt={5} pb={6}>
-        <H3 mb={4} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+        <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-        </H3>
+        </H2>
         {showFilters && (
           <Box mb={3}>
             <StyledFilters
@@ -182,6 +185,11 @@ class SectionTransactions extends React.Component {
             );
           })}
         </DebitCreditList>
+        <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+          <StyledButton mt={3} width="100%">
+            <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
+          </StyledButton>
+        </Link>
       </ContainerSectionContent>
     );
   }
@@ -202,6 +210,7 @@ export default React.memo(
             id
             name
             slug
+            type
           }
         }
         debitTransactions: allTransactions(CollectiveId: $id, type: "DEBIT", limit: 10) {
@@ -215,6 +224,7 @@ export default React.memo(
             id
             name
             slug
+            type
           }
         }
       }

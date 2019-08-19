@@ -30,10 +30,10 @@ class CollectiveCard extends React.Component {
           tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
           break;
         case 'ADMIN':
-          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Admin" />;
+          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Collective Admin" />;
           break;
         case 'MEMBER':
-          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Contributor" />;
+          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Core Contributor" />;
           break;
         default:
           tierName =

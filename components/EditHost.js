@@ -10,9 +10,13 @@ import CreateHostFormWithData from './CreateHostFormWithData';
 import HostsWithData from './HostsWithData';
 import CollectiveCard from './CollectiveCard';
 import Link from './Link';
+import { P } from './Text';
 import InputField from './InputField';
 import { formatCurrency, getQueryParams, formatDate } from '../lib/utils';
 import { Button } from 'react-bootstrap';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import Container from './Container';
+import StyledButton from './StyledButton';
 
 const Option = styled.div`
   h2 {
@@ -41,6 +45,8 @@ class EditHost extends React.Component {
       selectedOption: 'noHost',
       collective: props.collective,
       currency: props.collective.currency,
+      showModal: false,
+      action: '',
     };
   }
 
@@ -60,6 +66,7 @@ class EditHost extends React.Component {
 
   async changeHost(newHost = { id: null }) {
     const { collective } = this.props;
+    this.setState({ showModal: false });
     if (newHost.id === get(collective, 'host.id')) {
       return;
     }
@@ -78,92 +85,154 @@ class EditHost extends React.Component {
   render() {
     const { LoggedInUser, collective } = this.props;
     const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
+    const { showModal, action } = this.state;
 
     if (get(collective, 'host.id')) {
+      const name = collective.host.name;
+
       return (
-        <Flex>
-          <Box p={1} mr={3}>
-            <CollectiveCard collective={collective.host} membership={hostMembership} />
-          </Box>
-          <Box>
-            {!collective.isActive && (
-              <div>
-                <p>
-                  <FormattedMessage
-                    id="editCollective.host.pending"
-                    defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed."
-                    values={{
-                      host: get(collective, 'host.name'),
-                      date: formatDate(get(hostMembership, 'createdAt'), {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      }),
-                    }}
-                  />
-                </p>
-                <p>
-                  <Button bsStyle="primary" type="submit" onClick={() => this.changeHost()} className="removeHostBtn">
-                    <FormattedMessage
-                      id="editCollective.host.cancelApplicationBtn"
-                      defaultMessage="Withdraw application"
-                    />
-                  </Button>
-                </p>
-              </div>
-            )}
-            {collective.isActive && (
-              <div>
-                <p>
-                  <FormattedMessage
-                    id="editCollective.host.label"
-                    defaultMessage="Your fiscal host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
-                    values={{
-                      collectives: get(collective, 'host.stats.collectives.hosted'),
-                      host: get(collective, 'host.name'),
-                    }}
-                  />
-                </p>
-                {collective.stats.balance > 0 && (
+        <React.Fragment>
+          <Flex>
+            <Box p={1} mr={3}>
+              <CollectiveCard collective={collective.host} membership={hostMembership} />
+            </Box>
+            <Box>
+              {!collective.isActive && (
+                <div>
                   <p>
                     <FormattedMessage
-                      id="editCollective.host.balance"
-                      defaultMessage="Your host currently holds {balance} on behalf of your Collective."
+                      id="editCollective.host.pending"
+                      defaultMessage="You have applied to be hosted by {host} on {date}. Your application is being reviewed."
                       values={{
-                        balance: formatCurrency(collective.stats.balance, collective.currency),
+                        host: get(collective, 'host.name'),
+                        date: formatDate(get(hostMembership, 'createdAt'), {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        }),
                       }}
                     />
-                    <br />
+                  </p>
+                  <p>
+                    <Button
+                      bsStyle="primary"
+                      type="submit"
+                      onClick={() => this.setState({ showModal: true, action: 'Withdraw' })}
+                      className="removeHostBtn"
+                    >
+                      <FormattedMessage
+                        id="editCollective.host.cancelApplicationBtn"
+                        defaultMessage="Withdraw application"
+                      />
+                    </Button>
+                  </p>
+                </div>
+              )}
+              {collective.isActive && (
+                <div>
+                  <p>
                     <FormattedMessage
-                      id="editCollective.host.change.balanceNotEmpty"
-                      defaultMessage="If you would like to change fiscal host, you first need to empty your Collective balance. You can do this by submitting expenses, or by transfering funds to another Collective (select your Collective balance as the payment method when making a financial contribution) or to your host (via Advanced)."
+                      id="editCollective.host.label"
+                      defaultMessage="Your fiscal host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
+                      values={{
+                        collectives: get(collective, 'host.stats.collectives.hosted'),
+                        host: get(collective, 'host.name'),
+                      }}
                     />
                   </p>
-                )}
-                {collective.stats.balance === 0 && (
-                  <div>
+                  {collective.stats.balance > 0 && (
                     <p>
-                      <Button
-                        bsStyle="primary"
-                        type="submit"
-                        onClick={() => this.changeHost()}
-                        className="removeHostBtn"
-                      >
-                        <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
-                      </Button>
-                    </p>
-                    <Fineprint>
                       <FormattedMessage
-                        id="editCollective.host.change.removeFirst"
-                        defaultMessage="Once removed, your Collective won't be able to accept financial anymore. You will be able to apply to another host."
+                        id="editCollective.host.balance"
+                        defaultMessage="Your host currently holds {balance} on behalf of your Collective."
+                        values={{
+                          balance: formatCurrency(collective.stats.balance, collective.currency),
+                        }}
                       />
-                    </Fineprint>
-                  </div>
+                      <br />
+                      <FormattedMessage
+                        id="editCollective.host.change.balanceNotEmpty"
+                        defaultMessage="If you would like to change fiscal host, you first need to empty your Collective balance. You can do this by submitting expenses, or by transfering funds to another Collective (select your Collective balance as the payment method when making a financial contribution) or to your host (via Advanced)."
+                      />
+                    </p>
+                  )}
+                  {collective.stats.balance === 0 && (
+                    <div>
+                      <p>
+                        <Button
+                          bsStyle="primary"
+                          type="submit"
+                          onClick={() => this.setState({ showModal: true, action: 'Remove' })}
+                          className="removeHostBtn"
+                        >
+                          <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
+                        </Button>
+                      </p>
+                      <Fineprint>
+                        <FormattedMessage
+                          id="editCollective.host.change.removeFirst"
+                          defaultMessage="Once removed, your Collective won't be able to accept financial anymore. You will be able to apply to another host."
+                        />
+                      </Fineprint>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Box>
+          </Flex>
+          <Modal show={showModal} width="570px" height="250px" onClose={() => this.setState({ showModal: false })}>
+            <ModalHeader>
+              {action === 'Remove' ? (
+                <FormattedMessage id="collective.editHost.remove" values={{ name }} defaultMessage={'Remove {name}'} />
+              ) : (
+                <FormattedMessage
+                  id="collective.editHost.header"
+                  values={{ name }}
+                  defaultMessage={'Withdraw application from {name}'}
+                />
+              )}
+            </ModalHeader>
+            <ModalBody>
+              <P>
+                {action === 'Withdraw' && (
+                  <FormattedMessage
+                    id="collective.editHost.withdrawApp"
+                    values={{ name }}
+                    defaultMessage={'Are you sure you want to withdraw application from {name}?'}
+                  />
                 )}
-              </div>
-            )}
-          </Box>
-        </Flex>
+                {action === 'Remove' && (
+                  <FormattedMessage
+                    id="collective.editHost.removeHost"
+                    values={{ name }}
+                    defaultMessage={'Are you sure you want to remove {name}?'}
+                  />
+                )}
+              </P>
+            </ModalBody>
+            <ModalFooter>
+              <Container display="flex" justifyContent="flex-end">
+                <StyledButton
+                  mx={20}
+                  onClick={() =>
+                    this.setState({
+                      showModal: false,
+                    })
+                  }
+                >
+                  <FormattedMessage id="collective.editHost.cancel.btn" defaultMessage={'Cancel'} />
+                </StyledButton>
+                <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
+                  <FormattedMessage
+                    id="collective.editHost.continue.btn"
+                    values={{ action }}
+                    defaultMessage={'{action}'}
+                  />
+                </StyledButton>
+              </Container>
+            </ModalFooter>
+          </Modal>
+        </React.Fragment>
       );
     }
 

@@ -22,7 +22,7 @@ describe('create an update', () => {
 
     cy.get('[data-cy=toggleEditUpdate').click();
     cy.wait(300);
-    cy.get('.custom-checkbox').click(); // Make private
+    cy.get('[data-cy="custom-checkbox"').click(); // Make private
     cy.get('.actions button').click();
     cy.wait(1000);
     cy.get('[data-cy="privateIcon"]').should('exist');

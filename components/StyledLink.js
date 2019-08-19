@@ -2,16 +2,15 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import tag from 'clean-tag';
 import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/constants/theme';
+import { buttonSize, buttonStyle } from '../lib/theme';
 
 /**
  * styled-component anchor tag using styled-system
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledLink = styled(tag.a)`
+const StyledLink = styled.a`
   color: ${themeGet('colors.primary.500')};
 
   &:hover {
@@ -38,8 +37,6 @@ const StyledLink = styled(tag.a)`
 `;
 
 StyledLink.propTypes = {
-  /** @ignore */
-  omitProps: PropTypes.arrayOf(PropTypes.string),
   /**
    * Based on the design system theme
    */
@@ -50,7 +47,7 @@ StyledLink.propTypes = {
   buttonStyle: PropTypes.oneOf(['primary', 'standard']),
   /**
    * styled-system prop: accepts any css 'color' value or theme alias
-   * See lib/constants/theme.js for the list of theme colors
+   * See lib/theme/colors.js for the list of theme colors
    */
   color: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** styled-system prop: accepts any css 'display' value */
@@ -71,10 +68,6 @@ StyledLink.propTypes = {
   textDecoration: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** Disable the link, make it unclickable */
   disabled: PropTypes.bool,
-};
-
-StyledLink.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat('buttonStyle', 'buttonSize', 'whiteSpace'),
 };
 
 /** @component */

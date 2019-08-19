@@ -79,7 +79,7 @@ class CollectiveCover extends React.Component {
     callsToAction: PropTypes.shape({
       hasContact: PropTypes.bool,
       hasSubmitExpense: PropTypes.bool,
-    }).isRequired,
+    }),
     href: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
@@ -100,8 +100,8 @@ class CollectiveCover extends React.Component {
         id: 'host.apply.btn',
         defaultMessage: 'Apply to host your collective {collective}',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Admin' },
-      MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
+      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
+      MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
     });
 
     this.description = props.description || props.collective.description;
@@ -137,6 +137,7 @@ class CollectiveCover extends React.Component {
                   weekday="short"
                   day="numeric"
                   month="long"
+                  year="numeric"
                 />
                 , &nbsp;
                 <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
@@ -519,7 +520,7 @@ ${description}`;
                   </div>
                   <FormattedMessage
                     id="collective.stats.totalAmountSpent.label"
-                    defaultMessage="Total amount donated"
+                    defaultMessage="Total amount contributed"
                   />
                 </div>
                 {stats.totalAmountRaised > 0 && (

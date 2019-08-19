@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import slugify from 'slugify';
 import gql from 'graphql-tag';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -11,7 +11,7 @@ import themeGet from '@styled-system/theme-get';
 import { getCollectiveQuery } from '../lib/graphql/queries';
 import { withUser } from '../components/UserProvider';
 import { Link, Router } from '../server/pages';
-import { imagePreview } from '../lib/utils';
+import { compose, imagePreview } from '../lib/utils';
 import { defaultImage } from '../lib/constants/collectives';
 
 import Header from '../components/Header';

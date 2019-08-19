@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Fri Aug 01 2019 14:13:16 GMT+1200 (New Zealand Standard Time)
+# timestamp: Tue Aug 06 2019 12:40:23 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -121,6 +121,11 @@ type Collective implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 
   """
   Returns whether this collective is deletable
@@ -341,6 +346,7 @@ interface CollectiveInterface {
   isIncognito: Boolean
   canApply: Boolean
   isArchived: Boolean
+  isApproved: Boolean
   isDeletable: Boolean
   host: CollectiveInterface
   hostCollective: CollectiveInterface
@@ -698,7 +704,12 @@ type Contributor {
   roles: [ContributorRole]
 
   """
-  True if the contributor is a core contributor (admin)
+  True if the contributor is a collective admin
+  """
+  isAdmin: Boolean!
+
+  """
+  True if the contributor is a core contributor
   """
   isCore: Boolean!
 
@@ -889,6 +900,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 
   """
   Returns whether this collective is deletable
@@ -1969,6 +1985,11 @@ type Organization implements CollectiveInterface {
   isArchived: Boolean
 
   """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
+
+  """
   Returns whether this collective is deletable
   """
   isDeletable: Boolean
@@ -2875,6 +2896,11 @@ type User implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 
   """
   Returns whether this collective is deletable
