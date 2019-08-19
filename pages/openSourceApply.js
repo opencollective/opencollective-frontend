@@ -220,7 +220,7 @@ class OpenSourceApplyPage extends Component {
     const { result } = this.state;
     return (
       <Page title="Sign up GitHub repository">
-        <Flex alignItems="center" flexDirection="column" mx="auto" maxWidth={500} pt={4} my={4}>
+        <Flex alignItems="center" flexDirection="column" mx="auto" pt={4} my={4}>
           {result.mesg && (
             <Box mb={2}>
               <MessageBox withIcon type={result.type}>
