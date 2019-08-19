@@ -1,0 +1,10 @@
+name: Helpers
+on: [issue_comment]
+
+jobs:
+  update-langs:
+    name: Update language files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: ./.github/.workflows/update-langs
