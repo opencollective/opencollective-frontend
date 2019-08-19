@@ -18,7 +18,7 @@ import StyledLink from './StyledLink';
 import StyledTooltip from './StyledTooltip';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
 
-import languages from '../src/constants/locales';
+import languages from '../lib/constants/locales';
 
 const SocialLink = styled.a`
   align-items: center;

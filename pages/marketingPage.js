@@ -20,7 +20,7 @@ import giftCardPageStyle from '!css-loader!../static/gift-cards-page/stylesheets
 import becomeAFiscalHostStyle from '!css-loader!../static/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
 import { withUser } from '../components/UserProvider';
 
-import languages from '../src/constants/locales';
+import languages from '../lib/constants/locales';
 
 const PAGES = {
   'become-a-sponsor': {
