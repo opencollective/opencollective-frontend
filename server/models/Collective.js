@@ -1690,6 +1690,38 @@ export default function(Sequelize, DataTypes) {
       .then(() => this.getTiers());
   };
 
+  // Where `this` collective is a type == Host collective.
+  Collective.prototype.getExpensesForHost = function(
+    status,
+    startDate,
+    endDate = new Date(),
+    createdByUserId,
+    excludedTypes,
+  ) {
+    const where = {
+      createdAt: { [Op.lt]: endDate },
+    };
+    if (status) where.status = status;
+    if (startDate) where.createdAt[Op.gte] = startDate;
+    if (createdByUserId) where.UserId = createdByUserId;
+    if (excludedTypes) where.type = { [Op.or]: [{ [Op.eq]: null }, { [Op.notIn]: excludedTypes }] };
+
+    return models.Expense.findAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          association: 'collective',
+          include: [
+            {
+              association: 'hostCollective',
+              where: { id: this.id },
+            },
+          ],
+        },
+      ],
+    });
+  };
   Collective.prototype.getExpenses = function(status, startDate, endDate = new Date(), createdByUserId, excludedTypes) {
     const where = {
       createdAt: { [Op.lt]: endDate },
@@ -2191,7 +2223,8 @@ export default function(Sequelize, DataTypes) {
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
     const excludedTypes = [expenseTypes.RECEIPT];
-    const expenses = await this.getExpenses(status, since, until, UserId, excludedTypes);
+
+    const expenses = await this.getExpensesForHost(status, since, until, UserId, excludedTypes);
 
     const userTotal = sumBy(expenses, 'amount');
 
@@ -2204,7 +2237,7 @@ export default function(Sequelize, DataTypes) {
     const until = moment({ year }).add(1, 'y');
     const status = [PENDING, APPROVED, PAID];
     const excludedTypes = [expenseTypes.RECEIPT];
-    const expenses = await this.getExpenses(status, since, until, null, excludedTypes);
+    const expenses = await this.getExpensesForHost(status, since, until, null, excludedTypes);
 
     const userTotals = expenses.reduce((totals, expense) => {
       const { UserId } = expense;
@@ -2370,6 +2403,8 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Tier, { as: 'tiers' });
     Collective.hasMany(m.LegalDocument);
     Collective.hasMany(m.RequiredLegalDocument, { foreignKey: 'HostCollectiveId' });
+    Collective.hasMany(m.Collective, { as: 'hostedCollectives', foreignKey: 'HostCollectiveId' });
+    Collective.belongsTo(m.Collective, { as: 'hostCollective' });
   };
 
   Historical(Collective, Sequelize);
