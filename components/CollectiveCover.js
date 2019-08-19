@@ -137,6 +137,7 @@ class CollectiveCover extends React.Component {
                   weekday="short"
                   day="numeric"
                   month="long"
+                  year="numeric"
                 />
                 , &nbsp;
                 <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
