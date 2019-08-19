@@ -1690,7 +1690,7 @@ export default function(Sequelize, DataTypes) {
       .then(() => this.getTiers());
   };
 
-  // Where `this` collective is a type == Host collective.
+  // Where `this` collective is a type == ORGANIZATION collective.
   Collective.prototype.getExpensesForHost = function(
     status,
     startDate,
