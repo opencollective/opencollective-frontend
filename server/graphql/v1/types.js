@@ -1571,9 +1571,10 @@ export const OrderType = new GraphQLObjectType({
       },
       matchingFund: {
         description: 'Payment method used if this order was matched by a matching fund.',
+        deprecationReason: '2019-08-19: Matching funds are not supported anymore',
         type: PaymentMethodType,
-        resolve(order) {
-          return order.getMatchingPaymentMethod();
+        resolve() {
+          return null;
         },
       },
       transactions: {
@@ -1813,8 +1814,9 @@ export const PaymentMethodType = new GraphQLObjectType({
       matching: {
         type: GraphQLInt,
         description: 'Matching factor',
-        resolve(paymentMethod) {
-          return paymentMethod.matching;
+        deprecationReason: '2019-08-19: Matching funds are not supported anymore',
+        resolve() {
+          return 0;
         },
       },
       monthlyLimitPerMember: {
@@ -1902,7 +1904,7 @@ export const PaymentMethodType = new GraphQLObjectType({
           offset: { type: GraphQLInt },
         },
         description:
-          'Get the list of collectives that used this payment method. Useful to select the list of a backers for which the host has manually added funds or to get the list of backers that used a matching fund',
+          'Get the list of collectives that used this payment method. Useful to select the list of a backers for which the host has manually added funds.',
         async resolve(paymentMethod, args) {
           const res = await models.Transaction.findAll({
             attributes: [[sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'FromCollectiveId']],

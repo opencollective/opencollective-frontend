@@ -78,14 +78,13 @@ const queries = {
   MatchingFund: {
     type: PaymentMethodType,
     description: 'Fetch data about a matching fund from the short version of its UUID (first part)',
+    deprecationReason: '2019-08-19: Matching funds are not supported anymore',
     args: {
       uuid: { type: new GraphQLNonNull(GraphQLString) },
       ForCollectiveId: { type: GraphQLInt },
     },
-    resolve(_, args) {
-      return models.PaymentMethod.getMatchingFund(args.uuid, {
-        ForCollectiveId: args.ForCollectiveId,
-      });
+    resolve() {
+      return null;
     },
   },
 

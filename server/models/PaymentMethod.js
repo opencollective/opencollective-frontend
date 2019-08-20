@@ -67,7 +67,7 @@ export default function(Sequelize, DataTypes) {
       },
 
       name: DataTypes.STRING, // custom human readable identifier for the payment method
-      description: DataTypes.STRING, // custom human readable description (useful for matching fund)
+      description: DataTypes.STRING, // custom human readable description
       customerId: DataTypes.STRING, // stores the id of the customer from the payment processor at the platform level
       token: DataTypes.STRING,
       primary: DataTypes.BOOLEAN,
@@ -131,14 +131,6 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         description:
           'Initial balance on this payment method. Current balance should be a computed value based on transactions.',
-        validate: {
-          min: 0,
-        },
-      },
-
-      matching: {
-        type: DataTypes.INTEGER,
-        description: 'if not null, this payment method can only be used to match x times the donation amount',
         validate: {
           min: 0,
         },
@@ -245,7 +237,7 @@ export default function(Sequelize, DataTypes) {
     // we make sure it belongs to the logged in user or to a collective that the user is an admin of
     if (!user) throw new Error('You need to be logged in to be able to use a payment method on file');
 
-    const name = this.matching ? 'matching fund' : `payment method (${this.service}:${this.type})`;
+    const name = `payment method (${this.service}:${this.type})`;
 
     if (this.expiryDate && new Date(this.expiryDate) < new Date()) {
       throw new Error(`This ${name} has expired`);
@@ -303,12 +295,6 @@ export default function(Sequelize, DataTypes) {
           'This payment method is not saved to any collective and can only be used by the user that created it',
         );
       }
-    } else if (this.matching) {
-      // If the payment method is a matching fund, the user doesn't need to own it
-      // but we need to make sure that the order is referencing this matching fund
-      if (order.matchingFund !== this.uuid.substr(0, 8)) {
-        throw new Error('This payment method can only be used to match an order');
-      }
     } else {
       // If there is a monthly limit per member, the user needs to be a member or admin of the collective that owns the payment method
       if (this.monthlyLimitPerMember && !user.isMember(this.CollectiveId)) {
@@ -343,15 +329,6 @@ export default function(Sequelize, DataTypes) {
     }
 
     const balance = await this.getBalanceForUser(user);
-    if (totalAmountInPaymentMethodCurrency * this.matching > balance.amount) {
-      throw new Error(
-        `There is not enough funds left on this ${name} to match your order (balance: ${formatCurrency(
-          balance.amount,
-          this.currency,
-        )}`,
-      );
-    }
-
     if (balance && totalAmountInPaymentMethodCurrency > balance.amount) {
       throw new Error(
         `You don't have enough funds available (${formatCurrency(
@@ -524,8 +501,6 @@ export default function(Sequelize, DataTypes) {
           return pm;
         }
       });
-    } else if (paymentMethod.uuid && paymentMethod.uuid.length === 8) {
-      return PaymentMethod.getMatchingFund(paymentMethod.uuid);
     } else {
       return PaymentMethod.findOne({
         where: { uuid: paymentMethod.uuid },
@@ -536,45 +511,6 @@ export default function(Sequelize, DataTypes) {
         return pm;
       });
     }
-  };
-
-  PaymentMethod.getMatchingFund = (shortUUID, options = {}) => {
-    const where = {};
-    if (options.ForCollectiveId) {
-      where.limitedToCollectiveIds = Sequelize.or(
-        { limitedToCollectiveIds: { [Op.eq]: null } },
-        { limitedToCollectiveIds: options.ForCollectiveId },
-      );
-    }
-    return PaymentMethod.findOne({
-      where: Sequelize.and(
-        Sequelize.where(Sequelize.cast(Sequelize.col('uuid'), 'text'), {
-          [Op.like]: `${shortUUID}%`,
-        }),
-        { matching: { [Op.ne]: null } },
-      ),
-    }).then(async pm => {
-      if (pm.expiryDate) {
-        if (new Date(pm.expiryDate) < new Date()) {
-          throw new Error('This matching fund is expired');
-        }
-      }
-      if (pm.limitedToCollectiveIds) {
-        if (!options.ForCollectiveId || pm.limitedToCollectiveIds.indexOf(options.ForCollectiveId) === -1) {
-          throw new Error('This matching fund is not available for this collective');
-        }
-      }
-      if (pm.limitedToTags) {
-        if (!options.ForCollectiveId) {
-          throw new Error('Please provide a ForCollectiveId');
-        }
-        const collective = await models.Collective.findByPk(options.ForCollectiveId);
-        if (intersection(collective.tags, pm.limitedToTags).length === 0) {
-          throw new Error('This matching fund is not available to collectives in this category');
-        }
-      }
-      return pm;
-    });
   };
 
   return PaymentMethod;

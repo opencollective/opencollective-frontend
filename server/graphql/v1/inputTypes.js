@@ -325,6 +325,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     matchingFund: {
       type: GraphQLString,
       description: 'The first part of the UUID of the PaymentMethod that can be used to match the donation',
+      deprecationReason: '2019-08-19: Matching funds are not supported anymore',
     },
     referral: {
       type: CollectiveAttributesInputType,

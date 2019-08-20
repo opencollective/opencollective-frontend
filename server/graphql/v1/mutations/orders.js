@@ -303,22 +303,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       fromCollective = await models.Collective.createOrganization(order.fromCollective, user, remoteUser);
     }
 
-    let matchingFund;
-    if (order.matchingFund) {
-      matchingFund = await models.PaymentMethod.getMatchingFund(order.matchingFund, { ForCollectiveId: collective.id });
-      const canBeUsedForOrder = await matchingFund.canBeUsedForOrder(order, user);
-
-      if (!canBeUsedForOrder) {
-        matchingFund = null;
-      }
-    }
-
-    if (matchingFund) {
-      order.matchingFund = matchingFund;
-      order.MatchingPaymentMethodId = matchingFund.id;
-      order.referral = { id: matchingFund.CollectiveId }; // if there is a matching fund, we force the referral to be the owner of the fund
-    }
-
     const currency = (tier && tier.currency) || collective.currency;
     if (order.currency && order.currency !== currency) {
       throw new Error(`Invalid currency. Expected ${currency}.`);
@@ -440,7 +424,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       publicMessage: order.publicMessage, // deprecated: '2019-07-03: This info is now stored at the Member level'
       privateMessage: order.privateMessage,
       processedAt: paymentRequired || !collective.isActive ? null : new Date(),
-      MatchingPaymentMethodId: order.MatchingPaymentMethodId,
       data: {
         reqIp,
         recaptchaResponse,
@@ -470,7 +453,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     // eslint-disable-next-line no-var
     var orderCreated = await models.Order.create(orderData);
     orderCreated.interval = order.interval;
-    orderCreated.matchingFund = order.matchingFund;
 
     if (order.paymentMethod && order.paymentMethod.save) {
       order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
