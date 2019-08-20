@@ -368,7 +368,7 @@ export const isValidEmail = email => {
  */
 export const isEmailInternal = email => {
   if (!email) return false;
-  if (email.match(/(opencollective\.(com|org))$/i) !== -1) {
+  if (email.match(/(opencollective\.(com|org))$/i)) {
     return true;
   }
   if (email.match(/^xdamman.*@gmail\.com$/)) {
