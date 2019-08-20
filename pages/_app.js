@@ -9,8 +9,11 @@ import { ApolloProvider } from 'react-apollo';
 // For old browsers without window.Intl
 import 'intl';
 import 'intl/locale-data/jsonp/en.js';
+import 'intl-pluralrules';
+import '@formatjs/intl-relativetimeformat/polyfill';
+import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
 
-import { IntlProvider, addLocaleData } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 
 import UserProvider from '../components/UserProvider';
 import StripeProviderSSR from '../components/StripeProvider';
@@ -29,15 +32,6 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
-
-// Register React Intl's locale data for the user's locale in the browser. This
-// locale data was added to the page by `pages/_document.js`. This only happens
-// once, on initial page load in the browser.
-if (typeof window !== 'undefined' && window.ReactIntlLocaleData) {
-  Object.keys(window.ReactIntlLocaleData).forEach(lang => {
-    addLocaleData(window.ReactIntlLocaleData[lang]);
-  });
-}
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {

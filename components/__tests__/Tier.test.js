@@ -1,9 +1,7 @@
 import { mount } from 'enzyme';
 import React from 'react';
 import Tier from '../Tier';
-import { IntlProvider, addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-addLocaleData([...en]);
+import { IntlProvider } from 'react-intl';
 import { capitalize } from '../../lib/utils';
 
 const DEBUG = process.env.DEBUG || false;

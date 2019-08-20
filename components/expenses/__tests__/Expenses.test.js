@@ -1,10 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { IntlProvider, addLocaleData } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import { ApolloProvider } from 'react-apollo';
-
-import en from 'react-intl/locale-data/en';
-addLocaleData([...en]);
 
 import Expenses from '../Expenses';
 
