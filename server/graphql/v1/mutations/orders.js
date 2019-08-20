@@ -519,14 +519,15 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         orderCreated.update({ status: status.ERROR });
       }
 
-      orderCreated.error = error.message;
+      if (!error.stripeResponse) {
+        throw error;
+      }
 
-      if (error.stripeAccount) {
-        orderCreated.stripeAccount = error.stripeAccount;
-      }
-      if (error.stripeResponse) {
-        orderCreated.stripeResponse = error.stripeResponse;
-      }
+      orderCreated.stripeError = {
+        message: error.message,
+        account: error.stripeAccount,
+        response: error.stripeResponse,
+      };
 
       return orderCreated;
     }
@@ -550,12 +551,15 @@ export async function confirmOrder(order, remoteUser) {
       { model: models.PaymentMethod, as: 'paymentMethod' },
     ],
   });
+
   if (!existingOrder) {
     throw new errors.NotFound({ message: 'Order not found' });
   }
-
   if (!remoteUser.isAdmin(existingOrder.FromCollectiveId)) {
     throw new errors.Unauthorized({ message: "You don't have permission to confirm this order" });
+  }
+  if (existingOrder.status !== 'ERROR' && existingOrder.status !== 'PENDING') {
+    throw new errors.NotFound({ message: 'Order can only be confirmed if ERROR or PENDING.' });
   }
 
   try {
@@ -565,14 +569,15 @@ export async function confirmOrder(order, remoteUser) {
   } catch (error) {
     console.log(error);
 
-    existingOrder.error = error.message;
+    if (!error.stripeResponse) {
+      throw error;
+    }
 
-    if (error.stripeAccount) {
-      existingOrder.stripeAccount = error.stripeAccount;
-    }
-    if (error.stripeResponse) {
-      existingOrder.stripeResponse = error.stripeResponse;
-    }
+    existingOrder.stripeError = {
+      message: error.message,
+      account: error.stripeAccount,
+      response: error.stripeResponse,
+    };
 
     return existingOrder;
   }

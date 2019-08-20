@@ -81,6 +81,32 @@ export const IsoDateString = new GraphQLScalarType({
   },
 });
 
+export const StripeErrorType = new GraphQLObjectType({
+  name: 'StripeError',
+  fields: () => {
+    return {
+      message: {
+        type: GraphQLString,
+        resolve(error) {
+          return error.error;
+        },
+      },
+      account: {
+        type: GraphQLString,
+        resolve(error) {
+          return error.account;
+        },
+      },
+      response: {
+        type: GraphQLJSON,
+        resolve(error) {
+          return error.response;
+        },
+      },
+    };
+  },
+});
+
 export const UserType = new GraphQLObjectType({
   name: 'UserDetails',
   description: 'This represents the details of a User',
@@ -1654,22 +1680,10 @@ export const OrderType = new GraphQLObjectType({
           return pick(order.data, ['tax', 'customData']) || null;
         },
       },
-      error: {
-        type: GraphQLString,
+      stripeError: {
+        type: StripeErrorType,
         resolve(order) {
-          return order.error;
-        },
-      },
-      stripeAccount: {
-        type: GraphQLString,
-        resolve(order) {
-          return order.stripeAccount;
-        },
-      },
-      stripeResponse: {
-        type: GraphQLJSON,
-        resolve(order) {
-          return order.stripeResponse;
+          return order.stripeError;
         },
       },
     };
@@ -1945,6 +1959,12 @@ export const PaymentMethodType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(paymentMethod) {
           return paymentMethod.currency;
+        },
+      },
+      stripeError: {
+        type: StripeErrorType,
+        resolve(paymentMethod) {
+          return paymentMethod.stripeError;
         },
       },
     };

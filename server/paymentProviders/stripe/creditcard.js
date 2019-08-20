@@ -12,12 +12,20 @@ const stripe = Stripe(config.stripe.secret);
 /**
  * Get or create a customer under the platform stripe account
  */
-const getOrCreateCustomerOnPlatformAccount = async ({ paymentMethod, user }) => {
+const getOrCreateCustomerOnPlatformAccount = async ({ paymentMethod, user, collective }) => {
   if (paymentMethod.customerId) {
     return stripe.customers.retrieve(paymentMethod.customerId);
   }
 
-  const customer = await stripe.customers.create({ source: paymentMethod.token, email: user.email });
+  const payload = { source: paymentMethod.token };
+  if (user) {
+    payload.email = user.email;
+  }
+  if (collective) {
+    payload.description = `https://opencollective.com/${collective.slug}`;
+  }
+
+  const customer = await stripe.customers.create(payload);
 
   paymentMethod.customerId = customer.id;
   await paymentMethod.update({ customerId: customer.id });
@@ -71,38 +79,12 @@ const getOrCreateCustomerOnHostAccount = async (hostStripeAccount, { paymentMeth
  * Note: we need to create a token for hostStripeAccount because paymentMethod.customerId is a customer of the platform
  * See: Shared Customers: https://stripe.com/docs/connect/shared-customers
  */
-const createChargeAndTransactions = async (
-  hostStripeAccount,
-  { order, platformStripeCustomer, hostStripeCustomer },
-) => {
+const createChargeAndTransactions = async (hostStripeAccount, { order, hostStripeCustomer }) => {
   const { collective, createdByUser: user, paymentMethod } = order;
 
   const platformFee = isNaN(order.platformFee)
     ? parseInt((order.totalAmount * constants.OC_FEE_PERCENT) / 100, 10)
     : order.platformFee;
-
-  // TODO: double check if we really want Setup Intents supported here
-  let setupIntent;
-  if (!paymentMethod.data.setupIntent) {
-    setupIntent = await stripe.setupIntents.create({
-      customer: platformStripeCustomer.id,
-      payment_method: platformStripeCustomer.sources.data[0].id,
-      confirm: true,
-    });
-  } else {
-    setupIntent = await stripe.setupIntents.retrieve(paymentMethod.data.setupIntent.id);
-  }
-
-  if (!paymentMethod.data.setupIntent || paymentMethod.data.setupIntent.status !== setupIntent.status) {
-    paymentMethod.data.setupIntent = { id: setupIntent.id, status: setupIntent.status };
-    await paymentMethod.update({ data: paymentMethod.data });
-  }
-
-  if (setupIntent.next_action) {
-    const setupIntentError = new Error('Setup Intent require action');
-    setupIntentError.stripeResponse = { setupIntent };
-    throw setupIntentError;
-  }
 
   let paymentIntent;
   if (!order.data.paymentIntent) {
@@ -201,7 +183,6 @@ export default {
 
     const transactions = await createChargeAndTransactions(hostStripeAccount, {
       order,
-      platformStripeCustomer,
       hostStripeCustomer,
     });
 
@@ -288,5 +269,45 @@ export default {
   webhook: (/* requestBody, event */) => {
     // We don't do anything at the moment
     return Promise.resolve();
+  },
+
+  setupPaymentMethod: async (paymentMethod, { user, collective } = {}) => {
+    const platformStripeCustomer = await getOrCreateCustomerOnPlatformAccount({
+      paymentMethod,
+      user,
+      collective,
+    });
+
+    const paymentMethodId = platformStripeCustomer.sources.data[0].id;
+
+    let setupIntent;
+    if (paymentMethod.data.setupIntent) {
+      setupIntent = await stripe.setupIntents.retrieve(paymentMethod.data.setupIntent.id);
+      // TO CHECK: what happens if the setupIntent is not found
+    }
+    if (!setupIntent) {
+      setupIntent = await stripe.setupIntents.create({
+        customer: platformStripeCustomer.id,
+        payment_method: paymentMethodId,
+        confirm: true,
+      });
+    }
+
+    if (
+      !paymentMethod.data.setupIntent ||
+      paymentMethod.data.setupIntent.id !== setupIntent.id ||
+      paymentMethod.data.setupIntent.status !== setupIntent.status
+    ) {
+      paymentMethod.data.setupIntent = { id: setupIntent.id, status: setupIntent.status };
+      await paymentMethod.update({ data: paymentMethod.data });
+    }
+
+    if (setupIntent.next_action) {
+      const setupIntentError = new Error('Setup Intent require action');
+      setupIntentError.stripeResponse = { setupIntent };
+      throw setupIntentError;
+    }
+
+    return paymentMethod;
   },
 };
