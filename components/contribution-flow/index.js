@@ -369,17 +369,11 @@ class CreateOrderPage extends React.Component {
     try {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
-
-      if (orderCreated.error) {
-        if (orderCreated.stripeResponse) {
-          this.handleStripeResponse(orderCreated);
-        } else {
-          this.setState({ submitting: false, error: orderCreated.error });
-        }
-        return;
+      if (orderCreated.stripeError) {
+        this.handleStripeError(orderCreated);
+      } else {
+        this.handleSuccess(orderCreated);
       }
-
-      this.handleSuccess(orderCreated);
     } catch (e) {
       this.setState({ submitting: false, error: e.message });
     }
@@ -391,17 +385,11 @@ class CreateOrderPage extends React.Component {
     try {
       const res = await this.props.confirmOrder(order);
       const orderConfirmed = res.data.confirmOrder;
-
-      if (orderConfirmed.error) {
-        if (orderConfirmed.stripeResponse) {
-          this.handleStripeResponse(orderConfirmed);
-        } else {
-          this.setState({ submitting: false, error: orderConfirmed.error });
-        }
-        return;
+      if (orderConfirmed.stripeError) {
+        this.handleStripeError(orderConfirmed);
+      } else {
+        this.handleSuccess(orderConfirmed);
       }
-
-      this.handleSuccess(orderConfirmed);
     } catch (e) {
       this.setState({ submitting: false, error: e.message });
     }
@@ -421,22 +409,15 @@ class CreateOrderPage extends React.Component {
     }
   };
 
-  handleStripeResponse = async ({ stripeAccount, stripeResponse, id }) => {
-    if (stripeResponse.setupIntent) {
-      // Use Stripe.js to handle required card action (Setup Intent)
-      const stripe = await getStripe(null, stripeAccount);
-      const result = await stripe.handleCardSetup(stripeResponse.setupIntent.client_secret);
-      if (result.error) {
-        this.setState({ submitting: false, error: result.error.message });
-      }
-      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
-        this.confirmOrder({ id });
-      }
+  handleStripeError = async ({ id, stripeError: { message, account, response } }) => {
+    if (!response) {
+      this.setState({ submitting: false, error: message });
+      return;
     }
-    if (stripeResponse.paymentIntent) {
-      // Use Stripe.js to handle required card action (Payment Intent)
-      const stripe = await getStripe(null, stripeAccount);
-      const result = await stripe.handleCardAction(stripeResponse.paymentIntent.client_secret);
+
+    if (response.paymentIntent) {
+      const stripe = await getStripe(null, account);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {
         this.setState({ submitting: false, error: result.error.message });
       }
@@ -971,9 +952,11 @@ export const addCreateOrderMutation = graphql(
       createOrder(order: $order) {
         id
         status
-        error
-        stripeAccount
-        stripeResponse
+        stripeError {
+          message
+          account
+          response
+        }
         transactions {
           id
         }
@@ -993,9 +976,11 @@ export const addConfirmOrderMutation = graphql(
       confirmOrder(order: $order) {
         id
         status
-        error
-        stripeAccount
-        stripeResponse
+        stripeError {
+          message
+          account
+          response
+        }
         transactions {
           id
         }

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Fri Aug 16 2019 15:58:58 GMT+0200 (Central European Summer Time)
+# timestamp: Tue Aug 20 2019 21:25:30 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -1928,9 +1928,7 @@ type OrderType {
   Additional information on order: tax and custom fields
   """
   data: JSON
-  error: String
-  stripeAccount: String
-  stripeResponse: JSON
+  stripeError: StripeError
 }
 
 """
@@ -2231,6 +2229,7 @@ type PaymentMethodType {
   """
   fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
+  stripeError: StripeError
 }
 
 """
@@ -2528,6 +2527,12 @@ input StripeCreditCardDataInputType {
   country: String
   funding: String
   zip: String
+}
+
+type StripeError {
+  message: String
+  account: String
+  response: JSON
 }
 
 """
