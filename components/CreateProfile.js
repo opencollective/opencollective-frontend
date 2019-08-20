@@ -32,7 +32,7 @@ const Tab = ({ active, children, setActive }) => (
 );
 
 Tab.propTypes = {
-  active: PropTypes.object,
+  active: PropTypes.bool,
   children: PropTypes.node,
   setActive: PropTypes.func,
 };
@@ -53,7 +53,7 @@ const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
 
 SecondaryAction.propTypes = {
   children: PropTypes.node,
-  loading: PropTypes.object,
+  loading: PropTypes.bool,
   onSecondaryAction: PropTypes.func,
 };
 
