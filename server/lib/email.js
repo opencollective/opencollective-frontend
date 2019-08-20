@@ -145,7 +145,8 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     to = process.env.ONLY;
   } else if (config.env !== 'production') {
     if (!to) {
-      return Promise.reject(new Error('emailLib.sendMessage error: No recipient defined'));
+      debug('emailLib.sendMessage error: No recipient defined');
+      return Promise.resolve();
     }
     let sendToBcc = true;
     // Don't send to BCC if sendEvenIfNotProduction and NOT in testing env
