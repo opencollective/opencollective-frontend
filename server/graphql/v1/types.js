@@ -705,7 +705,7 @@ export const ExpenseType = new GraphQLObjectType({
           return isUserTaxFormRequiredBeforePayment({
             year: incurredYear,
             invoiceTotalThreshold: 600e2,
-            HostCollectiveId: expense.CollectiveId,
+            expenseCollectiveId: expense.CollectiveId,
             UserId: expense.UserId,
           });
         },
