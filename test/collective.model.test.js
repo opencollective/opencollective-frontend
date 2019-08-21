@@ -632,24 +632,18 @@ describe('Collective model', () => {
 
     it('add an existing user to a collective by email address', done => {
       collective
-        .editMembers([])
-        .then(members => {
-          expect(members).to.have.length(0);
-        })
-        .then(() =>
-          collective.editMembers([
-            {
-              role: 'ADMIN',
-              member: {
-                name: user1.name,
-                email: user1.email,
-              },
+        .editMembers([
+          {
+            role: 'ADMIN',
+            member: {
+              name: user1.name,
+              email: user1.email,
             },
-          ]),
-        )
+          },
+        ])
         .then(members => {
           expect(members).to.have.length(1);
-          expect(members[0].role).to.equal('MEMBER');
+          expect(members[0].role).to.equal('ADMIN');
           expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
           done();
         });
