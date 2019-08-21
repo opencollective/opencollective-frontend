@@ -120,6 +120,8 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
   debug('Beginning creation of order', order);
   await checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
+
+  let orderCreated;
   try {
     // ---- Set defaults ----
     order.quantity = order.quantity || 1;
@@ -448,10 +450,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       orderData.ReferralCollectiveId = order.referral.id;
     }
 
-    // using var so the scope is shared with the catch block below
-    // eslint-disable-next-line no-var
-    var orderCreated = await models.Order.create(orderData);
-    orderCreated.interval = order.interval;
+    orderCreated = await models.Order.create(orderData);
 
     if (order.paymentMethod && order.paymentMethod.save) {
       order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;

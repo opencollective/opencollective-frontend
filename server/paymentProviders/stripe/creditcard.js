@@ -53,11 +53,16 @@ const getOrCreateCustomerOnHostAccount = async (hostStripeAccount, { paymentMeth
       stripe_account: hostStripeAccount.username,
     });
   } else {
+    const platformStripeCustomer = await getOrCreateCustomerOnPlatformAccount({
+      paymentMethod,
+      user,
+    });
+
     // More info about that
     // - Documentation: https://stripe.com/docs/connect/shared-customers
     // - API: https://stripe.com/docs/api/tokens/create_card
     const token = await stripe.tokens.create(
-      { customer: paymentMethod.customerId },
+      { customer: platformStripeCustomer.id },
       { stripe_account: hostStripeAccount.username },
     );
 
@@ -170,11 +175,6 @@ export default {
 
   processOrder: async order => {
     const hostStripeAccount = await order.collective.getHostStripeAccount();
-
-    const platformStripeCustomer = await getOrCreateCustomerOnPlatformAccount({
-      paymentMethod: order.paymentMethod,
-      user: order.createdByUser,
-    });
 
     const hostStripeCustomer = await getOrCreateCustomerOnHostAccount(hostStripeAccount, {
       paymentMethod: order.paymentMethod,
