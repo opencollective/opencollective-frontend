@@ -30,6 +30,7 @@
   "addfunds.submit": "Aggiungi fondi",
   "addfunds.title": "Aggiungi fondi a {collective}",
   "addfunds.totalAmount": "Importo finanziamento",
+  "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "addfundstoorg.FromCollectiveId.label": "organizzatore",
   "Amount": "{amount} {currencyCode}",
   "amount.free": "gratis",

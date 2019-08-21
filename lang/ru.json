@@ -30,6 +30,7 @@
   "addfunds.submit": "Добавить средства",
   "addfunds.title": "Добавить средства {collective}",
   "addfunds.totalAmount": "Сумма финансирования",
+  "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "addfundstoorg.FromCollectiveId.label": "представитель",
   "Amount": "{amount} {currencyCode}",
   "amount.free": "бесплатно",

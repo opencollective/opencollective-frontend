@@ -30,6 +30,7 @@
   "addfunds.submit": "Voeg geld toe",
   "addfunds.title": "Voeg geld toe aan {collective}",
   "addfunds.totalAmount": "Totaal vermogen",
+  "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "addfundstoorg.FromCollectiveId.label": "beheerder",
   "Amount": "{amount} {currencyCode}",
   "amount.free": "beschikbaar",

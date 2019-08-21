@@ -30,6 +30,7 @@
   "addfunds.submit": "Githaben hinzufügen",
   "addfunds.title": "Guthaben zu {collective} hinzufügen",
   "addfunds.totalAmount": "Finanzierungsbetrag",
+  "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "addfundstoorg.FromCollectiveId.label": "Host",
   "Amount": "{amount} {currencyCode}",
   "amount.free": "kostenlos",
