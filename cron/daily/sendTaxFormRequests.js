@@ -32,10 +32,20 @@ const sendHelloWorksUsTaxForm = SendHelloWorksTaxForm({
 const init = async () => {
   console.log('>>>> Running tax form job');
   // Filter unique users
-  await findUsersThatNeedToBeSentTaxForm({
+  const users = findUsersThatNeedToBeSentTaxForm({
     invoiceTotalThreshold: US_TAX_FORM_THRESHOLD,
     year,
-  }).map(sendHelloWorksUsTaxForm);
+  });
+
+  if (process.env.DRY_RUN) {
+    console.log('>> Doing tax form dry run. Emails of users who need tax forms:');
+    return users.map(user => console.log(user.email));
+  } else {
+    return users.map(user => {
+      console.log(`>> Sending tax form to user: ${user.email}`);
+      return sendHelloWorksUsTaxForm(user);
+    });
+  }
 };
 
 init()
