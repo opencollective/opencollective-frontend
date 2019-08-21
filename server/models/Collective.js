@@ -1621,17 +1621,12 @@ export default function(Sequelize, DataTypes) {
           return models.Member.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diffMemberIds } } });
         }
       })
-      .then(async () => {
-        const oldAdminMembers = await this.getMembers({
-          where: { role: { [Op.in]: [roles.ADMIN] } },
-        });
-        const adminMembers = members.filter(m => m.role === roles.ADMIN);
-        const diff = differenceBy(oldAdminMembers, adminMembers, 'role');
-
-        if (oldAdminMembers.length === 1 && diff.length !== 0) {
-          throw new Error('A collective requires having at least one admin member.');
+      .then(() => {
+        if (members.filter(m => m.role === roles.ADMIN).length === 0) {
+          throw new Error('There must always be at least one collective admin');
         }
-        return Promise.map(members, async member => {
+
+        return Promise.map(members, member => {
           if (member.id) {
             // Edit an existing membership (edit the role/description)
             const editableAttributes = pick(member, ['role', 'description', 'since']);
