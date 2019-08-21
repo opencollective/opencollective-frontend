@@ -59,6 +59,7 @@ const PublicMessage = styled.p`
   margin-top: 12px;
   text-align: center;
   cursor: pointer;
+  word-break: break-word;
 
   &:hover {
     opacity: 0.9;
@@ -209,27 +210,24 @@ class OrderSuccessContributorCardWithData extends React.Component {
                     abbreviateInterval
                   />
                 </Span>
-                {member && member.publicMessage && (
-                  <Container textAlign="center" color="black.600">
-                    <PublicMessage onClick={this.showPopup}>“{member.publicMessage}”</PublicMessage>
-                  </Container>
-                )}
-                {member && !member.publicMessage && !hasPopup && (
-                  <Span
-                    mt={2}
-                    cursor="pointer"
-                    fontSize="Tiny"
-                    color="black.600"
-                    textAlign="center"
-                    onClick={this.showPopup}
-                  >
-                    <FormattedMessage
-                      id="contribute.publicMessage"
-                      defaultMessage="Leave a public message (Optional)"
-                    />
-                  </Span>
-                )}
               </React.Fragment>
+            )}
+            {member && member.publicMessage && (
+              <Container textAlign="center" color="black.600">
+                <PublicMessage onClick={this.showPopup}>“{member.publicMessage}”</PublicMessage>
+              </Container>
+            )}
+            {member && !member.publicMessage && !hasPopup && (
+              <Span
+                mt={2}
+                cursor="pointer"
+                fontSize="Tiny"
+                color="black.600"
+                textAlign="center"
+                onClick={this.showPopup}
+              >
+                <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+              </Span>
             )}
           </Flex>
         </StyledCard>
