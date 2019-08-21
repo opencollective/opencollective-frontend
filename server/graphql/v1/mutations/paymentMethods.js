@@ -2,7 +2,7 @@ import { pick } from 'lodash';
 import { URLSearchParams } from 'url';
 
 import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
-import * as stripeCreditcard from '../../../paymentProviders/stripe/creditcard';
+import { setupCreditCard } from '../../../paymentProviders/stripe/creditcard';
 import emailLib from '../../../lib/email';
 import models, { Op } from '../../../models';
 import { Forbidden, ValidationFailed } from '../../errors';
@@ -76,7 +76,7 @@ async function createStripeCreditCard(args, remoteUser) {
   let paymentMethod = await models.PaymentMethod.create(paymentMethodData);
 
   try {
-    paymentMethod = await stripeCreditcard.setupPaymentMethod(paymentMethod, {
+    paymentMethod = await setupCreditCard(paymentMethod, {
       collective,
       user: remoteUser,
     });

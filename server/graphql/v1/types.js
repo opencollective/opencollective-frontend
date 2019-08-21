@@ -81,32 +81,6 @@ export const IsoDateString = new GraphQLScalarType({
   },
 });
 
-export const StripeErrorType = new GraphQLObjectType({
-  name: 'StripeError',
-  fields: () => {
-    return {
-      message: {
-        type: GraphQLString,
-        resolve(error) {
-          return error.error;
-        },
-      },
-      account: {
-        type: GraphQLString,
-        resolve(error) {
-          return error.account;
-        },
-      },
-      response: {
-        type: GraphQLJSON,
-        resolve(error) {
-          return error.response;
-        },
-      },
-    };
-  },
-});
-
 export const UserType = new GraphQLObjectType({
   name: 'UserDetails',
   description: 'This represents the details of a User',
@@ -2100,5 +2074,31 @@ export const ImageFormatType = new GraphQLEnumType({
     jpg: {},
     gif: {},
     svg: {},
+  },
+});
+
+export const StripeErrorType = new GraphQLObjectType({
+  name: 'StripeError',
+  fields: () => {
+    return {
+      message: {
+        type: GraphQLString,
+        resolve(error) {
+          return error.message;
+        },
+      },
+      account: {
+        type: GraphQLString,
+        resolve(error) {
+          return error.account;
+        },
+      },
+      response: {
+        type: GraphQLJSON,
+        resolve(error) {
+          return error.response;
+        },
+      },
+    };
   },
 });

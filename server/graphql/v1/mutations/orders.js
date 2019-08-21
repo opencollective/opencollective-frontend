@@ -12,6 +12,7 @@ import cache from '../../../lib/cache';
 import * as github from '../../../lib/github';
 import recaptcha from '../../../lib/recaptcha';
 import * as libPayments from '../../../lib/payments';
+import { setupCreditCard } from '../../../paymentProviders/stripe/creditcard';
 import { capitalize, pluralize, formatCurrency, md5 } from '../../../lib/utils';
 import { getNextChargeAndPeriodStartDates, getChargeRetryCount } from '../../../lib/subscriptions';
 
@@ -727,34 +728,51 @@ export async function updateSubscription(remoteUser, args) {
     // TODO: Would be even better if we could charge you here directly
     // before letting you proceed
 
-    // means it's an existing paymentMethod
-    if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
-      newPm = await models.PaymentMethod.findOne({
-        where: { uuid: paymentMethod.uuid },
-      });
-      if (!newPm) {
-        throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
+    try {
+      // means it's an existing paymentMethod
+      if (paymentMethod.uuid && paymentMethod.uuid.length === 36) {
+        newPm = await models.PaymentMethod.findOne({
+          where: { uuid: paymentMethod.uuid },
+        });
+        if (!newPm) {
+          throw new Error('Payment method not found with this uuid', paymentMethod.uuid);
+        }
+      } else {
+        // means it's a new paymentMethod
+        const newPMData = Object.assign(paymentMethod, {
+          CollectiveId: order.FromCollectiveId,
+        });
+
+        newPm = await models.PaymentMethod.create(newPMData);
+        newPm = await setupCreditCard(newPm, {
+          user: remoteUser,
+        });
       }
-    } else {
-      // means it's a new paymentMethod
-      const newPMData = Object.assign(paymentMethod, {
-        CollectiveId: order.FromCollectiveId,
-      });
-      newPm = await models.PaymentMethod.createFromStripeSourceToken(newPMData);
+
+      // determine if this order was pastdue
+      if (order.Subscription.chargeRetryCount > 0) {
+        const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
+        const chargeRetryCount = getChargeRetryCount('updated', order);
+
+        await order.Subscription.update({
+          nextChargeDate: updatedDates.nextChargeDate,
+          chargeRetryCount,
+        });
+      }
+
+      order = await order.update({ PaymentMethodId: newPm.id });
+    } catch (error) {
+      console.log(error);
+
+      if (!error.stripeResponse) {
+        throw error;
+      }
+
+      order.stripeError = {
+        message: error.message,
+        response: error.stripeResponse,
+      };
     }
-
-    // determine if this order was pastdue
-    if (order.Subscription.chargeRetryCount > 0) {
-      const updatedDates = getNextChargeAndPeriodStartDates('updated', order);
-      const chargeRetryCount = getChargeRetryCount('updated', order);
-
-      await order.Subscription.update({
-        nextChargeDate: updatedDates.nextChargeDate,
-        chargeRetryCount,
-      });
-    }
-
-    order = await order.update({ PaymentMethodId: newPm.id });
   }
 
   if (amount !== undefined) {

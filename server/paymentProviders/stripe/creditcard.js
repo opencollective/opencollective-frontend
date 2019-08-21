@@ -167,6 +167,46 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
   return models.Transaction.createFromPayload(payload);
 };
 
+export const setupCreditCard = async (paymentMethod, { user, collective } = {}) => {
+  const platformStripeCustomer = await getOrCreateCustomerOnPlatformAccount({
+    paymentMethod,
+    user,
+    collective,
+  });
+
+  const paymentMethodId = platformStripeCustomer.sources.data[0].id;
+
+  let setupIntent;
+  if (paymentMethod.data.setupIntent) {
+    setupIntent = await stripe.setupIntents.retrieve(paymentMethod.data.setupIntent.id);
+    // TO CHECK: what happens if the setupIntent is not found
+  }
+  if (!setupIntent) {
+    setupIntent = await stripe.setupIntents.create({
+      customer: platformStripeCustomer.id,
+      payment_method: paymentMethodId,
+      confirm: true,
+    });
+  }
+
+  if (
+    !paymentMethod.data.setupIntent ||
+    paymentMethod.data.setupIntent.id !== setupIntent.id ||
+    paymentMethod.data.setupIntent.status !== setupIntent.status
+  ) {
+    paymentMethod.data.setupIntent = { id: setupIntent.id, status: setupIntent.status };
+    await paymentMethod.update({ data: paymentMethod.data });
+  }
+
+  if (setupIntent.next_action) {
+    const setupIntentError = new Error('Setup Intent require action');
+    setupIntentError.stripeResponse = { setupIntent };
+    throw setupIntentError;
+  }
+
+  return paymentMethod;
+};
+
 export default {
   features: {
     recurring: true,
@@ -269,45 +309,5 @@ export default {
   webhook: (/* requestBody, event */) => {
     // We don't do anything at the moment
     return Promise.resolve();
-  },
-
-  setupPaymentMethod: async (paymentMethod, { user, collective } = {}) => {
-    const platformStripeCustomer = await getOrCreateCustomerOnPlatformAccount({
-      paymentMethod,
-      user,
-      collective,
-    });
-
-    const paymentMethodId = platformStripeCustomer.sources.data[0].id;
-
-    let setupIntent;
-    if (paymentMethod.data.setupIntent) {
-      setupIntent = await stripe.setupIntents.retrieve(paymentMethod.data.setupIntent.id);
-      // TO CHECK: what happens if the setupIntent is not found
-    }
-    if (!setupIntent) {
-      setupIntent = await stripe.setupIntents.create({
-        customer: platformStripeCustomer.id,
-        payment_method: paymentMethodId,
-        confirm: true,
-      });
-    }
-
-    if (
-      !paymentMethod.data.setupIntent ||
-      paymentMethod.data.setupIntent.id !== setupIntent.id ||
-      paymentMethod.data.setupIntent.status !== setupIntent.status
-    ) {
-      paymentMethod.data.setupIntent = { id: setupIntent.id, status: setupIntent.status };
-      await paymentMethod.update({ data: paymentMethod.data });
-    }
-
-    if (setupIntent.next_action) {
-      const setupIntentError = new Error('Setup Intent require action');
-      setupIntentError.stripeResponse = { setupIntent };
-      throw setupIntentError;
-    }
-
-    return paymentMethod;
   },
 };
