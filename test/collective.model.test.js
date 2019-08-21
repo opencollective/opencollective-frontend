@@ -639,7 +639,7 @@ describe('Collective model', () => {
         .then(() =>
           collective.editMembers([
             {
-              role: 'MEMBER',
+              role: 'ADMIN',
               member: {
                 name: user1.name,
                 email: user1.email,
