@@ -36,7 +36,7 @@ class PaymentMethodChooser extends React.Component {
       showNewCreditCardForm: isEmpty(props.paymentMethodsList),
       result: {},
       card: {},
-      showUnknownPaymentMethodHelp: !get(this.props, 'paymentMethodInUse.name'), // check for premigration payment methods
+      showUnknownPaymentMethodHelp: !get(props, 'paymentMethodInUse.name'), // check for premigration payment methods
     };
 
     this.messages = defineMessages({
