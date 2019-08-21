@@ -1,0 +1,23 @@
+{{#if fromCollective.name}}
+Dear {{fromCollective.name}},
+{{else}}
+Hi!
+{{/if}}
+
+To comply with new regulations, we need you to confirm your credit card to process your payment of {{{currency order.totalAmount currency=order.currency}}} to {{collective.name}}.
+
+Please visit the following page to confirm your credit card: {{confirmOrderLink}}.
+
+If you have any questions, you can always reach us at support@opencollective.com.
+
+Warmly,
+
+  – Team Open Collective
+
+{{> footer.text}}
+
+OpenCollective, Inc.
+EIN: 47-3896707
+340 S LEMON AVE #3717
+Walnut CA 91789
+USA

@@ -121,16 +121,20 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
     });
   }
 
-  if (!order.data.paymentIntent || order.data.paymentIntent.status !== paymentIntent.status) {
+  if (paymentIntent.next_action) {
+    // Save reference to paymentIntent
     order.data.paymentIntent = { id: paymentIntent.id, status: paymentIntent.status };
     await order.update({ data: order.data });
-  }
-
-  if (paymentIntent.next_action) {
     const paymentIntentError = new Error('Payment Intent require action');
     paymentIntentError.stripeAccount = hostStripeAccount.username;
     paymentIntentError.stripeResponse = { paymentIntent };
     throw paymentIntentError;
+  }
+
+  // Success: delete reference to paymentIntent
+  if (order.data.paymentIntent) {
+    delete order.data.paymentIntent;
+    await order.update({ data: order.data });
   }
 
   const charge = paymentIntent.charges.data[0];

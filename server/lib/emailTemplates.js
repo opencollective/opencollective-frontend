@@ -54,6 +54,8 @@ export const templateNames = [
   'organization.newmember',
   'payment.failed',
   'payment.failed.text',
+  'payment.creditcard.confirmation',
+  'payment.creditcard.confirmation.text',
   'pledge.complete',
   'order.processing',
   'report.platform',
