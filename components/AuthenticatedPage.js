@@ -29,7 +29,7 @@ import SignInOrJoinFree from './SignInOrJoinFree';
 class AuthenticatedPage extends React.Component {
   static propTypes = {
     /** A child renderer to call when user is properly authenticated */
-    children: PropTypes.func,
+    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
     /** @ignore from withUser */
     loadingLoggedInUser: PropTypes.bool,
     /** @ignore from withUser */
@@ -55,8 +55,10 @@ class AuthenticatedPage extends React.Component {
           )}
         </Flex>
       );
-    } else {
+    } else if (typeof this.props.children === 'function') {
       return this.props.children(LoggedInUser);
+    } else {
+      return this.props.children;
     }
   }
 
