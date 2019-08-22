@@ -118,6 +118,7 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
 }
 
 export async function createOrder(order, loaders, remoteUser, reqIp) {
+  // console.log(order);
   debug('Beginning creation of order', order);
   await checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
@@ -438,7 +439,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
           taxIDNumberFrom: vatSettings.number,
         },
         customData: order.customData,
-        savePaymentMethod: Boolean(order.paymentMethod.save),
+        savePaymentMethod: Boolean(order.paymentMethod && order.paymentMethod.save),
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };
@@ -458,7 +459,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       if (get(order, 'paymentMethod.type') === 'manual') {
         orderCreated.paymentMethod = order.paymentMethod;
       } else {
-        order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
+        // Ideally, we should always save CollectiveId
+        // but this is breaking some conventions elsewhere
+        if (orderCreated.data.savePaymentMethod) {
+          order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
+        }
         await orderCreated.setPaymentMethod(order.paymentMethod);
       }
       // also adds the user as a BACKER of collective
@@ -501,7 +506,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     return order;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     if (orderCreated) {
       if (!orderCreated.processedAt) {
@@ -578,7 +583,7 @@ export async function confirmOrder(order, remoteUser) {
 
     return order;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     if (!error.stripeResponse) {
       throw error;

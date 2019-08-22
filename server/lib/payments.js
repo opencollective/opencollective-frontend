@@ -315,7 +315,7 @@ export const executeOrder = async (user, order, options) => {
   transaction && (await updateOrderWithTransaction(order, transaction));
 
   // If the user asked for it, mark the payment method as saved for future financial contributions
-  if (order.data.savePaymentMethod) {
+  if (order.data && order.data.savePaymentMethod) {
     order.paymentMethod.saved = true;
     order.paymentMethod.save();
   }

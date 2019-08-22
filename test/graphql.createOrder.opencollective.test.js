@@ -11,7 +11,7 @@ import * as store from './stores';
 /* What's being tested */
 import prepaid from '../server/paymentProviders/opencollective/prepaid';
 
-describe('grahpql.createOrder.opencollective', () => {
+describe('graphql.createOrder.opencollective', () => {
   describe('prepaid', () => {
     describe('#getBalance', () => {
       before(utils.resetTestDB);

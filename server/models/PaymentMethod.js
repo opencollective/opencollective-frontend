@@ -164,7 +164,10 @@ export default function(Sequelize, DataTypes) {
         onUpdate: 'CASCADE',
       },
 
-      saved: DataTypes.BOOLEAN,
+      saved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       paranoid: true,
@@ -468,15 +471,15 @@ export default function(Sequelize, DataTypes) {
    */
   PaymentMethod.getOrCreate = async (user, paymentMethod) => {
     if (!paymentMethod.uuid) {
-      // If no UUID provided, we check if one with this token already exists
-      if (paymentMethod.token) {
-        const paymentMethodWithToken = await models.PaymentMethod.findOne({
-          where: { token: paymentMethod.token },
-        });
-        if (paymentMethodWithToken) {
-          return paymentMethodWithToken;
-        }
-      }
+      // // If no UUID provided, we check if one with this token already exists
+      // if (paymentMethod.token) {
+      //   const paymentMethodWithToken = await models.PaymentMethod.findOne({
+      //     where: { token: paymentMethod.token },
+      //   });
+      //   if (paymentMethodWithToken) {
+      //     return paymentMethodWithToken;
+      //   }
+      // }
       // If no UUID provided, we create a new paymentMethod
       const paymentMethodData = {
         ...paymentMethod,

@@ -1,14 +1,12 @@
 import _ from 'lodash';
 import config from 'config';
-import Stripe from 'stripe';
 
 import models from '../../models';
 import logger from '../../lib/logger';
+import stripe from '../../lib/stripe';
 import * as constants from '../../constants/transactions';
 import * as stripeGateway from './gateway';
 import * as paymentsLib from '../../lib/payments';
-
-const stripe = Stripe(config.stripe.secret);
 
 /**
  * Get or create a customer under the platform stripe account
@@ -45,7 +43,7 @@ const getOrCreateCustomerOnHostAccount = async (hostStripeAccount, { paymentMeth
   // to the platform stripe account, not to the host's stripe
   // account. Since payment methods had no name before that
   // migration, we're using it to test for pre-migration users;
-  if (!paymentMethod.name) return paymentMethod.customerId;
+  // if (!paymentMethod.name) return paymentMethod.customerId;
 
   const data = paymentMethod.data || {};
   data.customerIdForHost = data.customerIdForHost || {};
@@ -90,8 +88,11 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
     ? parseInt((order.totalAmount * constants.OC_FEE_PERCENT) / 100, 10)
     : order.platformFee;
 
+  // Make sure data is available (breaking in some old tests)
+  order.data = order.data || {};
+
   let paymentIntent;
-  if (!order.data.paymentIntent) {
+  if (!order.data || !order.data.paymentIntent) {
     const payload = {
       amount: order.totalAmount,
       currency: order.currency,
@@ -131,7 +132,7 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
   if (paymentIntent.status !== 'succeeded') {
     logger.error('Unknown error with Stripe Payment Intent.');
     logger.error(paymentIntent);
-    throw new new Error('Unknown error with Stripe. Please contact support.')();
+    throw new Error('Unknown error with Stripe. Please contact support.')();
   }
 
   // Success: delete reference to paymentIntent

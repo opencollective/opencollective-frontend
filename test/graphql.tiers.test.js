@@ -1,11 +1,13 @@
+import Promise from 'bluebird';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import sinon from 'sinon';
-import * as stripe from '../server/paymentProviders/stripe/gateway';
-import Promise from 'bluebird';
+
 import * as utils from './utils';
+import stripe from '../server/lib/stripe';
 import models from '../server/models';
 import { VAT_OPTIONS } from '../server/constants/vat';
+import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 
 describe('graphql.tiers.test', () => {
   let user1, user2, host, collective1, collective2, tier1, tierWithCustomFields, tierProduct, paymentMethod1;
@@ -74,43 +76,59 @@ describe('graphql.tiers.test', () => {
   after(() => sandbox.restore());
 
   before(() => {
-    sandbox.stub(stripe, 'createToken').callsFake(() => {
-      return Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM' });
-    });
-    sandbox.stub(stripe, 'createCustomer').callsFake(() => {
-      return Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' });
-    });
-    sandbox.stub(stripe, 'createCharge').callsFake((hostStripeAccount, data) => {
-      return Promise.resolve({
-        amount: data.amount,
-        balance_transaction: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
-      });
-    });
-    sandbox.stub(stripe, 'retrieveBalanceTransaction').callsFake(() => {
-      return Promise.resolve({
-        id: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
-        object: 'balance_transaction',
-        amount: 999,
-        available_on: 1483920000,
-        created: 1483315442,
-        currency: 'usd',
-        description: null,
-        fee: 59,
-        fee_details: [
-          {
-            amount: 59,
-            application: null,
-            currency: 'usd',
-            description: 'Stripe processing fees',
-            type: 'stripe_fee',
-          },
-        ],
-        net: 940,
-        source: 'ch_19XJJ02eZvKYlo2CHfSUsSpl',
-        status: 'pending',
-        type: 'charge',
-      });
-    });
+    sandbox.stub(stripeGateway, 'createToken').callsFake(() => Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM' }));
+    sandbox.stub(stripe.tokens, 'create').callsFake(() => Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM' }));
+
+    sandbox.stub(stripeGateway, 'createCustomer').callsFake(() => Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' }));
+    sandbox.stub(stripe.customers, 'create').callsFake(() => Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' }));
+    sandbox.stub(stripe.customers, 'retrieve').callsFake(() => Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' }));
+
+    // sandbox.stub(stripeGateway, 'createCharge').callsFake((hostStripeAccount, data) =>
+    //   Promise.resolve({
+    //     amount: data.amount,
+    //     balance_transaction: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
+    //   }),
+    // );
+    sandbox.stub(stripe.paymentIntents, 'create').callsFake(data =>
+      Promise.resolve({
+        charges: {
+          data: [
+            {
+              id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm',
+              amount: data.amount,
+              balance_transaction: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
+            },
+          ],
+        },
+        status: 'succeeded',
+      }),
+    );
+
+    const balanceTransaction = {
+      id: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
+      object: 'balance_transaction',
+      amount: 999,
+      available_on: 1483920000,
+      created: 1483315442,
+      currency: 'usd',
+      description: null,
+      fee: 59,
+      fee_details: [
+        {
+          amount: 59,
+          application: null,
+          currency: 'usd',
+          description: 'Stripe processing fees',
+          type: 'stripe_fee',
+        },
+      ],
+      net: 940,
+      source: 'ch_19XJJ02eZvKYlo2CHfSUsSpl',
+      status: 'pending',
+      type: 'charge',
+    };
+    sandbox.stub(stripeGateway, 'retrieveBalanceTransaction').callsFake(() => Promise.resolve(balanceTransaction));
+    sandbox.stub(stripe.balanceTransactions, 'retrieve').callsFake(() => Promise.resolve(balanceTransaction));
   });
 
   describe('graphql.tiers.test.js', () => {
@@ -343,9 +361,13 @@ describe('graphql.tiers.test', () => {
           countryISO: 'BE', // Required when order has tax
         };
 
-        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
-        const createdOrder = queryResult.data.createOrder;
+        const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
 
+        // There should be no errors
+        res.errors && console.error(res.errors);
+        expect(res.errors).to.not.exist;
+
+        const createdOrder = res.data.createOrder;
         expect(createdOrder.taxAmount).to.equal(taxAmount);
         expect(createdOrder.data.tax).to.deep.equal({
           id: 'VAT',
@@ -369,8 +391,13 @@ describe('graphql.tiers.test', () => {
           countryISO: 'FR', // Required when order has tax
           taxIDNumber: 'FRXX999999998',
         };
-        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
-        const createdOrder = queryResult.data.createOrder;
+        const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+
+        // There should be no errors
+        res.errors && console.error(res.errors);
+        expect(res.errors).to.not.exist;
+
+        const createdOrder = res.data.createOrder;
         expect(createdOrder.taxAmount).to.equal(0);
         createdOrder.transactions.map(transaction => {
           expect(transaction.taxAmount).to.equal(0);
@@ -390,8 +417,13 @@ describe('graphql.tiers.test', () => {
           countryISO: 'BE',
           taxIDNumber: 'BE0414445663',
         };
-        const queryResult = await utils.graphqlQuery(createOrderQuery, { order }, user1);
-        const createdOrder = queryResult.data.createOrder;
+        const res = await utils.graphqlQuery(createOrderQuery, { order }, user1);
+
+        // There should be no errors
+        res.errors && console.error(res.errors);
+        expect(res.errors).to.not.exist;
+
+        const createdOrder = res.data.createOrder;
         expect(createdOrder.taxAmount).to.equal(taxAmount);
         createdOrder.transactions.map(transaction => {
           expect(transaction.taxAmount).to.equal(-taxAmount);

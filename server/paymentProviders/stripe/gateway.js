@@ -1,15 +1,9 @@
-/*
- * All calls to stripe are meant to go through this gateway
- */
-
 import { get } from 'lodash';
-import Stripe from 'stripe';
-import config from 'config';
 import debugLib from 'debug';
 
-const debug = debugLib('stripe');
+import stripe from '../../lib/stripe';
 
-export const appStripe = Stripe(config.stripe.secret);
+const debug = debugLib('stripe');
 
 /**
  * Create stripe customer
@@ -24,7 +18,7 @@ export const createCustomer = (stripeAccount, token, options = {}) => {
     email: options.email || '',
   };
 
-  return appStripe.customers.create(payload, {
+  return stripe.customers.create(payload, {
     stripe_account: stripeAccount && stripeAccount.username,
   });
 };
@@ -34,7 +28,7 @@ export const createCustomer = (stripeAccount, token, options = {}) => {
  */
 export const retrieveCustomer = (stripeAccount, customerId) => {
   debug('retrieveCustomer');
-  return appStripe.customers.retrieve(customerId, {
+  return stripe.customers.retrieve(customerId, {
     stripe_account: stripeAccount.username,
   });
 };
@@ -54,7 +48,7 @@ export const createToken = (stripeAccount, customerId) => {
     customerId,
   );
 
-  return appStripe.tokens.create({ customer: customerId }, { stripe_account: stripeAccount.username });
+  return stripe.tokens.create({ customer: customerId }, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -70,7 +64,7 @@ export const createCharge = (stripeAccount, charge) => {
     'charge:',
     charge,
   );
-  return appStripe.charges.create(charge, {
+  return stripe.charges.create(charge, {
     stripe_account: stripeAccount.username,
   });
 };
@@ -79,14 +73,14 @@ export const createCharge = (stripeAccount, charge) => {
  * Fetch charge
  */
 export const retrieveCharge = (stripeAccount, chargeId) => {
-  return appStripe.charges.retrieve(chargeId, {
+  return stripe.charges.retrieve(chargeId, {
     stripe_account: stripeAccount.username,
   });
 };
 
 /** Refund a charge & the application fee */
 export const refundCharge = (stripeAccount, chargeId) => {
-  return appStripe.refunds.create(
+  return stripe.refunds.create(
     { charge: chargeId, refund_application_fee: true },
     { stripe_account: stripeAccount.username },
   );
@@ -104,7 +98,7 @@ export const retrieveBalanceTransaction = (stripeAccount, txn) => {
     },
     txn,
   );
-  return appStripe.balanceTransactions.retrieve(txn, {
+  return stripe.balanceTransactions.retrieve(txn, {
     stripe_account: stripeAccount.username,
   });
 };
@@ -118,7 +112,7 @@ export const retrieveChargeWithRefund = async (stripeAccount, chargeId) => {
     throw Error(`charge id ${chargeId} not found`);
   }
   const refundId = get(charge, 'refunds.data[0].id');
-  const refund = await appStripe.refunds.retrieve(refundId, {
+  const refund = await stripe.refunds.retrieve(refundId, {
     stripe_account: stripeAccount.username,
   });
   return { charge, refund };
@@ -128,7 +122,7 @@ export const retrieveChargeWithRefund = async (stripeAccount, chargeId) => {
  * Retreive an event (for webhook)
  */
 export const retrieveEvent = (stripeAccount, eventId) => {
-  return appStripe.events.retrieve(eventId, {
+  return stripe.events.retrieve(eventId, {
     stripe_account: stripeAccount.username,
   });
 };
@@ -159,7 +153,7 @@ export const extractFees = balance => {
  * @param {string} starting_after A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.
  */
 export const listCharges = (stripe_account, params) => {
-  return appStripe.charges.list(params, { stripe_account });
+  return stripe.charges.list(params, { stripe_account });
 };
 
 /**

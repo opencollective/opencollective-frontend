@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import config from 'config';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -7,8 +8,8 @@ import * as utils from '../test/utils';
 import * as payments from '../server/lib/payments';
 import roles from '../server/constants/roles';
 import status from '../server/constants/order_status';
-import * as stripe from '../server/paymentProviders/stripe/gateway';
-import Promise from 'bluebird';
+import stripe from '../server/lib/stripe';
+import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 
 const AMOUNT = 1099;
 const AMOUNT2 = 199;
@@ -43,10 +44,15 @@ describe('lib.payments.test.js', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(stripe, 'createCustomer').callsFake(() => Promise.resolve({ id: 'cus_BM7mGwp1Ea8RtL' }));
-    sandbox.stub(stripe, 'createToken').callsFake(() => Promise.resolve({ id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' }));
-    sandbox.stub(stripe, 'createCharge').callsFake(() => Promise.resolve({ id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' }));
-    sandbox.stub(stripe, 'retrieveBalanceTransaction').callsFake(() => Promise.resolve(stripeMocks.balance));
+    sandbox.stub(stripe.customers, 'create').callsFake(() => Promise.resolve({ id: 'cus_BM7mGwp1Ea8RtL' }));
+    sandbox.stub(stripe.tokens, 'create').callsFake(() => Promise.resolve({ id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' }));
+    sandbox.stub(stripe.paymentIntents, 'create').callsFake(() =>
+      Promise.resolve({
+        charges: { data: [{ id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' }] },
+        status: 'succeeded',
+      }),
+    );
+    sandbox.stub(stripe.balanceTransactions, 'retrieve').callsFake(() => Promise.resolve(stripeMocks.balance));
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 

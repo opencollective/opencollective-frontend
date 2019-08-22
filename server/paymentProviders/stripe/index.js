@@ -1,22 +1,21 @@
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import debugLib from 'debug';
+import { get } from 'lodash';
 import { URLSearchParams } from 'url';
 
 import models from '../../models';
 import errors from '../../lib/errors';
 import { retrieveEvent } from './gateway';
 import creditcard from './creditcard';
-import stripeLib from 'stripe';
-import debugLib from 'debug';
-import { get } from 'lodash';
 import { addParamsToUrl } from '../../lib/utils';
+import stripe from '../../lib/stripe';
 
 const debug = debugLib('stripe');
+
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 const TOKEN_URI = 'https://connect.stripe.com/oauth/token';
-
-const stripe = stripeLib(config.stripe.secret);
 
 const getToken = code => () =>
   axios
