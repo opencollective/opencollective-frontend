@@ -18,6 +18,8 @@ const nextConfig = {
         GIFTCARDS_GENERATOR_URL: null,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
+        NCP_BETA_COLLECTIVES: null,
+        NCP_IS_DEFAULT: null,
       }),
     );
 
