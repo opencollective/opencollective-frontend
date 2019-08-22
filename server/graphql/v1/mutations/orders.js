@@ -453,6 +453,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     orderCreated = await models.Order.create(orderData);
 
+    // Attach Payment Method to collective to be used for future financial contributions
     if (order.paymentMethod && order.paymentMethod.save) {
       order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
     }
@@ -464,19 +465,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         await orderCreated.setPaymentMethod(order.paymentMethod);
       }
       // also adds the user as a BACKER of collective
-      try {
-        await libPayments.executeOrder(
-          remoteUser || user,
-          orderCreated,
-          pick(order, ['hostFeePercent', 'platformFeePercent']),
-        );
-      } catch (e) {
-        // Don't save new card for user if order failed
-        if (!order.paymentMethod.id && !order.paymentMethod.uuid) {
-          await orderCreated.paymentMethod.update({ CollectiveId: null });
-        }
-        throw e;
-      }
+      await libPayments.executeOrder(
+        remoteUser || user,
+        orderCreated,
+        pick(order, ['hostFeePercent', 'platformFeePercent']),
+      );
     } else if (!paymentRequired && order.interval && collective.type === types.COLLECTIVE) {
       // create inactive subscription to hold the interval info for the pledge
       const subscription = await models.Subscription.create({
@@ -515,8 +508,17 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     if (orderCreated) {
       if (!orderCreated.processedAt) {
-        // TODO: Order should be updated with data JSON field to store the error to review later
-        orderCreated.update({ status: status.ERROR });
+        if (error.stripeResponse) {
+          orderCreated.status = status.PENDING;
+        } else {
+          orderCreated.status = status.ERROR;
+          // Delete paymentMethod if it's not a recoverable error
+          if (!order.paymentMethod.id && !order.paymentMethod.uuid) {
+            await orderCreated.paymentMethod.destroy();
+          }
+        }
+        orderCreated.data.error = { message: error.message };
+        orderCreated.save();
       }
 
       if (!error.stripeResponse) {
@@ -541,7 +543,7 @@ export async function confirmOrder(order, remoteUser) {
     throw new errors.Unauthorized({ message: 'You need to be logged in to confirm an order' });
   }
 
-  const existingOrder = await models.Order.findOne({
+  order = await models.Order.findOne({
     where: {
       id: order.id,
     },
@@ -549,23 +551,39 @@ export async function confirmOrder(order, remoteUser) {
       { model: models.Collective, as: 'collective' },
       { model: models.Collective, as: 'fromCollective' },
       { model: models.PaymentMethod, as: 'paymentMethod' },
+      { model: models.Subscription, as: 'Subscription' },
     ],
   });
 
-  if (!existingOrder) {
+  if (!order) {
     throw new errors.NotFound({ message: 'Order not found' });
   }
-  if (!remoteUser.isAdmin(existingOrder.FromCollectiveId)) {
+  if (!remoteUser.isAdmin(order.FromCollectiveId)) {
     throw new errors.Unauthorized({ message: "You don't have permission to confirm this order" });
   }
-  if (existingOrder.status !== 'ERROR' && existingOrder.status !== 'PENDING') {
-    throw new errors.NotFound({ message: 'Order can only be confirmed if ERROR or PENDING.' });
+  if (order.status !== status.ERROR && order.status !== status.PENDING) {
+    throw new Error('Order can only be confirmed if its status is ERROR or PENDING.');
   }
 
   try {
-    await libPayments.executeOrder(remoteUser, existingOrder);
+    // If it's a first order -> executeOrder
+    // If it's a recurring subscription and not the initial order -> processOrder
+    if (!order.processedAt) {
+      await libPayments.executeOrder(remoteUser, order);
+      // executeOrder is updating the order to PAID
+    } else {
+      await libPayments.processOrder(order);
 
-    return existingOrder;
+      order.status = status.ACTIVE;
+      order.Subscription = Object.assign(order.Subscription, getNextChargeAndPeriodStartDates('success', order));
+      order.Subscription.chargeRetryCount = getChargeRetryCount('success', order);
+      order.Subscription.chargeNumber += 1;
+
+      await order.Subscription.save();
+      await order.save();
+    }
+
+    return order;
   } catch (error) {
     console.log(error);
 
@@ -573,13 +591,13 @@ export async function confirmOrder(order, remoteUser) {
       throw error;
     }
 
-    existingOrder.stripeError = {
+    order.stripeError = {
       message: error.message,
       account: error.stripeAccount,
       response: error.stripeResponse,
     };
 
-    return existingOrder;
+    return order;
   }
 }
 

@@ -3,6 +3,7 @@ import config from 'config';
 import Stripe from 'stripe';
 
 import models from '../../models';
+import logger from '../../lib/logger';
 import * as constants from '../../constants/transactions';
 import * as stripeGateway from './gateway';
 import * as paymentsLib from '../../lib/payments';
@@ -85,36 +86,33 @@ const getOrCreateCustomerOnHostAccount = async (hostStripeAccount, { paymentMeth
  * See: Shared Customers: https://stripe.com/docs/connect/shared-customers
  */
 const createChargeAndTransactions = async (hostStripeAccount, { order, hostStripeCustomer }) => {
-  const { collective, createdByUser: user, paymentMethod } = order;
-
   const platformFee = isNaN(order.platformFee)
     ? parseInt((order.totalAmount * constants.OC_FEE_PERCENT) / 100, 10)
     : order.platformFee;
 
   let paymentIntent;
   if (!order.data.paymentIntent) {
-    paymentIntent = await stripe.paymentIntents.create(
-      {
-        amount: order.totalAmount,
-        currency: order.currency,
-        customer: hostStripeCustomer.id,
-        description: order.description,
-        application_fee_amount: platformFee,
-        confirm: true,
-        confirmation_method: 'manual',
-        // TODO: implement return_url (could not find any way to test that)
-        // TODO: this should be only set when user save the credit card or subscription
-        setup_future_usage: 'off_session',
-        metadata: {
-          from: `${config.host.website}/${order.fromCollective.slug}`,
-          to: `${config.host.website}/${order.collective.slug}`,
-          customerEmail: user.email,
-        },
+    const payload = {
+      amount: order.totalAmount,
+      currency: order.currency,
+      customer: hostStripeCustomer.id,
+      description: order.description,
+      application_fee_amount: platformFee,
+      confirm: true,
+      confirmation_method: 'manual',
+      metadata: {
+        from: `${config.host.website}/${order.fromCollective.slug}`,
+        to: `${config.host.website}/${order.collective.slug}`,
       },
-      {
-        stripe_account: hostStripeAccount.username,
-      },
-    );
+    };
+    if (order.interval) {
+      payload.setup_future_usage = 'off_session';
+    } else if (!order.processedAt && order.data.savePaymentMethod) {
+      payload.setup_future_usage = 'on_session';
+    }
+    paymentIntent = await stripe.paymentIntents.create(payload, {
+      stripe_account: hostStripeAccount.username,
+    });
   } else {
     paymentIntent = await stripe.paymentIntents.confirm(order.data.paymentIntent.id, {
       stripe_account: hostStripeAccount.username,
@@ -122,13 +120,18 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
   }
 
   if (paymentIntent.next_action) {
-    // Save reference to paymentIntent
     order.data.paymentIntent = { id: paymentIntent.id, status: paymentIntent.status };
     await order.update({ data: order.data });
     const paymentIntentError = new Error('Payment Intent require action');
     paymentIntentError.stripeAccount = hostStripeAccount.username;
     paymentIntentError.stripeResponse = { paymentIntent };
     throw paymentIntentError;
+  }
+
+  if (paymentIntent.status !== 'succeeded') {
+    logger.error('Unknown error with Stripe Payment Intent.');
+    logger.error(paymentIntent);
+    throw new new Error('Unknown error with Stripe. Please contact support.')();
   }
 
   // Success: delete reference to paymentIntent
@@ -145,12 +148,12 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
 
   // Create a Transaction
   const fees = stripeGateway.extractFees(balanceTransaction);
-  const hostFeeInHostCurrency = paymentsLib.calcFee(balanceTransaction.amount, collective.hostFeePercent);
+  const hostFeeInHostCurrency = paymentsLib.calcFee(balanceTransaction.amount, order.collective.hostFeePercent);
   const payload = {
-    CreatedByUserId: user.id,
+    CreatedByUserId: order.CreatedByUserId,
     FromCollectiveId: order.FromCollectiveId,
-    CollectiveId: collective.id,
-    PaymentMethodId: paymentMethod.id,
+    CollectiveId: order.CollectiveId,
+    PaymentMethodId: order.PaymentMethodId,
     transaction: {
       type: constants.TransactionTypes.CREDIT,
       OrderId: order.id,
@@ -230,7 +233,6 @@ export default {
       hostStripeCustomer,
     });
 
-    // Mark paymentMethod as confirmed
     await order.paymentMethod.update({ confirmedAt: new Date() });
 
     return transactions;

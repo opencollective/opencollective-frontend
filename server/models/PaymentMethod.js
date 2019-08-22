@@ -458,15 +458,6 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
-   * Class Methods
-   */
-  PaymentMethod.createFromStripeSourceToken = PaymentMethodData => {
-    debug('createFromStripeSourceToken', PaymentMethodData);
-
-    throw new Error('createFromStripeSourceToken is deprecated');
-  };
-
-  /**
    * Create or get an existing payment method by uuid
    * This makes sure that the user can use this PaymentMethod
    * @param {*} user req.remoteUser

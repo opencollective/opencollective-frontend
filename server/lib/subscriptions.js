@@ -95,6 +95,7 @@ export async function processOrderWithSubscription(options, order) {
         }
         orderProcessedStatus = 'failure';
         csvEntry.error = error.message;
+        order.status = status.ERROR;
       }
       order.Subscription = Object.assign(
         order.Subscription,
@@ -344,7 +345,7 @@ export async function sendCreditCardConfirmationEmail(order) {
       order: order.info,
       collective: order.collective.info,
       fromCollective: order.fromCollective.minimal,
-      confirmOrderLink: `${config.host.website}/order/${order.id}/confirm`,
+      confirmOrderLink: `${config.host.website}/orders/${order.id}/confirm`,
     },
     {
       from: `${order.collective.name} <hello@${order.collective.slug}.opencollective.com>`,
