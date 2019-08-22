@@ -107,7 +107,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                 <FormattedMessage
                   id="host.apply.btn"
                   defaultMessage="Apply with {collective}"
-                  values={{ collective: this.inactiveCollective.name }}
+                  values={{ collective: <strong>{this.inactiveCollective.name}</strong> }}
                 />
               </StyledButton>
             )}
