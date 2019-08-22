@@ -85,8 +85,10 @@ class NewCollectivePage extends React.Component {
         colors: {
           ...theme.colors,
           primary: {
+            900: darken(0.15, primaryColor),
             800: darken(0.1, primaryColor),
             700: darken(0.05, primaryColor),
+            600: darken(0.025, primaryColor),
             500: primaryColor,
             400: lighten(0.1, primaryColor),
             300: lighten(0.2, primaryColor),

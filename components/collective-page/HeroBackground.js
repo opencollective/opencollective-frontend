@@ -5,7 +5,7 @@ import HeroBackgroundMask from './HeroBackgroundMask.svg';
 
 const generateBackground = (theme, backgroundImage) => {
   const color = theme.colors.primary[300];
-  const gradient = `linear-gradient(10deg, ${theme.colors.primary[700]}, ${theme.colors.primary[100]})`;
+  const gradient = `linear-gradient(10deg, ${theme.colors.primary[700]}, ${theme.colors.primary[200]})`;
   const defaultBackground = `${gradient}, ${color}`;
   return backgroundImage ? `url(${backgroundImage}), ${defaultBackground}` : defaultBackground;
 };
