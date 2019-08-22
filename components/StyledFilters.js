@@ -34,7 +34,7 @@ StyledFilters.propTypes = {
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.string,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  selectedButtonStyle: PropTypes.oneOf(['primary', 'dark']),
+  selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'dark']),
 };
 
 StyledFilters.defaultProps = {

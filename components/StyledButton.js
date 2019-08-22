@@ -21,6 +21,14 @@ const StyledButtonContent = styled.button`
   border: 1px solid;
   border-radius: 100px;
 
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    box-shadow: 0px 0px 0px 2px #83EBB4;
+  }
+
   ${buttonStyle}
   ${buttonSize}
 
@@ -64,7 +72,7 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'standard', 'dark']),
+  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
   /**
    * From styled-system: accepts any css 'display' value
    */

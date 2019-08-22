@@ -1,4 +1,6 @@
-### Standard button
+## Styles
+
+### Standard
 
 ```js
 <React.Fragment>
@@ -14,7 +16,7 @@
 </React.Fragment>
 ```
 
-### Primary button
+### Primary
 
 ```js
 <React.Fragment>
@@ -25,6 +27,38 @@
     Default
   </StyledButton>
   <StyledButton mr={3} buttonStyle="primary" buttonSize="large" loading>
+    Loading
+  </StyledButton>
+</React.Fragment>
+```
+
+### Secondary
+
+```js
+<React.Fragment>
+  <StyledButton mr={3} buttonStyle="secondary" buttonSize="large" disabled>
+    Disabled
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="secondary" buttonSize="large">
+    Default
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="secondary" buttonSize="large" loading>
+    Loading
+  </StyledButton>
+</React.Fragment>
+```
+
+### Dark
+
+```js
+<React.Fragment>
+  <StyledButton mr={3} buttonStyle="dark" buttonSize="large" disabled>
+    Disabled
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="dark" buttonSize="large">
+    Default
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="dark" buttonSize="large" loading>
     Loading
   </StyledButton>
 </React.Fragment>
