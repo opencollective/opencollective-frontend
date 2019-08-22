@@ -149,7 +149,7 @@ class NewCollectivePage extends React.Component {
 
 // eslint-disable graphql/template-strings
 const getCollective = graphql(gql`
-  query NewCollectivePage($slug: String!) {
+  query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
       id
       slug
@@ -175,6 +175,12 @@ const getCollective = graphql(gql`
         balance
         yearlyBudget
         updates
+        backers {
+          id
+          all
+          users
+          organizations
+        }
       }
       parentCollective {
         id
@@ -220,6 +226,19 @@ const getCollective = graphql(gql`
           id
           totalDonated
           totalRecurringDonations
+          contributors {
+            id
+            all
+            users
+            organizations
+          }
+        }
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
         }
       }
       events {
@@ -228,6 +247,22 @@ const getCollective = graphql(gql`
         name
         description
         image
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
       }
       ...TransactionsAndExpensesFragment
       updates(limit: 3, onlyPublishedUpdates: true) {

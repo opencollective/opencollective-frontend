@@ -10,15 +10,17 @@ import StyledTag from '../../StyledTag';
 import { P } from '../../Text';
 import StyledButton from '../../StyledButton';
 
-import { ContributionTypes } from '../_constants';
+import { ContributionTypes, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../_constants';
 import tierCardDefaultImage from '../ContributeCardDefaultImage.svg';
+import { ContributorAvatar } from '../../Avatar';
+import Container from '../../Container';
 
 /** The main container */
 const StyledContributeCard = styled(StyledCard)`
   display: flex;
   flex-direction: column;
-  width: 264px;
-  flex: 0 0 264px;
+  width: 300px;
+  flex: 0 0 300px;
   height: 100%;
 `;
 
@@ -69,7 +71,9 @@ const getContributeCTA = type => {
 /**
  * A contribute card with a "Contribute" call to action
  */
-const ContributeCard = ({ intl, title, type, route, routeParams, buttonText, children }) => {
+const ContributeCard = ({ intl, title, type, route, routeParams, buttonText, children, contributors, stats }) => {
+  const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
+
   return (
     <StyledContributeCard>
       <CoverImage />
@@ -85,11 +89,49 @@ const ContributeCard = ({ intl, title, type, route, routeParams, buttonText, chi
             {children}
           </Box>
         </Flex>
-        <Link route={route} params={routeParams}>
-          <StyledButton width={1} mb={2} mt={3}>
-            {buttonText || getContributeCTA(type)}
-          </StyledButton>
-        </Link>
+        <Box>
+          <Link route={route} params={routeParams}>
+            <StyledButton width={1} mb={2} mt={3}>
+              {buttonText || getContributeCTA(type)}
+            </StyledButton>
+          </Link>
+          {contributors && contributors.length > 0 && (
+            <Box mt={2} height={60}>
+              <Flex>
+                {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
+                  <Box key={contributor.id} mx={2}>
+                    {contributor.collectiveSlug ? (
+                      <Link route="collective" params={{ slug: contributor.collectiveSlug }} title={contributor.name}>
+                        <ContributorAvatar contributor={contributor} radius={32} />
+                      </Link>
+                    ) : (
+                      <ContributorAvatar contributor={contributor} radius={32} title={contributor.name} />
+                    )}
+                  </Box>
+                ))}
+                {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
+                  <Container ml={2} pt="0.7em" fontSize="Caption" color="black.600">
+                    + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
+                  </Container>
+                )}
+              </Flex>
+              {stats && (
+                <P mt={2} fontSize="Tiny" color="black.600">
+                  <FormattedMessage
+                    id="ContributorsCount"
+                    defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed"
+                    values={{
+                      userCount: stats.users,
+                      orgCount: stats.organizations,
+                      totalCount: stats.all,
+                      both: Number(stats.users && stats.organizations),
+                    }}
+                  />
+                </P>
+              )}
+            </Box>
+          )}
+        </Box>
       </Flex>
     </StyledContributeCard>
   );
@@ -108,6 +150,21 @@ ContributeCard.propTypes = {
   routeParams: PropTypes.object,
   /** The card body */
   children: PropTypes.node,
+  /** Contributors */
+  contributors: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      image: PropTypes.string,
+      collectiveSlug: PropTypes.string,
+    }),
+  ),
+  /** Contributors stats */
+  stats: PropTypes.shape({
+    all: PropTypes.number,
+    users: PropTypes.number,
+    organizations: PropTypes.number,
+  }),
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };
