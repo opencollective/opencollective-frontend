@@ -263,7 +263,7 @@ class TopBarProfileMenu extends React.Component {
             <ListItem py={1}>
               <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                  <FormattedMessage id="menu.subscriptions" defaultMessage="Recurring financial contributions" />
+                  <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                 </StyledLink>
               </Link>
             </ListItem>

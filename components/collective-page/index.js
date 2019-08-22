@@ -201,6 +201,7 @@ class CollectivePage extends Component {
             onCollectiveClick={this.onCollectiveClick}
             hasApply={collective.isHost}
             hasDashboard={collective.isHost && isAdmin}
+            hasManageSubscriptions={!collective.isHost && isAdmin}
             hasContact={!isAdmin}
             hideInfos={!isFixed}
             isAnimated={true}

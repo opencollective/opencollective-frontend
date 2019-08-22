@@ -17,7 +17,15 @@ const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn
 /**
  * Show call to actions as buttons for the collective.
  */
-const CollectiveCallsToAction = ({ collective, hasSubmitExpense, hasContact, hasApply, hasDashboard, ...props }) => {
+const CollectiveCallsToAction = ({
+  collective,
+  hasSubmitExpense,
+  hasContact,
+  hasApply,
+  hasDashboard,
+  hasManageSubscriptions,
+  ...props
+}) => {
   return (
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
@@ -37,6 +45,13 @@ const CollectiveCallsToAction = ({ collective, hasSubmitExpense, hasContact, has
               <ExpenseIcon size="1.5em" />
             </Span>
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+          </StyledButton>
+        </Link>
+      )}
+      {hasManageSubscriptions && (
+        <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
+          <StyledButton mx={2}>
+            <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
           </StyledButton>
         </Link>
       )}
@@ -62,6 +77,8 @@ CollectiveCallsToAction.propTypes = {
   hasApply: PropTypes.bool,
   /** Hosts "Dashboard" button */
   hasDashboard: PropTypes.bool,
+  /** Link to edit subscriptions */
+  hasManageSubscriptions: PropTypes.bool,
 };
 
 export default CollectiveCallsToAction;

@@ -188,6 +188,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
         </Flex>
         <StyledShortDescription>{collective.description}</StyledShortDescription>
         {!isCollective && !collective.isHost && <HeroTotalCollectiveContributionsWithData collective={collective} />}
+        {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
         <CollectiveCallsToAction
           display={['flex', 'none']}
           mt={3}

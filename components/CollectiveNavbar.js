@@ -274,6 +274,7 @@ const CollectiveNavbar = ({
   hasSubmitExpense,
   hasContact,
   hasApply,
+  hasManageSubscriptions,
   hasDashboard,
   isAnimated,
   intl,
@@ -370,6 +371,7 @@ const CollectiveNavbar = ({
             hasContact={hasContact}
             hasApply={hasApply}
             hasDashboard={hasDashboard}
+            hasManageSubscriptions={hasManageSubscriptions}
           />
         </div>
       </Container>
@@ -392,6 +394,7 @@ CollectiveNavbar.propTypes = {
   hasSubmitExpense: PropTypes.bool,
   hasApply: PropTypes.bool,
   hasDashboard: PropTypes.bool,
+  hasManageSubscriptions: PropTypes.bool,
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,
   /** Wether we want to display the "/edit" button */
