@@ -1622,6 +1622,10 @@ export default function(Sequelize, DataTypes) {
         }
       })
       .then(() => {
+        if (members.filter(m => m.role === roles.ADMIN).length === 0) {
+          throw new Error('There must always be at least one collective admin');
+        }
+
         return Promise.map(members, member => {
           if (member.id) {
             // Edit an existing membership (edit the role/description)
