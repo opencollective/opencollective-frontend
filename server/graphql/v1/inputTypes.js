@@ -330,6 +330,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     referral: {
       type: CollectiveAttributesInputType,
       description: 'The referral collective',
+      deprecationReason: '2019-08-22: Referals are not supported anymore',
     },
     user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },

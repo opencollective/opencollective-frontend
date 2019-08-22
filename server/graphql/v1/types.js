@@ -225,14 +225,9 @@ export const StatsMemberType = new GraphQLObjectType({
       totalRaised: {
         type: GraphQLInt,
         description: 'total amount raised by this member',
-        resolve(member, args, req) {
-          return (
-            member.totalRaised ||
-            req.loaders.members.totalAmountRaised.load({
-              ReferralCollectiveId: member.MemberCollectiveId,
-              CollectiveId: member.CollectiveId,
-            })
-          );
+        deprecationReason: '2019-08-22: Referals are not supported anymore',
+        resolve() {
+          return 0;
         },
       },
     };
@@ -1541,9 +1536,10 @@ export const OrderType = new GraphQLObjectType({
       },
       referral: {
         description: 'Referral user collective',
+        deprecationReason: '2019-08-22: Referals are not supported anymore',
         type: CollectiveInterfaceType,
-        resolve(order, args, req) {
-          return req.loaders.collective.findById.load(order.ReferralCollectiveId);
+        resolve() {
+          return null;
         },
       },
       tier: {

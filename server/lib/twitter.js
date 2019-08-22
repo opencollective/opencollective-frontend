@@ -65,7 +65,6 @@ const tweetNewMember = async activity => {
   // todo: we should use the handlebar templating system to support {{#if}}{{/if}}
   const status = template
     .replace('{backerTwitterHandle}', `@${get(activity, 'data.member.memberCollective.twitterHandle')}`)
-    .replace('{referralTwitterHandle}', `@${get(activity, 'data.order.referral.twitterHandle')}`)
     .replace('{amount}', formatCurrency(get(activity, 'data.order.totalAmount'), get(activity, 'data.order.currency')));
 
   return await twitterLib.tweetStatus(
