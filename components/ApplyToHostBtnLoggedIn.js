@@ -81,7 +81,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
     if (data.loading) {
       return (
-        <StyledButton buttonStyle={buttonStyle} disabled>
+        <StyledButton buttonStyle={buttonStyle} disabled data-cy="host-apply-btn">
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
         </StyledButton>
       );
@@ -96,14 +96,18 @@ class ApplyToHostBtnLoggedIn extends React.Component {
         <div className="ApplyToHostBtnLoggedIn">
           {!this.inactiveCollective && (
             <Link route={`/${host.slug}/apply`}>
-              <StyledButton buttonStyle={buttonStyle}>
+              <StyledButton buttonStyle={buttonStyle} data-cy="host-apply-btn">
                 <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
               </StyledButton>
             </Link>
           )}
           {this.inactiveCollective &&
             (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) && (
-              <StyledButton buttonStyle={buttonStyle} onClick={() => this.handleModalDisplay()}>
+              <StyledButton
+                buttonStyle={buttonStyle}
+                onClick={() => this.handleModalDisplay()}
+                data-cy="host-apply-btn"
+              >
                 <FormattedMessage
                   id="host.apply.btn"
                   defaultMessage="Apply with {collective}"
