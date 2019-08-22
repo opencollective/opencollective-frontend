@@ -1,7 +1,7 @@
 {{#if interval }}
 Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}} {{#if matchingFund}}(matched {{matchingFund.matching}}x by {{matchingFund.collective.name}}!){{/if}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -29,10 +29,6 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 
 <p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
   Your gift will help us continue our work.</p>
-{{/if}}
-
-{{#if matchingFund}}
-<p>🎉 Your donation has been matched {{matchingFund.matching}}x by <a href="https://opencollective.com/{{matchingFund.collective.slug}}">{{matchingFund.collective.name}}</a>!</p>
 {{/if}}
 
 <p>As a CH member, you get 1 free event per month. To get your free event, all you have to do is type in the email address you used to register for membership in eventbrite's purchase ticket section "<a href="https://res.cloudinary.com/opencollective/image/upload/v1515428737/Screen_Shot_2018-01-08_at_4.02.31_PM_qydkx7.png">Enter Promotional Code"</a> ...and your coded access will be accessed! </p>

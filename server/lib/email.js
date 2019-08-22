@@ -252,9 +252,6 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   if (template.match(/^host\.(monthly|yearly)report$/)) {
     template = 'host.report';
   }
-  if (template === 'donationmatched') {
-    if (slug.match(/wwcode/)) template += '.wwcode';
-  }
   if (template === 'thankyou') {
     if (slug.match(/wwcode/)) template += '.wwcode';
 

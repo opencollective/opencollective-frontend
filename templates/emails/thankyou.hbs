@@ -1,7 +1,7 @@
 {{#if interval }}
 Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}} {{#if matchingFund}}(matched {{matchingFund.matching}}x by {{matchingFund.collective.name}}!){{/if}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -27,10 +27,6 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 
 <p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
   Your gift will help us continue our work.</p>
-{{/if}}
-
-{{#if matchingFund}}
-<p>🎉 Your donation has been matched {{matchingFund.matching}}x by <a href="https://opencollective.com/{{matchingFund.collective.slug}}">{{matchingFund.collective.name}}</a>!</p>
 {{/if}}
 
 <p>You can follow our future activities and how we will be spending the money on our open collective page:

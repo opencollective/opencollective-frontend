@@ -11,8 +11,6 @@ export const templateNames = [
   'announcement',
   'announcement.text',
   'archived.collective',
-  'donationmatched',
-  'donationmatched.wwcode',
   'email.approve',
   'email.message',
   'github.signup',
