@@ -98,7 +98,7 @@ class CollectiveCover extends React.Component {
       contribute: { id: 'collective.contribute', defaultMessage: 'contribute' },
       apply: {
         id: 'host.apply.btn',
-        defaultMessage: 'Apply to host your collective {collective}',
+        defaultMessage: 'Apply with {collective}',
       },
       ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },

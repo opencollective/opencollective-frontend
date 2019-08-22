@@ -8,7 +8,6 @@ import { get } from 'lodash';
 
 import { compose } from '../lib/utils';
 
-import Button from './Button';
 import Link from './Link';
 import { P } from './Text';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
@@ -44,6 +43,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
     host: PropTypes.object.isRequired,
     data: PropTypes.object,
     editCollective: PropTypes.func,
+    buttonStyle: PropTypes.string,
   };
 
   constructor(props) {
@@ -77,13 +77,13 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   }
 
   render() {
-    const { host, data } = this.props;
+    const { host, data, buttonStyle } = this.props;
 
     if (data.loading) {
       return (
-        <Button className="blue" disabled>
-          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-        </Button>
+        <StyledButton buttonStyle={buttonStyle} disabled>
+          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+        </StyledButton>
       );
     }
 
@@ -95,19 +95,21 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       <Fragment>
         <div className="ApplyToHostBtnLoggedIn">
           {!this.inactiveCollective && (
-            <Button className="blue" href={`/${host.slug}/apply`}>
-              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-            </Button>
+            <Link route={`/${host.slug}/apply`}>
+              <StyledButton buttonStyle={buttonStyle}>
+                <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+              </StyledButton>
+            </Link>
           )}
           {this.inactiveCollective &&
             (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) && (
-              <Button onClick={() => this.handleModalDisplay()} className="blue">
+              <StyledButton buttonStyle={buttonStyle} onClick={() => this.handleModalDisplay()}>
                 <FormattedMessage
                   id="host.apply.btn"
-                  defaultMessage="Apply to host your collective {collective}"
+                  defaultMessage="Apply with {collective}"
                   values={{ collective: this.inactiveCollective.name }}
                 />
-              </Button>
+              </StyledButton>
             )}
           {get(this.inactiveCollective, 'host.id') === host.id && (
             <FormattedMessage
