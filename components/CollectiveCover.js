@@ -79,6 +79,8 @@ class CollectiveCover extends React.Component {
     callsToAction: PropTypes.shape({
       hasContact: PropTypes.bool,
       hasSubmitExpense: PropTypes.bool,
+      hasApply: PropTypes.bool,
+      hasDashboard: PropTypes.bool,
     }),
     href: PropTypes.string,
     className: PropTypes.string,
@@ -175,12 +177,7 @@ ${description}`;
     if (useNewCollectiveNavbar) {
       return (
         <Container borderTop="1px solid #E6E8EB" mb={4}>
-          <CollectiveNavbar
-            collective={collective}
-            isAdmin={canEdit}
-            callsToAction={this.props.callsToAction}
-            showEdit
-          />
+          <CollectiveNavbar collective={collective} isAdmin={canEdit} showEdit {...this.props.callsToAction} />
         </Container>
       );
     }
