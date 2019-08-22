@@ -314,6 +314,12 @@ export const executeOrder = async (user, order, options) => {
   const transaction = await processOrder(order, options);
   transaction && (await updateOrderWithTransaction(order, transaction));
 
+  // If the user asked for it, mark the payment method as saved for future financial contributions
+  if (order.data.savePaymentMethod) {
+    order.paymentMethod.saved = true;
+    order.paymentMethod.save();
+  }
+
   // Register user as collective backer
   await addBackerToCollective(
     { id: user.id, CollectiveId: order.FromCollectiveId },

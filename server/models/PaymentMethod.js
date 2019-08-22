@@ -163,6 +163,8 @@ export default function(Sequelize, DataTypes) {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },
+
+      saved: DataTypes.BOOLEAN,
     },
     {
       paranoid: true,

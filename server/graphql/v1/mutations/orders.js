@@ -438,6 +438,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
           taxIDNumberFrom: vatSettings.number,
         },
         customData: order.customData,
+        savePaymentMethod: Boolean(order.paymentMethod.save),
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };
@@ -453,15 +454,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     orderCreated = await models.Order.create(orderData);
 
-    // Attach Payment Method to collective to be used for future financial contributions
-    if (order.paymentMethod && order.paymentMethod.save) {
-      order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
-    }
-
     if (paymentRequired) {
       if (get(order, 'paymentMethod.type') === 'manual') {
         orderCreated.paymentMethod = order.paymentMethod;
       } else {
+        order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
         await orderCreated.setPaymentMethod(order.paymentMethod);
       }
       // also adds the user as a BACKER of collective
@@ -512,10 +509,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
           orderCreated.status = status.PENDING;
         } else {
           orderCreated.status = status.ERROR;
-          // Delete paymentMethod if it's not a recoverable error
-          if (!order.paymentMethod.id && !order.paymentMethod.uuid) {
-            await orderCreated.paymentMethod.destroy();
-          }
         }
         orderCreated.data.error = { message: error.message };
         orderCreated.save();
