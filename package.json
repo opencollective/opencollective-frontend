@@ -141,6 +141,7 @@
     "build:clean": "rm -rf dist && mkdir dist",
     "build:server": "babel server -d ./dist",
     "build:updates": "npm --prefix node_modules/cloudflare-ip run update-list",
+    "clean": "npm run build:clean && npm run test:clean",
     "commit": "git-cz",
     "compile:email": "babel-node scripts/compile-email.js",
     "compile:email:watch": "./scripts/watch_email_template.sh",
