@@ -13,6 +13,7 @@ import StyledMembershipCard from '../StyledMembershipCard';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from './EmptyCollectivesSectionImage.svg';
+import StyledButton from '../StyledButton';
 
 class SectionCollectives extends React.PureComponent {
   static propTypes = {
@@ -42,6 +43,10 @@ class SectionCollectives extends React.PureComponent {
     }),
   };
 
+  static NB_MEMBERSHIPS_PER_PAGE = 16;
+
+  state = { nbMemberships: SectionCollectives.NB_MEMBERSHIPS_PER_PAGE };
+
   /** Return unique members, pick based on role */
   getUniqueMemberships = memoizeOne(memberOf => {
     const ROLES_WEIGHT = {
@@ -67,8 +72,15 @@ class SectionCollectives extends React.PureComponent {
     return Object.values(membershipsMap);
   });
 
+  showMoreMemberships = () => {
+    this.setState(state => ({
+      nbMemberships: state.nbMemberships + SectionCollectives.NB_MEMBERSHIPS_PER_PAGE,
+    }));
+  };
+
   render() {
     const { collective, data } = this.props;
+    const { nbMemberships } = this.state;
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
@@ -94,7 +106,7 @@ class SectionCollectives extends React.PureComponent {
               <FormattedMessage id="CollectivePage.SectionCollectives.Title" defaultMessage="Collectives" />
             </H2>
             <Flex flexWrap="wrap" justifyContent={'space-evenly'}>
-              {memberships.map(membership => (
+              {memberships.slice(0, nbMemberships).map(membership => (
                 <StyledMembershipCard
                   key={membership.id}
                   role={membership.role}
@@ -106,6 +118,13 @@ class SectionCollectives extends React.PureComponent {
                 />
               ))}
             </Flex>
+            {nbMemberships < memberships.length && (
+              <Flex mt={3} justifyContent="center">
+                <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
+                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                </StyledButton>
+              </Flex>
+            )}
           </React.Fragment>
         )}
       </ContainerSectionContent>
