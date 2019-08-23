@@ -1441,17 +1441,21 @@ export default function(Sequelize, DataTypes) {
     };
 
     let isActive = false;
+    let approvedAt = null;
     if (creatorUser.isAdmin) {
       if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
         isActive = true;
+        approvedAt = new Date();
       } else if (creatorUser.isAdmin(hostCollective.id)) {
         isActive = true;
+        approvedAt = new Date();
       }
     }
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       hostFeePercent: hostCollective.hostFeePercent,
       isActive,
+      approvedAt,
     };
 
     // events should take the currency of their parent collective, not necessarily the host of their host.
@@ -1582,7 +1586,7 @@ export default function(Sequelize, DataTypes) {
       membership.destroy();
     }
     this.HostCollectiveId = null;
-    this.isActive = false; // we should rename isActive to isApproved (by the host)
+    this.isActive = false;
     this.approvedAt = null;
     if (newHostCollectiveId) {
       const newHostCollective = await models.Collective.findByPk(newHostCollectiveId);
