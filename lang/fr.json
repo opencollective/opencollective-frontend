@@ -599,7 +599,7 @@
   "goal.title.placeholder": "Requis si vous souhaitez que l'objectif soit affiché sur la page du collectif",
   "goal.type.label": "type",
   "goal.yearlyBudget.label": "budget annuel",
-  "Hero.HostFee": "Commission de l'hôte : {fee}",
+  "Hero.HostFee": "Commission : {fee}",
   "home.activeCollectives": "Collectifs actifs",
   "home.backers": "contributeurs financiers",
   "home.backYourStack": "BackYourStack est un projet communautaire initié par Open Collective.",
