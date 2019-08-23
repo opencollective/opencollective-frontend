@@ -111,7 +111,7 @@ ContributorsFilter.propTypes = {
   /** An optional list of active filters */
   filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
   /** Default button style when selected */
-  selectedButtonStyle: PropTypes.oneOf(['primary', 'dark']),
+  selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };

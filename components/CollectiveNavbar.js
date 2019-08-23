@@ -271,7 +271,11 @@ const CollectiveNavbar = ({
   onCollectiveClick,
   onSectionClick,
   hideInfos,
-  callsToAction,
+  hasSubmitExpense,
+  hasContact,
+  hasApply,
+  hasManageSubscriptions,
+  hasDashboard,
   isAnimated,
   intl,
 }) => {
@@ -337,23 +341,38 @@ const CollectiveNavbar = ({
               />
             </MenuLinkContainer>
           ))}
-          {callsToAction.hasSubmitExpense && (
+          {hasSubmitExpense && (
             <MenuLinkContainer mobileOnly>
               <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
                 <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
               </MenuLink>
             </MenuLinkContainer>
           )}
-          {callsToAction.hasContact && (
+          {hasContact && (
             <MenuLinkContainer mobileOnly>
               <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
                 <ExternalLinkAlt size="1em" /> <FormattedMessage id="Contact" defaultMessage="Contact" />
               </MenuLink>
             </MenuLinkContainer>
           )}
+          {hasDashboard && (
+            <MenuLinkContainer mobileOnly>
+              <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+                <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+              </MenuLink>
+            </MenuLinkContainer>
+          )}
         </Container>
         <div>
-          <CollectiveCallsToAction display={['none', 'flex']} collectiveSlug={collective.slug} {...callsToAction} />
+          <CollectiveCallsToAction
+            display={['none', 'flex']}
+            collective={collective}
+            hasSubmitExpense={hasSubmitExpense}
+            hasContact={hasContact}
+            hasApply={hasApply}
+            hasDashboard={hasDashboard}
+            hasManageSubscriptions={hasManageSubscriptions}
+          />
         </div>
       </Container>
     </MainContainer>
@@ -371,10 +390,11 @@ CollectiveNavbar.propTypes = {
     host: PropTypes.object,
   }).isRequired,
   /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
-  callsToAction: PropTypes.shape({
-    hasContact: PropTypes.bool,
-    hasSubmitExpense: PropTypes.bool,
-  }),
+  hasContact: PropTypes.bool,
+  hasSubmitExpense: PropTypes.bool,
+  hasApply: PropTypes.bool,
+  hasDashboard: PropTypes.bool,
+  hasManageSubscriptions: PropTypes.bool,
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,
   /** Wether we want to display the "/edit" button */
@@ -404,9 +424,7 @@ CollectiveNavbar.propTypes = {
 CollectiveNavbar.defaultProps = {
   hideInfos: false,
   isAnimated: false,
-  callsToAction: {
-    hasContact: true,
-  },
+  hasContact: true,
   // eslint-disable-next-line react/prop-types
   LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (

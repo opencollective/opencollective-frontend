@@ -199,6 +199,10 @@ class CollectivePage extends Component {
             isAdmin={isAdmin}
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
+            hasApply={collective.isHost}
+            hasDashboard={collective.isHost && isAdmin}
+            hasManageSubscriptions={!collective.isHost && isAdmin}
+            hasContact={!isAdmin}
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}

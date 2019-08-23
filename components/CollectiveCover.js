@@ -79,6 +79,8 @@ class CollectiveCover extends React.Component {
     callsToAction: PropTypes.shape({
       hasContact: PropTypes.bool,
       hasSubmitExpense: PropTypes.bool,
+      hasApply: PropTypes.bool,
+      hasDashboard: PropTypes.bool,
     }),
     href: PropTypes.string,
     className: PropTypes.string,
@@ -98,7 +100,7 @@ class CollectiveCover extends React.Component {
       contribute: { id: 'collective.contribute', defaultMessage: 'contribute' },
       apply: {
         id: 'host.apply.btn',
-        defaultMessage: 'Apply to host your collective {collective}',
+        defaultMessage: 'Apply with {collective}',
       },
       ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
@@ -175,12 +177,7 @@ ${description}`;
     if (useNewCollectiveNavbar) {
       return (
         <Container borderTop="1px solid #E6E8EB" mb={4}>
-          <CollectiveNavbar
-            collective={collective}
-            isAdmin={canEdit}
-            callsToAction={this.props.callsToAction}
-            showEdit
-          />
+          <CollectiveNavbar collective={collective} isAdmin={canEdit} showEdit {...this.props.callsToAction} />
         </Container>
       );
     }
