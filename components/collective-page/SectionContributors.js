@@ -36,6 +36,7 @@ export default class SectionContributors extends React.PureComponent {
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
+        since: PropTypes.string.isRequired,
         roles: PropTypes.arrayOf(PropTypes.string.isRequired),
         isCore: PropTypes.bool.isRequired,
         isBacker: PropTypes.bool.isRequired,
@@ -63,9 +64,20 @@ export default class SectionContributors extends React.PureComponent {
     // Sort contributors: core contributors are always first, then we sort by total amount donated
     // We make a copy of the array because mutation could break memoization for future renderings
     return [...contributors].sort((c1, c2) => {
-      if ((c1.isCore && !c2.isCore) || c1.totalAmountDonated > c2.totalAmountDonated) {
+      // Try to make a difference based on roles
+      if ((c1.isAdmin && !c2.isAdmin) || (c1.isCore && !c2.isCore)) {
         return -1;
-      } else if ((!c1.isCore && c2.isCore) || c1.totalAmountDonated < c2.totalAmountDonated) {
+      } else if ((!c1.isAdmin && c2.isAdmin) || (!c1.isCore && c2.isCore)) {
+        return 1;
+      } else if ((c1.isAdmin && c2.isAdmin) || (c1.isCore && c2.isCore)) {
+        // For admins/core contributors, sort by `since`
+        return c1.since < c2.since ? -1 : 1;
+      }
+
+      // Otherwise on the amount donated
+      if (c1.totalAmountDonated > c2.totalAmountDonated) {
+        return -1;
+      } else if (c1.totalAmountDonated < c2.totalAmountDonated) {
         return 1;
       } else {
         return 0;
