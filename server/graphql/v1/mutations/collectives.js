@@ -665,7 +665,7 @@ export async function unarchiveCollective(_, args, req) {
     });
   }
 
-  return collective.update({ isActive: true, deactivatedAt: null });
+  return collective.update({ deactivatedAt: null });
 }
 
 export async function deleteCollective(_, args, req) {
