@@ -65,24 +65,15 @@ function importAll(r) {
 }
 
 class MarketingPage extends React.Component {
-  static async getInitialProps({ req, query: { pageSlug } }) {
-    const confirmationPage =
-      req && req.method === 'POST' && (pageSlug === 'gift-of-giving' || pageSlug === 'gift-cards');
-
-    return { pageSlug, confirmationPage };
+  static getInitialProps({ query: { pageSlug } }) {
+    return { pageSlug };
   }
 
   static propTypes = {
     LoggedInUser: PropTypes.object,
     pageSlug: PropTypes.string.isRequired,
-    confirmationPage: PropTypes.bool,
     intl: PropTypes.object.isRequired,
   };
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
 
   async componentDidMount() {
     this.loadScripts();
