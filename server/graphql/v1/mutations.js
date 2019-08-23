@@ -21,6 +21,7 @@ import {
   completePledge,
   markOrderAsPaid,
 } from './mutations/orders';
+
 import { createMember, removeMember, editMembership } from './mutations/members';
 import { editTiers, editTier } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
@@ -30,6 +31,7 @@ import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
+import * as backyourstackMutations from './mutations/backyourstack';
 import { updateUserEmail, confirmUserEmail } from './mutations/users';
 
 import statuses from '../../constants/expense_status';
@@ -769,6 +771,17 @@ const mutations = {
     },
     resolve(_, args, req) {
       return deleteNotification(args, req.remoteUser);
+    },
+  },
+  backyourstackDispatchOrder: {
+    type: new GraphQLList(OrderType),
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+      },
+    },
+    resolve(_, args) {
+      return backyourstackMutations.dispatchOrder(args.id);
     },
   },
 };
