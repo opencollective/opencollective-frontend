@@ -7,7 +7,6 @@ import * as utils from './utils';
 import stripe from '../server/lib/stripe';
 import models from '../server/models';
 import { VAT_OPTIONS } from '../server/constants/vat';
-import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 
 describe('graphql.tiers.test', () => {
   let user1, user2, host, collective1, collective2, tier1, tierWithCustomFields, tierProduct, paymentMethod1;
@@ -76,19 +75,11 @@ describe('graphql.tiers.test', () => {
   after(() => sandbox.restore());
 
   before(() => {
-    sandbox.stub(stripeGateway, 'createToken').callsFake(() => Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM' }));
     sandbox.stub(stripe.tokens, 'create').callsFake(() => Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM' }));
 
-    sandbox.stub(stripeGateway, 'createCustomer').callsFake(() => Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' }));
     sandbox.stub(stripe.customers, 'create').callsFake(() => Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' }));
     sandbox.stub(stripe.customers, 'retrieve').callsFake(() => Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM' }));
 
-    // sandbox.stub(stripeGateway, 'createCharge').callsFake((hostStripeAccount, data) =>
-    //   Promise.resolve({
-    //     amount: data.amount,
-    //     balance_transaction: 'txn_19XJJ02eZvKYlo2ClwuJ1rbA',
-    //   }),
-    // );
     sandbox.stub(stripe.paymentIntents, 'create').callsFake(data =>
       Promise.resolve({
         charges: {
@@ -127,7 +118,6 @@ describe('graphql.tiers.test', () => {
       status: 'pending',
       type: 'charge',
     };
-    sandbox.stub(stripeGateway, 'retrieveBalanceTransaction').callsFake(() => Promise.resolve(balanceTransaction));
     sandbox.stub(stripe.balanceTransactions, 'retrieve').callsFake(() => Promise.resolve(balanceTransaction));
   });
 

@@ -18,7 +18,6 @@ import { loaders } from '../server/graphql/loaders';
 import { sequelize } from '../server/models';
 import cache from '../server/lib/cache';
 import * as libpayments from '../server/lib/payments';
-import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 import * as db_restore from '../scripts/db_restore';
 
 if (process.env.RECORD) {
@@ -212,19 +211,8 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
   /* Little helper function that returns the stub with a given
    * value. */
   const factory = name => async () => values[name];
-  sandbox.stub(stripeGateway, 'createToken').callsFake(factory('token'));
   sandbox.stub(stripe.tokens, 'create').callsFake(factory('token'));
 
-  // sandbox.stub(stripeGateway, 'createCharge').callsFake(factory('charge'));
-  // sandbox.stub(stripe.charges, 'create').callsFake(factory('charge'));
-
-  sandbox.stub(stripeGateway, 'createCustomer').callsFake(async (account, token) => {
-    if (token.startsWith('tok_chargeDeclined')) {
-      throw new Error('Your card was declined.');
-    }
-
-    return values.customer;
-  });
   sandbox.stub(stripe.customers, 'create').callsFake(async ({ source }) => {
     if (source.startsWith('tok_chargeDeclined')) {
       throw new Error('Your card was declined.');
@@ -254,6 +242,5 @@ export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0,
     status: 'pending',
     type: 'charge',
   };
-  sandbox.stub(stripeGateway, 'retrieveBalanceTransaction').callsFake(() => Promise.resolve(balanceTransaction));
   sandbox.stub(stripe.balanceTransactions, 'retrieve').callsFake(() => Promise.resolve(balanceTransaction));
 }

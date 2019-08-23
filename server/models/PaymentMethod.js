@@ -12,8 +12,8 @@ import { formatCurrency, formatArrayToString, cleanTags } from '../lib/utils';
 import { getFxRate } from '../lib/currency';
 
 import CustomDataTypes from './DataTypes';
-import * as stripeGateway from '../paymentProviders/stripe/gateway';
 import * as libpayments from '../lib/payments';
+import { isTestToken } from '../lib/stripe';
 
 import { maxInteger } from '../constants/math';
 
@@ -179,7 +179,7 @@ export default function(Sequelize, DataTypes) {
               throw new Error(`${instance.service} payment method requires a token`);
             }
             if (instance.service === 'stripe' && !instance.token.match(/^(tok|src|pm)_[a-zA-Z0-9]{24}/)) {
-              if (process.env.NODE_ENV !== 'production' && stripeGateway.isTestToken(instance.token)) {
+              if (process.env.NODE_ENV !== 'production' && isTestToken(instance.token)) {
                 // test token for end to end tests
               } else {
                 throw new Error(`Invalid Stripe token ${instance.token}`);

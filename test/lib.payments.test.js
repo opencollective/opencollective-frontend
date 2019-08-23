@@ -9,7 +9,6 @@ import * as payments from '../server/lib/payments';
 import roles from '../server/constants/roles';
 import status from '../server/constants/order_status';
 import stripe from '../server/lib/stripe';
-import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 
 const AMOUNT = 1099;
 const AMOUNT2 = 199;

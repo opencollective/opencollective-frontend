@@ -1,8 +1,8 @@
 #!/usr/bin/env ./node_modules/.bin/babel-node
 import '../server/env';
 import { get, last } from 'lodash';
-import { listCharges } from '../server/paymentProviders/stripe/gateway';
 import models from '../server/models';
+import stripe from '../server/lib/stripe';
 
 if (process.argv.length < 3) {
   console.error('Usage: ./scripts/diff-stripe-transactions.js STRIPE_ACCOUNT_ID [NB_CHARGES_TO_CHECK=100]');
@@ -63,7 +63,10 @@ async function main() {
     console.info(`🔎️ Checking transactions ${totalAlreadyChecked} to ${totalAlreadyChecked + nbToCheckInThisPage}`);
 
     // Retrieve the list and check all charges
-    const charges = await listCharges(STRIPE_ACCOUNT, { limit: nbToCheckInThisPage, starting_after: lastChargeId });
+    const charges = await stripe.charges.list(
+      { limit: nbToCheckInThisPage, starting_after: lastChargeId },
+      { stripe_account: STRIPE_ACCOUNT },
+    );
     for (let idx = 0; idx < charges.data.length; idx++) {
       await checkCharge(charges.data[idx]);
       totalAlreadyChecked += 1;
