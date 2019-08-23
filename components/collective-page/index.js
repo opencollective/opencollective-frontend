@@ -17,7 +17,7 @@ import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
 import SectionUpdates from './SectionUpdates';
-import SectionCollectives from './SectionCollectives';
+import SectionContributions from './SectionContributions';
 import SectionTransactions from './SectionTransactions';
 
 /** A mutation used by child components to update the collective */
@@ -173,8 +173,8 @@ class CollectivePage extends Component {
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
-      case Sections.COLLECTIVES:
-        return <SectionCollectives collective={this.props.collective} />;
+      case Sections.CONTRIBUTIONS:
+        return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} />;
       default:

@@ -195,9 +195,9 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Updates',
     defaultMessage: 'Updates',
   },
-  [Sections.COLLECTIVES]: {
-    id: 'CollectivePage.NavBar.Collectives',
-    defaultMessage: 'Collectives',
+  [Sections.CONTRIBUTIONS]: {
+    id: 'CollectivePage.NavBar.Contributions',
+    defaultMessage: 'Contributions',
   },
   [Sections.TRANSACTIONS]: {
     id: 'CollectivePage.NavBar.Transactions',
@@ -215,7 +215,7 @@ const getCollectiveTypeBlacklistedSections = collectiveType => {
     case CollectiveType.ORGANIZATION:
       return [Sections.CONTRIBUTE, Sections.UPDATES, Sections.BUDGET];
     case CollectiveType.COLLECTIVE:
-      return [Sections.COLLECTIVES, Sections.TRANSACTIONS];
+      return [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS];
     default:
       return [];
   }

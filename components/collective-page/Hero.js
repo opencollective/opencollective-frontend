@@ -112,7 +112,9 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
         <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap">
           {isCollective && (
             <StyledTag mx={2} my={2} mb={2}>
-              <I18nCollectiveTags tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags)} />
+              <I18nCollectiveTags
+                tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+              />
             </StyledTag>
           )}
           <Flex my={2}>
