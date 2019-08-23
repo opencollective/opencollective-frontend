@@ -30,6 +30,7 @@
   "addfunds.submit": "資金を追加",
   "addfunds.title": "{collective} に資金を追加します",
   "addfunds.totalAmount": "資金額",
+  "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
   "addfundstoorg.FromCollectiveId.label": "ホスト",
   "Amount": "{amount} {currencyCode}",
   "amount.free": "無料",
