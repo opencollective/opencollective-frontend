@@ -5,11 +5,10 @@ import '../server/env';
  * Use ./scripts/watch_email_template.sh [template] to compile an email template
  */
 import config from 'config';
-import nodemailer from 'nodemailer';
-import { has, get } from 'lodash';
 import juice from 'juice';
 
 import libEmailTemplates from '../server/lib/emailTemplates';
+import { getMailer } from '../server/lib/email';
 
 const templateName = process.argv[2];
 const data = {};
@@ -549,21 +548,15 @@ if (!templateName) {
     if (libEmailTemplates[`${templateName}.text`]) {
       text = libEmailTemplates[`${templateName}.text`](emailData);
     }
-
-    if (has(config, 'mailgun.user') && has(config, 'mailgun.password')) {
+    const mailer = getMailer();
+    if (mailer) {
       const attributes = getTemplateAttributes(html);
-      const mailgun = nodemailer.createTransport({
-        service: 'Mailgun',
-        auth: {
-          user: get(config, 'mailgun.user'),
-          pass: get(config, 'mailgun.password'),
-        },
-      });
-      console.log('>>> Sending by email to ', process.env.ONLY);
-      mailgun.sendMail(
+      const to = process.env.ONLY || 'test@opencollective.com';
+      console.log('>>> Sending by email to ', to);
+      mailer.sendMail(
         {
           from: config.email.from,
-          to: process.env.ONLY,
+          to,
           subject: attributes.subject,
           text,
           html: attributes.body,
