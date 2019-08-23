@@ -15,7 +15,7 @@ import { isEmailInternal, md5 } from './utils';
 
 const debug = debugLib('email');
 
-const getMailer = () => {
+export const getMailer = () => {
   if (process.env.MAILDEV) {
     return nodemailer.createTransport({
       ignoreTLS: true,
