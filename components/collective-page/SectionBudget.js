@@ -95,7 +95,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                               <P color="black.900" fontWeight="600">
                                 {description}
                               </P>
-                              <P color="black.500">
+                              <Container color="black.500">
                                 {item.usingVirtualCardFromCollective ? (
                                   <FormattedMessage
                                     id="Transactions.byWithGiftCard"
@@ -123,7 +123,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                                     }}
                                   />
                                 )}
-                              </P>
+                              </Container>
                             </Flex>
                           </Flex>
                           <P fontSize="LeadParagraph">
