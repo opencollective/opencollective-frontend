@@ -20,6 +20,8 @@ const ContributeEvent = ({ collective, event }) => {
       routeParams={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}
       type={ContributionTypes.EVENT_PARTICIPATE}
       title={event.name}
+      contributors={event.contributors}
+      stats={event.stats.backers}
     >
       {description}
       <Link route="event" params={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}>
@@ -40,6 +42,10 @@ ContributeEvent.propTypes = {
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     description: PropTypes.string,
+    contributors: PropTypes.arrayOf(PropTypes.object),
+    stats: PropTypes.shape({
+      backers: PropTypes.object,
+    }).isRequired,
   }),
 };
 

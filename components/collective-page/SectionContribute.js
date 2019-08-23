@@ -30,6 +30,7 @@ class SectionContribute extends React.PureComponent {
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
     }),
+    contributorsStats: PropTypes.object,
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
@@ -76,7 +77,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { collective, tiers, events, contributors } = this.props;
+    const { collective, tiers, events, contributors, contributorsStats } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
 
     return (
@@ -106,11 +107,11 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  <Box px={[3, 4]}>
-                    <ContributeCustom collective={collective} />
+                  <Box px={[3, 24]}>
+                    <ContributeCustom collective={collective} contributors={contributors} stats={contributorsStats} />
                   </Box>
                   {tiers.map(tier => (
-                    <Box key={tier.id} px={[3, 4]}>
+                    <Box key={tier.id} px={[3, 24]}>
                       <ContributeTier collective={collective} tier={tier} />
                     </Box>
                   ))}
@@ -139,7 +140,7 @@ class SectionContribute extends React.PureComponent {
 
                 <ContributeCardsContainer ref={ref}>
                   {events.map(event => (
-                    <Box key={event.id} px={[3, 4]}>
+                    <Box key={event.id} px={[3, 24]}>
                       <ContributeEvent collective={collective} event={event} />
                     </Box>
                   ))}

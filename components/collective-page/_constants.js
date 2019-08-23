@@ -38,3 +38,6 @@ export const ContributionTypes = {
   FINANCIAL_GOAL: 'FINANCIAL_GOAL',
   EVENT_PARTICIPATE: 'EVENT_PARTICIPATE',
 };
+
+/** Max number of contributors on each tier card */
+export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;

@@ -55,6 +55,7 @@ class CollectivePage extends Component {
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
       updates: PropTypes.number.isRequired,
+      backers: PropTypes.object,
     }),
   };
 
@@ -157,6 +158,7 @@ class CollectivePage extends Component {
             tiers={this.props.tiers}
             events={this.props.events}
             contributors={this.props.contributors}
+            contributorsStats={this.props.stats.backers}
           />
         );
       case Sections.CONTRIBUTORS:
