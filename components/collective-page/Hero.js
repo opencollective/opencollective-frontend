@@ -172,7 +172,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
                   <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
                 </StyledLink>
               )}
-              <Span ml={2} mr={3} color="black.500" fontSize="Caption">
+              <Container ml={2} mr={3} color="black.500" fontSize="Caption">
                 <FormattedMessage
                   id="Hero.HostFee"
                   defaultMessage="Host fee: {fee}"
@@ -184,7 +184,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
                     ),
                   }}
                 />
-              </Span>
+              </Container>
             </React.Fragment>
           )}
         </Flex>
