@@ -15,7 +15,7 @@ import ContainerSectionContent from './ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from './EmptyCollectivesSectionImage.svg';
 import StyledButton from '../StyledButton';
 
-class SectionCollectives extends React.PureComponent {
+class SectionContributions extends React.PureComponent {
   static propTypes = {
     /** Collective */
     collective: PropTypes.shape({
@@ -45,7 +45,7 @@ class SectionCollectives extends React.PureComponent {
 
   static NB_MEMBERSHIPS_PER_PAGE = 16;
 
-  state = { nbMemberships: SectionCollectives.NB_MEMBERSHIPS_PER_PAGE };
+  state = { nbMemberships: SectionContributions.NB_MEMBERSHIPS_PER_PAGE };
 
   /** Return unique members, pick based on role */
   getUniqueMemberships = memoizeOne(memberOf => {
@@ -74,7 +74,7 @@ class SectionCollectives extends React.PureComponent {
 
   showMoreMemberships = () => {
     this.setState(state => ({
-      nbMemberships: state.nbMemberships + SectionCollectives.NB_MEMBERSHIPS_PER_PAGE,
+      nbMemberships: state.nbMemberships + SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
     }));
   };
 
@@ -94,7 +94,7 @@ class SectionCollectives extends React.PureComponent {
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
             <P color="black.600" fontSize="LeadParagraph" mt={5}>
               <FormattedMessage
-                id="CollectivePage.SectionCollectives.Empty"
+                id="CollectivePage.SectionContributions.Empty"
                 defaultMessage="{collectiveName} seems to be hibernating on a cave in the North Pole ❄️☃️!"
                 values={{ collectiveName: collective.name }}
               />
@@ -103,7 +103,7 @@ class SectionCollectives extends React.PureComponent {
         ) : (
           <React.Fragment>
             <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
-              <FormattedMessage id="CollectivePage.SectionCollectives.Title" defaultMessage="Collectives" />
+              <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
             </H2>
             <Flex flexWrap="wrap" justifyContent={'space-evenly'}>
               {memberships.slice(0, nbMemberships).map(membership => (
@@ -164,5 +164,5 @@ export default React.memo(
         return { variables: { id: props.collective.id } };
       },
     },
-  )(SectionCollectives),
+  )(SectionContributions),
 );
