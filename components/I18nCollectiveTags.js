@@ -48,6 +48,18 @@ const TranslatedTags = defineMessages({
     id: 'Tags.US_NONPROFIT',
     defaultMessage: 'US nonprofit',
   },
+  [CollectiveCategory.EVENT]: {
+    id: 'Tags.EVENT',
+    defaultMessage: 'Event',
+  },
+  [CollectiveCategory.USER]: {
+    id: 'Tags.USER',
+    defaultMessage: 'User',
+  },
+  [CollectiveCategory.ORGANIZATION]: {
+    id: 'Tags.ORGANIZATION',
+    defaultMessage: 'Organization',
+  },
 });
 
 /** Translates a list of tags */

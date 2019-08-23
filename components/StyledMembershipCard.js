@@ -12,7 +12,8 @@ import I18nCollectiveTags from './I18nCollectiveTags';
 import { getCollectiveMainTag } from '../lib/collective.lib';
 import StyledTag from './StyledTag';
 
-const getBackground = backgroundImage => {
+const getBackground = collective => {
+  const backgroundImage = collective.backgroundImage || get(collective, 'parentCollective.backgroundImage');
   return backgroundImage
     ? `url(/static/images/collective-card-mask.png) bottom, url(${backgroundImage}) no-repeat, #1776E1`
     : 'url(/static/images/collective-card-mask.png) bottom, #1776E1';
@@ -24,13 +25,7 @@ const getBackground = backgroundImage => {
 const StyledMembershipCard = ({ toCollective, ...props }) => {
   return (
     <StyledCard width={250} height={360} position="relative" {...props}>
-      <Container
-        style={{ background: getBackground(toCollective.backgroundImage) }}
-        backgroundSize="cover"
-        height={100}
-        px={3}
-        pt={26}
-      >
+      <Container style={{ background: getBackground(toCollective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
           <Avatar collective={toCollective} radius={64} />
         </Container>
@@ -43,7 +38,9 @@ const StyledMembershipCard = ({ toCollective, ...props }) => {
             </P>
           </LinkCollective>
           <StyledTag display="inline-block" my={2}>
-            <I18nCollectiveTags tags={getCollectiveMainTag(get(toCollective, 'host.id'), toCollective.tags)} />
+            <I18nCollectiveTags
+              tags={getCollectiveMainTag(get(toCollective, 'host.id'), toCollective.tags, toCollective.type)}
+            />
           </StyledTag>
           <P fontSize="Caption" color="black.700" title={toCollective.description}>
             {truncate(toCollective.description, { length: 240 })}
@@ -60,11 +57,15 @@ StyledMembershipCard.propTypes = {
   toCollective: PropTypes.shape({
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     description: PropTypes.string,
     backgroundImage: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     host: PropTypes.shape({
       id: PropTypes.number,
+    }),
+    parentCollective: PropTypes.shape({
+      backgroundImage: PropTypes.string,
     }),
   }),
 };
