@@ -172,7 +172,8 @@ ${description}`;
     const { collective, context, className, LoggedInUser, intl } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
-    const useNewCollectiveNavbar = get(collective, 'settings.collectivePage.useV2', false);
+    const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
+    const useNewCollectiveNavbar = ncpIsDefault || get(collective, 'settings.collectivePage.useV2');
 
     if (useNewCollectiveNavbar) {
       return (
