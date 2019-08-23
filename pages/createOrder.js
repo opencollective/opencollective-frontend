@@ -207,6 +207,7 @@ const CollectiveWithTierDataQuery = gql`
       slug
       description
       amount
+      amountType
       minimumAmount
       currency
       interval

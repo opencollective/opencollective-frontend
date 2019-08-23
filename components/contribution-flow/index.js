@@ -11,6 +11,7 @@ import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
+import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
 import { stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -95,7 +96,16 @@ class CreateOrderPage extends React.Component {
       location: PropTypes.shape({ country: PropTypes.string }),
       settings: PropTypes.object,
     }).isRequired,
-    tier: PropTypes.shape(),
+    tier: PropTypes.shape({
+      id: PropTypes.number,
+      slug: PropTypes.string,
+      type: PropTypes.string,
+      amount: PropTypes.number,
+      minimumAmount: PropTypes.number,
+      amountType: PropTypes.string,
+      presets: PropTypes.arrayOf(PropTypes.string),
+      customFields: PropTypes.object,
+    }),
     verb: PropTypes.string.isRequired,
     step: PropTypes.string,
     referral: PropTypes.string,
@@ -432,17 +442,14 @@ class CreateOrderPage extends React.Component {
   getOrderMinAmount() {
     const tier = this.props.tier;
 
-    // When making a donation, min amount is $1
     if (!tier) {
+      // When making a donation, min amount is $1
       return 100;
+    } else if (tier.amountType === AmountTypes.FIXED) {
+      return tier.amount || 0;
+    } else {
+      return tier.minimumAmount || 0;
     }
-
-    // If the tier has not amount and no preset, it's a free tier
-    if (isNil(tier.amount) && isNil(tier.presets)) {
-      return 0;
-    }
-
-    return tier.minimumAmount;
   }
 
   getDefaultAmount() {
