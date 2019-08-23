@@ -506,8 +506,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 
     return order;
   } catch (error) {
-    // console.log(error);
-
     if (orderCreated) {
       if (!orderCreated.processedAt) {
         if (error.stripeResponse) {
@@ -583,8 +581,6 @@ export async function confirmOrder(order, remoteUser) {
 
     return order;
   } catch (error) {
-    // console.log(error);
-
     if (!error.stripeResponse) {
       throw error;
     }
@@ -778,8 +774,6 @@ export async function updateSubscription(remoteUser, args) {
 
       order = await order.update({ PaymentMethodId: newPm.id });
     } catch (error) {
-      console.log(error);
-
       if (!error.stripeResponse) {
         throw error;
       }

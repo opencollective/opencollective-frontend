@@ -81,8 +81,6 @@ async function createStripeCreditCard(args, remoteUser) {
       user: remoteUser,
     });
   } catch (error) {
-    console.log(error);
-
     if (!error.stripeResponse) {
       throw error;
     }

@@ -2,10 +2,7 @@ import nock from 'nock';
 
 export default function() {
   nock('https://api.stripe.com:443', { encodedQueryParams: true })
-    .post(
-      '/v1/customers',
-      'source=tok_1BvCA5DjPFcHOcTmg1234567&description=https%3A%2F%2Fopencollective.com%2Fundefined&email=',
-    )
+    .post('/v1/customers', 'source=tok_1BvCA5DjPFcHOcTmg1234567&email=user1%40opencollective.com')
     .reply(
       200,
       {
@@ -62,6 +59,34 @@ export default function() {
           total_count: 0,
           url: '/v1/customers/cus_BSeRpSPOYoLmLY/subscriptions',
         },
+      },
+      ['Server'],
+    );
+  nock('https://api.stripe.com:443', { encodedQueryParams: true })
+    .post('/v1/setup_intents', 'customer=cus_BSeRpSPOYo1234&payment_method=card_1B5j8xDjPFcHOcTmDV3bGhAI&confirm=true')
+    .reply(
+      200,
+      {
+        id: 'seti_123456789',
+        object: 'setup_intent',
+        application: null,
+        cancellation_reason: null,
+        client_secret: null,
+        created: 123456789,
+        customer: null,
+        description: null,
+        last_setup_error: null,
+        livemode: false,
+        metadata: {
+          user_id: 'guest',
+        },
+        next_action: null,
+        on_behalf_of: null,
+        payment_method: null,
+        payment_method_options: {},
+        payment_method_types: ['card'],
+        status: 'succeeded',
+        usage: 'off_session',
       },
       ['Server'],
     );

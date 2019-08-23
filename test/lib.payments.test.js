@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import nock from 'nock';
 import config from 'config';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -9,6 +10,9 @@ import * as payments from '../server/lib/payments';
 import roles from '../server/constants/roles';
 import status from '../server/constants/order_status';
 import stripe from '../server/lib/stripe';
+import emailLib from '../server/lib/email';
+
+import stripeMocks from './mocks/stripe';
 
 const AMOUNT = 1099;
 const AMOUNT2 = 199;
@@ -16,9 +20,6 @@ const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'tok_123456781234567812345678';
 const EMAIL = 'anotheruser@email.com';
 const userData = utils.data('user3');
-import stripeMocks from './mocks/stripe';
-import emailLib from '../server/lib/email';
-import nock from 'nock';
 
 describe('lib.payments.test.js', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
@@ -44,6 +45,7 @@ describe('lib.payments.test.js', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.stub(stripe.customers, 'create').callsFake(() => Promise.resolve({ id: 'cus_BM7mGwp1Ea8RtL' }));
+    sandbox.stub(stripe.customers, 'retrieve').callsFake(() => Promise.resolve({ id: 'cus_BM7mGwp1Ea8RtL' }));
     sandbox.stub(stripe.tokens, 'create').callsFake(() => Promise.resolve({ id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' }));
     sandbox.stub(stripe.paymentIntents, 'create').callsFake(() =>
       Promise.resolve({
