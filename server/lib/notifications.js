@@ -1,17 +1,15 @@
 import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
-import { get, set, template } from 'lodash';
+import { get } from 'lodash';
 
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
 import twitter from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
-import { W9_BOT_SLUG } from '../constants/collectives';
 import models from '../models';
 import debugLib from 'debug';
-import { formatCurrency } from './utils';
 import { channels } from '../constants';
 import { sanitizeActivity } from './webhooks';
 
@@ -171,69 +169,6 @@ export async function notifyAdminsOfCollective(CollectiveId, activity, options =
   return notifySubscribers(adminUsers, activity, options);
 }
 
-async function w9bot(activity) {
-  const HostCollectiveId = get(activity, 'data.host.id');
-  const host = await models.Collective.findByPk(HostCollectiveId);
-
-  if (!host) {
-    throw new Error(`w9bot: Host id ${HostCollectiveId} not found`);
-  }
-  // Host is not USD based so it wont trigger the bot comment
-  if (host.currency !== 'USD') return;
-
-  // Host has already received form from the current user so it won't trigger
-  if (get(host, 'data.W9.requestSentToUserIds') && host.data.W9.requestSentToUserIds.includes(activity.data.user.id)) {
-    return;
-  }
-
-  // ideally change to consider the current fiscal year instead(Example: might be from
-  // march to february instead of from the beginning from january)
-  const beginningOfCurrentYear = new Date(new Date().getFullYear(), 0, 1);
-  const totalAmountThisYear = await models.Expense.getTotalExpensesFromUserIdInBaseCurrency(
-    activity.data.user.id,
-    host.currency,
-    beginningOfCurrentYear,
-  );
-
-  const w9Bot = await models.Collective.findOne({
-    where: {
-      slug: W9_BOT_SLUG,
-    },
-  });
-
-  // U$ 600.00 total amount allowed without form as of July 2018
-  const threshold = get(w9Bot, 'settings.W9.threshold');
-  if (threshold && totalAmountThisYear > threshold) {
-    const compiled = template(get(w9Bot, 'settings.W9.comment'), {
-      interpolate: /{{([\s\S]+?)}}/g,
-    });
-    const html = compiled({
-      ExpenseId: activity.data.expense.id,
-      UserId: activity.data.user.id,
-      collective: activity.data.collective.name,
-      host: activity.data.collective.name,
-      fromName: activity.data.fromCollective.name,
-      totalAmountThisYear: formatCurrency(totalAmountThisYear, 'USD'),
-      expenseUrl: `${config.host.website}/${activity.data.collective.slug}/expenses/${activity.data.expense.id}`,
-    });
-
-    const commentData = {
-      CollectiveId: activity.data.collective.id,
-      ExpenseId: activity.data.expense.id,
-      FromCollectiveId: w9Bot.id,
-      html,
-    };
-    // adding UserId to Host Data to keep track of all UserIds that received the request
-    const requestSentToUserIds = get(host, 'data.W9.requestSentToUserIds', []);
-    requestSentToUserIds.push(activity.data.user.id);
-    set(host, 'data.W9.requestSentToUserIds', requestSentToUserIds);
-    host.update({ data: host.data });
-
-    return models.Comment.create(commentData);
-  }
-  return true;
-}
-
 async function notifyMembersOfCollective(CollectiveId, activity, options) {
   debug('notify members of CollectiveId', CollectiveId);
   const collective = await models.Collective.findByPk(CollectiveId);
@@ -278,7 +213,6 @@ async function notifyByEmail(activity) {
 
     case activityType.COLLECTIVE_EXPENSE_CREATED:
       notifyAdminsOfCollective(activity.data.collective.id, activity);
-      w9bot(activity);
       break;
 
     case activityType.COLLECTIVE_COMMENT_CREATED:
