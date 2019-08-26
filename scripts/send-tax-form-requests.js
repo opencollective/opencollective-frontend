@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import '../../server/env';
+import '../server/env';
 
 import config from 'config';
 import HelloWorks from 'helloworks-sdk';
 import moment from 'moment';
-import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../../server/lib/taxForms';
-import { sequelize } from '../../server/models';
+import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../server/lib/tax-forms';
+import { sequelize } from '../server/models';
 
 const US_TAX_FORM_THRESHOLD = 600e2;
 const HELLO_WORKS_KEY = config.get('helloworks.key');

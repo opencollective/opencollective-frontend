@@ -30,7 +30,7 @@ import orderStatus from '../../constants/order_status';
 import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
 import roles from '../../constants/roles';
-import { isUserTaxFormRequiredBeforePayment } from '../../lib/taxForms';
+import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
