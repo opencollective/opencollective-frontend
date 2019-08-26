@@ -67,10 +67,17 @@ const StyledShortDescription = styled.h2`
 /**
  * Collective's page Hero/Banner/Cover component.
  */
-const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
+const Hero = ({
+  collective,
+  host,
+  isAdmin,
+  onCollectiveClick,
+  hasContact,
+  hasDashboard,
+  hasManageSubscriptions,
+  intl,
+}) => {
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
-  const hasContact = (isCollective || collective.isHost) && !isAdmin;
-  const hasDashboard = collective.isHost && isAdmin;
 
   return (
     <Container position="relative" minHeight={325} zIndex={1000}>
@@ -197,6 +204,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
           collective={collective}
           hasContact={hasContact}
           hasDashboard={hasDashboard}
+          hasManageSubscriptions={hasManageSubscriptions}
         />
       </ContainerSectionContent>
     </Container>
@@ -233,6 +241,15 @@ Hero.propTypes = {
 
   /** When users click on avatar or collective name */
   onCollectiveClick: PropTypes.func.isRequired,
+
+  /** Show contact button */
+  hasContact: PropTypes.bool,
+
+  /** Show dashboard button */
+  hasDashboard: PropTypes.bool,
+
+  /** Show manage subscriptions button */
+  hasManageSubscriptions: PropTypes.bool,
 
   /** Define if we need to display special actions like the "Edit collective" button */
   isAdmin: PropTypes.bool,
