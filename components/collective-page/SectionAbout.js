@@ -15,27 +15,9 @@ import { CollectiveType } from '../../lib/constants/collectives';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic({
+const HTMLEditor = dynamic(() => import('./ReverseCompatibleHTMLEditor'), {
   loading: HTMLEditorLoadingPlaceholder,
-  modules: () => {
-    return {
-      Showdown: () => import('showdown'),
-      HTMLEditor: () => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor').then(mod => mod.default),
-    };
-  },
-  // Having a convertion with Showdown here will ensure a smooth migration
-  // from old collective page that used an (unofficial) markdown description.
-  // Once the new collective page becomes the default, we should remove all
-  // markdow-related code from the new collective page.
-  // eslint-disable-next-line react/display-name
-  render: (props, { HTMLEditor, Showdown }) => {
-    // eslint-disable-next-line react/prop-types
-    const defaultValue = props.defaultValue;
-    const isMarkdown = defaultValue && defaultValue[0] !== '<';
-    const htmlValue = isMarkdown ? new Showdown.Converter().makeHtml(defaultValue) : defaultValue;
-    return <HTMLEditor {...props} defaultValue={htmlValue} />;
-  },
-  ssr: false,
+  ssr: false, // No need for SSR as user needs to be logged in
 });
 
 // Some collectives have a legacy markdown description. We load the markdown renderer only

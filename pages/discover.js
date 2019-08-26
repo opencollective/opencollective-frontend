@@ -135,7 +135,7 @@ const DiscoverPage = ({ router, intl }) => {
     offset: Number(query.offset) || 0,
     tags: !query.show || query.show === 'all' ? undefined : [query.show],
     orderBy: query.sort === sortOptions.newest ? 'createdAt' : 'totalDonations',
-    limit: 15,
+    limit: Number(query.limit) || 50,
     isActive: query.show !== 'pledged',
     isPledged: query.show === 'pledged',
   };

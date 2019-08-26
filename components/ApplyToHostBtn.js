@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Button from './Button';
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
 import { get } from 'lodash';
 import HelpTooltip from './HelpTooltip';
 import { withUser } from './UserProvider';
+import Link from './Link';
+import StyledButton from './StyledButton';
 
 class ApplyToHostBtn extends React.Component {
   static propTypes = {
@@ -19,14 +20,16 @@ class ApplyToHostBtn extends React.Component {
     }).isRequired,
     LoggedInUser: PropTypes.object,
     showConditions: PropTypes.bool,
+    buttonStyle: PropTypes.string,
   };
 
   static defaultProps = {
     showConditions: true,
+    buttonStyle: 'secondary',
   };
 
   render() {
-    const { LoggedInUser, host, showConditions } = this.props;
+    const { LoggedInUser, host, showConditions, buttonStyle } = this.props;
 
     return (
       <div className="ApplyToHostBtn">
@@ -39,11 +42,13 @@ class ApplyToHostBtn extends React.Component {
           `}
         </style>
         {!LoggedInUser && (
-          <Button className="blue" href={`/${host.slug}/apply`}>
-            <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-          </Button>
+          <Link route={`/${host.slug}/apply`}>
+            <StyledButton buttonStyle={buttonStyle} data-cy="host-apply-btn">
+              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+            </StyledButton>
+          </Link>
         )}
-        {LoggedInUser && <ApplyToHostBtnLoggedIn LoggedInUser={LoggedInUser} host={host} />}
+        {LoggedInUser && <ApplyToHostBtnLoggedIn LoggedInUser={LoggedInUser} host={host} buttonStyle={buttonStyle} />}
         {showConditions && (
           <div className="hostConditions">
             <FormattedMessage

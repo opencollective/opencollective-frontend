@@ -17,7 +17,7 @@ import SectionBudget from './SectionBudget';
 import SectionContribute from './SectionContribute';
 import SectionContributors from './SectionContributors';
 import SectionUpdates from './SectionUpdates';
-import SectionCollectives from './SectionCollectives';
+import SectionContributions from './SectionContributions';
 import SectionTransactions from './SectionTransactions';
 
 /** A mutation used by child components to update the collective */
@@ -55,6 +55,7 @@ class CollectivePage extends Component {
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
       updates: PropTypes.number.isRequired,
+      backers: PropTypes.object,
     }),
   };
 
@@ -157,6 +158,7 @@ class CollectivePage extends Component {
             tiers={this.props.tiers}
             events={this.props.events}
             contributors={this.props.contributors}
+            contributorsStats={this.props.stats.backers}
           />
         );
       case Sections.CONTRIBUTORS:
@@ -171,8 +173,8 @@ class CollectivePage extends Component {
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
-      case Sections.COLLECTIVES:
-        return <SectionCollectives collective={this.props.collective} />;
+      case Sections.CONTRIBUTIONS:
+        return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} />;
       default:
@@ -199,6 +201,10 @@ class CollectivePage extends Component {
             isAdmin={isAdmin}
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
+            hasApply={collective.isHost}
+            hasDashboard={collective.isHost && isAdmin}
+            hasManageSubscriptions={!collective.isHost && isAdmin}
+            hasContact={!isAdmin}
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}

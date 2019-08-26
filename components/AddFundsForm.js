@@ -9,6 +9,8 @@ import { get } from 'lodash';
 import { getCurrencySymbol, formatCurrency } from '../lib/utils';
 import InputField from './InputField';
 import { AddFundsSourcePickerWithData, AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
+import { CollectiveType } from '../lib/constants/collectives';
+import { OC_FEE_PERCENT } from '../lib/constants/transactions';
 
 class AddFundsForm extends React.Component {
   static propTypes = {
@@ -35,7 +37,6 @@ class AddFundsForm extends React.Component {
       form: {
         totalAmount: 0,
         hostFeePercent: get(props, 'collective.hostFeePercent'),
-        platformFeePercent: 0,
       },
       result: {},
     };
@@ -216,11 +217,21 @@ class AddFundsForm extends React.Component {
     return false;
   }
 
+  getPlatformFee() {
+    if (this.state.form.platformFeePercent !== undefined) {
+      return this.state.form.platformFeePercent;
+    } else if (this.props.collective.type === CollectiveType.ORGANIZATION) {
+      return OC_FEE_PERCENT;
+    } else {
+      return 0;
+    }
+  }
+
   render() {
     const { loading } = this.props;
 
     const hostFeePercent = this.state.form.hostFeePercent || 0;
-    const platformFeePercent = this.state.form.platformFeePercent || 0;
+    const platformFeePercent = this.getPlatformFee();
 
     const hostFeeAmount = formatCurrency(
       (hostFeePercent / 100) * this.state.form.totalAmount,
@@ -398,8 +409,11 @@ class AddFundsForm extends React.Component {
                       <div>
                         {showAddFundsToOrgDetails && (
                           <div className="note">
-                            Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and 5% (
-                            {platformFeeAmount}) for platform fees.
+                            <FormattedMessage
+                              id="AddFundsForm.PutAside"
+                              defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
+                              values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
+                            />
                           </div>
                         )}
                       </div>

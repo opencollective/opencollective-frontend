@@ -17,7 +17,7 @@ const messages = defineMessages({
   },
 });
 
-const ContributeCustom = ({ intl, collective }) => {
+const ContributeCustom = ({ intl, collective, contributors, stats }) => {
   return (
     <Contribute
       route="orderCollectiveNew"
@@ -25,6 +25,8 @@ const ContributeCustom = ({ intl, collective }) => {
       contributeRoute={`/${collective.slug}/donate`}
       type={ContributionTypes.FINANCIAL_CUSTOM}
       title={intl.formatMessage(messages.title)}
+      contributors={contributors}
+      stats={stats}
     >
       {intl.formatMessage(messages.description)}
     </Contribute>
@@ -33,6 +35,8 @@ const ContributeCustom = ({ intl, collective }) => {
 
 ContributeCustom.propTypes = {
   intl: PropTypes.object,
+  stats: PropTypes.object,
+  contributors: PropTypes.arrayOf(PropTypes.object),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
   }).isRequired,

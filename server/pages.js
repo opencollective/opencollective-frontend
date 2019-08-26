@@ -146,14 +146,19 @@ pages.add(
 // Collective
 // ----------
 
-// New collective page
+// New collective page - we keep the v2 alias because we shared some of these URLs by email
 pages.add('new-collective-page', '/:slug/v2');
-// Hardcode some collectives for the beta program
-const collectivesBeta = process.env.NCP_BETA_COLLECTIVES || 'betree';
-pages.add('new-collective-page-beta', `/:slug(${collectivesBeta})`, 'new-collective-page');
 
-// Normal collective page
-pages.add('collective', '/:slug');
+// Collective page
+if (process.env.NCP_IS_DEFAULT === 'true') {
+  pages.add('collective', '/:slug', 'new-collective-page');
+  pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
+} else {
+  // Hardcode some collectives for the V2 beta program
+  const collectivesBeta = process.env.NCP_BETA_COLLECTIVES || 'betree';
+  pages.add('new-collective-page-beta', `/:slug(${collectivesBeta})`, 'new-collective-page');
+  pages.add('collective', '/:slug');
+}
 
 export default pages;
 

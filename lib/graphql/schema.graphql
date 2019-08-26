@@ -1,5 +1,5 @@
 # source: http://localhost:3000/api/graphql
-# timestamp: Tue Aug 06 2019 12:40:23 GMT+0200 (GMT+02:00)
+# timestamp: Tue Aug 20 2019 11:08:52 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -1883,7 +1883,7 @@ type OrderType {
   """
   Payment method used if this order was matched by a matching fund.
   """
-  matchingFund: PaymentMethodType
+  matchingFund: PaymentMethodType @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
 
   """
   transactions for this order ordered by createdAt DESC
@@ -2193,7 +2193,7 @@ type PaymentMethodType {
   """
   Matching factor
   """
-  matching: Int
+  matching: Int @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
   monthlyLimitPerMember: Int
   initialBalance: Int
 
@@ -2215,8 +2215,7 @@ type PaymentMethodType {
 
   """
   Get the list of collectives that used this payment method. Useful to select
-  the list of a backers for which the host has manually added funds or to get
-  the list of backers that used a matching fund
+  the list of a backers for which the host has manually added funds.
   """
   fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
@@ -2233,6 +2232,7 @@ type Query {
   Fetch data about a matching fund from the short version of its UUID (first part)
   """
   MatchingFund(uuid: String!, ForCollectiveId: Int): PaymentMethodType
+    @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
   LoggedInUser: UserDetails
   AuthenticatedUser: CollectiveInterface
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]

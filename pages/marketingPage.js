@@ -8,14 +8,6 @@ import Footer from '../components/Footer';
 
 import { loadScriptAsync } from '../lib/utils';
 
-import sponsorPageHtml from '../static/sponsor-page/index.html';
-import pricingPageHtml from '../static/pricing-page/index.html';
-import howItWorksPageHtml from '../static/how-it-works-page/index.html';
-import howItWorksPageHtmlFR from '../static/how-it-works-page/index.fr.html';
-import holidayGiftCardPageHtml from '../static/holiday-gift-card/index.html';
-import giftCardPageHtml from '../static/gift-cards-page/index.html';
-import becomeAFiscalHostHtml from '../static/become-a-fiscal-host-page/index.html';
-
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
@@ -28,10 +20,55 @@ import giftCardPageStyle from '!css-loader!../static/gift-cards-page/stylesheets
 import becomeAFiscalHostStyle from '!css-loader!../static/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
 import { withUser } from '../components/UserProvider';
 
+import languages from '../lib/constants/locales';
+
+const PAGES = {
+  'become-a-sponsor': {
+    pageContents: importAll(require.context('../static/sponsor-page', false, /\.(html)$/)),
+    css: sponsorPageStyle,
+    js: sponsorPageScript,
+    className: 'sponsorPage',
+  },
+  'how-it-works': {
+    pageContents: importAll(require.context('../static/how-it-works-page', false, /\.(html)$/)),
+    css: howItWorksPageStyle,
+    js: howItWorksPageScript,
+    className: 'mkt-page-how-it-works',
+  },
+  'gift-of-giving': {
+    pageContents: importAll(require.context('../static/holiday-gift-card', false, /\.(html)$/)),
+    css: holidayGiftCardPageStyle,
+  },
+  'gift-cards': {
+    pageContents: importAll(require.context('../static/gift-cards-page', false, /\.(html)$/)),
+    css: giftCardPageStyle,
+    className: 'mkt-page-how-it-works',
+  },
+  pricing: {
+    pageContents: importAll(require.context('../static/pricing-page', false, /\.(html)$/)),
+    css: pricingPageStyle,
+    js: pricingPageScript,
+  },
+  'become-a-fiscal-host': {
+    pageContents: importAll(require.context('../static/become-a-fiscal-host-page', false, /\.(html)$/)),
+    css: becomeAFiscalHostStyle,
+    className: 'mkt-page-become-a-fiscal-host',
+  },
+};
+
+function importAll(r) {
+  const map = {};
+  r.keys().map(item => {
+    map[item.replace('./', '')] = r(item);
+  });
+  return map;
+}
+
 class MarketingPage extends React.Component {
   static async getInitialProps({ req, query: { pageSlug } }) {
     const confirmationPage =
       req && req.method === 'POST' && (pageSlug === 'gift-of-giving' || pageSlug === 'gift-cards');
+
     return { pageSlug, confirmationPage };
   }
 
@@ -58,12 +95,9 @@ class MarketingPage extends React.Component {
   }
 
   loadScripts() {
-    if (this.props.pageSlug === 'become-a-sponsor') {
-      loadScriptAsync(sponsorPageScript);
-    } else if (this.props.pageSlug === 'how-it-works') {
-      loadScriptAsync(howItWorksPageScript);
-    } else if (this.props.pageSlug === 'pricing') {
-      loadScriptAsync(pricingPageScript);
+    const page = PAGES[this.props.pageSlug];
+    if (page && page.js) {
+      loadScriptAsync(page.js);
     }
   }
 
@@ -72,35 +106,16 @@ class MarketingPage extends React.Component {
     const { LoggedInUser } = this.props;
 
     let html, style, className;
+    const page = PAGES[pageSlug];
 
-    if (pageSlug === 'become-a-sponsor') {
-      html = sponsorPageHtml;
-      style = sponsorPageStyle;
-      className = 'sponsorPage';
-    } else if (pageSlug === 'pricing') {
-      html = pricingPageHtml;
-      style = pricingPageStyle;
-      className = null;
-    } else if (pageSlug === 'how-it-works') {
-      if (intl.locale === 'fr') {
-        html = howItWorksPageHtmlFR;
-      } else {
-        html = howItWorksPageHtml;
+    if (page) {
+      style = page.css;
+      className = page.className;
+
+      if (intl.locale != 'en' && languages[intl.locale]) {
+        html = page.pageContents[`index.${intl.locale}.html`];
       }
-      style = howItWorksPageStyle;
-      className = 'mkt-page-how-it-works';
-    } else if (pageSlug === 'gift-of-giving') {
-      html = holidayGiftCardPageHtml;
-      style = holidayGiftCardPageStyle;
-      className = null;
-    } else if (pageSlug === 'gift-cards') {
-      html = giftCardPageHtml;
-      style = giftCardPageStyle;
-      className = null;
-    } else if (pageSlug === 'become-a-fiscal-host') {
-      html = becomeAFiscalHostHtml;
-      style = becomeAFiscalHostStyle;
-      className = 'mkt-page-become-a-fiscal-host';
+      html = html || page.pageContents['index.html'];
     }
 
     return (

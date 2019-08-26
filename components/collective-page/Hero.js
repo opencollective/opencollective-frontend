@@ -4,7 +4,6 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { get } from 'lodash';
-import dynamic from 'next/dynamic';
 
 // Icons
 import { Twitter } from 'styled-icons/feather/Twitter';
@@ -34,9 +33,6 @@ import UserCompany from '../UserCompany';
 import ContainerSectionContent from './ContainerSectionContent';
 import HeroBackground from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
-
-// Dynamic imports
-const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn' */ '../ApplyToHostBtn'));
 
 const Translations = defineMessages({
   website: {
@@ -73,7 +69,8 @@ const StyledShortDescription = styled.h2`
  */
 const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
-  const hasContact = isCollective || collective.isHost;
+  const hasContact = (isCollective || collective.isHost) && !isAdmin;
+  const hasDashboard = collective.isHost && isAdmin;
 
   return (
     <Container position="relative" minHeight={325} zIndex={1000}>
@@ -115,7 +112,9 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
         <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap">
           {isCollective && (
             <StyledTag mx={2} my={2} mb={2}>
-              <I18nCollectiveTags tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags)} />
+              <I18nCollectiveTags
+                tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+              />
             </StyledTag>
           )}
           <Flex my={2}>
@@ -173,30 +172,31 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
                   <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
                 </StyledLink>
               )}
-              <Span ml={2} mr={3} color="black.500" fontSize="Caption">
+              <Container ml={2} mr={3} color="black.500" fontSize="Caption">
                 <FormattedMessage
                   id="Hero.HostFee"
                   defaultMessage="Host fee: {fee}"
                   values={{
                     fee: (
                       <DefinedTerm term={Terms.HOST_FEE} color="black.700">
-                        {collective.hostFeePercent}%
+                        {collective.hostFeePercent || 0}%
                       </DefinedTerm>
                     ),
                   }}
                 />
-              </Span>
-              <ApplyToHostBtn host={collective} showConditions={false} />
+              </Container>
             </React.Fragment>
           )}
         </Flex>
         <StyledShortDescription>{collective.description}</StyledShortDescription>
         {!isCollective && !collective.isHost && <HeroTotalCollectiveContributionsWithData collective={collective} />}
+        {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
         <CollectiveCallsToAction
           display={['flex', 'none']}
           mt={3}
-          collectiveSlug={collective.slug}
+          collective={collective}
           hasContact={hasContact}
+          hasDashboard={hasDashboard}
         />
       </ContainerSectionContent>
     </Container>

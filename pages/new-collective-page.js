@@ -85,8 +85,10 @@ class NewCollectivePage extends React.Component {
         colors: {
           ...theme.colors,
           primary: {
+            900: darken(0.15, primaryColor),
             800: darken(0.1, primaryColor),
             700: darken(0.05, primaryColor),
+            600: darken(0.025, primaryColor),
             500: primaryColor,
             400: lighten(0.1, primaryColor),
             300: lighten(0.2, primaryColor),
@@ -147,7 +149,7 @@ class NewCollectivePage extends React.Component {
 
 // eslint-disable graphql/template-strings
 const getCollective = graphql(gql`
-  query NewCollectivePage($slug: String!) {
+  query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
       id
       slug
@@ -173,6 +175,12 @@ const getCollective = graphql(gql`
         balance
         yearlyBudget
         updates
+        backers {
+          id
+          all
+          users
+          organizations
+        }
       }
       parentCollective {
         id
@@ -218,6 +226,19 @@ const getCollective = graphql(gql`
           id
           totalDonated
           totalRecurringDonations
+          contributors {
+            id
+            all
+            users
+            organizations
+          }
+        }
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
         }
       }
       events {
@@ -226,6 +247,22 @@ const getCollective = graphql(gql`
         name
         description
         image
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
       }
       ...TransactionsAndExpensesFragment
       updates(limit: 3, onlyPublishedUpdates: true) {

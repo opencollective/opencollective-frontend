@@ -39,10 +39,9 @@ describe('create a collective', () => {
       .click();
     cy.wait(300);
     cy.get('.ApplyToHostBtn', { timeout: 15000 }).contains('0% host fee');
-    cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').contains('Apply to host your collective New collective');
-    cy.get('.LoggedInUser .ApplyToHostBtn .Button:enabled').click({
-      force: true,
-    });
+    cy.get('[data-cy="host-apply-btn"]').should('not.be.disabled');
+    cy.get('[data-cy="host-apply-btn"]').contains('Apply with New collective');
+    cy.get('[data-cy="host-apply-btn"]').click();
     cy.get('.LoggedInUser .ApplyToHostBtn').contains(`Application pending for ${collectiveName}`);
     // Go back to collective page
     cy.get('.LoggedInUser .ApplyToHostBtn a')

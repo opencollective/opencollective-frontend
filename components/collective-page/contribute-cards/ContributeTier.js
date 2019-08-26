@@ -55,6 +55,8 @@ const ContributeTier = ({ intl, collective, tier }) => {
       title={tier.name}
       type={getContributionTypeFromTier(tier)}
       buttonText={tier.button}
+      contributors={tier.contributors}
+      stats={tier.stats.contributors}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
         <div>
@@ -143,7 +145,7 @@ ContributeTier.propTypes = {
     currency: PropTypes.string.isRequired,
   }),
   tier: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
@@ -158,7 +160,9 @@ ContributeTier.propTypes = {
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
       totalDonated: PropTypes.number,
+      contributors: PropTypes.object,
     }).isRequired,
+    contributors: PropTypes.arrayOf(PropTypes.object),
   }),
   /** @ignore */
   intl: PropTypes.object.isRequired,
