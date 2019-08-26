@@ -9,7 +9,7 @@ import {
   findUsersThatNeedToBeSentTaxForm,
   SendHelloWorksTaxForm,
   isUserTaxFormRequiredBeforePayment,
-} from '../server/lib/taxForms';
+} from '../server/lib/tax-forms';
 
 import expenseTypes from '../server/constants/expense_type';
 const { RECEIPT, INVOICE } = expenseTypes;

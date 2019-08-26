@@ -69,13 +69,15 @@ export default function(Sequelize, DataTypes) {
 
   LegalDocument.findByTypeYearUser = ({ documentType, year, user }) => {
     return user.getCollective().then(collective => {
-      return LegalDocument.findOne({
-        where: {
-          year,
-          CollectiveId: collective.id,
-          documentType,
-        },
-      });
+      if (collective) {
+        return LegalDocument.findOne({
+          where: {
+            year,
+            CollectiveId: collective.id,
+            documentType,
+          },
+        });
+      }
     });
   };
 
