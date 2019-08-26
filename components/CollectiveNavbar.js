@@ -284,7 +284,7 @@ const CollectiveNavbar = ({
       <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-            <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%" mr={2}>
+            <Container borderRadius="25%" mr={2}>
               <Avatar collective={collective} radius={40} />
             </Container>
           </LinkCollective>
