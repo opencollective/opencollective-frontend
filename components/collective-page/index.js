@@ -5,6 +5,7 @@ import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
+import { CollectiveType } from '../../lib/constants/collectives';
 import Container from '../Container';
 import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
 
@@ -186,6 +187,9 @@ class CollectivePage extends Component {
     const { collective, host, isAdmin, onPrimaryColorChange } = this.props;
     const { isFixed, selectedSection, hasColorPicker } = this.state;
     const sections = this.getSections(this.props);
+    const hasContact = collective.type === CollectiveType.COLLECTIVE || collective.isHost;
+    const hasDashboard = collective.isHost && isAdmin;
+    const hasManageSubscriptions = !collective.isHost && isAdmin && collective.type !== CollectiveType.COLLECTIVE;
 
     return (
       <Container
@@ -193,7 +197,15 @@ class CollectivePage extends Component {
         borderTop="1px solid #E6E8EB"
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
       >
-        <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
+        <Hero
+          collective={collective}
+          host={host}
+          isAdmin={isAdmin}
+          onCollectiveClick={this.onCollectiveClick}
+          hasContact={hasContact}
+          hasDashboard={hasDashboard}
+          hasManageSubscriptions={hasManageSubscriptions}
+        />
         <Container mt={[0, -30]} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
           <CollectiveNavbar
             collective={collective}
@@ -201,10 +213,10 @@ class CollectivePage extends Component {
             isAdmin={isAdmin}
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
+            hasContact={hasContact}
             hasApply={collective.isHost}
-            hasDashboard={collective.isHost && isAdmin}
-            hasManageSubscriptions={!collective.isHost && isAdmin}
-            hasContact={!isAdmin}
+            hasDashboard={hasDashboard}
+            hasManageSubscriptions={hasManageSubscriptions}
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
