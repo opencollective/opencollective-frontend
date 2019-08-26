@@ -177,7 +177,7 @@ class OrderSuccessPage extends React.Component {
     ) : (
       <FormattedMessage
         id="contributeFlow.successMessage"
-        defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s '{tierName}' tier!"
+        defaultMessage="{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s &quot;{tierName}&quot; tier!"
         values={{
           fromCollectiveName: fromCollective.name,
           collectiveName: collectiveLink,

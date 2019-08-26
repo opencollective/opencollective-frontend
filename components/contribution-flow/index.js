@@ -103,7 +103,7 @@ class CreateOrderPage extends React.Component {
       amount: PropTypes.number,
       minimumAmount: PropTypes.number,
       amountType: PropTypes.string,
-      presets: PropTypes.arrayOf(PropTypes.string),
+      presets: PropTypes.arrayOf(PropTypes.number),
       customFields: PropTypes.object,
     }),
     verb: PropTypes.string.isRequired,
