@@ -178,7 +178,12 @@ ${description}`;
     if (useNewCollectiveNavbar) {
       return (
         <Container borderTop="1px solid #E6E8EB" mb={4}>
-          <CollectiveNavbar collective={collective} isAdmin={canEdit} showEdit {...this.props.callsToAction} />
+          <CollectiveNavbar
+            collective={collective}
+            isAdmin={canEdit}
+            showEdit
+            callsToAction={this.props.callsToAction}
+          />
         </Container>
       );
     }
