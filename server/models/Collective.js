@@ -831,6 +831,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   // run when attaching a Stripe Account to this user/organization collective
+  // this Payment Method will be used for "Add Funds"
   Collective.prototype.becomeHost = function() {
     this.data = this.data || {};
     return models.PaymentMethod.findOne({
@@ -841,7 +842,7 @@ export default function(Sequelize, DataTypes) {
         CollectiveId: this.id,
         service: 'opencollective',
         type: 'collective',
-        name: `${capitalize(this.name)} Collective`,
+        name: `${capitalize(this.name)} Add Funds`,
         primary: true,
         currency: this.currency,
       });
