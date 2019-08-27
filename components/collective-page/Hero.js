@@ -253,9 +253,6 @@ Hero.propTypes = {
     slug: PropTypes.string.isRequired,
   }),
 
-  /** When users click on avatar or collective name */
-  onCollectiveClick: PropTypes.func.isRequired,
-
   /** Show the color picker input */
   onPrimaryColorChange: PropTypes.func.isRequired,
 

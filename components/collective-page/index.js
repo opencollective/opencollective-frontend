@@ -205,7 +205,6 @@ class CollectivePage extends Component {
           collective={collective}
           host={host}
           isAdmin={isAdmin}
-          onCollectiveClick={this.onCollectiveClick}
           callsToAction={callsToAction}
           onPrimaryColorChange={onPrimaryColorChange}
         />
