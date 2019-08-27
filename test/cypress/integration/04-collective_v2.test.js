@@ -22,7 +22,11 @@ describe('New collective page', () => {
   describe('Initial state for new collective', () => {
     it('Show tiers with default descriptions', () => {
       cy.contains('#section-contribute', 'Custom contribution');
-      cy.contains('#section-contribute', 'Nothing there for you? Make a custom one time or recurring contribution.');
+      cy.contains('#section-contribute', 'Donation');
+      cy.contains(
+        '#section-contribute',
+        'Make a custom one time or recurring contribution to support this collective.',
+      );
       cy.contains('#section-contribute', 'backer');
       cy.contains('#section-contribute', 'Become a backer for $5.00 per month and help us sustain our activities!');
       cy.contains('#section-contribute', 'sponsor');
