@@ -71,6 +71,7 @@ async function createStripeCreditCard(args, remoteUser) {
     type: 'creditcard',
     service: 'stripe',
     currency: args.currency || collective.currency,
+    saved: true,
   };
 
   let paymentMethod = await models.PaymentMethod.create(paymentMethodData);
