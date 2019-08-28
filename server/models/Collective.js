@@ -1604,7 +1604,12 @@ export default function(Sequelize, DataTypes) {
   // edit the list of members and admins of this collective (create/update/remove)
   // creates a User and a UserCollective if needed
   Collective.prototype.editMembers = function(members, defaultAttributes = {}) {
-    if (!members) return Promise.resolve();
+    if (!members || members.length === 0) {
+      return Promise.resolve();
+    }
+    if (members.filter(m => m.role === roles.ADMIN).length === 0) {
+      throw new Error('There must always be at least one collective admin');
+    }
     return this.getMembers({
       where: { role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
     })
@@ -1627,10 +1632,6 @@ export default function(Sequelize, DataTypes) {
         }
       })
       .then(() => {
-        if (members.filter(m => m.role === roles.ADMIN).length === 0) {
-          throw new Error('There must always be at least one collective admin');
-        }
-
         return Promise.map(members, member => {
           if (member.id) {
             // Edit an existing membership (edit the role/description)
