@@ -1442,6 +1442,10 @@ const CollectiveFields = () => {
           return [];
         }
         let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
+        // Filter Payment Methods used by organizations for "Add Funds"
+        paymentMethods.filter(
+          pm => !(collective.type === 'ORGANIZATION' && pm.service === 'opencollective' && pm.type === 'collective'),
+        );
         if (args.service) {
           paymentMethods = paymentMethods.filter(pm => pm.service === args.service);
         }
