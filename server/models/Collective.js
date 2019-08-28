@@ -1720,17 +1720,14 @@ export default function(Sequelize, DataTypes) {
       order: [['createdAt', 'DESC']],
       include: [
         {
-          association: 'collective',
-          include: [
-            {
-              association: 'HostCollective',
-              where: { id: this.id },
-            },
-          ],
+          model: models.Collective,
+          as: 'collective',
+          where: { HostCollectiveId: this.id },
         },
       ],
     });
   };
+
   Collective.prototype.getExpenses = function(status, startDate, endDate = new Date(), createdByUserId, excludedTypes) {
     const where = {
       createdAt: { [Op.lt]: endDate },
