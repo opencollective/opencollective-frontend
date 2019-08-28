@@ -339,7 +339,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       if (vatType === VAT_OPTIONS.OWN) {
         taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, baseCountry, baseCountry);
         vatSettings = { ...get(parentCollective, 'settings.VAT'), ...get(collective, 'settings.VAT') };
-      } else {
+      } else if (vatType === VAT_OPTIONS.HOST) {
         const hostCountry = get(hostCollective, 'countryISO');
         taxFromCountry = LibTaxes.getVatOriginCountry(tier.type, hostCountry, baseCountry);
         vatSettings = get(hostCollective, 'settings.VAT') || {};
