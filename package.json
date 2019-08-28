@@ -183,7 +183,7 @@
     "report": "node scripts/send_email_report_cli.js",
     "start": "node ./dist/index.js",
     "test": "TZ=UTC nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
-    "test:clean": "rm -rf .nyc_output coverage",
+    "test:clean": "rm -rf .nyc_output coverage test/output",
     "test:watch": "TZ=UTC nyc mocha --watch"
   },
   "nyc": {
