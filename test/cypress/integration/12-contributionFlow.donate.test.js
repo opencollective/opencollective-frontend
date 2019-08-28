@@ -1,4 +1,5 @@
 import mockRecaptcha from '../mocks/recaptcha';
+import { CreditCards } from '../../stripe-helpers';
 
 const visitParams = { onBeforeLoad: mockRecaptcha };
 
@@ -56,7 +57,7 @@ describe('Contribution Flow: Donate', () => {
       cy.wait(1000); // Wait for stripe to be loaded
 
       // Ensure we display errors
-      cy.fillStripeInput(null, { creditCardNumber: 123 });
+      cy.fillStripeInput({ card: { creditCardNumber: 123 } });
       cy.contains('button', 'Make contribution').click();
       cy.contains('Your card number is incomplete.');
 
@@ -137,5 +138,45 @@ describe('Contribution Flow: Donate', () => {
       cy.get('#page-order-success', { timeout: 20000 }).contains('$42.00 USD / yr.');
       cy.contains("You're now a backer of APEX!");
     });
+  });
+
+  it('works with 3D secure', () => {
+    cy.signup({ redirect: '/apex/donate/42/year', visitParams });
+    cy.contains('button', 'Next step').click();
+    cy.checkStepsProgress({ enabled: ['contributeAs', 'payment'] });
+    cy.wait(1000); // Wait for stripe to be loaded
+
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.contains('button', 'Make contribution').click();
+    cy.wait(10000); // 3D secure popup takes some time to appear
+
+    // Using 3D secure should trigger an iframe
+    const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
+
+    // Rejecting the validation should produce an error
+    cy.get(iframeSelector).then($3dSecureIframe => {
+      const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
+      const cyChallenge = cy.wrap($challengeIframe.contents().find('body'));
+      cyChallenge.find('#test-source-fail-3ds').click();
+    });
+    cy.contains(
+      'We are unable to authenticate your payment method. Please choose a different payment method and try again.',
+    );
+
+    // Refill stripe input to avoid using the same token twice
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+
+    // Re-trigger the popup
+    cy.contains('button', 'Make contribution').click();
+    cy.wait(7500); // 3D secure popup takes some time to appear
+
+    // Approving the validation should create the order
+    cy.get(iframeSelector).then($3dSecureIframe => {
+      const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
+      const cyChallenge = cy.wrap($challengeIframe.contents().find('body'));
+      cyChallenge.find('#test-source-authorize-3ds').click();
+    });
+
+    cy.contains("You're now a backer of APEX!", { timeout: 15000 });
   });
 });

@@ -14,7 +14,7 @@ import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
-import { stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { compose, formatCurrency, getEnvVar, parseToBoolean } from '../../lib/utils';
 import { getPaypal } from '../../lib/paypal';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
@@ -121,6 +121,7 @@ class CreateOrderPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     createOrder: PropTypes.func.isRequired, // from mutation
+    confirmOrder: PropTypes.func.isRequired, // from mutation
     createCollective: PropTypes.func.isRequired, // from mutation
     loadStripe: PropTypes.func.isRequired, // from withStripe
     intl: PropTypes.object.isRequired, // from injectIntl
@@ -288,6 +289,7 @@ class CreateOrderPage extends React.Component {
         return false;
       }
       const { token, error } = await this.state.stripe.createToken();
+
       if (error) {
         this.setState({ error: error.message });
         return false;
@@ -334,6 +336,7 @@ class CreateOrderPage extends React.Component {
 
   submitOrder = async (paymentMethodOverride = null) => {
     this.setState({ submitting: true, error: null });
+
     const { stepProfile, stepDetails, stepPayment, stepSummary, customData } = this.state;
 
     // Prepare payment method
@@ -376,19 +379,61 @@ class CreateOrderPage extends React.Component {
     try {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
-      this.setState({ submitting: false, submitted: true, error: null });
-      this.props.refetchLoggedInUser();
-      if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
-        const orderId = get(orderCreated, 'id', null);
-        const transactionId = get(orderCreated, 'transactions[0].id', null);
-        const status = orderCreated.status;
-        const redirectTo = `${this.props.redirect}?orderId=${orderId}&transactionid=${transactionId}&status=${status}`;
-        window.location.href = redirectTo;
+      if (orderCreated.stripeError) {
+        this.handleStripeError(orderCreated);
       } else {
-        this.pushStepRoute('success', { OrderId: orderCreated.id });
+        this.handleSuccess(orderCreated);
       }
     } catch (e) {
       this.setState({ submitting: false, error: e.message });
+    }
+  };
+
+  confirmOrder = async order => {
+    this.setState({ submitting: true, error: null });
+
+    try {
+      const res = await this.props.confirmOrder(order);
+      const orderConfirmed = res.data.confirmOrder;
+      if (orderConfirmed.stripeError) {
+        this.handleStripeError(orderConfirmed);
+      } else {
+        this.handleSuccess(orderConfirmed);
+      }
+    } catch (e) {
+      this.setState({ submitting: false, error: e.message });
+    }
+  };
+
+  handleSuccess = orderCreated => {
+    this.setState({ submitting: false, submitted: true, error: null });
+    this.props.refetchLoggedInUser();
+    if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
+      const orderId = get(orderCreated, 'id', null);
+      const transactionId = get(orderCreated, 'transactions[0].id', null);
+      const status = orderCreated.status;
+      const redirectTo = `${this.props.redirect}?orderId=${orderId}&transactionid=${transactionId}&status=${status}`;
+      window.location.href = redirectTo;
+    } else {
+      this.pushStepRoute('success', { OrderId: orderCreated.id });
+    }
+  };
+
+  handleStripeError = async ({ id, stripeError: { message, account, response } }) => {
+    if (!response) {
+      this.setState({ submitting: false, error: message });
+      return;
+    }
+
+    if (response.paymentIntent) {
+      const stripe = await getStripe(null, account);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      if (result.error) {
+        this.setState({ submitting: false, error: result.error.message });
+      }
+      if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
+        this.confirmOrder({ id });
+      }
     }
   };
 
@@ -914,6 +959,11 @@ export const addCreateOrderMutation = graphql(
       createOrder(order: $order) {
         id
         status
+        stripeError {
+          message
+          account
+          response
+        }
         transactions {
           id
         }
@@ -927,9 +977,34 @@ export const addCreateOrderMutation = graphql(
   },
 );
 
+export const addConfirmOrderMutation = graphql(
+  gql`
+    mutation confirmOrder($order: ConfirmOrderInputType!) {
+      confirmOrder(order: $order) {
+        id
+        status
+        stripeError {
+          message
+          account
+          response
+        }
+        transactions {
+          id
+        }
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      confirmOrder: order => mutate({ variables: { order } }),
+    }),
+  },
+);
+
 const addGraphQL = compose(
   addCreateCollectiveMutation,
   addCreateOrderMutation,
+  addConfirmOrderMutation,
 );
 
 export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));

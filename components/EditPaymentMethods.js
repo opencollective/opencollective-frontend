@@ -9,7 +9,7 @@ import { Add } from 'styled-icons/material/Add';
 
 import { compose, getErrorFromGraphqlException } from '../lib/utils';
 import { paymentMethodLabel } from '../lib/payment_method_label';
-import { stripeTokenToPaymentMethod } from '../lib/stripe';
+import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { H3, Span } from './Text';
 import Link from './Link';
 import Loading from './Loading';
@@ -75,11 +75,39 @@ class EditPaymentMethods extends React.Component {
           throw error;
         }
         const paymentMethod = stripeTokenToPaymentMethod(token);
-        await this.props.addCreditCard({ CollectiveId: this.props.data.Collective.id, ...paymentMethod });
-        this.props.data.refetch();
-        this.setState({ hasForm: false, error: null, newCreditCardInfo: null, submitting: false });
+        const res = await this.props.addCreditCard({ CollectiveId: this.props.data.Collective.id, ...paymentMethod });
+        const createdCreditCard = res.data.createCreditCard;
+
+        if (createdCreditCard.stripeError) {
+          this.handleStripeError(createdCreditCard.stripeError);
+        } else {
+          this.handleSuccess();
+        }
       } catch (e) {
         this.setState({ error: e.message, submitting: false });
+      }
+    }
+  };
+
+  handleSuccess = () => {
+    this.props.data.refetch();
+    this.setState({ hasForm: false, error: null, newCreditCardInfo: null, submitting: false });
+  };
+
+  handleStripeError = async ({ message, response }) => {
+    if (!response) {
+      this.setState({ error: message, submitting: false });
+      return;
+    }
+
+    if (response.setupIntent) {
+      const stripe = await getStripe();
+      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+      if (result.error) {
+        this.setState({ submitting: false, error: result.error.message });
+      }
+      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
+        this.handleSuccess();
       }
     }
   };
@@ -291,6 +319,10 @@ export const addCreditCard = graphql(
         monthlyLimitPerMember: $monthlyLimitPerMember
       ) {
         id
+        stripeError {
+          message
+          response
+        }
       }
     }
   `,
