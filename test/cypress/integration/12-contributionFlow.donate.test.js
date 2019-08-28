@@ -159,14 +159,16 @@ describe('Contribution Flow: Donate', () => {
       const cyChallenge = cy.wrap($challengeIframe.contents().find('body'));
       cyChallenge.find('#test-source-fail-3ds').click();
     });
-
     cy.contains(
       'We are unable to authenticate your payment method. Please choose a different payment method and try again.',
     );
 
+    // Refill stripe input to avoid using the same token twice
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+
     // Re-trigger the popup
     cy.contains('button', 'Make contribution').click();
-    cy.wait(5000); // 3D secure popup takes some time to appear
+    cy.wait(7500); // 3D secure popup takes some time to appear
 
     // Approving the validation should create the order
     cy.get(iframeSelector).then($3dSecureIframe => {
