@@ -11,7 +11,7 @@ import { isArray, pick, get, merge, includes } from 'lodash';
 import models from '../models';
 import logger from './logger';
 import templates from './emailTemplates';
-import { isEmailInternal, md5 } from './utils';
+import { md5 } from './utils';
 
 const debug = debugLib('email');
 
@@ -96,11 +96,6 @@ const sendMessage = (recipients, subject, html, options = {}) => {
   recipients = recipients.filter(recipient => {
     if (!recipient || !recipient.match(/.+@.+\..+/)) {
       debug(`${recipient} is an invalid email address, skipping`);
-      return false;
-    }
-    // if not in production, only send out emails to bcc'd opencollective address
-    if (config.env !== 'production' && !isEmailInternal(recipient)) {
-      debug(`${recipient} is an external email address, skipping in development environment`);
       return false;
     } else {
       return true;
