@@ -31,6 +31,8 @@ class Event extends React.Component {
     removeMember: PropTypes.func,
     createMember: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    /** Should be set to true if event is (re-)fetching. Disables actions. */
+    isLoading: PropTypes.bool,
   };
 
   static getDerivedStateFromProps(props) {
@@ -116,7 +118,7 @@ class Event extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, intl } = this.props;
+    const { LoggedInUser, intl, isLoading } = this.props;
     const { event } = this.state;
 
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
@@ -325,21 +327,27 @@ class Event extends React.Component {
                         </span>
                       )}
                     </h1>
-                    {canEditEvent && (
+                    {!isLoading && canEditEvent && (
                       <div className="adminActions" id="adminActions">
                         <ul>
                           <li>
                             <a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>
-                              Print name tags
+                              <FormattedMessage id="Event.PrintNameTags" defaultMessage="Print name tags" />
                             </a>
                           </li>
                           <li>
                             <a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>
-                              Send email
+                              <FormattedMessage id="Event.SendEmail" defaultMessage="Send email" />
                             </a>
                           </li>
                           <li>
-                            <a onClick={() => exportRSVPs(event)}>Export CSV</a>
+                            <a onClick={() => exportRSVPs(event)}>
+                              <FormattedMessage
+                                id="Export.Format"
+                                defaultMessage="Export {format}"
+                                values={{ format: 'CSV' }}
+                              />
+                            </a>
                           </li>
                         </ul>
                       </div>
