@@ -10,7 +10,7 @@ import { isURL } from 'validator';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
 
-import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
+import { OPENSOURCE_COLLECTIVE_ID, CollectiveType } from '../../lib/constants/collectives';
 import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
@@ -694,6 +694,7 @@ class CreateOrderPage extends React.Component {
                     profiles={profiles}
                     personal={personal}
                     defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
+                    canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
                   />
                 </Container>
               )}
