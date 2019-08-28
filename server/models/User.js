@@ -65,8 +65,6 @@ export default (Sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
 
-      billingAddress: DataTypes.STRING, // Used for the invoices, we should create a separate table for addresses (billing/shipping)
-
       paypalEmail: {
         type: DataTypes.STRING,
         unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password,

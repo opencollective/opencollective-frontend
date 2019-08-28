@@ -161,12 +161,6 @@ export const UserType = new GraphQLObjectType({
           });
         },
       },
-      billingAddress: {
-        type: GraphQLString,
-        resolve(user) {
-          return user.billingAddress; // TODO: shouldn't this be behind a login check like email and paypalEmail?
-        },
-      },
       paypalEmail: {
         type: GraphQLString,
         resolve(user, args, req) {
