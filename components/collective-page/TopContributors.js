@@ -184,7 +184,7 @@ const TopContributors = ({ organizations, individuals, currency }) => {
     <TopContributorsContainer>
       <Container maxWidth={1050} m="0 auto" px={[15, 30]}>
         <H4 fontWeight="normal" color="black.700" mb={3}>
-          <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top Contributors" />
+          <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top financial contributors" />
         </H4>
         <Flex mt={2} flexWrap="wrap" justify-content="space-between">
           {Blocks[0]}

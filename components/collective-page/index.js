@@ -174,9 +174,7 @@ class CollectivePage extends Component {
           />
         );
       case Sections.CONTRIBUTORS:
-        return (
-          <SectionContributors collectiveName={this.props.collective.name} contributors={this.props.contributors} />
-        );
+        return <SectionContributors collective={this.props.collective} contributors={this.props.contributors} />;
       case Sections.UPDATES:
         return (
           <SectionUpdates

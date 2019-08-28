@@ -9,11 +9,11 @@ import Contribute from './Contribute';
 const messages = defineMessages({
   title: {
     id: 'CollectivePage.Contribute.Custom',
-    defaultMessage: 'Custom contribution',
+    defaultMessage: 'Donation',
   },
   description: {
     id: 'CollectivePage.Contribute.Custom.Description',
-    defaultMessage: 'Nothing there for you? Make a custom one time or recurring contribution.',
+    defaultMessage: 'Make a custom one time or recurring contribution to support this collective.',
   },
 });
 
