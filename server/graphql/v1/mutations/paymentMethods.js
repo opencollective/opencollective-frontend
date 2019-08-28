@@ -2,6 +2,7 @@ import { pick } from 'lodash';
 import { URLSearchParams } from 'url';
 
 import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
+import { setupCreditCard } from '../../../paymentProviders/stripe/creditcard';
 import emailLib from '../../../lib/email';
 import models, { Op } from '../../../models';
 import { Forbidden, ValidationFailed } from '../../errors';
@@ -65,18 +66,35 @@ async function createStripeCreditCard(args, remoteUser) {
     throw Error('This collective does not exists');
   }
 
-  const paymentMethod = await models.PaymentMethod.createFromStripeSourceToken(
-    {
-      ...args,
-      type: 'creditcard',
-      service: 'stripe',
-      currency: args.currency || collective.currency,
-    },
-    {
+  const paymentMethodData = {
+    ...args,
+    type: 'creditcard',
+    service: 'stripe',
+    currency: args.currency || collective.currency,
+    saved: true,
+  };
+
+  let paymentMethod = await models.PaymentMethod.create(paymentMethodData);
+
+  try {
+    paymentMethod = await setupCreditCard(paymentMethod, {
       collective,
-      email: remoteUser.email,
-    },
-  );
+      user: remoteUser,
+    });
+  } catch (error) {
+    if (!error.stripeResponse) {
+      throw error;
+    }
+
+    paymentMethod.stripeError = {
+      message: error.message,
+      response: error.stripeResponse,
+    };
+
+    return paymentMethod;
+  }
+
+  paymentMethod = await paymentMethod.update({ primary: true });
 
   // We must unset the `primary` flag on all other payment methods
   await models.PaymentMethod.update(

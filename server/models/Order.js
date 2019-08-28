@@ -138,6 +138,11 @@ export default function(Sequelize, DataTypes) {
         },
       },
 
+      interval: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
       data: {
         type: DataTypes.JSON,
         allowNull: true,

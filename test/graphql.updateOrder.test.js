@@ -90,7 +90,11 @@ describe('updateOrder', () => {
     });
 
     utils.stubStripeCreate(sandbox, {
-      charge: { currency: 'eur', status: 'succeeded' },
+      // charge: { currency: 'eur', status: 'succeeded' },
+      paymentIntent: {
+        charges: { data: [{ currency: 'eur', status: 'succeeded' }] },
+        status: 'succeeded',
+      },
     });
   });
 
@@ -146,8 +150,9 @@ describe('updateOrder', () => {
 
     // When the query is executed
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
-    res.errors && console.log(res.errors);
+
     // Then there should be no errors
+    res.errors && console.log(res.errors);
     expect(res.errors).to.not.exist;
     expect(res.data.updateOrder.status).to.equal('PAID');
     expect(res.data.updateOrder.subscription).to.not.exist;
@@ -186,6 +191,7 @@ describe('updateOrder', () => {
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
 
     // Then there should be no errors
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     expect(res.data.updateOrder.subscription).to.exist;
     expect(res.data.updateOrder.status).to.equal('ACTIVE');
@@ -216,6 +222,7 @@ describe('updateOrder', () => {
     const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
 
     // Then there should be no errors
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     expect(res.data.updateOrder.subscription).to.exist;
     expect(res.data.updateOrder.status).to.equal('ACTIVE');

@@ -1,22 +1,20 @@
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import debugLib from 'debug';
+import { get } from 'lodash';
 import { URLSearchParams } from 'url';
 
 import models from '../../models';
 import errors from '../../lib/errors';
-import { retrieveEvent } from './gateway';
 import creditcard from './creditcard';
-import stripeLib from 'stripe';
-import debugLib from 'debug';
-import { get } from 'lodash';
 import { addParamsToUrl } from '../../lib/utils';
+import stripe from '../../lib/stripe';
 
 const debug = debugLib('stripe');
+
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 const TOKEN_URI = 'https://connect.stripe.com/oauth/token';
-
-const stripe = stripeLib(config.stripe.secret);
 
 const getToken = code => () =>
   axios
@@ -182,7 +180,7 @@ export default {
      * We check the event on stripe directly to be sure we don't get a fake event from
      * someone else
      */
-    return retrieveEvent({ username: requestBody.user_id }, requestBody.id).then(event => {
+    return stripe.events.retrieve(requestBody.id, { stripe_account: requestBody.user_id }).then(event => {
       if (!event || (event && !event.type)) {
         throw new errors.BadRequest('Event not found');
       }

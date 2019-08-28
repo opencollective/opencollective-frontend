@@ -586,6 +586,7 @@ describe('opencollective.virtualcard', () => {
         const initialBalance = await virtualcard.getBalance(virtualCardPm);
         const orderData = {
           createdByUser: user,
+          CreatedByUserId: user.id,
           fromCollective: user.collective,
           FromCollectiveId: user.collective.id,
           collective: targetCollective,

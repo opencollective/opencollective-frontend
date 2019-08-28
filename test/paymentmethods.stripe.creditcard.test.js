@@ -53,7 +53,7 @@ async function createOrderWithPaymentMethod(paymentMethodName, orderParams = {})
   return { order, user, collective, paymentMethod, connectedAccount };
 }
 
-describe('stripe.creditcard', () => {
+describe('paymentmethods.stripe.creditcard', () => {
   describe('#processOrder()', async () => {
     let secondCallToCreateCustomer;
 
@@ -66,19 +66,21 @@ describe('stripe.creditcard', () => {
         .reply(200, {});
 
       // Calls performed by getOrCreateCustomerIdForHost
-      secondCallToCreateCustomer = nock('https://api.stripe.com:443')
-        .post('/v1/customers')
-        .reply(200, {});
       nock('https://api.stripe.com:443')
         .post('/v1/tokens')
+        .reply(200, {});
+      secondCallToCreateCustomer = nock('https://api.stripe.com:443')
+        .post('/v1/customers')
         .reply(200, {});
 
       // Calls performed by createChargeAndTransactions
       nock('https://api.stripe.com:443')
-        .post('/v1/charges')
+        .post('/v1/payment_intents')
         .reply(200, {
-          id: 'ch_1B5j91D8MNtzsDcgNMsUgI8L',
-          balance_transaction: 'txn_1B5j92D8MNtzsDcgQzIcmfrn',
+          charges: {
+            data: [{ id: 'ch_1B5j91D8MNtzsDcgNMsUgI8L', balance_transaction: 'txn_1B5j92D8MNtzsDcgQzIcmfrn' }],
+          },
+          status: 'succeeded',
         });
       nock('https://api.stripe.com:443')
         .get('/v1/balance_transactions/txn_1B5j92D8MNtzsDcgQzIcmfrn')
@@ -87,13 +89,7 @@ describe('stripe.creditcard', () => {
 
     afterEach(() => nock.cleanAll());
 
-    it('should not create a new customer id for a host for pre-migration users', async () => {
-      const { order } = await createOrderWithPaymentMethod(null);
-      await creditcard.processOrder(order);
-      expect(secondCallToCreateCustomer.isDone()).to.be.false;
-    });
-
-    it('should create a new customer id for a host for post-migration users', async () => {
+    it('should create a new customer id for a host', async () => {
       const { order } = await createOrderWithPaymentMethod('name');
       await creditcard.processOrder(order);
       expect(secondCallToCreateCustomer.isDone()).to.be.true;

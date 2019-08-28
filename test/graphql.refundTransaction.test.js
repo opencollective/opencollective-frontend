@@ -7,8 +7,8 @@ import * as utils from './utils';
 // Code components used for setting up the tests
 import models from '../server/models';
 import * as constants from '../server/constants/transactions';
-import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 import * as paymentsLib from '../server/lib/payments';
+import { extractFees } from '../server/lib/stripe';
 
 // The GraphQL query that will refund a transaction (it returns the
 // transaction being refunded)
@@ -70,7 +70,7 @@ async function setupTestObjects() {
     status: 'pending',
     type: 'charge',
   };
-  const fees = stripeGateway.extractFees(balanceTransaction);
+  const fees = extractFees(balanceTransaction);
   const payload = {
     CreatedByUserId: user.id,
     FromCollectiveId: user.CollectiveId,

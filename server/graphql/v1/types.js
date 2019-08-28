@@ -1648,6 +1648,12 @@ export const OrderType = new GraphQLObjectType({
           return pick(order.data, ['tax', 'customData']) || null;
         },
       },
+      stripeError: {
+        type: StripeErrorType,
+        resolve(order) {
+          return order.stripeError;
+        },
+      },
     };
   },
 });
@@ -1923,6 +1929,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.currency;
         },
       },
+      stripeError: {
+        type: StripeErrorType,
+        resolve(paymentMethod) {
+          return paymentMethod.stripeError;
+        },
+      },
     };
   },
 });
@@ -2056,5 +2068,31 @@ export const ImageFormatType = new GraphQLEnumType({
     jpg: {},
     gif: {},
     svg: {},
+  },
+});
+
+export const StripeErrorType = new GraphQLObjectType({
+  name: 'StripeError',
+  fields: () => {
+    return {
+      message: {
+        type: GraphQLString,
+        resolve(error) {
+          return error.message;
+        },
+      },
+      account: {
+        type: GraphQLString,
+        resolve(error) {
+          return error.account;
+        },
+      },
+      response: {
+        type: GraphQLJSON,
+        resolve(error) {
+          return error.response;
+        },
+      },
+    };
   },
 });

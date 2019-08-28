@@ -13,6 +13,7 @@ import {
 } from './mutations/collectives';
 import {
   createOrder,
+  confirmOrder,
   cancelSubscription,
   updateSubscription,
   refundTransaction,
@@ -61,6 +62,7 @@ import {
   CollectiveInputType,
   CollectiveAttributesInputType,
   OrderInputType,
+  ConfirmOrderInputType,
   TierInputType,
   ExpenseInputType,
   UpdateInputType,
@@ -393,6 +395,17 @@ const mutations = {
     },
     resolve(_, args, req) {
       return createOrder(args.order, req.loaders, req.remoteUser, req.ip);
+    },
+  },
+  confirmOrder: {
+    type: OrderType,
+    args: {
+      order: {
+        type: new GraphQLNonNull(ConfirmOrderInputType),
+      },
+    },
+    resolve(_, args, req) {
+      return confirmOrder(args.order, req.remoteUser);
     },
   },
   addFundsToCollective: {

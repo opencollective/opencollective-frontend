@@ -12,8 +12,8 @@ import { formatCurrency, formatArrayToString, cleanTags } from '../lib/utils';
 import { getFxRate } from '../lib/currency';
 
 import CustomDataTypes from './DataTypes';
-import * as stripe from '../paymentProviders/stripe/gateway';
 import * as libpayments from '../lib/payments';
+import { isTestToken } from '../lib/stripe';
 
 import { maxInteger } from '../constants/math';
 
@@ -163,6 +163,11 @@ export default function(Sequelize, DataTypes) {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },
+
+      saved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       paranoid: true,
@@ -173,8 +178,8 @@ export default function(Sequelize, DataTypes) {
             if (!instance.token) {
               throw new Error(`${instance.service} payment method requires a token`);
             }
-            if (instance.service === 'stripe' && !instance.token.match(/^(tok|src)_[a-zA-Z0-9]{24}/)) {
-              if (process.env.NODE_ENV !== 'production' && stripe.isTestToken(instance.token)) {
+            if (instance.service === 'stripe' && !instance.token.match(/^(tok|src|pm)_[a-zA-Z0-9]{24}/)) {
+              if (process.env.NODE_ENV !== 'production' && isTestToken(instance.token)) {
                 // test token for end to end tests
               } else {
                 throw new Error(`Invalid Stripe token ${instance.token}`);
@@ -458,26 +463,26 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
-   * Class Methods
-   */
-  PaymentMethod.createFromStripeSourceToken = (PaymentMethodData, options) => {
-    debug('createFromStripeSourceToken', PaymentMethodData);
-    return stripe.createCustomer(null, PaymentMethodData.token, options).then(customer => {
-      PaymentMethodData.customerId = customer.id;
-      PaymentMethodData.primary = true;
-      return PaymentMethod.create(PaymentMethodData);
-    });
-  };
-
-  /**
    * Create or get an existing payment method by uuid
    * This makes sure that the user can use this PaymentMethod
    * @param {*} user req.remoteUser
    * @param {*} paymentMethod { uuid } or { token, CollectiveId, ... } to create a new one and optionally attach it to CollectiveId
    * @post PaymentMethod { id, uuid, service, token, balance, CollectiveId }
    */
-  PaymentMethod.getOrCreate = (user, paymentMethod) => {
+  PaymentMethod.getOrCreate = async (user, paymentMethod) => {
     if (!paymentMethod.uuid) {
+      // If no UUID provided, we check if this token already exists
+      // NOTE: we have to disable this better behavior because it's breaking too many tests
+      /*
+      if (paymentMethod.token) {
+        const paymentMethodWithToken = await models.PaymentMethod.findOne({
+          where: { token: paymentMethod.token },
+        });
+        if (paymentMethodWithToken) {
+          return paymentMethodWithToken;
+        }
+      }
+      */
       // If no UUID provided, we create a new paymentMethod
       const paymentMethodData = {
         ...paymentMethod,

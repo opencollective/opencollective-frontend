@@ -3,6 +3,8 @@ import config from 'config';
 import debugLib from 'debug';
 import Promise from 'bluebird';
 
+import logger from './logger';
+
 const debug = debugLib('currency');
 const cache = {};
 
@@ -50,7 +52,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;
           debug(msg, 'json:', json, 'error:', e);
           if (!process.env.NODE_ENV || ['test', 'development', 'circleci'].includes(process.env.NODE_ENV)) {
-            console.log('>>> development environment -> returning 1.1 instead of throwing the error');
+            logger.info('lib/currency: development environment -> returning 1.1 instead of throwing the error');
             return resolve(1.1);
           } else {
             reject(e);
@@ -61,7 +63,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
         debug('Unable to fetch fxrate', e.message);
         // for testing in airplane mode
         if (!process.env.NODE_ENV || ['test', 'development'].includes(process.env.NODE_ENV)) {
-          console.log('>>> development environment -> returning 1.1 instead of throwing the error');
+          logger.info('lib/currency: development environment -> returning 1.1 instead of throwing the error');
           return resolve(1.1);
         } else {
           reject(e);

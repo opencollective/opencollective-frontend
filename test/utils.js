@@ -3,7 +3,6 @@ import debug from 'debug';
 import nock from 'nock';
 
 import Promise from 'bluebird';
-import Stripe from 'stripe';
 import { graphql } from 'graphql';
 import { isArray, values, get, cloneDeep } from 'lodash';
 import { execSync } from 'child_process';
@@ -13,15 +12,13 @@ import jsonData from './mocks/data';
 
 /* Server code being used */
 import userlib from '../server/lib/userlib';
+import stripe from '../server/lib/stripe';
 import schema from '../server/graphql/v1/schema';
 import { loaders } from '../server/graphql/loaders';
 import { sequelize } from '../server/models';
 import cache from '../server/lib/cache';
 import * as libpayments from '../server/lib/payments';
-import * as stripeGateway from '../server/paymentProviders/stripe/gateway';
 import * as db_restore from '../scripts/db_restore';
-
-const appStripe = Stripe(config.stripe.secret);
 
 if (process.env.RECORD) {
   nock.recorder.rec();
@@ -186,7 +183,7 @@ export const separator = length => {
 /* ---- Stripe Helpers ---- */
 
 export const createStripeToken = async () => {
-  return appStripe.tokens
+  return stripe.tokens
     .create({
       card: {
         number: '4242424242424242',
@@ -208,20 +205,24 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
     customer: { id: 'cus_BM7mGwp1Ea8RtL' },
     token: { id: 'tok_1AzPXGD8MNtzsDcgwaltZuvp' },
     charge: { id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' },
+    paymentIntent: { charges: { data: [{ id: 'ch_1AzPXHD8MNtzsDcgXpUhv4pm' }] }, status: 'succeeded' },
     ...overloadDefaults,
   };
   /* Little helper function that returns the stub with a given
    * value. */
   const factory = name => async () => values[name];
-  sandbox.stub(stripeGateway, 'createToken').callsFake(factory('token'));
-  sandbox.stub(stripeGateway, 'createCharge').callsFake(factory('charge'));
-  sandbox.stub(stripeGateway, 'createCustomer').callsFake(async (account, token) => {
-    if (token.startsWith('tok_chargeDeclined')) {
+  sandbox.stub(stripe.tokens, 'create').callsFake(factory('token'));
+
+  sandbox.stub(stripe.customers, 'create').callsFake(async ({ source }) => {
+    if (source.startsWith('tok_chargeDeclined')) {
       throw new Error('Your card was declined.');
     }
 
     return values.customer;
   });
+
+  sandbox.stub(stripe.customers, 'retrieve').callsFake(factory('customer'));
+  sandbox.stub(stripe.paymentIntents, 'create').callsFake(factory('paymentIntent'));
 }
 
 export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0, stripeFee = 0) {
@@ -229,7 +230,8 @@ export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0,
   const fee = applicationFee + stripeFee;
   if (applicationFee && applicationFee > 0) fee_details.push({ type: 'application_fee', amount: applicationFee });
   if (stripeFee && stripeFee > 0) fee_details.push({ type: 'stripe_fee', amount: stripeFee });
-  return sandbox.stub(stripeGateway, 'retrieveBalanceTransaction').callsFake(async () => ({
+
+  const balanceTransaction = {
     id: 'txn_1Bs9EEBYycQg1OMfTR33Y5Xr',
     object: 'balance_transaction',
     amount,
@@ -239,5 +241,6 @@ export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0,
     net: amount - fee,
     status: 'pending',
     type: 'charge',
-  }));
+  };
+  sandbox.stub(stripe.balanceTransactions, 'retrieve').callsFake(() => Promise.resolve(balanceTransaction));
 }
