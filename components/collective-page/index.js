@@ -129,6 +129,17 @@ class CollectivePage extends Component {
     }
   };
 
+  getCallsToAction = memoizeOne((type, isHost, isAdmin) => {
+    const isCollective = type === CollectiveType.COLLECTIVE;
+    return {
+      hasContact: isCollective,
+      hasSubmitExpense: isCollective,
+      hasApply: isHost,
+      hasDashboard: isHost && isAdmin,
+      hasManageSubscriptions: !isHost && isAdmin && !isCollective,
+    };
+  });
+
   onCollectiveClick = () => {
     window.scrollTo(0, 0);
   };
@@ -187,9 +198,7 @@ class CollectivePage extends Component {
     const { collective, host, isAdmin, onPrimaryColorChange } = this.props;
     const { isFixed, selectedSection, hasColorPicker } = this.state;
     const sections = this.getSections(this.props);
-    const hasContact = collective.type === CollectiveType.COLLECTIVE || collective.isHost;
-    const hasDashboard = collective.isHost && isAdmin;
-    const hasManageSubscriptions = !collective.isHost && isAdmin && collective.type !== CollectiveType.COLLECTIVE;
+    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin);
 
     return (
       <Container
@@ -202,9 +211,7 @@ class CollectivePage extends Component {
           host={host}
           isAdmin={isAdmin}
           onCollectiveClick={this.onCollectiveClick}
-          hasContact={hasContact}
-          hasDashboard={hasDashboard}
-          hasManageSubscriptions={hasManageSubscriptions}
+          callsToAction={callsToAction}
         />
         <Container mt={[0, -30]} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
           <CollectiveNavbar
@@ -213,10 +220,7 @@ class CollectivePage extends Component {
             isAdmin={isAdmin}
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
-            hasContact={hasContact}
-            hasApply={collective.isHost}
-            hasDashboard={hasDashboard}
-            hasManageSubscriptions={hasManageSubscriptions}
+            callsToAction={callsToAction}
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
