@@ -766,6 +766,8 @@
   "openSourceApply.title": "Pour les projets open-source",
   "order.active": "actif",
   "order.cancelled": "annulé",
+  "Order.Confirm.Processing": "Confirming your payment method…",
+  "Order.Confirm.Success": "Your payment method has now been confirmed and the payment successfully went through.",
   "order.created.tweet": "Je viens de contribuer {amount} à {collective}. Toi aussi, contribue!",
   "order.created.tweet.event": "Je viens de réserver ma place pour {event}. Rejoins-moi!",
   "order.error": "erreur",
