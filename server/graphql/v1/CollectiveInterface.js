@@ -585,6 +585,11 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           },
           role: { type: GraphQLString },
           roles: { type: new GraphQLList(GraphQLString) },
+          onlyActiveCollectives: {
+            type: GraphQLBoolean,
+            description: 'Only return memberships for active collectives (that have been approved by the host)',
+            defaultValue: false,
+          },
         },
       },
       contributors: {
@@ -1080,6 +1085,11 @@ const CollectiveFields = () => {
         },
         role: { type: GraphQLString },
         roles: { type: new GraphQLList(GraphQLString) },
+        onlyActiveCollectives: {
+          type: GraphQLBoolean,
+          description: 'Only return memberships for active collectives (that have been approved by the host)',
+          defaultValue: false,
+        },
       },
       resolve(collective, args) {
         const where = { MemberCollectiveId: collective.id };
@@ -1090,6 +1100,9 @@ const CollectiveFields = () => {
         const collectiveConditions = { deletedAt: null };
         if (args.type) {
           collectiveConditions.type = args.type;
+        }
+        if (args.onlyActiveCollectives) {
+          collectiveConditions.isActive = true;
         }
         return models.Member.findAll({
           where,
