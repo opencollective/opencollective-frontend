@@ -51,3 +51,4 @@
 | HELLO_WORKS_CALLBACK_PATH           | .helloworks.callbackPath                    | HelloWorks callback path, eg. /helloworks/callback                |
 | HELLO_WORKS_DOCUMENT_ENCRYPTION_KEY | .helloworks.documentEncryptionKey           | base64 encoded secret key for encrypting document before storage. |
 | HELLO_WORKS_AWS_S3_BUCKET           | .helloworks.aws.s3.bucket                   | the bucket where tax forms will be uploaded                       |
+| GITHUB_FLOW_MIN_NB_STARS            | .githubFlow.minNbStars                 | Minimum number of Github stars required to apply to the open source collective    |

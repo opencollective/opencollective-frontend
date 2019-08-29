@@ -19,5 +19,8 @@
   },
   "stripe": {
     "redirectUri": "https://api-staging.opencollective.com/connected-accounts/stripe/callback"
+  },
+  "githubFlow": {
+    "minNbStars": 0
   }
 }

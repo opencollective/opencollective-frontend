@@ -9,8 +9,6 @@ import * as github from '../lib/github';
 
 const { ConnectedAccount, User } = models;
 
-const GITHUB_REPO_MIN_STAR = 100;
-
 export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
   const { utm_source, redirect } = req.query;
   const { service } = req.params;
@@ -170,7 +168,7 @@ export const fetchAllRepositories = async (req, res, next) => {
     let repos = await github.getAllUserPublicRepos(githubAccount.token);
     if (repos.length !== 0) {
       repos = repos.filter(repo => {
-        return repo.stargazers_count >= GITHUB_REPO_MIN_STAR && repo.fork === false;
+        return repo.stargazers_count >= config.githubFlow.minNbStars && repo.fork === false;
       });
     }
     res.send(repos);

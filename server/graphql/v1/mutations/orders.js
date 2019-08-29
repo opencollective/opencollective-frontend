@@ -155,9 +155,9 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
             message: 'We could not verify the GitHub repository',
           });
         }
-        if (repo.stargazers_count < 100) {
+        if (repo.stargazers_count < config.githubFlow.minNbStars) {
           throw new errors.ValidationFailed({
-            message: 'The repository need at least 100 GitHub stars to be pledged.',
+            message: `The repository need at least ${config.githubFlow.minNbStars} GitHub stars to be pledged.`,
           });
         }
       } else {
@@ -169,10 +169,10 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
           });
         }
         const allRepos = await github.getAllOrganizationPublicRepos(githubHandle).catch(() => null);
-        const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= 100);
+        const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= config.githubFlow.minNbStars);
         if (!repoWith100stars) {
           throw new errors.ValidationFailed({
-            message: 'The organization need at least one repository with 100 GitHub stars to be pledged.',
+            message: `The organization need at least one repository with ${config.githubFlow.minNbStars} GitHub stars to be pledged.`,
           });
         }
       }
