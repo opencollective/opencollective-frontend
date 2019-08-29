@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { get, set } from 'lodash';
@@ -9,22 +8,14 @@ import { get, set } from 'lodash';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledCard from '../StyledCard';
-
-const EditCollectiveSettings = gql`
-  mutation EditCollective($id: Int!, $settings: JSON) {
-    editCollective(collective: { id: $id, settings: $settings }) {
-      id
-      settings
-    }
-  }
-`;
+import { EditCollectiveSettingsMutation } from './graphql/mutations';
 
 const colorPath = 'collectivePage.primaryColor';
 
 const CollectiveColorPicker = ({ collective, onChange, onClose }) => {
   const [newColor, setValue] = React.useState(get(collective.settings, colorPath, '#000000'));
   return (
-    <Mutation mutation={EditCollectiveSettings}>
+    <Mutation mutation={EditCollectiveSettingsMutation}>
       {(editSettings, { loading }) => (
         <StyledCard
           px={2}

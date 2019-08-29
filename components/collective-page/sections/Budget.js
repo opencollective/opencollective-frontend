@@ -20,7 +20,7 @@ import MessageBox from '../../MessageBox';
 import StyledLink from '../../StyledLink';
 
 import ContainerSectionContent from '../ContainerSectionContent';
-import { TransactionsAndExpensesFragment } from '../fragments';
+import { TransactionsAndExpensesFragment } from '../graphql/fragments';
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`

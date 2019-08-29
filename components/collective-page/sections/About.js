@@ -12,6 +12,7 @@ import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
+import { EditCollectiveLongDescriptionMutation } from '../graphql/mutations';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -27,7 +28,7 @@ const Markdown = dynamic(() => import('react-markdown'));
 /**
  * Display the inline editable description section for the collective
  */
-const SectionAbout = ({ collective, canEdit, editMutation }) => {
+const SectionAbout = ({ collective, canEdit }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   canEdit = collective.isArchived ? false : canEdit;
@@ -48,7 +49,7 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
 
       <Container width="100%" maxWidth={700} margin="0 auto">
         <InlineEditField
-          mutation={editMutation}
+          mutation={EditCollectiveLongDescriptionMutation}
           values={collective}
           field="longDescription"
           canEdit={canEdit}
@@ -121,8 +122,7 @@ SectionAbout.propTypes = {
     type: PropTypes.string,
     isArchived: PropTypes.bool,
   }).isRequired,
-  /** A mutation used to update the description */
-  editMutation: PropTypes.object,
+
   /** Can user edit the description? */
   canEdit: PropTypes.bool,
 };

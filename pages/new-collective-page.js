@@ -13,7 +13,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
+import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
 import { getCollectivePrimaryColor } from '../components/collective-page/_utils';
 
@@ -272,8 +272,8 @@ const getCollective = graphql(gql`
     }
   }
 
-  ${TransactionsAndExpensesFragment}
-  ${UpdatesFieldsFragment}
+  ${fragments.TransactionsAndExpensesFragment}
+  ${fragments.UpdatesFieldsFragment}
 `);
 
 export default withUser(getCollective(NewCollectivePage));

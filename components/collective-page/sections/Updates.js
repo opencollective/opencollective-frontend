@@ -21,7 +21,7 @@ import StyledButton from '../../StyledButton';
 import HTMLContent from '../../HTMLContent';
 
 import ContainerSectionContent from '../ContainerSectionContent';
-import { UpdatesFieldsFragment } from '../fragments';
+import { UpdatesFieldsFragment } from '../graphql/fragments';
 
 /** Query to re-fetch updates */
 const UpdatesQuery = gql`
