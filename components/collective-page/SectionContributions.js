@@ -10,11 +10,12 @@ import roles from '../../lib/constants/roles';
 import { H2, P } from '../Text';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledMembershipCard from '../StyledMembershipCard';
-
-import ContainerSectionContent from './ContainerSectionContent';
-import EmptyCollectivesSectionImageSVG from './EmptyCollectivesSectionImage.svg';
 import StyledButton from '../StyledButton';
 import StyledFilters from '../StyledFilters';
+
+// Local imports
+import ContainerSectionContent from './ContainerSectionContent';
+import EmptyCollectivesSectionImageSVG from './images/EmptyCollectivesSectionImage.svg';
 
 const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
 const FILTERS_LIST = Object.values(FILTERS);

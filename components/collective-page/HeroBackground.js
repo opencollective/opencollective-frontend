@@ -15,7 +15,8 @@ import Container from '../Container';
 import StyledButton from '../StyledButton';
 import { Span } from '../Text';
 
-import HeroBackgroundMask from './HeroBackgroundMask.svg';
+// Local imports
+import HeroBackgroundMask from './images/HeroBackgroundMask.svg';
 
 const BASE_WIDTH = 1368;
 const BASE_HEIGHT = 325;

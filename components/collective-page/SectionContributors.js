@@ -11,9 +11,10 @@ import { P, H2, H3, Span } from '../Text';
 import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../ContributorsGrid';
 import * as ContributorsFilter from '../ContributorsFilter';
 
+// Local imports
 import { Dimensions } from './_constants';
 import ContainerSectionContent from './ContainerSectionContent';
-import ContributorsGridBackgroundSVG from './ContributorsGridBackground.svg';
+import ContributorsGridBackgroundSVG from './images/ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
