@@ -57,7 +57,7 @@
     "hashids": "1.2.2",
     "he": "1.2.0",
     "helloworks-sdk": "pietgeursen/helloworks-nodejs-sdk",
-    "helmet": "3.20.0",
+    "helmet": "3.20.1",
     "html-pdf": "2.2.0",
     "ics": "2.16.0",
     "intl-messageformat": "7.1.0",
