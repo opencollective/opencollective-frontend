@@ -197,7 +197,9 @@ const HeroAvatar = ({ collective, isAdmin }) => {
 HeroAvatar.propTypes = {
   collective: PropTypes.shape({
     type: PropTypes.string,
-  }),
+    image: PropTypes.string,
+    imageUrl: PropTypes.string,
+  }).isRequired,
   isAdmin: PropTypes.bool,
 };
 
