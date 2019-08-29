@@ -241,7 +241,7 @@ class Collective extends React.Component {
           `}
         </style>
 
-        <Header collective={collective} LoggedInUser={LoggedInUser} href={`/${collective.slug}`} />
+        <Header collective={collective} LoggedInUser={LoggedInUser} canonicalURL={`/${collective.slug}`} />
 
         <Body>
           <div className={classNames('CollectivePage', { archiveCollective: collective.isArchived })}>
