@@ -18,6 +18,7 @@ import StyledCard from '../StyledCard';
 import Link from '../Link';
 import Avatar from '../Avatar';
 import StyledButton from '../StyledButton';
+import HTMLContent from '../HTMLContent';
 
 import ContainerSectionContent from './ContainerSectionContent';
 import { UpdatesFieldsFragment } from './fragments';
@@ -150,7 +151,7 @@ class SectionUpdates extends React.PureComponent {
                       </P>
                     </Link>
                     {update.userCanSeeUpdate ? (
-                      <P color="black.700" dangerouslySetInnerHTML={{ __html: update.summary }} />
+                      <HTMLContent content={update.summary} />
                     ) : (
                       <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
                         <FormattedMessage

@@ -50,6 +50,7 @@ pages
   )
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
+  .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
   .add('discover', '/discover');
 
 // Tier page

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { capitalize, omit, uniqBy, get } from 'lodash';
+import { capitalize, omit, uniqBy, get, remove } from 'lodash';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -126,7 +126,15 @@ const useForm = ({ onProfileChange }) => {
 /**
  * Search is displayed if 5 or more profiles are passed in.
  */
-const StepProfile = ({ intl, onProfileChange, personal, profiles, defaultSelectedProfile, ...fieldProps }) => {
+const StepProfile = ({
+  intl,
+  onProfileChange,
+  personal,
+  profiles,
+  defaultSelectedProfile,
+  canUseIncognito,
+  ...fieldProps
+}) => {
   const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ onProfileChange });
   if (state.search) {
     const test = new RegExp(escapeInput(state.search), 'i');
@@ -136,9 +144,18 @@ const StepProfile = ({ intl, onProfileChange, personal, profiles, defaultSelecte
   const options = uniqBy([personal, ...profiles], 'id');
 
   // if the user doesn't have an incognito profile yet, we offer to create one
-  const incognitoProfile = options.find(p => p.type === 'USER' && p.isIncognito);
-  if (!incognitoProfile) {
-    options.push({ id: 'incognito', type: 'USER', isIncognito: true, name: intl.formatMessage(messages['incognito']) });
+  if (canUseIncognito) {
+    const incognitoProfile = options.find(p => p.type === 'USER' && p.isIncognito);
+    if (!incognitoProfile) {
+      options.push({
+        id: 'incognito',
+        type: 'USER',
+        isIncognito: true,
+        name: intl.formatMessage(messages['incognito']),
+      });
+    }
+  } else {
+    remove(options, p => p.isIncognito);
   }
 
   options.push({ id: 'org.new', type: 'ORGANIZATION', name: intl.formatMessage(messages['org.new']) });
@@ -290,6 +307,7 @@ StepProfile.propTypes = {
    */
   intl: PropTypes.object.isRequired,
   onProfileChange: PropTypes.func,
+  canUseIncognito: PropTypes.bool,
   defaultSelectedProfile: PropTypes.shape({
     id: PropTypes.number,
   }),
@@ -314,6 +332,7 @@ StepProfile.propTypes = {
 
 StepProfile.defaultProps = {
   onProfileChange: () => {}, // noop
+  canUseIncognito: true,
 };
 
 export default injectIntl(StepProfile);

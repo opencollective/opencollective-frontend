@@ -53,6 +53,10 @@ const StyledButtonContent = styled.button`
   ${layout}
   ${typography}
   ${textTransform}
+
+  & > * {
+    vertical-align: middle;
+  }
 `;
 
 const StyledButton = ({ loading, ...props }) =>

@@ -14,7 +14,7 @@ describe('Contribution Flow: Order', () => {
     // safe to delete these tests.
     it('with /apex/contribute/tier/470-sponsors', () => {
       cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
-      cy.contains("Contribute to 'Sponsors' tier");
+      cy.contains('Contribute to "Sponsors" tier');
       cy.contains('button', 'Next').click();
       // Ensure we enforce the new URLs
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/details');
@@ -22,7 +22,7 @@ describe('Contribution Flow: Order', () => {
 
     it('with /apex/donate/tier/470-sponsors', () => {
       cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
-      cy.contains("Contribute to 'Sponsors' tier");
+      cy.contains('Contribute to "Sponsors" tier');
       cy.contains('button', 'Next').click();
       // Ensure we enforce the new URLs
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/details');
@@ -32,7 +32,7 @@ describe('Contribution Flow: Order', () => {
   describe('route resiliance', () => {
     it('with a multipart slug', () => {
       cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
-      cy.contains("Contribute to 'Sponsors' tier");
+      cy.contains('Contribute to "Sponsors" tier');
       cy.contains('button', 'Next').click();
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/details');
     });
@@ -82,7 +82,7 @@ describe('Contribution Flow: Order', () => {
 
       // ---- Final: Success ----
       cy.get('#page-order-success', { timeout: 20000 }).contains('$500.00 USD / mo.');
-      cy.contains(`${user.firstName} ${user.lastName} is now a member of APEX's 'Sponsors' tier!`);
+      cy.contains(`${user.firstName} ${user.lastName} is now a member of APEX's "Sponsors" tier!`);
     });
   });
 
@@ -124,7 +124,7 @@ describe('Contribution Flow: Order', () => {
           }
           cy.get('#page-order-success', { timeout: 20000 }).contains('$100.00 USD / mo.');
           // TestOrg is the name of the created organization.
-          cy.contains("TestOrg is now a member of APEX's 'Sponsors' tier!");
+          cy.contains('TestOrg is now a member of APEX\'s "Sponsors" tier!');
         });
       });
     });

@@ -29,12 +29,13 @@ const Markdown = dynamic(() => import('react-markdown'));
  */
 const SectionAbout = ({ collective, canEdit, editMutation }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
+  const isCollective = collective.type === CollectiveType.COLLECTIVE;
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
     <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 5]}>
       <H3 fontSize="H2" lineHeight="H2" fontWeight="normal" textAlign="center" mb={5}>
-        {collective.type === CollectiveType.COLLECTIVE ? (
+        {isCollective ? (
           <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
         ) : (
           <FormattedMessage
@@ -70,14 +71,16 @@ const SectionAbout = ({ collective, canEdit, editMutation }) => {
                 <Flex justifyContent="center">
                   {canEdit ? (
                     <Flex flexDirection="column" alignItems="center">
-                      <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
-                        <FormattedMessage
-                          id="SectionAbout.Why"
-                          defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"
-                        />
-                      </MessageBox>
+                      {isCollective && (
+                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
+                          <FormattedMessage
+                            id="SectionAbout.Why"
+                            defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"
+                          />
+                        </MessageBox>
+                      )}
                       <StyledButton buttonSize="large" onClick={enableEditor}>
-                        <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add your mission" />
+                        <FormattedMessage id="CollectivePage.AddLongDescription" defaultMessage="Add a description" />
                       </StyledButton>
                     </Flex>
                   ) : (

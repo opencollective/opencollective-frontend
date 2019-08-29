@@ -1,6 +1,7 @@
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
 import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
+import { CreditCards } from '../../stripe-helpers';
 
 /**
  * Login with an exising account. If not provided in `params`, the email used for
@@ -276,17 +277,16 @@ function getLoggedInUserFromToken(token) {
   });
 }
 
-function fillStripeInput(
-  container,
-  cardParams = {
-    creditCardNumber: '4242424242424242',
-    expirationDate: '1250',
-    cvcCode: '123',
-    postalCode: '42222',
-  },
-) {
+/**
+ * @param {object} params
+ *   - container
+ *   - card
+ */
+function fillStripeInput(params) {
+  const { container, card } = params || {};
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
   const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
+  const cardParams = card || CreditCards.CARD_DEFAULT;
 
   return iframePromise.then(iframe => {
     const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;

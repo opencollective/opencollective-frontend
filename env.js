@@ -14,7 +14,7 @@ const defaults = {
   INVOICES_URL: 'https://invoices-staging.opencollective.com',
   GIFTCARDS_GENERATOR_URL: 'https://giftcards-generator-staging.opencollective.com',
   PAYPAL_ENVIRONMENT: 'sandbox',
-  STRIPE_KEY: 'pk_test_5aBB887rPuzvWzbdRiSzV3QB',
+  STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',
   GOOGLE_MAPS_API_KEY: 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
   RECAPTCHA_ENABLED: false,

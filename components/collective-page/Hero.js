@@ -9,7 +9,9 @@ import { get } from 'lodash';
 import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
 import { ExternalLink } from 'styled-icons/feather/ExternalLink';
-import { Cog } from 'styled-icons/typicons/Cog';
+import { Settings } from 'styled-icons/feather/Settings';
+import { Camera } from 'styled-icons/feather/Camera';
+import { Palette } from 'styled-icons/boxicons-regular/Palette';
 
 // General project imports
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -20,7 +22,6 @@ import StyledLink from '../StyledLink';
 import ExternalLinkNewTab from '../ExternalLinkNewTab';
 import { Span, H1 } from '../Text';
 import Container from '../Container';
-import Avatar from '../Avatar';
 import I18nCollectiveTags from '../I18nCollectiveTags';
 import StyledTag from '../StyledTag';
 import DefinedTerm, { Terms } from '../DefinedTerm';
@@ -28,11 +29,14 @@ import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import CollectiveCallsToAction from '../CollectiveCallsToAction';
 import UserCompany from '../UserCompany';
+import StyledButton from '../StyledButton';
 
 // Local imports
 import ContainerSectionContent from './ContainerSectionContent';
 import HeroBackground from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
+import CollectiveColorPicker from './CollectiveColorPicker';
+import HeroAvatar from './HeroAvatar';
 
 const Translations = defineMessages({
   website: {
@@ -67,42 +71,50 @@ const StyledShortDescription = styled.h2`
 /**
  * Collective's page Hero/Banner/Cover component.
  */
-const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
+const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, intl }) => {
+  const [hasColorPicker, showColorPicker] = React.useState(false);
+  const [isEditingCover, editCover] = React.useState(false);
+  const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
-  const hasContact = (isCollective || collective.isHost) && !isAdmin;
-  const hasDashboard = collective.isHost && isAdmin;
 
   return (
     <Container position="relative" minHeight={325} zIndex={1000}>
-      <HeroBackground backgroundImage={collective.backgroundImage} />
+      <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
+      {isAdmin && !isEditing && (
+        // We don't have any mobile view for this one yet
+        <Container display={['none', null, null, 'block']} position="absolute" right={25} top={25} zIndex={222}>
+          <StyledButton buttonStyle="secondary" onClick={() => editCover(true)}>
+            <Span mr={2}>
+              <Camera size="1.2em" />
+            </Span>
+            <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
+          </StyledButton>
+          <StyledButton buttonStyle="secondary" ml={3} onClick={() => showColorPicker(true)}>
+            <Span mr={2}>
+              <Palette size="1.2em" />
+            </Span>
+            <FormattedMessage id="Hero.EditColor" defaultMessage="Edit main color" />
+          </StyledButton>
+        </Container>
+      )}
+      {hasColorPicker && (
+        <Container position="fixed" right={25} top={72} zIndex={99999}>
+          <CollectiveColorPicker
+            collective={collective}
+            onChange={onPrimaryColorChange}
+            onClose={() => showColorPicker(false)}
+          />
+        </Container>
+      )}
       <ContainerSectionContent pt={40} display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
         {/* Collective presentation (name, logo, description...) */}
         <Flex flexDirection={'column'} alignItems={['center', 'flex-start']}>
-          <Container position="relative" display="flex" justifyContent={['center', 'flex-start']}>
-            <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-              <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%">
-                <Avatar collective={collective} radius={128} />
-              </Container>
-            </LinkCollective>
-            {isAdmin && (
-              <Container position="absolute" right={-10} bottom={-5} color="#4B4E52">
-                <Link
-                  route="editCollective"
-                  params={{ slug: collective.slug }}
-                  title={intl.formatMessage(Translations.settings)}
-                >
-                  <StyledRoundButton size={40} bg="#F0F2F5">
-                    <Cog size={24} />
-                  </StyledRoundButton>
-                </Link>
-              </Container>
-            )}
+          <Container position="relative" display="flex" justifyContent={['center', 'flex-start']} mb={2}>
+            <HeroAvatar collective={collective} isAdmin={isAdmin} />
           </Container>
-          <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-            <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', 'left']}>
-              {collective.name || collective.slug}
-            </H1>
-          </LinkCollective>
+          <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', 'left']}>
+            {collective.name || collective.slug}
+          </H1>
         </Flex>
 
         {collective.company && (
@@ -118,6 +130,17 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
             </StyledTag>
           )}
           <Flex my={2}>
+            {isAdmin && (
+              <Link
+                route="editCollective"
+                params={{ slug: collective.slug }}
+                title={intl.formatMessage(Translations.settings)}
+              >
+                <StyledRoundButton size={32} mr={3}>
+                  <Settings size={16} />
+                </StyledRoundButton>
+              </Link>
+            )}
             {collective.twitterHandle && (
               <ExternalLinkNewTab href={twitterProfileUrl(collective.twitterHandle)} title="Twitter">
                 <StyledRoundButton size={32} mr={3}>
@@ -195,8 +218,7 @@ const Hero = ({ collective, host, isAdmin, onCollectiveClick, intl }) => {
           display={['flex', 'none']}
           mt={3}
           collective={collective}
-          hasContact={hasContact}
-          hasDashboard={hasDashboard}
+          callsToAction={callsToAction}
         />
       </ContainerSectionContent>
     </Container>
@@ -231,8 +253,11 @@ Hero.propTypes = {
     slug: PropTypes.string.isRequired,
   }),
 
-  /** When users click on avatar or collective name */
-  onCollectiveClick: PropTypes.func.isRequired,
+  /** Show the color picker input */
+  onPrimaryColorChange: PropTypes.func.isRequired,
+
+  /** Defines which buttons get displayed. See `CollectiveCallsToAction` */
+  callsToAction: PropTypes.object,
 
   /** Define if we need to display special actions like the "Edit collective" button */
   isAdmin: PropTypes.bool,

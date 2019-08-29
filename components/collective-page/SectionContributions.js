@@ -185,15 +185,7 @@ class SectionContributions extends React.PureComponent {
             )}
             <Flex flexWrap="wrap" justifyContent={memberships.length >= 4 ? 'space-evenly' : 'left'}>
               {memberships.slice(0, nbMemberships).map(membership => (
-                <StyledMembershipCard
-                  key={membership.id}
-                  role={membership.role}
-                  description={membership.description}
-                  since={membership.since}
-                  toCollective={membership.collective}
-                  mb={40}
-                  mr={[1, 4]}
-                />
+                <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4]} />
               ))}
             </Flex>
             {nbMemberships < memberships.length && (
@@ -215,16 +207,21 @@ const withData = graphql(
     query SectionCollective($id: Int!) {
       Collective(id: $id) {
         id
-        memberOf {
+        memberOf(onlyActiveCollectives: true) {
           id
           role
           since
           description
+          stats {
+            id
+            totalDonations
+          }
           collective {
             id
             name
             slug
             type
+            currency
             isIncognito
             description
             backgroundImage
@@ -235,6 +232,14 @@ const withData = graphql(
             }
             host {
               id
+            }
+            stats {
+              id
+              yearlyBudget
+              backers {
+                id
+                all
+              }
             }
           }
         }

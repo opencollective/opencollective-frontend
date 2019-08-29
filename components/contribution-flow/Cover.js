@@ -22,13 +22,13 @@ const Cover = ({ collective, tier }) => {
           {tier.type === 'TICKET' ? (
             <FormattedMessage
               id="contribute.ticketType"
-              defaultMessage="Order a '{name}' ticket"
+              defaultMessage='Order a "{name}" ticket'
               values={{ name: tier.name }}
             />
           ) : (
             <FormattedMessage
               id="contribute.contributorType"
-              defaultMessage="Contribute to '{name}' tier"
+              defaultMessage='Contribute to "{name}" tier'
               values={{ name: tier.name }}
             />
           )}

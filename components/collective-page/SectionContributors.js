@@ -5,10 +5,11 @@ import { Box } from '@rebass/grid';
 import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import Container from '../Container';
 import { P, H2, H3, Span } from '../Text';
 import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../ContributorsGrid';
-import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
+import * as ContributorsFilter from '../ContributorsFilter';
 
 import { Dimensions } from './_constants';
 import ContainerSectionContent from './ContainerSectionContent';
@@ -32,7 +33,10 @@ const MainContainer = styled(Container)`
  */
 export default class SectionContributors extends React.PureComponent {
   static propTypes = {
-    collectiveName: PropTypes.string.isRequired,
+    collective: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+    }),
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
@@ -50,7 +54,7 @@ export default class SectionContributors extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.state = { filter: null };
+    this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
   }
 
   setFilter = filter => {
@@ -58,8 +62,8 @@ export default class SectionContributors extends React.PureComponent {
   };
 
   // Memoize filtering functions as they can get expensive if there are a lot of contributors
-  getContributorsFilters = memoizeOne(getContributorsFilters);
-  filterContributors = memoizeOne(filterContributors);
+  getContributorsFilters = memoizeOne(ContributorsFilter.getContributorsFilters);
+  filterContributors = memoizeOne(ContributorsFilter.filterContributors);
   sortContributors = memoizeOne(contributors => {
     // Sort contributors: core contributors are always first, then we sort by total amount donated
     // We make a copy of the array because mutation could break memoization for future renderings
@@ -86,41 +90,51 @@ export default class SectionContributors extends React.PureComponent {
   });
 
   render() {
-    const { collectiveName, contributors } = this.props;
+    const { collective, contributors } = this.props;
     const { filter } = this.state;
-    const hasFilters = contributors.length >= SectionContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
+    const onlyShowCore = collective.type === CollectiveType.ORGANIZATION;
+    const hasFilters = !onlyShowCore && contributors.length >= SectionContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
+    const activeFilter = onlyShowCore ? ContributorsFilter.CONTRIBUTOR_FILTERS.CORE : filter;
     const filters = hasFilters && this.getContributorsFilters(contributors);
-    const filteredContributors = hasFilters ? this.filterContributors(contributors, filter) : contributors;
+    const filteredContributors = this.filterContributors(contributors, activeFilter);
     const sortedContributors = this.sortContributors(filteredContributors);
 
     return (
       <MainContainer py={[4, 5]}>
         <ContainerSectionContent>
-          <H2 mb={4} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
-            <FormattedMessage
-              id="CollectivePage.AllOfUs"
-              defaultMessage="{collectiveName} is all of us"
-              values={{ collectiveName }}
-            />
-          </H2>
-          <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
-            <FormattedMessage
-              id="CollectivePage.OurContributors"
-              defaultMessage="Our contributors {count}"
-              values={{ count: <Span color="black.400">{contributors.length}</Span> }}
-            />
-          </H3>
-          <P color="black.600" mb={4}>
-            <FormattedMessage
-              id="CollectivePage.ContributorsDescription"
-              defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
-              values={{ collectiveName }}
-            />
-          </P>
+          {!onlyShowCore ? (
+            <React.Fragment>
+              <H2 mb={4} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
+                <FormattedMessage
+                  id="CollectivePage.AllOfUs"
+                  defaultMessage="{collectiveName} is all of us"
+                  values={{ collectiveName: collective.name }}
+                />
+              </H2>
+              <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+                <FormattedMessage
+                  id="CollectivePage.OurContributors"
+                  defaultMessage="Our contributors {count}"
+                  values={{ count: <Span color="black.400">{contributors.length}</Span> }}
+                />
+              </H3>
+              <P color="black.600" mb={4}>
+                <FormattedMessage
+                  id="CollectivePage.ContributorsDescription"
+                  defaultMessage="Everyone who has supported {collectiveName}. Individuals and organizations that believe in –and take ownership of– our purpose."
+                  values={{ collectiveName: collective.name }}
+                />
+              </P>
+            </React.Fragment>
+          ) : (
+            <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
+              <FormattedMessage id="ContributorsFilter.Core" defaultMessage="Core contributors" />
+            </H2>
+          )}
         </ContainerSectionContent>
         {hasFilters && filters.length > 2 && (
           <Container maxWidth={Dimensions.MAX_SECTION_WIDTH - 30} margin="0 auto">
-            <ContributorsFilter
+            <ContributorsFilter.default
               selected={filter}
               onChange={this.setFilter}
               filters={filters}

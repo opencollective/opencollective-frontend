@@ -12,7 +12,7 @@ import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { defaultBackgroundImage } from '../lib/constants/collectives';
+import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
 import Link from './Link';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
@@ -174,11 +174,17 @@ ${description}`;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
     const useNewCollectiveNavbar = ncpIsDefault || get(collective, 'settings.collectivePage.useV2');
+    const isEvent = type === CollectiveType.EVENT;
 
-    if (useNewCollectiveNavbar) {
+    if (!isEvent && useNewCollectiveNavbar) {
       return (
         <Container borderTop="1px solid #E6E8EB" mb={4}>
-          <CollectiveNavbar collective={collective} isAdmin={canEdit} showEdit {...this.props.callsToAction} />
+          <CollectiveNavbar
+            collective={collective}
+            isAdmin={canEdit}
+            showEdit
+            callsToAction={this.props.callsToAction}
+          />
         </Container>
       );
     }

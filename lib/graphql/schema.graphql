@@ -1,5 +1,5 @@
-# source: http://localhost:3000/api/graphql
-# timestamp: Tue Aug 20 2019 11:08:52 GMT+0200 (GMT+02:00)
+# source: http://localhost:3060/graphql
+# timestamp: Thu Aug 29 2019 10:01:51 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -160,6 +160,11 @@ type Collective implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -385,6 +390,11 @@ interface CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -660,6 +670,13 @@ type CommentType {
   collective: CollectiveInterface
   expense: ExpenseType
   update: UpdateType
+}
+
+"""
+Input type for ConfirmOrderType
+"""
+input ConfirmOrderInputType {
+  id: Int
 }
 
 """
@@ -939,6 +956,11 @@ type Event implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -1452,6 +1474,7 @@ type Mutation {
   """
   editMembership(id: Int!, publicMessage: String): Member
   createOrder(order: OrderInputType!): OrderType
+  confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
@@ -1621,6 +1644,7 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
+  backyourstackDispatchOrder(id: Int!): [OrderType]
 }
 
 """
@@ -1920,6 +1944,7 @@ type OrderType {
   Additional information on order: tax and custom fields
   """
   data: JSON
+  stripeError: StripeError
 }
 
 """
@@ -2022,6 +2047,11 @@ type Organization implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -2219,6 +2249,7 @@ type PaymentMethodType {
   """
   fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
+  stripeError: StripeError
 }
 
 """
@@ -2517,6 +2548,12 @@ input StripeCreditCardDataInputType {
   country: String
   funding: String
   zip: String
+}
+
+type StripeError {
+  message: String
+  account: String
+  response: JSON
 }
 
 """
@@ -2935,6 +2972,11 @@ type User implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -3028,7 +3070,6 @@ type UserDetails {
   email: String
   emailWaitingForValidation: String
   memberOf: [Member]
-  billingAddress: String
   paypalEmail: String
 }
 
