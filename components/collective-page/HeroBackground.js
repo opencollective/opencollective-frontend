@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, set } from 'lodash';
+import { get, set, has } from 'lodash';
 
 import { Upload } from 'styled-icons/feather/Upload';
 
@@ -110,6 +110,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
   const [zoom, onZoomChange] = React.useState(getZoom(collective));
   const [uploadedImage, setUploadedImage] = React.useState();
   const [submitting, setSubmitting] = React.useState(false);
+  const hasBackgroundSettings = has(collective.settings, 'collectivePage.background');
 
   return !isEditing ? (
     <StyledBackground>
@@ -117,7 +118,11 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
         <ImageContainer>
           <BackgroundImage
             src={collective.backgroundImage}
-            style={{ transform: `translate(${crop.x}px, ${crop.y}px) scale(${zoom})` }}
+            style={
+              hasBackgroundSettings
+                ? { transform: `translate(${crop.x}px, ${crop.y}px) scale(${zoom})` }
+                : { minWidth: '100%' }
+            }
           />
         </ImageContainer>
       )}
