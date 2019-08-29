@@ -1372,7 +1372,7 @@ const CollectiveFields = () => {
         onlyPublishedUpdates: { type: GraphQLBoolean },
       },
       resolve(collective, args) {
-        const query = { where: { CollectiveId: collective.id } };
+        const query = { where: { CollectiveId: collective.id }, order: [['createdAt', 'DESC']] };
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         if (args.onlyPublishedUpdates) query.where.publishedAt = { [Op.ne]: null };
