@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Aug 20 2019 21:25:30 GMT+0200 (Central European Summer Time)
+# timestamp: Thu Aug 29 2019 10:01:51 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -160,6 +160,11 @@ type Collective implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -385,6 +390,11 @@ interface CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -946,6 +956,11 @@ type Event implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -1629,6 +1644,7 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
+  backyourstackDispatchOrder(id: Int!): [OrderType]
 }
 
 """
@@ -2031,6 +2047,11 @@ type Organization implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -2951,6 +2972,11 @@ type User implements CollectiveInterface {
     type: String
     role: String
     roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
   ): [Member]
 
   """
@@ -3044,7 +3070,6 @@ type UserDetails {
   email: String
   emailWaitingForValidation: String
   memberOf: [Member]
-  billingAddress: String
   paypalEmail: String
 }
 
