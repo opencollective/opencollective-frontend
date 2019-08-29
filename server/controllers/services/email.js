@@ -7,16 +7,13 @@ import { pick, get } from 'lodash';
 import models, { sequelize, Op } from '../../models';
 import errors from '../../lib/errors';
 import emailLib from '../../lib/email';
-import { md5 } from '../../lib/utils';
 
 const debugEmail = debug('email');
 const debugWebhook = debug('webhook');
 
 export const unsubscribe = (req, res, next) => {
   const { type, email, slug, token } = req.params;
-
-  const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
-  const computedToken = md5(identifier);
+  const computedToken = emailLib.generateUnsubscribeToken(email, slug, type);
   if (token !== computedToken) {
     return next(new errors.BadRequest('Invalid token'));
   }
