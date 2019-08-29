@@ -207,7 +207,7 @@ const withData = graphql(
     query SectionCollective($id: Int!) {
       Collective(id: $id) {
         id
-        memberOf {
+        memberOf(onlyActiveCollectives: true) {
           id
           role
           since
