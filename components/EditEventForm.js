@@ -80,10 +80,12 @@ class EditEventForm extends React.Component {
         event['endsAt'] = value;
       }
     }
-    if (!value) {
-      this.setState({ disabled: true });
-    } else {
-      this.setState({ disabled: false });
+    if (fieldname === 'name') {
+      if (!event['name']) {
+        this.setState({ disabled: true });
+      } else {
+        this.setState({ disabled: false });
+      }
     }
 
     this.setState({ event: Object.assign({}, this.state.event, event) });
