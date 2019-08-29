@@ -7,20 +7,20 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
-import { formatCurrency } from '../../lib/utils';
-import { H2, H3, P, Span } from '../Text';
-import Container from '../Container';
-import MessageBox from '../MessageBox';
-import Avatar from '../Avatar';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import DebitCreditList, { DebitItem, CreditItem } from '../DebitCreditList';
-import StyledFilters from '../StyledFilters';
+import { formatCurrency } from '../../../lib/utils';
+import { H2, H3, P, Span } from '../../Text';
+import Container from '../../Container';
+import MessageBox from '../../MessageBox';
+import Avatar from '../../Avatar';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import DebitCreditList, { DebitItem, CreditItem } from '../../DebitCreditList';
+import StyledFilters from '../../StyledFilters';
 
-import ContainerSectionContent from './ContainerSectionContent';
-import LinkCollective from '../LinkCollective';
-import StyledLink from '../StyledLink';
-import StyledButton from '../StyledButton';
-import Link from '../Link';
+import ContainerSectionContent from '../ContainerSectionContent';
+import LinkCollective from '../../LinkCollective';
+import StyledLink from '../../StyledLink';
+import StyledButton from '../../StyledButton';
+import Link from '../../Link';
 
 const FILTERS = { ALL: 'ALL', CREDIT: 'CREDIT', DEBIT: 'DEBIT' };
 const FILTERS_LIST = Object.values(FILTERS);

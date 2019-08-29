@@ -4,18 +4,18 @@ import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import dynamic from 'next/dynamic';
 
-import { H3, Span } from '../Text';
-import HTMLContent, { isEmptyValue } from '../HTMLContent';
-import InlineEditField from '../InlineEditField';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import MessageBox from '../MessageBox';
-import { CollectiveType } from '../../lib/constants/collectives';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { H3, Span } from '../../Text';
+import HTMLContent, { isEmptyValue } from '../../HTMLContent';
+import InlineEditField from '../../InlineEditField';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import('./ReverseCompatibleHTMLEditor'), {
+const HTMLEditor = dynamic(() => import('../ReverseCompatibleHTMLEditor'), {
   loading: HTMLEditorLoadingPlaceholder,
   ssr: false, // No need for SSR as user needs to be logged in
 });

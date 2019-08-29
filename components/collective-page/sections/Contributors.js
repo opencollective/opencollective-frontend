@@ -5,16 +5,16 @@ import { Box } from '@rebass/grid';
 import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import Container from '../Container';
-import { P, H2, H3, Span } from '../Text';
-import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../ContributorsGrid';
-import * as ContributorsFilter from '../ContributorsFilter';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import Container from '../../Container';
+import { P, H2, H3, Span } from '../../Text';
+import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../../ContributorsGrid';
+import * as ContributorsFilter from '../../ContributorsFilter';
 
 // Local imports
-import { Dimensions } from './_constants';
-import ContainerSectionContent from './ContainerSectionContent';
-import ContributorsGridBackgroundSVG from './images/ContributorsGridBackground.svg';
+import { Dimensions } from '../_constants';
+import ContainerSectionContent from '../ContainerSectionContent';
+import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`

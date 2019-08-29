@@ -12,13 +12,13 @@ import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar'
 // Collective page imports
 import { Sections } from './_constants';
 import Hero from './Hero';
-import SectionAbout from './SectionAbout';
-import SectionBudget from './SectionBudget';
-import SectionContribute from './SectionContribute';
-import SectionContributors from './SectionContributors';
-import SectionUpdates from './SectionUpdates';
-import SectionContributions from './SectionContributions';
-import SectionTransactions from './SectionTransactions';
+import SectionAbout from './sections/About';
+import SectionBudget from './sections/Budget';
+import SectionContribute from './sections/Contribute';
+import SectionContributors from './sections/Contributors';
+import SectionUpdates from './sections/Updates';
+import SectionContributions from './sections/Contributions';
+import SectionTransactions from './sections/Transactions';
 
 /** A mutation used by child components to update the collective */
 const EditCollectiveMutation = gql`
