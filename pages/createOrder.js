@@ -59,7 +59,6 @@ class CreateOrderPage extends React.Component {
       interval: query.interval,
       verb: query.verb,
       redirect: query.redirect,
-      referral: query.referral,
       customData: query.data,
     };
   }
@@ -75,7 +74,6 @@ class CreateOrderPage extends React.Component {
     step: PropTypes.string,
     customData: PropTypes.object,
     redirect: PropTypes.string,
-    referral: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from injectIntl
   };
@@ -127,7 +125,6 @@ class CreateOrderPage extends React.Component {
           tier={data.Tier}
           verb={this.props.verb}
           step={this.props.step}
-          referral={this.props.referral}
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}

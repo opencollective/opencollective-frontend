@@ -19,7 +19,6 @@ class TierCard extends React.Component {
     tier: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
     className: PropTypes.string,
-    referral: PropTypes.string,
     intl: PropTypes.object.isRequired,
   };
 
@@ -93,7 +92,7 @@ class TierCard extends React.Component {
   }
 
   render() {
-    const { collective, tier, referral, intl } = this.props;
+    const { collective, tier, intl } = this.props;
     const amount = tier.presets ? tier.minimumAmount : tier.amount;
     const disabled = (amount > 0 && !collective.isActive) || tier.stats.availableQuantity === 0;
     const totalActiveDistinctOrders = tier.stats.totalActiveDistinctOrders;
@@ -118,10 +117,6 @@ class TierCard extends React.Component {
       params: { collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' },
       anchor: '#content',
     };
-
-    if (referral) {
-      linkRoute.params.referral = referral;
-    }
 
     return (
       <div className={classNames('TierCard', this.props.className, this.anchor)}>

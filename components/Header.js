@@ -5,8 +5,7 @@ import { get } from 'lodash';
 
 import TopBar from './TopBar';
 
-import storage from '../lib/storage';
-import { truncate, getQueryParams, getCollectiveImage } from '../lib/utils';
+import { truncate, getCollectiveImage } from '../lib/utils';
 
 class Header extends React.Component {
   static propTypes = {
@@ -20,13 +19,6 @@ class Header extends React.Component {
     title: PropTypes.string,
     showSearch: PropTypes.bool,
   };
-
-  componentDidMount() {
-    const urlParams = getQueryParams();
-    if (urlParams.referral) {
-      storage.set('referral', urlParams.referral, 48 * 60 * 60 * 1000); // we keep the referral for 48h or until we receive a new ?referral=
-    }
-  }
 
   getTitle() {
     let title = this.props.title;
