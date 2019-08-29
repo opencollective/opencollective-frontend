@@ -182,7 +182,7 @@ const TopContributors = ({ organizations, individuals, currency }) => {
 
   return (
     <TopContributorsContainer>
-      <Container maxWidth={1050} m="0 auto" px={[15, 30]}>
+      <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
         <H4 fontWeight="normal" color="black.700" mb={3}>
           <FormattedMessage id="SectionContribute.TopContributors" defaultMessage="Top financial contributors" />
         </H4>
