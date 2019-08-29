@@ -216,7 +216,7 @@
   "collective.user.orderProcessing.message": "В данный момент мы проверяем ваше пожертвование в {collective}. Мы добавим эту информацию в ваш профиль, и пришлём вам подтверждающее письмо, как только платёж будет подтверждён.",
   "collective.website.description": "Enter the URL of your website or Facebook Page",
   "collective.website.label": "Сайт",
-  "CollectivePage.AddLongDescription": "Add your mission",
+  "CollectivePage.AddLongDescription": "Add a description",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
   "CollectivePage.Contribute": "Contribute",
   "CollectivePage.Contribute.Custom": "Donation",
