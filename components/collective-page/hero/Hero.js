@@ -14,25 +14,25 @@ import { Camera } from 'styled-icons/feather/Camera';
 import { Palette } from 'styled-icons/boxicons-regular/Palette';
 
 // General project imports
-import { CollectiveType } from '../../lib/constants/collectives';
-import { getCollectiveMainTag } from '../../lib/collective.lib';
-import { twitterProfileUrl, githubProfileUrl } from '../../lib/url_helpers';
-import StyledRoundButton from '../StyledRoundButton';
-import StyledLink from '../StyledLink';
-import ExternalLinkNewTab from '../ExternalLinkNewTab';
-import { Span, H1 } from '../Text';
-import Container from '../Container';
-import I18nCollectiveTags from '../I18nCollectiveTags';
-import StyledTag from '../StyledTag';
-import DefinedTerm, { Terms } from '../DefinedTerm';
-import Link from '../Link';
-import LinkCollective from '../LinkCollective';
-import CollectiveCallsToAction from '../CollectiveCallsToAction';
-import UserCompany from '../UserCompany';
-import StyledButton from '../StyledButton';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { getCollectiveMainTag } from '../../../lib/collective.lib';
+import { twitterProfileUrl, githubProfileUrl } from '../../../lib/url_helpers';
+import StyledRoundButton from '../../StyledRoundButton';
+import StyledLink from '../../StyledLink';
+import ExternalLinkNewTab from '../../ExternalLinkNewTab';
+import { Span, H1 } from '../../Text';
+import Container from '../../Container';
+import I18nCollectiveTags from '../../I18nCollectiveTags';
+import StyledTag from '../../StyledTag';
+import DefinedTerm, { Terms } from '../../DefinedTerm';
+import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
+import CollectiveCallsToAction from '../../CollectiveCallsToAction';
+import UserCompany from '../../UserCompany';
+import StyledButton from '../../StyledButton';
 
 // Local imports
-import ContainerSectionContent from './ContainerSectionContent';
+import ContainerSectionContent from '../ContainerSectionContent';
 import HeroBackground from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 import CollectiveColorPicker from './CollectiveColorPicker';

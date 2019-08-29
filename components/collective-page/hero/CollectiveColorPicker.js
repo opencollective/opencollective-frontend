@@ -5,10 +5,10 @@ import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { get, set } from 'lodash';
 
-import StyledButton from '../StyledButton';
-import StyledInput from '../StyledInput';
-import StyledCard from '../StyledCard';
-import { EditCollectiveSettingsMutation } from './graphql/mutations';
+import StyledButton from '../../StyledButton';
+import StyledInput from '../../StyledInput';
+import StyledCard from '../../StyledCard';
+import { EditCollectiveSettingsMutation } from '../graphql/mutations';
 
 const colorPath = 'collectivePage.primaryColor';
 

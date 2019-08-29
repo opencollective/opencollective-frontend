@@ -8,15 +8,15 @@ import { get, set, has } from 'lodash';
 
 import { Upload } from 'styled-icons/feather/Upload';
 
-import { upload } from '../../lib/api';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import { Span } from '../Text';
+import { upload } from '../../../lib/api';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import { Span } from '../../Text';
 
 // Local imports
-import { EditCollectiveBackgroundMutation } from './graphql/mutations';
-import HeroBackgroundMask from './images/HeroBackgroundMask.svg';
+import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
+import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
 
 const BASE_WIDTH = 1368;
 const BASE_HEIGHT = 325;

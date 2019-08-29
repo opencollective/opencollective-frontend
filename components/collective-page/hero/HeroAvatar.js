@@ -7,14 +7,14 @@ import { Mutation } from 'react-apollo';
 
 import { Camera } from 'styled-icons/feather/Camera';
 
-import { upload } from '../../lib/api';
-import { getAvatarBorderRadius } from '../../lib/utils';
-import Avatar from '../Avatar';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import StyledRoundButton from '../StyledRoundButton';
-import StyledButton from '../StyledButton';
-import Container from '../Container';
-import { EditAvatarMutation } from './graphql/mutations';
+import { upload } from '../../../lib/api';
+import { getAvatarBorderRadius } from '../../../lib/utils';
+import Avatar from '../../Avatar';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import StyledRoundButton from '../../StyledRoundButton';
+import StyledButton from '../../StyledButton';
+import Container from '../../Container';
+import { EditAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
 

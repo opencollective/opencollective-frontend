@@ -10,7 +10,7 @@ import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar'
 
 // Collective page imports
 import { Sections } from './_constants';
-import Hero from './Hero';
+import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionContribute from './sections/Contribute';
