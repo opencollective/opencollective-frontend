@@ -170,6 +170,7 @@ const getCollective = graphql(gql`
       isHost
       hostFeePercent
       image
+      imageUrl
       stats {
         id
         balance
