@@ -216,7 +216,7 @@
   "collective.user.orderProcessing.message": "We zijn momenteel je donatie aan {collective} aan het verwerken. We zullen het toevoegen aan je profiel en je een email sturen zodra de betaling bevestigd is.",
   "collective.website.description": "Geef de URL in van je website of Facebook pagina",
   "collective.website.label": "Website",
-  "CollectivePage.AddLongDescription": "Voeg je missie toe",
+  "CollectivePage.AddLongDescription": "Add a description",
   "CollectivePage.AllOfUs": "wij zijn {collectiveName}",
   "CollectivePage.Contribute": "Draag bij",
   "CollectivePage.Contribute.Custom": "Donation",

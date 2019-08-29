@@ -216,7 +216,7 @@
   "collective.user.orderProcessing.message": "We are currently processing your donation to {collective}. We will add it to your profile and we will send you a confirmation email once the payment is confirmed.",
   "collective.website.description": "Enter the URL of your website or Facebook Page",
   "collective.website.label": "Website",
-  "CollectivePage.AddLongDescription": "Add your mission",
+  "CollectivePage.AddLongDescription": "Add a description",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
   "CollectivePage.Contribute": "Contribute",
   "CollectivePage.Contribute.Custom": "Donation",
