@@ -49,7 +49,7 @@ describe('New collective page', () => {
     it('Can add description to about section', () => {
       const richDescription = 'Hello{selectall}{ctrl}B{rightarrow}{ctrl}B world!';
       cy.get('#section-about').scrollIntoView();
-      cy.contains('#section-about button', 'Add your mission').click();
+      cy.contains('#section-about button', 'Add a description').click();
       cy.get('#section-about [data-cy="HTMLEditor"] .ql-editor').type(richDescription);
       cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
       cy.get('[data-cy="longDescription"]').should('have.html', '<p><strong>Hello</strong> world!</p>');

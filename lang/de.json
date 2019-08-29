@@ -216,7 +216,7 @@
   "collective.user.orderProcessing.message": "Deine Spende für {collective} ist in Bearbeitung. Wir werden sie deinem Profil hinzufügen und dir eine Bestätigungsmail senden sobald die Zahlung bestätigt ist.",
   "collective.website.description": "Gib die URL deiner Webseite oder Facebook Seite ein",
   "collective.website.label": "Webseite",
-  "CollectivePage.AddLongDescription": "Add your mission",
+  "CollectivePage.AddLongDescription": "Add a description",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
   "CollectivePage.Contribute": "Spende",
   "CollectivePage.Contribute.Custom": "Donation",

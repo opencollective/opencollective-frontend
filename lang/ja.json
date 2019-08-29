@@ -216,7 +216,7 @@
   "collective.user.orderProcessing.message": "We are currently processing your donation to {collective}. We will add it to your profile and we will send you a confirmation email once the payment is confirmed.",
   "collective.website.description": "あなたのウェブサイトまたは Facebook ページの URL を入力してください",
   "collective.website.label": "ウェブサイト",
-  "CollectivePage.AddLongDescription": "Add your mission",
+  "CollectivePage.AddLongDescription": "Add a description",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
   "CollectivePage.Contribute": "Contribute",
   "CollectivePage.Contribute.Custom": "Donation",
