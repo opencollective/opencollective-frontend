@@ -29,6 +29,7 @@
       "apiKey": "API_KEY",
       "sessionSecret": "SESSION_SECRET",
       "jwtSecret": "JWT_SECRET",
+      "emailUnsubscribeSecret": "EMAIL_UNSUBSCRIBE_SECRET",
       "hashidSalt": "HASHID_SALT"
     }
   },

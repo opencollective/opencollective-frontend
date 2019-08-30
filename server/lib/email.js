@@ -58,7 +58,7 @@ const render = (template, data) => {
 };
 
 const generateUnsubscribeToken = (email, collectiveSlug, type) => {
-  const uid = `${email}.${collectiveSlug || 'any'}.${type}.${config.keys.opencollective.jwtSecret}`;
+  const uid = `${email}.${collectiveSlug || 'any'}.${type}.${config.keys.opencollective.emailUnsubscribeSecret}`;
   const token = md5(uid);
   return token;
 };
@@ -335,6 +335,7 @@ const emailLib = {
   render,
   getTemplateAttributes,
   sendMessage,
+  generateUnsubscribeToken,
   generateEmailFromTemplate,
   send: generateEmailFromTemplateAndSend,
 };
