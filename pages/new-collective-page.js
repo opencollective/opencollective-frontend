@@ -42,6 +42,9 @@ class NewCollectivePage extends React.Component {
         description: PropTypes.string,
         twitterHandle: PropTypes.string,
         image: PropTypes.string,
+        isApproved: PropTypes.bool,
+        isArchived: PropTypes.bool,
+        isHost: PropTypes.bool,
         parentCollective: PropTypes.shape({ image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
@@ -166,6 +169,7 @@ const getCollective = graphql(gql`
       type
       currency
       settings
+      isApproved
       isArchived
       isHost
       hostFeePercent

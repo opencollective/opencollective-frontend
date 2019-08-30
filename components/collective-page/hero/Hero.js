@@ -163,7 +163,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               </ExternalLinkNewTab>
             )}
           </Flex>
-          {host && (
+          {host && collective.isApproved && (
             <Container mx={1} color="#969ba3" my={2}>
               <FormattedMessage
                 id="Collective.Hero.Host"
@@ -233,6 +233,7 @@ Hero.propTypes = {
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     company: PropTypes.string,
+    isApproved: PropTypes.bool,
     backgroundImage: PropTypes.string,
     twitterHandle: PropTypes.string,
     githubHandle: PropTypes.string,
