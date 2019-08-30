@@ -1,6 +1,7 @@
 import * as utils from './utils';
 import models from '../server/models';
 import { expect } from 'chai';
+import { randEmail } from './stores';
 
 describe('graphql.connectedAccounts.test.js', () => {
   let user, admin, backer, collective, connectedAccount, connectedAccountData;
@@ -16,11 +17,9 @@ describe('graphql.connectedAccounts.test.js', () => {
   before(() => utils.resetTestDB());
 
   before(async () => {
-    user = await models.User.createUserWithCollective({ name: 'random user' });
-    backer = await models.User.createUserWithCollective({
-      name: 'backer user',
-    });
-    admin = await models.User.createUserWithCollective({ name: 'admin user' });
+    user = await models.User.createUserWithCollective({ email: randEmail(), name: 'random user' });
+    backer = await models.User.createUserWithCollective({ email: randEmail(), name: 'backer user' });
+    admin = await models.User.createUserWithCollective({ email: randEmail(), name: 'admin user' });
     collective = await models.Collective.create({ name: 'testcollective' });
     collective.addUserWithRole(admin, 'ADMIN');
     collective.addUserWithRole(backer, 'BACKER');

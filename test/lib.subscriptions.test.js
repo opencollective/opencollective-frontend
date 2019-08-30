@@ -10,6 +10,7 @@ import models from '../server/models';
 import emailLib from '../server/lib/email';
 import * as paymentsLib from '../server/lib/payments';
 import status from '../server/constants/order_status';
+import { randEmail } from './stores';
 
 // What's being tested
 import {
@@ -24,12 +25,8 @@ import {
 
 async function createOrderWithSubscription(interval, date, quantity = 1) {
   const payment = { amount: 1000, currency: 'USD', interval };
-  const user = await models.User.createUserWithCollective({
-    name: 'Test McTesterson',
-  });
-  const fromCollective = await models.Collective.create({
-    name: 'Donor Collective',
-  });
+  const user = await models.User.createUserWithCollective({ email: randEmail(), name: 'Test McTesterson' });
+  const fromCollective = await models.Collective.create({ email: randEmail(), name: 'Donor Collective' });
   const collective = await models.Collective.create({ name: 'Parcel' });
   const tier = await models.Tier.create({ name: 'backer', amount: 0 });
   const subscription = await models.Subscription.create({
@@ -506,9 +503,7 @@ describe('LibSubscription', () => {
 
     beforeEach(async () => {
       await utils.resetTestDB();
-      user = await models.User.createUserWithCollective({
-        name: 'Test McTesterson',
-      });
+      user = await models.User.createUserWithCollective({ email: randEmail(), name: 'Test McTesterson' });
       collective = await models.Collective.create({ name: 'Parcel' });
       tier = await models.Tier.create({ name: 'backer', amount: 0 });
     });

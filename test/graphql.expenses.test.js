@@ -1090,9 +1090,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       // And a backer user
-      const backer = await models.User.createUserWithCollective({
-        name: 'test backer user',
-      });
+      const backer = await models.User.createUserWithCollective({ email: store.randEmail(), name: 'test backer user' });
       await models.Member.create({
         CollectiveId: collective.id,
         MemberCollectiveId: backer.CollectiveId,
