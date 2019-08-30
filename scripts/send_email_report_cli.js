@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 import '../server/env';
 
+console.log('This script is being deprecated.');
+console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
+process.exit();
+
+/*
 import util from 'util';
 import childProcessPromise from 'child-process-promise';
 
@@ -38,10 +43,6 @@ const PG_DATABASE = process.env.PG_DATABASE || 'opencollective_prod_snapshot';
 
 const exec = childProcessPromise.exec;
 const execPromise = util.promisify(exec);
-
-console.log('This script is being deprecated.');
-console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
-process.exit();
 
 function getChoices(array) {
   return array.map(key => ({ title: key.template, value: key.command }));
@@ -159,3 +160,5 @@ main(process)
     console.error(err);
     process.exit(1);
   });
+
+*/

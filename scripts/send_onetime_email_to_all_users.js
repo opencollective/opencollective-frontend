@@ -5,6 +5,11 @@ import '../server/env';
  * This script is useful for sending a one-time email to all users.
  */
 
+console.log('This script is being deprecated.');
+console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
+process.exit();
+
+/*
 process.env.PORT = 3066;
 
 import Promise from 'bluebird';
@@ -15,10 +20,6 @@ import emailLib from '../server/lib/email';
 const debug = debugLib('onetime.email');
 
 const { User } = models;
-
-console.log('This script is being deprecated.');
-console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
-process.exit();
 
 const init = () => {
   console.log('\nStarting script to send a one-time email...\n');
@@ -60,3 +61,5 @@ const sendEmail = recipients => {
 };
 
 init();
+
+*/
