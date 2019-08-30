@@ -32,7 +32,6 @@ import logger from '../lib/logger';
 import userlib from '../lib/userlib';
 import emailLib from '../lib/email';
 import queries from '../lib/queries';
-import { convertToCurrency } from '../lib/currency';
 import {
   isBlacklistedCollectiveSlug,
   collectiveSlugBlacklist,
@@ -1300,11 +1299,7 @@ export default function(Sequelize, DataTypes) {
                   FromCollectiveId: member.MemberCollectiveId,
                   // status: { [Op.in]: ['ACTIVE', 'PAID'] },
                 },
-                include: [
-                  { model: models.Tier },
-                  { model: models.Subscription },
-                  { model: models.Collective, as: 'referral' },
-                ],
+                include: [{ model: models.Tier }, { model: models.Subscription }],
                 order: [['createdAt', 'DESC']],
               },
               sequelizeParams,
@@ -1325,9 +1320,6 @@ export default function(Sequelize, DataTypes) {
                 },
               },
             };
-            if (order && order.referral) {
-              data.order.referral = order.referral.minimal;
-            }
             return models.Activity.create(
               {
                 CollectiveId: this.id,
@@ -1902,29 +1894,6 @@ export default function(Sequelize, DataTypes) {
         limit: 1,
       })
       .then(res => res.collectives[0] && res.collectives[0].dataValues.monthlySpending);
-  };
-
-  // Get the total amount raised through referral
-  Collective.prototype.getTotalAmountRaised = function() {
-    return models.Order.findAll({
-      attributes: [
-        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('totalAmount')), 0), 'total'],
-        [Sequelize.fn('MAX', Sequelize.col('createdAt')), 'createdAt'],
-        [Sequelize.fn('MAX', Sequelize.col('currency')), 'currency'],
-      ],
-      where: {
-        ReferralCollectiveId: this.id,
-        status: 'PAID',
-      },
-      group: ['currency'],
-    })
-      .then(rows => rows.map(r => r.dataValues))
-      .then(amounts => Promise.map(amounts, s => convertToCurrency(s.total, s.currency, this.currency, s.createdAt)))
-      .then(amounts => {
-        let total = 0;
-        amounts.map(a => (total += a));
-        return Math.round(total);
-      });
   };
 
   /**

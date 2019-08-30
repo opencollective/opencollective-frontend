@@ -498,30 +498,6 @@ export const loaders = req => {
           order: [['createdAt', 'DESC']],
         }).then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', [])),
       ),
-      totalAmountRaised: new DataLoader(keys =>
-        models.Order.findAll({
-          attributes: [
-            'ReferralCollectiveId',
-            'CollectiveId',
-            [sequelize.fn('SUM', sequelize.col('totalAmount')), 'totalAmount'],
-          ],
-          where: {
-            ReferralCollectiveId: {
-              [Op.in]: keys.map(k => k.ReferralCollectiveId),
-            },
-            CollectiveId: { [Op.in]: keys.map(k => k.CollectiveId) },
-          },
-          group: ['ReferralCollectiveId', 'CollectiveId'],
-        }).then(results => {
-          const resultsByKey = {};
-          results.forEach(r => {
-            resultsByKey[`${r.ReferralCollectiveId}-${r.CollectiveId}`] = r.dataValues.totalAmount;
-          });
-          return keys.map(key => {
-            return resultsByKey[`${key.ReferralCollectiveId}-${key.CollectiveId}`] || 0;
-          });
-        }),
-      ),
     },
     transactions: {
       findByOrderId: options =>

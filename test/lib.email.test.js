@@ -78,7 +78,7 @@ describe('lib/email', () => {
         `Merci pour votre donation de ${amountStr}/mois à En Marche`,
       );
       expect(nm.sendMail.lastCall.args[0].html).to.contain('Merci pour continuer à nous soutenir');
-      expect(nm.sendMail.lastCall.args[0].html).to.contain('donate?referral=1');
+      expect(nm.sendMail.lastCall.args[0].html).to.contain('donate');
       expect(nm.sendMail.lastCall.args[0].headers['X-Mailgun-Tag']).to.equal('internal');
     });
   });

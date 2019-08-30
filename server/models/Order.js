@@ -115,15 +115,6 @@ export default function(Sequelize, DataTypes) {
         onUpdate: 'CASCADE',
       },
 
-      ReferralCollectiveId: {
-        type: DataTypes.INTEGER,
-        references: { model: 'Collectives', key: 'id' },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
-        allowNull: true,
-        description: 'Referral',
-      },
-
       processedAt: DataTypes.DATE,
 
       status: {

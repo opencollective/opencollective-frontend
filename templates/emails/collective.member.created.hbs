@@ -94,14 +94,6 @@ Subject: {{member.memberCollective.name}} joined {{collective.name}} as {{{toLow
     <td>{{order.publicMessage}}</td>
   </tr>
   {{/if}}
-  {{#if order.referral}}
-  <tr>
-    <th>Referral:</th>
-    <td><a href="{{config.host.website}}/{{order.referral.slug}}">{{order.referral.name}}</a>
-      {{#if order.referral.twitterHandle}}<a
-        href="https://twitter.com/{{order.referral.twitterHandle}}">@{{order.referral.twitterHandle}}</a>{{/if}}</td>
-  </tr>
-  {{/if}}
 </table>
 {{/if}}
 

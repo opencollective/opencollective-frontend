@@ -449,10 +449,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       orderData.status = order.interval ? status.ACTIVE : status.PAID;
     }
 
-    if (order.referral && get(order, 'referral.id') !== orderData.FromCollectiveId) {
-      orderData.ReferralCollectiveId = order.referral.id;
-    }
-
     orderCreated = await models.Order.create(orderData);
 
     if (paymentRequired) {
@@ -498,11 +494,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     order = await models.Order.findByPk(orderCreated.id);
-
-    // If there was a referral for this order, we add it as a FUNDRAISER role
-    if (order.ReferralCollectiveId && order.ReferralCollectiveId !== user.CollectiveId) {
-      collective.addUserWithRole({ id: user.id, CollectiveId: order.ReferralCollectiveId }, roles.FUNDRAISER);
-    }
 
     return order;
   } catch (error) {

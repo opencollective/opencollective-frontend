@@ -80,23 +80,6 @@ export async function processOrder(order, options) {
   }
 }
 
-/**
- * If the transaction is not null, this function will mark the order as
- * paid and will ensure the payment method used for it does not belong
- * to the order referral. If it does, the field will be nulled.
- */
-export async function updateOrderWithTransaction(order, transaction) {
-  if (transaction) {
-    const updateParams = { status: status.PAID, processedAt: new Date() };
-    const pmEmitterId = transaction.UsingVirtualCardFromCollectiveId;
-    if (pmEmitterId && pmEmitterId === order.ReferralCollectiveId) {
-      updateParams.ReferralCollectiveId = null;
-    }
-
-    await order.update(updateParams);
-  }
-}
-
 /** Refund a transaction
  *
  * @param {Object} transaction must contain a valid `PaymentMethod`
@@ -312,7 +295,9 @@ export const executeOrder = async (user, order, options) => {
   await order.populate();
 
   const transaction = await processOrder(order, options);
-  transaction && (await updateOrderWithTransaction(order, transaction));
+  if (transaction) {
+    await order.update({ status: status.PAID, processedAt: new Date() });
+  }
 
   // If the user asked for it, mark the payment method as saved for future financial contributions
   if (order.data && order.data.savePaymentMethod) {
@@ -343,6 +328,8 @@ export const executeOrder = async (user, order, options) => {
   // Credit card charges are synchronous. If the transaction is
   // created here it means that the payment went through so it's
   // safe to create subscription after this.
+
+  // The order will be updated to ACTIVE
   order.interval && transaction && (await createSubscription(order));
 };
 
