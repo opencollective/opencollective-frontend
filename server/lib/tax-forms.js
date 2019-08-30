@@ -33,6 +33,11 @@ export async function isUserTaxFormRequiredBeforePayment({ invoiceTotalThreshold
     },
   });
 
+  // Host can be null (we allow submitting expenses to collectives without a host)
+  if (!collective.HostCollective) {
+    return false;
+  }
+
   const { HostCollective: host } = collective;
   const user = await User.findByPk(UserId);
   const requiredDocuments = await host.getRequiredLegalDocuments({
