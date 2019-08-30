@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 import '../server/env';
 
-import models, { sequelize } from '../server/models';
-import { createFromPaidExpense as createTransactionFromPaidExpense } from '../server/lib/transactions';
-
 /*
  * This script finds all expenses that are paid and don't have a transaction
  */
@@ -11,6 +8,11 @@ import { createFromPaidExpense as createTransactionFromPaidExpense } from '../se
 console.log('This script is being deprecated.');
 console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
 process.exit();
+
+/*
+
+import models, { sequelize } from '../server/models';
+import { createFromPaidExpense as createTransactionFromPaidExpense } from '../server/lib/transactions';
 
 const done = err => {
   if (err) console.log('err', err);
@@ -21,10 +23,8 @@ const done = err => {
 const expensesFixed = [];
 
 function run() {
-  /*
-    Find all expenses that are paid, with payout method 'manual' or 'other'
-    and don't have an entry in the Transactions table.
-   */
+  // Find all expenses that are paid, with payout method 'manual' or 'other'
+  // and don't have an entry in the Transactions table.
   return sequelize
     .query(
       `
@@ -71,3 +71,5 @@ function run() {
 }
 
 run();
+
+*/

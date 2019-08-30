@@ -5,14 +5,15 @@ import '../server/env';
  * This script calculates how many new backers and old backers we have added by calendar months
  */
 
+console.log('This script is being deprecated.');
+console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
+process.exit();
+
+/*
 import fs from 'fs';
 import { parse as json2csv } from 'json2csv';
 
 import models, { Op } from '../server/models';
-
-console.log('This script is being deprecated.');
-console.log('To re-enable it, remove this message with a Pull Request explaining the use case.');
-process.exit();
 
 const done = err => {
   if (err) console.log(err);
@@ -34,9 +35,6 @@ const calculateNewBackersPerMonth = () => {
 
   return models.Order.findAll({
     where: {
-      /* PaymentMethodId: {
-        [Op.not]: null
-      }*/
       CollectiveId: {
         [Op.notIn]: [1],
       },
@@ -95,3 +93,5 @@ const run = () => {
 };
 
 run();
+
+*/
