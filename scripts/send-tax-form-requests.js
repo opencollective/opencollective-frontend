@@ -4,8 +4,13 @@ import '../server/env';
 import config from 'config';
 import HelloWorks from 'helloworks-sdk';
 import moment from 'moment';
+import pThrottle from 'p-throttle';
+
 import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../server/lib/tax-forms';
 import { sequelize } from '../server/models';
+
+const MAX_REQUESTS_PER_SECOND = 1;
+const ONE_SECOND_IN_MILLISECONDS = 1000;
 
 const US_TAX_FORM_THRESHOLD = 600e2;
 const HELLO_WORKS_KEY = config.get('helloworks.key');
@@ -39,17 +44,33 @@ const init = async () => {
 
   if (process.env.DRY_RUN) {
     console.log('>> Doing tax form dry run. Emails of users who need tax forms:');
-    return users.map(user => console.log(user.email));
+    return users.map(
+      pThrottle(
+        user => {
+          console.log(user.email);
+        },
+        MAX_REQUESTS_PER_SECOND,
+        ONE_SECOND_IN_MILLISECONDS,
+      ),
+    );
   } else {
-    return users.map(user => {
-      console.log(`>> Sending tax form to user: ${user.email}`);
-      return sendHelloWorksUsTaxForm(user);
-    });
+    return users.map(
+      pThrottle(
+        user => {
+          console.log(`>> Sending tax form to user: ${user.email}`);
+          return sendHelloWorksUsTaxForm(user);
+        },
+        MAX_REQUESTS_PER_SECOND,
+        ONE_SECOND_IN_MILLISECONDS,
+      ),
+    );
   }
 };
 
 init()
-  .catch(console.log)
+  .catch(error => {
+    console.log(error);
+  })
   .finally(() => {
     sequelize.close();
   });
