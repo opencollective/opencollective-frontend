@@ -135,8 +135,16 @@ const run = async () => {
   logger.info(`Found ${collectives.length} active collective(s) with GitHub settings`);
 
   for (const collective of collectives) {
-    const org = get(collective, 'settings.githubOrg');
-    const repo = get(collective, 'settings.githubRepo');
+    let org = get(collective, 'settings.githubOrg');
+    let repo = get(collective, 'settings.githubRepo');
+
+    if (collective.githubHandle) {
+      if (collective.githubHandle.includes('/')) {
+        repo = collective.githubHandle;
+      } else {
+        org = collective.githubHandle;
+      }
+    }
 
     if (org) {
       queue
