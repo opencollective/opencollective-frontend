@@ -4,19 +4,19 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import { H2, H3 } from '../Text';
-import StyledButton from '../StyledButton';
-import HorizontalScroller from '../HorizontalScroller';
-import Link from '../Link';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { H2, H3 } from '../../Text';
+import StyledButton from '../../StyledButton';
+import HorizontalScroller from '../../HorizontalScroller';
+import Link from '../../Link';
 
-import ContainerSectionContent from './ContainerSectionContent';
-import TopContributors from './TopContributors';
-import ContributeCardsContainer from './ContributeCardsContainer';
+import ContainerSectionContent from '../ContainerSectionContent';
+import TopContributors from '../TopContributors';
 
-import ContributeCustom from './contribute-cards/ContributeCustom';
-import ContributeTier from './contribute-cards/ContributeTier';
-import ContributeEvent from './contribute-cards/ContributeEvent';
+import ContributeCardsContainer from '../contribute-cards/ContributeCardsContainer';
+import ContributeCustom from '../contribute-cards/ContributeCustom';
+import ContributeTier from '../contribute-cards/ContributeTier';
+import ContributeEvent from '../contribute-cards/ContributeEvent';
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary

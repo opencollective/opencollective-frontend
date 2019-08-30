@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
-import { Dimensions } from './_constants';
+import { CustomScrollbarCSS } from '../../../lib/styled-components-shared-styles';
+import { Dimensions } from '../_constants';
 
 /** An horizontally scrollable container to display contribute cards cards */
 const ContributeCardsContainer = styled.div`

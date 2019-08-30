@@ -9,11 +9,12 @@ import StyledCard from '../../StyledCard';
 import StyledTag from '../../StyledTag';
 import { P } from '../../Text';
 import StyledButton from '../../StyledButton';
-
-import { ContributionTypes, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../_constants';
-import tierCardDefaultImage from '../ContributeCardDefaultImage.svg';
 import { ContributorAvatar } from '../../Avatar';
 import Container from '../../Container';
+
+// Local imports
+import { ContributionTypes, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../_constants';
+import tierCardDefaultImage from '../images/ContributeCardDefaultImage.svg';
 
 /** The main container */
 const StyledContributeCard = styled(StyledCard)`

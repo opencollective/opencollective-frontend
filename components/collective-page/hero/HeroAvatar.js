@@ -4,29 +4,19 @@ import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
 
 import { Camera } from 'styled-icons/feather/Camera';
 
-import { upload } from '../../lib/api';
-import { getAvatarBorderRadius } from '../../lib/utils';
-import Avatar from '../Avatar';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import StyledRoundButton from '../StyledRoundButton';
-import StyledButton from '../StyledButton';
-import Container from '../Container';
+import { upload } from '../../../lib/api';
+import { getAvatarBorderRadius } from '../../../lib/utils';
+import Avatar from '../../Avatar';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import StyledRoundButton from '../../StyledRoundButton';
+import StyledButton from '../../StyledButton';
+import Container from '../../Container';
+import { EditAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
-
-const EditAvatarMutation = gql`
-  mutation EditCollectiveImage($id: Int!, $image: String) {
-    editCollective(collective: { id: $id, image: $image }) {
-      id
-      image
-      imageUrl
-    }
-  }
-`;
 
 // Dynamically import components for admins
 const DropzoneLoadingPlaceholder = () => (

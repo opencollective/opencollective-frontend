@@ -4,18 +4,19 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import { Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
 import { get, set, has } from 'lodash';
 
 import { Upload } from 'styled-icons/feather/Upload';
 
-import { upload } from '../../lib/api';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import { Span } from '../Text';
+import { upload } from '../../../lib/api';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import { Span } from '../../Text';
 
-import HeroBackgroundMask from './HeroBackgroundMask.svg';
+// Local imports
+import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
+import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
 
 const BASE_WIDTH = 1368;
 const BASE_HEIGHT = 325;
@@ -31,16 +32,6 @@ const Cropper = dynamic(() => import(/* webpackChunkName: 'react-easy-crop' */ '
 const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), {
   ssr: false,
 });
-
-const EditCollectiveBackgroundMutation = gql`
-  mutation EditCollective($id: Int!, $settings: JSON, $backgroundImage: String) {
-    editCollective(collective: { id: $id, settings: $settings, backgroundImage: $backgroundImage }) {
-      id
-      settings
-      backgroundImage
-    }
-  }
-`;
 
 const generateBackground = theme => {
   const color = theme.colors.primary[300];

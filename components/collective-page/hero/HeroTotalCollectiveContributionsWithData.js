@@ -4,8 +4,8 @@ import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import { P } from '../Text';
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { P } from '../../Text';
+import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 
 const TotalCollectiveContributionsQuery = gql`
   query TotalCollectiveContributions($id: Int) {

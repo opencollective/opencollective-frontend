@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
@@ -11,24 +10,14 @@ import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar'
 
 // Collective page imports
 import { Sections } from './_constants';
-import Hero from './Hero';
-import SectionAbout from './SectionAbout';
-import SectionBudget from './SectionBudget';
-import SectionContribute from './SectionContribute';
-import SectionContributors from './SectionContributors';
-import SectionUpdates from './SectionUpdates';
-import SectionContributions from './SectionContributions';
-import SectionTransactions from './SectionTransactions';
-
-/** A mutation used by child components to update the collective */
-const EditCollectiveMutation = gql`
-  mutation EditCollective($id: Int!, $longDescription: String) {
-    editCollective(collective: { id: $id, longDescription: $longDescription }) {
-      id
-      longDescription
-    }
-  }
-`;
+import Hero from './hero/Hero';
+import SectionAbout from './sections/About';
+import SectionBudget from './sections/Budget';
+import SectionContribute from './sections/Contribute';
+import SectionContributors from './sections/Contributors';
+import SectionUpdates from './sections/Updates';
+import SectionContributions from './sections/Contributions';
+import SectionTransactions from './sections/Transactions';
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -144,13 +133,7 @@ class CollectivePage extends Component {
   renderSection(section) {
     switch (section) {
       case Sections.ABOUT:
-        return (
-          <SectionAbout
-            collective={this.props.collective}
-            canEdit={this.props.isAdmin}
-            editMutation={EditCollectiveMutation}
-          />
-        );
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
       case Sections.BUDGET:
         return (
           <SectionBudget

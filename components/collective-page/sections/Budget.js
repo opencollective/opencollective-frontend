@@ -6,21 +6,21 @@ import { get, filter, orderBy, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
-import { formatCurrency } from '../../lib/utils';
-import { H3, P, Span } from '../Text';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import StyledCard from '../StyledCard';
-import Link from '../Link';
-import DebitCreditList, { DebitItem, CreditItem } from '../DebitCreditList';
-import DefinedTerm, { Terms } from '../DefinedTerm';
-import LinkCollective from '../LinkCollective';
-import Avatar from '../Avatar';
-import MessageBox from '../MessageBox';
-import StyledLink from '../StyledLink';
+import { formatCurrency } from '../../../lib/utils';
+import { H3, P, Span } from '../../Text';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import StyledCard from '../../StyledCard';
+import Link from '../../Link';
+import DebitCreditList, { DebitItem, CreditItem } from '../../DebitCreditList';
+import DefinedTerm, { Terms } from '../../DefinedTerm';
+import LinkCollective from '../../LinkCollective';
+import Avatar from '../../Avatar';
+import MessageBox from '../../MessageBox';
+import StyledLink from '../../StyledLink';
 
-import ContainerSectionContent from './ContainerSectionContent';
-import { TransactionsAndExpensesFragment } from './fragments';
+import ContainerSectionContent from '../ContainerSectionContent';
+import { TransactionsAndExpensesFragment } from '../graphql/fragments';
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`

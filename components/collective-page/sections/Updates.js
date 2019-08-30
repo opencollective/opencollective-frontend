@@ -9,19 +9,19 @@ import { graphql } from 'react-apollo';
 
 import { Lock } from 'styled-icons/fa-solid';
 
-import { formatDate } from '../../lib/utils';
-import { H3, P } from '../Text';
-import Container from '../Container';
-import MessageBox from '../MessageBox';
-import StyledTooltip from '../StyledTooltip';
-import StyledCard from '../StyledCard';
-import Link from '../Link';
-import Avatar from '../Avatar';
-import StyledButton from '../StyledButton';
-import HTMLContent from '../HTMLContent';
+import { formatDate } from '../../../lib/utils';
+import { H3, P } from '../../Text';
+import Container from '../../Container';
+import MessageBox from '../../MessageBox';
+import StyledTooltip from '../../StyledTooltip';
+import StyledCard from '../../StyledCard';
+import Link from '../../Link';
+import Avatar from '../../Avatar';
+import StyledButton from '../../StyledButton';
+import HTMLContent from '../../HTMLContent';
 
-import ContainerSectionContent from './ContainerSectionContent';
-import { UpdatesFieldsFragment } from './fragments';
+import ContainerSectionContent from '../ContainerSectionContent';
+import { UpdatesFieldsFragment } from '../graphql/fragments';
 
 /** Query to re-fetch updates */
 const UpdatesQuery = gql`
