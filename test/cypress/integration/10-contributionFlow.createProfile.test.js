@@ -9,6 +9,11 @@ describe('Contribution Flow: Create profile', () => {
       .contains('Join Free')
       .click();
 
+    // Has TOS
+    cy.contains('By joining, you agree to our Terms of Service and Privacy Policy.');
+    cy.get('[data-cy="join-conditions"] a[href="/tos"]');
+    cy.get('[data-cy="join-conditions"] a[href="/privacypolicy"]');
+
     // Test frontend validations
     cy.get('#content input[name=email]').type('Incorrect value');
     cy.get('#content button[type=submit]').click();

@@ -145,13 +145,13 @@ class SignInOrJoinFree extends React.Component {
               />
               <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
             </Flex>
-            <P mt={4} color="black.500" fontSize="Caption" mb={3}>
+            <P mt={4} color="black.500" fontSize="Caption" mb={3} data-cy="join-conditions">
               <FormattedMessage
                 id="contributeFlow.createProfile.legal"
-                defaultMessage="By joining, you agree to our <tosLink>Terms of Service</tosLink> and <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
+                defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
                 values={{
-                  tosLink: msg => <Link route="/tos">{msg}</Link>,
-                  privacyPolicyLink: msg => <Link route="/privacypolicy">{msg}</Link>,
+                  'tos-link': msg => <Link route="/tos">{msg}</Link>,
+                  'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
                 }}
               />
             </P>

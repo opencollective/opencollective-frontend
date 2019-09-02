@@ -317,9 +317,9 @@ class CreatePledgePage extends React.Component {
                 <P mt={[5, null, 4]} color="black.700" fontSize="LeadParagraph" lineHeight="LeadParagraph">
                   <FormattedMessage
                     id="createPledge.signinToCreate"
-                    defaultMessage="<link>Sign in or join free</link> to create a pledge."
+                    defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
-                      link: msg => (
+                      'signin-link': msg => (
                         <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
                           {msg}
                         </Link>
