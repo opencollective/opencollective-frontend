@@ -327,7 +327,7 @@
   "ContributeDetails.faq.isIncognito.content": "Als je kiest om \"incognito\" bij te dragen, je financiële bijdrage zal publiekelijk verschijnen als een incognito donatie en het zal niet verwijzen naar je publiek profiel. Niettemin, in de poging om transparant en conform met de KYC regelgeving (Know Your Customer), de fiscaal beheerder en de administrators van het collectief kunnen een lijst oproepen van alle financiële bijdragers met hun persoonlijke informatie.",
   "ContributeDetails.faq.isIncognito.title": "Wat is een incognito bijdrage?",
   "contributeFlow.contributedTotal": "Contributed a total of:",
-  "contributeFlow.createProfile.legal": "By joining, you agree to our <tosLink>Terms of Service</tosLink> and <privacyPolicyLink>Privacy Policy</privacyPolicyLink>.",
+  "contributeFlow.createProfile.legal": "By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   "contributeFlow.successMessage": "{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a member of {collectiveName}'s \"{tierName}\" tier!",
   "contributeFlow.successMessageBacker": "{fromCollectiveName, select, incognito {You're} other {{fromCollectiveName} is}} now a backer of {collectiveName}!",
   "contributeFlow.successMessageTicket": "{fromCollectiveName, select, incognito {You've} other {{fromCollectiveName} has}} registered for the event {eventName} ({tierName})",
