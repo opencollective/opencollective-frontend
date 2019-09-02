@@ -138,5 +138,8 @@
         "bucket": "HELLO_WORKS_AWS_S3_BUCKET"
       }
     }
+  },
+  "githubFlow": {
+    "minNbStars": "GITHUB_FLOW_MIN_NB_STARS"
   }
 }

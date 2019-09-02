@@ -2,6 +2,7 @@ import debug from 'debug';
 import slugify from 'limax';
 import { get, omit, truncate } from 'lodash';
 import { map } from 'bluebird';
+import config from 'config';
 
 import models, { Op } from '../../../models';
 import * as errors from '../../errors';
@@ -240,19 +241,23 @@ export async function createCollectiveFromGithub(_, args, req) {
   if (githubHandle.includes('/')) {
     // A repository GitHub Handle (most common)
     const repo = await github.getRepo(githubHandle, githubAccount.token);
+
     const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
     if (!isGithubRepositoryAdmin) {
       throw new errors.ValidationFailed({
         message: "We could not verify that you're admin of the GitHub repository",
       });
+    } else if (repo.stargazers_count < config.githubFlow.minNbStars) {
+      throw new errors.ValidationFailed({
+        message: `The repository need at least ${config.githubFlow.minNbStars} stars to apply to the Open Source Collective.`,
+      });
     }
+
     collectiveData.tags = repo.topics || [];
     collectiveData.tags.push('open source');
     collectiveData.description = truncate(repo.description, { length: 255 });
     collectiveData.longDescription = repo.description;
-    collectiveData.settings = {
-      githubRepo: githubHandle,
-    };
+    collectiveData.settings = { githubRepo: githubHandle };
   } else {
     // An organization GitHub Handle
     const memberships = await github.getOrgMemberships(githubAccount.token);
@@ -264,9 +269,14 @@ export async function createCollectiveFromGithub(_, args, req) {
         message: "We could not verify that you're admin of the GitHub organization",
       });
     }
-    collectiveData.settings = {
-      githubOrg: githubHandle,
-    };
+    const allRepos = await github.getAllOrganizationPublicRepos(githubHandle).catch(() => null);
+    const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= config.githubFlow.minNbStars);
+    if (!repoWith100stars) {
+      throw new errors.ValidationFailed({
+        message: `The organization need at least one repository with ${config.githubFlow.minNbStars} GitHub stars to be pledged.`,
+      });
+    }
+    collectiveData.settings = { githubOrg: githubHandle };
     // TODO: we sometime still wants to store the main repository
   }
 
