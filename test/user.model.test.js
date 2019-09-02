@@ -150,8 +150,6 @@ describe('user.models.test.js', () => {
 
       // And then the decoded token should contain the user data
       expect(Number(decoded.sub)).to.equal(user.id);
-      expect(decoded.id).to.equal(user.id);
-      expect(decoded.email).to.equal('foo@oc.com');
 
       // And then the default expiration of the token should have a
       // short life time

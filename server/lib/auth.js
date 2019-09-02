@@ -19,7 +19,7 @@ const KID = 'HS256-2019-09-02';
 
 /** Generate a JWToken with the received parameters */
 export function createJwt(subject, payload, expiresIn) {
-  return jwt.sign(payload, config.keys.opencollective.jwtSecret, {
+  return jwt.sign(payload || {}, config.keys.opencollective.jwtSecret, {
     expiresIn,
     subject: String(subject),
     algorithm: ALGORITHM,

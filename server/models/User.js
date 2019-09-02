@@ -3,7 +3,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import slugify from 'limax';
 import debugLib from 'debug';
-import { extend, defaults, intersection } from 'lodash';
+import { defaults, intersection } from 'lodash';
 import { Op } from 'sequelize';
 
 import logger from '../lib/logger';
@@ -242,20 +242,17 @@ export default (Sequelize, DataTypes) => {
     },
   );
 
+  /** Instance Methods */
+
   /**
-   * Instance Methods
+   * Generate a JWT for user.
+   *
+   * @param {object} `payload` - data to attach to the token
+   * @param {Number} `expiration` - expiration period in seconds
    */
   User.prototype.jwt = function(payload, expiration) {
     expiration = expiration || auth.TOKEN_EXPIRATION_LOGIN;
-
-    // We are sending too much data (large jwt) but the app and website
-    // need the id and email. We will refactor that progressively to
-    // have a smaller token.
-    const data = extend({}, payload, {
-      id: this.id,
-      email: this.email,
-    });
-    return auth.createJwt(this.id, data, expiration);
+    return auth.createJwt(this.id, payload, expiration);
   };
 
   User.prototype.generateLoginLink = function(redirect = '/', websiteUrl) {
