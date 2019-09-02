@@ -204,7 +204,7 @@ class OpenSourceApplyPage extends Component {
           loading={this.state.loadingRepos}
           disabled={this.state.loadingRepos}
         >
-          Get started
+          <FormattedMessage id="openSourceApply.GetStarted" defaultMessage="Get started" />
         </StyledButton>
       </StyledCard>
     );
