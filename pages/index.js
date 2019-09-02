@@ -505,9 +505,9 @@ class HomePage extends React.Component {
                 <P {...sectionDetailStyles} my={3}>
                   <FormattedMessage
                     id="home.onboard"
-                    defaultMessage="If you’re looking to financially support an initiative through Open Collective, <link>let us know</link> and we’ll gladly help it get up and going."
+                    defaultMessage="If you’re looking to financially support an initiative through Open Collective, <a>let us know</a> and we’ll gladly help it get up and going."
                     values={{
-                      link: msg => <a href="mailto:info@opencollective.com">{msg}</a>,
+                      a: msg => <a href="mailto:info@opencollective.com">{msg}</a>,
                     }}
                   />
                 </P>
