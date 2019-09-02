@@ -102,8 +102,10 @@ export async function processOrderWithSubscription(options, order) {
         getNextChargeAndPeriodStartDates(orderProcessedStatus, order),
       );
       order.Subscription.chargeRetryCount = getChargeRetryCount(orderProcessedStatus, order);
-      if (orderProcessedStatus === 'success' && order.Subscription.chargeNumber !== null) {
-        order.Subscription.chargeNumber += 1;
+      if (orderProcessedStatus === 'success') {
+        if (order.Subscription.chargeNumber !== null) {
+          order.Subscription.chargeNumber += 1;
+        }
         order.status = status.ACTIVE;
       }
     }
