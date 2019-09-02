@@ -327,7 +327,7 @@
   "ContributeDetails.faq.isIncognito.content": "Si vous choisissez de contribuer en \"incognito\", votre contribution financière apparaîtra publiquement comme un don privé qui ne sera pas lié à votre profil public. Afin d'être en conformité avec les réglementations KYC regulations (Know Your Customer), l'hôte fiscal et les administrateurs du collectifs peuvent toutefois exporter une liste de toutes les contributions financières avec vos information personnelles.",
   "ContributeDetails.faq.isIncognito.title": "Qu'est ce qu'une contribution incognito ?",
   "contributeFlow.contributedTotal": "Total de votre contribution :",
-  "contributeFlow.createProfile.legal": "En vous inscrivant, vous acceptez nos <tosLink>Conditions d'utilisation</tosLink> et notre <privacyPolicyLink>politique de vie privée</privacyPolicyLink>.",
+  "contributeFlow.createProfile.legal": "By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   "contributeFlow.successMessage": "{fromCollectiveName, select, incognito {Vous êtes} other {{fromCollectiveName} est}} maintenant membre du groupe « {tierName} » de {collectiveName} !",
   "contributeFlow.successMessageBacker": "{fromCollectiveName, select, incognito {Vous êtes} other {{fromCollectiveName} est}} maintenant un contributeur de {collectiveName} !",
   "contributeFlow.successMessageTicket": "{fromCollectiveName, select, incognito {Vous êtes} other {{fromCollectiveName} est}} maintenant enregistré comme un·e participant·e pour {eventName} ({tierName})",
