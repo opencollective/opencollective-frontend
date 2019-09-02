@@ -92,7 +92,7 @@
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.4",
     "sanitize-html": "1.20.1",
-    "sequelize": "5.17.2",
+    "sequelize": "5.18.0",
     "sequelize-cli": "5.5.0",
     "sequelize-historical": "5.1.0",
     "showdown": "1.9.0",
