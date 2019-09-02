@@ -15,6 +15,7 @@ export const TOKEN_EXPIRATION_CONNECTED_ACCOUNT = daysToSeconds(1);
 export const TOKEN_EXPIRATION_SESSION = daysToSeconds(90);
 
 const ALGORITHM = 'HS256';
+const KID = 'HS256-2019-09-02';
 
 /** Generate a JWToken with the received parameters */
 export function createJwt(subject, payload, expiresIn) {
@@ -22,6 +23,9 @@ export function createJwt(subject, payload, expiresIn) {
     expiresIn,
     subject: String(subject),
     algorithm: ALGORITHM,
+    header: {
+      kid: KID,
+    },
   });
 }
 
