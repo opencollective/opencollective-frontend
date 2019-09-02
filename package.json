@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@babel/runtime": "7.4.5",
-    "@formatjs/intl-relativetimeformat": "2.8.2",
+    "@formatjs/intl-relativetimeformat": "2.8.3",
     "@material-ui/core": "4.4.0",
     "@opencollective/taxes": "2.3.0",
     "@rebass/grid": "6.1.0",
