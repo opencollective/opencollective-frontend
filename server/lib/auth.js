@@ -14,14 +14,22 @@ export const TOKEN_EXPIRATION_LOGIN = minutesToSeconds(75);
 export const TOKEN_EXPIRATION_CONNECTED_ACCOUNT = daysToSeconds(1);
 export const TOKEN_EXPIRATION_SESSION = daysToSeconds(90);
 
+const ALGORITHM = 'HS256';
+
 /** Generate a JWToken with the received parameters */
 export function createJwt(subject, payload, expiresIn) {
-  return jwt.sign(payload, config.keys.opencollective.jwtSecret, { expiresIn, subject: String(subject) });
+  return jwt.sign(payload, config.keys.opencollective.jwtSecret, {
+    expiresIn,
+    subject: String(subject),
+    algorithm: ALGORITHM,
+  });
 }
 
 /** Verify JWToken */
 export function verifyJwt(token) {
-  return jwt.verify(token, config.keys.opencollective.jwtSecret);
+  return jwt.verify(token, config.keys.opencollective.jwtSecret, {
+    algorithms: [ALGORITHM],
+  });
 }
 
 /**
