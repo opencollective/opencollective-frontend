@@ -267,6 +267,7 @@ class Collective extends React.Component {
               LoggedInUser={LoggedInUser}
               key={collective.slug}
               displayContributeLink={collective.isActive && collective.host ? true : false}
+              forceLegacy
             />
 
             <div>
