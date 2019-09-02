@@ -3,7 +3,7 @@ import config from 'config';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import request from 'request-promise';
-import { get, contains, omitBy, isNil } from 'lodash';
+import { get, omitBy, isNil } from 'lodash';
 import { URLSearchParams } from 'url';
 
 import models from '../../models';
@@ -13,7 +13,7 @@ import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controll
 
 const { User } = models;
 
-const { BadRequest, CustomError, Unauthorized } = errors;
+const { BadRequest, CustomError } = errors;
 
 const { jwtSecret } = config.keys.opencollective;
 
@@ -128,38 +128,6 @@ export function authenticateUser(req, res, next) {
     });
   });
 }
-
-export function authenticateInternalUserByJwt() {
-  return (req, res, next) => {
-    parseJwtNoExpiryCheck(req, res, e => {
-      if (e) {
-        debug('auth')('>>> parseJwtNoExpiryCheck error', e);
-        return next(e);
-      }
-      checkJwtExpiry(req, res, e => {
-        if (e) {
-          debug('auth')('>>> checkJwtExpiry error', e);
-          return next(e);
-        }
-        _authenticateUserByJwt(req, res, e => {
-          if (e) {
-            debug('auth')('>>> _authenticateUserByJwt error', e);
-            return next(e);
-          }
-          _authenticateInternalUserById(req, res, next);
-        });
-      });
-    });
-  };
-}
-
-export const _authenticateInternalUserById = (req, res, next) => {
-  if (req.jwtPayload && contains([1, 2, 4, 5, 6, 7, 8, 30, 40, 212, 772], Number(req.jwtPayload.sub))) {
-    next();
-  } else {
-    throw new Unauthorized();
-  }
-};
 
 export const authenticateService = (req, res, next) => {
   const { service } = req.params;
