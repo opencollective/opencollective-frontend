@@ -22,8 +22,6 @@ import Button from './Button';
 import SectionTitle from './SectionTitle';
 import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
 
-const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
-
 class Event extends React.Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
@@ -190,9 +188,6 @@ class Event extends React.Component {
       };
     }
 
-    const backgroundImage =
-      event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
-
     return (
       <div>
         <style jsx>
@@ -230,14 +225,7 @@ class Event extends React.Component {
         </style>
 
         <div className="EventPage">
-          <Header
-            title={event.name}
-            description={event.description || event.longDescription}
-            twitterHandle={event.parentCollective.twitterHandle}
-            image={event.parentCollective.image || backgroundImage}
-            className={this.state.status}
-            LoggedInUser={LoggedInUser}
-          />
+          <Header collective={event} className={this.state.status} LoggedInUser={LoggedInUser} />
 
           <Body>
             <div className={`EventPage ${this.state.modal && 'showModal'}`}>

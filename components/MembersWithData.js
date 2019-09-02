@@ -234,9 +234,9 @@ const getMembersQuery = gql`
         company
         description
         slug
-        image
-        backgroundImage
         website
+        imageUrl
+        backgroundImage
         isIncognito
       }
     }

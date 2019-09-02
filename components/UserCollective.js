@@ -328,15 +328,7 @@ class UserCollective extends React.Component {
           `}
         </style>
 
-        <Header
-          title={collective.name}
-          description={collective.description || collective.longDescription}
-          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
-          image={get(collective.parentCollective, 'image')}
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-          href={`/${collective.slug}`}
-        />
+        <Header collective={collective} className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
           <div className={classNames({ archiveCollective: collective.isArchived })}>

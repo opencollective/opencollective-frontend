@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
+import { get } from 'lodash';
+
 import TopBar from './TopBar';
 
-import { truncate, getQueryParams } from '../lib/utils';
 import storage from '../lib/storage';
+import { truncate, getQueryParams, getCollectiveImage } from '../lib/utils';
 
 class Header extends React.Component {
   static propTypes = {
+    collective: PropTypes.object,
     canonicalURL: PropTypes.string,
     description: PropTypes.string,
     image: PropTypes.string,
@@ -18,12 +21,46 @@ class Header extends React.Component {
     showSearch: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-    const { description, image, twitterHandle, title } = props;
+  componentDidMount() {
+    const urlParams = getQueryParams();
+    if (urlParams.referral) {
+      storage.set('referral', urlParams.referral, 48 * 60 * 60 * 1000); // we keep the referral for 48h or until we receive a new ?referral=
+    }
+  }
+
+  getTitle() {
+    let title = this.props.title;
+
+    if (!title) {
+      if (this.props.collective) {
+        title = this.props.collective.name;
+      } else {
+        title = 'Open Collective - open your finances to your community';
+      }
+    }
+
+    if (!title.match(/open collective/i)) {
+      title = `${title} - Open Collective`;
+    }
+
+    return title;
+  }
+
+  getMetas() {
+    const collective = this.props.collective;
+
+    const title = this.props.title || (collective && collective.name);
+    const image = this.props.image || (collective && getCollectiveImage(collective));
+    const description =
+      this.props.description || (collective && (collective.description || collective.longDescription));
+    const twitterHandle =
+      this.props.twitterHandle ||
+      (collective && (collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')));
+
     const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
     const defaultImage = 'https://opencollective.com/static/images/opencollective-og-default.jpg';
-    const meta = {
+
+    const metas = {
       'twitter:site': '@opencollect',
       'twitter:creator': twitterHandle ? `@${twitterHandle}` : '',
       'fb:app_id': '266835577107099',
@@ -37,28 +74,11 @@ class Header extends React.Component {
       'og:title': metaTitle,
     };
 
-    this.meta = [];
-    for (const name in meta) {
-      this.meta.push({
-        name,
-        content: meta[name],
-      });
-    }
-  }
-
-  componentDidMount() {
-    const urlParams = getQueryParams();
-    if (urlParams.referral) {
-      storage.set('referral', urlParams.referral, 48 * 60 * 60 * 1000); // we keep the referral for 48h or until we receive a new ?referral=
-    }
+    return Object.keys(metas).map(key => ({ key, value: metas[key] }));
   }
 
   render() {
     const { css, className, canonicalURL } = this.props;
-    let title = this.props.title || 'Open Collective - open your finances to your community';
-    if (!title.match(/open collective/i)) {
-      title += ' - Open Collective';
-    }
     return (
       <header>
         <Head>
@@ -68,9 +88,9 @@ class Header extends React.Component {
           <meta property="og:logo" content="/static/images/opencollectivelogo480x80" size="480x80" />
           <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
           {css && <link rel="stylesheet" href={css} />}
-          <title>{title}</title>
-          {this.meta.map(({ name, content }) => (
-            <meta property={name} content={content} key={`meta-${name}`} />
+          <title>{this.getTitle()}</title>
+          {this.getMetas().map(({ key, value }) => (
+            <meta property={key} content={value} key={`meta-${key}`} />
           ))}
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>

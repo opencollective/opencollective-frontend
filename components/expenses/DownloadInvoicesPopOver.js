@@ -9,8 +9,7 @@ import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
 import { FileDownload } from 'styled-icons/material/FileDownload';
 
-import { formatCurrency, imagePreview } from '../../lib/utils';
-import { defaultImage } from '../../lib/constants/collectives';
+import { formatCurrency, getCollectiveImage } from '../../lib/utils';
 
 import InputField from '../InputField';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
@@ -41,9 +40,7 @@ class Overlay extends React.Component {
 
   renderInvoiceLabel(isLoading, totalAmount, currency, host) {
     const formattedAmount = formatCurrency(totalAmount, currency, { precision: 0 });
-    const image = isLoading
-      ? '/static/images/loading.gif'
-      : imagePreview(host.image, defaultImage.ORGANIZATION, { height: 48 });
+    const image = isLoading ? '/static/images/loading.gif' : getCollectiveImage(host);
     return (
       <React.Fragment>
         <img height={24} src={image} /> {host.slug} ({formattedAmount})

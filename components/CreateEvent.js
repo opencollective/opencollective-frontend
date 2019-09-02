@@ -108,14 +108,7 @@ class CreateEvent extends React.Component {
           `}
         </style>
 
-        <Header
-          title={title}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
-        />
+        <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
           <CollectiveCover href={`/${collective.slug}`} className="small" title={title} collective={collective} />

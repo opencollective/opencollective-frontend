@@ -199,12 +199,12 @@ const getTopBackersQuery = gql`
       member {
         id
         type
-        isIncognito
         name
         company
         description
         slug
-        image
+        imageUrl
+        isIncognito
       }
     }
   }

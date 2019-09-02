@@ -20,6 +20,7 @@ const Page = ({
   showSearch,
   canonicalURL,
   withoutGlobalStyles,
+  collective,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -36,6 +37,7 @@ const Page = ({
         description={description}
         image={image}
         canonicalURL={canonicalURL}
+        collective={collective}
       />
       <Body withoutGlobalStyles={withoutGlobalStyles}>
         {typeof children === 'function' ? children(childProps) : children}
@@ -61,6 +63,7 @@ Page.propTypes = {
   withoutGlobalStyles: PropTypes.bool,
   title: PropTypes.string,
   twitterHandle: PropTypes.string,
+  collective: PropTypes.object,
 };
 
 Page.defaultProps = {
