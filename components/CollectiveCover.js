@@ -92,6 +92,8 @@ class CollectiveCover extends React.Component {
     cta: PropTypes.object, // { href, label }
     context: PropTypes.string,
     displayContributeLink: PropTypes.bool,
+    /** If true, the component will never render the new collective navbar */
+    forceLegacy: PropTypes.bool,
   };
 
   constructor(props) {
@@ -169,14 +171,15 @@ ${description}`;
   }
 
   render() {
-    const { collective, context, className, LoggedInUser, intl } = this.props;
+    const { collective, context, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
-    const useNewCollectiveNavbar = ncpIsDefault || get(collective, 'settings.collectivePage.useV2');
+    const collectiveHasV2 = get(collective, 'settings.collectivePage.useV2');
+    const useNewCollectiveNavbar = !forceLegacy && (ncpIsDefault || collectiveHasV2);
     const isEvent = type === CollectiveType.EVENT;
 
-    if (!isEvent && useNewCollectiveNavbar) {
+    if (!isEvent && useNewCollectiveNavbar && collective && collective.slug) {
       return (
         <Container borderTop="1px solid #E6E8EB" mb={4}>
           <CollectiveNavbar
