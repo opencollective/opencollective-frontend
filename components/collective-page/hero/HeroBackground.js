@@ -46,7 +46,7 @@ const StyledBackground = styled.div`
   height: 100%;
   width: 100%;
   max-width: 1368px; // Should match SVG's viewbox
-  z-index: 0;
+  z-index: ${props => (props.isEditing ? 0 : -1)};
 
   @supports (mask-size: cover) {
     background: ${props => generateBackground(props.theme)};
