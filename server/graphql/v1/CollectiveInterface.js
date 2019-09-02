@@ -1457,9 +1457,9 @@ const CollectiveFields = () => {
         }
         let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
         // Filter Payment Methods used by organizations for "Add Funds"
-        paymentMethods.filter(
-          pm => !(collective.type === 'ORGANIZATION' && pm.service === 'opencollective' && pm.type === 'collective'),
-        );
+        if (collective.type === 'ORGANIZATION') {
+          paymentMethods = paymentMethods.filter(pm => !(pm.service === 'opencollective' && pm.type === 'collective'));
+        }
         // Filter only "saved" stripe Payment Methods
         // In the future we should only return the "saved" whatever the service
         paymentMethods = paymentMethods.filter(pm => pm.service !== 'stripe' || pm.saved);
