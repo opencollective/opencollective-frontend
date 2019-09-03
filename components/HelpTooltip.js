@@ -48,7 +48,7 @@ class HelpTooltip extends React.Component {
               margin: 0 5px;
             }
             .customTooltip {
-              max-width: 400px;
+              max-width: 800px;
               z-index: 1000000;
               background: white !important;
               color: #6e747a !important;
