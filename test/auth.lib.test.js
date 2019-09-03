@@ -31,4 +31,23 @@ describe('authlib', () => {
     const token = auth.createJwt('sub', {}, 5);
     expect(Boolean(auth.verifyJwt(token))).to.be.true;
   });
+
+  it('should prevent changing the algorithm for validate', () => {
+    const payload = { foo: 'bar' };
+    const testKey = `-----BEGIN EC PRIVATE KEY-----
+MHgCAQEEIQCngKdlZNZLnHz1759Ws3tKUfkyTfh+E9o52L5yzjMQ+KAKBggqhkjO
+PQMBB6FEA0IABE6r13quwp3ZFr9SF8k6B0BRiOzAX8UGF1JkV/0KOnyqeTTT9lgW
+quLDCejRhHBkI/i5vZXyk4MqC5q4COJlxKU=
+-----END EC PRIVATE KEY-----`;
+    const maliciousToken = jwt.sign(payload, testKey, {
+      subject: String(payload),
+      header: {
+        alg: 'ES256',
+      },
+    });
+
+    expect(() => {
+      auth.verifyJwt(maliciousToken);
+    }).to.throw('invalid algorithm');
+  });
 });
