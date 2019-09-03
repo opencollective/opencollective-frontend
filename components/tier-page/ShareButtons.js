@@ -9,7 +9,7 @@ import { Mail } from 'styled-icons/feather/Mail';
 import { Twitter } from 'styled-icons/feather/Twitter';
 import { Facebook } from 'styled-icons/feather/Facebook';
 import { Linkedin } from 'styled-icons/feather/Linkedin';
-import { ContentCopy } from 'styled-icons/material/ContentCopy';
+import { Clipboard } from 'styled-icons/feather/Clipboard';
 
 // Open Collective Frontend imports
 import { facebooKShareURL, tweetURL, linkedInShareURL, mailToURL } from '../../lib/url_helpers';
@@ -57,7 +57,7 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
         </StyledRoundButton>
       </ExternalLinkNewTab>
       <StyledRoundButton size={40} onClick={() => copy(pageUrl)}>
-        <ContentCopy size={14} />
+        <Clipboard size={15} />
       </StyledRoundButton>
     </Flex>
   );
