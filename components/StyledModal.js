@@ -53,10 +53,14 @@ const Body = styled(Container)`
 `;
 
 const Divider = styled.div`
-  margin: 3rem 0;
+  margin: 2rem 0;
   width: 100%;
   height: 1px;
   background-color: #e1e4e6;
+
+  @media (min-width: 52em) {
+    margin: 3rem 0;
+  }
 `;
 
 const CloseIcon = styled(Times)`
