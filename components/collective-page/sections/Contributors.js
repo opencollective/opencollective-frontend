@@ -13,6 +13,7 @@ import * as ContributorsFilter from '../../ContributorsFilter';
 
 // Local imports
 import { Dimensions } from '../_constants';
+import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.svg';
 
@@ -105,14 +106,14 @@ export default class SectionContributors extends React.PureComponent {
         <ContainerSectionContent>
           {!onlyShowCore ? (
             <React.Fragment>
-              <H2 mb={4} fontSize={['H3', 80]} lineHeight="1em" color="black.900" wordBreak="break-word">
+              <SectionTitle fontWeight="bold">
                 <FormattedMessage
                   id="CollectivePage.AllOfUs"
                   defaultMessage="{collectiveName} is all of us"
                   values={{ collectiveName: collective.name }}
                 />
-              </H2>
-              <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+              </SectionTitle>
+              <H3 mb={3} fontWeight="normal" color="black.900">
                 <FormattedMessage
                   id="CollectivePage.OurContributors"
                   defaultMessage="Our contributors {count}"
