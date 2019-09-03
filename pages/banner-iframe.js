@@ -97,67 +97,105 @@ class BannerIframe extends React.Component {
         <style jsx global>
           {`
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
               font-style: normal;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Regular.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Regular.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-Regular.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-Regular.woff') format('woff');
             }
-
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
               font-style: italic;
               font-weight: 400;
-              src: url('/static/fonts/inter-ui/Inter-UI-Italic.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Italic.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-Italic.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-Italic.woff') format('woff');
             }
 
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
               font-style: normal;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-Medium.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Medium.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-Medium.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-Medium.woff') format('woff');
             }
-
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
               font-style: italic;
               font-weight: 500;
-              src: url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-MediumItalic.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-MediumItalic.woff') format('woff');
             }
 
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
+              font-style: normal;
+              font-weight: 600;
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-SemiBold.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-SemiBold.woff') format('woff');
+            }
+            @font-face {
+              font-family: 'Inter';
+              font-style: italic;
+              font-weight: 600;
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter';
               font-style: normal;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-Bold.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Bold.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-Bold.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-Bold.woff') format('woff');
             }
-
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
               font-style: italic;
               font-weight: 700;
-              src: url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BoldItalic.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-BoldItalic.woff') format('woff');
             }
 
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
+              font-style: normal;
+              font-weight: 800;
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-ExtraBold.woff') format('woff');
+            }
+            @font-face {
+              font-family: 'Inter';
+              font-style: italic;
+              font-weight: 800;
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
+            }
+
+            @font-face {
+              font-family: 'Inter';
               font-style: normal;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-Black.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-Black.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-Black.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-Black.woff') format('woff');
             }
-
             @font-face {
-              font-family: 'Inter UI';
+              font-family: 'Inter';
               font-style: italic;
               font-weight: 900;
-              src: url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff2') format('woff2'),
-                url('/static/fonts/inter-ui/Inter-UI-BlackItalic.woff') format('woff');
+              font-display: swap;
+              src: url('/static/fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
+                url('/static/fonts/inter/Inter-BlackItalic.woff') format('woff');
             }
 
             body {
@@ -165,7 +203,7 @@ class BannerIframe extends React.Component {
               height: 100%;
               padding: 0;
               margin: 0;
-              font-family: ${style.body && `${style.body.fontFamily},`} 'Inter UI', Helvetica, sans-serif;
+              font-family: ${style.body && `${style.body.fontFamily},`} 'Inter', Helvetica, sans-serif;
               font-weight: 300;
               font-size: 1rem;
               line-height: 1.5;

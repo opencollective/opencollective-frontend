@@ -20,11 +20,11 @@
 }
 
 .PricePage p, .PricePage span {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
 }
 
 .PricePage h1, .PricePage h2, .PricePage h3, .PricePage h4, .PricePage h5 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
 }
 
 .PricePage__hero {
@@ -149,7 +149,7 @@
   height: 64px;
   left: calc(50% - 539px/2 + 0.5px);
   top: calc(50% - 64px/2 - 124px);
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 600;
   line-height: 32px;
@@ -180,7 +180,7 @@
   height: 24px;
   left: calc(50% - 327px/2 + 0.5px);
   top: calc(50% - 24px/2 - 56px);
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: normal;
   line-height: 24px;
@@ -254,7 +254,7 @@
 }
 
 .PricePage__table__heading-1__text h3 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 800;
   line-height: 32px;
@@ -271,7 +271,7 @@
 }
 
 .PricePage__table__heading-1__text p {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
@@ -316,7 +316,7 @@
 }
 
 .PricePage__table__heading-2__text h4 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 24px;
@@ -363,7 +363,7 @@
 }
 
 .PricePage__table__item-1__text h4 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 18px;
@@ -374,7 +374,7 @@
 }
 
 .PricePage__table__item-1__text h3 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 18px;
@@ -385,7 +385,7 @@
 }
 
 .PricePage__table__item-1__text p {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: normal;
   line-height: 16px;
@@ -424,7 +424,7 @@
 }
 
 .PricePage__table__item-2__text h5 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 18px;
@@ -435,7 +435,7 @@
 }
 
 .PricePage__table__item-2__text p {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: normal;
   line-height: 16px;
@@ -494,7 +494,7 @@
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 600;
   line-height: 24px;
@@ -567,7 +567,7 @@
   height: 16px;
   left: 50%;
   top: 50%;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -603,7 +603,7 @@
   height: 16px;
   left: 50%;
   top: 50%;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -635,7 +635,7 @@
   top: 50%;
   left: 50%;
   width: 60%;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -663,7 +663,7 @@
 }
 
 .PricePage__table__res__content__item2 h3 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -677,7 +677,7 @@
 }
 
 .PricePage__table__res__content__item2 p {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: bold;
   line-height: 16px;
@@ -691,7 +691,7 @@
 }
 
 .PricePage__table__res__content__item2 span {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: normal;
   line-height: 16px;
@@ -828,7 +828,7 @@
 }
 
 .PricePage__create__container__content h1 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 800;
   line-height: 48px;
@@ -860,7 +860,7 @@
 }
 
 .PricePage__create__container__content p {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 600;
   line-height: 32px;
@@ -895,7 +895,7 @@
   background: #3385FF;
   border-radius: 100px;
   height: 56px;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
   line-height: 56px;
@@ -924,7 +924,7 @@
 
 .PricePage__create__container__content a.learn-more {
   margin-left: 40px;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: normal;
   line-height: 24px;
@@ -977,7 +977,7 @@
 }
 
 .PricePage__faq h1 {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 600;
   line-height: 40px;
@@ -1009,7 +1009,7 @@
 .PricePage__faq__panel-group__heading a, .PricePage__faq__panel-group__heading a:active {
   display: block;
   padding: 15px;
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
@@ -1034,7 +1034,7 @@
 }
 
 .PricePage__faq__panel-group__body {
-  font-family: 'Inter UI';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: normal;
   line-height: 24px;
