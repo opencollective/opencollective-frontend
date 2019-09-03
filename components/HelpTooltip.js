@@ -50,6 +50,7 @@ class HelpTooltip extends React.Component {
             .customTooltip {
               max-width: 400px;
               z-index: 1000000;
+              text-shadow: none;
               background: white !important;
               color: #6e747a !important;
               font-size: 12px !important;
@@ -59,9 +60,6 @@ class HelpTooltip extends React.Component {
             }
             .customTooltip.place-bottom::after {
               border-color: white transparent !important;
-            }
-            span {
-              text-shadow: none;
             }
           `}
         </style>
