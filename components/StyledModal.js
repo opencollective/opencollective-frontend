@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
@@ -113,8 +114,8 @@ ModalFooter.propTypes = {
  * a styled `Container`.
  */
 const StyledModal = ({ children, show, onClose, ...props }) => {
-  if (show) {
-    return (
+  if (show && typeof document !== 'undefined') {
+    return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
         <ModalWrapper {...props}>
@@ -126,7 +127,8 @@ const StyledModal = ({ children, show, onClose, ...props }) => {
           })}
         </ModalWrapper>
         <ModalOverlay onClick={onClose} />
-      </React.Fragment>
+      </React.Fragment>,
+      document.body,
     );
   } else {
     return null;
