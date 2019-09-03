@@ -35,6 +35,7 @@ class SectionContribute extends React.PureComponent {
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+        isBacker: PropTypes.bool,
       }),
     ),
   };
@@ -77,15 +78,21 @@ class SectionContribute extends React.PureComponent {
     return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
   });
 
+  getFinancialContributors = memoizeOne(contributors => {
+    return contributors.filter(c => c.isBacker);
+  });
+
   render() {
     const { collective, tiers, events, contributors, contributorsStats } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
+    const financialContributors = this.getFinancialContributors(contributors);
+    const hasNoContributor = financialContributors.length === 0;
 
     return (
       <Box py={[4, 5]}>
         <ContainerSectionContent>
           <SectionTitle>
-            <FormattedMessage id="CP.Sections.Contribute.Title" defaultMessage="Become a contributor" />
+            <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
           </SectionTitle>
         </ContainerSectionContent>
 
@@ -106,11 +113,16 @@ class SectionContribute extends React.PureComponent {
 
                 <ContributeCardsContainer ref={ref}>
                   <Box px={[3, 24]}>
-                    <ContributeCustom collective={collective} contributors={contributors} stats={contributorsStats} />
+                    <ContributeCustom
+                      collective={collective}
+                      contributors={financialContributors}
+                      stats={contributorsStats}
+                      hideContributors={hasNoContributor}
+                    />
                   </Box>
                   {tiers.map(tier => (
                     <Box key={tier.id} px={[3, 24]}>
-                      <ContributeTier collective={collective} tier={tier} />
+                      <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
                     </Box>
                   ))}
                 </ContributeCardsContainer>

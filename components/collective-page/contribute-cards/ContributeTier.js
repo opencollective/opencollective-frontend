@@ -31,21 +31,25 @@ const getContributionTypeFromTier = tier => {
   }
 };
 
-const ContributeTier = ({ intl, collective, tier }) => {
+const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const currency = tier.currency || collective.currency;
   const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
 
   let description;
-  if (tier.description) {
-    description = truncate(tier.description, { length: tier.hasLongDescription ? 60 : 256 });
-  } else {
+  let isTruncated = false;
+  if (!tier.description) {
     description = intl.formatMessage(messages.fallbackDescription, {
       minAmount,
       tierName: tier.name,
       minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
       interval: tier.interval,
     });
+  } else if (tier.description.length > 100) {
+    description = truncate(tier.description, { length: 100 });
+    isTruncated = true;
+  } else {
+    description = tier.description;
   }
 
   return (
@@ -57,6 +61,7 @@ const ContributeTier = ({ intl, collective, tier }) => {
       buttonText={tier.button}
       contributors={tier.contributors}
       stats={tier.stats.contributors}
+      {...props}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
         <div>
@@ -100,9 +105,9 @@ const ContributeTier = ({ intl, collective, tier }) => {
               </Box>
             </Box>
           )}
-          <P mb={4} mt={2}>
+          <P mb={4}>
             {description}{' '}
-            {tier.hasLongDescription && (
+            {(isTruncated || tier.hasLongDescription) && (
               <Link
                 route="tier"
                 params={{
