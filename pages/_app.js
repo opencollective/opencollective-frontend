@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import App, { Container } from 'next/app';
+import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
@@ -76,7 +76,7 @@ class OpenCollectiveFrontendApp extends App {
     const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
 
     return (
-      <Container>
+      <Fragment>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
@@ -91,7 +91,7 @@ class OpenCollectiveFrontendApp extends App {
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
-      </Container>
+      </Fragment>
     );
   }
 }
