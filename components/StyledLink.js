@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
@@ -34,6 +34,23 @@ const StyledLink = styled.a`
     text-decoration: none;
     color: ${themeGet('colors.black.300')};
   }
+
+  ${props =>
+    props.buttonStyle &&
+    css`
+      cursor: pointer;
+      outline: 0;
+      border: 1px solid;
+      border-radius: 100px;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+
+      &:focus {
+        box-shadow: 0px 0px 0px 2px #83ebb4;
+      }
+    `}
 `;
 
 StyledLink.propTypes = {
