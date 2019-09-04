@@ -27,7 +27,7 @@
   "addfunds.organization.label": "组织",
   "addfunds.platformFeePercent.label": "平台费用",
   "addfunds.platformFees": "平台费用 ({platformFees})",
-  "addfunds.submit": "Add Funds",
+  "addfunds.submit": "追加资金",
   "addfunds.title": "Add Funds to {collective}",
   "addfunds.totalAmount": "Funding amount",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
