@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { typography } from 'styled-system';
+import { typography, size } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
@@ -35,10 +35,10 @@ const CustomCheckbox = styled.span`
 `;
 
 const CheckboxContainer = styled(Flex)`
-  ${typography}
-  height: ${props => props.size};
   align-items: center;
   width: 100%;
+  ${size}
+  ${typography}
 
   /* Hide the default checkbox */
   input {
@@ -59,12 +59,11 @@ const CheckboxContainer = styled(Flex)`
 
   /* Show our custom checkbox */
   ${CustomCheckbox} {
-    height: ${props => props.size};
-    width: ${props => props.size};
+    ${size}
   }
 
   /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
-  @media (hover:hover) {
+  @media (hover: hover) {
     &:hover input:not(:disabled):not(:checked) ~ ${CustomCheckbox} {
       background: ${themeGet('colors.primary.100')};
       border-color: ${themeGet('colors.primary.100')};

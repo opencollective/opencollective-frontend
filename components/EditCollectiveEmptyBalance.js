@@ -58,12 +58,7 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
         </StyledButton>
       )}
 
-      <Modal
-        show={modal.show}
-        width="570px"
-        height="230px"
-        onClose={() => setModal({ ...modal, show: false, isApproved: false })}
-      >
+      <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false, isApproved: false })}>
         <ModalHeader>
           <FormattedMessage
             id="collective.emptyBalance.header"
@@ -90,11 +85,7 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
               data-cy="action"
               onClick={() => setModal({ ...modal, show: false, isApproved: true })}
             >
-              <FormattedMessage
-                id="collective.archive.confirm.btn"
-                values={{ action: modal.type }}
-                defaultMessage={'{action}'}
-              />
+              <FormattedMessage id="collective.empty.confirm.btn" defaultMessage={'Confirm'} />
             </StyledButton>
           </Container>
         </ModalFooter>

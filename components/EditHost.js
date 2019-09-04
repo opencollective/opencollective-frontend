@@ -180,7 +180,7 @@ class EditHost extends React.Component {
               )}
             </Box>
           </Flex>
-          <Modal show={showModal} width="570px" height="250px" onClose={() => this.setState({ showModal: false })}>
+          <Modal show={showModal} width="570px" onClose={() => this.setState({ showModal: false })}>
             <ModalHeader>
               {action === 'Remove' ? (
                 <FormattedMessage id="collective.editHost.remove" values={{ name }} defaultMessage={'Remove {name}'} />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Times } from 'styled-icons/fa-solid/Times';
@@ -52,10 +53,14 @@ const Body = styled(Container)`
 `;
 
 const Divider = styled.div`
-  margin: 3rem 0;
+  margin: 2rem 0;
   width: 100%;
   height: 1px;
   background-color: #e1e4e6;
+
+  @media (min-width: 52em) {
+    margin: 3rem 0;
+  }
 `;
 
 const CloseIcon = styled(Times)`
@@ -113,8 +118,8 @@ ModalFooter.propTypes = {
  * a styled `Container`.
  */
 const StyledModal = ({ children, show, onClose, ...props }) => {
-  if (show) {
-    return (
+  if (show && typeof document !== 'undefined') {
+    return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
         <ModalWrapper {...props}>
@@ -126,7 +131,8 @@ const StyledModal = ({ children, show, onClose, ...props }) => {
           })}
         </ModalWrapper>
         <ModalOverlay onClick={onClose} />
-      </React.Fragment>
+      </React.Fragment>,
+      document.body,
     );
   } else {
     return null;
