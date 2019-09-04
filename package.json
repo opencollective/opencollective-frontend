@@ -63,7 +63,7 @@
     "node-fetch": "2.6.0",
     "nodemailer": "6.3.0",
     "nprogress": "0.2.0",
-    "nuka-carousel": "4.5.9",
+    "nuka-carousel": "4.5.11",
     "payment": "2.3.0",
     "polished": "3.4.1",
     "prop-types": "15.7.2",
