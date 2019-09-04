@@ -111,6 +111,7 @@ class HostDashboardPage extends React.Component {
             collective={host}
             href={`/${host.slug}/dashboard`}
             className="small"
+            forceLegacy
             title={
               <FormattedMessage
                 id="host.dashboard.title"
