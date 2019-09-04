@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Aug 29 2019 10:01:51 GMT+0200 (GMT+02:00)
+# timestamp: Wed Sep 04 2019 09:58:05 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -221,6 +221,11 @@ type Collective implements CollectiveInterface {
     isConfirmed: Boolean = true
     types: [String]
     orderBy: PaymenMethodOrderField = type
+
+    """
+    Defines if the organization "collective" payment method should be returned
+    """
+    includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -469,6 +474,11 @@ interface CollectiveInterface {
     Order entries based on given column. Set to null for no ordering.
     """
     orderBy: PaymenMethodOrderField
+
+    """
+    Defines if the organization "collective" payment method should be returned
+    """
+    includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
   createdVirtualCards(
     limit: Int
@@ -614,7 +624,7 @@ type CollectiveStatsType {
   """
   Total amount raised through referral
   """
-  totalAmountRaised: Int
+  totalAmountRaised: Int @deprecated(reason: "2019-08-22: Referals are not supported anymore")
   yearlyBudget: Int
   topExpenses: JSON
   topFundingSources: JSON
@@ -1017,6 +1027,11 @@ type Event implements CollectiveInterface {
     isConfirmed: Boolean = true
     types: [String]
     orderBy: PaymenMethodOrderField = type
+
+    """
+    Defines if the organization "collective" payment method should be returned
+    """
+    includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -1894,7 +1909,7 @@ type OrderType {
   """
   Referral user collective
   """
-  referral: CollectiveInterface
+  referral: CollectiveInterface @deprecated(reason: "2019-08-22: Referals are not supported anymore")
   tier: Tier
 
   """
@@ -2108,6 +2123,11 @@ type Organization implements CollectiveInterface {
     isConfirmed: Boolean = true
     types: [String]
     orderBy: PaymenMethodOrderField = type
+
+    """
+    Defines if the organization "collective" payment method should be returned
+    """
+    includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -2517,7 +2537,7 @@ type StatsMemberType {
   """
   total amount raised by this member
   """
-  totalRaised: Int
+  totalRaised: Int @deprecated(reason: "2019-08-22: Referals are not supported anymore")
 }
 
 """
@@ -3033,6 +3053,11 @@ type User implements CollectiveInterface {
     isConfirmed: Boolean = true
     types: [String]
     orderBy: PaymenMethodOrderField = type
+
+    """
+    Defines if the organization "collective" payment method should be returned
+    """
+    includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
