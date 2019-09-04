@@ -720,6 +720,11 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
             type: PaymentMethodOrderFieldType,
             description: 'Order entries based on given column. Set to null for no ordering.',
           },
+          includeOrganizationCollectivePaymentMethod: {
+            type: GraphQLBoolean,
+            defaultValue: false,
+            description: 'Defines if the organization "collective" payment method should be returned',
+          },
         },
       },
       createdVirtualCards: {
@@ -1450,6 +1455,11 @@ const CollectiveFields = () => {
           type: PaymentMethodOrderFieldType,
           defaultValue: 'type',
         },
+        includeOrganizationCollectivePaymentMethod: {
+          type: GraphQLBoolean,
+          defaultValue: false,
+          description: 'Defines if the organization "collective" payment method should be returned',
+        },
       },
       async resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
@@ -1457,7 +1467,7 @@ const CollectiveFields = () => {
         }
         let paymentMethods = await req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
         // Filter Payment Methods used by organizations for "Add Funds"
-        if (collective.type === 'ORGANIZATION') {
+        if (!args.includeOrganizationCollectivePaymentMethod && collective.type === 'ORGANIZATION') {
           paymentMethods = paymentMethods.filter(pm => !(pm.service === 'opencollective' && pm.type === 'collective'));
         }
         // Filter only "saved" stripe Payment Methods
