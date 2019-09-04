@@ -71,6 +71,10 @@ const ImageContainer = styled.div`
   right: 0;
   position: absolute;
   overflow: hidden;
+
+  img {
+    margin: 0;
+  }
 `;
 
 const BackgroundImage = styled.img.attrs({ alt: '' })`

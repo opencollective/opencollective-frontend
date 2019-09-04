@@ -53,7 +53,7 @@ const MenuLink = styled.a`
     text-decoration: none;
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     padding: 16px;
   }
 `;
@@ -79,7 +79,7 @@ const MenuLinkContainer = styled.div`
       ${MenuLink} {
         color: #090a0a;
       }
-      @media (min-width: 40em) {
+      @media (min-width: 52em) {
         &::after {
           width: 100%;
           float: left;
@@ -90,12 +90,12 @@ const MenuLinkContainer = styled.div`
   ${props =>
     props.mobileOnly &&
     css`
-      @media (min-width: 40em) {
+      @media (min-width: 52em) {
         display: none;
       }
     `}
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
@@ -118,7 +118,7 @@ const InfosContainer = styled(Container)`
   transform: translateY(0);
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     padding: 12px 16px;
   }
 
@@ -139,7 +139,7 @@ const ExpandMenuIcon = styled(ChevronDown).attrs({ size: 28 })`
   margin-rigth: 4px;
   flex: 0 0 28px;
 
-  @media (min-width: 40em) {
+  @media (min-width: 52em) {
     display: none;
   }
 
@@ -165,7 +165,7 @@ const CollectiveName = styled.h1`
     color: #313233;
   }
 
-  @media (min-width: 40em) {
+  @media (min-width: 52em) {
     text-align: center;
   }
 `;
@@ -313,10 +313,10 @@ const CollectiveNavbar = ({
       >
         <Container
           flex="2 1 600px"
-          display={isExpended ? 'flex' : ['none', 'flex']}
+          display={isExpended ? 'flex' : ['none', null, 'flex']}
           css={{ overflowX: 'auto' }}
           data-cy="CollectivePage.NavBar"
-          flexDirection={['column', 'row']}
+          flexDirection={['column', null, 'row']}
           height="100%"
           borderBottom={['1px solid #e6e8eb', 'none']}
         >
@@ -360,7 +360,11 @@ const CollectiveNavbar = ({
           )}
         </Container>
         <div>
-          <CollectiveCallsToAction display={['none', 'flex']} collective={collective} callsToAction={callsToAction} />
+          <CollectiveCallsToAction
+            display={['none', null, 'flex']}
+            collective={collective}
+            callsToAction={callsToAction}
+          />
         </div>
       </Container>
     </MainContainer>
