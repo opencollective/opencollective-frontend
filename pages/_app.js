@@ -72,6 +72,7 @@ class OpenCollectiveFrontendApp extends App {
     const digitalClimateStrikeBannerEnabled = true;
     const digitalClimateStrikeFullpageEnabled = ctx.req && ctx.req.url === '/';
     const digitalClimateStrikeOptions = {
+      enabled: !process.env.CI,
       cookieExpirationDays: 30,
       disableGoogleAnalytics: true,
       showCloseButtonOnFullPageWidget: true,
@@ -110,12 +111,16 @@ class OpenCollectiveFrontendApp extends App {
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
-          }}
-        />
-        <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js" />
+        {digitalClimateStrikeOptions && digitalClimateStrikeOptions.enabled && (
+          <Fragment>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
+              }}
+            />
+            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js" />
+          </Fragment>
+        )}
       </Fragment>
     );
   }
