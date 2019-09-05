@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 import config from 'config';
-import Hashids from 'hashids';
+import Hashids from 'hashids/cjs';
 
 const alphabet = '1234567890abcdefghijklmnopqrstuvwxyz';
 
