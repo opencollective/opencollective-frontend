@@ -21,8 +21,8 @@ export default class Body extends React.Component {
             main {
               height: 100%;
               width: 100%;
-              font-family: 'Inter UI', sans-serif;
-              letter-spacing: -0.2px;
+              font-family: 'Inter', sans-serif;
+              letter-spacing: -0.4px;
               font-weight: 300;
               font-size: 1.6rem;
               line-height: 1.5;
