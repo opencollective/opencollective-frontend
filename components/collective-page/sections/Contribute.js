@@ -5,7 +5,7 @@ import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { H2, H3 } from '../../Text';
+import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
@@ -13,6 +13,7 @@ import Link from '../../Link';
 import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
 
+import SectionTitle from '../SectionTitle';
 import ContributeCardsContainer from '../contribute-cards/ContributeCardsContainer';
 import ContributeCustom from '../contribute-cards/ContributeCustom';
 import ContributeTier from '../contribute-cards/ContributeTier';
@@ -34,6 +35,7 @@ class SectionContribute extends React.PureComponent {
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+        isBacker: PropTypes.bool,
       }),
     ),
   };
@@ -76,16 +78,22 @@ class SectionContribute extends React.PureComponent {
     return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
   });
 
+  getFinancialContributors = memoizeOne(contributors => {
+    return contributors.filter(c => c.isBacker);
+  });
+
   render() {
     const { collective, tiers, events, contributors, contributorsStats } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
+    const financialContributors = this.getFinancialContributors(contributors);
+    const hasNoContributor = financialContributors.length === 0;
 
     return (
       <Box py={[4, 5]}>
         <ContainerSectionContent>
-          <H2 mb={3} fontWeight="normal" color="black.900">
-            <FormattedMessage id="CollectivePage.Contribute" defaultMessage="Contribute" />
-          </H2>
+          <SectionTitle>
+            <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
+          </SectionTitle>
         </ContainerSectionContent>
 
         <Box mb={4}>
@@ -94,11 +102,8 @@ class SectionContribute extends React.PureComponent {
               <div>
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                    <H3 fontSize="H5" fontWeight="normal" color="black.900">
-                      <FormattedMessage
-                        id="CollectivePage.FinancialContributor"
-                        defaultMessage="Become a financial contributor"
-                      />
+                    <H3 fontSize="H5" fontWeight="600" color="black.700">
+                      <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
                     </H3>
                     <Box m={2} flex="0 0 50px">
                       <Chevrons />
@@ -108,11 +113,16 @@ class SectionContribute extends React.PureComponent {
 
                 <ContributeCardsContainer ref={ref}>
                   <Box px={[3, 24]}>
-                    <ContributeCustom collective={collective} contributors={contributors} stats={contributorsStats} />
+                    <ContributeCustom
+                      collective={collective}
+                      contributors={financialContributors}
+                      stats={contributorsStats}
+                      hideContributors={hasNoContributor}
+                    />
                   </Box>
                   {tiers.map(tier => (
                     <Box key={tier.id} px={[3, 24]}>
-                      <ContributeTier collective={collective} tier={tier} />
+                      <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
                     </Box>
                   ))}
                 </ContributeCardsContainer>
@@ -126,7 +136,7 @@ class SectionContribute extends React.PureComponent {
               <div>
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                    <H3 fontSize="H5" fontWeight="normal" color="black.900">
+                    <H3 fontSize="H5" fontWeight="600" color="black.700">
                       <FormattedMessage
                         id="CollectivePage.MoreWaysToContribute"
                         defaultMessage="More ways to contribute"

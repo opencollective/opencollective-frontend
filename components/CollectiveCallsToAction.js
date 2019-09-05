@@ -3,13 +3,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import dynamic from 'next/dynamic';
 
-import { Mail } from 'styled-icons/feather/Mail';
-import { FileText as ExpenseIcon } from 'styled-icons/feather/FileText';
-
 import Container from './Container';
 import StyledButton from './StyledButton';
 import Link from './Link';
-import { Span } from './Text';
 
 // Dynamic imports
 const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn' */ './ApplyToHostBtn'));
@@ -27,19 +23,13 @@ const CollectiveCallsToAction = ({
       {hasContact && (
         <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
           <StyledButton mx={2}>
-            <Span mr="5px">
-              <Mail size="1.1em" style={{ verticalAlign: 'sub' }} />
-            </Span>
             <FormattedMessage id="Contact" defaultMessage="Contact" />
           </StyledButton>
         </a>
       )}
       {hasSubmitExpense && (
         <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2}>
-            <Span mr="5px">
-              <ExpenseIcon size="1.5em" />
-            </Span>
+          <StyledButton mx={2} buttonStyle="secondary">
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </StyledButton>
         </Link>
