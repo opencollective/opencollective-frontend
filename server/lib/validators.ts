@@ -4,7 +4,9 @@
 
 // --- Validators for videos ---
 
-const ProvidersRegexs = {
+type RegexMap = { [s: string]: RegExp };
+
+const ProvidersRegexs: RegexMap = {
   YouTube: /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/i,
   Vimeo: /:\/\/(www\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^/]*)\/videos\/|)(\d+)(?:|\/\?)/i,
 };
@@ -19,7 +21,7 @@ export const supportedVideoProviders = Object.keys(ProvidersRegexs);
  *
  * Returns `false` if `url` is null, undefined or empty.
  */
-export const isSupportedVideoProvider = url => {
+export const isSupportedVideoProvider = (url: string): boolean => {
   if (!url) {
     return false;
   }

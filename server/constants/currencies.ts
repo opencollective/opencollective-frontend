@@ -1,5 +1,12 @@
+type CurrenciesMap = {
+  [s: string]: {
+    fxrate: Number;
+    format: (value: string | Number) => string;
+  };
+};
+
 // FX Rates as of 10/3/2017
-export default {
+const fxRates: CurrenciesMap = {
   AUD: { fxrate: 1.25, format: value => `${value} AUD` },
   CAD: { fxrate: 1.23, format: value => `${value} CAD` },
   EUR: { fxrate: 0.83, format: value => `€${value}` },
@@ -10,3 +17,5 @@ export default {
   USD: { fxrate: 1, format: value => `$${value}` },
   UYU: { fxrate: 29.17, format: value => `$U ${value}` },
 };
+
+export default fxRates;

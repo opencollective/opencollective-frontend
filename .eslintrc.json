@@ -1,5 +1,6 @@
 {
-  "extends": ["opencollective"],
+  "extends": ["plugin:@typescript-eslint/recommended", "plugin:import/typescript", "opencollective"],
+  "parser": "@typescript-eslint/parser",
   "env": { "mocha": true },
   "plugins": ["mocha"],
   "rules": {
@@ -13,6 +14,23 @@
     "node/shebang": "off",
     "no-useless-escape": "off",
     // relaxing because we have many errors
-    "require-atomic-updates": "warn"
+    "require-atomic-updates": "warn",
+    // typescript
+    "node/no-missing-import": ["error", { "tryExtensions": [".js", ".ts"] }]
+  },
+  // Disable typescript checks in JS
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "rules": {
+        "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/indent": "off"
+      }
+    }
+  ],
+  "settings": {
+    // Ignore .d.ts files for import (they just define the types)
+    "import/ignore": [".d.ts$"]
   }
 }

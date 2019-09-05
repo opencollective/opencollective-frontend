@@ -107,7 +107,10 @@
   "devDependencies": {
     "@babel/cli": "7.5.5",
     "@babel/polyfill": "7.4.4",
+    "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "7.5.5",
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
     "babel-eslint": "^10.0.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -133,7 +136,8 @@
     "react-dom": "^16.9.0",
     "sinon": "^7.4.2",
     "supertest": "^4.0.2",
-    "supertest-as-promised": "^4.0.2"
+    "supertest-as-promised": "^4.0.2",
+    "typescript": "^3.5.3"
   },
   "scripts": {
     "build": "npm run build:clean && npm run build:updates && npm run build:server",
@@ -165,7 +169,7 @@
     "db:setup": "babel-node ./scripts/db_setup.js",
     "deploy:production": "./scripts/pre-deploy.sh production && bash -x scripts/deploy.sh production",
     "deploy:staging": "./scripts/pre-deploy.sh staging && bash -x scripts/deploy.sh staging",
-    "dev": "nodemon server/index.js -x babel-node . -e js,hbs",
+    "dev": "nodemon server/index.js -x \"babel-node --extensions .js,.ts\" . -e js,hbs,ts",
     "export:csv": "babel-node scripts/monthly_data_exports.js",
     "git:clean": "./scripts/git_clean.sh",
     "hint": "npm run lint:quiet",
@@ -183,7 +187,8 @@
     "start": "node ./dist/index.js",
     "test": "TZ=UTC nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
     "test:clean": "rm -rf .nyc_output coverage test/output",
-    "test:watch": "TZ=UTC nyc mocha --watch"
+    "test:watch": "TZ=UTC nyc mocha --watch",
+    "type:check": "tsc"
   },
   "nyc": {
     "reporter": [
