@@ -12,6 +12,7 @@ import StyledCard from './StyledCard';
 import StyledRadioList from './StyledRadioList';
 import StyledInput from './StyledInput';
 import GithubRepositoryEntry from './GithubRepositoryEntry';
+import { injectIntl, defineMessages } from 'react-intl';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
@@ -24,10 +25,14 @@ const RepositoryEntryContainer = styled(Container)`
   }
 `;
 
+const messages = defineMessages({
+  filterByName: { id: 'Filter.ByName', defaultMessage: 'Filter by name' },
+});
+
 /**
  * Component for displaying list of public repositories
  */
-const GithubRepositories = ({ repositories, onCreateCollective, creatingCollective, ...fieldProps }) => {
+const GithubRepositories = ({ repositories, onCreateCollective, creatingCollective, intl, ...fieldProps }) => {
   const [search, setSearch] = useState('');
   if (search) {
     const test = new RegExp(escapeInput(search), 'i');
@@ -45,7 +50,7 @@ const GithubRepositories = ({ repositories, onCreateCollective, creatingCollecti
             type="text"
             fontSize="Paragraph"
             lineHeight="Paragraph"
-            placeholder="Filter by name..."
+            placeholder={intl.formatMessage(messages.filterByName)}
             onChange={({ target }) => {
               setSearch(target.value);
             }}
@@ -87,6 +92,8 @@ GithubRepositories.propTypes = {
   creatingCollective: PropTypes.bool,
   /** handles the submitted collective */
   onCreateCollective: PropTypes.func.isRequired,
+  /** @ignore from injectIntl */
+  intl: PropTypes.object,
 };
 
-export default GithubRepositories;
+export default injectIntl(GithubRepositories);
