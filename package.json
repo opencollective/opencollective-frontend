@@ -125,7 +125,7 @@
     "lint-staged": "^9.2.5",
     "mocha": "^6.2.0",
     "mocha-circleci-reporter": "^0.0.3",
-    "nock": "^10.0.6",
+    "nock": "^11.3.1",
     "nodemon": "^1.19.2",
     "nyc": "^14.1.1",
     "prettier": "1.18.2",
