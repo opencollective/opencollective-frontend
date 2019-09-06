@@ -31,7 +31,7 @@ import BubblesSVG from './Bubbles.svg';
 const TierCover = styled(Container)`
   width: 100%;
   height: ${Dimensions.COVER_HEIGHT}px;
-  background-color: #005ea6;
+  background-color: ${props => props.theme.colors.primary[300]};
   background-repeat: no-repeat;
   background-size: cover;
   filter: blur(15px);
@@ -321,7 +321,7 @@ class TierPage extends Component {
                       collectiveSlug: collective.slug,
                     }}
                   >
-                    <StyledButton buttonStyle="dark" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
+                    <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                       <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
                     </StyledButton>
                   </Link>

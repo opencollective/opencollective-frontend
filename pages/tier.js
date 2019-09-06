@@ -9,6 +9,7 @@ import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import TierPageContent from '../components/tier-page';
 
 /** Overrides global styles for this page */
@@ -76,13 +77,15 @@ class TierPage extends React.Component {
         ) : (
           <React.Fragment>
             <GlobalStyles />
-            <TierPageContent
-              LoggedInUser={LoggedInUser}
-              collective={data.Tier.collective}
-              tier={data.Tier}
-              contributors={data.Tier.contributors}
-              contributorsStats={data.Tier.stats.contributors}
-            />
+            <CollectiveThemeProvider collective={data.Tier.collective}>
+              <TierPageContent
+                LoggedInUser={LoggedInUser}
+                collective={data.Tier.collective}
+                tier={data.Tier}
+                contributors={data.Tier.contributors}
+                contributorsStats={data.Tier.stats.contributors}
+              />
+            </CollectiveThemeProvider>
           </React.Fragment>
         )}
       </Page>
@@ -90,7 +93,7 @@ class TierPage extends React.Component {
   }
 }
 
-const getCollective = graphql(gql`
+const getTierData = graphql(gql`
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
@@ -122,6 +125,7 @@ const getCollective = graphql(gql`
         type
         name
         backgroundImage
+        settings
         admins: members(role: "ADMIN") {
           id
           role
@@ -159,4 +163,4 @@ const getCollective = graphql(gql`
   }
 `);
 
-export default withUser(getCollective(TierPage));
+export default withUser(getTierData(TierPage));
