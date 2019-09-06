@@ -13,7 +13,6 @@ import Container from '../../Container';
 
 // Local imports
 import { ContributionTypes, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../_constants';
-import tierCardDefaultImage from '../images/ContributeCardDefaultImage.svg';
 
 /** The main container */
 const StyledContributeCard = styled.div`
@@ -28,8 +27,11 @@ const StyledContributeCard = styled.div`
 
 /** Tier card banner */
 const CoverImage = styled.div`
-  background-color: #f5f7fa;
-  background-image: url(${tierCardDefaultImage});
+  background: ${props => {
+    const primary = props.theme.colors.primary;
+    const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 150%)`;
+    return `${radial}, ${primary[500]}`;
+  }};
   height: 104px;
   background-repeat: no-repeat;
   background-size: cover;

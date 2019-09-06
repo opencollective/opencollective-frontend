@@ -35,7 +35,7 @@ const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ '
 
 const generateBackground = theme => {
   const color = theme.colors.primary[300];
-  const gradient = `linear-gradient(10deg, ${theme.colors.primary[700]}, ${theme.colors.primary[200]})`;
+  const gradient = `linear-gradient(10deg, ${theme.colors.primary[800]}, ${theme.colors.primary[300]})`;
   return `${gradient}, ${color}`;
 };
 
