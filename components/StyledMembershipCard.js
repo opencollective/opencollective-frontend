@@ -89,31 +89,35 @@ const StyledMembershipCard = ({ membership, ...props }) => {
           ) : (
             <Box mb={2}>
               <P fontSize="Caption">
-                <FormattedMessage
-                  id="Membership.ContributorsCount"
-                  defaultMessage="{count, plural, one {<strong>1</strong> Contributor} other {<strong>{count}</strong> Contributors}} "
-                  values={{
-                    count: collective.stats.backers.all,
-                    strong: formatStrongValue,
-                  }}
-                />
+                {collective.stats.backers.all > 0 && (
+                  <FormattedMessage
+                    id="Membership.ContributorsCount"
+                    defaultMessage="{count, plural, one {<strong>1</strong> Contributor} other {<strong>{count}</strong> Contributors}} "
+                    values={{
+                      count: collective.stats.backers.all,
+                      strong: formatStrongValue,
+                    }}
+                  />
+                )}
               </P>
               <P mt={3} fontSize="Caption">
-                <FormattedMessage
-                  id="StyledMembershipCard.YearlyBudget"
-                  defaultMessage="{amount} yearly budget"
-                  values={{
-                    amount: (
-                      <Span fontWeight="bold">
-                        <FormattedMoneyAmount
-                          amount={collective.stats.yearlyBudget}
-                          currency={collective.currency || 'USD'}
-                          amountStyles={{ fontSize: 'LeadParagraph' }}
-                        />
-                      </Span>
-                    ),
-                  }}
-                />
+                {collective.stats.yearlyBudget > 0 && (
+                  <FormattedMessage
+                    id="StyledMembershipCard.YearlyBudget"
+                    defaultMessage="{amount} yearly budget"
+                    values={{
+                      amount: (
+                        <Span fontWeight="bold">
+                          <FormattedMoneyAmount
+                            amount={collective.stats.yearlyBudget}
+                            currency={collective.currency || 'USD'}
+                            amountStyles={{ fontSize: 'LeadParagraph' }}
+                          />
+                        </Span>
+                      ),
+                    }}
+                  />
+                )}
               </P>
             </Box>
           )}
@@ -125,8 +129,8 @@ const StyledMembershipCard = ({ membership, ...props }) => {
 
 StyledMembershipCard.propTypes = {
   membership: PropTypes.shape({
-    role: PropTypes.string.isRequired,
-    since: PropTypes.string.isRequired,
+    role: PropTypes.string,
+    since: PropTypes.string,
     stats: PropTypes.shape({
       totalDonations: PropTypes.numer,
     }),
