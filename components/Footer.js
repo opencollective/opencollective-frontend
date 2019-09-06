@@ -130,7 +130,7 @@ class Footer extends React.Component {
                     />
                   )}
                 >
-                  <InfoCircle size={16} cursor="pointer" />
+                  <InfoCircle size={16} />
                 </StyledTooltip>
               </P>
               <div data-cy="language-switcher">

@@ -72,9 +72,11 @@ const UnderlinedTerm = styled.span`
 const DefinedTerm = ({ intl, term, termTextTransform, children, color }) => {
   return (
     <StyledTooltip content={() => intl.formatMessage(TranslatedDefinitions[term])}>
-      <UnderlinedTerm textTransform={termTextTransform} color={color} borderColor={color}>
-        {children || intl.formatMessage(TranslatedTerms[term])}
-      </UnderlinedTerm>
+      {props => (
+        <UnderlinedTerm {...props} textTransform={termTextTransform} color={color} borderColor={color}>
+          {children || intl.formatMessage(TranslatedTerms[term])}
+        </UnderlinedTerm>
+      )}
     </StyledTooltip>
   );
 };
