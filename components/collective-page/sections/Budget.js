@@ -82,7 +82,6 @@ const SectionBudget = ({ collective, stats, intl }) => {
                     const isExpense = __typename === 'ExpenseType';
                     const isCredit = type === 'CREDIT';
                     const ItemContainer = isExpense || !isCredit ? DebitItem : CreditItem;
-                    const amount = isExpense ? item.amount : item.netAmountInCollectiveCurrency;
                     const currency = collective.currency;
 
                     return (
@@ -138,7 +137,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                               </Span>
                             )}
                             <Span fontWeight="bold" mr={1}>
-                              {formatCurrency(Math.abs(amount), currency)}
+                              {formatCurrency(Math.abs(item.amount), currency)}
                             </Span>
                             <Span color="black.400" textTransform="uppercase">
                               {currency}
@@ -224,7 +223,7 @@ SectionBudget.propTypes = {
   transactions: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number,
-      netAmountInCollectiveCurrency: PropTypes.number,
+      amount: PropTypes.number,
       type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
       usingVirtualCardFromCollective: PropTypes.shape({
         id: PropTypes.number,
