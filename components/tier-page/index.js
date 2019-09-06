@@ -206,7 +206,14 @@ class TierPage extends Component {
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
-                <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line" data-cy="shortDescription">
+                <H3
+                  color="black.500"
+                  fontSize="H5"
+                  mb={4}
+                  whiteSpace="pre-line"
+                  data-cy="shortDescription"
+                  wordBreak="break-word"
+                >
                   <InlineEditField
                     mutation={EditTierMutation}
                     canEdit={canEdit}
