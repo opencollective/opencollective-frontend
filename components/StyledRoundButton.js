@@ -8,7 +8,9 @@ import StyledButton from './StyledButton';
 const StyledRoundButton = styled(StyledButton).attrs({
   p: 0,
   textAlign: 'center',
-})``;
+})`
+  line-height: 1;
+`;
 
 StyledRoundButton.propTypes = {
   /** From styled-system: accepts any css 'width' value */
