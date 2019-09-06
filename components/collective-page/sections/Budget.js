@@ -108,7 +108,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
                                       ),
                                       collectiveGiftCardName: item.usingVirtualCardFromCollective.name,
                                       giftCard: (
-                                        <DefinedTerm term={Terms.GIFT_CARD} termTextTransform="lowercase" intl={intl} />
+                                        <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" intl={intl} />
                                       ),
                                     }}
                                   />
@@ -186,10 +186,8 @@ const SectionBudget = ({ collective, stats, intl }) => {
             )}
           </Box>
           <Container flex="1" background="#F5F7FA" py={16} px={24}>
-            <P fontSize="Tiny" textTransform="uppercase" color="black.700">
-              <FormattedMessage id="CollectivePage.SectionBudget.Annual" defaultMessage="Estimated annual budget" />
-            </P>
-            <P fontSize="H5" mt={1}>
+            <DefinedTerm term={Terms.ESTIMATED_BUDGET} fontSize="Tiny" textTransform="uppercase" color="black.700" />
+            <P fontSize="H5" mt={2}>
               <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
               <Span color="black.400">{collective.currency}</Span>
             </P>
