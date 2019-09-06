@@ -234,6 +234,7 @@
   "CollectivePage.NavBar.Updates": "Updates",
   "CollectivePage.OurContributors": "Our contributors {count}",
   "CollectivePage.SectionBudget.Annual": "Estimated annual budget",
+  "CollectivePage.SectionBudget.Annual.Definition": "Projected annual budget based on total financial contributions from the past 12 months.",
   "CollectivePage.SectionBudget.Balance": "Today’s balance",
   "CollectivePage.SectionBudget.Description": "See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reinmbursed and more!",
   "CollectivePage.SectionBudget.SubmitExpense": "Submit Expenses",
