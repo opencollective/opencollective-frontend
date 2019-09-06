@@ -48,6 +48,10 @@ const StyledBackground = styled.div`
   max-width: 1368px; // Should match SVG's viewbox
   z-index: ${props => (props.isEditing ? 0 : -1)};
 
+  img {
+    margin: 0;
+  }
+
   @supports (mask-size: cover) {
     background: ${props => generateBackground(props.theme)};
     background-repeat: no-repeat;
@@ -71,10 +75,6 @@ const ImageContainer = styled.div`
   right: 0;
   position: absolute;
   overflow: hidden;
-
-  img {
-    margin: 0;
-  }
 `;
 
 const BackgroundImage = styled.img.attrs({ alt: '' })`
