@@ -16,8 +16,8 @@ export const TransactionsAndExpensesFragment = gql`
         id
         slug
         name
-        image
         type
+        imageUrl
         isIncognito
       }
       usingVirtualCardFromCollective {
@@ -40,8 +40,9 @@ export const TransactionsAndExpensesFragment = gql`
         id
         slug
         name
-        image
         type
+        imageUrl
+        isIncognito
       }
     }
   }
@@ -65,7 +66,7 @@ export const UpdatesFieldsFragment = gql`
       type
       name
       slug
-      image
+      imageUrl
     }
   }
 `;

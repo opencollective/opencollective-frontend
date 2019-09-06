@@ -7,7 +7,7 @@ import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
 import { formatCurrency } from '../../../lib/utils';
-import { H3, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
@@ -20,6 +20,7 @@ import MessageBox from '../../MessageBox';
 import StyledLink from '../../StyledLink';
 
 import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
 import { TransactionsAndExpensesFragment } from '../graphql/fragments';
 
 /** Query to re-fetch transactions and expenses */
@@ -41,9 +42,9 @@ const TransactionsAndExpensesQuery = gql`
 const SectionBudget = ({ collective, stats, intl }) => {
   return (
     <ContainerSectionContent py={[4, 5]}>
-      <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+      <SectionTitle>
         <FormattedMessage id="CollectivePage.SectionBudget.Title" defaultMessage="Latest transactions" />
-      </H3>
+      </SectionTitle>
       <P color="black.600" mb={4} maxWidth={830}>
         <FormattedMessage
           id="CollectivePage.SectionBudget.Description"

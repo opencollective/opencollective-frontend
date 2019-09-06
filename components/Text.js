@@ -20,7 +20,7 @@ export const P = styled.p.attrs(props => ({
 
 P.defaultProps = {
   fontSize: 'Paragraph',
-  letterSpacing: '-0.2px',
+  letterSpacing: '-0.4px',
   lineHeight: 'Paragraph',
 };
 
@@ -68,7 +68,7 @@ H4.defaultProps = {
   ...P.defaultProps,
   fontSize: 'H4',
   fontWeight: 'bold',
-  letterSpacing: '-0.2px',
+  letterSpacing: '-0.4px',
   lineHeight: 'H4',
 };
 
@@ -77,7 +77,7 @@ export const H5 = P.withComponent('h5');
 H5.defaultProps = {
   ...P.defaultProps,
   fontSize: 'H5',
-  letterSpacing: '-0.2px',
+  letterSpacing: '-0.4px',
   lineHeight: 'H5',
   textAlign: 'center',
   fontWeight: 500,

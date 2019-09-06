@@ -77,13 +77,7 @@ class CreateExpensePage extends React.Component {
 
     return (
       <div className="ExpensesPage">
-        <Header
-          title={collective.name}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
           <CollectiveCover
@@ -212,10 +206,11 @@ const getCollectiveQuery = gql`
       path
       name
       currency
-      backgroundImage
       expensePolicy
       settings
       image
+      imageUrl
+      backgroundImage
       isHost
       isActive
       tags

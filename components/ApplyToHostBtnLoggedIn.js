@@ -14,11 +14,12 @@ import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 import StyledCheckbox from './StyledCheckbox';
 import StyledButton from './StyledButton';
 import Container from './Container';
+import ExternalLinkNewTab from './ExternalLinkNewTab';
 
 const CheckboxWrapper = styled(Container)`
   color: #090a0a;
   display: flex;
-  align-items: baseline;
+  align-items: center;
 `;
 
 const TOS = styled(P)`
@@ -26,15 +27,13 @@ const TOS = styled(P)`
   font-size: 16px;
   text-align: left;
   text-shadow: none;
+  margin-top: 8px;
+  margin-bottom: 16px;
 `;
 
-const TOSLinkWrapper = styled.span`
+const TOSLinkWrapper = styled.div`
   text-align: left;
   margin-left: 20px;
-`;
-
-const TOSLink = styled.a`
-  color: rgb(51, 133, 255) !important;
 `;
 
 class ApplyToHostBtnLoggedIn extends React.Component {
@@ -134,19 +133,24 @@ class ApplyToHostBtnLoggedIn extends React.Component {
             />
           </ModalHeader>
           <ModalBody>
-            <TOS>Terms of service</TOS>
+            <TOS>
+              <FormattedMessage id="collective.tos.label" defaultMessage="Terms of Service" />
+            </TOS>
             <CheckboxWrapper>
               <StyledCheckbox
                 onChange={({ checked }) => this.setState({ checkTOS: checked })}
                 checked={this.state.checkTOS}
+                size={16}
               />
               <TOSLinkWrapper>
-                I agree with the{' '}
-                <TOSLink href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
-                  {' '}
-                  the terms of fiscal sponsorship of the host
-                </TOSLink>{' '}
-                ({host.name}) that will collect money on behalf of our collective.
+                <FormattedMessage
+                  id="ApplyToHostBtnLoggedIn.TOS"
+                  defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
+                  values={{
+                    'tos-link': msg => <ExternalLinkNewTab href={get(host, 'settings.tos')}>{msg}</ExternalLinkNewTab>,
+                    hostName: host.name,
+                  }}
+                />
               </TOSLinkWrapper>
             </CheckboxWrapper>
           </ModalBody>

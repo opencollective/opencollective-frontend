@@ -20,8 +20,6 @@ import ExpensesSection from './expenses/ExpensesSection';
 import EventsSection from './EventsSection';
 import LongDescription from './LongDescription';
 
-const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
-
 class Collective extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
@@ -144,12 +142,6 @@ class Collective extends React.Component {
     const { intl, LoggedInUser, query, collective } = this.props;
     const status = get(query, 'status');
 
-    const donateParams = { collectiveSlug: collective.slug, verb: 'donate' };
-    if (query.referral) {
-      donateParams.referral = query.referral;
-    }
-    const backgroundImage =
-      collective.backgroundImage || get(collective, 'parentCollective.backgroundImage') || defaultBackgroundImage;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
     if (status === 'collectiveCreated') {
@@ -244,14 +236,7 @@ class Collective extends React.Component {
           `}
         </style>
 
-        <Header
-          title={collective.name}
-          description={collective.description || collective.longDescription}
-          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
-          image={collective.image || get(collective.parentCollective, 'image') || backgroundImage}
-          LoggedInUser={LoggedInUser}
-          href={`/${collective.slug}`}
-        />
+        <Header collective={collective} LoggedInUser={LoggedInUser} canonicalURL={`/${collective.slug}`} />
 
         <Body>
           <div className={classNames('CollectivePage', { archiveCollective: collective.isArchived })}>
@@ -291,12 +276,7 @@ class Collective extends React.Component {
                   {collective.isActive && collective.host && (
                     <div className="sidebar tiers" id="contribute">
                       {collective.tiers.map(tier => (
-                        <TierCard
-                          key={`TierCard-${tier.slug}`}
-                          collective={collective}
-                          tier={tier}
-                          referral={query.referral}
-                        />
+                        <TierCard key={`TierCard-${tier.slug}`} collective={collective} tier={tier} />
                       ))}
                       <div className="CustomDonationTierCard">
                         <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>

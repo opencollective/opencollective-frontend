@@ -7,13 +7,14 @@ import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
 import roles from '../../../lib/constants/roles';
-import { H2, P } from '../../Text';
+import { P } from '../../Text';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 
 // Local imports
+import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 
@@ -171,9 +172,9 @@ class SectionContributions extends React.PureComponent {
           </Flex>
         ) : (
           <React.Fragment>
-            <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
+            <SectionTitle textAlign={['center', 'left']} mb={4}>
               <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
-            </H2>
+            </SectionTitle>
             {filters.length > 1 && (
               <Box mb={4}>
                 <StyledFilters

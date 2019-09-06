@@ -175,14 +175,7 @@ class EditCollective extends React.Component {
           `}
         </style>
 
-        <Header
-          title={collective.name}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header collective={collective} className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
           {collective.isArchived && (

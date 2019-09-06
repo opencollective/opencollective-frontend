@@ -108,7 +108,6 @@ class CreateOrderPage extends React.Component {
     }),
     verb: PropTypes.string.isRequired,
     step: PropTypes.string,
-    referral: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
     /** An interval that users will **not** be able to change */
@@ -368,7 +367,6 @@ class CreateOrderPage extends React.Component {
       quantity: get(stepDetails, 'quantity', 1),
       currency: this.getCurrency(),
       interval: stepDetails.interval,
-      referral: this.props.referral,
       fromCollective: pick(stepProfile, ['id', 'type', 'name']),
       collective: pick(this.props.collective, ['id']),
       tier: tier ? pick(tier, ['id', 'amount']) : undefined,

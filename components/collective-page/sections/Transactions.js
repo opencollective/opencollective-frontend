@@ -8,19 +8,20 @@ import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
 import { formatCurrency } from '../../../lib/utils';
-import { H2, H3, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import Avatar from '../../Avatar';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import DebitCreditList, { DebitItem, CreditItem } from '../../DebitCreditList';
 import StyledFilters from '../../StyledFilters';
-
-import ContainerSectionContent from '../ContainerSectionContent';
 import LinkCollective from '../../LinkCollective';
 import StyledLink from '../../StyledLink';
 import StyledButton from '../../StyledButton';
 import Link from '../../Link';
+
+import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
 
 const FILTERS = { ALL: 'ALL', CREDIT: 'CREDIT', DEBIT: 'DEBIT' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -107,9 +108,9 @@ class SectionTransactions extends React.Component {
     } else if (data.creditTransactions.length === 0 && data.debitTransactions.length === 0) {
       return (
         <ContainerSectionContent pt={5} pb={6}>
-          <H3 mb={4} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+          <SectionTitle mb={4} fontSize={['H4', 'H2']}>
             <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-          </H3>
+          </SectionTitle>
           <MessageBox type="info" withIcon>
             <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
           </MessageBox>
@@ -122,9 +123,9 @@ class SectionTransactions extends React.Component {
     const transactions = this.getAllTransactions(data.creditTransactions, data.debitTransactions, filter);
     return (
       <ContainerSectionContent pt={5} pb={6}>
-        <H2 mb={4} textAlign={['center', 'left']} fontWeight="normal" color="black.900">
+        <SectionTitle mb={4} textAlign={['center', 'left']}>
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-        </H2>
+        </SectionTitle>
         {showFilters && (
           <Box mb={3}>
             <StyledFilters

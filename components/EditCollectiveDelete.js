@@ -85,7 +85,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           />{' '}
         </P>
       )}
-      <Modal show={showModal} width="570px" height="230px" onClose={() => setShowModal(false)}>
+      <Modal show={showModal} width="570px" onClose={() => setShowModal(false)}>
         <ModalHeader>
           <FormattedMessage
             id="collective.delete.modal.header"

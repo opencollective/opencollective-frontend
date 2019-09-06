@@ -83,13 +83,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       {isAdmin && !isEditing && (
         // We don't have any mobile view for this one yet
         <Container display={['none', null, null, 'block']} position="absolute" right={25} top={25} zIndex={222}>
-          <StyledButton buttonStyle="secondary" onClick={() => editCover(true)}>
+          <StyledButton onClick={() => editCover(true)}>
             <Span mr={2}>
               <Camera size="1.2em" />
             </Span>
             <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
           </StyledButton>
-          <StyledButton buttonStyle="secondary" ml={3} onClick={() => showColorPicker(true)}>
+          <StyledButton ml={3} onClick={() => showColorPicker(true)}>
             <Span mr={2}>
               <Palette size="1.2em" />
             </Span>
@@ -106,13 +106,18 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           />
         </Container>
       )}
-      <ContainerSectionContent pt={40} display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
+      <ContainerSectionContent
+        pt={40}
+        display="flex"
+        flexDirection="column"
+        alignItems={['center', null, 'flex-start']}
+      >
         {/* Collective presentation (name, logo, description...) */}
-        <Flex flexDirection={'column'} alignItems={['center', 'flex-start']}>
-          <Container position="relative" display="flex" justifyContent={['center', 'flex-start']} mb={2}>
+        <Flex flexDirection={'column'} alignItems={['center', null, 'flex-start']}>
+          <Container position="relative" display="flex" justifyContent={['center', null, 'flex-start']} mb={2}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} />
           </Container>
-          <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', 'left']}>
+          <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', null, 'left']}>
             {collective.name || collective.slug}
           </H1>
         </Flex>
@@ -121,7 +126,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
         )}
 
-        <Flex alignItems="center" justifyContent={['center', 'left']} flexWrap="wrap">
+        <Flex alignItems="center" justifyContent={['center', null, 'left']} flexWrap="wrap">
           {isCollective && (
             <StyledTag mx={2} my={2} mb={2}>
               <I18nCollectiveTags
@@ -215,8 +220,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         {!isCollective && !collective.isHost && <HeroTotalCollectiveContributionsWithData collective={collective} />}
         {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
         <CollectiveCallsToAction
-          display={['flex', 'none']}
+          display={['flex', null, 'none']}
           mt={3}
+          width="100%"
           collective={collective}
           callsToAction={callsToAction}
         />

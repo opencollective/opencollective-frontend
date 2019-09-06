@@ -217,8 +217,8 @@ const getEventsQuery = gql`
         slug
         name
         mission
+        imageUrl
         backgroundImage
-        image
       }
     }
   }

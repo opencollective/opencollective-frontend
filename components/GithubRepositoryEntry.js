@@ -14,6 +14,7 @@ import StyledButton from './StyledButton';
 import Link from './Link';
 import StyledRadioList from './StyledRadioList';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
+import { FormattedMessage } from 'react-intl';
 
 const useForm = () => {
   const [state, setState] = useState({ errors: '', useType: 'repository' });
@@ -47,6 +48,9 @@ const useForm = () => {
     setState,
   };
 };
+
+const FISCAL_SPONSOR_TERMS =
+  'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
 
 const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCollective }) => {
   const { type, login } = value.owner;
@@ -140,13 +144,21 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
             </P>
 
             <Box mb={3} mt={4}>
-              <StyledInputField label="Collective name" htmlFor="name" error={getFieldError('name')}>
+              <StyledInputField
+                label={<FormattedMessage id="GithubFlow.CollectiveName" defaultMessage="Collective name" />}
+                htmlFor="name"
+                error={getFieldError('name')}
+              >
                 {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} required width={1} />}
               </StyledInputField>
             </Box>
 
             <Box mb={3}>
-              <StyledInputField label="Collective URL" htmlFor="slug" error={getFieldError('slug')}>
+              <StyledInputField
+                label={<FormattedMessage id="GithubFlow.CollectiveURL" defaultMessage="Collective URL" />}
+                htmlFor="slug"
+                error={getFieldError('slug')}
+              >
                 {inputProps => (
                   <StyledInputGroup
                     {...inputProps}
@@ -167,16 +179,22 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                 loading={creatingCollective}
                 type="submit"
               >
-                Create collective
+                <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" />
               </StyledButton>
             </Container>
             <P textAlign="center" color="black.500" fontSize="1.2rem" fontWeight="normal">
-              By pressing ‘Create Collective’ you agree to our <Link route="/tos">Terms of Service</Link>, to the{' '}
-              <ExternalLinkNewTab href="https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub">
-                Terms of Fiscal Sponsorship
-              </ExternalLinkNewTab>{' '}
-              and to the <Link route="/privacypolicy">Privacy Policy</Link> of the Fiscal Host that will collect money
-              on behalf of this collective.
+              <FormattedMessage
+                id="contributeFlow.createProfile.legal"
+                defaultMessage="By pressing ‘Create Collective’ you agree to our <tos-link>Terms of Service</tos-link>, to the <host-terms>Terms of Fiscal Sponsorship</host-terms> and to the <privacy-policy-link>Privacy Policy</privacy-policy-link> of the Fiscal Host that will collect money on behalf of this collective."
+                values={{
+                  // eslint-disable-next-line
+                  'tos-link': msg => <Link route="/tos">{msg}</Link>,
+                  // eslint-disable-next-line
+                  'host-terms': msg => <ExternalLinkNewTab href={FISCAL_SPONSOR_TERMS}>{msg}</ExternalLinkNewTab>,
+                  // eslint-disable-next-line
+                  'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
+                }}
+              />
             </P>
           </Container>
         )}

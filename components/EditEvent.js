@@ -71,14 +71,7 @@ class EditEvent extends React.Component {
           `}
         </style>
 
-        <Header
-          title={parentCollective.name}
-          description={parentCollective.description}
-          twitterHandle={parentCollective.twitterHandle}
-          image={parentCollective.image || parentCollective.backgroundImage}
-          className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
-        />
+        <Header collective={parentCollective} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
           <CollectiveCover

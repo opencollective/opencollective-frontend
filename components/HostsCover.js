@@ -58,13 +58,7 @@ class HostsCover extends React.Component {
     );
 
     return (
-      <CollectiveCover
-        href="/hosts"
-        title={title}
-        description={descriptionNode}
-        collective={this.collective}
-        className="small"
-      />
+      <CollectiveCover title={title} description={descriptionNode} collective={this.collective} className="small" />
     );
   }
 }

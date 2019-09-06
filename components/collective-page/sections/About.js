@@ -5,7 +5,7 @@ import { Flex } from '@rebass/grid';
 import dynamic from 'next/dynamic';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { H3, Span } from '../../Text';
+import { Span } from '../../Text';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
 import InlineEditField from '../../InlineEditField';
 import Container from '../../Container';
@@ -13,6 +13,7 @@ import StyledButton from '../../StyledButton';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { EditCollectiveLongDescriptionMutation } from '../graphql/mutations';
+import SectionTitle from '../SectionTitle';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -35,7 +36,7 @@ const SectionAbout = ({ collective, canEdit }) => {
 
   return (
     <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 5]}>
-      <H3 fontSize="H2" lineHeight="H2" fontWeight="normal" textAlign="center" mb={5}>
+      <SectionTitle textAlign="center" mb={5}>
         {isCollective ? (
           <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
         ) : (
@@ -45,7 +46,7 @@ const SectionAbout = ({ collective, canEdit }) => {
             values={{ collectiveName: collective.name }}
           />
         )}
-      </H3>
+      </SectionTitle>
 
       <Container width="100%" maxWidth={700} margin="0 auto">
         <InlineEditField

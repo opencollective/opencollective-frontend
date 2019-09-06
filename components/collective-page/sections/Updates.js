@@ -10,7 +10,7 @@ import { graphql } from 'react-apollo';
 import { Lock } from 'styled-icons/fa-solid';
 
 import { formatDate } from '../../../lib/utils';
-import { H3, P } from '../../Text';
+import { P } from '../../Text';
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledTooltip from '../../StyledTooltip';
@@ -20,6 +20,7 @@ import Avatar from '../../Avatar';
 import StyledButton from '../../StyledButton';
 import HTMLContent from '../../HTMLContent';
 
+import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { UpdatesFieldsFragment } from '../graphql/fragments';
 
@@ -113,9 +114,9 @@ class SectionUpdates extends React.PureComponent {
 
     return (
       <ContainerSectionContent py={[5, 6]}>
-        <H3 mb={3} fontSize={['H4', 'H2']} fontWeight="normal" color="black.900">
+        <SectionTitle mb={4}>
           <FormattedMessage id="CollectivePage.SectionUpdates.Title" defaultMessage="Latest updates" />
-        </H3>
+        </SectionTitle>
         {isEmpty(updates) ? (
           <div>
             <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="Paragraph">

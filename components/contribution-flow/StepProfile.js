@@ -34,6 +34,7 @@ const messages = defineMessages({
   'org.website': { id: 'contributeAs.org.website', defaultMessage: 'Website' },
   'org.twitter': { id: 'contributeAs.org.twitter', defaultMessage: 'Twitter (optional)' },
   'org.github': { id: 'contributeAs.org.github', defaultMessage: 'GitHub (optional)' },
+  filterByName: { id: 'Filter.ByName', defaultMessage: 'Filter by name' },
 });
 
 const useForm = ({ onProfileChange }) => {
@@ -173,7 +174,7 @@ const StepProfile = ({
             type="text"
             fontSize="Paragraph"
             lineHeight="Paragraph"
-            placeholder="Filter by name..."
+            placeholder={intl.formatMessage(messages.filterByName)}
             onChange={onSearch}
             ml={2}
           />

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import { graphql } from 'react-apollo';
@@ -27,6 +27,13 @@ import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
 
 const MIN_AMOUNT = 5;
 const MAX_AMOUNT = 10000;
+
+const messages = defineMessages({
+  emailCustomMessage: {
+    id: 'virtualCards.email.customMessage',
+    defaultMessage: 'Will be sent in the invitation email',
+  },
+});
 
 const InlineField = ({ name, children, label, isLabelClickable }) => (
   <Flex flexWrap="wrap" alignItems="center" mb="2.5em" className={`field-${name}`}>
@@ -107,6 +114,8 @@ class CreateVirtualCardsForm extends Component {
     collectiveSlug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     createVirtualCards: PropTypes.func.isRequired,
+    /** @ignore from injectIntl */
+    intl: PropTypes.object,
   };
 
   constructor(props) {
@@ -304,7 +313,7 @@ class CreateVirtualCardsForm extends Component {
             id="virtualcard-customMessage"
             type="text"
             maxLength="255"
-            placeholder="Will be sent in the invitation email"
+            placeholder={this.props.intl.formatMessage(messages.emailCustomMessage)}
             onChange={e => this.onChange('customMessage', e.target.value)}
             style={{ flexGrow: 1 }}
             disabled={submitting}
@@ -488,4 +497,4 @@ const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutationQuery, {
   }),
 });
 
-export default addPaymentMethods(addCreateVirtualCardsMutation(CreateVirtualCardsForm));
+export default injectIntl(addPaymentMethods(addCreateVirtualCardsMutation(CreateVirtualCardsForm)));

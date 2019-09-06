@@ -17,7 +17,7 @@ const messages = defineMessages({
   },
 });
 
-const ContributeCustom = ({ intl, collective, contributors, stats }) => {
+const ContributeCustom = ({ intl, collective, contributors, stats, ...props }) => {
   return (
     <Contribute
       route="orderCollectiveNew"
@@ -27,6 +27,7 @@ const ContributeCustom = ({ intl, collective, contributors, stats }) => {
       title={intl.formatMessage(messages.title)}
       contributors={contributors}
       stats={stats}
+      {...props}
     >
       {intl.formatMessage(messages.description)}
     </Contribute>

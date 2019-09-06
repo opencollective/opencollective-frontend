@@ -367,9 +367,9 @@ const getExpenseQuery = gql`
         id
         name
         username
-        image
         paypalEmail
         email
+        image
       }
     }
   }

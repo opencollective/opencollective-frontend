@@ -939,10 +939,10 @@ const query = gql`
         type
         fromCollective {
           id
-          image
           name
           slug
           type
+          imageUrl
           isIncognito
         }
         collective {
@@ -980,8 +980,9 @@ const query = gql`
         slug
         currency
         name
-        image
+        imageUrl
         backgroundImage
+        isIncognito
         description
         settings
         stats {
@@ -999,12 +1000,12 @@ const query = gql`
       collectives {
         id
         type
-        isIncognito
         slug
         currency
         name
-        image
+        imageUrl
         backgroundImage
+        isIncognito
         description
         settings
         stats {
@@ -1023,10 +1024,10 @@ const query = gql`
         id
         currency
         type
-        isIncognito
         slug
         name
-        image
+        imageUrl
+        isIncognito
         stats {
           totalAmountSpent
         }
