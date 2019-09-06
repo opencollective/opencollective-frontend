@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
+import { get } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql, Query } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { P } from '../../Text';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -60,18 +62,55 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
+const ParentedCollectivesQuery = gql`
+  query SuperCollectiveChildren($tags: [String]) {
+    allCollectives(orderBy: balance, orderDirection: DESC, limit: 50, tags: $tags) {
+      collectives {
+        id
+        name
+        slug
+        type
+        currency
+        isIncognito
+        description
+        backgroundImage
+        tags
+        parentCollective {
+          id
+          backgroundImage
+        }
+        host {
+          id
+        }
+        stats {
+          id
+          yearlyBudget
+          backers {
+            id
+            all
+          }
+        }
+      }
+    }
+  }
+`;
+
 class SectionContributions extends React.PureComponent {
   static propTypes = {
     /** Collective */
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
     }).isRequired,
 
     /** @ignore from withData */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       Collective: PropTypes.shape({
+        settings: PropTypes.shape({
+          superCollectiveTags: PropTypes.arrayOf(PropTypes.string),
+        }),
         memberOf: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.number.isRequired,
@@ -157,8 +196,10 @@ class SectionContributions extends React.PureComponent {
 
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
+    const isOrganization = collective.type === CollectiveType.ORGANIZATION;
+    const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
-      <ContainerSectionContent pt={5} pb={6}>
+      <ContainerSectionContent py={5}>
         {data.Collective.memberOf.length === 0 ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
@@ -182,12 +223,13 @@ class SectionContributions extends React.PureComponent {
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
                   onChange={filter => this.setState({ selectedFilter: filter })}
                   selected={selectedFilter}
+                  justifyContent={['center', 'left']}
                 />
               </Box>
             )}
-            <Flex flexWrap="wrap" justifyContent={memberships.length >= 4 ? 'space-evenly' : 'left'}>
+            <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
               {memberships.slice(0, nbMemberships).map(membership => (
-                <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4]} />
+                <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
               ))}
             </Flex>
             {nbMemberships < memberships.length && (
@@ -199,6 +241,32 @@ class SectionContributions extends React.PureComponent {
             )}
           </React.Fragment>
         )}
+        {isOrganization && superCollectiveTags.length > 0 && (
+          <Query query={ParentedCollectivesQuery} variables={{ tags: superCollectiveTags }}>
+            {({ loading, error, data: subCollectivesData }) => {
+              const collectives = get(subCollectivesData, 'allCollectives.collectives', []);
+              if (loading || error || collectives.length === 0) {
+                return null;
+              }
+              return (
+                <section>
+                  <SectionTitle textAlign={['center', 'left']} mb={4}>
+                    <FormattedMessage
+                      id="CP.Contributions.PartOfOrg"
+                      defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
+                      values={{ n: collectives.length }}
+                    />
+                  </SectionTitle>
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
+                    {collectives.map(collective => (
+                      <StyledMembershipCard key={collective.id} membership={{ collective }} mb={40} mr={[1, 4, 34]} />
+                    ))}
+                  </Flex>
+                </section>
+              );
+            }}
+          </Query>
+        )}
       </ContainerSectionContent>
     );
   }
@@ -209,6 +277,7 @@ const withData = graphql(
     query SectionCollective($id: Int!) {
       Collective(id: $id) {
         id
+        settings
         memberOf(onlyActiveCollectives: true) {
           id
           role

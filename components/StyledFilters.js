@@ -7,9 +7,9 @@ import { Span } from './Text';
 /**
  * A controlled component to display a list of filters.
  */
-const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth }) => {
+const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
   return (
-    <Flex css={{ overflowX: 'auto' }}>
+    <Flex css={{ overflowX: 'auto' }} {...flexProps}>
       {filters.map(filter => {
         const isSelected = filter === selected;
         return (
