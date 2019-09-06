@@ -2,12 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, throttle } from 'lodash';
-import memoizeOne from 'memoize-one';
-import { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { lighten, darken } from 'polished';
+import { get } from 'lodash';
+import { createGlobalStyle } from 'styled-components';
 
-import theme, { generateTheme } from '../lib/theme';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -15,7 +12,7 @@ import Loading from '../components/Loading';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
-import { getCollectivePrimaryColor } from '../components/collective-page/_utils';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -62,8 +59,6 @@ class NewCollectivePage extends React.Component {
     return { slug, status };
   }
 
-  state = { newPrimaryColor: null };
-
   getPageMetaData(collective) {
     if (collective) {
       return {
@@ -80,34 +75,6 @@ class NewCollectivePage extends React.Component {
     }
   }
 
-  getTheme = memoizeOne(primaryColor => {
-    if (!primaryColor) {
-      return theme;
-    } else {
-      return generateTheme({
-        colors: {
-          ...theme.colors,
-          primary: {
-            900: darken(0.15, primaryColor),
-            800: darken(0.1, primaryColor),
-            700: darken(0.05, primaryColor),
-            600: darken(0.025, primaryColor),
-            500: primaryColor,
-            400: lighten(0.1, primaryColor),
-            300: lighten(0.2, primaryColor),
-            200: lighten(0.3, primaryColor),
-            100: lighten(0.4, primaryColor),
-            50: lighten(0.6, primaryColor),
-          },
-        },
-      });
-    }
-  });
-
-  onPrimaryColorChange = throttle(newPrimaryColor => {
-    this.setState({ newPrimaryColor });
-  }, 2000);
-
   render() {
     const { data, LoggedInUser, status } = this.props;
 
@@ -123,28 +90,29 @@ class NewCollectivePage extends React.Component {
 
     const collective = data.Collective;
     const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const primaryColor = this.state.newPrimaryColor || getCollectivePrimaryColor(collective);
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
-        <ThemeProvider theme={this.getTheme(primaryColor)}>
-          <CollectivePage
-            collective={collective}
-            host={collective.host}
-            contributors={collective.contributors}
-            tiers={collective.tiers}
-            events={collective.events}
-            transactions={collective.transactions}
-            expenses={collective.expenses}
-            stats={collective.stats}
-            updates={collective.updates}
-            LoggedInUser={LoggedInUser}
-            isAdmin={isAdmin}
-            status={status}
-            onPrimaryColorChange={this.onPrimaryColorChange}
-          />
-        </ThemeProvider>
+        <CollectiveThemeProvider collective={collective}>
+          {({ onPrimaryColorChange }) => (
+            <CollectivePage
+              collective={collective}
+              host={collective.host}
+              contributors={collective.contributors}
+              tiers={collective.tiers}
+              events={collective.events}
+              transactions={collective.transactions}
+              expenses={collective.expenses}
+              stats={collective.stats}
+              updates={collective.updates}
+              LoggedInUser={LoggedInUser}
+              isAdmin={isAdmin}
+              status={status}
+              onPrimaryColorChange={onPrimaryColorChange}
+            />
+          )}
+        </CollectiveThemeProvider>
       </Page>
     );
   }
