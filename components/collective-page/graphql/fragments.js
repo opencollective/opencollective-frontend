@@ -8,7 +8,7 @@ export const TransactionsAndExpensesFragment = gql`
   fragment TransactionsAndExpensesFragment on Collective {
     transactions(limit: 3) {
       id
-      netAmountInCollectiveCurrency
+      amount
       description
       type
       createdAt
