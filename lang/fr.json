@@ -234,6 +234,7 @@
   "CollectivePage.NavBar.Updates": "Actualités",
   "CollectivePage.OurContributors": "Nos contributeurs {count}",
   "CollectivePage.SectionBudget.Annual": "Estimation du budget annuel",
+  "CollectivePage.SectionBudget.Annual.Definition": "Projected annual budget based on total financial contributions from the past 12 months.",
   "CollectivePage.SectionBudget.Balance": "Solde actuel",
   "CollectivePage.SectionBudget.Description": "Observez comment les fonds de {collectiveName} circulent librement. Tous les contributeurs et toutes les dépenses sont publiées sur notre registre transparent et ouvert. Voyez qui donne, combien, où part l'argent, ajoutez des dépenses, soyez remboursez et plus encore !",
   "CollectivePage.SectionBudget.SubmitExpense": "Soumettre une dépense",
