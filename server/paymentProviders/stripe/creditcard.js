@@ -42,7 +42,9 @@ const getOrCreateCustomerOnHostAccount = async (hostStripeAccount, { paymentMeth
   // to the platform stripe account, not to the host's stripe
   // account. Since payment methods had no name before that
   // migration, we're using it to test for pre-migration users;
-  // if (!paymentMethod.name) return paymentMethod.customerId;
+  if (!paymentMethod.name) {
+    return { id: paymentMethod.customerId };
+  }
 
   const data = paymentMethod.data || {};
   data.customerIdForHost = data.customerIdForHost || {};
