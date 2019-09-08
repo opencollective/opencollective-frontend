@@ -1,6 +1,6 @@
 {
-  "action.approveCollective.Error": "Failed to approve collective for {host}",
-  "action.collective.Approved": "Collective {collective} has been approved to be hosted by {host}",
+  "action.approveCollective.Error": "{host} 에 대한 단체 승인에 실패",
+  "action.collective.Approved": "단체 {collective} 이(가) {host} 에 의해 호스팅되도록 승인되었습니다",
   "action.expense.approved": "지출 승인됨",
   "action.expense.rejected": "지출 거절됨",
   "action.Invalid": "잘못된 확인 링크",
