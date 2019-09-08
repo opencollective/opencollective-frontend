@@ -69,6 +69,7 @@ class ApplyToHostBtn extends React.Component {
             />
             &nbsp;
             <StyledTooltip
+              place="right"
               type="light"
               content={
                 <FormattedMessage
