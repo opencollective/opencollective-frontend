@@ -1140,6 +1140,7 @@
   "update.viewLatestUpdates": "最新のアップデートを表示",
   "updates.create.login": "コアメンバーとしてアップデートを作成するためにはログインする必要があります。",
   "updates.empty": "アップデートはありません",
+  "updates.new.error": "Update failed: {err}",
   "updates.new.title": "新しいアップデート",
   "Upload": "Upload",
   "uploadImage.error": "エラー: {error}",

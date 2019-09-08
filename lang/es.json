@@ -1140,6 +1140,7 @@
   "update.viewLatestUpdates": "View latest updates",
   "updates.create.login": "You need to be logged in as a core contributor of this collective to be able to create an update.",
   "updates.empty": "Ninguna novedad",
+  "updates.new.error": "Update failed: {err}",
   "updates.new.title": "New update",
   "Upload": "Upload",
   "uploadImage.error": "Error:{error}",
