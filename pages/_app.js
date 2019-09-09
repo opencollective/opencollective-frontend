@@ -78,6 +78,8 @@ class OpenCollectiveFrontendApp extends App {
       showCloseButtonOnFullPageWidget: true,
       footerDisplayStartDate: digitalClimateStrikeBannerEnabled ? new Date(2019, 8, 1) : new Date(2021, 8, 20),
       fullPageDisplayStartDate: digitalClimateStrikeFullpageEnabled ? new Date(2019, 8, 20) : new Date(2021, 8, 20),
+      websiteName: 'Open Collective',
+      iframeHost: 'https://oc-digital-climate-strike.now.sh',
     };
 
     return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
