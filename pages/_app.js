@@ -69,11 +69,33 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    return { pageProps, scripts, initialNow, locale, messages };
+    const digitalClimateStrikeBannerEnabled = true;
+    const digitalClimateStrikeFullpageEnabled = ctx.req && ctx.req.url === '/';
+    const digitalClimateStrikeOptions = {
+      enabled: !process.env.CI,
+      cookieExpirationDays: 30,
+      disableGoogleAnalytics: true,
+      showCloseButtonOnFullPageWidget: true,
+      footerDisplayStartDate: digitalClimateStrikeBannerEnabled ? new Date(2019, 8, 1) : new Date(2021, 8, 20),
+      fullPageDisplayStartDate: digitalClimateStrikeFullpageEnabled ? new Date(2019, 8, 20) : new Date(2021, 8, 20),
+      websiteName: 'Open Collective',
+      iframeHost: 'https://oc-digital-climate-strike.now.sh',
+    };
+
+    return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
   }
 
   render() {
-    const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
+    const {
+      client,
+      Component,
+      pageProps,
+      scripts,
+      initialNow,
+      locale,
+      messages,
+      digitalClimateStrikeOptions,
+    } = this.props;
 
     return (
       <Fragment>
@@ -91,6 +113,16 @@ class OpenCollectiveFrontendApp extends App {
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
+        {digitalClimateStrikeOptions && digitalClimateStrikeOptions.enabled && (
+          <Fragment>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
+              }}
+            />
+            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js" />
+          </Fragment>
+        )}
       </Fragment>
     );
   }

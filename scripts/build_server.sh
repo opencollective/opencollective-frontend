@@ -13,3 +13,4 @@ cp -R $SRC/static/fonts $DIST/static
 cp -R $SRC/static/icons $DIST/static
 cp -R $SRC/static/images $DIST/static
 cp -R $SRC/static/styles $DIST/static
+cp -R $SRC/static/scripts $DIST/static
