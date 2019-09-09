@@ -107,7 +107,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.6.0",
-    "@babel/polyfill": "7.4.4",
+    "@babel/polyfill": "7.6.0",
     "@babel/register": "7.6.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
