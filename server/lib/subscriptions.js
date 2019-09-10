@@ -11,7 +11,7 @@ import { getRecommendedCollectives } from './data';
 import status from '../constants/order_status';
 
 /** Maximum number of attempts before an order gets cancelled. */
-export const MAX_RETRIES = 3;
+export const MAX_RETRIES = 5;
 
 /** Find all orders with subscriptions that are active & due.
  *
@@ -96,12 +96,16 @@ export async function processOrderWithSubscription(options, order) {
         orderProcessedStatus = 'failure';
         csvEntry.error = error.message;
         order.status = status.ERROR;
+        order.data = order.data || {};
+        order.data.latestError = error.message;
       }
+
+      order.Subscription.chargeRetryCount = getChargeRetryCount(orderProcessedStatus, order);
       order.Subscription = Object.assign(
         order.Subscription,
         getNextChargeAndPeriodStartDates(orderProcessedStatus, order),
       );
-      order.Subscription.chargeRetryCount = getChargeRetryCount(orderProcessedStatus, order);
+
       if (orderProcessedStatus === 'success') {
         if (order.Subscription.chargeNumber !== null) {
           order.Subscription.chargeNumber += 1;
@@ -198,7 +202,11 @@ export function getNextChargeAndPeriodStartDates(status, order) {
     }
     response.nextPeriodStart = nextChargeDate.toDate();
   } else if (status === 'failure') {
-    nextChargeDate = moment(new Date()).add(2, 'days');
+    if (order.Subscription.chargeRetryCount >= 2) {
+      nextChargeDate = moment(new Date()).add(5, 'days');
+    } else {
+      nextChargeDate = moment(new Date()).add(2, 'days');
+    }
   } else if (status === 'updated') {
     // used when user updates payment method
     nextChargeDate = moment(new Date()); // sets next charge date to now
