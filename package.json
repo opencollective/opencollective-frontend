@@ -22,7 +22,7 @@
     "apollo-cache-inmemory": "1.6.3",
     "apollo-client": "2.6.4",
     "apollo-link": "1.2.13",
-    "apollo-link-context": "1.0.18",
+    "apollo-link-context": "1.0.19",
     "apollo-link-error": "1.1.12",
     "apollo-link-http": "1.5.16",
     "bluebird": "3.5.5",
