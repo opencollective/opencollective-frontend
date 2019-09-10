@@ -31,7 +31,7 @@ import BubblesSVG from './Bubbles.svg';
 const TierCover = styled(Container)`
   width: 100%;
   height: ${Dimensions.COVER_HEIGHT}px;
-  background-color: #005ea6;
+  background-color: ${props => props.theme.colors.primary[300]};
   background-repeat: no-repeat;
   background-size: cover;
   filter: blur(15px);
@@ -206,7 +206,14 @@ class TierPage extends Component {
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
-                <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line" data-cy="shortDescription">
+                <H3
+                  color="black.500"
+                  fontSize="H5"
+                  mb={4}
+                  whiteSpace="pre-line"
+                  data-cy="shortDescription"
+                  wordBreak="break-word"
+                >
                   <InlineEditField
                     mutation={EditTierMutation}
                     canEdit={canEdit}
@@ -321,7 +328,7 @@ class TierPage extends Component {
                       collectiveSlug: collective.slug,
                     }}
                   >
-                    <StyledButton buttonStyle="dark" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
+                    <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                       <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
                     </StyledButton>
                   </Link>
