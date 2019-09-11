@@ -98,7 +98,7 @@ const HeroAvatar = ({ collective, isAdmin }) => {
             <EditOverlay borderRadius={borderRadius}>
               {!isDragActive && (
                 <React.Fragment>
-                  <StyledRoundButton backgroundColor="#297EFF" color="white.full" size={40} mb={2}>
+                  <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
                     <Camera size={25} />
                   </StyledRoundButton>
                   <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
