@@ -22,8 +22,6 @@ import { Router } from '../server/pages';
 import { getGithubRepos } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
 
-const MIN_REPO_STARS = 100;
-
 class OpenSourceApplyPage extends Component {
   static async getInitialProps({ query }) {
     return {
@@ -61,9 +59,7 @@ class OpenSourceApplyPage extends Component {
     this.setState({ loadingRepos: true });
 
     try {
-      const repositories = await getGithubRepos(token).then(repositories =>
-        repositories.filter(repo => repo.stargazers_count >= MIN_REPO_STARS),
-      );
+      const repositories = await getGithubRepos(token);
       if (repositories.length !== 0) {
         this.setState({ repositories, loadingRepos: false, result: {} });
       } else {
@@ -112,7 +108,6 @@ class OpenSourceApplyPage extends Component {
         creatingCollective: false,
         result: { type: 'error', mesg: errorMsg },
       });
-      // throw new Error(errorMsg);
     }
   }
 
@@ -179,7 +174,7 @@ class OpenSourceApplyPage extends Component {
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description.p2"
-            defaultMessage="We have created the {osclink}), a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}."
+            defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}."
             values={{
               osclink: <a href="https://opencollective.com/opensource">Open Source Collective 501c6</a>,
               communityguidelineslink: (
@@ -209,7 +204,7 @@ class OpenSourceApplyPage extends Component {
           loading={this.state.loadingRepos}
           disabled={this.state.loadingRepos}
         >
-          Get started
+          <FormattedMessage id="openSourceApply.GetStarted" defaultMessage="Get started" />
         </StyledButton>
       </StyledCard>
     );
@@ -220,7 +215,7 @@ class OpenSourceApplyPage extends Component {
     const { result } = this.state;
     return (
       <Page title="Sign up GitHub repository">
-        <Flex alignItems="center" flexDirection="column" mx="auto" maxWidth={500} pt={4} my={4}>
+        <Flex alignItems="center" flexDirection="column" mx="auto" pt={4} my={4}>
           {result.mesg && (
             <Box mb={2}>
               <MessageBox withIcon type={result.type}>

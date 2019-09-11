@@ -12,7 +12,7 @@ import { prettyUrl, imagePreview } from '../lib/utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { defaultBackgroundImage } from '../lib/constants/collectives';
+import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
 import Link from './Link';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
@@ -79,7 +79,9 @@ class CollectiveCover extends React.Component {
     callsToAction: PropTypes.shape({
       hasContact: PropTypes.bool,
       hasSubmitExpense: PropTypes.bool,
-    }).isRequired,
+      hasApply: PropTypes.bool,
+      hasDashboard: PropTypes.bool,
+    }),
     href: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
@@ -90,6 +92,8 @@ class CollectiveCover extends React.Component {
     cta: PropTypes.object, // { href, label }
     context: PropTypes.string,
     displayContributeLink: PropTypes.bool,
+    /** If true, the component will never render the new collective navbar */
+    forceLegacy: PropTypes.bool,
   };
 
   constructor(props) {
@@ -98,10 +102,10 @@ class CollectiveCover extends React.Component {
       contribute: { id: 'collective.contribute', defaultMessage: 'contribute' },
       apply: {
         id: 'host.apply.btn',
-        defaultMessage: 'Apply to host your collective {collective}',
+        defaultMessage: 'Apply with {collective}',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Admin' },
-      MEMBER: { id: 'roles.member.label', defaultMessage: 'Contributor' },
+      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
+      MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
     });
 
     this.description = props.description || props.collective.description;
@@ -137,6 +141,7 @@ class CollectiveCover extends React.Component {
                   weekday="short"
                   day="numeric"
                   month="long"
+                  year="numeric"
                 />
                 , &nbsp;
                 <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
@@ -166,19 +171,22 @@ ${description}`;
   }
 
   render() {
-    const { collective, context, className, LoggedInUser, intl } = this.props;
+    const { collective, context, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
-    const useNewCollectiveNavbar = get(collective, 'settings.collectivePage.useV2', false);
+    const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
+    const collectiveHasV2 = get(collective, 'settings.collectivePage.useV2');
+    const useNewCollectiveNavbar = !forceLegacy && (ncpIsDefault || collectiveHasV2);
+    const isEvent = type === CollectiveType.EVENT;
 
-    if (useNewCollectiveNavbar) {
+    if (!isEvent && useNewCollectiveNavbar && collective && collective.slug) {
       return (
         <Container borderTop="1px solid #E6E8EB" mb={4}>
           <CollectiveNavbar
             collective={collective}
             isAdmin={canEdit}
-            callsToAction={this.props.callsToAction}
             showEdit
+            callsToAction={this.props.callsToAction}
           />
         </Container>
       );
@@ -429,13 +437,15 @@ ${description}`;
           <div className="backgroundCover" style={style} />
 
           <div className="content">
-            <Link route={href} className="goBack">
-              {collective.type === 'USER' ? (
-                <Avatar collective={collective} className="logo" radius="10rem" />
-              ) : (
-                <Logo collective={collective} className="logo" height="10rem" />
-              )}
-            </Link>
+            {collective.slug && (
+              <Link route={href} className="goBack">
+                {collective.type === 'USER' ? (
+                  <Avatar collective={collective} className="logo" radius="10rem" />
+                ) : (
+                  <Logo collective={collective} className="logo" height="10rem" />
+                )}
+              </Link>
+            )}
             <h1>{title}</h1>
             {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
@@ -519,7 +529,7 @@ ${description}`;
                   </div>
                   <FormattedMessage
                     id="collective.stats.totalAmountSpent.label"
-                    defaultMessage="Total amount donated"
+                    defaultMessage="Total amount contributed"
                   />
                 </div>
                 {stats.totalAmountRaised > 0 && (

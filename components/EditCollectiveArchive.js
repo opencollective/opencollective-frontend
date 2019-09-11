@@ -83,7 +83,9 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.description"
-            defaultMessage={'This will mark this {type} as archived.'}
+            defaultMessage={
+              'Archiving a {type} means it will visually appear inactive and no new activity will be allowed.'
+            }
           />
           &nbsp;
           {collective.type === 'COLLECTIVE' && (
@@ -139,20 +141,16 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         </StyledButton>
       )}
 
-      <Modal show={modal.show} width="570px" height="230px" onClose={() => setModal({ ...modal, show: false })}>
+      <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
         <ModalHeader>
-          <FormattedMessage
-            id="collective.archive.modal.header"
-            values={{ name: collective.name, action: modal.type }}
-            defaultMessage={'{action} {name}'}
-          />
+          <FormattedMessage id="collective.archive.modal.header" defaultMessage={'Archive collective'} />
         </ModalHeader>
         <ModalBody>
           <P>
             <FormattedMessage
               id="collective.archive.modal.body"
-              values={{ type: collectiveType.toLowerCase(), action: modal.type.toLowerCase() }}
-              defaultMessage={'Are you sure you want to {action} this {type}?'}
+              values={{ type: collectiveType.toLowerCase() }}
+              defaultMessage={'Are you sure you want to archive this {type}?'}
             />
           </P>
         </ModalBody>
@@ -172,11 +170,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
                 }
               }}
             >
-              <FormattedMessage
-                id="collective.archive.confirm.btn"
-                values={{ action: modal.type }}
-                defaultMessage={'{action}'}
-              />
+              <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
             </StyledButton>
           </Container>
         </ModalFooter>

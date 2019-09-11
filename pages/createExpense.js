@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Box, Flex } from '@rebass/grid';
 import { pick } from 'lodash';
+
+import { compose } from '../lib/utils';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
@@ -75,13 +77,7 @@ class CreateExpensePage extends React.Component {
 
     return (
       <div className="ExpensesPage">
-        <Header
-          title={collective.name}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
           <CollectiveCover
@@ -210,10 +206,11 @@ const getCollectiveQuery = gql`
       path
       name
       currency
-      backgroundImage
       expensePolicy
       settings
       image
+      imageUrl
+      backgroundImage
       isHost
       isActive
       tags

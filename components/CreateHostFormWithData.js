@@ -1,11 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+
+import { Flex } from '@rebass/grid';
+
+import { compose } from '../lib/utils';
+
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';
-import { Flex } from '@rebass/grid';
 
 class CreateHostFormWithData extends React.Component {
   static propTypes = {
@@ -80,7 +84,7 @@ const getConnectedAccountsQuery = gql`
           name
           isHost
           createdAt
-          image
+          imageUrl
           connectedAccounts {
             id
             service
@@ -115,7 +119,7 @@ const createCollectiveQuery = gql`
       id
       slug
       name
-      image
+      imageUrl
       createdAt
     }
   }

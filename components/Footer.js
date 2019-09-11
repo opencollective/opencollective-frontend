@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { Github } from 'styled-icons/fa-brands/Github';
-import { MediumM } from 'styled-icons/fa-brands/MediumM';
+import { Blog } from 'styled-icons/icomoon/Blog';
 import { Slack } from 'styled-icons/fa-brands/Slack';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Mail } from 'styled-icons/material/Mail';
@@ -17,6 +17,8 @@ import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 import StyledTooltip from './StyledTooltip';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
+
+import languages from '../lib/constants/locales';
 
 const SocialLink = styled.a`
   align-items: center;
@@ -68,18 +70,10 @@ const navigation = {
   },
   COMPANY: {
     About: 'https://docs.opencollective.com/help/about',
-    Blog: 'https://medium.com/open-collective',
+    Blog: 'https://blog.opencollective.com/',
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',
   },
-};
-
-const languages = {
-  en: { name: 'English' },
-  fr: { name: 'French', nativeName: 'Français', completion: '66%' },
-  ja: { name: 'Japanese', nativeName: '日本語', completion: '37%' },
-  es: { name: 'Spanish', nativeName: 'Español', completion: '23%' },
-  ru: { name: 'Russian', nativeName: 'Русский', completion: '10%' },
 };
 
 const switchLanguage = (e, key) => {
@@ -136,7 +130,7 @@ class Footer extends React.Component {
                     />
                   )}
                 >
-                  <InfoCircle size={16} cursor="pointer" />
+                  <InfoCircle size={16} />
                 </StyledTooltip>
               </P>
               <div data-cy="language-switcher">
@@ -164,8 +158,8 @@ class Footer extends React.Component {
             order={['2', null, '3']}
             maxWidth="300px"
           >
-            <SocialLink href="https://medium.com/open-collective">
-              <MediumM size={17} color="#9399A3" />
+            <SocialLink href="https://blog.opencollective.com/">
+              <Blog size={17} color="#9399A3" />
             </SocialLink>
             <SocialLink href="https://twitter.com/opencollect">
               <Twitter size={17} color="#9399A3" />

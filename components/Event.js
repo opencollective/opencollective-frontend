@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Markdown from 'react-markdown';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { uniqBy, get, union } from 'lodash';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -10,9 +13,7 @@ import NotificationBar from './NotificationBar';
 import Sponsors from './Sponsors';
 import Responses from './Responses';
 import { filterCollection, trimObject } from '../lib/utils';
-import Markdown from 'react-markdown';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { uniqBy, get, union } from 'lodash';
+import { canOrderTicketsFromEvent, moneyCanMoveFromEvent } from '../lib/events';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../lib/graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
@@ -21,8 +22,6 @@ import Button from './Button';
 import SectionTitle from './SectionTitle';
 import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
 
-const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
-
 class Event extends React.Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
@@ -30,6 +29,8 @@ class Event extends React.Component {
     removeMember: PropTypes.func,
     createMember: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    /** Should be set to true if event is (re-)fetching. Disables actions. */
+    isLoading: PropTypes.bool,
   };
 
   static getDerivedStateFromProps(props) {
@@ -115,13 +116,12 @@ class Event extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, intl } = this.props;
+    const { LoggedInUser, intl, isLoading } = this.props;
     const { event } = this.state;
 
     const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
     const responses = { sponsors: [] };
-
-    const isEventOver = new Date(event.endsAt).getTime() < new Date().getTime();
+    const canOrderTickets = canOrderTicketsFromEvent(event);
 
     const guests = {};
     guests.interested = [];
@@ -163,7 +163,7 @@ class Event extends React.Component {
 
     let notification = {};
     // If event is over and has a positive balance, we ask the admins if they want to move the money to the parent collective
-    if (isEventOver && get(this.props.event, 'stats.balance') > 0 && canEditEvent) {
+    if (canEditEvent && moneyCanMoveFromEvent(event)) {
       notification = {
         title: intl.formatMessage(this.messages['event.over.sendMoneyToParent.title']),
         description: intl.formatMessage(this.messages['event.over.sendMoneyToParent.description'], {
@@ -187,9 +187,6 @@ class Event extends React.Component {
         ],
       };
     }
-
-    const backgroundImage =
-      event.backgroundImage || get(event, 'parentCollective.backgroundImage') || defaultBackgroundImage;
 
     return (
       <div>
@@ -221,18 +218,14 @@ class Event extends React.Component {
             .ticketsGrid :global(.tier) {
               margin: 2rem auto;
             }
+            .hide {
+              display: none;
+            }
           `}
         </style>
 
         <div className="EventPage">
-          <Header
-            title={event.name}
-            description={event.description || event.longDescription}
-            twitterHandle={event.parentCollective.twitterHandle}
-            image={event.parentCollective.image || backgroundImage}
-            className={this.state.status}
-            LoggedInUser={LoggedInUser}
-          />
+          <Header collective={event} className={this.state.status} LoggedInUser={LoggedInUser} />
 
           <Body>
             <div className={`EventPage ${this.state.modal && 'showModal'}`}>
@@ -248,7 +241,7 @@ class Event extends React.Component {
                 collective={event}
                 title={event.name}
                 LoggedInUser={LoggedInUser}
-                cta={{ label: 'tickets', href: '#tickets' }}
+                cta={canOrderTickets ? { label: 'tickets', href: '#tickets' } : null}
               />
 
               <div>
@@ -256,32 +249,33 @@ class Event extends React.Component {
                   <div className="eventDescription">
                     <Markdown source={event.longDescription || event.description} escapeHtml={false} />
                   </div>
+                  {!canOrderTickets ? null : (
+                    <section id="tickets">
+                      <SectionTitle
+                        section="tickets"
+                        action={
+                          canEditEvent
+                            ? {
+                                label: intl.formatMessage(this.messages['event.tickets.edit']),
+                                href: `${event.path}/edit#tiers`,
+                              }
+                            : null
+                        }
+                      />
 
-                  <section id="tickets">
-                    <SectionTitle
-                      section="tickets"
-                      action={
-                        LoggedInUser && LoggedInUser.canEditCollective(event)
-                          ? {
-                              label: intl.formatMessage(this.messages['event.tickets.edit']),
-                              href: `${event.path}/edit#tiers`,
-                            }
-                          : null
-                      }
-                    />
-
-                    <div className="ticketsGrid">
-                      {event.tiers.map(tier => (
-                        <Tier
-                          key={tier.id}
-                          tier={tier}
-                          values={this.state.tierInfo[tier.id] || {}}
-                          onChange={response => this.updateOrder(response)}
-                          onClick={response => this.handleOrderTier(response)}
-                        />
-                      ))}
-                    </div>
-                  </section>
+                      <div className="ticketsGrid">
+                        {event.tiers.map(tier => (
+                          <Tier
+                            key={tier.id}
+                            tier={tier}
+                            values={this.state.tierInfo[tier.id] || {}}
+                            onChange={response => this.updateOrder(response)}
+                            onClick={response => this.handleOrderTier(response)}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )}
                 </div>
 
                 {get(event, 'location.name') && <Location location={event.location} />}
@@ -321,21 +315,27 @@ class Event extends React.Component {
                         </span>
                       )}
                     </h1>
-                    {canEditEvent && (
+                    {!isLoading && canEditEvent && (
                       <div className="adminActions" id="adminActions">
                         <ul>
                           <li>
                             <a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>
-                              Print name tags
+                              <FormattedMessage id="Event.PrintNameTags" defaultMessage="Print name tags" />
                             </a>
                           </li>
                           <li>
                             <a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>
-                              Send email
+                              <FormattedMessage id="Event.SendEmail" defaultMessage="Send email" />
                             </a>
                           </li>
                           <li>
-                            <a onClick={() => exportRSVPs(event)}>Export CSV</a>
+                            <a onClick={() => exportRSVPs(event)}>
+                              <FormattedMessage
+                                id="Export.Format"
+                                defaultMessage="Export {format}"
+                                values={{ format: 'CSV' }}
+                              />
+                            </a>
                           </li>
                         </ul>
                       </div>

@@ -9,7 +9,7 @@ import Container from './Container';
 import { P, Span } from './Text';
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
-import Currency from './Currency';
+import FormattedMoneyAmount from './FormattedMoneyAmount';
 
 const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAmount }) => (
   <Container bg="white" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
@@ -43,18 +43,15 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
     </P>
 
     <P fontSize="Tiny" textAlign="center" mt={2} px={2} pb={2}>
-      Has pledged:
+      <FormattedMessage id="PledgeCard.HasPledged" defaultMessage="Has pledged:" />
       <br />
       <Span fontSize="Caption">
-        <Currency fontWeight="bold" value={totalAmount} currency={currency} precision={0} abbreviate />
-
-        {interval && (
-          <FormattedMessage
-            id="order.interval"
-            values={{ interval }}
-            defaultMessage=" / {interval, select, month {mo.} year {yr.}}"
-          />
-        )}
+        <FormattedMoneyAmount
+          amount={totalAmount}
+          currency={currency}
+          interval={interval}
+          amountStyles={{ fontWeight: 'bold' }}
+        />
       </Span>
     </P>
 

@@ -5,9 +5,7 @@ import EditEventForm from '../EditEventForm';
 import eventData from '../../test/mocks/Event.json';
 const event = eventData.data.Collective;
 
-import { IntlProvider, addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-addLocaleData([...en]);
+import { IntlProvider } from 'react-intl';
 
 describe('EditEventForm component', () => {
   const onSubmit = form => {

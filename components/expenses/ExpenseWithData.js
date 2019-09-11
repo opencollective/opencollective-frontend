@@ -89,6 +89,7 @@ const getExpenseQuery = gql`
       currency
       payoutMethod
       privateMessage
+      userTaxFormRequiredBeforePayment
       attachment
       collective {
         id
@@ -109,7 +110,7 @@ const getExpenseQuery = gql`
         type
         name
         slug
-        image
+        imageUrl
       }
       user {
         id

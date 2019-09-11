@@ -1,33 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
+import { CollectiveType } from '../../lib/constants/collectives';
 import Container from '../Container';
 import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
 
 // Collective page imports
 import { Sections } from './_constants';
-import Hero from './Hero';
-import SectionAbout from './SectionAbout';
-import SectionBudget from './SectionBudget';
-import SectionContribute from './SectionContribute';
-import SectionContributors from './SectionContributors';
-import SectionUpdates from './SectionUpdates';
-import SectionCollectives from './SectionCollectives';
-import SectionTransactions from './SectionTransactions';
-
-/** A mutation used by child components to update the collective */
-const EditCollectiveMutation = gql`
-  mutation EditCollective($id: Int!, $longDescription: String) {
-    editCollective(collective: { id: $id, longDescription: $longDescription }) {
-      id
-      longDescription
-    }
-  }
-`;
+import Hero from './hero/Hero';
+import SectionAbout from './sections/About';
+import SectionBudget from './sections/Budget';
+import SectionContribute from './sections/Contribute';
+import SectionContributors from './sections/Contributors';
+import SectionUpdates from './sections/Updates';
+import SectionContributions from './sections/Contributions';
+import SectionTransactions from './sections/Transactions';
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -49,10 +39,12 @@ class CollectivePage extends Component {
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
+    onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
       yearlyBudget: PropTypes.number.isRequired,
       updates: PropTypes.number.isRequired,
+      backers: PropTypes.object,
     }),
   };
 
@@ -123,6 +115,17 @@ class CollectivePage extends Component {
     }
   };
 
+  getCallsToAction = memoizeOne((type, isHost, isAdmin) => {
+    const isCollective = type === CollectiveType.COLLECTIVE;
+    return {
+      hasContact: isCollective,
+      hasSubmitExpense: isCollective,
+      hasApply: isHost,
+      hasDashboard: isHost && isAdmin,
+      hasManageSubscriptions: !isHost && isAdmin && !isCollective,
+    };
+  });
+
   onCollectiveClick = () => {
     window.scrollTo(0, 0);
   };
@@ -130,13 +133,7 @@ class CollectivePage extends Component {
   renderSection(section) {
     switch (section) {
       case Sections.ABOUT:
-        return (
-          <SectionAbout
-            collective={this.props.collective}
-            canEdit={this.props.isAdmin}
-            editMutation={EditCollectiveMutation}
-          />
-        );
+        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
       case Sections.BUDGET:
         return (
           <SectionBudget
@@ -153,12 +150,11 @@ class CollectivePage extends Component {
             tiers={this.props.tiers}
             events={this.props.events}
             contributors={this.props.contributors}
+            contributorsStats={this.props.stats.backers}
           />
         );
       case Sections.CONTRIBUTORS:
-        return (
-          <SectionContributors collectiveName={this.props.collective.name} contributors={this.props.contributors} />
-        );
+        return <SectionContributors collective={this.props.collective} contributors={this.props.contributors} />;
       case Sections.UPDATES:
         return (
           <SectionUpdates
@@ -167,8 +163,8 @@ class CollectivePage extends Component {
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
-      case Sections.COLLECTIVES:
-        return <SectionCollectives collective={this.props.collective} />;
+      case Sections.CONTRIBUTIONS:
+        return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} />;
       default:
@@ -177,9 +173,10 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, isAdmin } = this.props;
+    const { collective, host, isAdmin, onPrimaryColorChange } = this.props;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props);
+    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin);
 
     return (
       <Container
@@ -187,7 +184,13 @@ class CollectivePage extends Component {
         borderTop="1px solid #E6E8EB"
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
       >
-        <Hero collective={collective} host={host} isAdmin={isAdmin} onCollectiveClick={this.onCollectiveClick} />
+        <Hero
+          collective={collective}
+          host={host}
+          isAdmin={isAdmin}
+          callsToAction={callsToAction}
+          onPrimaryColorChange={onPrimaryColorChange}
+        />
         <Container mt={[0, -30]} position="sticky" top={0} zIndex={999} ref={this.navbarRef}>
           <CollectiveNavbar
             collective={collective}
@@ -195,11 +198,12 @@ class CollectivePage extends Component {
             isAdmin={isAdmin}
             selected={selectedSection || sections[0]}
             onCollectiveClick={this.onCollectiveClick}
+            callsToAction={callsToAction}
             hideInfos={!isFixed}
             isAnimated={true}
             onSectionClick={this.onSectionClick}
-            LinkComponent={({ section, label, ...props }) => (
-              <a href={`#section-${section}`} onClick={e => e.preventDefault()} {...props}>
+            LinkComponent={({ section, label, className }) => (
+              <a href={`#section-${section}`} className={className} onClick={e => e.preventDefault()}>
                 {label}
               </a>
             )}

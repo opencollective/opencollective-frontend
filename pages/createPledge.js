@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import slugify from 'slugify';
 import gql from 'graphql-tag';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -10,8 +10,8 @@ import themeGet from '@styled-system/theme-get';
 
 import { getCollectiveQuery } from '../lib/graphql/queries';
 import { withUser } from '../components/UserProvider';
-import { Link, Router } from '../server/pages';
-import { imagePreview } from '../lib/utils';
+import { Router } from '../server/pages';
+import { compose, imagePreview } from '../lib/utils';
 import { defaultImage } from '../lib/constants/collectives';
 
 import Header from '../components/Header';
@@ -23,6 +23,7 @@ import StyledInputGroup from '../components/StyledInputGroup';
 import { Box, Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import ButtonGroup from '../components/ButtonGroup';
+import Link from '../components/Link';
 import StyledLink from '../components/StyledLink';
 import Currency from '../components/Currency';
 
@@ -316,19 +317,11 @@ class CreatePledgePage extends React.Component {
                 <P mt={[5, null, 4]} color="black.700" fontSize="LeadParagraph" lineHeight="LeadParagraph">
                   <FormattedMessage
                     id="createPledge.signinToCreate"
-                    defaultMessage="{signInLink} to create a pledge."
+                    defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
-                      signInLink: (
-                        <Link
-                          route="signin"
-                          passHref
-                          params={{
-                            next: slug ? `/${slug}/pledges/new` : '/pledges/new',
-                          }}
-                        >
-                          <a>
-                            <FormattedMessage id="createPledge.signInLink" defaultMessage="Sign in or join free" />
-                          </a>
+                      'signin-link': msg => (
+                        <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                          {msg}
                         </Link>
                       ),
                     }}
@@ -528,24 +521,22 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-                            <a>
-                              <Container
-                                backgroundImage={`url(${imagePreview(
-                                  fromCollective.image,
-                                  defaultImage[fromCollective.type],
-                                  {
-                                    width: 65,
-                                  },
-                                )})`}
-                                backgroundSize="contain"
-                                backgroundRepeat="no-repeat"
-                                backgroundPosition="center center"
-                                borderRadius={100}
-                                height={40}
-                                width={40}
-                              />
-                            </a>
+                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                            <Container
+                              backgroundImage={`url(${imagePreview(
+                                fromCollective.image,
+                                defaultImage[fromCollective.type],
+                                {
+                                  width: 65,
+                                },
+                              )})`}
+                              backgroundSize="contain"
+                              backgroundRepeat="no-repeat"
+                              backgroundPosition="center center"
+                              borderRadius={100}
+                              height={40}
+                              width={40}
+                            />
                           </Link>
                         </Box>
                       ))}
@@ -559,24 +550,22 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
-                            <a>
-                              <Container
-                                backgroundImage={`url(${imagePreview(
-                                  fromCollective.image,
-                                  defaultImage[fromCollective.type],
-                                  {
-                                    width: 65,
-                                  },
-                                )})`}
-                                backgroundSize="contain"
-                                backgroundRepeat="no-repeat"
-                                backgroundPosition="center center"
-                                borderRadius={8}
-                                height={40}
-                                width={40}
-                              />
-                            </a>
+                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                            <Container
+                              backgroundImage={`url(${imagePreview(
+                                fromCollective.image,
+                                defaultImage[fromCollective.type],
+                                {
+                                  width: 65,
+                                },
+                              )})`}
+                              backgroundSize="contain"
+                              backgroundRepeat="no-repeat"
+                              backgroundPosition="center center"
+                              borderRadius={8}
+                              height={40}
+                              width={40}
+                            />
                           </Link>
                         </Box>
                       ))}

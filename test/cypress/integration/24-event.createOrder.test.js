@@ -1,9 +1,17 @@
 describe('event.createOrder page', () => {
+  it("can't order if the event is over", () => {
+    cy.visit('/opensource/events/webpack-webinar');
+    cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
+    cy.get('.cover .cta').should('not.exist');
+    cy.get('#tickets').should('not.exist');
+  });
+
   it('makes an order for a free ticket as an existing user', () => {
+    cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
     cy.login({ redirect: '/opensource/events/webpack-webinar' });
     cy.get('#free.tier .btn.increase').click();
     cy.get('#free.tier .ctabtn').click();
-    cy.location().should(location => {
+    cy.location({ timeout: 15000 }).should(location => {
       expect(location.pathname).to.eq('/opensource/events/webpack-webinar/order/78');
       expect(location.search).to.eq('?quantity=2&totalAmount=0');
     });
@@ -31,10 +39,11 @@ describe('event.createOrder page', () => {
   });
 
   it('makes an order for a paying ticket as an existing user', () => {
+    cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
     cy.signup({ redirect: '/opensource/events/webpack-webinar' });
     cy.get('#silver-sponsor.tier .btn.increase').click();
     cy.get('#silver-sponsor.tier .ctabtn').click();
-    cy.location().should(location => {
+    cy.location({ timeout: 15000 }).should(location => {
       expect(location.pathname).to.eq('/opensource/events/webpack-webinar/order/77');
       expect(location.search).to.eq('?quantity=2&totalAmount=50000');
     });
@@ -87,6 +96,7 @@ describe('event.createOrder page', () => {
       cy.contains('.breakdown-line', 'Item price').contains('$10.00');
       cy.contains('.breakdown-line', 'Quantity').contains('8');
       cy.contains('.breakdown-line', 'Your contribution').contains('$80.00');
+      cy.wait(1000);
 
       // Algeria should not have taxes
       cy.contains('[data-cy="select"]', 'Please select your country').click();

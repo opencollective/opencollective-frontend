@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { ArrowBack } from 'styled-icons/boxicons-regular';
 
+import { compose } from '../lib/utils';
+import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { Router } from '../server/pages';
 
 import Header from '../components/Header';
@@ -18,9 +20,6 @@ import EditUpdateForm from '../components/EditUpdateForm';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import Link from '../components/Link';
-
-import { addCollectiveCoverData } from '../lib/graphql/queries';
-
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -100,13 +99,7 @@ class CreateUpdatePage extends React.Component {
             }
           `}
         </style>
-        <Header
-          title={collective.name}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
           <CollectiveCover

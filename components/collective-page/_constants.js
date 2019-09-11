@@ -17,7 +17,7 @@ export const AnimationsDurations = {
  * A map of unique identifiers for the sections of the page
  */
 export const Sections = {
-  COLLECTIVES: 'collectives',
+  CONTRIBUTIONS: 'contributions',
   CONTRIBUTE: 'contribute',
   // CONVERSATIONS: 'conversations',
   UPDATES: 'updates',
@@ -39,5 +39,5 @@ export const ContributionTypes = {
   EVENT_PARTICIPATE: 'EVENT_PARTICIPATE',
 };
 
-/** Default primary colors for collectives */
-export const DEFAULT_PRIMARY_COLOR = '#000000';
+/** Max number of contributors on each tier card */
+export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;

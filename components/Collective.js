@@ -20,8 +20,6 @@ import ExpensesSection from './expenses/ExpensesSection';
 import EventsSection from './EventsSection';
 import LongDescription from './LongDescription';
 
-const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
-
 class Collective extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
@@ -48,6 +46,18 @@ class Collective extends React.Component {
         id: 'collective.created.description',
         defaultMessage:
           'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
+      },
+      'collective.approved.description': {
+        id: 'collective.approved.description',
+        defaultMessage: 'Your collective is already approved by the host ({host}).',
+      },
+      'collective.pending': {
+        id: 'collective.pending',
+        defaultMessage: 'Collective pending approval.',
+      },
+      'collective.pending.description': {
+        id: 'collective.pending.description',
+        defaultMessage: 'This collective is pending approval from the host ({host}).',
       },
       'collective.isArchived': {
         id: 'collective.isArchived',
@@ -132,25 +142,31 @@ class Collective extends React.Component {
     const { intl, LoggedInUser, query, collective } = this.props;
     const status = get(query, 'status');
 
-    const donateParams = { collectiveSlug: collective.slug, verb: 'donate' };
-    if (query.referral) {
-      donateParams.referral = query.referral;
-    }
-    const backgroundImage =
-      collective.backgroundImage || get(collective, 'parentCollective.backgroundImage') || defaultBackgroundImage;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
     if (status === 'collectiveCreated') {
       notification.title = intl.formatMessage(this.messages['collective.created']);
-      notification.description = intl.formatMessage(this.messages['collective.created.description'], {
-        host: collective.host.name,
-      });
+      if (collective.isApproved) {
+        notification.description = intl.formatMessage(this.messages['collective.approved.description'], {
+          host: collective.host.name,
+        });
+      } else {
+        notification.description = intl.formatMessage(this.messages['collective.created.description'], {
+          host: collective.host.name,
+        });
+      }
     } else if (status === 'collectiveArchived' || collective.isArchived) {
       notification.title = intl.formatMessage(this.messages['collective.isArchived'], {
         name: collective.name,
       });
       notification.description = intl.formatMessage(this.messages['collective.isArchived.description']);
       notification.status = 'collectiveArchived';
+    } else if (!collective.isApproved && collective.host) {
+      notification.title = intl.formatMessage(this.messages['collective.pending']);
+      notification.description = intl.formatMessage(this.messages['collective.pending.description'], {
+        host: collective.host.name,
+      });
+      notification.status = 'collectivePending';
     }
 
     const contributorsStats = { ...get(collective, 'stats.backers') };
@@ -220,14 +236,7 @@ class Collective extends React.Component {
           `}
         </style>
 
-        <Header
-          title={collective.name}
-          description={collective.description || collective.longDescription}
-          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
-          image={collective.image || get(collective.parentCollective, 'image') || backgroundImage}
-          LoggedInUser={LoggedInUser}
-          href={`/${collective.slug}`}
-        />
+        <Header collective={collective} LoggedInUser={LoggedInUser} canonicalURL={`/${collective.slug}`} />
 
         <Body>
           <div className={classNames('CollectivePage', { archiveCollective: collective.isArchived })}>
@@ -243,6 +252,7 @@ class Collective extends React.Component {
               LoggedInUser={LoggedInUser}
               key={collective.slug}
               displayContributeLink={collective.isActive && collective.host ? true : false}
+              forceLegacy
             />
 
             <div>
@@ -266,21 +276,14 @@ class Collective extends React.Component {
                   {collective.isActive && collective.host && (
                     <div className="sidebar tiers" id="contribute">
                       {collective.tiers.map(tier => (
-                        <TierCard
-                          key={`TierCard-${tier.slug}`}
-                          collective={collective}
-                          tier={tier}
-                          referral={query.referral}
-                        />
+                        <TierCard key={`TierCard-${tier.slug}`} collective={collective} tier={tier} />
                       ))}
                       <div className="CustomDonationTierCard">
                         <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
-                          <a>
-                            <FormattedMessage
-                              id="collective.tiers.donate"
-                              defaultMessage="Or make a custom financial contribution"
-                            />
-                          </a>
+                          <FormattedMessage
+                            id="collective.tiers.donate"
+                            defaultMessage="Or make a custom financial contribution"
+                          />
                         </Link>
                       </div>
                     </div>

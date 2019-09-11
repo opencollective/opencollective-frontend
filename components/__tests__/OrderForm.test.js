@@ -4,9 +4,7 @@ import OrderForm from '../OrderForm';
 import sinon from 'sinon';
 import * as stripe from '../../lib/stripe';
 import * as api from '../../lib/api';
-import { IntlProvider, addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-addLocaleData([...en]);
+import { IntlProvider } from 'react-intl';
 
 import { mount } from 'enzyme';
 

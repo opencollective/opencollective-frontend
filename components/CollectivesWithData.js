@@ -158,8 +158,8 @@ const getCollectivesQuery = gql`
         name
         description
         longDescription
-        image
         currency
+        imageUrl
         backgroundImage
         stats {
           id

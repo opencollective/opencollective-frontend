@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import App, { Container } from 'next/app';
+import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
@@ -9,14 +9,17 @@ import { ApolloProvider } from 'react-apollo';
 // For old browsers without window.Intl
 import 'intl';
 import 'intl/locale-data/jsonp/en.js';
+import 'intl-pluralrules';
+import '@formatjs/intl-relativetimeformat/polyfill';
+import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
 
-import { IntlProvider, addLocaleData } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 
 import UserProvider from '../components/UserProvider';
 import StripeProviderSSR from '../components/StripeProvider';
 import withData from '../lib/withData';
 
-import theme from '../lib/constants/theme';
+import theme from '../lib/theme';
 
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'; // eslint-disable-line node/no-unpublished-import
 import '../node_modules/nprogress/nprogress.css'; // eslint-disable-line node/no-unpublished-import
@@ -29,15 +32,6 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
-
-// Register React Intl's locale data for the user's locale in the browser. This
-// locale data was added to the page by `pages/_document.js`. This only happens
-// once, on initial page load in the browser.
-if (typeof window !== 'undefined' && window.ReactIntlLocaleData) {
-  Object.keys(window.ReactIntlLocaleData).forEach(lang => {
-    addLocaleData(window.ReactIntlLocaleData[lang]);
-  });
-}
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -75,14 +69,36 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    return { pageProps, scripts, initialNow, locale, messages };
+    const digitalClimateStrikeBannerEnabled = true;
+    const digitalClimateStrikeFullpageEnabled = ctx.req && ctx.req.url === '/';
+    const digitalClimateStrikeOptions = {
+      enabled: !process.env.CI,
+      cookieExpirationDays: 30,
+      disableGoogleAnalytics: true,
+      showCloseButtonOnFullPageWidget: true,
+      footerDisplayStartDate: digitalClimateStrikeBannerEnabled ? new Date(2019, 8, 1) : new Date(2021, 8, 20),
+      fullPageDisplayStartDate: digitalClimateStrikeFullpageEnabled ? new Date(2019, 8, 20) : new Date(2021, 8, 20),
+      websiteName: 'Open Collective',
+      iframeHost: 'https://oc-digital-climate-strike.now.sh',
+    };
+
+    return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
   }
 
   render() {
-    const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
+    const {
+      client,
+      Component,
+      pageProps,
+      scripts,
+      initialNow,
+      locale,
+      messages,
+      digitalClimateStrikeOptions,
+    } = this.props;
 
     return (
-      <Container>
+      <Fragment>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
@@ -97,7 +113,17 @@ class OpenCollectiveFrontendApp extends App {
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
-      </Container>
+        {digitalClimateStrikeOptions && digitalClimateStrikeOptions.enabled && (
+          <Fragment>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
+              }}
+            />
+            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js" />
+          </Fragment>
+        )}
+      </Fragment>
     );
   }
 }

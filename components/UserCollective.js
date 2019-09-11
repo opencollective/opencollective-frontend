@@ -230,7 +230,7 @@ class UserCollective extends React.Component {
     const type = collective.type.toLowerCase();
     let cta;
     if (collective.canApply && !collective.isArchived) {
-      cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} sticky={false} />;
+      cta = <ApplyToHostBtn LoggedInUser={LoggedInUser} host={collective} buttonStyle="primary" />;
     }
 
     const notification = {};
@@ -328,15 +328,7 @@ class UserCollective extends React.Component {
           `}
         </style>
 
-        <Header
-          title={collective.name}
-          description={collective.description || collective.longDescription}
-          twitterHandle={collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')}
-          image={get(collective.parentCollective, 'image')}
-          className={this.state.status}
-          LoggedInUser={LoggedInUser}
-          href={`/${collective.slug}`}
-        />
+        <Header collective={collective} className={this.state.status} LoggedInUser={LoggedInUser} />
 
         <Body>
           <div className={classNames({ archiveCollective: collective.isArchived })}>
@@ -367,7 +359,7 @@ class UserCollective extends React.Component {
                   {isProfileEmpty && canEditCollective && (
                     <div className="message">
                       <div className="editBtn">
-                        <Button onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>
+                        <Button data-cy="editBtn" onClick={() => Router.pushRoute(`/${collective.slug}/edit`)}>
                           {intl.formatMessage(this.messages[`${type}.collective.edit`])}
                         </Button>
                       </div>

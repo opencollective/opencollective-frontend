@@ -63,7 +63,8 @@ class EventsWithData extends React.Component {
         {!event.startsAt && console.warn(`EventsWithData: event.startsAt should not be empty. event.id: ${event.id}`)}
         {event.startsAt && (
           <React.Fragment>
-            <FormattedDate value={event.startsAt} timeZone={event.timezone} day="numeric" month="long" />, &nbsp;
+            <FormattedDate value={event.startsAt} timeZone={event.timezone} day="numeric" month="long" year="numeric" />
+            , &nbsp;
           </React.Fragment>
         )}
         {event.location.name}
@@ -216,8 +217,8 @@ const getEventsQuery = gql`
         slug
         name
         mission
+        imageUrl
         backgroundImage
-        image
       }
     }
   }

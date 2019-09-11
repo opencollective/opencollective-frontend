@@ -59,6 +59,7 @@ const PublicMessage = styled.p`
   margin-top: 12px;
   text-align: center;
   cursor: pointer;
+  word-break: break-word;
 
   &:hover {
     opacity: 0.9;
@@ -196,40 +197,37 @@ class OrderSuccessContributorCardWithData extends React.Component {
           <Flex flexDirection="column" p={12} alignItems="center">
             {totalAmount !== 0 && (
               <React.Fragment>
-                <Span fontSize="10px">
+                <Span fontSize="Tiny">
                   <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
                 </Span>
-                <FormattedMoneyAmount
-                  fontWeight="bold"
-                  fontSize="Caption"
-                  color="black.900"
-                  abbreviateInterval={false}
-                  precision={2}
-                  amount={totalAmount}
-                  currency={currency}
-                  interval={interval}
-                />
-                {member && member.publicMessage && (
-                  <Container textAlign="center" color="black.600">
-                    <PublicMessage onClick={this.showPopup}>“{member.publicMessage}”</PublicMessage>
-                  </Container>
-                )}
-                {member && !member.publicMessage && !hasPopup && (
-                  <Span
-                    mt={2}
-                    cursor="pointer"
-                    fontSize="Tiny"
-                    color="black.600"
-                    textAlign="center"
-                    onClick={this.showPopup}
-                  >
-                    <FormattedMessage
-                      id="contribute.publicMessage"
-                      defaultMessage="Leave a public message (Optional)"
-                    />
-                  </Span>
-                )}
+                <Span fontSize="Caption">
+                  <FormattedMoneyAmount
+                    precision={2}
+                    amount={totalAmount}
+                    currency={currency}
+                    interval={interval}
+                    amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                    abbreviateInterval
+                  />
+                </Span>
               </React.Fragment>
+            )}
+            {member && member.publicMessage && (
+              <Container textAlign="center" color="black.600">
+                <PublicMessage onClick={this.showPopup}>“{member.publicMessage}”</PublicMessage>
+              </Container>
+            )}
+            {member && !member.publicMessage && !hasPopup && (
+              <Span
+                mt={2}
+                cursor="pointer"
+                fontSize="Tiny"
+                color="black.600"
+                textAlign="center"
+                onClick={this.showPopup}
+              >
+                <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+              </Span>
             )}
           </Flex>
         </StyledCard>

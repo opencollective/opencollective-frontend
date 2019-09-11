@@ -47,7 +47,7 @@ module.exports = {
     },
     {
       name: 'Contribution Flow',
-      components: 'components/Contribute*.js',
+      components: 'components/contribution-flow/*.js',
       description: 'These components are used on the donate/contribute flow.',
     },
     {

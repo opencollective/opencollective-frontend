@@ -134,7 +134,7 @@ const getMembershipsQuery = gql`
         currency
         description
         slug
-        image
+        imageUrl
         backgroundImage
         stats {
           id

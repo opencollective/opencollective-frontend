@@ -47,7 +47,7 @@ export const getContributorsFilters = contributors => {
 
   // Add filters to the set based on contributors roles
   for (const c of contributors) {
-    if (c.isCore) {
+    if (c.isCore || c.isAdmin) {
       if (addFilter(CONTRIBUTOR_FILTERS.CORE)) {
         break;
       }
@@ -78,7 +78,7 @@ export const filterContributors = (contributors, filter) => {
   if (filter === CONTRIBUTOR_FILTERS.FINANCIAL) {
     return contributors.filter(c => c.isBacker || c.isFundraiser);
   } else if (filter === CONTRIBUTOR_FILTERS.CORE) {
-    return contributors.filter(c => c.isCore);
+    return contributors.filter(c => c.isCore || c.isAdmin);
   } else {
     // For filters not implemented yet and `ALL`, just return the contributors list
     return contributors;
@@ -111,7 +111,7 @@ ContributorsFilter.propTypes = {
   /** An optional list of active filters */
   filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
   /** Default button style when selected */
-  selectedButtonStyle: PropTypes.oneOf(['primary', 'dark']),
+  selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };

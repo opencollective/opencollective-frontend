@@ -13,7 +13,7 @@ import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
 import { withUser } from './UserProvider';
-import theme from '../lib/constants/theme';
+import theme from '../lib/theme';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',

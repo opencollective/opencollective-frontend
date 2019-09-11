@@ -126,8 +126,10 @@ const getRole = (contributor, intl) => {
   // ADMIN > BACKER > FUNDRAISER > *
   // Everything that comes after follower is considered same priority so we just
   // take the first role in the list.
-  if (contributor.isCore) {
+  if (contributor.isAdmin) {
     return formatMemberRole(intl, roles.ADMIN);
+  } else if (contributor.isCore) {
+    return formatMemberRole(intl, roles.MEMBER);
   } else if (contributor.isBacker) {
     return formatMemberRole(intl, roles.BACKER);
   } else if (contributor.isFundraiser) {
@@ -148,6 +150,7 @@ class ContributorCard extends React.PureComponent {
       name: PropTypes.string.isRequired,
       roles: PropTypes.arrayOf(PropTypes.string.isRequired),
       type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+      isAdmin: PropTypes.bool.isRequired,
       isCore: PropTypes.bool.isRequired,
       isBacker: PropTypes.bool.isRequired,
       isFundraiser: PropTypes.bool.isRequired,

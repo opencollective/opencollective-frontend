@@ -1,23 +1,25 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 
-import Button from './Button';
+import { compose } from '../lib/utils';
+
 import Link from './Link';
 import { P } from './Text';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 import StyledCheckbox from './StyledCheckbox';
 import StyledButton from './StyledButton';
 import Container from './Container';
+import ExternalLinkNewTab from './ExternalLinkNewTab';
 
 const CheckboxWrapper = styled(Container)`
   color: #090a0a;
   display: flex;
-  align-items: baseline;
+  align-items: center;
 `;
 
 const TOS = styled(P)`
@@ -25,15 +27,13 @@ const TOS = styled(P)`
   font-size: 16px;
   text-align: left;
   text-shadow: none;
+  margin-top: 8px;
+  margin-bottom: 16px;
 `;
 
-const TOSLinkWrapper = styled.span`
+const TOSLinkWrapper = styled.div`
   text-align: left;
   margin-left: 20px;
-`;
-
-const TOSLink = styled.a`
-  color: rgb(51, 133, 255) !important;
 `;
 
 class ApplyToHostBtnLoggedIn extends React.Component {
@@ -42,6 +42,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
     host: PropTypes.object.isRequired,
     data: PropTypes.object,
     editCollective: PropTypes.func,
+    buttonStyle: PropTypes.string,
   };
 
   constructor(props) {
@@ -75,21 +76,13 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   }
 
   render() {
-    const { host, data } = this.props;
+    const { host, data, buttonStyle } = this.props;
 
     if (data.loading) {
       return (
-        <Button className="blue" disabled>
-          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-        </Button>
-      );
-    }
-
-    if (host && host.slug === 'opensource') {
-      return (
-        <Button className="blue" href={`/${host.slug}/apply`}>
-          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-        </Button>
+        <StyledButton buttonStyle={buttonStyle} disabled data-cy="host-apply-btn">
+          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+        </StyledButton>
       );
     }
 
@@ -101,19 +94,25 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       <Fragment>
         <div className="ApplyToHostBtnLoggedIn">
           {!this.inactiveCollective && (
-            <Button className="blue" href={`/${host.slug}/apply`}>
-              <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply to create a collective" />
-            </Button>
+            <Link route={`/${host.slug}/apply`}>
+              <StyledButton buttonStyle={buttonStyle} data-cy="host-apply-btn">
+                <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+              </StyledButton>
+            </Link>
           )}
           {this.inactiveCollective &&
             (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) && (
-              <Button onClick={() => this.handleModalDisplay()} className="blue">
+              <StyledButton
+                buttonStyle={buttonStyle}
+                onClick={() => this.handleModalDisplay()}
+                data-cy="host-apply-btn"
+              >
                 <FormattedMessage
                   id="host.apply.btn"
-                  defaultMessage="Apply to host your collective {collective}"
-                  values={{ collective: this.inactiveCollective.name }}
+                  defaultMessage="Apply with {collective}"
+                  values={{ collective: <strong>{this.inactiveCollective.name}</strong> }}
                 />
-              </Button>
+              </StyledButton>
             )}
           {get(this.inactiveCollective, 'host.id') === host.id && (
             <FormattedMessage
@@ -134,19 +133,24 @@ class ApplyToHostBtnLoggedIn extends React.Component {
             />
           </ModalHeader>
           <ModalBody>
-            <TOS>Terms of service</TOS>
+            <TOS>
+              <FormattedMessage id="collective.tos.label" defaultMessage="Terms of Service" />
+            </TOS>
             <CheckboxWrapper>
               <StyledCheckbox
                 onChange={({ checked }) => this.setState({ checkTOS: checked })}
                 checked={this.state.checkTOS}
+                size={16}
               />
               <TOSLinkWrapper>
-                I agree with the{' '}
-                <TOSLink href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
-                  {' '}
-                  the terms of fiscal sponsorship of the host
-                </TOSLink>{' '}
-                ({host.name}) that will collect money on behalf of our collective.
+                <FormattedMessage
+                  id="ApplyToHostBtnLoggedIn.TOS"
+                  defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
+                  values={{
+                    'tos-link': msg => <ExternalLinkNewTab href={get(host, 'settings.tos')}>{msg}</ExternalLinkNewTab>,
+                    hostName: host.name,
+                  }}
+                />
               </TOSLinkWrapper>
             </CheckboxWrapper>
           </ModalBody>

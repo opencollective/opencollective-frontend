@@ -31,7 +31,7 @@ import BubblesSVG from './Bubbles.svg';
 const TierCover = styled(Container)`
   width: 100%;
   height: ${Dimensions.COVER_HEIGHT}px;
-  background-color: #005ea6;
+  background-color: ${props => props.theme.colors.primary[300]};
   background-repeat: no-repeat;
   background-size: cover;
   filter: blur(15px);
@@ -206,7 +206,14 @@ class TierPage extends Component {
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
-                <H3 color="black.500" fontSize="H5" mb={4} whiteSpace="pre-line" data-cy="shortDescription">
+                <H3
+                  color="black.500"
+                  fontSize="H5"
+                  mb={4}
+                  whiteSpace="pre-line"
+                  data-cy="shortDescription"
+                  wordBreak="break-word"
+                >
                   <InlineEditField
                     mutation={EditTierMutation}
                     canEdit={canEdit}
@@ -257,7 +264,7 @@ class TierPage extends Component {
               <Flex flex="0 1 50%" flexDirection="column" justifyContent="center">
                 {tier.goal && (
                   <P
-                    fontSize={['Paragraph', null, null, 'H5']}
+                    fontSize={['Caption', 'Paragraph', null, 'H5']}
                     color="black.500"
                     lineHeight={['LeadParagraph', null, null, 'H3']}
                     mb={[0, null, null, 3]}
@@ -268,12 +275,12 @@ class TierPage extends Component {
                       values={{
                         amountWithInterval: (
                           <FormattedMoneyAmount
-                            fontWeight="bold"
-                            fontSize={['LeadParagraph', null, null, 'H3']}
-                            color="black.900"
                             amount={tier.goal}
                             currency={tier.currency}
                             interval={tier.interval}
+                            abbreviateAmount
+                            abbreviateInterval
+                            amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                           />
                         ),
                       }}
@@ -281,8 +288,8 @@ class TierPage extends Component {
                   </P>
                 )}
                 <P
-                  fontSize={['Tiny', null, 'Paragraph']}
-                  color="black.400"
+                  fontSize={['9px', 'Tiny', 'Paragraph']}
+                  color="black.500"
                   lineHeight={['Caption', null, 'LeadParagraph']}
                   mb={[0, null, null, 2]}
                 >
@@ -292,12 +299,11 @@ class TierPage extends Component {
                     values={{
                       amountWithInterval: (
                         <FormattedMoneyAmount
-                          fontWeight="bold"
-                          fontSize={['Caption', null, 'LeadParagraph']}
                           color="black.700"
                           amount={amountRaised}
                           currency={tier.currency}
                           interval={tier.interval}
+                          amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
                         />
                       ),
                     }}
@@ -322,7 +328,7 @@ class TierPage extends Component {
                       collectiveSlug: collective.slug,
                     }}
                   >
-                    <StyledButton buttonStyle="dark" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
+                    <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                       <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
                     </StyledButton>
                   </Link>

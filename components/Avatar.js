@@ -5,7 +5,7 @@ import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
-import { getCollectiveImage } from '../lib/utils';
+import { getCollectiveImage, getAvatarBorderRadius } from '../lib/utils';
 import { defaultImage } from '../lib/constants/collectives';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
@@ -19,7 +19,7 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: ${({ type }) => (type === 'USER' ? '50%' : '25%')};
+  border-radius: ${({ type }) => getAvatarBorderRadius(type)};
   ${border}
   color: ${themeGet('colors.black.400')};
   font-weight: bold;

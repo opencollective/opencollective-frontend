@@ -62,7 +62,10 @@ class CreateEvent extends React.Component {
     } catch (err) {
       console.error('>>> createEvent error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-      this.setState({ result: { error: errorMsg } });
+      this.setState({
+        status: 'idle',
+        result: { error: errorMsg },
+      });
       throw new Error(errorMsg);
     }
   }
@@ -108,14 +111,7 @@ class CreateEvent extends React.Component {
           `}
         </style>
 
-        <Header
-          title={title}
-          description={collective.description}
-          twitterHandle={collective.twitterHandle}
-          image={collective.image || collective.backgroundImage}
-          className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
-        />
+        <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
           <CollectiveCover href={`/${collective.slug}`} className="small" title={title} collective={collective} />

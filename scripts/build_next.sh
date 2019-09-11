@@ -1,13 +1,12 @@
 DIST=./dist
 
 echo "> Cleaning dist (before build)"
-npx rimraf $DIST
-mkdir -p $DIST
+shx rm -rf $DIST
+shx mkdir -p $DIST
 
 echo "> Building next"
-npx next build
+next build || exit 1
 
 echo "> Copying .next to dist folder"
 
 cp -R .next $DIST
-

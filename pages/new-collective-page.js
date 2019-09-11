@@ -3,19 +3,16 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import memoizeOne from 'memoize-one';
-import { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { lighten, darken } from 'polished';
+import { createGlobalStyle } from 'styled-components';
 
-import theme, { generateTheme } from '../lib/constants/theme';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import { TransactionsAndExpensesFragment, UpdatesFieldsFragment } from '../components/collective-page/fragments';
+import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
-import { getCollectivePrimaryColor } from '../components/collective-page/_utils';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -42,6 +39,9 @@ class NewCollectivePage extends React.Component {
         description: PropTypes.string,
         twitterHandle: PropTypes.string,
         image: PropTypes.string,
+        isApproved: PropTypes.bool,
+        isArchived: PropTypes.bool,
+        isHost: PropTypes.bool,
         parentCollective: PropTypes.shape({ image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
@@ -75,28 +75,6 @@ class NewCollectivePage extends React.Component {
     }
   }
 
-  getTheme = memoizeOne(primaryColor => {
-    if (!primaryColor) {
-      return theme;
-    } else {
-      return generateTheme({
-        colors: {
-          ...theme.colors,
-          primary: {
-            800: darken(0.1, primaryColor),
-            700: darken(0.05, primaryColor),
-            500: primaryColor,
-            400: lighten(0.1, primaryColor),
-            300: lighten(0.2, primaryColor),
-            200: lighten(0.3, primaryColor),
-            100: lighten(0.4, primaryColor),
-            50: lighten(0.6, primaryColor),
-          },
-        },
-      });
-    }
-  });
-
   render() {
     const { data, LoggedInUser, status } = this.props;
 
@@ -116,22 +94,25 @@ class NewCollectivePage extends React.Component {
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
-        <ThemeProvider theme={this.getTheme(getCollectivePrimaryColor(collective))}>
-          <CollectivePage
-            collective={collective}
-            host={collective.host}
-            contributors={collective.contributors}
-            tiers={collective.tiers}
-            events={collective.events}
-            transactions={collective.transactions}
-            expenses={collective.expenses}
-            stats={collective.stats}
-            updates={collective.updates}
-            LoggedInUser={LoggedInUser}
-            isAdmin={isAdmin}
-            status={status}
-          />
-        </ThemeProvider>
+        <CollectiveThemeProvider collective={collective}>
+          {({ onPrimaryColorChange }) => (
+            <CollectivePage
+              collective={collective}
+              host={collective.host}
+              contributors={collective.contributors}
+              tiers={collective.tiers}
+              events={collective.events}
+              transactions={collective.transactions}
+              expenses={collective.expenses}
+              stats={collective.stats}
+              updates={collective.updates}
+              LoggedInUser={LoggedInUser}
+              isAdmin={isAdmin}
+              status={status}
+              onPrimaryColorChange={onPrimaryColorChange}
+            />
+          )}
+        </CollectiveThemeProvider>
       </Page>
     );
   }
@@ -139,7 +120,7 @@ class NewCollectivePage extends React.Component {
 
 // eslint-disable graphql/template-strings
 const getCollective = graphql(gql`
-  query NewCollectivePage($slug: String!) {
+  query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
       id
       slug
@@ -152,16 +133,27 @@ const getCollective = graphql(gql`
       githubHandle
       website
       tags
+      company
       type
       currency
       settings
+      isApproved
       isArchived
+      isHost
+      hostFeePercent
       image
+      imageUrl
       stats {
         id
         balance
         yearlyBudget
         updates
+        backers {
+          id
+          all
+          users
+          organizations
+        }
       }
       parentCollective {
         id
@@ -179,6 +171,7 @@ const getCollective = graphql(gql`
         id
         name
         roles
+        isAdmin
         isCore
         isBacker
         isFundraiser
@@ -201,10 +194,24 @@ const getCollective = graphql(gql`
         currency
         amount
         minimumAmount
+        button
         stats {
           id
           totalDonated
           totalRecurringDonations
+          contributors {
+            id
+            all
+            users
+            organizations
+          }
+        }
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
         }
       }
       events {
@@ -213,6 +220,22 @@ const getCollective = graphql(gql`
         name
         description
         image
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
       }
       ...TransactionsAndExpensesFragment
       updates(limit: 3, onlyPublishedUpdates: true) {
@@ -221,8 +244,8 @@ const getCollective = graphql(gql`
     }
   }
 
-  ${TransactionsAndExpensesFragment}
-  ${UpdatesFieldsFragment}
+  ${fragments.TransactionsAndExpensesFragment}
+  ${fragments.UpdatesFieldsFragment}
 `);
 
 export default withUser(getCollective(NewCollectivePage));

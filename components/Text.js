@@ -1,10 +1,9 @@
 import styled from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
-import tag from 'clean-tag';
 
 import { textTransform, whiteSpace, wordBreak, cursor } from '../lib/styled_system_custom';
 
-export const P = styled(tag.p).attrs(props => ({
+export const P = styled.p.attrs(props => ({
   // Overrides default margin Y to avoid global styles
   mb: props.mb || props.my || props.m || 0,
   mt: props.mt || props.my || props.m || 0,
@@ -20,13 +19,12 @@ export const P = styled(tag.p).attrs(props => ({
 `;
 
 P.defaultProps = {
-  omitProps: tag.defaultProps.omitProps.concat(['textTransform', 'whiteSpace', 'wordBreak', 'cursor']),
   fontSize: 'Paragraph',
-  letterSpacing: '-0.2px',
+  letterSpacing: '-0.4px',
   lineHeight: 'Paragraph',
 };
 
-export const Span = P.withComponent(tag.span);
+export const Span = P.withComponent('span');
 
 Span.defaultProps = {
   ...P.defaultProps,
@@ -34,7 +32,7 @@ Span.defaultProps = {
   lineHeight: 'inherit',
 };
 
-export const H1 = P.withComponent(tag.h1);
+export const H1 = P.withComponent('h1');
 
 H1.defaultProps = {
   ...P.defaultProps,
@@ -44,7 +42,7 @@ H1.defaultProps = {
   lineHeight: 'H1',
 };
 
-export const H2 = P.withComponent(tag.h2);
+export const H2 = P.withComponent('h2');
 
 H2.defaultProps = {
   ...P.defaultProps,
@@ -54,7 +52,7 @@ H2.defaultProps = {
   lineHeight: 'H2',
 };
 
-export const H3 = P.withComponent(tag.h3);
+export const H3 = P.withComponent('h3');
 
 H3.defaultProps = {
   ...P.defaultProps,
@@ -64,22 +62,22 @@ H3.defaultProps = {
   lineHeight: 'H3',
 };
 
-export const H4 = P.withComponent(tag.h4);
+export const H4 = P.withComponent('h4');
 
 H4.defaultProps = {
   ...P.defaultProps,
   fontSize: 'H4',
   fontWeight: 'bold',
-  letterSpacing: '-0.2px',
+  letterSpacing: '-0.4px',
   lineHeight: 'H4',
 };
 
-export const H5 = P.withComponent(tag.h5);
+export const H5 = P.withComponent('h5');
 
 H5.defaultProps = {
   ...P.defaultProps,
   fontSize: 'H5',
-  letterSpacing: '-0.2px',
+  letterSpacing: '-0.4px',
   lineHeight: 'H5',
   textAlign: 'center',
   fontWeight: 500,

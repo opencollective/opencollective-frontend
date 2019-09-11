@@ -7,6 +7,7 @@ import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
 import Link from './Link';
 import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
+import { getStripe } from '../lib/stripe';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import colors from '../lib/constants/colors';
 import CancelSubscriptionBtn from './CancelSubscriptionBtn';
@@ -76,22 +77,50 @@ class SubscriptionCard extends React.Component {
   }
 
   update = async ({ paymentMethod, amount }) => {
-    const { intl } = this.props;
     this.setState({ loading: true, result: {} });
     try {
-      await this.props.updateSubscription(this.props.subscription.id, paymentMethod, amount);
-      this.setState({
-        loading: false,
-        visibleState: this.stateConstants.normal,
-        result: {
-          success: intl.formatMessage(this.messages['subscription.updated']),
-        },
-      });
+      const res = await this.props.updateSubscription(this.props.subscription.id, paymentMethod, amount);
+      const updatedOrder = res.data.updateSubscription;
+      if (updatedOrder.stripeError) {
+        this.handleStripeError(updatedOrder.stripeError);
+      } else {
+        this.handleSuccess();
+      }
     } catch (e) {
       this.setState({
         loading: false,
         result: { error: e.graphQLErrors[0].message },
       });
+    }
+  };
+
+  handleSuccess = () => {
+    const { intl } = this.props;
+
+    this.setState({
+      loading: false,
+      visibleState: this.stateConstants.normal,
+      result: {
+        success: intl.formatMessage(this.messages['subscription.updated']),
+      },
+    });
+  };
+
+  handleStripeError = async ({ message, response }) => {
+    if (!response) {
+      this.setState({ loading: false, result: { error: message } });
+      return;
+    }
+
+    if (response.setupIntent) {
+      const stripe = await getStripe();
+      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+      if (result.error) {
+        this.setState({ loading: false, result: { error: result.error.message } });
+      }
+      if (result.setupIntent && result.setupIntent.status === 'succeeded') {
+        this.handleSuccess();
+      }
     }
   };
 
@@ -610,9 +639,9 @@ const updateSubscriptionQuery = gql`
         currency
         slug
         type
-        image
         description
         longDescription
+        imageUrl
         backgroundImage
       }
       fromCollective {
@@ -632,6 +661,10 @@ const updateSubscriptionQuery = gql`
         data
         balance
         expiryDate
+      }
+      stripeError {
+        message
+        response
       }
     }
   }

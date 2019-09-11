@@ -72,6 +72,7 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
     collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
+    collective.application = get(collective, 'settings.apply');
     collective.goals = get(collective, 'settings.goals');
     collective.markdown = get(collective, 'settings.markdown');
 
@@ -190,7 +191,15 @@ class EditCollectiveForm extends React.Component {
       },
       'sendInvoiceByEmail.description': {
         id: 'collective.sendInvoiceByEmail.description',
-        defaultMessage: 'Automatically attach the PDF of your receipts to the monthly report email',
+        defaultMessage: 'Include a PDF of receipts with your monthly report email',
+      },
+      'application.label': {
+        id: 'collective.application.label',
+        defaultMessage: 'Applications',
+      },
+      'application.description': {
+        id: 'collective.application.description',
+        defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
       'hostFeePercent.label': {
         id: 'collective.hostFeePercent.label',
@@ -198,8 +207,7 @@ class EditCollectiveForm extends React.Component {
       },
       'hostFeePercent.description': {
         id: 'collective.hostFeePercent.description',
-        defaultMessage:
-          'Commission on all the donations received by the collectives that you are hosting to cover your administrative costs.',
+        defaultMessage: 'Commission on financial contributions to Collectives you fiscally host.',
       },
       'location.label': {
         id: 'collective.location.label',
@@ -515,6 +523,13 @@ class EditCollectiveForm extends React.Component {
         },
       ],
       advanced: [
+        {
+          name: 'application',
+          className: 'horizontal',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'settings.apply'),
+          when: () => this.state.section === 'advanced' && collective.isHost,
+        },
         {
           name: 'sendInvoiceByEmail',
           className: 'horizontal',
@@ -883,7 +898,7 @@ class EditCollectiveForm extends React.Component {
                   <Link route="collective" params={{ slug: collective.slug }}>
                     <FormattedMessage
                       id="collective.edit.backToProfile"
-                      defaultMessage="view the {type} page"
+                      defaultMessage="view {type} page"
                       values={{ type }}
                     />
                   </Link>

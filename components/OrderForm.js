@@ -8,7 +8,6 @@ import { Button, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import colors from '../lib/constants/colors';
 import TierComponent from './Tier';
 import InputField from './InputField';
-import MatchingFundWithData from './MatchingFundWithData';
 import ActionButton from './Button';
 import SectionTitle from './SectionTitle';
 import CreateOrganizationForm from './CreateOrganizationForm';
@@ -26,7 +25,6 @@ class OrderForm extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func,
-    matchingFund: PropTypes.string,
     redeemFlow: PropTypes.bool,
     intl: PropTypes.object,
     client: PropTypes.object,
@@ -128,10 +126,6 @@ class OrderForm extends React.Component {
       'paymentMethod.creditcardOrGiftcard': {
         id: 'paymentMethod.creditcardOrGiftcard',
         defaultMessage: 'Credit Card / Gift Card',
-      },
-      'paymentMethod.bitcoin': {
-        id: 'paymentMethod.bitcoin',
-        defaultMessage: 'bitcoin',
       },
       'paymentMethod.paypal': {
         id: 'paymentMethod.paypal',
@@ -616,7 +610,6 @@ class OrderForm extends React.Component {
       publicMessage: order.publicMessage,
       interval: order.interval || order.tier.interval,
       totalAmount: this.getTotalAmount(),
-      matchingFund: order.matchingFund,
     };
     if (order.tier && order.tier.id) {
       orderRequest.tier = { id: order.tier.id, amount: order.tier.amount };
@@ -1080,18 +1073,6 @@ class OrderForm extends React.Component {
                     </div>
                   </Col>
                 </Row>
-                {this.props.matchingFund && (
-                  <Row>
-                    <Col sm={12}>
-                      <MatchingFundWithData
-                        collective={collective}
-                        order={order}
-                        uuid={this.props.matchingFund}
-                        onChange={matchingFund => this.handleChange('order', 'matchingFund', matchingFund)}
-                      />
-                    </Col>
-                  </Row>
-                )}
                 <Row>
                   <Col sm={12}>
                     <InputField

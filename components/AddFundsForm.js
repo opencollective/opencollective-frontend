@@ -9,6 +9,8 @@ import { get } from 'lodash';
 import { getCurrencySymbol, formatCurrency } from '../lib/utils';
 import InputField from './InputField';
 import { AddFundsSourcePickerWithData, AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
+import { CollectiveType } from '../lib/constants/collectives';
+import { OC_FEE_PERCENT } from '../lib/constants/transactions';
 
 class AddFundsForm extends React.Component {
   static propTypes = {
@@ -134,6 +136,7 @@ class AddFundsForm extends React.Component {
       {
         name: 'hostFeePercent',
         when: () => !this.isAddFundsToOrg,
+        defaultValue: props.collective.hostFeePercent,
         type: 'number',
         post: '%',
       },
@@ -182,13 +185,14 @@ class AddFundsForm extends React.Component {
     const { host } = this.props;
 
     const newState = { ...this.state };
+
     if (value !== undefined) {
       newState[obj][attr] = value;
     } else {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
 
-    if (attr === 'FromCollectiveId') {
+    if (attr === 'FromCollectiveId' && value !== 'other') {
       value = Number(value);
       if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
@@ -198,7 +202,6 @@ class AddFundsForm extends React.Component {
            receiving funds and the right host must be pulled from
            GraphQL when the user chooses an option in the combo. */
         newState[obj].hostFeePercent = await this.retrieveHostFeePercent(value);
-        newState[obj].platformFeePercent = 5;
       }
     }
 
@@ -214,11 +217,21 @@ class AddFundsForm extends React.Component {
     return false;
   }
 
+  getPlatformFee() {
+    if (this.state.form.platformFeePercent !== undefined) {
+      return this.state.form.platformFeePercent;
+    } else if (this.props.collective.type === CollectiveType.ORGANIZATION) {
+      return OC_FEE_PERCENT;
+    } else {
+      return 0;
+    }
+  }
+
   render() {
     const { loading } = this.props;
 
     const hostFeePercent = this.state.form.hostFeePercent || 0;
-    const platformFeePercent = this.state.form.platformFeePercent || 0;
+    const platformFeePercent = this.getPlatformFee();
 
     const hostFeeAmount = formatCurrency(
       (hostFeePercent / 100) * this.state.form.totalAmount,
@@ -365,7 +378,7 @@ class AddFundsForm extends React.Component {
                               <td className="amount">{hostFeeAmount}</td>
                             </tr>
                           )}
-                          {platformFeePercent > 0 && !this.isAddFundsToOrg && (
+                          {!this.isAddFundsToOrg && (
                             <tr>
                               <td>
                                 <FormattedMessage
@@ -396,8 +409,11 @@ class AddFundsForm extends React.Component {
                       <div>
                         {showAddFundsToOrgDetails && (
                           <div className="note">
-                            Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and 5% (
-                            {platformFeeAmount}) for platform fees.
+                            <FormattedMessage
+                              id="AddFundsForm.PutAside"
+                              defaultMessage="Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees."
+                              values={{ hostFeePercent, hostFeeAmount, platformFeePercent, platformFeeAmount }}
+                            />
                           </div>
                         )}
                       </div>

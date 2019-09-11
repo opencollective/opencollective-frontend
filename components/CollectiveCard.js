@@ -12,7 +12,6 @@ class CollectiveCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     membership: PropTypes.object,
-    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -20,7 +19,7 @@ class CollectiveCard extends React.Component {
   }
 
   render() {
-    const { collective, membership, LoggedInUser } = this.props;
+    const { collective, membership } = this.props;
 
     let tierName = get(membership, 'tier.name');
     const role = get(membership, 'role');
@@ -30,10 +29,10 @@ class CollectiveCard extends React.Component {
           tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
           break;
         case 'ADMIN':
-          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Admin" />;
+          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Collective Admin" />;
           break;
         case 'MEMBER':
-          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Contributor" />;
+          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Core Contributor" />;
           break;
         default:
           tierName =
@@ -74,10 +73,6 @@ class CollectiveCard extends React.Component {
     } else {
       route = 'collective';
       params = { slug: collective.slug };
-    }
-
-    if (LoggedInUser) {
-      params.referral = LoggedInUser.CollectiveId;
     }
 
     return (

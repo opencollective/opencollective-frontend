@@ -20,7 +20,7 @@ class OrderCreated extends React.Component {
     super(props);
     const {
       intl,
-      order: { collective, fromCollective, totalAmount },
+      order: { collective, totalAmount },
     } = props;
     this.messages = defineMessages({
       tweet: {
@@ -45,7 +45,7 @@ class OrderCreated extends React.Component {
         values.event = collective.name;
       }
       const tweetText = intl.formatMessage(this.messages[tweetId], values);
-      const url = `https://opencollective.com${collective.path}?referral=${fromCollective.id}`;
+      const url = `https://opencollective.com${collective.path}`;
       this.tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(
         url,
       )}`;
@@ -83,7 +83,7 @@ class OrderCreated extends React.Component {
       status,
       collectiveType,
       paymentMethodType,
-      order: { collective, fromCollective, totalAmount },
+      order: { collective, totalAmount },
     } = this.props;
 
     const membership = {
@@ -211,8 +211,8 @@ class OrderCreated extends React.Component {
                     defaultMessage="Share this URL:"
                   />
                   <br />
-                  <a href={`https://opencollective.com${collective.path}?referral=${fromCollective.id}`}>
-                    {`https://opencollective.com${collective.path}?referral=${fromCollective.id}`}
+                  <a href={`https://opencollective.com${collective.path}`}>
+                    {`https://opencollective.com${collective.path}`}
                   </a>
                   <br />
                   {collectiveType === 'COLLECTIVE' && (

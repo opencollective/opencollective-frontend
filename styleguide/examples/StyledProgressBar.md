@@ -21,5 +21,5 @@
 # Customize
 
 ```js
-<StyledProgressBar percentage={0.75} height={20} borderRadius={0} color="primary.400" backgroundColor="secondary.700" />
+<StyledProgressBar percentage={0.75} height={20} borderRadius={0} color="primary.400" backgroundColor="red.700" />
 ```

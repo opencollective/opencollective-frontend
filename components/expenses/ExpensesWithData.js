@@ -114,7 +114,7 @@ const getExpensesQuery = gql`
         type
         name
         slug
-        image
+        imageUrl
       }
       user {
         id

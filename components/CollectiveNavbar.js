@@ -53,7 +53,7 @@ const MenuLink = styled.a`
     text-decoration: none;
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     padding: 16px;
   }
 `;
@@ -79,7 +79,7 @@ const MenuLinkContainer = styled.div`
       ${MenuLink} {
         color: #090a0a;
       }
-      @media (min-width: 40em) {
+      @media (min-width: 52em) {
         &::after {
           width: 100%;
           float: left;
@@ -90,12 +90,12 @@ const MenuLinkContainer = styled.div`
   ${props =>
     props.mobileOnly &&
     css`
-      @media (min-width: 40em) {
+      @media (min-width: 52em) {
         display: none;
       }
     `}
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     border-top: 1px solid #e1e1e1;
     &::after {
       display: none;
@@ -118,7 +118,7 @@ const InfosContainer = styled(Container)`
   transform: translateY(0);
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
-  @media (max-width: 40em) {
+  @media (max-width: 52em) {
     padding: 12px 16px;
   }
 
@@ -139,7 +139,7 @@ const ExpandMenuIcon = styled(ChevronDown).attrs({ size: 28 })`
   margin-rigth: 4px;
   flex: 0 0 28px;
 
-  @media (min-width: 40em) {
+  @media (min-width: 52em) {
     display: none;
   }
 
@@ -165,7 +165,7 @@ const CollectiveName = styled.h1`
     color: #313233;
   }
 
-  @media (min-width: 40em) {
+  @media (min-width: 52em) {
     text-align: center;
   }
 `;
@@ -195,9 +195,9 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Updates',
     defaultMessage: 'Updates',
   },
-  [Sections.COLLECTIVES]: {
-    id: 'CollectivePage.NavBar.Collectives',
-    defaultMessage: 'Collectives',
+  [Sections.CONTRIBUTIONS]: {
+    id: 'CollectivePage.NavBar.Contributions',
+    defaultMessage: 'Contributions',
   },
   [Sections.TRANSACTIONS]: {
     id: 'CollectivePage.NavBar.Transactions',
@@ -215,7 +215,7 @@ const getCollectiveTypeBlacklistedSections = collectiveType => {
     case CollectiveType.ORGANIZATION:
       return [Sections.CONTRIBUTE, Sections.UPDATES, Sections.BUDGET];
     case CollectiveType.COLLECTIVE:
-      return [Sections.COLLECTIVES, Sections.TRANSACTIONS];
+      return [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS];
     default:
       return [];
   }
@@ -268,10 +268,10 @@ const CollectiveNavbar = ({
   sections,
   selected,
   LinkComponent,
+  callsToAction,
   onCollectiveClick,
   onSectionClick,
   hideInfos,
-  callsToAction,
   isAnimated,
   intl,
 }) => {
@@ -284,7 +284,7 @@ const CollectiveNavbar = ({
       <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
           <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
-            <Container background="rgba(245, 245, 245, 0.5)" borderRadius="25%" mr={2}>
+            <Container borderRadius="25%" mr={2}>
               <Avatar collective={collective} radius={40} />
             </Container>
           </LinkCollective>
@@ -313,10 +313,10 @@ const CollectiveNavbar = ({
       >
         <Container
           flex="2 1 600px"
-          display={isExpended ? 'flex' : ['none', 'flex']}
+          display={isExpended ? 'flex' : ['none', null, 'flex']}
           css={{ overflowX: 'auto' }}
           data-cy="CollectivePage.NavBar"
-          flexDirection={['column', 'row']}
+          flexDirection={['column', null, 'row']}
           height="100%"
           borderBottom={['1px solid #e6e8eb', 'none']}
         >
@@ -351,9 +351,20 @@ const CollectiveNavbar = ({
               </MenuLink>
             </MenuLinkContainer>
           )}
+          {callsToAction.hasDashboard && (
+            <MenuLinkContainer mobileOnly>
+              <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+                <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+              </MenuLink>
+            </MenuLinkContainer>
+          )}
         </Container>
         <div>
-          <CollectiveCallsToAction display={['none', 'flex']} collectiveSlug={collective.slug} {...callsToAction} />
+          <CollectiveCallsToAction
+            display={['none', null, 'flex']}
+            collective={collective}
+            callsToAction={callsToAction}
+          />
         </div>
       </Container>
     </MainContainer>
@@ -374,6 +385,9 @@ CollectiveNavbar.propTypes = {
   callsToAction: PropTypes.shape({
     hasContact: PropTypes.bool,
     hasSubmitExpense: PropTypes.bool,
+    hasApply: PropTypes.bool,
+    hasDashboard: PropTypes.bool,
+    hasManageSubscriptions: PropTypes.bool,
   }),
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,
@@ -404,13 +418,11 @@ CollectiveNavbar.propTypes = {
 CollectiveNavbar.defaultProps = {
   hideInfos: false,
   isAnimated: false,
-  callsToAction: {
-    hasContact: true,
-  },
+  callsToAction: { hasContact: true },
   // eslint-disable-next-line react/prop-types
-  LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, ...props }) {
+  LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (
-      <Link route={`${collectivePath}/v2#section-${section}`} {...props}>
+      <Link route={`${collectivePath}/v2#section-${section}`} className={className}>
         {label}
       </Link>
     );

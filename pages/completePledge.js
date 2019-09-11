@@ -1,9 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql, compose } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 
+import { compose } from '../lib/utils';
 import { Router } from '../server/pages';
 
 import Header from '../components/Header';

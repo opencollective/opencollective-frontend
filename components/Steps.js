@@ -160,7 +160,6 @@ export default class Steps extends React.Component {
 
   /** Go to previous step. Will be blocked if current step is not validated. */
   goBack = () => {
-    console.log('Go back');
     const currentStep = this.getStepByName(this.props.currentStepName);
     if (!currentStep || currentStep.index === 0) {
       return false;

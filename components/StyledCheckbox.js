@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { typography } from 'styled-system';
+import { typography, size } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
@@ -16,10 +16,29 @@ const IconCheckmark = () => {
   );
 };
 
-const CheckboxContainer = styled(Flex)`
-  ${typography}
-  height: ${props => props.size};
+const CustomCheckbox = styled.span`
+  display: flex;
+  justify-content: center;
   align-items: center;
+  position: absolute;
+  cursor: pointer;
+  border: 1px solid #dcdee0;
+  border-radius: 4px;
+  background-color: white;
+  transition: background-color 0.2s;
+  svg {
+    opacity: 0;
+    height: 0.572em;
+    width: 0.572em;
+    fill: white;
+  }
+`;
+
+const CheckboxContainer = styled(Flex)`
+  align-items: center;
+  width: 100%;
+  ${size}
+  ${typography}
 
   /* Hide the default checkbox */
   input {
@@ -39,29 +58,13 @@ const CheckboxContainer = styled(Flex)`
   }
 
   /* Show our custom checkbox */
-  .custom-checkbox {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    cursor: pointer;
-    height: ${props => props.size};
-    width: ${props => props.size};
-    border: 1px solid #dcdee0;
-    border-radius: 4px;
-    background-color: white;
-    transition: background-color 0.2s;
-    svg {
-      opacity: 0;
-      height: 0.572em;
-      width: 0.572em;
-      fill: white;
-    }
+  ${CustomCheckbox} {
+    ${size}
   }
 
   /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
-  @media (hover:hover) {
-    &:hover input:not(:disabled):not(:checked) ~ .custom-checkbox {
+  @media (hover: hover) {
+    &:hover input:not(:disabled):not(:checked) ~ ${CustomCheckbox} {
       background: ${themeGet('colors.primary.100')};
       border-color: ${themeGet('colors.primary.100')};
       svg {
@@ -71,7 +74,7 @@ const CheckboxContainer = styled(Flex)`
   }
 
   /* Checked */
-  input:checked ~ .custom-checkbox {
+  input:checked ~ ${CustomCheckbox} {
     background: ${themeGet('colors.primary.500')};
     border-color: ${themeGet('colors.primary.500')};
     svg {
@@ -80,14 +83,14 @@ const CheckboxContainer = styled(Flex)`
   }
 
   /* Focused */
-  input:focus ~ .custom-checkbox {
+  input:focus ~ ${CustomCheckbox} {
     background: ${themeGet('colors.primary.400')};
     border-color: ${themeGet('colors.primary.400')};
   }
 
   /* Disabled */
   input:disabled {
-    & ~ .custom-checkbox {
+    & ~ ${CustomCheckbox} {
       background: #f7f8fa;
       border: 1px solid #e8e9eb;
       cursor: not-allowed;
@@ -130,10 +133,10 @@ class StyledCheckbox extends React.Component {
     return (
       <CheckboxContainer onClick={() => this.onChange(!realChecked)} fontSize={size} size={size}>
         <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
-        <span className="custom-checkbox">
+        <CustomCheckbox data-cy="custom-checkbox">
           <IconCheckmark />
-        </span>
-        {label && <label>{label}</label>}
+        </CustomCheckbox>
+        {label && <label htmlFor={inputId}>{label}</label>}
       </CheckboxContainer>
     );
   }
