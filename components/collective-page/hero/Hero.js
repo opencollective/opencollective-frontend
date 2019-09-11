@@ -225,6 +225,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           width="100%"
           collective={collective}
           callsToAction={callsToAction}
+          buttonsMinWidth={140}
         />
       </ContainerSectionContent>
     </Container>
