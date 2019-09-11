@@ -623,6 +623,8 @@
   "ExportContributors.OnlyIndividuals": "Only individuals: {link}",
   "ExportContributors.OnlyOrganizations": "Only organizations: {link}",
   "ExportContributors.Title": "Export {format}",
+  "ExportImages.AllFinancial": "All financial contributors badge",
+  "ExportImages.Title": "You can export images showing the financial contributors to each tier.",
   "Filter.ByName": "Filter by name",
   "Fiscalhost": "Fiscal Host",
   "Fiscalhost.definition": "A fiscal host is a legal entity holding the money and responsible for the admin/taxes forms for the collective.",

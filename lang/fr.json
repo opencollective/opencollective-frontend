@@ -623,6 +623,8 @@
   "ExportContributors.OnlyIndividuals": "Seulement les personnes : {link}",
   "ExportContributors.OnlyOrganizations": "Seulement les organisations : {link}",
   "ExportContributors.Title": "Exporter au format {format}",
+  "ExportImages.AllFinancial": "All financial contributors badge",
+  "ExportImages.Title": "You can export images showing the financial contributors to each tier.",
   "Filter.ByName": "Filtrer par nom",
   "Fiscalhost": "Hôte fiscal",
   "Fiscalhost.definition": "Un hôte fiscal est une entité légale qui stocke l'argent et a la responsabilité de l'administration et des taxes pour le collectif.",
