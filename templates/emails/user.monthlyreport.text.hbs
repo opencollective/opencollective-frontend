@@ -11,7 +11,7 @@ You are currently contributing {{{currency order.Subscription.amount currency=or
 [increase your contribution]({{../config.host.website}}/{{../fromCollective.slug}}/subscriptions)
 [share their goal](https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}})
 {{else}}
-You have contributed {{{currency order.totalAmount currency=order.currency}}}.
+You have contributed {{{order.totalAmount}}}.
 [increase your contribution]({{../config.host.website}}/{{slug}}/donate)
 [share their goal](https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}})
 {{/if}}
@@ -33,7 +33,7 @@ Next goal: {{{currency nextGoal.amount currency=currency}}}{{#if nextGoal.interv
 Your contribution: {{currency order.Subscription.amount currency=order.Subscription.currency}} per {{order.Subscription.interval}}
 Member since: {{{moment order.subscription.createdAt format="MMMM YYYY"}}}
 {{else}}
-Your contribution: {{currency order.totalAmount currency=order.currency}}
+Your contribution: {{order.totalAmount}}
 {{/if}}
 {{#if updates}}
 

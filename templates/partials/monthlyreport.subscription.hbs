@@ -136,7 +136,7 @@
           {{#if order.Subscription}}
             <td><p>You’re contributing <b>{{{currency order.Subscription.amount currency=order.Subscription.currency}}}</b> per {{order.Subscription.interval}} since {{{moment order.Subscription.createdAt format="MMMM YYYY"}}}</p></td>
           {{else}}
-            <td><p>You've contributed <b>{{{currency order.totalAmount currency=order.currency}}}</b></p></td>
+            <td><p>You've contributed <b>{{{order.totalAmount}}}</b></p></td>
           {{/if}}
         </tr>
         <tr><td height="10"></td></tr>
