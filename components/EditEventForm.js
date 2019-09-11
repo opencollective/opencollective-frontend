@@ -81,7 +81,7 @@ class EditEventForm extends React.Component {
       }
     }
     if (fieldname === 'name') {
-      if (!event['name']) {
+      if (!event['name'].trim()) {
         this.setState({ disabled: true });
       } else {
         this.setState({ disabled: false });
