@@ -29,6 +29,17 @@ describe('Contribution Flow: Order', () => {
     });
   });
 
+  describe("check when tier doesn't exist", () => {
+    it('with /apex/contribute/backer-46999999/checkout', () => {
+      const visitParams = { onBeforeLoad: mockRecaptcha, failOnStatusCode: false };
+      cy.visit('/apex/contribute/backer-46999999/checkout', visitParams);
+      cy.contains('Next step').click();
+      cy.contains("Oops! This tier doesn't exist or has been removed by the collective admins.");
+      cy.contains('View all the other ways to contribute').click();
+      cy.location('pathname').should('eq', '/apex/contribute');
+    });
+  });
+
   describe('route resiliance', () => {
     it('with a multipart slug', () => {
       cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
