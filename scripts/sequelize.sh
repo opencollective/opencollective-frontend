@@ -9,7 +9,7 @@ PATH=${PATH}:$NODEBIN
 
 # Parameters & Command
 SEQUELIZE_CONFIG="--models-path server/models/ --config config/sequelize-cli.js"
-COMMAND="babel-node $NODEBIN/sequelize ${SEQUELIZE_CONFIG} $@"
+COMMAND="babel-node --extensions .js,.ts $NODEBIN/sequelize ${SEQUELIZE_CONFIG} $@"
 
 # Variables exported for the exec
 export CUSTOM_DB PATH
