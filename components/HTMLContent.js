@@ -45,6 +45,7 @@ const HTMLContent = styled(({ content, ...props }) => {
   h2,
   h3 {
     margin: 0;
+    margin-bottom: 0.5em;
   }
 
   img {
