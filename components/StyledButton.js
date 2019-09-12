@@ -25,10 +25,6 @@ const StyledButtonContent = styled.button`
     cursor: not-allowed;
   }
 
-  &:focus {
-    box-shadow: 0px 0px 0px 2px #83EBB4;
-  }
-
   ${buttonStyle}
   ${buttonSize}
 
