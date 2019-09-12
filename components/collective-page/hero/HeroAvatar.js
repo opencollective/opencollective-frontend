@@ -88,6 +88,7 @@ const HeroAvatar = ({ collective, isAdmin }) => {
         multiple={false}
         accept="image/jpeg, image/png"
         disabled={submitting}
+        inputProps={{ style: { width: 1 } }}
         onDrop={acceptedFiles => {
           setUploadedImage(acceptedFiles[0]);
           setEditing(true);
