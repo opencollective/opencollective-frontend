@@ -19,6 +19,7 @@ import StyledFilters from '../../StyledFilters';
 import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
+import { Dimensions } from '../_constants';
 
 const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -61,6 +62,8 @@ const filterFuncs = {
   [FILTERS.CORE]: ({ role }) => role === roles.ADMIN || role === roles.MEMBER,
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
+
+const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
 
 const ParentedCollectivesQuery = gql`
   query SuperCollectiveChildren($tags: [String]) {
@@ -199,7 +202,7 @@ class SectionContributions extends React.PureComponent {
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
-      <ContainerSectionContent py={5}>
+      <Box py={5}>
         {data.Collective.memberOf.length === 0 ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
@@ -213,11 +216,13 @@ class SectionContributions extends React.PureComponent {
           </Flex>
         ) : (
           <React.Fragment>
-            <SectionTitle textAlign={['center', 'left']} mb={4}>
-              <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
-            </SectionTitle>
+            <ContainerSectionContent>
+              <SectionTitle textAlign={['center', 'left']} mb={4}>
+                <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
+              </SectionTitle>
+            </ContainerSectionContent>
             {filters.length > 1 && (
-              <Box mb={4}>
+              <Box mb={4} mx="auto" maxWidth={MAX_STYLED_FILTERS_WIDTH}>
                 <StyledFilters
                   filters={filters}
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
@@ -227,18 +232,20 @@ class SectionContributions extends React.PureComponent {
                 />
               </Box>
             )}
-            <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
-              {memberships.slice(0, nbMemberships).map(membership => (
-                <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
-              ))}
-            </Flex>
-            {nbMemberships < memberships.length && (
-              <Flex mt={3} justifyContent="center">
-                <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
-                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-                </StyledButton>
+            <ContainerSectionContent>
+              <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
+                {memberships.slice(0, nbMemberships).map(membership => (
+                  <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
+                ))}
               </Flex>
-            )}
+              {nbMemberships < memberships.length && (
+                <Flex mt={3} justifyContent="center">
+                  <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
+                    <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                  </StyledButton>
+                </Flex>
+              )}
+            </ContainerSectionContent>
           </React.Fragment>
         )}
         {isOrganization && superCollectiveTags.length > 0 && (
@@ -267,7 +274,7 @@ class SectionContributions extends React.PureComponent {
             }}
           </Query>
         )}
-      </ContainerSectionContent>
+      </Box>
     );
   }
 }

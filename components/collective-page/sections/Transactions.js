@@ -22,6 +22,9 @@ import Link from '../../Link';
 
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
+import { Dimensions } from '../_constants';
+
+const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
 
 const FILTERS = { ALL: 'ALL', CREDIT: 'CREDIT', DEBIT: 'DEBIT' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -122,12 +125,14 @@ class SectionTransactions extends React.Component {
 
     const transactions = this.getAllTransactions(data.creditTransactions, data.debitTransactions, filter);
     return (
-      <ContainerSectionContent pt={5} pb={6}>
-        <SectionTitle mb={4} textAlign={['center', 'left']}>
-          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-        </SectionTitle>
+      <Box pt={5} pb={6}>
+        <ContainerSectionContent>
+          <SectionTitle mb={4} textAlign={['center', 'left']}>
+            <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+          </SectionTitle>
+        </ContainerSectionContent>
         {showFilters && (
-          <Box mb={3}>
+          <Box mb={3} maxWidth={MAX_STYLED_FILTERS_WIDTH} mx="auto">
             <StyledFilters
               filters={FILTERS_LIST}
               selected={this.state.filter}
@@ -138,60 +143,62 @@ class SectionTransactions extends React.Component {
           </Box>
         )}
 
-        <DebitCreditList>
-          {transactions.map(transaction => {
-            const { id, currency, fromCollective, description, createdAt } = transaction;
-            const isCredit = transaction.type === 'CREDIT';
-            const amount = isCredit
-              ? transaction.netAmountInCollectiveCurrency
-              : transaction.netAmountInCollectiveCurrency * -1;
-            const ItemContainer = isCredit ? CreditItem : DebitItem;
+        <ContainerSectionContent>
+          <DebitCreditList>
+            {transactions.map(transaction => {
+              const { id, currency, fromCollective, description, createdAt } = transaction;
+              const isCredit = transaction.type === 'CREDIT';
+              const amount = isCredit
+                ? transaction.netAmountInCollectiveCurrency
+                : transaction.netAmountInCollectiveCurrency * -1;
+              const ItemContainer = isCredit ? CreditItem : DebitItem;
 
-            return (
-              <ItemContainer key={id}>
-                <Container p={24} display="flex" justifyContent="space-between">
-                  <Flex>
-                    <Box mr={3}>
-                      <Avatar collective={fromCollective} radius={40} />
-                    </Box>
-                    <Flex flexDirection="column" justifyContent="space-between">
-                      <P color="black.900" fontWeight="600">
-                        {description}
-                      </P>
-                      <P color="black.400">
-                        <StyledLink as={LinkCollective} collective={fromCollective} /> |{' '}
-                        <FormattedDate value={createdAt} />
-                      </P>
+              return (
+                <ItemContainer key={id}>
+                  <Container p={24} display="flex" justifyContent="space-between">
+                    <Flex>
+                      <Box mr={3}>
+                        <Avatar collective={fromCollective} radius={40} />
+                      </Box>
+                      <Flex flexDirection="column" justifyContent="space-between">
+                        <P color="black.900" fontWeight="600">
+                          {description}
+                        </P>
+                        <P color="black.400">
+                          <StyledLink as={LinkCollective} collective={fromCollective} /> |{' '}
+                          <FormattedDate value={createdAt} />
+                        </P>
+                      </Flex>
                     </Flex>
-                  </Flex>
-                  <P fontSize="LeadParagraph">
-                    {isCredit ? (
-                      <Span color="green.700" mr={2}>
-                        +
+                    <P fontSize="LeadParagraph">
+                      {isCredit ? (
+                        <Span color="green.700" mr={2}>
+                          +
+                        </Span>
+                      ) : (
+                        <Span color="red.700" mr={2}>
+                          −
+                        </Span>
+                      )}
+                      <Span fontWeight="bold" mr={1}>
+                        {formatCurrency(Math.abs(amount), currency)}
                       </Span>
-                    ) : (
-                      <Span color="red.700" mr={2}>
-                        −
+                      <Span color="black.400" textTransform="uppercase">
+                        {currency}
                       </Span>
-                    )}
-                    <Span fontWeight="bold" mr={1}>
-                      {formatCurrency(Math.abs(amount), currency)}
-                    </Span>
-                    <Span color="black.400" textTransform="uppercase">
-                      {currency}
-                    </Span>
-                  </P>
-                </Container>
-              </ItemContainer>
-            );
-          })}
-        </DebitCreditList>
-        <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mt={3} width="100%">
-            <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
-          </StyledButton>
-        </Link>
-      </ContainerSectionContent>
+                    </P>
+                  </Container>
+                </ItemContainer>
+              );
+            })}
+          </DebitCreditList>
+          <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+            <StyledButton mt={3} width="100%">
+              <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
+            </StyledButton>
+          </Link>
+        </ContainerSectionContent>
+      </Box>
     );
   }
 }
