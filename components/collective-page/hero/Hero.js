@@ -116,6 +116,19 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         <Flex flexDirection={'column'} alignItems={['center', null, 'flex-start']}>
           <Container position="relative" display="flex" justifyContent={['center', null, 'flex-start']} mb={2}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} />
+            {isAdmin && (
+              <Container position="absolute" right={0} bottom={0}>
+                <Link
+                  route="editCollective"
+                  params={{ slug: collective.slug }}
+                  title={intl.formatMessage(Translations.settings)}
+                >
+                  <StyledRoundButton size={40} color="black.700">
+                    <Settings size={18} />
+                  </StyledRoundButton>
+                </Link>
+              </Container>
+            )}
           </Container>
           <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', null, 'left']}>
             {collective.name || collective.slug}
@@ -135,17 +148,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             </StyledTag>
           )}
           <Flex my={2}>
-            {isAdmin && (
-              <Link
-                route="editCollective"
-                params={{ slug: collective.slug }}
-                title={intl.formatMessage(Translations.settings)}
-              >
-                <StyledRoundButton size={32} mr={3}>
-                  <Settings size={16} />
-                </StyledRoundButton>
-              </Link>
-            )}
             {collective.twitterHandle && (
               <ExternalLinkNewTab href={twitterProfileUrl(collective.twitterHandle)} title="Twitter">
                 <StyledRoundButton size={32} mr={3}>
