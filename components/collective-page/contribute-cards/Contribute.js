@@ -118,7 +118,7 @@ const ContributeCard = ({
         </Flex>
         <Box>
           <Link route={route} params={routeParams}>
-            <StyledButton width={1} mb={2} mt={3}>
+            <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3}>
               {buttonText || getContributeCTA(type)}
             </StyledButton>
           </Link>
