@@ -9,7 +9,6 @@ import { get } from 'lodash';
 import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
 import { ExternalLink } from 'styled-icons/feather/ExternalLink';
-import { Settings } from 'styled-icons/feather/Settings';
 import { Camera } from 'styled-icons/feather/Camera';
 import { Palette } from 'styled-icons/boxicons-regular/Palette';
 
@@ -25,7 +24,6 @@ import Container from '../../Container';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import StyledTag from '../../StyledTag';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
-import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import CollectiveCallsToAction from '../../CollectiveCallsToAction';
 import UserCompany from '../../UserCompany';
@@ -43,17 +41,12 @@ const Translations = defineMessages({
     id: 'collective.website.label',
     defaultMessage: 'Website',
   },
-  settings: {
-    id: 'collective.settings',
-    defaultMessage: 'Settings',
-  },
 });
 
 const StyledShortDescription = styled.h2`
   margin-top: 8px;
   font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
   line-height: 24px;
-  text-align: center;
 
   @media (min-width: 40em) {
     text-align: left;
@@ -106,31 +99,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           />
         </Container>
       )}
-      <ContainerSectionContent
-        pt={40}
-        display="flex"
-        flexDirection="column"
-        alignItems={['center', null, 'flex-start']}
-      >
+      <ContainerSectionContent pt={40} display="flex" flexDirection="column">
         {/* Collective presentation (name, logo, description...) */}
-        <Flex flexDirection={'column'} alignItems={['center', null, 'flex-start']}>
-          <Container position="relative" display="flex" justifyContent={['center', null, 'flex-start']} mb={2}>
+        <Flex flexDirection="column">
+          <Container position="relative" display="flex" mb={2}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} />
-            {isAdmin && (
-              <Container position="absolute" right={0} bottom={0}>
-                <Link
-                  route="editCollective"
-                  params={{ slug: collective.slug }}
-                  title={intl.formatMessage(Translations.settings)}
-                >
-                  <StyledRoundButton size={40} color="black.700">
-                    <Settings size={18} />
-                  </StyledRoundButton>
-                </Link>
-              </Container>
-            )}
           </Container>
-          <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', null, 'left']}>
+          <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
             {collective.name || collective.slug}
           </H1>
         </Flex>
@@ -139,7 +114,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
         )}
 
-        <Flex alignItems="center" justifyContent={['center', null, 'left']} flexWrap="wrap">
+        <Flex alignItems="center" flexWrap="wrap">
           {isCollective && (
             <StyledTag mx={2} my={2} mb={2}>
               <I18nCollectiveTags

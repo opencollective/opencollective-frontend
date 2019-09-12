@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Mutation } from 'react-apollo';
 
 import { Camera } from 'styled-icons/feather/Camera';
+import { Settings } from 'styled-icons/feather/Settings';
 
 import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/utils';
@@ -15,6 +16,7 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import { EditAvatarMutation } from '../graphql/mutations';
+import Link from '../../Link';
 
 const AVATAR_SIZE = 128;
 
@@ -73,7 +75,14 @@ const Triangle = styled.div`
   text-shadow: -2px -3px 4px rgba(121, 121, 121, 0.5);
 `;
 
-const HeroAvatar = ({ collective, isAdmin }) => {
+const Translations = defineMessages({
+  settings: {
+    id: 'collective.settings',
+    defaultMessage: 'Settings',
+  },
+});
+
+const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [editing, setEditing] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
@@ -113,6 +122,17 @@ const HeroAvatar = ({ collective, isAdmin }) => {
                 ))}
             </EditOverlay>
             <Avatar collective={collective} radius={AVATAR_SIZE} />
+            <Container position="absolute" right={0} bottom={0}>
+              <Link
+                route="editCollective"
+                params={{ slug: collective.slug }}
+                title={intl.formatMessage(Translations.settings)}
+              >
+                <StyledRoundButton size={40} color="black.700">
+                  <Settings size={18} />
+                </StyledRoundButton>
+              </Link>
+            </Container>
           </EditableAvatarContainer>
         )}
       </Dropzone>
@@ -192,6 +212,7 @@ HeroAvatar.propTypes = {
     imageUrl: PropTypes.string,
   }).isRequired,
   isAdmin: PropTypes.bool,
+  intl: PropTypes.object,
 };
 
-export default HeroAvatar;
+export default injectIntl(HeroAvatar);
