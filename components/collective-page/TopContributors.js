@@ -42,7 +42,7 @@ const ContributorsList = styled(Flex)`
 
 const ContributorItem = styled.div`
   display: flex;
-  margin: 16px 24px 16px 0;
+  margin: 0 24px 16px 0;
   width: 200px;
 `;
 
@@ -80,7 +80,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
   return (
     <Box flex="50% 1 3" style={{ flexBasis: getFlexBasisForCol(contributors.length, totalNbContributors) }}>
       {showTitle && (
-        <P fontSize="LeadParagraph" color="black.700">
+        <P fontSize="LeadParagraph" color="black.700" mb={3}>
           {title}
         </P>
       )}
