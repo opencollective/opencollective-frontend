@@ -42,7 +42,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
   }
 
   return (
-    <Flex flexWrap="wrap" my={2} justifyContent="center">
+    <Flex flexWrap="wrap" my={2}>
       {data.Collective.stats.totalAmountSpent > 0 && (
         <Box my={1}>
           <P fontSize="Tiny" textTransform="uppercase">
