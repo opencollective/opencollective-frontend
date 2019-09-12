@@ -18,6 +18,7 @@ import SectionContributors from './sections/Contributors';
 import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
 import SectionTransactions from './sections/Transactions';
+import SectionContainer from './SectionContainer';
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -210,9 +211,13 @@ class CollectivePage extends Component {
           />
         </Container>
         {sections.map(section => (
-          <div key={section} ref={sectionRef => (this.sectionsRefs[section] = sectionRef)} id={`section-${section}`}>
+          <SectionContainer
+            key={section}
+            ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
+            id={`section-${section}`}
+          >
             {this.renderSection(section)}
-          </div>
+          </SectionContainer>
         ))}
       </Container>
     );
