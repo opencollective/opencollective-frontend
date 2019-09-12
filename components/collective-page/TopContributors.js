@@ -6,12 +6,12 @@ import styled from 'styled-components';
 import { truncate, size } from 'lodash';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { formatCurrency } from '../../lib/utils';
 import withViewport from '../../lib/withViewport';
 import { H4, P, Span } from '../Text';
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import LinkContributor from '../LinkContributor';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
 /** The container for Top Contributors view */
 const TopContributorsContainer = styled.div`
@@ -108,10 +108,16 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                   id="TotalDonatedSince"
                   defaultMessage="{totalDonated} since {date}"
                   values={{
-                    totalDonated: (
-                      <Span fontWeight="bold">{formatCurrency(contributor.totalAmountDonated, currency)}</Span>
-                    ),
                     date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
+                    totalDonated: (
+                      <Span fontWeight="bold">
+                        <FormattedMoneyAmount
+                          amount={contributor.totalAmountDonated}
+                          currency={currency}
+                          abbreviateAmount
+                        />
+                      </Span>
+                    ),
                   }}
                 />
               </P>
