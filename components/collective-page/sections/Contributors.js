@@ -90,6 +90,16 @@ export default class SectionContributors extends React.PureComponent {
     });
   });
 
+  getTitleFontSize(collectiveName) {
+    if (collectiveName.length < 15) {
+      return 48;
+    } else if (collectiveName.length < 20) {
+      return 40;
+    } else {
+      return 32;
+    }
+  }
+
   render() {
     const { collective, contributors } = this.props;
     const { filter } = this.state;
@@ -105,7 +115,7 @@ export default class SectionContributors extends React.PureComponent {
         <ContainerSectionContent>
           {!onlyShowCore ? (
             <React.Fragment>
-              <SectionTitle fontWeight="bold">
+              <SectionTitle fontWeight="bold" fontSize={this.getTitleFontSize(collective.name)}>
                 <FormattedMessage
                   id="CollectivePage.AllOfUs"
                   defaultMessage="{collectiveName} is all of us"
@@ -162,7 +172,7 @@ export default class SectionContributors extends React.PureComponent {
               } else {
                 // Otherwise add a normal section padding on the left
                 const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
-                return (width - Dimensions.MAX_SECTION_WIDTH) / 2 - cardsLeftOffset;
+                return (width - Math.max(Dimensions.MAX_SECTION_WIDTH, rowWidth)) / 2 - cardsLeftOffset;
               }
             }}
           />
