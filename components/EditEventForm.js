@@ -22,7 +22,7 @@ class EditEventForm extends React.Component {
 
     const event = { ...(props.event || {}) };
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
-    this.state = { event, tiers: event.tiers || [{}] };
+    this.state = { event, tiers: event.tiers || [{}], disabled: false };
 
     this.messages = defineMessages({
       'slug.label': { id: 'event.slug.label', defaultMessage: 'url' },
@@ -78,6 +78,13 @@ class EditEventForm extends React.Component {
         }
         value = newEndDate.toString();
         event['endsAt'] = value;
+      }
+    }
+    if (fieldname === 'name') {
+      if (!event['name'].trim()) {
+        this.setState({ disabled: true });
+      } else {
+        this.setState({ disabled: false });
       }
     }
 
@@ -231,7 +238,12 @@ class EditEventForm extends React.Component {
           />
         </div>
         <div className="actions">
-          <Button className="blue" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
+          <Button
+            className="blue"
+            label={submitBtnLabel}
+            onClick={this.handleSubmit}
+            disabled={this.state.disabled ? true : loading}
+          />
         </div>
       </div>
     );
