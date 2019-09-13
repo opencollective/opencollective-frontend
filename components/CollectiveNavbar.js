@@ -99,11 +99,6 @@ const MenuLinkContainer = styled.div`
     &::after {
       display: none;
     }
-    ${props =>
-      props.isSelected &&
-      css`
-        text-decoration: underline;
-      `}
   }
 `;
 
