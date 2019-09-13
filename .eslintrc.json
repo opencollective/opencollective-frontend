@@ -9,6 +9,7 @@
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],
     "graphql/no-deprecated-fields": ["warn"],
+    "node/no-unpublished-import": ["warn"],
     "react-hooks/rules-of-hooks": ["error"],
     // We can be stricter with these rules
     // because we don't have any occurences anymore
