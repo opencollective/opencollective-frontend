@@ -138,7 +138,10 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             restrictPosition={false}
             onCropChange={onCropChange}
             onZoomChange={onZoomChange}
-            style={{ imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' } }}
+            style={{
+              imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
+              containerStyle: { height: BASE_HEIGHT },
+            }}
           />
           <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
             <Dropzone
