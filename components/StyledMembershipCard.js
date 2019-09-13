@@ -38,7 +38,9 @@ const StyledMembershipCard = ({ membership, ...props }) => {
     <StyledCard width={250} height={360} position="relative" {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
-          <Avatar collective={collective} radius={64} />
+          <LinkCollective collective={collective}>
+            <Avatar collective={collective} radius={64} />
+          </LinkCollective>
         </Container>
       </Container>
       <Flex flexDirection="column" justifyContent="space-between" height={260}>

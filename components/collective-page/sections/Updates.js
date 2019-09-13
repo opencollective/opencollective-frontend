@@ -128,12 +128,14 @@ class SectionUpdates extends React.PureComponent {
               defaultMessage="Stay up to dates with our latest activities and progress."
             />
           </P>
-          <StyledButton buttonStyle="primary">
-            <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
-              +
-            </Span>
-            <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
-          </StyledButton>
+          <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+            <StyledButton buttonStyle="primary">
+              <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
+                +
+              </Span>
+              <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
+            </StyledButton>
+          </Link>
         </Flex>
         {isEmpty(updates) ? (
           <div>
