@@ -148,6 +148,15 @@ const SectionBudget = ({ collective, stats, intl }) => {
                     );
                   })}
                 </DebitCreditList>
+                <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+                  <StyledButton buttonSize="large" mt={4} width={1} py="10px">
+                    <FormattedMessage
+                      id="CollectivePage.SectionBudget.ViewAll"
+                      defaultMessage="View all transactions"
+                    />{' '}
+                    →
+                  </StyledButton>
+                </Link>
               </Container>
             );
           }}
@@ -193,11 +202,6 @@ const SectionBudget = ({ collective, stats, intl }) => {
           </Container>
         </StyledCard>
       </Flex>
-      <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-        <StyledButton buttonSize="large" mt={3} width={1} py="10px">
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> →
-        </StyledButton>
-      </Link>
     </ContainerSectionContent>
   );
 };
