@@ -101,14 +101,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       )}
       <ContainerSectionContent pt={40} display="flex" flexDirection="column">
         {/* Collective presentation (name, logo, description...) */}
-        <Flex flexDirection="column">
-          <Container position="relative" display="flex" mb={2}>
-            <HeroAvatar collective={collective} isAdmin={isAdmin} />
-          </Container>
-          <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
-            {collective.name || collective.slug}
-          </H1>
-        </Flex>
+        <Container position="relative" mb={2} width={128}>
+          <HeroAvatar collective={collective} isAdmin={isAdmin} />
+        </Container>
+        <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
+          {collective.name || collective.slug}
+        </H1>
 
         {collective.company && (
           <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
