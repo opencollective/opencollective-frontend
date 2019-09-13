@@ -113,8 +113,8 @@ class SectionUpdates extends React.PureComponent {
     }
 
     return (
-      <ContainerSectionContent py={[5, 6]}>
-        <SectionTitle mb={4}>
+      <ContainerSectionContent pt={5}>
+        <SectionTitle mb={24}>
           <FormattedMessage
             id="CollectivePage.SectionUpdates.Title"
             defaultMessage="What's new with {collectiveName}"
@@ -230,7 +230,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton buttonSize="large" mt={3} width={1}>
+            <StyledButton buttonSize="large" mt={4} width={1} p="10px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>
