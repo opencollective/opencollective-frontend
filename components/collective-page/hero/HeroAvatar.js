@@ -93,50 +93,55 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
   } else if (!editing) {
     return (
-      <Dropzone
-        style={{}}
-        multiple={false}
-        accept="image/jpeg, image/png"
-        disabled={submitting}
-        inputProps={{ style: { width: 1 } }}
-        onDrop={acceptedFiles => {
-          setUploadedImage(acceptedFiles[0]);
-          setEditing(true);
-        }}
-      >
-        {({ isDragActive, isDragAccept }) => (
-          <EditableAvatarContainer isDragActive={isDragActive}>
-            <EditOverlay borderRadius={borderRadius}>
-              {!isDragActive && (
-                <React.Fragment>
-                  <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
-                    <Camera size={25} />
-                  </StyledRoundButton>
-                  <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
-                </React.Fragment>
-              )}
-              {isDragActive &&
-                (isDragAccept ? (
-                  <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
-                ) : (
-                  <FormattedMessage id="uploadImage.isDragReject" defaultMessage="🚫 This file type is not accepted" />
-                ))}
-            </EditOverlay>
-            <Avatar collective={collective} radius={AVATAR_SIZE} />
-            <Container position="absolute" right={0} bottom={0}>
-              <Link
-                route="editCollective"
-                params={{ slug: collective.slug }}
-                title={intl.formatMessage(Translations.settings)}
-              >
-                <StyledRoundButton size={40} color="black.700">
-                  <Settings size={18} />
-                </StyledRoundButton>
-              </Link>
-            </Container>
-          </EditableAvatarContainer>
-        )}
-      </Dropzone>
+      <React.Fragment>
+        <Dropzone
+          style={{}}
+          multiple={false}
+          accept="image/jpeg, image/png"
+          disabled={submitting}
+          inputProps={{ style: { width: 1 } }}
+          onDrop={acceptedFiles => {
+            setUploadedImage(acceptedFiles[0]);
+            setEditing(true);
+          }}
+        >
+          {({ isDragActive, isDragAccept }) => (
+            <EditableAvatarContainer isDragActive={isDragActive}>
+              <EditOverlay borderRadius={borderRadius}>
+                {!isDragActive && (
+                  <React.Fragment>
+                    <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
+                      <Camera size={25} />
+                    </StyledRoundButton>
+                    <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
+                  </React.Fragment>
+                )}
+                {isDragActive &&
+                  (isDragAccept ? (
+                    <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
+                  ) : (
+                    <FormattedMessage
+                      id="uploadImage.isDragReject"
+                      defaultMessage="🚫 This file type is not accepted"
+                    />
+                  ))}
+              </EditOverlay>
+              <Avatar collective={collective} radius={AVATAR_SIZE} />
+            </EditableAvatarContainer>
+          )}
+        </Dropzone>
+        <Container position="absolute" right={0} bottom={0}>
+          <Link
+            route="editCollective"
+            params={{ slug: collective.slug }}
+            title={intl.formatMessage(Translations.settings)}
+          >
+            <StyledRoundButton size={40} color="black.700">
+              <Settings size={18} />
+            </StyledRoundButton>
+          </Link>
+        </Container>
+      </React.Fragment>
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
