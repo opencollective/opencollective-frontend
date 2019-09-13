@@ -24,9 +24,9 @@ We think you’d be great at this if you:
  
  - You are excited about contributing to our mission! 
 
-Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities. You can find [links](drive.opencollective.com) to our transparent budget, investor updates, case studies, and Collective pages (whose budgets are all transparent too).
+Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities. You can find [links](https://drive.opencollective.com) to our transparent budget, investor updates, case studies, and Collective pages (whose budgets are all transparent too).
 
-We're 100% Open Source, so everything you will be doing will be Open Source! If you want to know more about us, you can already join our [Slack](slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/the-open-collective-way) to learn more about how we operate and what we stand for. 
+We're 100% Open Source, so everything you will be doing will be Open Source! If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/the-open-collective-way) to learn more about how we operate and what we stand for. 
 
 We are a full remote team - with team members in New Zealand (Wellington), Mexico (Guadalajara), Spain (Madrid), Belgium (Brussels), Germany (Berlin) and France (South Coast).
 
