@@ -89,7 +89,7 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = financialContributors.length === 0;
 
     return (
-      <Box py={[4, 5]}>
+      <Box pt={[4, 5]}>
         <ContainerSectionContent>
           <SectionTitle>
             <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />

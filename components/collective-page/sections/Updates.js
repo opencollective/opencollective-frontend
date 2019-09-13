@@ -10,7 +10,7 @@ import { graphql } from 'react-apollo';
 import { Lock } from 'styled-icons/fa-solid';
 
 import { formatDate } from '../../../lib/utils';
-import { P } from '../../Text';
+import { P, Span } from '../../Text';
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledTooltip from '../../StyledTooltip';
@@ -113,10 +113,28 @@ class SectionUpdates extends React.PureComponent {
     }
 
     return (
-      <ContainerSectionContent py={[5, 6]}>
-        <SectionTitle mb={4}>
-          <FormattedMessage id="CollectivePage.SectionUpdates.Title" defaultMessage="Latest updates" />
+      <ContainerSectionContent pt={5}>
+        <SectionTitle mb={24}>
+          <FormattedMessage
+            id="CollectivePage.SectionUpdates.Title"
+            defaultMessage="What's new with {collectiveName}"
+            values={{ collectiveName: collective.name }}
+          />
         </SectionTitle>
+        <Flex mb={24} justifyContent="space-between" alignItems="center">
+          <P color="black.700">
+            <FormattedMessage
+              id="section.updates.subtitle"
+              defaultMessage="Stay up to dates with our latest activities and progress."
+            />
+          </P>
+          <StyledButton buttonStyle="primary">
+            <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
+              +
+            </Span>
+            <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
+          </StyledButton>
+        </Flex>
         {isEmpty(updates) ? (
           <div>
             <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="Paragraph">
@@ -127,7 +145,7 @@ class SectionUpdates extends React.PureComponent {
             </MessageBox>
             <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
               <StyledButton buttonSize="large" width={1}>
-                <FormattedMessage id="SectionUpdates.CreateBtn" defaultMessage="Post an update" />
+                <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
               </StyledButton>
             </Link>
           </div>
@@ -212,7 +230,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton buttonSize="large" mt={3} width={1}>
+            <StyledButton buttonSize="large" mt={4} width={1} p="10px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>
