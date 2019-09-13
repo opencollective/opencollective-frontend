@@ -617,6 +617,7 @@
   "Hero.EditCover": "Edit cover",
   "Hero.HostFee": "Host fee: {fee}",
   "HeroAvatar.Edit": "Edit logo",
+  "HeroBackground.Instructions": "Use your mouse wheel or pinch to change the zoom, drag and drop to adjust position.",
   "home.activeCollectives": "Active Collectives",
   "home.backers": "financial contributors",
   "home.backYourStack": "BackYourStack - это общественный проект, запущенный Open Collective.",
