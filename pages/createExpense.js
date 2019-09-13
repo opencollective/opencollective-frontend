@@ -10,7 +10,6 @@ import { compose } from '../lib/utils';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
-import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
