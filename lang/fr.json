@@ -1138,6 +1138,7 @@
   "update.viewLatestUpdates": "Voir les dernières actualités",
   "updates.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer une nouvelle actualité.",
   "updates.empty": "Pas d'actualités",
+  "updates.new.error": "Update failed: {err}",
   "updates.new.title": "Nouvelle actualité",
   "Upload": "Upload",
   "uploadImage.error": "Erreur: {error}",
