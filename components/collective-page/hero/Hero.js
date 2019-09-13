@@ -8,9 +8,9 @@ import { get } from 'lodash';
 // Icons
 import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
-import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Camera } from 'styled-icons/feather/Camera';
 import { Palette } from 'styled-icons/boxicons-regular/Palette';
+import { Globe } from 'styled-icons/feather/Globe';
 
 // General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -138,7 +138,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             {collective.website && (
               <ExternalLinkNewTab href={collective.website} title={intl.formatMessage(Translations.website)}>
                 <StyledRoundButton size={32} mr={3}>
-                  <ExternalLink size={12} />
+                  <Globe size={14} />
                 </StyledRoundButton>
               </ExternalLinkNewTab>
             )}
