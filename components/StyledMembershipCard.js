@@ -24,12 +24,6 @@ const getBackground = collective => {
     : 'url(/static/images/collective-card-mask.png) bottom, #1776E1';
 };
 
-const formatStrongValue = msg => (
-  <Span textTransform="capitalize" fontSize="LeadParagraph" fontWeight="bold">
-    {msg}
-  </Span>
-);
-
 /**
  * A card to show a user's membership.
  */
