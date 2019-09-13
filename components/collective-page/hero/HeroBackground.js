@@ -13,6 +13,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
+import MessageBox from '../../MessageBox';
 
 // Local imports
 import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
@@ -138,7 +139,10 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             restrictPosition={false}
             onCropChange={onCropChange}
             onZoomChange={onZoomChange}
-            style={{ imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' } }}
+            style={{
+              imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
+              containerStyle: { height: BASE_HEIGHT },
+            }}
           />
           <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
             <Dropzone
@@ -238,6 +242,14 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             >
               <FormattedMessage id="save" defaultMessage="save" />
             </StyledButton>
+          </Container>
+          <Container zIndex={222} position="absolute" right={25} top={75}>
+            <MessageBox type="info" withIcon opacity={0.8} px={2} py={1}>
+              <FormattedMessage
+                id="HeroBackground.Instructions"
+                defaultMessage="Use your mouse wheel or pinch to change the zoom, drag and drop to adjust position."
+              />
+            </MessageBox>
           </Container>
         </StyledBackground>
       )}

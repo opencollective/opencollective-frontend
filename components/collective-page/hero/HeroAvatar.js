@@ -29,8 +29,8 @@ const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ '
 
 const EditOverlay = styled.div`
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 128px;
+  height: 128px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -44,6 +44,7 @@ const EditOverlay = styled.div`
 
 const EditableAvatarContainer = styled.div`
   position: relative;
+  width: 128px;
 
   ${props =>
     !props.isDragActive &&
@@ -141,7 +142,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     return uploadedImage || collective.imageUrl ? (
       <Mutation mutation={EditAvatarMutation}>
         {editAvatar => (
-          <div>
+          <>
             <EditingAvatarContainer borderRadius={borderRadius}>
               <img src={uploadedImage ? uploadedImage.preview : collective.imageUrl} alt="" />
             </EditingAvatarContainer>
@@ -196,7 +197,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                 <FormattedMessage id="save" defaultMessage="save" />
               </StyledButton>
             </Container>
-          </div>
+          </>
         )}
       </Mutation>
     ) : (

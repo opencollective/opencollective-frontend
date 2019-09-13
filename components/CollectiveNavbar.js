@@ -6,7 +6,6 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 
@@ -100,11 +99,6 @@ const MenuLinkContainer = styled.div`
     &::after {
       display: none;
     }
-    ${props =>
-      props.isSelected &&
-      css`
-        text-decoration: underline;
-      `}
   }
 `;
 
@@ -347,7 +341,7 @@ const CollectiveNavbar = ({
           {callsToAction.hasContact && (
             <MenuLinkContainer mobileOnly>
               <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
-                <ExternalLinkAlt size="1em" /> <FormattedMessage id="Contact" defaultMessage="Contact" />
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
               </MenuLink>
             </MenuLinkContainer>
           )}
