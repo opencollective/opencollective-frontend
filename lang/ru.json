@@ -1138,6 +1138,7 @@
   "update.viewLatestUpdates": "Просмотреть недавние обновления",
   "updates.create.login": "Вы должны быть авторизованы как основной вкладчик этого коллектива, чтобы иметь возможность создать обновление.",
   "updates.empty": "Нет обновлений",
+  "updates.new.error": "Update failed: {err}",
   "updates.new.title": "Новое обновление",
   "Upload": "Upload",
   "uploadImage.error": "Ошибка: {error}",
