@@ -34,12 +34,12 @@ const I18nFilters = defineMessages({
     defaultMessage: 'All',
   },
   [FILTERS.CREDIT]: {
-    id: 'SectionTransactions.Credit',
-    defaultMessage: 'Credit',
+    id: 'section.expenses.title',
+    defaultMessage: 'Expenses',
   },
   [FILTERS.DEBIT]: {
-    id: 'SectionTransactions.Debit',
-    defaultMessage: 'Debit',
+    id: 'SectionTransactions.Title',
+    defaultMessage: 'Transactions',
   },
 });
 

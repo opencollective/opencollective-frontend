@@ -43,7 +43,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
   return (
     <ContainerSectionContent pt={[4, 5]}>
       <SectionTitle>
-        <FormattedMessage id="CollectivePage.SectionBudget.Title" defaultMessage="Latest transactions" />
+        <FormattedMessage id="CollectivePage.SectionBudget.Title" defaultMessage="Budget" />
       </SectionTitle>
       <P color="black.600" mb={4} maxWidth={830}>
         <FormattedMessage
