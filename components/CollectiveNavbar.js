@@ -103,7 +103,7 @@ const MenuLinkContainer = styled.div`
 `;
 
 const InfosContainer = styled(Container)`
-  padding: 16px 24px;
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -113,7 +113,7 @@ const InfosContainer = styled(Container)`
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
   @media (max-width: 52em) {
-    padding: 12px 16px;
+    padding: 10px 16px;
   }
 
   /** Hidden state */
