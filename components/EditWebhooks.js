@@ -29,6 +29,7 @@ const messages = defineMessages({
     id: 'webhooks.url.label',
     defaultMessage: 'URL',
   },
+
   'webhooks.types.label': {
     id: 'webhooks.types.label',
     defaultMessage: 'Activity',
