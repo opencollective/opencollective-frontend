@@ -19,7 +19,7 @@ import StyledHr from './StyledHr';
 import MessageBox from './MessageBox';
 import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
-import StyledSelect from './DeprecatedStyledSelect';
+import StyledSelect from './StyledSelect';
 import { Add } from 'styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
@@ -310,12 +310,12 @@ class EditWebhooks extends React.Component {
                 <FormattedMessage id="saved" defaultMessage="saved" />
               </Span>
             ) : (
-              <FormattedMessage
-                id="webhooks.save"
-                defaultMessage="Save {count} webhooks"
-                values={{ count: webhooksCount }}
-              />
-            )}
+                <FormattedMessage
+                  id="webhooks.save"
+                  defaultMessage="Save {count} webhooks"
+                  values={{ count: webhooksCount }}
+                />
+              )}
           </StyledButton>
         </Box>
       </div>
