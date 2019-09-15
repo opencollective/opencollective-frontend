@@ -23,7 +23,7 @@
   "addfunds.FromCollectiveId.label": "资源",
   "addfunds.hostFeePercent.label": "主办方手续费",
   "addfunds.hostFees": "Host fees ({hostFees})",
-  "addfunds.netAmount": "Net amount",
+  "addfunds.netAmount": "净金额",
   "addfunds.organization.label": "组织",
   "addfunds.platformFeePercent.label": "平台费用",
   "addfunds.platformFees": "平台费用 ({platformFees})",
