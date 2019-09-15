@@ -71,7 +71,6 @@ const buildDisplayMap = options => {
 const StepDetails = ({
   amountOptions,
   currency,
-  disabledInterval,
   disabledAmount,
   minAmount,
   amount,
