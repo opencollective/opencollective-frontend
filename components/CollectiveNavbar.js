@@ -6,7 +6,6 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 
@@ -100,16 +99,11 @@ const MenuLinkContainer = styled.div`
     &::after {
       display: none;
     }
-    ${props =>
-      props.isSelected &&
-      css`
-        text-decoration: underline;
-      `}
   }
 `;
 
 const InfosContainer = styled(Container)`
-  padding: 16px 24px;
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -119,7 +113,7 @@ const InfosContainer = styled(Container)`
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
   @media (max-width: 52em) {
-    padding: 12px 16px;
+    padding: 10px 16px;
   }
 
   /** Hidden state */
@@ -347,7 +341,7 @@ const CollectiveNavbar = ({
           {callsToAction.hasContact && (
             <MenuLinkContainer mobileOnly>
               <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
-                <ExternalLinkAlt size="1em" /> <FormattedMessage id="Contact" defaultMessage="Contact" />
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
               </MenuLink>
             </MenuLinkContainer>
           )}

@@ -89,7 +89,7 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = financialContributors.length === 0;
 
     return (
-      <Box py={[4, 5]}>
+      <Box pt={[4, 5]}>
         <ContainerSectionContent>
           <SectionTitle>
             <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
@@ -161,7 +161,7 @@ class SectionContribute extends React.PureComponent {
         )}
         <ContainerSectionContent>
           <Link route="tiers" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-            <StyledButton buttonSize="large" mt={3} width={1}>
+            <StyledButton buttonSize="large" mt={3} width={1} p="10px">
               <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
             </StyledButton>
           </Link>

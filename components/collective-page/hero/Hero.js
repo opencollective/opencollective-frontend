@@ -8,9 +8,9 @@ import { get } from 'lodash';
 // Icons
 import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
-import { ExternalLink } from 'styled-icons/feather/ExternalLink';
 import { Camera } from 'styled-icons/feather/Camera';
 import { Palette } from 'styled-icons/boxicons-regular/Palette';
+import { Globe } from 'styled-icons/feather/Globe';
 
 // General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -101,14 +101,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       )}
       <ContainerSectionContent pt={40} display="flex" flexDirection="column">
         {/* Collective presentation (name, logo, description...) */}
-        <Flex flexDirection="column">
-          <Container position="relative" display="flex" mb={2}>
-            <HeroAvatar collective={collective} isAdmin={isAdmin} />
-          </Container>
-          <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
-            {collective.name || collective.slug}
-          </H1>
-        </Flex>
+        <Container position="relative" mb={2} width={128}>
+          <HeroAvatar collective={collective} isAdmin={isAdmin} />
+        </Container>
+        <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
+          {collective.name || collective.slug}
+        </H1>
 
         {collective.company && (
           <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
@@ -140,7 +138,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             {collective.website && (
               <ExternalLinkNewTab href={collective.website} title={intl.formatMessage(Translations.website)}>
                 <StyledRoundButton size={32} mr={3}>
-                  <ExternalLink size={12} />
+                  <Globe size={14} />
                 </StyledRoundButton>
               </ExternalLinkNewTab>
             )}

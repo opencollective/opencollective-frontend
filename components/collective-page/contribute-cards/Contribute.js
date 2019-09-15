@@ -148,7 +148,7 @@ const ContributeCard = ({
                       </Container>
                     )}
                   </Flex>
-                  {stats && (
+                  {stats && stats.all > 0 && (
                     <P mt={2} fontSize="Tiny" color="black.600">
                       <FormattedMessage
                         id="ContributorsCount"

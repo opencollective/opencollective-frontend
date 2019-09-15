@@ -54,6 +54,7 @@ class EditUpdateForm extends React.Component {
       modified: false,
       update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'isPrivate') : {},
       loading: false,
+      error: '',
     };
 
     this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || get(this.props, 'collective.slug')}`;
@@ -90,7 +91,7 @@ class EditUpdateForm extends React.Component {
       this.setState({ modified: false, loading: false });
       storage.set(this.storageKey, null);
     } catch (e) {
-      this.setState({ loading: false });
+      this.setState({ loading: false, error: `${e}` });
       console.error('EditUpdateForm onSubmit error', e);
     }
     return false;
