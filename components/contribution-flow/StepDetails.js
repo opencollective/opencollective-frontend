@@ -94,7 +94,10 @@ const StepDetails = ({
     setShowModal(true);
   };
 
-  const dispatchChange = values => onChange(getChangeFromState({ amount, interval, quantity, ...values }));
+  const dispatchChange = values => {
+    console.log(values);
+    onChange(getChangeFromState({ amount, interval, quantity, ...values }));
+  };
   const intervalOptions = generateOptions(intl);
   interval = interval || 'oneTime';
 
