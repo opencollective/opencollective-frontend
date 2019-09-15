@@ -9,7 +9,7 @@
   "actions.delete": "删除",
   "actions.done": "完成",
   "actions.download": "下载",
-  "actions.processing": "Processing",
+  "actions.processing": "处理中……",
   "actions.rejectExpense.processing": "Rejecting expense",
   "addfunds.amount.label": "数量",
   "addfunds.description.label": "描述",
