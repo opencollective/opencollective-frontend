@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
@@ -13,6 +13,8 @@ import { P, Span } from '../Text';
 import Currency from '../Currency';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInput from '../StyledInput';
+import StyledButton from '../StyledButton';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getNextChargeDate } from '../../lib/date-utils';
 
 const FrequenciesI18n = defineMessages({
@@ -86,6 +88,13 @@ const StepDetails = ({
 }) => {
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
+  const [showModal, setShowModal] = useState(false);
+  const [tempInterval, setTempInterval] = useState(interval);
+  const confirmIntervalChange = ({ interval }) => {
+    setTempInterval(interval);
+    setShowModal(true);
+  };
+
   const dispatchChange = values => onChange(getChangeFromState({ amount, interval, quantity, ...values }));
   const intervalOptions = generateOptions(intl);
   interval = interval || 'oneTime';
@@ -174,7 +183,6 @@ const StepDetails = ({
           </StyledInputField>
         )}
       </Flex>
-
       {showInterval && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
@@ -186,10 +194,9 @@ const StepDetails = ({
                 id={id}
                 options={intervalOptions}
                 value={getOption(intl, interval)}
-                onChange={({ value }) => dispatchChange({ interval: value })}
+                onChange={({ value }) => confirmIntervalChange({ interval: value })}
                 isSearchable={false}
                 minWidth={150}
-                disabled={disabledInterval}
               />
               {interval !== 'oneTime' && (
                 <P color="black.500" ml={3}>
@@ -213,6 +220,33 @@ const StepDetails = ({
           )}
         </StyledInputField>
       )}
+      <Modal show={showModal} onClose={() => setShowModal(false)} height="300px">
+        <ModalHeader>
+          <FormattedMessage id="Frequency.change" defaultMessage={'Change frequency?'} />
+        </ModalHeader>
+        <ModalBody>
+          <FormattedMessage
+            id="contribute.changeFrequency.confirmMsg"
+            defaultMessage={
+              "If you're changing the frequency, we will not contribute to this specific tier 'Gold Sponsor'"
+            }
+          />
+        </ModalBody>
+        <ModalFooter>
+          <StyledButton mx={20} onClick={() => setShowModal(false)}>
+            <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
+          </StyledButton>
+          <StyledButton
+            buttonStyle="primary"
+            onClick={() => {
+              setShowModal(false);
+              dispatchChange({ interval: tempInterval });
+            }}
+          >
+            <FormattedMessage id="collective.empty.confirm.btn" defaultMessage={'Confirm'} />
+          </StyledButton>
+        </ModalFooter>
+      </Modal>
       {customFields &&
         customFields.length > 0 &&
         customFields.map(customField => {
