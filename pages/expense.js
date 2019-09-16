@@ -20,7 +20,7 @@ import { withUser } from '../components/UserProvider';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId, createSuccess } }) {
-    return { slug: collectiveSlug, ExpenseId: parseInt(ExpenseId), createSuccess: createSuccess };
+    return { slug: collectiveSlug, ExpenseId: parseInt(ExpenseId), expenseCreated: createSuccess };
   }
 
   static propTypes = {
@@ -28,7 +28,7 @@ class ExpensePage extends React.Component {
     ExpenseId: PropTypes.number,
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
-    createSuccess: PropTypes.string, // actually a stringed boolean 'true'
+    expenseCreated: PropTypes.string, // actually a stringed boolean 'true'
   };
 
   constructor(props) {
@@ -39,12 +39,9 @@ class ExpensePage extends React.Component {
   }
 
   render() {
-    const { data, ExpenseId, LoggedInUser, createSuccess } = this.props;
-    const expenseCreated = {
-      id: ExpenseId,
-    };
+    const { data, ExpenseId, LoggedInUser, expenseCreated } = this.props;
 
-    if (!data.Collective || data.Collective.host) return <ErrorPage data={data} />;
+    if (!data.Collective) return <ErrorPage data={data} />;
 
     const collective = data.Collective;
 
@@ -97,9 +94,9 @@ class ExpensePage extends React.Component {
                 </div>
 
                 <Box width={[1, null, 3 / 4]}>
-                  {createSuccess && (
+                  {expenseCreated && (
                     <Box m={3}>
-                      <p className="createSuccess">
+                      <p className="expenseCreated">
                         {collective.host && (
                           <FormattedMessage
                             id="expense.created"
@@ -114,7 +111,7 @@ class ExpensePage extends React.Component {
                           />
                         )}
                       </p>
-                      <ExpenseNeedsTaxFormMessage id={expenseCreated.id} />
+                      <ExpenseNeedsTaxFormMessage id={ExpenseId} />
                       <Flex justifyContent="center" mt={4} flexWrap="wrap">
                         <Button className="blue" href={`/${collective.slug}/expenses/new`}>
                           <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />

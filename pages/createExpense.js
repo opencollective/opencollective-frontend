@@ -59,10 +59,6 @@ class CreateExpensePage extends React.Component {
       console.log('>>> createExpense res', res);
       const expenseCreated = res.data.createExpense;
       Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/?createSuccess=true`);
-      // this.setState({
-      //   showNewExpenseForm: false,
-      //   expenseCreated: res.data.createExpense,
-      // });
     } catch (e) {
       console.error(e);
     }
