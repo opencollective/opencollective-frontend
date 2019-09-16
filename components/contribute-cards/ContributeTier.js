@@ -4,13 +4,13 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 import { truncate } from 'lodash';
 
-import { formatCurrency } from '../../../lib/utils';
-import Link from '../../Link';
-import { P, Span } from '../../Text';
-import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import StyledProgressBar from '../../StyledProgressBar';
+import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { formatCurrency } from '../../lib/utils';
+import Link from '../Link';
+import { P, Span } from '../Text';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import StyledProgressBar from '../StyledProgressBar';
 
-import { ContributionTypes } from '../_constants';
 import Contribute from './Contribute';
 
 const messages = defineMessages({

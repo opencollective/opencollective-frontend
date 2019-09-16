@@ -55,7 +55,7 @@ pages
 
 // Tier page
 // ---------------
-pages.add('tiers', '/:collectiveSlug/:verb(tiers|contribute)');
+pages.add('contribute', '/:collectiveSlug/:verb(tiers|contribute)');
 pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)');
 
 // Contribute Flow

@@ -7,7 +7,7 @@ describe('Tier page', () => {
     cy.createHostedCollective().then(c => {
       collective = c;
       cy.visit(`/${collective.slug}/tiers`);
-      cy.contains('[data-cy=tiers] a', 'contribute').then($a => {
+      cy.contains('[data-cy=contribute-tier] a', 'Contribute').then($a => {
         const splitUrl = $a.attr('href').split('/');
         const tierSlugDashId = splitUrl[splitUrl.length - 2];
         tierUrl = `/${collective.slug}/contribute/${tierSlugDashId}`;

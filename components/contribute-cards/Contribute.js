@@ -4,22 +4,24 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 
-import Link from '../../Link';
-import StyledTag from '../../StyledTag';
-import { P } from '../../Text';
-import StyledButton from '../../StyledButton';
-import { ContributorAvatar } from '../../Avatar';
-import Container from '../../Container';
+import { ContributionTypes } from '../../lib/constants/contribution-types';
 
-// Local imports
-import { ContributionTypes, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../_constants';
+import Link from '../Link';
+import StyledTag from '../StyledTag';
+import { P } from '../Text';
+import StyledButton from '../StyledButton';
+import { ContributorAvatar } from '../Avatar';
+import Container from '../Container';
+
+/** Max number of contributors on each tier card */
+export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
 
 /** The main container */
 const StyledContributeCard = styled.div`
   display: flex;
   flex-direction: column;
-  width: 290px;
-  flex: 0 0 290px;
+  width: 280px;
+  flex: 0 0 280px;
   height: 100%;
   border-radius: 16px;
   border: 1px solid #dcdee0;
@@ -152,7 +154,7 @@ const ContributeCard = ({
                     )}
                   </Flex>
                   {stats && stats.all > 0 && (
-                    <P mt={2} fontSize="Tiny" color="black.600">
+                    <P mt={2} fontSize="Tiny" color="black.600" letterSpacing="-0.6px">
                       <FormattedMessage
                         id="ContributorsCount"
                         defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed"

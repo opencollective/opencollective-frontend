@@ -126,7 +126,7 @@ class CreateOrderPage extends React.Component {
               id="createOrder.missingTier"
               defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins. "
             />
-            <Link route="tiers" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
+            <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
             </Link>
           </MessageBox>

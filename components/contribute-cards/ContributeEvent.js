@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { truncate } from 'lodash';
 
-import { canOrderTicketsFromEvent } from '../../../lib/events';
-import { Span } from '../../Text';
-import Link from '../../Link';
-import { ContributionTypes } from '../_constants';
+import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { canOrderTicketsFromEvent } from '../../lib/events';
+import { Span } from '../Text';
+import Link from '../Link';
 import Contribute from './Contribute';
 
 const ContributeEvent = ({ collective, event, ...props }) => {

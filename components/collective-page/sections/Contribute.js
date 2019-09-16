@@ -9,15 +9,14 @@ import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
+import ContributeCustom from '../../contribute-cards/ContributeCustom';
+import ContributeTier from '../../contribute-cards/ContributeTier';
+import ContributeEvent from '../../contribute-cards/ContributeEvent';
 
+import ContributeCardsContainer from '../ContributeCardsContainer';
 import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
-
 import SectionTitle from '../SectionTitle';
-import ContributeCardsContainer from '../contribute-cards/ContributeCardsContainer';
-import ContributeCustom from '../contribute-cards/ContributeCustom';
-import ContributeTier from '../contribute-cards/ContributeTier';
-import ContributeEvent from '../contribute-cards/ContributeEvent';
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -88,11 +87,15 @@ class SectionContribute extends React.PureComponent {
     return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
   });
 
+  hasContributors = memoizeOne(contributors => {
+    return contributors.find(c => c.isBacker);
+  });
+
   render() {
     const { collective, tiers, events, contributors, contributorsStats } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
-    const hasNoContributor = financialContributorsWithoutTier.length === 0;
+    const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
 
     return (
@@ -119,7 +122,7 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  <Box px={[3, 24]}>
+                  <Box px={[3, 21]}>
                     <ContributeCustom
                       collective={collective}
                       contributors={financialContributorsWithoutTier}
@@ -128,7 +131,7 @@ class SectionContribute extends React.PureComponent {
                     />
                   </Box>
                   {tiers.map(tier => (
-                    <Box key={tier.id} px={[3, 24]}>
+                    <Box key={tier.id} px={[3, 21]}>
                       <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
                     </Box>
                   ))}
@@ -154,7 +157,7 @@ class SectionContribute extends React.PureComponent {
 
                 <ContributeCardsContainer ref={ref}>
                   {events.map(event => (
-                    <Box key={event.id} px={[3, 24]}>
+                    <Box key={event.id} px={[3, 21]}>
                       <ContributeEvent
                         collective={collective}
                         event={event}
@@ -168,7 +171,7 @@ class SectionContribute extends React.PureComponent {
           </HorizontalScroller>
         )}
         <ContainerSectionContent>
-          <Link route="tiers" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
             <StyledButton buttonSize="large" mt={3} width={1} p="10px">
               <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
             </StyledButton>

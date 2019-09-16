@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { injectIntl, defineMessages } from 'react-intl';
 
-import { ContributionTypes } from '../_constants';
+import { ContributionTypes } from '../../lib/constants/contribution-types';
 import Contribute from './Contribute';
 
 const messages = defineMessages({

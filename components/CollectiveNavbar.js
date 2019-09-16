@@ -301,7 +301,7 @@ const CollectiveNavbar = ({
         position={['absolute', 'relative']}
         display="flex"
         justifyContent="space-between"
-        px={[0, 24]}
+        px={[0, Dimensions.PADDING_X[1]]}
         width="100%"
         background="white"
       >
