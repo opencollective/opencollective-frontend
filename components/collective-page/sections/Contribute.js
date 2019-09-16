@@ -26,7 +26,12 @@ import ContributeEvent from '../contribute-cards/ContributeEvent';
 class SectionContribute extends React.PureComponent {
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object),
-    events: PropTypes.arrayOf(PropTypes.object),
+    events: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        contributors: PropTypes.arrayOf(PropTypes.object),
+      }),
+    ),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
@@ -87,6 +92,7 @@ class SectionContribute extends React.PureComponent {
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributors = this.getFinancialContributors(contributors);
     const hasNoContributor = financialContributors.length === 0;
+    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
 
     return (
       <Box pt={[4, 5]}>
@@ -148,7 +154,11 @@ class SectionContribute extends React.PureComponent {
                 <ContributeCardsContainer ref={ref}>
                   {events.map(event => (
                     <Box key={event.id} px={[3, 24]}>
-                      <ContributeEvent collective={collective} event={event} />
+                      <ContributeEvent
+                        collective={collective}
+                        event={event}
+                        hideContributors={hasNoContributorForEvents}
+                      />
                     </Box>
                   ))}
                 </ContributeCardsContainer>

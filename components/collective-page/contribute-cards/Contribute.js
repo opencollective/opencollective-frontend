@@ -99,6 +99,7 @@ const ContributeCard = ({
   contributors,
   stats,
   hideContributors,
+  withoutCTA,
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
@@ -117,11 +118,13 @@ const ContributeCard = ({
           <TierBody>{children}</TierBody>
         </Flex>
         <Box>
-          <Link route={route} params={routeParams}>
-            <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3}>
-              {buttonText || getContributeCTA(type)}
-            </StyledButton>
-          </Link>
+          {!withoutCTA && (
+            <Link route={route} params={routeParams}>
+              <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3}>
+                {buttonText || getContributeCTA(type)}
+              </StyledButton>
+            </Link>
+          )}
           {!hideContributors && (
             <Box mt={2} height={60}>
               {contributors && contributors.length > 0 && (
@@ -202,6 +205,8 @@ ContributeCard.propTypes = {
   }),
   /** If true, contributors will not be displayed */
   hideContributors: PropTypes.bool,
+  /** If true, contribute button will be withoutCTA */
+  withoutCTA: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };

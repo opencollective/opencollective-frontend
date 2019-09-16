@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { truncate } from 'lodash';
 
+import { canOrderTicketsFromEvent } from '../../../lib/events';
 import { Span } from '../../Text';
 import Link from '../../Link';
 import { ContributionTypes } from '../_constants';
 import Contribute from './Contribute';
 
-const ContributeEvent = ({ collective, event }) => {
+const ContributeEvent = ({ collective, event, ...props }) => {
   let description = null;
   if (event.description) {
     description = `${truncate(event.description, { length: 256 })} `;
@@ -22,6 +23,8 @@ const ContributeEvent = ({ collective, event }) => {
       title={event.name}
       contributors={event.contributors}
       stats={event.stats.backers}
+      withoutCTA={!canOrderTicketsFromEvent(event)}
+      {...props}
     >
       {description}
       <Link route="event" params={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}>
@@ -41,6 +44,8 @@ ContributeEvent.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
+    startsAt: PropTypes.string,
+    endsAt: PropTypes.string,
     description: PropTypes.string,
     contributors: PropTypes.arrayOf(PropTypes.object),
     stats: PropTypes.shape({

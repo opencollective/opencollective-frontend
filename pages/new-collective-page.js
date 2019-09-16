@@ -206,12 +206,14 @@ const getCollective = graphql(gql`
           type
         }
       }
-      events {
+      events(includePastEvents: true) {
         id
         slug
         name
         description
         image
+        startsAt
+        endsAt
         contributors(limit: $nbContributorsPerContributeCard) {
           id
           image
