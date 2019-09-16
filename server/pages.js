@@ -4,7 +4,7 @@ const pages = nextRoutes();
 
 pages
   .add('home', '/', 'index')
-  .add('static', '/:pageSlug(widgets|tos|privacypolicy|support)', 'staticPage')
+  .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
   .add('redeem', '/redeem/:code?')
   .add('redeemed', '/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
