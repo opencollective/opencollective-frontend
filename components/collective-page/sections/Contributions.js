@@ -78,6 +78,7 @@ const ParentedCollectivesQuery = gql`
         description
         backgroundImage
         tags
+        settings
         parentCollective {
           id
           backgroundImage

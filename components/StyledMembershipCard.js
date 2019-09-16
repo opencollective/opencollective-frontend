@@ -19,9 +19,10 @@ import FormattedMoneyAmount from './FormattedMoneyAmount';
 
 const getBackground = collective => {
   const backgroundImage = collective.backgroundImage || get(collective, 'parentCollective.backgroundImage');
+  const primaryColor = get(collective.settings, 'collectivePage.primaryColor', '#1776E1');
   return backgroundImage
-    ? `url(/static/images/collective-card-mask.png) bottom, url(${backgroundImage}) no-repeat, #1776E1`
-    : 'url(/static/images/collective-card-mask.png) bottom, #1776E1';
+    ? `url(/static/images/collective-card-mask.svg) 0 0 / cover no-repeat, url(${backgroundImage}) 0 0 / cover no-repeat, ${primaryColor}`
+    : `url(/static/images/collective-card-mask.svg) 0 0 / cover no-repeat, ${primaryColor}`;
 };
 
 /**
@@ -121,6 +122,7 @@ StyledMembershipCard.propTypes = {
       currency: PropTypes.string,
       backgroundImage: PropTypes.string,
       tags: PropTypes.arrayOf(PropTypes.string),
+      settings: PropTypes.object,
       host: PropTypes.shape({
         id: PropTypes.number,
       }),
