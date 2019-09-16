@@ -1415,7 +1415,11 @@ const CollectiveFields = () => {
         },
       },
       resolve(collective, args) {
-        const query = { where: { type: 'EVENT', ParentCollectiveId: collective.id } };
+        const query = {
+          where: { type: 'EVENT', ParentCollectiveId: collective.id },
+          order: [['startsAt', 'DESC'], ['endsAt', 'DESC']],
+        };
+
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         if (!args.includeInactive) query.where.isActive = true;
