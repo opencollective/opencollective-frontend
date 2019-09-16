@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
-import { FormattedMessage, FormattedDate } from 'react-intl';
+import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
 
 import { getCollectiveMainTag } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
+import formatMemberRole from '../lib/i18n-member-role';
 import { formatCurrency } from '../lib/utils';
 import StyledCard from './StyledCard';
 import LinkCollective from './LinkCollective';
@@ -23,22 +24,18 @@ const getBackground = collective => {
     : 'url(/static/images/collective-card-mask.png) bottom, #1776E1';
 };
 
-const formatStrongValue = msg => (
-  <Span textTransform="capitalize" fontSize="LeadParagraph" fontWeight="bold">
-    {msg}
-  </Span>
-);
-
 /**
  * A card to show a user's membership.
  */
-const StyledMembershipCard = ({ membership, ...props }) => {
+const StyledMembershipCard = ({ membership, intl, ...props }) => {
   const { collective, since, stats, role } = membership;
   return (
     <StyledCard width={250} height={360} position="relative" {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
-          <Avatar collective={collective} radius={64} />
+          <LinkCollective collective={collective}>
+            <Avatar collective={collective} radius={64} />
+          </LinkCollective>
         </Container>
       </Container>
       <Flex flexDirection="column" justifyContent="space-between" height={260}>
@@ -55,22 +52,18 @@ const StyledMembershipCard = ({ membership, ...props }) => {
           </StyledTag>
         </Container>
         <Container p={3}>
-          {role === roles.BACKER ? (
-            <Box mb={2}>
-              <P fontSize="Caption">
-                <FormattedMessage
-                  id="Membership.ContributorSince"
-                  defaultMessage="{contributorType} since"
-                  values={{
-                    contributorType: (
-                      <FormattedMessage id="Member.Role.BACKER" defaultMessage="Financial Contributor" />
-                    ),
-                  }}
-                />
-                <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
-                  <FormattedDate value={since} month="long" year="numeric" />
-                </Span>
-              </P>
+          <Box mb={2}>
+            <P fontSize="Caption" mb={3}>
+              <FormattedMessage
+                id="Membership.ContributorSince"
+                defaultMessage="{contributorType} since"
+                values={{ contributorType: formatMemberRole(intl, role) }}
+              />
+              <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
+                <FormattedDate value={since} month="long" year="numeric" />
+              </Span>
+            </P>
+            {role === roles.BACKER ? (
               <P mt={3}>
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
                   {msg => (
@@ -85,21 +78,7 @@ const StyledMembershipCard = ({ membership, ...props }) => {
                   formatCurrency(stats.totalDonations, 'USD', { precision: 0 })}
                 </Span>
               </P>
-            </Box>
-          ) : (
-            <Box mb={2}>
-              <P fontSize="Caption">
-                {collective.stats.backers.all > 0 && (
-                  <FormattedMessage
-                    id="Membership.ContributorsCount"
-                    defaultMessage="{count, plural, one {<strong>1</strong> Contributor} other {<strong>{count}</strong> Contributors}} "
-                    values={{
-                      count: collective.stats.backers.all,
-                      strong: formatStrongValue,
-                    }}
-                  />
-                )}
-              </P>
+            ) : (
               <P mt={3} fontSize="Caption">
                 {collective.stats.yearlyBudget > 0 && (
                   <FormattedMessage
@@ -119,8 +98,8 @@ const StyledMembershipCard = ({ membership, ...props }) => {
                   />
                 )}
               </P>
-            </Box>
-          )}
+            )}
+          </Box>
         </Container>
       </Flex>
     </StyledCard>
@@ -156,6 +135,7 @@ StyledMembershipCard.propTypes = {
       }),
     }),
   }).isRequired,
+  intl: PropTypes.object,
 };
 
-export default StyledMembershipCard;
+export default injectIntl(StyledMembershipCard);

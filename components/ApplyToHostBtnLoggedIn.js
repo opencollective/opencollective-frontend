@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { get, truncate } from 'lodash';
 
 import { compose } from '../lib/utils';
 
@@ -110,7 +110,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                 <FormattedMessage
                   id="host.apply.btn"
                   defaultMessage="Apply with {collective}"
-                  values={{ collective: <strong>{this.inactiveCollective.name}</strong> }}
+                  values={{ collective: <strong>{truncate(this.inactiveCollective.name, { length: 18 })}</strong> }}
                 />
               </StyledButton>
             )}

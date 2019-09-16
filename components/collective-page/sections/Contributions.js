@@ -105,6 +105,9 @@ class SectionContributions extends React.PureComponent {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      stats: PropTypes.shape({
+        yearlyBudget: PropTypes.number,
+      }).isRequired,
     }).isRequired,
 
     /** @ignore from withData */
@@ -183,6 +186,21 @@ class SectionContributions extends React.PureComponent {
     return Object.values(membershipsMap);
   });
 
+  sortMemberships = memoizeOne(memberships => {
+    // Sort memberships: hosted are always first, then we sort by yearly budget then by total amount donated
+    return [...memberships].sort((m1, m2) => {
+      if (m1.role === roles.HOST && m2.role !== roles.HOST) {
+        return -1;
+      } else if (m1.role !== roles.HOST && m2.role === roles.HOST) {
+        return 1;
+      } else if (m1.role === roles.HOST) {
+        return m1.collective.stats.yearlyBudget > m2.collective.stats.yearlyBudget ? -1 : 1;
+      } else {
+        return m1.stats.totalDonations > m2.stats.totalDonations ? -1 : 1;
+      }
+    });
+  });
+
   showMoreMemberships = () => {
     this.setState(state => ({
       nbMemberships: state.nbMemberships + SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
@@ -199,6 +217,7 @@ class SectionContributions extends React.PureComponent {
 
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
+    const sortedMemberships = this.sortMemberships(memberships);
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
@@ -234,11 +253,11 @@ class SectionContributions extends React.PureComponent {
             )}
             <ContainerSectionContent>
               <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
-                {memberships.slice(0, nbMemberships).map(membership => (
+                {sortedMemberships.slice(0, nbMemberships).map(membership => (
                   <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
                 ))}
               </Flex>
-              {nbMemberships < memberships.length && (
+              {nbMemberships < sortedMemberships.length && (
                 <Flex mt={3} justifyContent="center">
                   <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
                     <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓

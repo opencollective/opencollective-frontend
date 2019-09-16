@@ -19,6 +19,7 @@ import ErrorPage from '../components/ErrorPage';
 import EditUpdateForm from '../components/EditUpdateForm';
 import Button from '../components/Button';
 import Container from '../components/Container';
+import MessageBox from '../components/MessageBox';
 import Link from '../components/Link';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -54,7 +55,7 @@ class CreateUpdatePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { update: {} };
+    this.state = { update: {}, status: '', error: '' };
   }
 
   createUpdate = async update => {
@@ -70,6 +71,7 @@ class CreateUpdatePage extends React.Component {
       return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       console.error(e);
+      this.setState({ status: 'error', error: `${e}` });
     }
   };
 
@@ -143,6 +145,15 @@ class CreateUpdatePage extends React.Component {
                 </Container>
               )}
               {canCreateUpdate && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
+              {this.state.status === 'error' && (
+                <MessageBox type="error" withIcon>
+                  <FormattedMessage
+                    id="updates.new.error"
+                    defaultMessage="Update failed: {err}"
+                    values={{ err: this.state.error }}
+                  />
+                </MessageBox>
+              )}
             </Container>
           </CreateUpdateWrapper>
         </Body>
