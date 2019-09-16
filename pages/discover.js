@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { withRouter } from 'next/router';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
@@ -15,7 +15,7 @@ import { H1, P } from '../components/Text';
 import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import MessageBox from '../components/MessageBox';
-import StyledSelect from '../components/DeprecatedStyledSelect';
+import StyledSelect from '../components/StyledSelect';
 import { Link } from '../server/pages';
 import SearchForm from '../components/SearchForm';
 
@@ -112,17 +112,14 @@ const SearchFormContainer = styled(Box)`
   min-width: 10rem;
 `;
 
-const sortOptions = {
-  popularity: 'popularity',
-  newest: 'newest',
-};
+const sortOptions = [{ value: 'popularity' }, { value: 'newest' }];
 
 const I18nSortLabels = defineMessages({
-  [sortOptions.popularity]: {
+  popularity: {
     id: 'discover.sort.Popularity',
     defaultMessage: 'Most popular',
   },
-  [sortOptions.newest]: {
+  newest: {
     id: 'discover.sort.Newest',
     defaultMessage: 'Newest',
   },
@@ -134,7 +131,7 @@ const DiscoverPage = ({ router, intl }) => {
   const params = {
     offset: Number(query.offset) || 0,
     tags: !query.show || query.show === 'all' ? undefined : [query.show],
-    orderBy: query.sort === sortOptions.newest ? 'createdAt' : 'totalDonations',
+    orderBy: query.sort === 'newest' ? 'createdAt' : 'totalDonations',
     limit: Number(query.limit) || 50,
     isActive: query.show !== 'pledged',
     isPledged: query.show === 'pledged',
@@ -147,7 +144,7 @@ const DiscoverPage = ({ router, intl }) => {
     });
   };
 
-  const selectedSort = sortOptions[query.sort] || sortOptions.popularity;
+  const selectedSort = sortOptions.find(({ value }) => value === query.sort) || sortOptions[0];
 
   const handleSubmit = event => {
     const searchInput = event.target.elements.q;
@@ -246,14 +243,10 @@ const DiscoverPage = ({ router, intl }) => {
                       options={sortOptions}
                       defaultValue={selectedSort}
                       placeholder={'Sort by'}
-                      onChange={selected => {
-                        if (selected && selected.key) {
-                          setRouteParam('sort', selected && selected.key);
-                        }
-                      }}
-                    >
-                      {({ value }) => intl.formatMessage(I18nSortLabels[value])}
-                    </StyledSelect>
+                      minWidth={140}
+                      getOptionLabel={({ value }) => intl.formatMessage(I18nSortLabels[value])}
+                      onChange={({ value }) => setRouteParam('sort', value)}
+                    />
                   </Flex>
                 </Flex>
 
