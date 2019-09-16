@@ -18,7 +18,7 @@ We think you’d be great at this if you:
  
  - Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](http://www.reinventingorganizationswiki.com/Decision_Making)) and autonomous (you can run a feature end to end on your own!) 
  
- - Know JavaScript.  
+ - Have experience with JavaScript
  
  - You are able to contribute indifferently to our two main stacks:  GraphQL API (powered by Node and PostgreSQL) and our Web App (powered by Next.js, React and Apollo).
  
