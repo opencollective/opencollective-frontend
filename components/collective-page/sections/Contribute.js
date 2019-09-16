@@ -137,10 +137,7 @@ class SectionContribute extends React.PureComponent {
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
                     <H3 fontSize="H5" fontWeight="600" color="black.700">
-                      <FormattedMessage
-                        id="CollectivePage.MoreWaysToContribute"
-                        defaultMessage="More ways to contribute"
-                      />
+                      <FormattedMessage id="section.events.title" defaultMessage="Events" />
                     </H3>
                     <Box m={2} flex="0 0 50px">
                       <Chevrons />
