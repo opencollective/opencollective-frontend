@@ -16,7 +16,7 @@ Watch this 2 minute explainer video about what we do and why we are passionate a
  
  - Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](http://www.reinventingorganizationswiki.com/Decision_Making)) and autonomous (you can run a feature end to end on your own!) 
  
- - You are able to contribute indifferently to our two main stacks:  GraphQL API (powered by Node and PostgreSQL) and our Web App (powered by Next.js, React and Apollo).
+ - You are able to contribute to our two main stacks:  GraphQL API (powered by Node and PostgreSQL) and our Web App (powered by Next.js, React and Apollo).
  
  - You are excited about contributing to our mission! 
 
@@ -26,4 +26,4 @@ We are a fully remote team - with team members in New Zealand (Wellington), Mexi
 
 ### Want to apply?
 
-Please [email us](mailto:hello@opencollective.com) about who you are, your experience and skills, and why you’re interested in this role. This can take the form of a traditional CV, your website, a video, or however you like to communicate.
+Please [email us](mailto:info@opencollective.com) about who you are, your experience and skills, and why you’re interested in this role. This can take the form of a traditional CV, your website, a video, or however you like to communicate.
