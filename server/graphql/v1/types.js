@@ -411,6 +411,14 @@ export const ContributorType = new GraphQLObjectType({
         return contributor.roles.includes(roles.FUNDRAISER);
       },
     },
+    tiersIds: {
+      type: new GraphQLNonNull(new GraphQLList(GraphQLInt)),
+      description:
+        'A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.',
+      resolve(contributor) {
+        return contributor.tiersIds || [];
+      },
+    },
     since: {
       type: new GraphQLNonNull(IsoDateString),
       description: 'Member join date',
