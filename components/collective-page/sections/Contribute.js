@@ -41,6 +41,7 @@ class SectionContribute extends React.PureComponent {
       PropTypes.shape({
         type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
         isBacker: PropTypes.bool,
+        tiersIds: PropTypes.arrayOf(PropTypes.number),
       }),
     ),
   };
@@ -83,15 +84,15 @@ class SectionContribute extends React.PureComponent {
     return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
   });
 
-  getFinancialContributors = memoizeOne(contributors => {
-    return contributors.filter(c => c.isBacker);
+  getFinancialContributorsWithoutTier = memoizeOne(contributors => {
+    return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
   });
 
   render() {
     const { collective, tiers, events, contributors, contributorsStats } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
-    const financialContributors = this.getFinancialContributors(contributors);
-    const hasNoContributor = financialContributors.length === 0;
+    const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
+    const hasNoContributor = financialContributorsWithoutTier.length === 0;
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
 
     return (
@@ -121,7 +122,7 @@ class SectionContribute extends React.PureComponent {
                   <Box px={[3, 24]}>
                     <ContributeCustom
                       collective={collective}
-                      contributors={financialContributors}
+                      contributors={financialContributorsWithoutTier}
                       stats={contributorsStats}
                       hideContributors={hasNoContributor}
                     />
