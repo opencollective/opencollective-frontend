@@ -160,7 +160,7 @@ class CollectivePage extends Component {
         return (
           <SectionUpdates
             collective={this.props.collective}
-            canSeeDrafts={this.props.isAdmin}
+            isAdmin={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
