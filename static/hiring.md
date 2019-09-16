@@ -8,11 +8,9 @@ Open Collective is on a mission to help communities around the world be sustaina
 
 Watch this 2 minute explainer video about what we do and why we are passionate about it. 
 
-<iframe src="https://www.youtube.com/embed/IBU5fSILAe8?wmode=opaque&amp;enablejsapi=1" scrolling="no" width="854" height="480" frameborder="0"></iframe>
+<iframe src="https://www.youtube.com/embed/IBU5fSILAe8?wmode=opaque&amp;enablejsapi=1" scrolling="no" width="854" height="480" frameborder="0"></iframe>  
 
-Big task! We know. That’s why we are looking to grow our team and add a full stack engineer to help us develop the tools these communities need in order to thrive.  
-
-We think you’d be great at this if you: 
+### We think you’d be great at this if you: 
 
  - Have experience in a full time full stack engineer position using JavaScript.
  
@@ -26,6 +24,6 @@ Like the movements that we support, we value openness and transparency. We striv
 
 We are a fully remote team - with team members in New Zealand (Wellington), Mexico (Guadalajara), Spain (Madrid), Belgium (Brussels), Germany (Berlin) and France (South Coast).
 
-Want to apply?
+### Want to apply?
 
 Please [email us](mailto:hello@opencollective.com) about who you are, your experience and skills, and why you’re interested in this role. This can take the form of a traditional CV, your website, a video, or however you like to communicate.
