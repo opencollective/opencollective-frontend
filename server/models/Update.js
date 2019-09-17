@@ -3,6 +3,7 @@
  */
 import config from 'config';
 import Historical from 'sequelize-historical';
+import { Op } from 'sequelize';
 import slugify from 'limax';
 import Promise from 'bluebird';
 import showdown from 'showdown';
@@ -12,6 +13,8 @@ import * as errors from '../graphql/errors';
 import activities from '../constants/activities';
 import { sanitizeObject } from '../lib/utils';
 import { mustHaveRole } from '../lib/auth';
+
+import logger from '../lib/logger';
 
 const markdownConverter = new showdown.Converter();
 
@@ -147,6 +150,11 @@ export default function(Sequelize, DataTypes) {
       deletedAt: {
         type: DataTypes.DATE,
       },
+
+      makePublicOn: {
+        type: DataTypes.DATE,
+        defaultValue: null,
+      },
     },
     {
       paranoid: true,
@@ -235,6 +243,7 @@ export default function(Sequelize, DataTypes) {
       'image',
       'tags',
       'isPrivate',
+      'makePublicOn',
     ];
     sanitizeObject(newUpdateData, ['html', 'markdown']);
     return await this.update({
@@ -313,6 +322,23 @@ export default function(Sequelize, DataTypes) {
         if (!slug) return Promise.reject(new Error("We couldn't generate a unique slug for this Update"));
         this.slug = slug;
       });
+  };
+
+  Update.makeUpdatesPublic = function() {
+    const today = new Date().setUTCHours(0, 0, 0, 0);
+    return models.Update.update(
+      {
+        isPrivate: false,
+      },
+      {
+        where: {
+          isPrivate: true,
+          makePublicOn: { [Op.lte]: today },
+        },
+      },
+    ).then(([affectedCount]) => {
+      logger.info(`Number of private updates made public: ${affectedCount}`);
+    });
   };
 
   Update.createMany = (updates, defaultValues) => {

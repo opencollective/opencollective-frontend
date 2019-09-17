@@ -31,6 +31,7 @@ export async function createUpdate(_, args, req) {
     TierId: get(args, 'update.tier.id'),
     CreatedByUserId: req.remoteUser.id,
     FromCollectiveId: req.remoteUser.CollectiveId,
+    makePublicOn: args.update.makePublicOn,
   });
 
   purgeCacheForPage(`/${collective.slug}`);
