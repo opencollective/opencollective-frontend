@@ -65,7 +65,7 @@ class SectionUpdates extends React.PureComponent {
     }).isRequired,
 
     /** Does user can see drafts? */
-    canSeeDrafts: PropTypes.bool.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
 
     /** Is user loggedIn? */
     isLoggedIn: PropTypes.bool.isRequired,
@@ -104,11 +104,11 @@ class SectionUpdates extends React.PureComponent {
   }
 
   render() {
-    const { collective, canSeeDrafts } = this.props;
+    const { collective, isAdmin } = this.props;
     const updates = get(this.props.data, 'Collective.updates', []);
 
     // Nothing to show if updates is empty and user can't add new ones
-    if (isEmpty(updates) && !canSeeDrafts) {
+    if (isEmpty(updates) && !isAdmin) {
       return null;
     }
 
@@ -128,14 +128,16 @@ class SectionUpdates extends React.PureComponent {
               defaultMessage="Stay up to dates with our latest activities and progress."
             />
           </P>
-          <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton buttonStyle="primary">
-              <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
-                +
-              </Span>
-              <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
-            </StyledButton>
-          </Link>
+          {isAdmin && (
+            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+              <StyledButton buttonStyle="primary">
+                <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
+                  +
+                </Span>
+                <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
+              </StyledButton>
+            </Link>
+          )}
         </Flex>
         {isEmpty(updates) ? (
           <div>
@@ -145,11 +147,6 @@ class SectionUpdates extends React.PureComponent {
                 defaultMessage="Use this section to promote your actions and keep your community up-to-date."
               />
             </MessageBox>
-            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonSize="large" width={1}>
-                <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
-              </StyledButton>
-            </Link>
           </div>
         ) : (
           <StyledCard>
@@ -248,7 +245,7 @@ export default injectIntl(
       return {
         variables: {
           slug: props.collective.slug,
-          onlyPublishedUpdates: !props.canSeeDrafts,
+          onlyPublishedUpdates: !props.isAdmin,
         },
       };
     },
