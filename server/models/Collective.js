@@ -2144,10 +2144,19 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getBackgroundImageUrl = function(args = {}) {
-    const imageType = 'background';
-    const imageHeight = args.height ? `/${args.height}` : '';
-    const imageFormat = args.format || 'png';
-    return `${config.host.images}/${this.slug}/${imageType}${imageHeight}.${imageFormat}`;
+    const sections = [config.host.images, this.slug];
+
+    if (this.backgroundImage) {
+      sections.push(md5(this.backgroundImage).substring(0, 7));
+    }
+
+    sections.push('background');
+
+    if (args.height) {
+      sections.push(args.height);
+    }
+
+    return `${sections.join('/')}.${args.format || 'png'}`;
   };
 
   /**
