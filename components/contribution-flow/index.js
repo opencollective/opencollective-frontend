@@ -96,6 +96,7 @@ class CreateOrderPage extends React.Component {
       location: PropTypes.shape({ country: PropTypes.string }),
       settings: PropTypes.object,
     }).isRequired,
+    skipStepDetails: PropTypes.bool,
     tier: PropTypes.shape({
       id: PropTypes.number,
       slug: PropTypes.string,
@@ -501,10 +502,10 @@ class CreateOrderPage extends React.Component {
 
     if (!isNil(stateAmount)) {
       return stateAmount;
-    } else if (tier && !isNil(tier.amount)) {
-      return tier.amount;
     } else if (!isNil(this.props.fixedAmount)) {
       return this.props.fixedAmount;
+    } else if (tier && !isNil(tier.amount)) {
+      return tier.amount;
     } else if (this.getOrderMinAmount() === 0) {
       // Free tiers are free per default, even when user can make a donation
       return 0;
@@ -571,6 +572,7 @@ class CreateOrderPage extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
+    const { skipStepDetails } = this.props;
     const { stepDetails, stepPayment, stepSummary } = this.state;
     const tier = this.props.tier;
     const isFixedContribution = this.isFixedContribution();
@@ -586,7 +588,7 @@ class CreateOrderPage extends React.Component {
     ];
 
     // If amount and interval are forced by a tier or by params, skip StepDetails (except for events)
-    if (!isFixedContribution || (tier && tier.type === 'TICKET')) {
+    if (!skipStepDetails && (!isFixedContribution || (tier && tier.type === 'TICKET'))) {
       steps.push({
         name: 'details',
         isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),

@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { compose } from '../lib/utils';
+import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
 
 import ErrorPage from '../components/ErrorPage';
@@ -61,6 +61,7 @@ class CreateOrderPage extends React.Component {
       verb: query.verb,
       redirect: query.redirect,
       customData: query.data,
+      skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
     };
   }
 
@@ -77,6 +78,7 @@ class CreateOrderPage extends React.Component {
     redirect: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from injectIntl
+    skipStepDetails: PropTypes.bool,
   };
 
   getPageMetadata() {
@@ -146,6 +148,7 @@ class CreateOrderPage extends React.Component {
           fixedInterval={this.props.interval}
           fixedAmount={this.props.totalAmount}
           customData={this.props.customData}
+          skipStepDetails={this.props.skipStepDetails}
         />
       );
     }
