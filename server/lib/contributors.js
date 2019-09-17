@@ -25,6 +25,7 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}
         MIN(m.since) as since,
         MAX(m."publicMessage") as "publicMessage",
         ARRAY_AGG(DISTINCT m."role") as roles,
+        ARRAY_AGG(DISTINCT tier."id") as "tiersIds",
         COALESCE(MAX(m.description), MAX(tier.name)) as description,
         (
           SELECT  COALESCE(SUM(amount), 0) 
@@ -73,6 +74,7 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         MIN(m.since) as since,
         MAX(m."publicMessage") as "publicMessage",
         ARRAY_AGG(DISTINCT m."role") as roles,
+        ARRAY_AGG(DISTINCT tier."id") as "tiersIds",
         COALESCE(MAX(m.description), MAX(tier.name)) as description,
         (
           SELECT  COALESCE(SUM(amount), 0) 
