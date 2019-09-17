@@ -12,32 +12,53 @@ import { sequelize } from '../models';
 /**
  * Returns all the contributors for given collective
  */
-export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}) => {
+export const getContributorsForCollective = (collectiveId, { limit = 5000, roles } = {}) => {
+  // Subquery to get the total amount contributed for each member
+  const TotalAmountContributedQuery = `
+    SELECT  COALESCE(SUM(amount), 0)
+    FROM    "Transactions"
+    WHERE   "CollectiveId" = :collectiveId
+    AND     TYPE = 'CREDIT'
+    AND     "deletedAt" IS NULL
+    AND     "RefundTransactionId" IS NULL
+    AND     ("FromCollectiveId" = mc.id OR "UsingVirtualCardFromCollectiveId" = mc.id)
+  `;
+
+  // Helper to filter based on roles
+  const getRolesCondition = roles => {
+    if (!roles || !roles.length) {
+      return '';
+    } else if (roles.length === 1) {
+      return 'AND role = :roles';
+    } else {
+      return 'AND role IN (:roles)';
+    }
+  };
+
   return sequelize.query(
     `
-      SELECT
+      WITH member_collectives_matching_roles AS (
+        SELECT      c.*
+        FROM        "Collectives" c
+        INNER JOIN  "Members" m ON m."MemberCollectiveId" = c.id
+        WHERE       m."CollectiveId" = :collectiveId
+        ${getRolesCondition(roles)}
+        GROUP BY    c.id
+      ) SELECT
         mc.id,
-        mc.name,
-        mc.slug as "collectiveSlug",
-        mc.image,
-        mc.type,
-        mc."isIncognito",
-        MIN(m.since) as since,
-        MAX(m."publicMessage") as "publicMessage",
-        ARRAY_AGG(DISTINCT m."role") as roles,
-        ARRAY_AGG(DISTINCT tier."id") as "tiersIds",
-        COALESCE(MAX(m.description), MAX(tier.name)) as description,
-        (
-          SELECT  COALESCE(SUM(amount), 0) 
-          FROM    "Transactions" 
-          WHERE   "CollectiveId" = :collectiveId 
-          AND     TYPE = 'CREDIT'
-          AND     "deletedAt" IS NULL
-          AND     "RefundTransactionId" IS NULL
-          AND     ("FromCollectiveId" = mc.id OR "UsingVirtualCardFromCollectiveId" = mc.id)
-        ) AS "totalAmountDonated"
+        MAX(mc.name) AS name,
+        MAX(mc.slug) AS "collectiveSlug",
+        MAX(mc.image) AS image,
+        MAX(mc.type) AS type,
+        MIN(m.since) AS since,
+        MAX(m."publicMessage") AS "publicMessage",
+        BOOL_OR(mc."isIncognito") AS "isIncognito",
+        ARRAY_AGG(DISTINCT m."role") AS roles,
+        ARRAY_AGG(DISTINCT tier."id") AS "tiersIds",
+        COALESCE(MAX(m.description), MAX(tier.name)) AS description,
+        (${TotalAmountContributedQuery}) AS "totalAmountDonated"
       FROM
-        "Collectives" mc
+        "member_collectives_matching_roles" mc
       INNER JOIN
         "Members" m ON m."MemberCollectiveId" = mc.id AND m."deletedAt" IS NULL
       LEFT JOIN 
@@ -52,8 +73,13 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000 } = {}
       LIMIT :limit
     `,
     {
-      replacements: { collectiveId, limit },
+      raw: true,
       type: sequelize.QueryTypes.SELECT,
+      replacements: {
+        collectiveId,
+        limit,
+        roles,
+      },
     },
   );
 };

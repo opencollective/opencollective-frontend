@@ -30,6 +30,7 @@ import {
   DateString,
   ContributorType,
   UpdateType,
+  ContributorRoleEnum,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -598,6 +599,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         description: 'All the persons and entities that contribute to this organization',
         args: {
           limit: { type: GraphQLInt, defaultValue: 1000 },
+          roles: { type: new GraphQLList(ContributorRoleEnum) },
         },
       },
       collectives: {
@@ -1129,9 +1131,10 @@ const CollectiveFields = () => {
       description: 'All the persons and entities that contribute to this organization',
       args: {
         limit: { type: GraphQLInt, defaultValue: 1000 },
+        roles: { type: new GraphQLList(ContributorRoleEnum) },
       },
       resolve(collective, args) {
-        return getContributorsForCollective(collective.id, { limit: args.limit });
+        return getContributorsForCollective(collective.id, args);
       },
     },
     collectives: {
