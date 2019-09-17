@@ -216,7 +216,6 @@ Hero.propTypes = {
     slug: PropTypes.string.isRequired,
     company: PropTypes.string,
     isApproved: PropTypes.bool,
-    backgroundImage: PropTypes.string,
     twitterHandle: PropTypes.string,
     githubHandle: PropTypes.string,
     website: PropTypes.string,

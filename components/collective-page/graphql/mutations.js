@@ -23,8 +23,7 @@ export const EditAvatarMutation = gql`
   mutation EditCollectiveImage($id: Int!, $image: String) {
     editCollective(collective: { id: $id, image: $image }) {
       id
-      image
-      imageUrl
+      imageUrl(height: 256)
     }
   }
 `;
@@ -34,7 +33,7 @@ export const EditCollectiveBackgroundMutation = gql`
     editCollective(collective: { id: $id, settings: $settings, backgroundImage: $backgroundImage }) {
       id
       settings
-      backgroundImage
+      backgroundImageUrl(height: 650)
     }
   }
 `;

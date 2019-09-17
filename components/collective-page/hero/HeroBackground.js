@@ -110,10 +110,10 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
 
   return !isEditing ? (
     <StyledBackground>
-      {collective.backgroundImage && (
+      {collective.backgroundImageUrl && (
         <ImageContainer>
           <BackgroundImage
-            src={collective.backgroundImage}
+            src={collective.backgroundImageUrl}
             style={
               hasBackgroundSettings
                 ? { transform: `translate(${crop.x}px, ${crop.y}px) scale(${zoom})` }
@@ -126,9 +126,9 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
   ) : (
     <Mutation mutation={EditCollectiveBackgroundMutation}>
       {editBackground => (
-        <StyledBackground backgroundImage={collective.backgroundImage} isEditing>
+        <StyledBackground backgroundImage={collective.backgroundImageUrl} isEditing>
           <Cropper
-            image={uploadedImage ? uploadedImage.preview : collective.backgroundImage}
+            image={uploadedImage ? uploadedImage.preview : collective.backgroundImageUrl}
             cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}
             apect={BASE_WIDTH / BASE_HEIGHT}
             crop={crop}
@@ -174,7 +174,8 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 </StyledButton>
               )}
             </Dropzone>
-            {((collective.backgroundImage && uploadedImage !== KEY_IMG_REMOVE) || uploadedImage !== KEY_IMG_REMOVE) && (
+            {((collective.backgroundImageUrl && uploadedImage !== KEY_IMG_REMOVE) ||
+              uploadedImage !== KEY_IMG_REMOVE) && (
               <StyledButton
                 minWidth={150}
                 ml={3}
@@ -209,7 +210,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 setSubmitting(true); // Need this because `upload` is not a graphql function
 
                 try {
-                  let imgURL = collective.backgroundImage;
+                  let imgURL = collective.backgroundImageUrl;
 
                   // Upload image if changed or remove it
                   if (uploadedImage === KEY_IMG_REMOVE) {
@@ -262,7 +263,7 @@ HeroBackground.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number,
     /** The background image */
-    backgroundImage: PropTypes.string,
+    backgroundImageUrl: PropTypes.string,
     /** Collective settings */
     settings: PropTypes.shape({
       collectivePage: PropTypes.shape({

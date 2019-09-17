@@ -130,7 +130,6 @@ const getCollective = graphql(gql`
       name
       description
       longDescription
-      backgroundImage
       twitterHandle
       githubHandle
       website
@@ -143,8 +142,8 @@ const getCollective = graphql(gql`
       isArchived
       isHost
       hostFeePercent
-      image
-      imageUrl
+      imageUrl(height: 256)
+      backgroundImageUrl(height: 650)
       stats {
         id
         balance
@@ -211,7 +210,6 @@ const getCollective = graphql(gql`
         slug
         name
         description
-        image
         startsAt
         endsAt
         contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
