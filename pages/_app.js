@@ -69,7 +69,10 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    const digitalClimateStrikeBannerEnabled = true;
+    let digitalClimateStrikeBannerEnabled = true;
+    if (ctx.req && ctx.req.url.match(/\.html/)) {
+      digitalClimateStrikeBannerEnabled = false;
+    }
     const digitalClimateStrikeFullpageEnabled = ctx.req && ctx.req.url === '/';
     const digitalClimateStrikeOptions = {
       enabled: !process.env.CI,
