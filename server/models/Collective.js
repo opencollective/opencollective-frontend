@@ -2144,11 +2144,13 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getBackgroundImageUrl = function(args = {}) {
+    if (!this.backgroundImage) {
+      return null;
+    }
+
     const sections = [config.host.images, this.slug];
 
-    if (this.backgroundImage) {
-      sections.push(md5(this.backgroundImage).substring(0, 7));
-    }
+    sections.push(md5(this.backgroundImage).substring(0, 7));
 
     sections.push('background');
 
