@@ -219,6 +219,7 @@
   "collective.website.description": "Entrez l'adresse URL de votre site Web ou de votre page Facebook",
   "collective.website.label": "Site Internet",
   "CollectiveColorPicker.Custom": "Use custom color",
+  "CollectiveColorPicker.Error": "Please use an hexadecimal value (eg. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Preset colors",
   "CollectiveColorPicker.Title": "Select page color",
   "CollectivePage.AddLongDescription": "Ajouter une description",

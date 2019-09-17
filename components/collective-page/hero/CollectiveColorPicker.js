@@ -5,6 +5,7 @@ import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { set } from 'lodash';
 import styled, { withTheme } from 'styled-components';
+import { isHexColor } from 'validator';
 
 import { Check } from 'styled-icons/fa-solid/Check';
 
@@ -28,7 +29,6 @@ const ColorPreset = styled.button`
   border-radius: 50%;
   border: none;
   transition: transform 0.1s;
-
   &:hover {
     transform: scale(1.25);
   }
@@ -41,10 +41,14 @@ const PRESET_COLORS = [
   '#FA533E', '#F6A050', '#FFA413', '#1AC780', '#55C9BC', '#3E8DCE', '#B13BC6', '#95A5A6',
 ];
 
+/** Ensure the color is formatted like #123456 */
+const validateColor = value => isHexColor(value) && value.length === 7;
+
 const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   const color = theme.colors.primary[500];
   const [textValue, setTextValue] = React.useState(color.replace('#', ''));
-  const hasError = textValue.length !== 6;
+  const [showError, setShowError] = React.useState(false);
+  const hasError = !validateColor(`#${textValue}`);
   const dispatchValue = v => {
     setTextValue(v.replace('#', ''));
     onChange(v);
@@ -86,22 +90,36 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                   dispatchValue(e.target.value);
                 }}
               />
-              <StyledInputGroup
-                prepend="#"
-                placeholder="000000"
-                px={2}
-                containerProps={{ ml: 2 }}
-                value={textValue}
-                disabled={loading}
-                error={hasError}
-                onChange={e => {
-                  const newValue = e.target.value.replace('#', '');
-                  setTextValue(newValue);
-                  if (newValue.length === 6) {
-                    onChange(`#${newValue}`);
+              <div>
+                <StyledInputGroup
+                  prepend="#"
+                  placeholder="000000"
+                  px={2}
+                  containerProps={{ ml: 2 }}
+                  value={textValue}
+                  maxLength={6}
+                  disabled={loading}
+                  onBlur={() => setShowError(true)}
+                  error={
+                    showError &&
+                    hasError && (
+                      <FormattedMessage
+                        id="CollectiveColorPicker.Error"
+                        defaultMessage="Please use an hexadecimal value (eg. #3E8DCE)"
+                      />
+                    )
                   }
-                }}
-              />
+                  onChange={e => {
+                    const newValue = e.target.value.replace('#', '');
+                    setTextValue(newValue);
+                    setShowError(false); // Don't show errors while typing
+                    const hexValue = `#${newValue}`;
+                    if (validateColor(hexValue)) {
+                      onChange(hexValue);
+                    }
+                  }}
+                />
+              </div>
             </Flex>
           </Box>
           <Container borderTop="1px solid #D7DBE0" p={2}>

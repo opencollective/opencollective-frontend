@@ -219,6 +219,7 @@
   "collective.website.description": "Geef de URL in van je website of Facebook pagina",
   "collective.website.label": "Website",
   "CollectiveColorPicker.Custom": "Use custom color",
+  "CollectiveColorPicker.Error": "Please use an hexadecimal value (eg. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Preset colors",
   "CollectiveColorPicker.Title": "Select page color",
   "CollectivePage.AddLongDescription": "Add a description",
