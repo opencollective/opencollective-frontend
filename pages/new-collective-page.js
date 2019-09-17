@@ -45,7 +45,8 @@ class NewCollectivePage extends React.Component {
         parentCollective: PropTypes.shape({ image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
-        contributors: PropTypes.arrayOf(PropTypes.object),
+        coreContributors: PropTypes.arrayOf(PropTypes.object),
+        financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
         events: PropTypes.arrayOf(PropTypes.object),
         transactions: PropTypes.arrayOf(PropTypes.object),
@@ -99,7 +100,8 @@ class NewCollectivePage extends React.Component {
             <CollectivePage
               collective={collective}
               host={collective.host}
-              contributors={collective.contributors}
+              coreContributors={collective.coreContributors}
+              financialContributors={collective.financialContributors}
               tiers={collective.tiers}
               events={collective.events}
               transactions={collective.transactions}
@@ -167,22 +169,11 @@ const getCollective = graphql(gql`
         slug
         type
       }
-      contributors {
-        id
-        name
-        roles
-        isAdmin
-        isCore
-        isBacker
-        isFundraiser
-        since
-        image
-        description
-        collectiveSlug
-        totalAmountDonated
-        type
-        publicMessage
-        isIncognito
+      coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+        ...ContributorsFieldsFragment
+      }
+      financialContributors: contributors(roles: [BACKER]) {
+        ...ContributorsFieldsFragment
       }
       tiers {
         id
@@ -247,6 +238,7 @@ const getCollective = graphql(gql`
 
   ${fragments.TransactionsAndExpensesFragment}
   ${fragments.UpdatesFieldsFragment}
+  ${fragments.ContributorsFieldsFragment}
 `);
 
 export default withUser(getCollective(NewCollectivePage));
