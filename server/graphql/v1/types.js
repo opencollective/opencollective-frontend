@@ -31,6 +31,7 @@ import { maxInteger } from '../../constants/math';
 import intervals from '../../constants/intervals';
 import roles from '../../constants/roles';
 import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
+import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
@@ -362,6 +363,17 @@ export const ContributorRoleEnum = new GraphQLEnumType({
   }, {}),
 });
 
+export const ImageFormatType = new GraphQLEnumType({
+  name: 'ImageFormat',
+  values: {
+    txt: {},
+    png: {},
+    jpg: {},
+    gif: {},
+    svg: {},
+  },
+});
+
 export const ContributorType = new GraphQLObjectType({
   name: 'Contributor',
   description: `
@@ -450,6 +462,17 @@ export const ContributorType = new GraphQLObjectType({
     image: {
       type: GraphQLString,
       description: 'Contributor avatar or logo',
+      args: {
+        height: { type: GraphQLInt },
+        format: { type: ImageFormatType },
+      },
+      resolve(contributor, args) {
+        if (!contributor.collectiveSlug) {
+          return null;
+        } else {
+          return getCollectiveAvatarUrl(contributor.collectiveSlug, contributor.type, contributor.image, args);
+        }
+      },
     },
     publicMessage: {
       type: GraphQLString,
@@ -2063,17 +2086,6 @@ export const PaginatedExpensesType = new GraphQLObjectType({
 });
 
 export const PaginatedPaymentMethodsType = paginatedList(PaymentMethodType, 'PaymentMethod', 'paymentMethods');
-
-export const ImageFormatType = new GraphQLEnumType({
-  name: 'ImageFormat',
-  values: {
-    txt: {},
-    png: {},
-    jpg: {},
-    gif: {},
-    svg: {},
-  },
-});
 
 export const StripeErrorType = new GraphQLObjectType({
   name: 'StripeError',
