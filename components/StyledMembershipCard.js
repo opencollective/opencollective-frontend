@@ -53,16 +53,18 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
         </Container>
         <Container p={3}>
           <Box mb={2}>
-            <P fontSize="Caption" mb={3}>
-              <FormattedMessage
-                id="Membership.ContributorSince"
-                defaultMessage="{contributorType} since"
-                values={{ contributorType: formatMemberRole(intl, role) }}
-              />
-              <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
-                <FormattedDate value={since} month="long" year="numeric" />
-              </Span>
-            </P>
+            {role && (
+              <P fontSize="Caption" mb={3}>
+                <FormattedMessage
+                  id="Membership.ContributorSince"
+                  defaultMessage="{contributorType} since"
+                  values={{ contributorType: formatMemberRole(intl, role) }}
+                />
+                <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
+                  <FormattedDate value={since} month="long" year="numeric" />
+                </Span>
+              </P>
+            )}
             {role === roles.BACKER ? (
               <P mt={3}>
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
