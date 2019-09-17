@@ -1138,6 +1138,7 @@
   "update.createdAtBy": "Créée le {date} (brouillon) par {author}",
   "update.delete": "supprimer",
   "update.edit": "éditer",
+  "update.makePublicOn.label": "Automatically make the update public on this date:",
   "update.new.post": "Poster une Actualité",
   "update.paid": "payé",
   "update.pending": "en attente",

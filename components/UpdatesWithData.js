@@ -105,6 +105,7 @@ const getUpdatesQuery = gql`
       tags
       image
       isPrivate
+      makePublicOn
       collective {
         id
         slug

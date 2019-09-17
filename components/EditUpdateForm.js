@@ -13,6 +13,7 @@ import Container from './Container';
 import StyledCheckbox from './StyledCheckbox';
 
 import storage from '../lib/storage';
+import moment from 'moment';
 
 const UpdateFormWrapper = styled(Container)`
   width: 100%;
@@ -52,7 +53,7 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'isPrivate') : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'isPrivate', 'makePublicOn') : {},
       loading: false,
       error: '',
     };
@@ -71,6 +72,7 @@ class EditUpdateForm extends React.Component {
   }
 
   handleChange(attr, value) {
+    console.log('handleChange', attr, value);
     const update = {
       ...this.state.update,
       [attr]: value,
@@ -205,6 +207,33 @@ class EditUpdateForm extends React.Component {
               />
             </Container>
           </div>
+
+          <div className="row">
+            <div className="col large">
+              <Container mb={2} fontWeight="500" fontSize="1.6rem" lineHeight="1.7">
+                <Box as="span">
+                  <FormattedMessage
+                    id="update.makePublicOn.label"
+                    defaultMessage="Automatically make the update public on this date:"
+                  />
+                </Box>
+              </Container>
+              <StyledInputField htmlFor="makePublicOn">
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    type="date"
+                    value={update.makePublicOn ? moment(update.makePublicOn).format('YYYY-MM-DD') : ''}
+                    onChange={e => this.handleChange('makePublicOn', moment(e.target.value).toISOString())}
+                    width="100%"
+                    maxWidth="40em"
+                    placeHolder="Normal"
+                  />
+                )}
+              </StyledInputField>
+            </div>
+          </div>
+
           <ActionButtonWrapper className="row actions" mx={2} my={4}>
             <StyledButton
               className="bluewhite"

@@ -1138,6 +1138,7 @@
   "update.createdAtBy": "Created on {date} (draft) by {author}",
   "update.delete": "удалить",
   "update.edit": "редактировать",
+  "update.makePublicOn.label": "Automatically make the update public on this date:",
   "update.new.post": "Post Update",
   "update.paid": "оплачено",
   "update.pending": "в ожидании",

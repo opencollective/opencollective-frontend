@@ -2865,6 +2865,7 @@ input UpdateAttributesInputType {
   title: String
   image: String
   isPrivate: Boolean
+  makePublicOn: IsoDateString
   markdown: String
   html: String
   fromCollective: CollectiveAttributesInputType
@@ -2881,6 +2882,7 @@ input UpdateInputType {
   title: String
   image: String
   isPrivate: Boolean
+  makePublicOn: IsoDateString
   markdown: String
   html: String
   fromCollective: CollectiveAttributesInputType
@@ -2897,6 +2899,7 @@ type UpdateType {
   slug: String
   image: String
   isPrivate: Boolean
+  makePublicOn: IsoDateString
 
   """
   Indicates whether or not the user is allowed to see the content of this update
