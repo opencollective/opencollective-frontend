@@ -81,6 +81,7 @@ class TierPage extends Component {
       id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      currency: PropTypes.string,
       type: PropTypes.string.isRequired,
       image: PropTypes.string,
       backgroundImage: PropTypes.string,
@@ -344,6 +345,7 @@ class TierPage extends Component {
             collectiveName={collective.name}
             contributors={contributors}
             contributorsStats={contributorsStats}
+            currency={tier.currency || collective.currency}
           />
         )}
       </Container>
