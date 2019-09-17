@@ -297,6 +297,16 @@ export const TransactionExpenseType = new GraphQLObjectType({
             : null;
         },
       },
+      expenseId: {
+        type: GraphQLInt,
+        resolve(transaction, args, req) {
+          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // otherwise we return null
+          return transaction.getExpenseForViewer
+            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.id)
+            : null;
+        },
+      },
       attachment: {
         type: GraphQLString,
         resolve(transaction, args, req) {
