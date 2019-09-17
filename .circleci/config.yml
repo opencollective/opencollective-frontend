@@ -216,6 +216,7 @@ jobs:
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 1*.js
+      CYPRESS_VIDEO: 'true'
     <<: *e2e_steps
 
   test-e2e-2:
