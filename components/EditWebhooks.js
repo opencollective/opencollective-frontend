@@ -29,7 +29,6 @@ const messages = defineMessages({
     id: 'webhooks.url.label',
     defaultMessage: 'URL',
   },
-
   'webhooks.types.label': {
     id: 'webhooks.types.label',
     defaultMessage: 'Activity',
@@ -221,8 +220,11 @@ class EditWebhooks extends React.Component {
           <Box>
             <Span fontSize="Paragraph">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
             <StyledSelect
-              options={this.getEventTypes(data.Collective.type, data.Collective.isHost)}
-              value={webhook.type}
+              options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(webhook => ({
+                label: webhook,
+                value: webhook,
+              }))}
+              value={{ label: webhook.type, value: webhook.type }}
               onChange={({ value }) => this.editWebhook(index, 'type', value)}
             />
           </Box>
