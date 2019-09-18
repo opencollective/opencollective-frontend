@@ -172,7 +172,7 @@ const getCollective = graphql(gql`
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         ...ContributorsFieldsFragment
       }
-      financialContributors: contributors(roles: [BACKER]) {
+      financialContributors: contributors(roles: [BACKER], limit: 150) {
         ...ContributorsFieldsFragment
       }
       tiers {
