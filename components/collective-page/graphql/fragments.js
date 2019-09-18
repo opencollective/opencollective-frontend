@@ -82,7 +82,6 @@ export const ContributorsFieldsFragment = gql`
     isAdmin
     isCore
     isBacker
-    isFundraiser
     since
     image
     description
