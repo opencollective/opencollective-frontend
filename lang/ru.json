@@ -929,6 +929,7 @@
   "sections.team.edit": "Редактировать членов команды",
   "sections.update.new": "Создать обновление",
   "SectionTransactions.All": "All",
+  "SectionTransactions.Contributions": "Contributions",
   "SectionTransactions.Empty": "No transaction yet.",
   "SectionTransactions.Title": "Transactions",
   "SectionUpdates.PostFirst": "Use this section to promote your actions and keep your community up-to-date.",

@@ -38,8 +38,8 @@ const I18nFilters = defineMessages({
     defaultMessage: 'Expenses',
   },
   [FILTERS.DEBIT]: {
-    id: 'SectionTransactions.Title',
-    defaultMessage: 'Transactions',
+    id: 'SectionTransactions.Contributions',
+    defaultMessage: 'Contributions',
   },
 });
 
