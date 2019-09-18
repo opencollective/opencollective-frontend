@@ -14,6 +14,7 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import Button from '../Button';
 import Container from '../Container';
 import { P } from '../Text';
+import StyledTooltip from '../StyledTooltip.js';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -65,21 +66,25 @@ class CreateExpenseForm extends React.Component {
         id: 'expense.error.attachmentMissing',
         defaultMessage: 'Missing attachment',
       },
+      'error.expenseTypeMissing': {
+        id: 'expense.error.expenseTypeMissing',
+        defaultMessage: 'Please pick the type of this expense',
+      },
     });
 
     this.categoriesOptions = categories(props.collective.slug).map(category => {
       return { [category]: category };
     });
 
-    this.expenseTypes = Object.keys(expenseTypes).map(t => {
-      return { [t]: titleCase(t) };
+    this.expenseTypes = Object.entries(expenseTypes).map(t => {
+      return { [t[0]]: titleCase(t[1]) };
     });
 
     this.state = {
       modified: false,
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
-        type: expenseTypes.RECEIPT,
+        type: expenseTypes.DEFAULT,
         payoutMethod: 'paypal',
         paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || undefined,
       },
@@ -134,6 +139,12 @@ class CreateExpenseForm extends React.Component {
       });
       return false;
     }
+    if (expense.type === '' && !expense.type) {
+      this.setState({
+        error: intl.formatMessage(this.messages['error.expenseTypeMissing']),
+      });
+      return false;
+    }
     this.setState({ error: null });
     return true;
   }
@@ -153,9 +164,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   async onSubmit(e) {
-    if (e) {
-      e.preventDefault();
-    }
+    e && e.preventDefault();
 
     this.setState({
       loading: true,
@@ -442,14 +451,24 @@ class CreateExpenseForm extends React.Component {
               </label>
               <div className="expenseType">
                 <span className="expenseType">
-                  <InputField
-                    type="select"
-                    options={this.expenseTypes}
-                    defaultValue={expenseTypes.RECEIPT}
-                    name="type"
-                    className="expenseField"
-                    onChange={expenseType => this.handleChange('type', expenseType)}
-                  />
+                  <StyledTooltip
+                    type="light"
+                    content={() => (
+                      <FormattedMessage
+                        id="expense.type.tooltip"
+                        defaultMessage="Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt."
+                      />
+                    )}
+                  >
+                    <InputField
+                      type="select"
+                      options={this.expenseTypes}
+                      defaultValue={expenseTypes.DEFAULT}
+                      name="type"
+                      className="expenseField"
+                      onChange={expenseType => this.handleChange('type', expenseTypes[expenseType])}
+                    />
+                  </StyledTooltip>
                 </span>
               </div>
             </div>
