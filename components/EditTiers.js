@@ -235,7 +235,11 @@ class EditTiers extends React.Component {
       },
     ];
 
-    if (parseToBoolean(process.env.ENABLE_TIER_GOALS) || get(props, 'collective.settings.enableTierGoals')) {
+    if (
+      parseToBoolean(process.env.ENABLE_TIER_GOALS) ||
+      parseToBoolean(process.env.NCP_IS_DEFAULT) ||
+      get(props, 'collective.settings.enableTierGoals')
+    ) {
       this.fields.push({
         name: 'goal',
         pre: getCurrencySymbol(props.currency),
