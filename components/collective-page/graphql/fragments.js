@@ -90,5 +90,6 @@ export const ContributorsFieldsFragment = gql`
     type
     publicMessage
     isIncognito
+    tiersIds
   }
 `;

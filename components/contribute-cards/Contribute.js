@@ -4,24 +4,28 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 
-import Link from '../../Link';
-import StyledTag from '../../StyledTag';
-import { P } from '../../Text';
-import StyledButton from '../../StyledButton';
-import { ContributorAvatar } from '../../Avatar';
-import Container from '../../Container';
+import { ContributionTypes } from '../../lib/constants/contribution-types';
 
-// Local imports
-import { ContributionTypes, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../_constants';
+import Link from '../Link';
+import StyledTag from '../StyledTag';
+import { P } from '../Text';
+import StyledButton from '../StyledButton';
+import { ContributorAvatar } from '../Avatar';
+import Container from '../Container';
+
+/** Max number of contributors on each tier card */
+export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
+export const CONTRIBUTE_CARD_WIDTH = 280;
+export const CONTRIBUTE_CARD_BORDER_RADIUS = 16;
 
 /** The main container */
 const StyledContributeCard = styled.div`
   display: flex;
   flex-direction: column;
-  width: 290px;
-  flex: 0 0 290px;
+  width: ${CONTRIBUTE_CARD_WIDTH}px;
+  flex: 0 0 ${CONTRIBUTE_CARD_WIDTH}px;
   height: 100%;
-  border-radius: 16px;
+  border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
 `;
 
@@ -99,6 +103,7 @@ const ContributeCard = ({
   contributors,
   stats,
   hideContributors,
+  withoutCTA,
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
@@ -117,11 +122,13 @@ const ContributeCard = ({
           <TierBody>{children}</TierBody>
         </Flex>
         <Box>
-          <Link route={route} params={routeParams}>
-            <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3}>
-              {buttonText || getContributeCTA(type)}
-            </StyledButton>
-          </Link>
+          {!withoutCTA && (
+            <Link route={route} params={routeParams}>
+              <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3}>
+                {buttonText || getContributeCTA(type)}
+              </StyledButton>
+            </Link>
+          )}
           {!hideContributors && (
             <Box mt={2} height={60}>
               {contributors && contributors.length > 0 && (
@@ -149,7 +156,7 @@ const ContributeCard = ({
                     )}
                   </Flex>
                   {stats && stats.all > 0 && (
-                    <P mt={2} fontSize="Tiny" color="black.600">
+                    <P mt={2} fontSize="Tiny" color="black.600" letterSpacing="-0.6px">
                       <FormattedMessage
                         id="ContributorsCount"
                         defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed"
@@ -202,6 +209,8 @@ ContributeCard.propTypes = {
   }),
   /** If true, contributors will not be displayed */
   hideContributors: PropTypes.bool,
+  /** If true, contribute button will be withoutCTA */
+  withoutCTA: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };

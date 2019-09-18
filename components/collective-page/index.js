@@ -153,6 +153,7 @@ class CollectivePage extends Component {
             events={this.props.events}
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
+            isAdmin={this.props.isAdmin}
           />
         );
       case Sections.CONTRIBUTORS:

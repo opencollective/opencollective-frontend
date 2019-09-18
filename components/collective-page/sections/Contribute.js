@@ -9,15 +9,17 @@ import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
+import ContributeCustom from '../../contribute-cards/ContributeCustom';
+import ContributeTier from '../../contribute-cards/ContributeTier';
+import ContributeEvent from '../../contribute-cards/ContributeEvent';
 
+import ContributeCardsContainer from '../ContributeCardsContainer';
 import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
-
 import SectionTitle from '../SectionTitle';
-import ContributeCardsContainer from '../contribute-cards/ContributeCardsContainer';
-import ContributeCustom from '../contribute-cards/ContributeCustom';
-import ContributeTier from '../contribute-cards/ContributeTier';
-import ContributeEvent from '../contribute-cards/ContributeEvent';
+import CreateNew from '../../contribute-cards/CreateNew';
+
+const CONTRIBUTE_CARD_PADDING_X = [3, 21];
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -26,7 +28,12 @@ import ContributeEvent from '../contribute-cards/ContributeEvent';
 class SectionContribute extends React.PureComponent {
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object),
-    events: PropTypes.arrayOf(PropTypes.object),
+    events: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        contributors: PropTypes.arrayOf(PropTypes.object),
+      }),
+    ),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
@@ -36,8 +43,10 @@ class SectionContribute extends React.PureComponent {
       PropTypes.shape({
         type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
         isBacker: PropTypes.bool,
+        tiersIds: PropTypes.arrayOf(PropTypes.number),
       }),
     ),
+    isAdmin: PropTypes.bool,
   };
 
   getTopContributors = memoizeOne(contributors => {
@@ -78,15 +87,20 @@ class SectionContribute extends React.PureComponent {
     return [topOrgs.slice(0, takeNbOrgs), topIndividuals.slice(0, takeNbIndividuals)];
   });
 
-  getFinancialContributors = memoizeOne(contributors => {
-    return contributors.filter(c => c.isBacker);
+  getFinancialContributorsWithoutTier = memoizeOne(contributors => {
+    return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
+  });
+
+  hasContributors = memoizeOne(contributors => {
+    return contributors.find(c => c.isBacker);
   });
 
   render() {
-    const { collective, tiers, events, contributors, contributorsStats } = this.props;
+    const { collective, tiers, events, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
-    const financialContributors = this.getFinancialContributors(contributors);
-    const hasNoContributor = financialContributors.length === 0;
+    const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
+    const hasNoContributor = !this.hasContributors(contributors);
+    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
 
     return (
       <Box pt={[4, 5]}>
@@ -112,35 +126,39 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  <Box px={[3, 24]}>
+                  <Box px={CONTRIBUTE_CARD_PADDING_X}>
                     <ContributeCustom
                       collective={collective}
-                      contributors={financialContributors}
+                      contributors={financialContributorsWithoutTier}
                       stats={contributorsStats}
                       hideContributors={hasNoContributor}
                     />
                   </Box>
                   {tiers.map(tier => (
-                    <Box key={tier.id} px={[3, 24]}>
+                    <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
                       <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
                     </Box>
                   ))}
+                  {isAdmin && (
+                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                      <CreateNew route={`/${collective.slug}/edit/tiers`}>
+                        <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+                      </CreateNew>
+                    </Box>
+                  )}
                 </ContributeCardsContainer>
               </div>
             )}
           </HorizontalScroller>
         </Box>
-        {events.length > 0 && (
+        {(isAdmin || events.length > 0) && (
           <HorizontalScroller>
             {(ref, Chevrons) => (
               <div>
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
                     <H3 fontSize="H5" fontWeight="600" color="black.700">
-                      <FormattedMessage
-                        id="CollectivePage.MoreWaysToContribute"
-                        defaultMessage="More ways to contribute"
-                      />
+                      <FormattedMessage id="section.events.title" defaultMessage="Events" />
                     </H3>
                     <Box m={2} flex="0 0 50px">
                       <Chevrons />
@@ -149,18 +167,30 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  {events.map(event => (
-                    <Box key={event.id} px={[3, 24]}>
-                      <ContributeEvent collective={collective} event={event} />
+                  {events &&
+                    events.map(event => (
+                      <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                        <ContributeEvent
+                          collective={collective}
+                          event={event}
+                          hideContributors={hasNoContributorForEvents}
+                        />
+                      </Box>
+                    ))}
+                  {isAdmin && (
+                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                      <CreateNew route={`/${collective.slug}/events/create`}>
+                        <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                      </CreateNew>
                     </Box>
-                  ))}
+                  )}
                 </ContributeCardsContainer>
               </div>
             )}
           </HorizontalScroller>
         )}
         <ContainerSectionContent>
-          <Link route="tiers" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
             <StyledButton buttonSize="large" mt={3} width={1} p="10px">
               <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
             </StyledButton>
