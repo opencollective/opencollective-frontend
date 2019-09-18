@@ -219,6 +219,7 @@
   "collective.website.description": "Задайте адрес вашего сайта или страницы Facebook",
   "collective.website.label": "Сайт",
   "CollectiveColorPicker.Custom": "Использовать собственный цвет",
+  "CollectiveColorPicker.Error": "Please use an hexadecimal value (eg. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Предустановленные цвета",
   "CollectiveColorPicker.Title": "Выберите цвет страницы",
   "CollectivePage.AddLongDescription": "Добавить описание",
