@@ -114,6 +114,7 @@ const getTierData = graphql(gql`
         name
         backgroundImage
         settings
+        currency
         admins: members(role: "ADMIN") {
           id
           role

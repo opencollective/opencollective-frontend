@@ -93,4 +93,5 @@ ContributorAvatar.propTypes = {
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
+/** @component */
 export default Avatar;

@@ -364,6 +364,7 @@
   "ContributionType.Goal": "Ziel",
   "ContributionType.OneTime": "Einmalige Spende",
   "ContributionType.Recurring": "Regelmäßige Spende",
+  "ContributorCard.Total": "Total contributions",
   "ContributorsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed",
   "ContributorsFilter.All": "Alle Unterstützer",
   "ContributorsFilter.Core": "Core contributors",

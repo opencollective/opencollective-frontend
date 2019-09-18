@@ -176,6 +176,7 @@ const getCollective = graphql(gql`
         isBacker
         isFundraiser
         since
+        image
         description
         collectiveSlug
         totalAmountDonated

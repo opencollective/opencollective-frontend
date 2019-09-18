@@ -37,6 +37,7 @@ export default class SectionContributors extends React.PureComponent {
     collective: PropTypes.shape({
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
     }),
     contributors: PropTypes.arrayOf(
       PropTypes.shape({
@@ -156,6 +157,7 @@ export default class SectionContributors extends React.PureComponent {
         <Box mb={4}>
           <ContributorsGrid
             contributors={sortedContributors}
+            currency={collective.currency}
             getPaddingLeft={({ width, rowWidth, nbRows }) => {
               if (width < Dimensions.MAX_SECTION_WIDTH) {
                 // No need for padding on screens small enough so they don't have padding
