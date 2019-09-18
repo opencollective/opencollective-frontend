@@ -9,6 +9,7 @@ import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
@@ -121,108 +122,36 @@ class NewCollectivePage extends React.Component {
 }
 
 // eslint-disable graphql/template-strings
-const getCollective = graphql(gql`
-  query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
-    Collective(slug: $slug) {
-      id
-      slug
-      path
-      name
-      description
-      longDescription
-      backgroundImage
-      twitterHandle
-      githubHandle
-      website
-      tags
-      company
-      type
-      currency
-      settings
-      isApproved
-      isArchived
-      isHost
-      hostFeePercent
-      image
-      imageUrl
-      stats {
+const getCollective = graphql(
+  gql`
+    query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+      Collective(slug: $slug) {
         id
-        balance
-        yearlyBudget
-        updates
-        backers {
-          id
-          all
-          users
-          organizations
-        }
-      }
-      parentCollective {
-        id
-        image
+        slug
+        path
+        name
+        description
+        longDescription
+        backgroundImage
         twitterHandle
+        githubHandle
+        website
+        tags
+        company
         type
-      }
-      host {
-        id
-        name
-        slug
-        type
-      }
-      coreContributors: contributors(roles: [ADMIN, MEMBER]) {
-        ...ContributorsFieldsFragment
-      }
-      financialContributors: contributors(roles: [BACKER], limit: 150) {
-        ...ContributorsFieldsFragment
-      }
-      tiers {
-        id
-        name
-        slug
-        description
-        hasLongDescription
-        goal
-        interval
         currency
-        amount
-        minimumAmount
-        button
-        stats {
-          id
-          totalDonated
-          totalRecurringDonations
-          contributors {
-            id
-            all
-            users
-            organizations
-          }
-        }
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-        }
-      }
-      events(includePastEvents: true) {
-        id
-        slug
-        name
-        description
+        settings
+        isApproved
+        isArchived
+        isHost
+        hostFeePercent
         image
-        startsAt
-        endsAt
-        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-        }
+        imageUrl
         stats {
           id
+          balance
+          yearlyBudget
+          updates
           backers {
             id
             all
@@ -230,17 +159,99 @@ const getCollective = graphql(gql`
             organizations
           }
         }
-      }
-      ...TransactionsAndExpensesFragment
-      updates(limit: 3, onlyPublishedUpdates: true) {
-        ...UpdatesFieldsFragment
+        parentCollective {
+          id
+          image
+          twitterHandle
+          type
+        }
+        host {
+          id
+          name
+          slug
+          type
+        }
+        coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+          ...ContributorsFieldsFragment
+        }
+        financialContributors: contributors(roles: [BACKER], limit: 150) {
+          ...ContributorsFieldsFragment
+        }
+        tiers {
+          id
+          name
+          slug
+          description
+          hasLongDescription
+          goal
+          interval
+          currency
+          amount
+          minimumAmount
+          button
+          stats {
+            id
+            totalDonated
+            totalRecurringDonations
+            contributors {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            image
+            collectiveSlug
+            name
+            type
+          }
+        }
+        events(includePastEvents: true) {
+          id
+          slug
+          name
+          description
+          image
+          startsAt
+          endsAt
+          contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+            id
+            image
+            collectiveSlug
+            name
+            type
+          }
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+        }
+        ...TransactionsAndExpensesFragment
+        updates(limit: 3, onlyPublishedUpdates: true) {
+          ...UpdatesFieldsFragment
+        }
       }
     }
-  }
 
-  ${fragments.TransactionsAndExpensesFragment}
-  ${fragments.UpdatesFieldsFragment}
-  ${fragments.ContributorsFieldsFragment}
-`);
+    ${fragments.TransactionsAndExpensesFragment}
+    ${fragments.UpdatesFieldsFragment}
+    ${fragments.ContributorsFieldsFragment}
+  `,
+  {
+    options: props => ({
+      variables: {
+        slug: props.slug,
+        nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+      },
+    }),
+  },
+);
 
 export default withUser(getCollective(NewCollectivePage));
