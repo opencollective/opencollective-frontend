@@ -35,7 +35,6 @@ const ExpectedContributorsPropTypes = PropTypes.shape({
   roles: PropTypes.arrayOf(PropTypes.string.isRequired),
   isCore: PropTypes.bool.isRequired,
   isBacker: PropTypes.bool.isRequired,
-  isFundraiser: PropTypes.bool.isRequired,
   totalAmountDonated: PropTypes.number.isRequired,
 });
 
