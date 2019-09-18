@@ -21,6 +21,7 @@ import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
 
 const BASE_WIDTH = 1368;
 const BASE_HEIGHT = 325;
+export const FETCHED_BACKGROUND_HEIGHT = BASE_HEIGHT * 2; // use 2x real size for retina screens
 
 // Dynamically import cropper component
 const EditBackgroundLoadingPlaceholder = () => <LoadingPlaceholder height={BASE_HEIGHT} />;
@@ -106,6 +107,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
   const [zoom, onZoomChange] = React.useState(getZoom(collective));
   const [uploadedImage, setUploadedImage] = React.useState();
   const [submitting, setSubmitting] = React.useState(false);
+  const [uploadedImageSize, setUploadedImageSize] = React.useState(null);
   const hasBackgroundSettings = has(collective.settings, 'collectivePage.background');
 
   return !isEditing ? (
@@ -134,11 +136,12 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             crop={crop}
             zoom={zoom}
             minZoom={0.25}
-            maxZoom={5}
+            maxZoom={uploadedImageSize ? Math.max(1, BASE_HEIGHT / uploadedImageSize.naturalHeight) : 5} // If we allow to much, the resized image will be low-quality
             zoomSpeed={0.5}
             restrictPosition={false}
             onCropChange={onCropChange}
             onZoomChange={onZoomChange}
+            onImageLoaded={setUploadedImageSize}
             style={{
               imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
               containerStyle: { height: BASE_HEIGHT },
@@ -180,7 +183,13 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 minWidth={150}
                 ml={3}
                 disabled={submitting}
-                onClick={() => (uploadedImage ? setUploadedImage(null) : setUploadedImage(KEY_IMG_REMOVE))}
+                onClick={() => {
+                  const uploadedImage = uploadedImage ? null : KEY_IMG_REMOVE;
+                  setUploadedImage(uploadedImage);
+                  onCropChange(DEFAULT_CROP);
+                  onZoomChange(1);
+                  setUploadedImageSize(null);
+                }}
               >
                 <FormattedMessage id="Remove" defaultMessage="Remove" />
               </StyledButton>
@@ -195,6 +204,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 onCropChange((base && base.crop) || DEFAULT_CROP);
                 onZoomChange((base && base.zoom) || 1);
                 setUploadedImage(null);
+                setUploadedImageSize(null);
                 onEditCancel();
               }}
             >
@@ -211,12 +221,19 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
 
                 try {
                   let imgURL = collective.backgroundImageUrl;
+                  let newBackgroundParams = { zoom, crop };
 
                   // Upload image if changed or remove it
                   if (uploadedImage === KEY_IMG_REMOVE) {
                     imgURL = null;
                   } else if (uploadedImage) {
                     imgURL = await upload(uploadedImage);
+                    const zoomRatio = uploadedImageSize.naturalHeight / FETCHED_BACKGROUND_HEIGHT;
+                    const offsetRatio = FETCHED_BACKGROUND_HEIGHT / uploadedImageSize.naturalHeight;
+                    newBackgroundParams = {
+                      zoom: zoom * zoomRatio,
+                      crop: { x: crop.x * offsetRatio, y: crop.y * offsetRatio },
+                    };
                   }
 
                   // Update settings
@@ -224,7 +241,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                     variables: {
                       id: collective.id,
                       backgroundImage: imgURL,
-                      settings: set({ ...collective.settings }, 'collectivePage.background', { crop, zoom }),
+                      settings: set({ ...collective.settings }, 'collectivePage.background', newBackgroundParams),
                     },
                   });
 
@@ -233,6 +250,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                   onCropChange((base && base.crop) || DEFAULT_CROP);
                   onZoomChange((base && base.zoom) || 1);
                   setUploadedImage(null);
+                  setUploadedImageSize(null);
 
                   // Close the form
                   onEditCancel();
