@@ -10,7 +10,7 @@ export const CONTRIBUTOR_FILTERS = {
   FINANCIAL: 'FINANCIAL',
 };
 
-const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
+export const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
 
 const Translations = defineMessages({
   [CONTRIBUTOR_FILTERS.ALL]: {

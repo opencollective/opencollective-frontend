@@ -70,3 +70,25 @@ export const UpdatesFieldsFragment = gql`
     }
   }
 `;
+
+/**
+ * Fields fetched for contributors
+ */
+export const ContributorsFieldsFragment = gql`
+  fragment ContributorsFieldsFragment on Contributor {
+    id
+    name
+    roles
+    isAdmin
+    isCore
+    isBacker
+    since
+    image
+    description
+    collectiveSlug
+    totalAmountDonated
+    type
+    publicMessage
+    isIncognito
+  }
+`;

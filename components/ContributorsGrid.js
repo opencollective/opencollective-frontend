@@ -152,16 +152,6 @@ ContributorsGrid.propTypes = {
   contributors: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      image: PropTypes.string.isRequired,
-      roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-      isCore: PropTypes.bool.isRequired,
-      isBacker: PropTypes.bool.isRequired,
-      isFundraiser: PropTypes.bool.isRequired,
-      totalAmountDonated: PropTypes.number,
-      publicMessage: PropTypes.string,
-      collectiveSlug: PropTypes.string,
-      type: PropTypes.string,
     }),
   ),
 

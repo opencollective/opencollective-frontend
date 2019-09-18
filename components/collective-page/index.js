@@ -30,7 +30,8 @@ class CollectivePage extends Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     host: PropTypes.object,
-    contributors: PropTypes.arrayOf(PropTypes.object),
+    financialContributors: PropTypes.arrayOf(PropTypes.object),
+    coreContributors: PropTypes.arrayOf(PropTypes.object),
     topOrganizations: PropTypes.arrayOf(PropTypes.object),
     topIndividuals: PropTypes.arrayOf(PropTypes.object),
     tiers: PropTypes.arrayOf(PropTypes.object),
@@ -150,12 +151,19 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
-            contributors={this.props.contributors}
+            contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
           />
         );
       case Sections.CONTRIBUTORS:
-        return <SectionContributors collective={this.props.collective} contributors={this.props.contributors} />;
+        return (
+          <SectionContributors
+            collective={this.props.collective}
+            financialContributors={this.props.financialContributors}
+            coreContributors={this.props.coreContributors}
+            stats={this.props.stats}
+          />
+        );
       case Sections.UPDATES:
         return (
           <SectionUpdates

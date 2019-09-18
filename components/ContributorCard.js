@@ -122,7 +122,6 @@ ContributorCard.propTypes = {
     isAdmin: PropTypes.bool.isRequired,
     isBacker: PropTypes.bool.isRequired,
     isCore: PropTypes.bool.isRequired,
-    isFundraiser: PropTypes.bool.isRequired,
   }).isRequired,
   /** The currency used to show the contributions */
   currency: PropTypes.string,
