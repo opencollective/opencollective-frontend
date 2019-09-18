@@ -15,15 +15,17 @@ import Container from '../Container';
 
 /** Max number of contributors on each tier card */
 export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
+export const CONTRIBUTE_CARD_WIDTH = 280;
+export const CONTRIBUTE_CARD_BORDER_RADIUS = 16;
 
 /** The main container */
 const StyledContributeCard = styled.div`
   display: flex;
   flex-direction: column;
-  width: 280px;
-  flex: 0 0 280px;
+  width: ${CONTRIBUTE_CARD_WIDTH}px;
+  flex: 0 0 ${CONTRIBUTE_CARD_WIDTH}px;
   height: 100%;
-  border-radius: 16px;
+  border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
 `;
 

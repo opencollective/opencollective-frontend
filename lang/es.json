@@ -292,6 +292,7 @@
   "contribute.changeTaxNumber": "Cambiar {taxName} numero",
   "contribute.ContributionDetailsTitle": "Contribution details:",
   "contribute.contributorType": "Contribute to \"{name}\" tier",
+  "Contribute.CreateTier": "Create Contribution Tier",
   "contribute.details.label": "Detalles de la contribución:",
   "contribute.enterTaxNumber": "Ingrese {taxName} numero (si usted tiene uno)",
   "contribute.freeTicket": "Este es un ticket gratis, puede enviar su pedido directamente.",

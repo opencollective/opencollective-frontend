@@ -17,6 +17,9 @@ import ContributeCardsContainer from '../ContributeCardsContainer';
 import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
 import SectionTitle from '../SectionTitle';
+import CreateNew from '../../contribute-cards/CreateNew';
+
+const CONTRIBUTE_CARD_PADDING_X = [3, 21];
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -43,6 +46,7 @@ class SectionContribute extends React.PureComponent {
         tiersIds: PropTypes.arrayOf(PropTypes.number),
       }),
     ),
+    isAdmin: PropTypes.bool,
   };
 
   getTopContributors = memoizeOne(contributors => {
@@ -92,7 +96,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { collective, tiers, events, contributors, contributorsStats } = this.props;
+    const { collective, tiers, events, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
@@ -122,7 +126,7 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  <Box px={[3, 21]}>
+                  <Box px={CONTRIBUTE_CARD_PADDING_X}>
                     <ContributeCustom
                       collective={collective}
                       contributors={financialContributorsWithoutTier}
@@ -131,16 +135,23 @@ class SectionContribute extends React.PureComponent {
                     />
                   </Box>
                   {tiers.map(tier => (
-                    <Box key={tier.id} px={[3, 21]}>
+                    <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
                       <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
                     </Box>
                   ))}
+                  {isAdmin && (
+                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                      <CreateNew route={`/${collective.slug}/edit/tiers`}>
+                        <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+                      </CreateNew>
+                    </Box>
+                  )}
                 </ContributeCardsContainer>
               </div>
             )}
           </HorizontalScroller>
         </Box>
-        {events.length > 0 && (
+        {(isAdmin || events.length > 0) && (
           <HorizontalScroller>
             {(ref, Chevrons) => (
               <div>
@@ -156,15 +167,23 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  {events.map(event => (
-                    <Box key={event.id} px={[3, 21]}>
-                      <ContributeEvent
-                        collective={collective}
-                        event={event}
-                        hideContributors={hasNoContributorForEvents}
-                      />
+                  {events &&
+                    events.map(event => (
+                      <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                        <ContributeEvent
+                          collective={collective}
+                          event={event}
+                          hideContributors={hasNoContributorForEvents}
+                        />
+                      </Box>
+                    ))}
+                  {isAdmin && (
+                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                      <CreateNew route={`/${collective.slug}/events/create`}>
+                        <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                      </CreateNew>
                     </Box>
-                  ))}
+                  )}
                 </ContributeCardsContainer>
               </div>
             )}

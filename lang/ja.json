@@ -292,6 +292,7 @@
   "contribute.changeTaxNumber": "{taxName} 番号を変更",
   "contribute.ContributionDetailsTitle": "Contribution details:",
   "contribute.contributorType": "Contribute to \"{name}\" tier",
+  "Contribute.CreateTier": "Create Contribution Tier",
   "contribute.details.label": "コントリビュートの詳細:",
   "contribute.enterTaxNumber": "{taxName} 番号を入力 (あるのなら)",
   "contribute.freeTicket": "これは無料チケットです。直接注文できます。",

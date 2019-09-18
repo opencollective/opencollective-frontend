@@ -292,6 +292,7 @@
   "contribute.changeTaxNumber": "Verander {taxName} nummer",
   "contribute.ContributionDetailsTitle": "Details Bijdrage:",
   "contribute.contributorType": "Contribute to \"{name}\" tier",
+  "Contribute.CreateTier": "Create Contribution Tier",
   "contribute.details.label": "Details Bijdrage:",
   "contribute.enterTaxNumber": "Geef {taxName} nummer in (als je er één hebt)",
   "contribute.freeTicket": "Dit is een gratis ticket, je kan je bestelling rechtstreeks ingeven.",
