@@ -213,6 +213,7 @@ const processBacker = async FromCollectiveId => {
       collectivesWithOrders.push({
         ...collective,
         orders: ordersByCollectiveId[collective.id],
+        order: computeOrderSummary(ordersByCollectiveId[collective.id]),
       });
     }
   });
@@ -394,6 +395,27 @@ const getTopKeysFromObject = (obj, valueAttr, limit = 3) => {
     topValues.push(values[i].value);
   }
   return topValues;
+};
+
+const computeOrderSummary = orders => {
+  const orderSummary = {
+    totalAmount: '',
+    totalAmountPerCurrency: {},
+    Subscription: null,
+  };
+  if (orders && orders.length > 0) {
+    for (const order of orders) {
+      orderSummary.totalAmountPerCurrency[order.currency] = orderSummary.totalAmountPerCurrency[order.currency] || 0;
+      orderSummary.totalAmountPerCurrency[order.currency] += order.totalAmount;
+
+      if (order.Subscription && order.Subscription.isActive) {
+        orderSummary.Subscription = order.Subscription;
+      }
+    }
+  }
+
+  orderSummary.totalAmount = formatCurrencyObject(orderSummary.totalAmountPerCurrency);
+  return orderSummary;
 };
 
 const computeStats = async (collectives, currency = 'USD') => {

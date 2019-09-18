@@ -231,7 +231,7 @@ Subject: {{{capitalize month}}} Report
               (<a href="{{../config.host.website}}/{{../fromCollective.slug}}/subscriptions">increase your contribution</a>)
               (<a href="https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}}">share their goal</a>)
               {{else}}
-              You have contributed {{{currency order.totalAmount currency=order.currency}}}.
+              You have contributed {{{order.totalAmount}}}.
               (<a href="{{../config.host.website}}/{{slug}}/donate">increase your contribution</a>)
               (<a href="https://twitter.com/intent/tweet?text={{{encodeURIComponent nextGoal.tweet}}}">share their goal</a>)
               {{/if}}
