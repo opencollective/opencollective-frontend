@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { typography, size } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import { Flex } from '@rebass/grid';
 
 const IconCheckmark = () => {
   return (
@@ -34,10 +33,11 @@ const CustomCheckbox = styled.span`
   }
 `;
 
-const CheckboxContainer = styled(Flex)`
+const CheckboxContainer = styled.div`
+  display: flex;
   align-items: center;
   width: 100%;
-  ${size}
+  line-height: 1.4em;
   ${typography}
 
   /* Hide the default checkbox */
