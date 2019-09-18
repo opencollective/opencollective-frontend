@@ -214,7 +214,7 @@ const getCollective = graphql(gql`
         image
         startsAt
         endsAt
-        contributors(limit: $nbContributorsPerContributeCard) {
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
           id
           image
           collectiveSlug
