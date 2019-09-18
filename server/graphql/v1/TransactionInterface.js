@@ -13,7 +13,7 @@ import {
 
 import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
-import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString } from './types';
+import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString, ExpenseType } from './types';
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: 'Transaction',
@@ -297,13 +297,13 @@ export const TransactionExpenseType = new GraphQLObjectType({
             : null;
         },
       },
-      expenseId: {
-        type: GraphQLInt,
+      expense: {
+        type: ExpenseType,
         resolve(transaction, args, req) {
           // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
           // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.id)
+          return transaction.getExpense
+            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense)
             : null;
         },
       },
