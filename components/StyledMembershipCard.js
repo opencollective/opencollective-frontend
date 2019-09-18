@@ -18,10 +18,11 @@ import StyledTag from './StyledTag';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 
 const getBackground = collective => {
-  const backgroundImage = collective.backgroundImage || get(collective, 'parentCollective.backgroundImage');
+  const backgroundImage = collective.backgroundImageUrl || get(collective, 'parentCollective.backgroundImageUrl');
+  const primaryColor = get(collective.settings, 'collectivePage.primaryColor', '#1776E1');
   return backgroundImage
-    ? `url(/static/images/collective-card-mask.png) bottom, url(${backgroundImage}) no-repeat, #1776E1`
-    : 'url(/static/images/collective-card-mask.png) bottom, #1776E1';
+    ? `url(/static/images/collective-card-mask.svg) 0 0 / cover no-repeat, url(${backgroundImage}) 0 0 / cover no-repeat, ${primaryColor}`
+    : `url(/static/images/collective-card-mask.svg) 0 0 / cover no-repeat, ${primaryColor}`;
 };
 
 /**
@@ -121,13 +122,14 @@ StyledMembershipCard.propTypes = {
       type: PropTypes.string.isRequired,
       description: PropTypes.string,
       currency: PropTypes.string,
-      backgroundImage: PropTypes.string,
+      backgroundImageUrl: PropTypes.string,
       tags: PropTypes.arrayOf(PropTypes.string),
+      settings: PropTypes.object,
       host: PropTypes.shape({
         id: PropTypes.number,
       }),
       parentCollective: PropTypes.shape({
-        backgroundImage: PropTypes.string,
+        backgroundImageUrl: PropTypes.string,
       }),
       stats: PropTypes.shape({
         yearlyBudget: PropTypes.numer,

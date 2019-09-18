@@ -76,8 +76,10 @@ const ParentedCollectivesQuery = gql`
         currency
         isIncognito
         description
-        backgroundImage
+        imageUrl(height: 128)
+        backgroundImageUrl(height: 200)
         tags
+        settings
         parentCollective {
           id
           backgroundImage
@@ -321,11 +323,12 @@ const withData = graphql(
             currency
             isIncognito
             description
-            backgroundImage
+            imageUrl(height: 128)
+            backgroundImageUrl(height: 200)
             tags
             parentCollective {
               id
-              backgroundImage
+              backgroundImageUrl(height: 200)
             }
             host {
               id
