@@ -48,6 +48,8 @@
   "ApplyToHostBtnLoggedIn.TOS": "I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective.",
   "authorization.loginRequired": "您需要登录才能继续。",
   "button.submit": "提交",
+  "Clipboard.Copied": "Copied!",
+  "Clipboard.Copy": "Copy to clipboard",
   "collective": "我的集体",
   "collective.about.title": "关于",
   "collective.addHostBtn": "Add a host",

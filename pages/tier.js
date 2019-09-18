@@ -145,6 +145,7 @@ const getTierData = graphql(gql`
         description
         publicMessage
         collectiveSlug
+        totalAmountDonated
         type
         isIncognito
       }

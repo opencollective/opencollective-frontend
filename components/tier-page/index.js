@@ -27,10 +27,18 @@ import TierLongDescription from './TierLongDescription';
 import TierVideo from './TierVideo';
 import BubblesSVG from './Bubbles.svg';
 
+const generateBackground = (theme, image) => {
+  const color = theme.colors.primary[300];
+  const gradient = `linear-gradient(0deg, ${theme.colors.primary[800]}, ${theme.colors.primary[400]})`;
+  const imageCss = image ? `url(${image}), ` : '';
+  return `${imageCss}${gradient}, ${color}`;
+};
+
 /** The blured background image displayed under the tier description */
-const TierCover = styled(Container)`
+const TierCover = styled.div`
   width: 100%;
   height: ${Dimensions.COVER_HEIGHT}px;
+  background: ${props => generateBackground(props.theme, props.backgroundImage)};
   background-color: ${props => props.theme.colors.primary[300]};
   background-repeat: no-repeat;
   background-size: cover;
@@ -169,9 +177,7 @@ class TierPage extends Component {
         </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
-            <TierCover
-              backgroundImage={collective.backgroundImage ? `url(${collective.backgroundImage})` : undefined}
-            />
+            <TierCover backgroundImage={collective.backgroundImage} />
           </Container>
           <Container
             position="absolute"
