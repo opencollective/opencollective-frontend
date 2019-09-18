@@ -928,6 +928,7 @@
   "sections.team.edit": "Éditer les membres de l'équipe",
   "sections.update.new": "Créer une actualité",
   "SectionTransactions.All": "Tout",
+  "SectionTransactions.Contributions": "Contributions",
   "SectionTransactions.Empty": "Aucune transaction.",
   "SectionTransactions.Title": "Transactions",
   "SectionUpdates.PostFirst": "Utilisez cette section pour promouvoir vos actions et tenir votre communauté informée.",
