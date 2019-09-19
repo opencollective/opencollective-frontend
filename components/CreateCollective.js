@@ -76,16 +76,27 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    if (!CollectiveInputType.tos) {
-      this.setState({
-        result: { error: 'Please accept the terms of service' },
-      });
+    const websiteRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+
+    if (!CollectiveInputType.name) {
+      this.error('Please enter a name');
       return;
-    }
-    if (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos) {
-      this.setState({
-        result: { error: 'Please accept the terms of fiscal sponsorship' },
-      });
+    } else if (!CollectiveInputType.description) {
+      this.error('Please enter a description');
+      return;
+    } else if (!CollectiveInputType.website) {
+      this.error('Please enter a website url');
+      return;
+    } else if (CollectiveInputType.description.length > 255) {
+      this.error('The description should be of less than 255 characters');
+    } else if (!websiteRegex.test(CollectiveInputType.website)) {
+      this.error('Please enter a valid website url');
+      return;
+    } else if (!CollectiveInputType.tos) {
+      this.error('Please accept the terms of service');
+      return;
+    } else if (get(this.host, 'settings.tos') && !CollectiveInputType.hostTos) {
+      this.error('Please accept the terms of fiscal sponsorship');
       return;
     }
     this.setState({ status: 'loading' });
@@ -220,6 +231,7 @@ class CreateCollective extends React.Component {
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}
+                  showForm={!this.state.result.success}
                 />
 
                 <div className="result">

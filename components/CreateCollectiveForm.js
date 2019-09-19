@@ -15,7 +15,9 @@ class CreateCollectiveForm extends React.Component {
     collective: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
+    onChange: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    showForm: PropTypes.bool,
   };
 
   constructor(props) {
@@ -212,6 +214,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   handleChange(fieldname, value) {
+    this.props.onChange();
     if (fieldname === 'category' && value === 'opensource') {
       return (window.location = '/opensource/apply');
     }
@@ -287,9 +290,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { host, collective, loading, intl } = this.props;
-
-    const showForm = Boolean(this.categories.length === 0 || this.state.collective.category);
+    const { host, collective, loading, intl, showForm } = this.props;
     const defaultStartsAt = new Date();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
