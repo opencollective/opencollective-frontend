@@ -1014,6 +1014,7 @@
   "tier.error.hostMissing": "Votre collectif a besoin d'une association qui puisse récolter de l'argent en votre nom avant de pouvoir recevoir de l'argent.",
   "tier.error.outOfStock": "Ce tier n'est plus disponible ({availableQuantity} disponible sur {maxQuantity})",
   "tier.expiration.label": "Expiration",
+  "tier.forceLongDescription": "The standalone tier page, represented by the \"Read more\" link, will be enabled automatically if you write a short description longer than 100 characters or if you've already set a long description. You can use this switch to force the display of the page.",
   "tier.goal.description": "Le montant que vous essayez d'atteindre",
   "tier.goal.label": "Objectif",
   "tier.interval": "par {interval, select, month {mois} year {an} other {}}",
