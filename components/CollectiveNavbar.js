@@ -276,13 +276,13 @@ const CollectiveNavbar = ({
       {/** Collective infos */}
       <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
-          <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
+          <LinkCollective collective={collective} onClick={onCollectiveClick}>
             <Container borderRadius="25%" mr={2}>
               <Avatar collective={collective} radius={40} />
             </Container>
           </LinkCollective>
           <CollectiveName>
-            <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion />
+            <LinkCollective collective={collective} onClick={onCollectiveClick} />
           </CollectiveName>
           {isAdmin && showEdit && (
             <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">

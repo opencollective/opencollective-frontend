@@ -22,21 +22,13 @@ const LinkCollective = ({
   title,
   collective: { type, slug, name, parentCollective, isIncognito },
   children,
-  isNewVersion,
   ...props
 }) => {
   if (type === 'USER' && (!name || isIncognito || !slug)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link
-      route={isNewVersion ? 'new-collective-page' : 'collective'}
-      params={{ slug }}
-      {...props}
-      title={title}
-      target={target}
-      passHref
-    >
+    <Link route="collective" params={{ slug }} {...props} title={title} target={target} passHref>
       {children || name || slug}
     </Link>
   ) : (
@@ -66,8 +58,6 @@ LinkCollective.propTypes = {
   }).isRequired,
   /** If not given, will render the name of the collective */
   children: PropTypes.node,
-  /** Link to the new collective page */
-  isNewVersion: PropTypes.bool,
   title: PropTypes.string,
   target: PropTypes.string,
 };
