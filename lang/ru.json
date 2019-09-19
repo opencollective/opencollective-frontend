@@ -1079,7 +1079,7 @@
   "tier.type.tier": "generic tier",
   "tier.type.tier.add": "добавить уровень",
   "tier.type.tier.remove": "удалить уровень",
-  "TierCard.DefaultDescription": "{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}} {minAmount, select, 0 {} other {for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!",
+  "TierCard.DefaultDescription": "{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!",
   "TierPage.AddDescription": "Add a short description",
   "TierPage.AddLongDescription": "Add a rich description",
   "TierPage.AddTitle": "Add a title",

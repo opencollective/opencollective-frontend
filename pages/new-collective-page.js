@@ -191,6 +191,7 @@ const getCollective = graphql(
           amount
           minimumAmount
           button
+          amountType
           stats {
             id
             totalDonated
