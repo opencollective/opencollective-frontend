@@ -71,6 +71,7 @@ const buildDisplayMap = options => {
 const StepDetails = ({
   amountOptions,
   currency,
+  disabledInterval,
   disabledAmount,
   minAmount,
   amount,
@@ -90,12 +91,15 @@ const StepDetails = ({
   const [showModal, setShowModal] = useState(false);
   const [tempInterval, setTempInterval] = useState(interval);
   const confirmIntervalChange = ({ interval }) => {
-    setTempInterval(interval);
-    setShowModal(true);
+    if (disabledInterval == true) {
+      setTempInterval(interval);
+      setShowModal(true);
+    } else {
+      dispatchChange({ interval });
+    }
   };
 
   const dispatchChange = values => {
-    console.log(values);
     onChange(getChangeFromState({ amount, interval, quantity, ...values }));
   };
   const intervalOptions = generateOptions(intl);
