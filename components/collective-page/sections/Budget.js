@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get, filter, orderBy, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
@@ -12,16 +12,13 @@ import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import Link from '../../Link';
-import DebitCreditList, { DebitItem, CreditItem } from '../../DebitCreditList';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
-import LinkCollective from '../../LinkCollective';
-import Avatar from '../../Avatar';
 import MessageBox from '../../MessageBox';
-import StyledLink from '../../StyledLink';
 
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 import { TransactionsAndExpensesFragment } from '../graphql/fragments';
+import BudgetItemsList from '../../BudgetItemsList';
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`
@@ -39,7 +36,7 @@ const TransactionsAndExpensesQuery = gql`
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, intl }) => {
+const SectionBudget = ({ collective, stats }) => {
   return (
     <ContainerSectionContent pt={[4, 5]}>
       <SectionTitle>
@@ -53,7 +50,7 @@ const SectionBudget = ({ collective, stats, intl }) => {
         />
       </P>
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
-        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }} pollInterval={15000}>
+        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }} pollInterval={60000}>
           {({ data }) => {
             const expenses = get(data, 'Collective.expenses');
             const transactions = get(data, 'Collective.transactions');
@@ -72,82 +69,11 @@ const SectionBudget = ({ collective, stats, intl }) => {
             // Merge items, filter expenses that already have a transaction as they'll already be
             // included in `transactions`.
             const unpaidExpenses = filter(expenses, e => !e.transaction);
-            const allItemsUnsorted = [...transactions, ...unpaidExpenses];
-            const allItems = orderBy(allItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
+            const budgetItemsUnsorted = [...transactions, ...unpaidExpenses];
+            const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
             return (
               <Container flex="10" mb={3} width="100%" maxWidth={800}>
-                <DebitCreditList>
-                  {allItems.map(item => {
-                    const { __typename, id, type, fromCollective, description, createdAt } = item;
-                    const isExpense = __typename === 'ExpenseType';
-                    const isCredit = type === 'CREDIT';
-                    const ItemContainer = isExpense || !isCredit ? DebitItem : CreditItem;
-                    const currency = collective.currency;
-
-                    return (
-                      <ItemContainer key={`${__typename}_${id}`}>
-                        <Container p={24} display="flex" justifyContent="space-between">
-                          <Flex>
-                            <Box mr={3}>
-                              <Avatar collective={fromCollective} radius={40} />
-                            </Box>
-                            <Flex flexDirection="column" justifyContent="space-between">
-                              <P color="black.900" fontWeight="600">
-                                {description}
-                              </P>
-                              <Container color="black.500">
-                                {item.usingVirtualCardFromCollective ? (
-                                  <FormattedMessage
-                                    id="Transactions.byWithGiftCard"
-                                    defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
-                                    values={{
-                                      collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
-                                      date: (
-                                        <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
-                                      ),
-                                      collectiveGiftCardName: item.usingVirtualCardFromCollective.name,
-                                      giftCard: (
-                                        <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" intl={intl} />
-                                      ),
-                                    }}
-                                  />
-                                ) : (
-                                  <FormattedMessage
-                                    id="Transactions.by"
-                                    defaultMessage="by {collectiveName} on {date}"
-                                    values={{
-                                      collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
-                                      date: (
-                                        <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />
-                                      ),
-                                    }}
-                                  />
-                                )}
-                              </Container>
-                            </Flex>
-                          </Flex>
-                          <P fontSize="LeadParagraph">
-                            {isCredit ? (
-                              <Span color="green.700" mr={2}>
-                                +
-                              </Span>
-                            ) : (
-                              <Span color="red.700" mr={2}>
-                                −
-                              </Span>
-                            )}
-                            <Span fontWeight="bold" mr={1}>
-                              {formatCurrency(Math.abs(item.amount), currency)}
-                            </Span>
-                            <Span color="black.400" textTransform="uppercase">
-                              {currency}
-                            </Span>
-                          </P>
-                        </Container>
-                      </ItemContainer>
-                    );
-                  })}
-                </DebitCreditList>
+                <BudgetItemsList items={budgetItems} />
                 <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
                   <StyledButton buttonSize="large" mt={4} width={1} py="10px">
                     <FormattedMessage
@@ -220,44 +146,6 @@ SectionBudget.propTypes = {
     balance: PropTypes.number.isRequired,
     yearlyBudget: PropTypes.number.isRequired,
   }),
-
-  /** Transactions */
-  transactions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number,
-      amount: PropTypes.number,
-      type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
-      usingVirtualCardFromCollective: PropTypes.shape({
-        id: PropTypes.number,
-        slug: PropTypes.string,
-        name: PropTypes.string,
-      }),
-      fromCollective: PropTypes.shape({
-        id: PropTypes.number,
-        slug: PropTypes.string,
-        name: PropTypes.string,
-      }),
-    }),
-  ),
-
-  /** Expenses */
-  expenses: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      amount: PropTypes.number.isRequired,
-      description: PropTypes.string.isRequired,
-      createdAt: PropTypes.string.isRequired,
-      category: PropTypes.string.isRequired,
-      transaction: PropTypes.shape({
-        id: PropTypes.number,
-      }),
-      fromCollective: PropTypes.shape({
-        id: PropTypes.number,
-        slug: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-      }).isRequired,
-    }),
-  ),
 
   /** @ignore from injectIntl */
   intl: PropTypes.object,

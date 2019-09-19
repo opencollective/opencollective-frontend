@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { BudgetItemExpenseTypeFragment, BudgetItemOrderFragment } from '../../BudgetItemsList';
 
 /**
  * Query the transactions and expenses for the collective, to show in the
@@ -7,45 +8,14 @@ import gql from 'graphql-tag';
 export const TransactionsAndExpensesFragment = gql`
   fragment TransactionsAndExpensesFragment on Collective {
     transactions(limit: 3) {
-      id
-      amount
-      description
-      type
-      createdAt
-      fromCollective {
-        id
-        slug
-        name
-        type
-        imageUrl
-        isIncognito
-      }
-      usingVirtualCardFromCollective {
-        id
-        slug
-        name
-        type
-      }
+      ...BudgetItemOrderFragment
     }
     expenses(limit: 3) {
-      id
-      amount
-      description
-      createdAt
-      category
-      transaction {
-        id
-      }
-      fromCollective {
-        id
-        slug
-        name
-        type
-        imageUrl
-        isIncognito
-      }
+      ...BudgetItemExpenseTypeFragment
     }
   }
+  ${BudgetItemOrderFragment}
+  ${BudgetItemExpenseTypeFragment}
 `;
 
 /**

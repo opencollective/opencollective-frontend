@@ -1,43 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl, defineMessages, FormattedDate } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
+import { Box } from '@rebass/grid';
 import { orderBy } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 
-import { formatCurrency } from '../../../lib/utils';
-import { P, Span } from '../../Text';
-import Container from '../../Container';
 import MessageBox from '../../MessageBox';
-import Avatar from '../../Avatar';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import DebitCreditList, { DebitItem, CreditItem } from '../../DebitCreditList';
 import StyledFilters from '../../StyledFilters';
-import LinkCollective from '../../LinkCollective';
-import StyledLink from '../../StyledLink';
 import StyledButton from '../../StyledButton';
 import Link from '../../Link';
 
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 import { Dimensions } from '../_constants';
+import BudgetItemsList, { BudgetItemExpenseTypeFragment, BudgetItemExpenseFragment } from '../../BudgetItemsList';
 
 const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
-
-const FILTERS = { ALL: 'ALL', CREDIT: 'CREDIT', DEBIT: 'DEBIT' };
+const NB_DISPLAYED = 10;
+const FILTERS = { ALL: 'ALL', EXPENSES: 'EXPENSES', CONTRIBUTIONS: 'CONTRIBUTIONS' };
 const FILTERS_LIST = Object.values(FILTERS);
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
     id: 'SectionTransactions.All',
     defaultMessage: 'All',
   },
-  [FILTERS.CREDIT]: {
+  [FILTERS.EXPENSES]: {
     id: 'section.expenses.title',
     defaultMessage: 'Expenses',
   },
-  [FILTERS.DEBIT]: {
+  [FILTERS.CONTRIBUTIONS]: {
     id: 'SectionTransactions.Contributions',
     defaultMessage: 'Contributions',
   },
@@ -50,39 +44,58 @@ class SectionTransactions extends React.Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
     }).isRequired,
 
     /** @ignore from withData */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       /** Expenses paid + refunds */
-      creditTransactions: PropTypes.arrayOf(
+      contributions: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
-          netAmountInCollectiveCurrency: PropTypes.number.isRequired,
+          amount: PropTypes.number.isRequired,
           createdAt: PropTypes.string.isRequired,
           type: PropTypes.string.isRequired,
+          description: PropTypes.string,
           fromcollective: PropTypes.shape({
             id: PropTypes.number.isRequired,
             name: PropTypes.string.isRequired,
             slug: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
+            imageUrl: PropTypes.string,
+            isIncognito: PropTypes.bool,
+          }),
+          usingVirtualCardFromCollective: PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            name: PropTypes.string.isRequired,
+            slug: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
           }),
         }),
       ),
       /** Financial contributions */
-      debitTransactions: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.number.isRequired,
-          netAmountInCollectiveCurrency: PropTypes.number.isRequired,
-          createdAt: PropTypes.string.isRequired,
-          type: PropTypes.string.isRequired,
-          collective: PropTypes.shape({
+      expenses: PropTypes.shape({
+        entries: PropTypes.arrayOf(
+          PropTypes.shape({
             id: PropTypes.number.isRequired,
-            name: PropTypes.string.isRequired,
-            slug: PropTypes.string.isRequired,
+            amount: PropTypes.number.isRequired,
+            description: PropTypes.string.isRequired,
+            createdAt: PropTypes.string.isRequired,
+            category: PropTypes.string.isRequired,
+            transaction: PropTypes.shape({
+              id: PropTypes.number,
+            }),
+            fromCollective: PropTypes.shape({
+              id: PropTypes.number,
+              slug: PropTypes.string.isRequired,
+              name: PropTypes.string.isRequired,
+              imageUrl: PropTypes.string,
+              isIncognito: PropTypes.bool,
+            }).isRequired,
           }),
-        }),
-      ),
+        ),
+      }),
     }),
 
     /** @ignore from injectIntl */
@@ -91,13 +104,13 @@ class SectionTransactions extends React.Component {
 
   state = { filter: FILTERS.ALL };
 
-  getAllTransactions = memoizeOne((credits, debits, filter) => {
-    if (filter === FILTERS.CREDIT) {
-      return credits;
-    } else if (filter === FILTERS.DEBIT) {
-      return debits;
+  getBudgetItems = memoizeOne((contributions, expenses, filter) => {
+    if (filter === FILTERS.EXPENSES) {
+      return expenses;
+    } else if (filter === FILTERS.CONTRIBUTIONS) {
+      return contributions;
     } else {
-      return orderBy([...credits, ...debits], t => new Date(t.createdAt), ['desc']).slice(0, 10);
+      return orderBy([...contributions, ...expenses], t => new Date(t.createdAt), ['desc']).slice(0, NB_DISPLAYED);
     }
   });
 
@@ -106,9 +119,13 @@ class SectionTransactions extends React.Component {
     const { filter } = this.state;
     let showFilters = true;
 
-    if (data.loading) {
+    if (!data || data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
-    } else if (data.creditTransactions.length === 0 && data.debitTransactions.length === 0) {
+    }
+
+    const contributions = data.contributions || [];
+    const expenses = (data.expenses && data.expenses.entries) || [];
+    if (contributions.length === 0 && expenses.length === 0) {
       return (
         <ContainerSectionContent pt={5} pb={6}>
           <SectionTitle mb={4} fontSize={['H4', 'H2']}>
@@ -119,11 +136,11 @@ class SectionTransactions extends React.Component {
           </MessageBox>
         </ContainerSectionContent>
       );
-    } else if (data.creditTransactions.length === 0 || data.debitTransactions.length === 0) {
+    } else if (contributions.length === 0 || expenses.length === 0) {
       showFilters = false;
     }
 
-    const transactions = this.getAllTransactions(data.creditTransactions, data.debitTransactions, filter);
+    const budgetItems = this.getBudgetItems(contributions, expenses, filter);
     return (
       <Box pt={5} pb={6}>
         <ContainerSectionContent>
@@ -144,54 +161,7 @@ class SectionTransactions extends React.Component {
         )}
 
         <ContainerSectionContent>
-          <DebitCreditList>
-            {transactions.map(transaction => {
-              const { id, currency, fromCollective, description, createdAt } = transaction;
-              const isCredit = transaction.type === 'CREDIT';
-              const amount = isCredit
-                ? transaction.netAmountInCollectiveCurrency
-                : transaction.netAmountInCollectiveCurrency * -1;
-              const ItemContainer = isCredit ? CreditItem : DebitItem;
-
-              return (
-                <ItemContainer key={id}>
-                  <Container p={24} display="flex" justifyContent="space-between">
-                    <Flex>
-                      <Box mr={3}>
-                        <Avatar collective={fromCollective} radius={40} />
-                      </Box>
-                      <Flex flexDirection="column" justifyContent="space-between">
-                        <P color="black.900" fontWeight="600">
-                          {description}
-                        </P>
-                        <P color="black.400">
-                          <StyledLink as={LinkCollective} collective={fromCollective} /> |{' '}
-                          <FormattedDate value={createdAt} />
-                        </P>
-                      </Flex>
-                    </Flex>
-                    <P fontSize="LeadParagraph">
-                      {isCredit ? (
-                        <Span color="green.700" mr={2}>
-                          +
-                        </Span>
-                      ) : (
-                        <Span color="red.700" mr={2}>
-                          −
-                        </Span>
-                      )}
-                      <Span fontWeight="bold" mr={1}>
-                        {formatCurrency(Math.abs(amount), currency)}
-                      </Span>
-                      <Span color="black.400" textTransform="uppercase">
-                        {currency}
-                      </Span>
-                    </P>
-                  </Container>
-                </ItemContainer>
-              );
-            })}
-          </DebitCreditList>
+          <BudgetItemsList items={budgetItems} isInverted />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
             <StyledButton mt={3} width="100%">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
@@ -206,40 +176,22 @@ class SectionTransactions extends React.Component {
 export default React.memo(
   graphql(
     gql`
-      query SectionCollective($id: Int!) {
-        creditTransactions: allTransactions(CollectiveId: $id, type: "CREDIT", limit: 10) {
-          id
-          netAmountInCollectiveCurrency
-          createdAt
-          type
-          currency
-          description
-          fromCollective {
-            id
-            name
-            slug
-            type
-          }
+      query SectionTransactions($id: Int!, $nbDisplayed: Int!) {
+        contributions: allTransactions(CollectiveId: $id, type: "DEBIT", limit: $nbDisplayed) {
+          ...BudgetItemExpenseFragment
         }
-        debitTransactions: allTransactions(CollectiveId: $id, type: "DEBIT", limit: 10) {
-          id
-          netAmountInCollectiveCurrency
-          createdAt
-          type
-          currency
-          description
-          fromCollective {
-            id
-            name
-            slug
-            type
+        expenses(FromCollectiveId: $id, limit: $nbDisplayed) {
+          entries: expenses {
+            ...BudgetItemExpenseTypeFragment
           }
         }
       }
+      ${BudgetItemExpenseFragment}
+      ${BudgetItemExpenseTypeFragment}
     `,
     {
       options(props) {
-        return { variables: { id: props.collective.id } };
+        return { variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED } };
       },
     },
   )(injectIntl(SectionTransactions)),
