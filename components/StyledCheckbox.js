@@ -39,6 +39,8 @@ const CheckboxContainer = styled.div`
   width: 100%;
   line-height: 1.4em;
   ${typography}
+  align-items: center;
+  width: 100%;
 
   /* Hide the default checkbox */
   input {
@@ -52,7 +54,6 @@ const CheckboxContainer = styled.div`
     cursor: pointer;
     margin: 0;
     margin-left: 1.5em;
-    color: black;
     z-index: 9;
     font-weight: normal;
   }
