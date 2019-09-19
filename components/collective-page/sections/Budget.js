@@ -74,15 +74,28 @@ const SectionBudget = ({ collective, stats }) => {
             return (
               <Container flex="10" mb={3} width="100%" maxWidth={800}>
                 <BudgetItemsList items={budgetItems} />
-                <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-                  <StyledButton buttonSize="large" mt={4} width={1} py="10px">
-                    <FormattedMessage
-                      id="CollectivePage.SectionBudget.ViewAll"
-                      defaultMessage="View all transactions"
-                    />{' '}
-                    →
-                  </StyledButton>
-                </Link>
+                <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
+                  <Box flex="1 1" mx={[0, 2]}>
+                    <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+                      <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
+                        <FormattedMessage
+                          id="CollectivePage.SectionBudget.ViewAll"
+                          defaultMessage="View all transactions"
+                        />
+                      </StyledButton>
+                    </Link>
+                  </Box>
+                  <Box flex="1 1" mx={[0, 2]}>
+                    <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
+                      <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
+                        <FormattedMessage
+                          id="CollectivePage.SectionBudget.ViewAllExpenses"
+                          defaultMessage="View all expenses"
+                        />
+                      </StyledButton>
+                    </Link>
+                  </Box>
+                </Flex>
               </Container>
             );
           }}
