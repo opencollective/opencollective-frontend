@@ -41,6 +41,7 @@ class CollectivePage extends Component {
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
+    isRoot: PropTypes.bool.isRequired,
     onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
@@ -117,7 +118,7 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin) => {
+  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
     return {
       hasContact: isCollective,
@@ -125,6 +126,7 @@ class CollectivePage extends Component {
       hasApply: isHost,
       hasDashboard: isHost && isAdmin,
       hasManageSubscriptions: !isHost && isAdmin && !isCollective,
+      addFunds: isRoot && type === CollectiveType.ORGANIZATION,
     };
   });
 
@@ -183,10 +185,10 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, isAdmin, onPrimaryColorChange } = this.props;
+    const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props);
-    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin);
+    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin, isRoot);
 
     return (
       <Container
