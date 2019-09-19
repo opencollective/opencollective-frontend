@@ -84,7 +84,10 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
             if (updateCopyBtnTimeout) {
               clearTimeout(updateCopyBtnTimeout);
             }
-            updateCopyBtnTimeout = setTimeout(() => setCopied(false), 3000);
+            updateCopyBtnTimeout = setTimeout(() => {
+              setCopied(false);
+              updateCopyBtnTimeout = null;
+            }, 3000);
           }}
         >
           <ContentCopy size={14} />

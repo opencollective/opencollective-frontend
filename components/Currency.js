@@ -19,7 +19,7 @@ const Currency = ({ abbreviate, currency, precision, value, ...styles }) => (
       abbreviate ? (
         <Span {...styles} whiteSpace="nowrap">
           {formattedNumber.slice(0, 1)}
-          {abbreviateNumber(value / 100, precision)}
+          {value > 0 && abbreviateNumber(value / 100, precision)}
         </Span>
       ) : (
         <Span {...styles} whiteSpace="nowrap">
