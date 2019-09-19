@@ -49,7 +49,6 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       collective: { type: CollectiveInterfaceType },
       type: { type: GraphQLString },
       description: { type: GraphQLString },
-      privateMessage: { type: GraphQLString },
       createdAt: { type: DateString },
       updatedAt: { type: DateString },
       refundTransaction: { type: TransactionInterfaceType },
@@ -277,40 +276,10 @@ export const TransactionExpenseType = new GraphQLObjectType({
           return transaction.description || expense;
         },
       },
-      privateMessage: {
-        type: GraphQLString,
-        resolve(transaction, args, req) {
-          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
-          // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage)
-            : null;
-        },
-      },
-      category: {
-        type: GraphQLString,
-        resolve(transaction, args, req) {
-          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
-          // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category)
-            : null;
-        },
-      },
       expense: {
         type: ExpenseType,
         resolve(transaction, args, req) {
           return req.loaders.expense.findById.load(transaction.ExpenseId);
-        },
-      },
-      attachment: {
-        type: GraphQLString,
-        resolve(transaction, args, req) {
-          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
-          // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment)
-            : null;
         },
       },
     };
