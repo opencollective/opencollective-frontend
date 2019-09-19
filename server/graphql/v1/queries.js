@@ -707,13 +707,18 @@ const queries = {
       };
 
       if (FromCollectiveId || FromCollectiveSlug) {
-        const { id } = await models.User.findOne({
+        const collectiveUser = await models.User.findOne({
           attributes: ['id'],
           where: {
             CollectiveId: FromCollectiveId || (await fetchCollectiveId(FromCollectiveSlug)),
           },
         });
-        query.where.UserId = id;
+
+        if (!collectiveUser) {
+          return { expenses: [], limit, offset, total: 0 };
+        }
+
+        query.where.UserId = collectiveUser.id;
       }
 
       if (category) query.where.category = { [Op.iLike]: category };
