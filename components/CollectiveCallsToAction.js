@@ -23,28 +23,28 @@ const CollectiveCallsToAction = ({
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
         <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
-          <StyledButton mx={2} minWidth={buttonsMinWidth}>
+          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="Contact" defaultMessage="Contact" />
           </StyledButton>
         </a>
       )}
       {hasSubmitExpense && (
         <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} minWidth={buttonsMinWidth} buttonStyle="secondary">
+          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} buttonStyle="secondary">
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </StyledButton>
         </Link>
       )}
       {hasManageSubscriptions && (
         <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} minWidth={buttonsMinWidth}>
+          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
           </StyledButton>
         </Link>
       )}
       {hasDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-          <StyledButton mx={2} minWidth={buttonsMinWidth}>
+          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
           </StyledButton>
         </Link>

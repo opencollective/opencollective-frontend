@@ -11,6 +11,7 @@ const StyledTag = styled.span`
   text-transform: uppercase;
   background: #F0F2F5;
   color: #71757A;
+  text-align: center;
 
   ${background}
   ${border}

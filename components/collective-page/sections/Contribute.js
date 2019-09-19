@@ -178,7 +178,7 @@ class SectionContribute extends React.PureComponent {
                       </Box>
                     ))}
                   {isAdmin && (
-                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                    <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
                       <CreateNew route={`/${collective.slug}/events/create`}>
                         <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
                       </CreateNew>

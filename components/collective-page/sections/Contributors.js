@@ -113,7 +113,7 @@ export default class SectionContributors extends React.PureComponent {
         <ContainerSectionContent>
           {!onlyShowCore ? (
             <React.Fragment>
-              <SectionTitle fontWeight="bold" fontSize={this.getTitleFontSize(collective.name)}>
+              <SectionTitle fontWeight="bold" fontSize={this.getTitleFontSize(collective.name)} lineHeight="1em">
                 <FormattedMessage
                   id="CollectivePage.AllOfUs"
                   defaultMessage="{collectiveName} is all of us"

@@ -223,7 +223,7 @@ class SectionContributions extends React.PureComponent {
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
-      <Box py={5}>
+      <Box pt={5}>
         {data.Collective.memberOf.length === 0 ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
@@ -238,7 +238,7 @@ class SectionContributions extends React.PureComponent {
         ) : (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionTitle textAlign={['center', 'left']} mb={4}>
+              <SectionTitle textAlign="left" mb={4}>
                 <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
               </SectionTitle>
             </ContainerSectionContent>
@@ -249,12 +249,13 @@ class SectionContributions extends React.PureComponent {
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
                   onChange={filter => this.setState({ selectedFilter: filter })}
                   selected={selectedFilter}
-                  justifyContent={['center', 'left']}
+                  justifyContent="left"
+                  minButtonWidth={175}
                 />
               </Box>
             )}
             <ContainerSectionContent>
-              <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
+              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
                   <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
                 ))}
@@ -278,14 +279,14 @@ class SectionContributions extends React.PureComponent {
               }
               return (
                 <section>
-                  <SectionTitle textAlign={['center', 'left']} mb={4}>
+                  <SectionTitle textAlign="left" mb={4}>
                     <FormattedMessage
                       id="CP.Contributions.PartOfOrg"
                       defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
                       values={{ n: collectives.length }}
                     />
                   </SectionTitle>
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                     {collectives.map(collective => (
                       <StyledMembershipCard key={collective.id} membership={{ collective }} mb={40} mr={[1, 4, 34]} />
                     ))}
