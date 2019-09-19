@@ -23,8 +23,20 @@ const ContributeCardsContainer = styled.div`
   }
 
   /** Respect left margin / center cards on widescreens */
-  @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
-    padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH + 10}px) / 2);
+
+  @supports (width: fit-content) {
+    @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
+      margin: 0 auto;
+      min-width: ${Dimensions.MAX_SECTION_WIDTH}px;
+      width: fit-content;
+      max-width: 100%;
+    }
+  }
+
+  @supports not (width: fit-content) {
+    @media (min-width: ${Dimensions.MAX_SECTION_WIDTH}px) {
+      padding-left: calc((100% - ${Dimensions.MAX_SECTION_WIDTH + 10}px) / 2);
+    }
   }
 `;
 

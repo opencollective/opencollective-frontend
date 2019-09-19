@@ -18,8 +18,9 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
 import SectionTitle from '../SectionTitle';
 import CreateNew from '../../contribute-cards/CreateNew';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 
-const CONTRIBUTE_CARD_PADDING_X = [3, 21];
+const CONTRIBUTE_CARD_PADDING_X = [15, 18];
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -95,6 +96,17 @@ class SectionContribute extends React.PureComponent {
     return contributors.find(c => c.isBacker);
   });
 
+  getContributeCardsScrollDistance(width) {
+    const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
+    if (width <= oneCardScrollDistance * 2) {
+      return oneCardScrollDistance;
+    } else if (width <= oneCardScrollDistance * 4) {
+      return oneCardScrollDistance * 2;
+    } else {
+      return oneCardScrollDistance * 3;
+    }
+  }
+
   render() {
     const { collective, tiers, events, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
@@ -111,7 +123,7 @@ class SectionContribute extends React.PureComponent {
         </ContainerSectionContent>
 
         <Box mb={4}>
-          <HorizontalScroller>
+          <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
                 <ContainerSectionContent>
@@ -152,7 +164,7 @@ class SectionContribute extends React.PureComponent {
           </HorizontalScroller>
         </Box>
         {(isAdmin || events.length > 0) && (
-          <HorizontalScroller>
+          <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
                 <ContainerSectionContent>
