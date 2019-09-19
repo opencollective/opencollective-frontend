@@ -13,6 +13,7 @@ import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
+import StyledCheckbox from './StyledCheckbox';
 
 const Tab = ({ active, children, setActive }) => (
   <Container
@@ -57,8 +58,22 @@ SecondaryAction.propTypes = {
   onSecondaryAction: PropTypes.func,
 };
 
+const NewsletterCheckBox = ({ onChange }) => {
+  return (
+    <StyledCheckbox
+      onChange={({ checked }) => onChange({ target: { name: 'newsletterOptIn', value: checked } })}
+      name="newsletterOptIn"
+      label="Receive our monthly newsletter with updates about new collectives and features."
+    />
+  );
+};
+
+NewsletterCheckBox.propTypes = {
+  onChange: PropTypes.func,
+};
+
 const useForm = ({ onEmailChange, errors }) => {
-  const [state, setState] = useState({ errors });
+  const [state, setState] = useState({ errors, newsletterOptIn: false });
 
   return {
     getFieldProps: name => ({
@@ -131,7 +146,7 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['firstName', 'lastName']);
+            const data = pick(state, ['firstName', 'lastName', 'newsletterOptIn']);
             onPersonalSubmit({ ...data, email });
           }}
           method="POST"
@@ -163,6 +178,10 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
+          <Box mb={4}>
+            <NewsletterCheckBox {...getFieldProps('newsletterOptIn')} />
+          </Box>
+
           <StyledButton
             buttonStyle="primary"
             disabled={!email}
@@ -182,7 +201,15 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']);
+            const data = pick(state, [
+              'firstName',
+              'lastName',
+              'orgName',
+              'website',
+              'githubHandle',
+              'twitterHandle',
+              'newsletterOptIn',
+            ]);
             onOrgSubmit({ ...data, email });
           }}
           method="POST"
@@ -251,6 +278,10 @@ const CreateProfile = ({
             <StyledInputField label="Twitter (optional)" htmlFor="twitterHandle" error={getFieldError('twitterHandle')}>
               {inputProps => <StyledInputGroup {...inputProps} {...getFieldProps(inputProps.name)} prepend="@" />}
             </StyledInputField>
+          </Box>
+
+          <Box mb={4}>
+            <NewsletterCheckBox {...getFieldProps('newsletterOptIn')} />
           </Box>
 
           <StyledButton
