@@ -507,6 +507,10 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       company: { type: GraphQLString },
       description: { type: GraphQLString },
       longDescription: { type: GraphQLString },
+      hasLongDescription: {
+        type: GraphQLBoolean,
+        description: 'Returns true if the collective has a long description',
+      },
       expensePolicy: { type: GraphQLString },
       mission: { type: GraphQLString },
       tags: { type: new GraphQLList(GraphQLString) },
@@ -804,6 +808,13 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.longDescription;
+      },
+    },
+    hasLongDescription: {
+      type: GraphQLBoolean,
+      description: 'Returns true if the collective has a long description',
+      resolve(collective) {
+        return Boolean(collective.longDescription);
       },
     },
     expensePolicy: {
