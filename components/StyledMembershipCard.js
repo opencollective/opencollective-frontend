@@ -15,7 +15,6 @@ import { P, Span } from './Text';
 import Avatar from './Avatar';
 import I18nCollectiveTags from './I18nCollectiveTags';
 import StyledTag from './StyledTag';
-import FormattedMoneyAmount from './FormattedMoneyAmount';
 
 const getBackground = collective => {
   const backgroundImage = collective.backgroundImageUrl || get(collective, 'parentCollective.backgroundImageUrl');
@@ -83,18 +82,15 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </P>
             ) : (
               <P mt={3} fontSize="Caption">
-                {collective.stats.yearlyBudget > 0 && (
+                {collective.stats.backers.all > 0 && (
                   <FormattedMessage
-                    id="StyledMembershipCard.YearlyBudget"
-                    defaultMessage="{amount} yearly budget"
+                    id="StyledMembershipCard.backers.all"
+                    defaultMessage="{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}"
                     values={{
-                      amount: (
-                        <Span fontWeight="bold">
-                          <FormattedMoneyAmount
-                            amount={collective.stats.yearlyBudget}
-                            currency={collective.currency || 'USD'}
-                            amountStyles={{ fontSize: 'LeadParagraph' }}
-                          />
+                      count: collective.stats.backers.all,
+                      prettyCount: (
+                        <Span fontWeight="bold" fontSize="LeadParagraph">
+                          {collective.stats.backers.all}
                         </Span>
                       ),
                     }}
@@ -132,7 +128,6 @@ StyledMembershipCard.propTypes = {
         backgroundImageUrl: PropTypes.string,
       }),
       stats: PropTypes.shape({
-        yearlyBudget: PropTypes.numer,
         backers: PropTypes.shape({
           all: PropTypes.number,
         }),

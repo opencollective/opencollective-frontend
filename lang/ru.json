@@ -955,7 +955,7 @@
   "signin.noAccount": "Don't have an account?",
   "signin.unknownEmail": "Нет пользователя с такой почтой.",
   "signin.usingEmail": "Авторизоваться по электронной почте:",
-  "StyledMembershipCard.YearlyBudget": "{amount} yearly budget",
+  "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
   "subscription.amountToDate": "contributed to date",
   "subscription.cancel.btn": "да",
   "subscription.cancel.no.btn": "нет",
