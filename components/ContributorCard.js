@@ -35,7 +35,7 @@ const CollectiveLogoContainer = styled.div`
 
 /** User-submitted public message */
 const PublicMessage = styled.p`
-  margin: 5px 0px;
+  margin: 4px 0px;
   font-size: 10px;
   line-height: 13px;
   letter-spacing: -0.5px;
@@ -82,7 +82,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, ...props 
       <Flex flexDirection="column" alignItems="center" p={2} pt={1}>
         <LinkContributor contributor={contributor}>
           <H5 fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" title={contributor.name}>
-            {truncate(contributor.name, { length: 18 })}
+            {truncate(contributor.name, { length: 16 })}
           </H5>
         </LinkContributor>
         <StyledTag my={2} padding="5px" letterSpacing="0.05em" fontStyle="initial">
@@ -90,7 +90,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, ...props 
         </StyledTag>
         {contributor.totalAmountDonated > 0 && (
           <React.Fragment>
-            <P fontSize="Tiny" color="black.500">
+            <P fontSize="Tiny" lineHeight="Caption" color="black.500">
               <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
             </P>
             <P fontSize="Caption" fontWeight="bold">

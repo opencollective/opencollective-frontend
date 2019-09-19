@@ -121,8 +121,8 @@ class SectionUpdates extends React.PureComponent {
             values={{ collectiveName: collective.name }}
           />
         </SectionTitle>
-        <Flex mb={24} justifyContent="space-between" alignItems="center">
-          <P color="black.700">
+        <Flex mb={3} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+          <P color="black.700" my={2} mr={2}>
             <FormattedMessage
               id="section.updates.subtitle"
               defaultMessage="Stay up to dates with our latest activities and progress."

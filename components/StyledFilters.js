@@ -16,9 +16,11 @@ const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, 
           <StyledButton
             key={filter}
             onClick={isSelected ? undefined : () => onChange(filter)}
+            height={32}
             buttonStyle={isSelected ? 'primary' : 'standard'}
             minWidth={minButtonWidth}
             mx={2}
+            py={1}
           >
             <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
           </StyledButton>

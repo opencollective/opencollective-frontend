@@ -125,9 +125,9 @@ class SectionTransactions extends React.Component {
 
     const transactions = this.getAllTransactions(data.creditTransactions, data.debitTransactions, filter);
     return (
-      <Box pt={5} pb={6}>
+      <Box pt={5}>
         <ContainerSectionContent>
-          <SectionTitle mb={4} textAlign={['center', 'left']}>
+          <SectionTitle mb={4} textAlign="left">
             <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
           </SectionTitle>
         </ContainerSectionContent>
