@@ -188,7 +188,11 @@ export default function(Sequelize, DataTypes) {
       },
 
       customFields: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: DataTypes.JSON,
+      },
+
+      data: {
+        type: DataTypes.JSON,
       },
 
       startsAt: {

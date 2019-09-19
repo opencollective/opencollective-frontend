@@ -449,6 +449,16 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       orderData.status = order.interval ? status.ACTIVE : status.PAID;
     }
 
+    // Handle specific fees
+    if (tier && tier.data) {
+      if (tier.data.hostFeePercent) {
+        order.hostFeePercent = 0;
+      }
+      if (tier.data.platformFeePercent) {
+        order.platformFeePercent = 0;
+      }
+    }
+
     orderCreated = await models.Order.create(orderData);
 
     if (paymentRequired) {
