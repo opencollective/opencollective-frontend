@@ -9,6 +9,7 @@ import Link from './Link';
 
 // Dynamic imports
 const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn' */ './ApplyToHostBtn'));
+const AddFundsModal = dynamic(() => import('./AddFundsModal'));
 
 /**
  * Show call to actions as buttons for the collective.
@@ -16,9 +17,10 @@ const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn
 const CollectiveCallsToAction = ({
   collective,
   buttonsMinWidth,
-  callsToAction: { hasSubmitExpense, hasContact, hasApply, hasDashboard, hasManageSubscriptions },
+  callsToAction: { hasSubmitExpense, hasContact, hasApply, hasDashboard, hasManageSubscriptions, addFunds },
   ...props
 }) => {
+  const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
   return (
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
@@ -50,6 +52,14 @@ const CollectiveCallsToAction = ({
         </Link>
       )}
       {hasApply && <ApplyToHostBtn host={collective} showConditions={false} />}
+      {addFunds && (
+        <>
+          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} onClick={() => showAddFundsModal(true)}>
+            <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
+          </StyledButton>
+          <AddFundsModal collective={collective} show={hasAddFundsModal} setShow={showAddFundsModal} />
+        </>
+      )}
     </Container>
   );
 };
@@ -69,6 +79,8 @@ CollectiveCallsToAction.propTypes = {
     hasDashboard: PropTypes.bool,
     /** Link to edit subscriptions */
     hasManageSubscriptions: PropTypes.bool,
+    /** Link to add funds */
+    addFunds: PropTypes.bool,
   }).isRequired,
   /** Will apply a min-width to all buttons */
   buttonsMinWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

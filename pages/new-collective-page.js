@@ -92,6 +92,7 @@ class NewCollectivePage extends React.Component {
 
     const collective = data.Collective;
     const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
+    const isRoot = Boolean(LoggedInUser && LoggedInUser.isRoot());
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
@@ -111,6 +112,7 @@ class NewCollectivePage extends React.Component {
               updates={collective.updates}
               LoggedInUser={LoggedInUser}
               isAdmin={isAdmin}
+              isRoot={isRoot}
               status={status}
               onPrimaryColorChange={onPrimaryColorChange}
             />
