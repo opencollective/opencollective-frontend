@@ -74,15 +74,28 @@ const SectionBudget = ({ collective, stats }) => {
             return (
               <Container flex="10" mb={3} width="100%" maxWidth={800}>
                 <BudgetItemsList items={budgetItems} />
-                <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-                  <StyledButton buttonSize="large" mt={4} width={1} py="10px">
-                    <FormattedMessage
-                      id="CollectivePage.SectionBudget.ViewAll"
-                      defaultMessage="View all transactions"
-                    />{' '}
-                    →
-                  </StyledButton>
-                </Link>
+                <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
+                  <Box flex="1 1" mx={[0, 2]}>
+                    <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+                      <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
+                        <FormattedMessage
+                          id="CollectivePage.SectionBudget.ViewAll"
+                          defaultMessage="View all transactions"
+                        />
+                      </StyledButton>
+                    </Link>
+                  </Box>
+                  <Box flex="1 1" mx={[0, 2]}>
+                    <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
+                      <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
+                        <FormattedMessage
+                          id="CollectivePage.SectionBudget.ViewAllExpenses"
+                          defaultMessage="View all expenses"
+                        />
+                      </StyledButton>
+                    </Link>
+                  </Box>
+                </Flex>
               </Container>
             );
           }}
@@ -99,27 +112,15 @@ const SectionBudget = ({ collective, stats }) => {
           mx={[null, null, 3]}
           minWidth={300}
         >
-          <Box flex="1" py={16} px={24}>
+          <Box flex="1" py={16} px={4}>
             <P fontSize="Tiny" textTransform="uppercase" color="black.700">
               <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
             </P>
-            <P fontSize="H5" mt={1} mb={3}>
+            <P fontSize="H5" mt={1}>
               {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
             </P>
-            {collective.isArchived ? (
-              <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3} disabled>
-                <FormattedMessage id="CollectivePage.SectionBudget.SubmitExpense" defaultMessage="Submit Expenses" /> →
-              </StyledButton>
-            ) : (
-              <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton buttonSize="small" fontWeight="bold" py={2} px={3}>
-                  <FormattedMessage id="CollectivePage.SectionBudget.SubmitExpense" defaultMessage="Submit Expenses" />{' '}
-                  →
-                </StyledButton>
-              </Link>
-            )}
           </Box>
-          <Container flex="1" background="#F5F7FA" py={16} px={24}>
+          <Container flex="1" background="#F5F7FA" py={16} px={4}>
             <DefinedTerm term={Terms.ESTIMATED_BUDGET} fontSize="Tiny" textTransform="uppercase" color="black.700" />
             <P fontSize="H5" mt={2}>
               <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
