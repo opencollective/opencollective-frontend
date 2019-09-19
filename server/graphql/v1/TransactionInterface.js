@@ -13,7 +13,7 @@ import {
 
 import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
-import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString } from './types';
+import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString, ExpenseType } from './types';
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: 'Transaction',
@@ -295,6 +295,12 @@ export const TransactionExpenseType = new GraphQLObjectType({
           return transaction.getExpenseForViewer
             ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category)
             : null;
+        },
+      },
+      expense: {
+        type: ExpenseType,
+        resolve(transaction, args, req) {
+          return req.loaders.expense.findById.load(transaction.ExpenseId);
         },
       },
       attachment: {
