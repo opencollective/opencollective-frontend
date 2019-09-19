@@ -5,6 +5,7 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
+import { URL } from 'universal-url';
 
 // For old browsers without window.Intl
 import 'intl';
@@ -100,8 +101,11 @@ class OpenCollectiveFrontendApp extends App {
     };
 
     if (!process.env.CI) {
-      if (ctx.req && ctx.req.url === '/') {
-        digitalClimateStrikeOptions.enabled = true;
+      if (ctx.req) {
+        const url = new URL(`${ctx.req.protocol}://${ctx.req.get('host')}${ctx.req.originalUrl}`);
+        if (url.pathname == '/') {
+          digitalClimateStrikeOptions.enabled = true;
+        }
       }
       if (pageProps.slug && digitalClimateStrikeParticipants.includes(pageProps.slug)) {
         digitalClimateStrikeOptions.enabled = true;
