@@ -115,6 +115,20 @@ const getTierData = graphql(gql`
         backgroundImage
         settings
         currency
+        isArchived
+        path
+        host {
+          id
+        }
+        stats {
+          id
+          updates
+          balance
+          transactions {
+            id
+            all
+          }
+        }
         admins: members(role: "ADMIN") {
           id
           role
@@ -145,6 +159,7 @@ const getTierData = graphql(gql`
         description
         publicMessage
         collectiveSlug
+        totalAmountDonated
         type
         isIncognito
       }

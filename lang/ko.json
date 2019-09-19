@@ -48,6 +48,8 @@
   "ApplyToHostBtnLoggedIn.TOS": "I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective.",
   "authorization.loginRequired": "계속하려면 로그인 해주세요.",
   "button.submit": "제출",
+  "Clipboard.Copied": "Copied!",
+  "Clipboard.Copy": "Copy to clipboard",
   "collective": "내 집단",
   "collective.about.title": "소개",
   "collective.addHostBtn": "재정 추가",

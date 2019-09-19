@@ -13,22 +13,34 @@ import { ContentCopy } from 'styled-icons/material/ContentCopy';
 
 // Open Collective Frontend imports
 import { facebooKShareURL, tweetURL, linkedInShareURL, mailToURL } from '../../lib/url_helpers';
-
-// Local tier page imports
+import StyledTooltip from '../StyledTooltip';
 import ExternalLinkNewTab from '../ExternalLinkNewTab';
 import StyledRoundButton from '../StyledRoundButton';
+import Container from '../Container';
 
 const messages = defineMessages({
   shareTitle: {
     id: 'TierPage.Share.title',
     defaultMessage: 'Help {collective} reach their goal!',
   },
+  copy: {
+    id: 'Clipboard.Copy',
+    defaultMessage: 'Copy to clipboard',
+  },
+  copied: {
+    id: 'Clipboard.Copied',
+    defaultMessage: 'Copied!',
+  },
 });
+
+let updateCopyBtnTimeout = null;
 
 /**
  * Buttons to share the tier page.
  */
 const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) => {
+  const [copied, setCopied] = React.useState(false);
+  const copyMsg = copied ? intl.formatMessage(messages.copied) : intl.formatMessage(messages.copy);
   const defaultShareTitle = intl.formatMessage(messages.shareTitle, { collective: name });
   const twitterShareMsg = intl.formatMessage(messages.shareTitle, {
     collective: twitterHandle ? `@${twitterHandle}` : name,
@@ -56,9 +68,31 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
           <Mail size={14} />
         </StyledRoundButton>
       </ExternalLinkNewTab>
-      <StyledRoundButton size={40} onClick={() => copy(pageUrl)}>
-        <ContentCopy size={14} />
-      </StyledRoundButton>
+      <StyledTooltip
+        delayHide={0}
+        content={() => (
+          <Container minWidth={125} textAlign="center">
+            {copyMsg}
+          </Container>
+        )}
+      >
+        <StyledRoundButton
+          size={40}
+          onClick={() => {
+            copy(pageUrl);
+            setCopied(true);
+            if (updateCopyBtnTimeout) {
+              clearTimeout(updateCopyBtnTimeout);
+            }
+            updateCopyBtnTimeout = setTimeout(() => {
+              setCopied(false);
+              updateCopyBtnTimeout = null;
+            }, 3000);
+          }}
+        >
+          <ContentCopy size={14} />
+        </StyledRoundButton>
+      </StyledTooltip>
     </Flex>
   );
 };

@@ -20,9 +20,8 @@ import CollectiveCallsToAction from './CollectiveCallsToAction';
 
 /** Main container for the entire component */
 const MainContainer = styled.div`
-  border-bottom: 1px solid #e6e8eb;
   background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.7);
+  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
 
   /** Everything's inside cannot be larger than max section width */
   & > * {
@@ -244,7 +243,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     if (!balance && !(transactions && transactions.all)) {
       toRemove.add(Sections.BUDGET);
     }
-    if (!collective.longDescription) {
+    if (!collective.hasLongDescription && !collective.longDescription) {
       toRemove.add(Sections.ABOUT);
     }
   }
@@ -325,7 +324,7 @@ const CollectiveNavbar = ({
             >
               <MenuLink
                 as={LinkComponent}
-                collectivePath={collective.path}
+                collectivePath={collective.path || `/${collective.slug}`}
                 section={section}
                 label={intl.formatMessage(i18nSection[section])}
               />
@@ -370,8 +369,8 @@ CollectiveNavbar.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
-    path: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    path: PropTypes.string,
     isArchived: PropTypes.bool,
     host: PropTypes.object,
   }).isRequired,

@@ -48,6 +48,8 @@
   "ApplyToHostBtnLoggedIn.TOS": "I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective.",
   "authorization.loginRequired": "Вам нужно войти, чтобы продолжить.",
   "button.submit": "Отправить",
+  "Clipboard.Copied": "Copied!",
+  "Clipboard.Copy": "Copy to clipboard",
   "collective": "мои коллективы",
   "collective.about.title": "О нас",
   "collective.addHostBtn": "Добавить представителя",

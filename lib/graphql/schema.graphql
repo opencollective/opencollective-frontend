@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Sep 18 2019 11:08:33 GMT+0200 (GMT+02:00)
+# timestamp: Thu Sep 19 2019 11:17:18 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -73,6 +73,11 @@ type Collective implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -324,6 +329,11 @@ interface CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -884,6 +894,11 @@ type Event implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -1980,6 +1995,11 @@ type Organization implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -2910,6 +2930,11 @@ type User implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
