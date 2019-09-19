@@ -1076,7 +1076,7 @@
   "tier.type.tier": "categoría (una sola por orden)",
   "tier.type.tier.add": "sumar otra categoría",
   "tier.type.tier.remove": "quitar categoría",
-  "TierCard.DefaultDescription": "{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}} {minAmount, select, 0 {} other {for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!",
+  "TierCard.DefaultDescription": "{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!",
   "TierPage.AddDescription": "Añade una descripción a este nivel",
   "TierPage.AddLongDescription": "Add a rich description",
   "TierPage.AddTitle": "Añade un titulo a este nivel",
