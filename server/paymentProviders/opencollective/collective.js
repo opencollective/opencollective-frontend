@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import { get } from 'lodash';
 
 import logger from '../../lib/logger';
 import models, { sequelize } from '../../models';
@@ -54,7 +55,7 @@ paymentMethodProvider.getBalance = paymentMethod => {
   });
 };
 
-paymentMethodProvider.processOrder = async (order, options = {}) => {
+paymentMethodProvider.processOrder = async order => {
   // Get the host of the fromCollective and collective
   const fromCollectiveHost = await order.fromCollective.getHostCollective();
   const collectiveHost = await order.collective.getHostCollective();
@@ -91,8 +92,8 @@ paymentMethodProvider.processOrder = async (order, options = {}) => {
     throw new Error('Cannot use the opencollective payment method to make a payment on behalf of another collective');
   }
 
-  const hostFeePercent = options.hostFeePercent || 0;
-  const platformFeePercent = options.platformFeePercent || 0;
+  const hostFeePercent = get(order, 'data.hostFeePercent', 0);
+  const platformFeePercent = get(order, 'data.platformFeePercent', 0);
 
   if (!fromCollectiveHost) {
     // If the fromCollective has no Host (ie. when we add fund on behalf of a user/organization),

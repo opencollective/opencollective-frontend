@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import models from '../../models';
 import { TransactionTypes } from '../../constants/transactions';
 import { maxInteger } from '../../constants/math';
@@ -33,7 +33,8 @@ async function processOrder(order) {
     );
   }
 
-  const hostFeeInHostCurrency = -Math.round((order.collective.hostFeePercent / 100) * order.totalAmount);
+  const hostFeePercent = get(order, 'data.hostFeePercent', order.collective.hostFeePercent);
+  const hostFeeInHostCurrency = -Math.round((hostFeePercent / 100) * order.totalAmount);
   const platformFeeInHostCurrency = 0;
   const paymentProcessorFeeInHostCurrency = 0;
 

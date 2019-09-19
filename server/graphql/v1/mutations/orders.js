@@ -2,7 +2,7 @@ import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import debugLib from 'debug';
 import Promise from 'bluebird';
-import { pick, omit, get, isNil } from 'lodash';
+import { omit, get, isNil } from 'lodash';
 import config from 'config';
 import * as LibTaxes from '@opencollective/taxes';
 
@@ -475,11 +475,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         await orderCreated.setPaymentMethod(order.paymentMethod);
       }
       // also adds the user as a BACKER of collective
-      await libPayments.executeOrder(
-        remoteUser || user,
-        orderCreated,
-        pick(order, ['hostFeePercent', 'platformFeePercent']),
-      );
+      await libPayments.executeOrder(remoteUser || user, orderCreated);
     } else if (!paymentRequired && order.interval && collective.type === types.COLLECTIVE) {
       // create inactive subscription to hold the interval info for the pledge
       const subscription = await models.Subscription.create({
@@ -642,7 +638,7 @@ export async function completePledge(remoteUser, order) {
       await existingOrder.setPaymentMethod(order.paymentMethod);
     }
     // also adds the user as a BACKER of collective
-    await libPayments.executeOrder(remoteUser, existingOrder, pick(order, ['hostFeePercent', 'platformFeePercent']));
+    await libPayments.executeOrder(remoteUser, existingOrder);
   }
   await existingOrder.reload();
   return existingOrder;
@@ -994,17 +990,23 @@ export async function addFundsToCollective(order, remoteUser) {
     currency: collective.currency,
     description: order.description,
     status: status.PENDING,
+    data: {},
   };
 
+  // Handle specific fees
+  if (order.hostFeePercent) {
+    orderData.data.hostFeePercent = order.hostFeePercent;
+  }
+  if (order.platformFeePercent) {
+    orderData.data.platformFeePercent = order.platformFeePercent;
+  }
+
   const orderCreated = await models.Order.create(orderData);
+
   await orderCreated.setPaymentMethod(order.paymentMethod);
 
   try {
-    await libPayments.executeOrder(
-      remoteUser || user,
-      orderCreated,
-      pick(order, ['hostFeePercent', 'platformFeePercent']),
-    );
+    await libPayments.executeOrder(remoteUser || user, orderCreated);
   } catch (e) {
     // Don't save new card for user if order failed
     if (!order.paymentMethod.id && !order.paymentMethod.uuid) {

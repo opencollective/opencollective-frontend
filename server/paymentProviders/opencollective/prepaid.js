@@ -59,7 +59,7 @@ async function getBalance(paymentMethod) {
  *  processing Giftcard orders, the transaction generated from it is
  *  returned.
  */
-async function processOrder(order, options) {
+async function processOrder(order) {
   const user = order.createdByUser;
   const {
     paymentMethod: { data },
@@ -80,19 +80,11 @@ async function processOrder(order, options) {
     throw new Error("This payment method doesn't have enough funds to complete this order");
   }
 
-  let hostFeeInHostCurrency, platformFeeInHostCurrency;
+  const platformFeePercent = get(order, 'data.platformFeePercent', OC_FEE_PERCENT);
+  const platformFeeInHostCurrency = libpayments.calcFee(order.totalAmount, platformFeePercent);
 
-  if (options && options.skipPlatformFee) {
-    platformFeeInHostCurrency = 0;
-  } else {
-    platformFeeInHostCurrency = libpayments.calcFee(order.totalAmount, OC_FEE_PERCENT);
-  }
-
-  if (options && options.skipHostFee) {
-    hostFeeInHostCurrency = 0;
-  } else {
-    hostFeeInHostCurrency = libpayments.calcFee(order.totalAmount, order.collective.hostFeePercent);
-  }
+  const hostFeePercent = get(order, 'data.hostFeePercent', order.collective.hostFeePercent);
+  const hostFeeInHostCurrency = libpayments.calcFee(order.totalAmount, hostFeePercent);
 
   // Use the above payment method to donate to Collective
   const transactions = await models.Transaction.createFromPayload({
