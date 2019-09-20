@@ -70,6 +70,7 @@
   "collective.archive.title": "Archivar este {type}",
   "collective.backgroundImage.label": "Imagen de portada",
   "collective.balance.description": "Transfiere el saldo restante al anfitrión fiscal. El saldo colectivo debe ser cero para archivarlo o cambiar hosts. Alternativamente, puede enviar un gasto o donar a otro Colectivo.",
+  "collective.balance.notAvailable": "The host doesn't support this feature. Submit an expense, donate to another Collective or contact support if you're blocked.",
   "collective.balance.title": "Colectivo sin balance (balance vacío)",
   "collective.card.collectives.count": "{n, plural, one {collective} other {collectives}} hosted",
   "collective.card.memberOf.count": "{n, plural, one {collective} other {collectives}} backed",
