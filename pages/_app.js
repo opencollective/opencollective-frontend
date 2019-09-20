@@ -63,7 +63,11 @@ class OpenCollectiveFrontendApp extends App {
         if (ctx.req) {
           scripts['google-maps'] = getGoogleMapsScriptUrl();
         } else {
-          await loadGoogleMaps();
+          try {
+            await loadGoogleMaps();
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
     }
