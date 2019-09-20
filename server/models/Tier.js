@@ -1,3 +1,4 @@
+import Historical from 'sequelize-historical';
 import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
@@ -369,5 +370,6 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  Historical(Tier, Sequelize);
   return Tier;
 }
