@@ -147,7 +147,7 @@ const CollectiveName = styled.h1`
   font-size: 20px;
   line-height: 24px;
   text-align: center;
-  letter-spacing: -1.2px;
+  letter-spacing: -1px;
   font-weight: bold;
   text-overflow: ellipsis;
   white-space: nowrap;
