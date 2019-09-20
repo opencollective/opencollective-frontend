@@ -69,21 +69,47 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    let digitalClimateStrikeBannerEnabled = true;
-    if (ctx.req && ctx.req.url.match(/\.html/)) {
-      digitalClimateStrikeBannerEnabled = false;
-    }
-    const digitalClimateStrikeFullpageEnabled = ctx.req && ctx.req.url === '/';
+    const digitalClimateStrikeParticipants = [
+      'wwcodenyc',
+      'visjs',
+      'korerowellington',
+      'debates',
+      'hledger',
+      'cljdoc',
+      'streetlives',
+      'javers',
+      'dokku',
+      'kitspace',
+      'pytest',
+      'terser',
+      'ghost',
+      'adnauseam',
+      'opencollective',
+      'opencollectiveinc',
+      'engineering',
+      'design',
+    ];
+
     const digitalClimateStrikeOptions = {
-      enabled: !process.env.CI,
+      enabled: false,
       cookieExpirationDays: 30,
       disableGoogleAnalytics: true,
-      showCloseButtonOnFullPageWidget: true,
-      footerDisplayStartDate: digitalClimateStrikeBannerEnabled ? new Date(2019, 8, 1) : new Date(2021, 8, 20),
-      fullPageDisplayStartDate: digitalClimateStrikeFullpageEnabled ? new Date(2019, 8, 20) : new Date(2021, 8, 20),
+      showCloseButtonOnFullPageWidget: false,
       websiteName: 'Open Collective',
       iframeHost: 'https://oc-digital-climate-strike.now.sh',
     };
+
+    if (!process.env.CI) {
+      if (ctx.req && ctx.req.url === '/') {
+        digitalClimateStrikeOptions.enabled = true;
+      }
+      if (pageProps.slug && digitalClimateStrikeParticipants.includes(pageProps.slug)) {
+        digitalClimateStrikeOptions.enabled = true;
+      }
+      if (ctx.req && ctx.req.url.match(/\.html/)) {
+        digitalClimateStrikeOptions.enabled = false;
+      }
+    }
 
     return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
   }
@@ -123,7 +149,7 @@ class OpenCollectiveFrontendApp extends App {
                 __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
               }}
             />
-            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js" />
+            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js?v=2" />
           </Fragment>
         )}
       </Fragment>
