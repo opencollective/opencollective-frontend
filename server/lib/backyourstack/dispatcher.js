@@ -137,10 +137,7 @@ export async function dispatchFunds(order) {
       await orderCreated.setPaymentMethod(paymentMethod);
 
       try {
-        await paymentsLib.executeOrder(order.createdByUser, orderCreated, {
-          skipPlatformFee: true,
-          skipHostFee: true,
-        });
+        await paymentsLib.executeOrder(order.createdByUser, orderCreated);
       } catch (e) {
         debug(`Error occured excuting order ${orderCreated.id}`, e);
         throw e;

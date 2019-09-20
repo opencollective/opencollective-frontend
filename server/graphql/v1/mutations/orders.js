@@ -207,7 +207,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
     if (order.hostFeePercent) {
       const HostCollectiveId = await collective.getHostCollectiveId();
-
       if (!remoteUser.isAdmin(HostCollectiveId)) {
         throw new Error('Only an admin of the host can change the hostFeePercent');
       }
@@ -218,7 +217,6 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     let tier;
     if (order.tier) {
       tier = await models.Tier.findByPk(order.tier.id);
-
       if (!tier) {
         throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${order.collective.slug}`);
       }
@@ -443,6 +441,20 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       },
       status: status.PENDING, // default status, will get updated after the order is processed
     };
+
+    // Handle specific fees
+    // we use data instead of a column for now because it's an edge/experimental case
+    // should be moved to a column if it starts to be widely used
+    if (order.hostFeePercent) {
+      orderData.data.hostFeePercent = order.hostFeePercent;
+    } else if (tier && tier.data && tier.data.hostFeePercent) {
+      orderData.data.hostFeePercent = tier.data.hostFeePercent;
+    }
+    if (order.platformFeePercent) {
+      orderData.data.platformFeePercent = order.platformFeePercent;
+    } else if (tier && tier.data && tier.data.hostFeePercent) {
+      orderData.data.platformFeePercent = tier.data.platformFeePercent;
+    }
 
     // Handle status for "free" orders
     if (orderData.totalAmount === 0) {
