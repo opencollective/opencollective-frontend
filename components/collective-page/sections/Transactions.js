@@ -16,7 +16,11 @@ import Link from '../../Link';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 import { Dimensions } from '../_constants';
-import BudgetItemsList, { BudgetItemExpenseTypeFragment, BudgetItemExpenseFragment } from '../../BudgetItemsList';
+import BudgetItemsList, {
+  BudgetItemExpenseTypeFragment,
+  BudgetItemExpenseFragment,
+  BudgetItemOrderFragment,
+} from '../../BudgetItemsList';
 
 const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
 const NB_DISPLAYED = 10;
@@ -179,6 +183,7 @@ export default React.memo(
       query SectionTransactions($id: Int!, $nbDisplayed: Int!) {
         contributions: allTransactions(CollectiveId: $id, type: "DEBIT", limit: $nbDisplayed) {
           ...BudgetItemExpenseFragment
+          ...BudgetItemOrderFragment
         }
         expenses(FromCollectiveId: $id, limit: $nbDisplayed) {
           entries: expenses {
@@ -187,6 +192,7 @@ export default React.memo(
         }
       }
       ${BudgetItemExpenseFragment}
+      ${BudgetItemOrderFragment}
       ${BudgetItemExpenseTypeFragment}
     `,
     {

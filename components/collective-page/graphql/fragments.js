@@ -1,5 +1,9 @@
 import gql from 'graphql-tag';
-import { BudgetItemExpenseTypeFragment, BudgetItemOrderFragment } from '../../BudgetItemsList';
+import {
+  BudgetItemExpenseTypeFragment,
+  BudgetItemOrderFragment,
+  BudgetItemExpenseFragment,
+} from '../../BudgetItemsList';
 
 /**
  * Query the transactions and expenses for the collective, to show in the
@@ -7,13 +11,15 @@ import { BudgetItemExpenseTypeFragment, BudgetItemOrderFragment } from '../../Bu
  */
 export const TransactionsAndExpensesFragment = gql`
   fragment TransactionsAndExpensesFragment on Collective {
-    transactions(limit: 3) {
+    transactions(limit: 3, type: "CREDIT") {
       ...BudgetItemOrderFragment
+      ...BudgetItemExpenseFragment
     }
     expenses(limit: 3) {
       ...BudgetItemExpenseTypeFragment
     }
   }
+  ${BudgetItemExpenseFragment}
   ${BudgetItemOrderFragment}
   ${BudgetItemExpenseTypeFragment}
 `;
