@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 
@@ -10,7 +10,7 @@ import { Span } from './Text';
 const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
   return (
     <Flex css={{ overflowX: 'auto' }} {...flexProps}>
-      {filters.map(filter => {
+      {filters.map((filter, idx) => {
         const isSelected = filter === selected;
         return (
           <StyledButton
@@ -19,13 +19,15 @@ const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, 
             height={32}
             buttonStyle={isSelected ? 'primary' : 'standard'}
             minWidth={minButtonWidth}
-            mx={2}
+            ml={idx === 0 ? 0 : 2}
+            mr={2}
             py={1}
           >
             <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
           </StyledButton>
         );
       })}
+      <Box px={2} />
     </Flex>
   );
 };

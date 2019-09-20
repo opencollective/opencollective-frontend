@@ -144,12 +144,13 @@ export default class SectionContributors extends React.PureComponent {
           )}
         </ContainerSectionContent>
         {hasFilters && (
-          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH - 30} margin="0 auto">
+          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} margin="0 auto">
             <ContributorsFilter.default
               selected={filter}
               onChange={this.setFilter}
               filters={filters}
               selectedButtonStyle="primary"
+              px={Dimensions.PADDING_X}
             />
           </Container>
         )}
