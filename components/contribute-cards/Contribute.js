@@ -77,6 +77,10 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.Event',
     defaultMessage: 'Event',
   },
+  [ContributionTypes.EVENT_PASSED]: {
+    id: 'ContributionType.EventPassed',
+    defaultMessage: 'Past event',
+  },
 });
 
 const getContributeCTA = type => {
@@ -84,8 +88,18 @@ const getContributeCTA = type => {
     return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
   } else if (type === ContributionTypes.EVENT_PARTICIPATE) {
     return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
+  } else if (type === ContributionTypes.EVENT_PASSED) {
+    return <FormattedMessage id="ContributeCard.BtnEventPassed" defaultMessage="View event" />;
   } else {
     return <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />;
+  }
+};
+
+const getCTAButtonStyle = type => {
+  if (type === ContributionTypes.EVENT_PASSED) {
+    return 'standard';
+  } else {
+    return 'secondary';
   }
 };
 
@@ -103,7 +117,6 @@ const ContributeCard = ({
   contributors,
   stats,
   hideContributors,
-  withoutCTA,
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
@@ -122,13 +135,11 @@ const ContributeCard = ({
           <TierBody>{children}</TierBody>
         </Flex>
         <Box>
-          {!withoutCTA && (
-            <Link route={route} params={routeParams}>
-              <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3}>
-                {buttonText || getContributeCTA(type)}
-              </StyledButton>
-            </Link>
-          )}
+          <Link route={route} params={routeParams}>
+            <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3}>
+              {buttonText || getContributeCTA(type)}
+            </StyledButton>
+          </Link>
           {!hideContributors && (
             <Box mt={2} height={60}>
               {contributors && contributors.length > 0 && (
@@ -209,8 +220,6 @@ ContributeCard.propTypes = {
   }),
   /** If true, contributors will not be displayed */
   hideContributors: PropTypes.bool,
-  /** If true, contribute button will be withoutCTA */
-  withoutCTA: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
 };
