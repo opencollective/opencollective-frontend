@@ -134,9 +134,11 @@ class CreateOrganization extends React.Component {
             {LoggedInUser && (
               <div>
                 <CreateCollectiveForm
+                  host={this.host}
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}
+                  showForm={!this.state.result.success}
                 />
 
                 <div className="result">
