@@ -22,7 +22,6 @@ import BudgetItemsList, {
   BudgetItemOrderFragment,
 } from '../../BudgetItemsList';
 
-const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
 const NB_DISPLAYED = 10;
 const FILTERS = { ALL: 'ALL', EXPENSES: 'EXPENSES', CONTRIBUTIONS: 'CONTRIBUTIONS' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -153,13 +152,14 @@ class SectionTransactions extends React.Component {
           </SectionTitle>
         </ContainerSectionContent>
         {showFilters && (
-          <Box mb={3} maxWidth={MAX_STYLED_FILTERS_WIDTH} mx="auto">
+          <Box mb={3} maxWidth={Dimensions.MAX_SECTION_WIDTH} mx="auto">
             <StyledFilters
               filters={FILTERS_LIST}
               selected={this.state.filter}
               onChange={filter => this.setState({ filter })}
               getLabel={filter => intl.formatMessage(I18nFilters[filter])}
               minButtonWidth={180}
+              px={Dimensions.PADDING_X}
             />
           </Box>
         )}

@@ -63,8 +63,6 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
-const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
-
 const ParentedCollectivesQuery = gql`
   query SuperCollectiveChildren($tags: [String]) {
     allCollectives(orderBy: balance, orderDirection: DESC, limit: 50, tags: $tags) {
@@ -244,7 +242,7 @@ class SectionContributions extends React.PureComponent {
               </SectionTitle>
             </ContainerSectionContent>
             {filters.length > 1 && (
-              <Box mb={4} mx="auto" maxWidth={MAX_STYLED_FILTERS_WIDTH}>
+              <Box mb={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
                 <StyledFilters
                   filters={filters}
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
@@ -252,6 +250,7 @@ class SectionContributions extends React.PureComponent {
                   selected={selectedFilter}
                   justifyContent="left"
                   minButtonWidth={175}
+                  px={Dimensions.PADDING_X}
                 />
               </Box>
             )}

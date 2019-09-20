@@ -91,7 +91,7 @@ export const filterContributors = (contributors, filter) => {
  * - `getContributorsFilters`: For a given list of Contributors, returns all the filters that can be applied to the list.
  * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */
-const ContributorsFilter = ({ intl, selected, onChange, filters, selectedButtonStyle }) => {
+const ContributorsFilter = ({ intl, selected, onChange, filters, selectedButtonStyle, ...props }) => {
   return (
     <StyledFilters
       filters={filters}
@@ -99,6 +99,7 @@ const ContributorsFilter = ({ intl, selected, onChange, filters, selectedButtonS
       onChange={onChange}
       selected={selected || CONTRIBUTOR_FILTERS.ALL}
       selectedButtonStyle={selectedButtonStyle}
+      {...props}
     />
   );
 };
