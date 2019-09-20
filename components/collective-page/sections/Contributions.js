@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql, Query } from 'react-apollo';
 import memoizeOne from 'memoize-one';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
@@ -20,6 +21,7 @@ import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 import { Dimensions } from '../_constants';
+import { fadeIn } from '../../StyledKeyframes';
 
 const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -62,6 +64,21 @@ const filterFuncs = {
   [FILTERS.CORE]: ({ role }) => role === roles.ADMIN || role === roles.MEMBER,
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
+
+/** A container for membership cards to ensure we have a smooth transition */
+const MembershipCardContainer = styled.div`
+  animation: ${fadeIn} 0.2s;
+  margin-bottom: 40px;
+  margin-right: 4px;
+
+  @media screen and (min-width: 52em) {
+    margin-right: 34px;
+  }
+
+  @media screen and (min-width: 40em) {
+    margin-right: 32px;
+  }
+`;
 
 const ParentedCollectivesQuery = gql`
   query SuperCollectiveChildren($tags: [String]) {
@@ -257,7 +274,9 @@ class SectionContributions extends React.PureComponent {
             <ContainerSectionContent>
               <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                  <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
+                  <MembershipCardContainer key={membership.id}>
+                    <StyledMembershipCard membership={membership} />
+                  </MembershipCardContainer>
                 ))}
               </Flex>
               {nbMemberships < sortedMemberships.length && (
@@ -288,7 +307,9 @@ class SectionContributions extends React.PureComponent {
                   </SectionTitle>
                   <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                     {collectives.map(collective => (
-                      <StyledMembershipCard key={collective.id} membership={{ collective }} mb={40} mr={[1, 4, 34]} />
+                      <MembershipCardContainer key={collective.id}>
+                        <StyledMembershipCard membership={{ collective }} />
+                      </MembershipCardContainer>
                     ))}
                   </Flex>
                 </section>
