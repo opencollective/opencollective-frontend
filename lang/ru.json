@@ -548,7 +548,7 @@
   "expense.reject.btn": "отказать",
   "expense.rejected": "отказано",
   "expense.save": "сохранить",
-  "expense.type": "type",
+  "expense.type": "Type",
   "expense.type.tooltip": "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
   "expense.viewDetails": "Показать детали",
   "expenseNeedsTaxForm.hover": "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com",

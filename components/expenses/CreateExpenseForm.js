@@ -14,7 +14,7 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import Button from '../Button';
 import Container from '../Container';
 import { P } from '../Text';
-import StyledTooltip from '../StyledTooltip.js';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -76,8 +76,8 @@ class CreateExpenseForm extends React.Component {
       return { [category]: category };
     });
 
-    this.expenseTypes = Object.entries(expenseTypes).map(t => {
-      return { [t[0]]: titleCase(t[1]) };
+    this.expenseTypes = Object.entries(expenseTypes).map(([key, value]) => {
+      return { [key]: titleCase(value) };
     });
 
     this.state = {
@@ -164,8 +164,9 @@ class CreateExpenseForm extends React.Component {
   }
 
   async onSubmit(e) {
-    e && e.preventDefault();
-
+    if (e) {
+      e.preventDefault();
+    }
     this.setState({
       loading: true,
     });
@@ -447,28 +448,18 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage id="expense.type" defaultMessage="type" />
+                <DefinedTerm term={Terms.EXPENSE_TYPE} />
               </label>
               <div className="expenseType">
                 <span className="expenseType">
-                  <StyledTooltip
-                    type="light"
-                    content={() => (
-                      <FormattedMessage
-                        id="expense.type.tooltip"
-                        defaultMessage="Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt."
-                      />
-                    )}
-                  >
-                    <InputField
-                      type="select"
-                      options={this.expenseTypes}
-                      defaultValue={expenseTypes.DEFAULT}
-                      name="type"
-                      className="expenseField"
-                      onChange={expenseType => this.handleChange('type', expenseTypes[expenseType])}
-                    />
-                  </StyledTooltip>
+                  <InputField
+                    type="select"
+                    options={this.expenseTypes}
+                    defaultValue={expenseTypes.DEFAULT}
+                    name="type"
+                    className="expenseField"
+                    onChange={expenseType => this.handleChange('type', expenseTypes[expenseType])}
+                  />
                 </span>
               </div>
             </div>
