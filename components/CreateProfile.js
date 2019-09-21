@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
 import Container from './Container';
@@ -14,6 +14,13 @@ import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
 import StyledCheckbox from './StyledCheckbox';
+
+const messages = defineMessages({
+  newsletter: {
+    id: 'newsletter.label',
+    defaultMessage: 'Receive our monthly newsletter with updates about new collectives and features.',
+  },
+});
 
 const Tab = ({ active, children, setActive }) => (
   <Container
@@ -58,18 +65,21 @@ SecondaryAction.propTypes = {
   onSecondaryAction: PropTypes.func,
 };
 
-const NewsletterCheckBox = ({ onChange }) => {
+const NewsletterCheckBox = ({ onChange, checked }) => {
+  const intl = useIntl();
   return (
     <StyledCheckbox
-      onChange={({ checked }) => onChange({ target: { name: 'newsletterOptIn', value: checked } })}
+      onChange={({ checked, name }) => onChange({ target: { name, value: checked } })}
+      checked={checked}
       name="newsletterOptIn"
-      label="Receive our monthly newsletter with updates about new collectives and features."
+      label={intl.formatMessage(messages.newsletter)}
     />
   );
 };
 
 NewsletterCheckBox.propTypes = {
   onChange: PropTypes.func,
+  checked: PropTypes.bool,
 };
 
 const useForm = ({ onEmailChange, errors }) => {
@@ -179,7 +189,7 @@ const CreateProfile = ({
           </Box>
 
           <Box mb={4}>
-            <NewsletterCheckBox {...getFieldProps('newsletterOptIn')} />
+            <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
           </Box>
 
           <StyledButton
@@ -281,7 +291,7 @@ const CreateProfile = ({
           </Box>
 
           <Box mb={4}>
-            <NewsletterCheckBox {...getFieldProps('newsletterOptIn')} />
+            <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
           </Box>
 
           <StyledButton
