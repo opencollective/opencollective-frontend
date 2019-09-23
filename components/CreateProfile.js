@@ -18,7 +18,7 @@ import StyledCheckbox from './StyledCheckbox';
 const messages = defineMessages({
   newsletter: {
     id: 'newsletter.label',
-    defaultMessage: 'Receive our monthly newsletter with updates about new collectives and features.',
+    defaultMessage: 'Receive our monthly newsletter',
   },
 });
 
