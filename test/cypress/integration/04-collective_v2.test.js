@@ -28,9 +28,9 @@ describe('New collective page', () => {
         'Make a custom one time or recurring contribution to support this collective.',
       );
       cy.contains('#section-contribute', 'backer');
-      cy.contains('#section-contribute', 'Become a backer and help us sustain our activities!');
+      cy.contains('#section-contribute', 'Become a backer for $5.00 per month and help us sustain our activities!');
       cy.contains('#section-contribute', 'sponsor');
-      cy.contains('#section-contribute', 'Become a sponsor and help us sustain our activities!');
+      cy.contains('#section-contribute', 'Become a sponsor for $100.00 per month and help us sustain our activities!');
     });
 
     it('Has a link to show all tiers', () => {
