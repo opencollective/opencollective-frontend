@@ -279,7 +279,9 @@ export const TransactionExpenseType = new GraphQLObjectType({
       expense: {
         type: ExpenseType,
         resolve(transaction, args, req) {
-          return req.loaders.expense.findById.load(transaction.ExpenseId);
+          if (transaction.ExpenseId) {
+            return req.loaders.expense.findById.load(transaction.ExpenseId);
+          }
         },
       },
     };
