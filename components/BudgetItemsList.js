@@ -42,6 +42,7 @@ export const BudgetItemExpenseFragment = gql`
   fragment BudgetItemExpenseFragment on Expense {
     id
     amount
+    netAmountInCollectiveCurrency
     description
     type
     createdAt
@@ -89,12 +90,14 @@ export const BudgetItemOrderFragment = gql`
   }
 `;
 
-const isCreditItem = (item, isInverted) => {
-  if (item.__typename === 'ExpenseType') {
-    return isInverted;
-  } else if (item.__typename === 'Order') {
-    const isCreditTransaction = item.type === TransactionTypes.CREDIT;
-    return !isInverted ? isCreditTransaction : !isCreditTransaction;
+const getItemInfo = (item, isInverted) => {
+  switch (item.__typename) {
+    case 'Expense':
+      return { isCredit: !isInverted, amount: isInverted ? item.netAmountInCollectiveCurrency : item.amount };
+    case 'ExpenseType':
+      return { isCredit: isInverted, amount: item.amount };
+    case 'Order':
+      return { isCredit: item.type === TransactionTypes.CREDIT ? !isInverted : isInverted, amount: item.amount };
   }
 };
 
@@ -112,7 +115,7 @@ const BudgetItemsList = ({ items, isInverted }) => {
     <DebitCreditList>
       {items.map(item => {
         const { __typename, id, fromCollective, description, createdAt } = item;
-        const isCredit = isCreditItem(item, isInverted);
+        const { isCredit, amount } = getItemInfo(item, isInverted);
         const ItemContainer = isCredit ? CreditItem : DebitItem;
 
         return (
@@ -162,7 +165,7 @@ const BudgetItemsList = ({ items, isInverted }) => {
                   </Span>
                 )}
                 <Span fontWeight="bold" mr={1}>
-                  {formatCurrency(Math.abs(item.amount), item.currency)}
+                  {formatCurrency(Math.abs(amount), item.currency)}
                 </Span>
                 <Span color="black.400" textTransform="uppercase">
                   {item.currency}
