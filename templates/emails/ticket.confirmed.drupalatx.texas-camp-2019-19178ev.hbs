@@ -1,0 +1,34 @@
+Subject: {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}} confirmed for {{ event.name }}
+
+{{> header}}
+{{> eventsnippet}}
+
+{{> toplogo}}
+
+{{#if recipient.name}}
+<p>Dear {{recipient.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+<p>This confirms your {{ order.quantity }} {{{pluralize "ticket" n=order.quantity}}}{{#if order.totalAmount}} for a total of {{{currency order.totalAmount currency=order.currency}}}{{/if}}. </p>
+
+<p>We are excited that you'll be joining us at <a href="{{config.host.website}}/{{collective.slug}}/events/{{event.slug}}">{{ event.name }}</a> on {{ moment event.startsAt timezone=event.timezone format="MMMM Do YYYY" }} at {{ moment event.startsAt timezone=event.timezone format="h:mma" }} at {{ event.locationName }} ({{event.address}}).</p>
+
+<p>Please fill out the <a href="https://docs.google.com/forms/d/e/1FAIpQLSeDIG_DZgYEhmNS8dUJJyuPkzlet-N2hko2KaPUluhXFjowKA/viewform">attendee questionnaire</a>.</p>
+
+<p>Warmly,</p>
+
+<p>
+  – The {{event.name}} organizers
+</p>
+
+
+<section>
+  <h2>Questions about the event?</h2>
+  <p>Check out the <a href="https://2019.texascamp.org">website</a> for more information. You can also reply to this email to contact the organizers.</p>
+</section>
+
+{{> eventdata}}
+
+{{> footer}}
