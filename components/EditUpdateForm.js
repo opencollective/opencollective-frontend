@@ -13,7 +13,7 @@ import Container from './Container';
 import StyledCheckbox from './StyledCheckbox';
 
 import storage from '../lib/storage';
-import moment from 'moment';
+import { toIsoDateStr } from '../lib/utils';
 
 const UpdateFormWrapper = styled(Container)`
   width: 100%;
@@ -49,6 +49,7 @@ class EditUpdateForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.tryUpdateDate = this.tryUpdateDate.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
     this.state = {
@@ -71,7 +72,19 @@ class EditUpdateForm extends React.Component {
     this.forceUpdate();
   }
 
+  tryUpdateDate(attr, value) {
+    console.log('tryUpdateDate', value);
+    try {
+      const d = new Date(value).toISOString();
+      this.handleChange(attr, d);
+    } catch {
+      // eslint-disable-next-line no-empty
+      return false;
+    }
+  }
+
   handleChange(attr, value) {
+    console.log('handleChange', value);
     const update = {
       ...this.state.update,
       [attr]: value,
@@ -101,6 +114,8 @@ class EditUpdateForm extends React.Component {
   render() {
     const { collective, LoggedInUser } = this.props;
     const { update } = this.state;
+    console.log('update.makePublicOn', update.makePublicOn);
+    console.log('new Date(update.makePublicOn)', new Date(update.makePublicOn));
     if (!this._isMounted) return <div />;
 
     const editor =
@@ -222,8 +237,8 @@ class EditUpdateForm extends React.Component {
                   <StyledInput
                     {...inputProps}
                     type="date"
-                    value={update.makePublicOn ? moment(update.makePublicOn).format('YYYY-MM-DD') : ''}
-                    onChange={e => this.handleChange('makePublicOn', new Date(e.target.value).toISOString())}
+                    value={update.makePublicOn ? toIsoDateStr(new Date(update.makePublicOn)) : ''}
+                    onChange={e => this.tryUpdateDate('makePublicOn', e.target.value)}
                     width="100%"
                     maxWidth="40em"
                     placeHolder="Normal"
