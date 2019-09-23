@@ -21,6 +21,14 @@ const messages = defineMessages({
     id: 'collective.isArchived.description',
     defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
   },
+  approvalPending: {
+    id: 'collective.pending',
+    defaultMessage: 'Collective pending approval.',
+  },
+  approvalPendingDescription: {
+    id: 'collective.pending.description',
+    defaultMessage: 'This collective is pending approval from the host ({host}).',
+  },
 });
 
 const getNotification = (intl, status, collective, host) => {
@@ -33,6 +41,11 @@ const getNotification = (intl, status, collective, host) => {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
       description: intl.formatMessage(messages.collectiveArchivedDescription),
+    };
+  } else if (!collective.isApproved && collective.host) {
+    return {
+      title: intl.formatMessage(messages.approvalPending),
+      description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
     };
   }
 };
