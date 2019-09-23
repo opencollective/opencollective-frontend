@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { defaultImage } from '../lib/constants/collectives';
-import { firstSentence, imagePreview } from '../lib/utils';
+import { defaultImage } from '../../lib/constants/collectives';
+import { firstSentence, imagePreview } from '../../lib/utils';
 
-import Container from './Container';
-import Currency from './Currency';
-import { Link } from '../server/pages';
-import StyledLink from './StyledLink';
-import { P } from './Text';
+import Container from '../Container';
+import Currency from '../Currency';
+import { Link } from '../../server/pages';
+import StyledLink from '../StyledLink';
+import { P } from '../Text';
 
 const SponsorCard = ({ currency, image, name, description, slug, totalDonations, type }) => (
   <Container bg="white.full" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">

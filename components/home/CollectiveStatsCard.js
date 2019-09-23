@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { defaultImage, defaultBackgroundImage } from '../lib/constants/collectives';
+import { defaultImage, defaultBackgroundImage } from '../../lib/constants/collectives';
 
-import { imagePreview } from '../lib/utils';
+import { imagePreview } from '../../lib/utils';
 
 import { Flex } from '@rebass/grid';
-import Container from './Container';
-import { P, Span } from './Text';
-import { Link } from '../server/pages';
-import StyledLink from './StyledLink';
-import Currency from './Currency';
+import Container from '../Container';
+import { P, Span } from '../Text';
+import { Link } from '../../server/pages';
+import StyledLink from '../StyledLink';
+import Currency from '../Currency';
 
 const hasGoals = (settings = {}) => get(settings, 'goals[0].amount', 0) > 0;
 
