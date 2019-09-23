@@ -70,6 +70,7 @@
   "collective.archive.title": "Archiver ce {type}",
   "collective.backgroundImage.label": "Image de couverture",
   "collective.balance.description": "Transférer les fonds à l'hôte fiscal. Pour pour changer d'hôte ou archiver le collectif, le solde du compte doit être à zéro. Alternativement, vous pouvez ajouter une dépense ou donner à un autre collectif.",
+  "collective.balance.notAvailable": "The host doesn't support this feature. Submit an expense, donate to another Collective or contact support if you're blocked.",
   "collective.balance.title": "Solder le compte du collectif",
   "collective.card.collectives.count": "{n, plural, one {collectif hébergé} other {collectifs hébergés}}",
   "collective.card.memberOf.count": "{n, plural, one {collectif supporté} other {collectifs supportés}}",
