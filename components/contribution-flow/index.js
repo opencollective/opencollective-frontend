@@ -720,6 +720,8 @@ class CreateOrderPage extends React.Component {
               amountOptions={this.props.fixedAmount ? null : this.getAmountsPresets()}
               currency={this.getCurrency()}
               onChange={this.updateDetails}
+              tierName={tier ? tier.name : ''}
+              collectiveSlug={collective.slug}
               interval={interval}
               amount={get(stepDetails, 'amount') || defaultStepDetails.amount}
               quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
