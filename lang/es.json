@@ -785,6 +785,7 @@
   "newcreditcard.label": "Tarjeta de crédito",
   "newExpense.paypal.label": "Por favor, proporciona una dirección",
   "newsletter.container.title": "Stay updated about our news and progress.",
+  "newsletter.label": "Receive our monthly newsletter",
   "notFound": "not found",
   "notFound.search": "Let me try to find {term} for you...",
   "openSourceApply.description.p1": "You're creating software. You don't want to worry about creating a legal entity or seperate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project.",
