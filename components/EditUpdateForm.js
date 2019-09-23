@@ -73,7 +73,6 @@ class EditUpdateForm extends React.Component {
   }
 
   tryUpdateDate(attr, value) {
-    console.log('tryUpdateDate', value);
     try {
       const d = new Date(value).toISOString();
       this.handleChange(attr, d);
@@ -84,7 +83,6 @@ class EditUpdateForm extends React.Component {
   }
 
   handleChange(attr, value) {
-    console.log('handleChange', value);
     const update = {
       ...this.state.update,
       [attr]: value,
@@ -114,8 +112,6 @@ class EditUpdateForm extends React.Component {
   render() {
     const { collective, LoggedInUser } = this.props;
     const { update } = this.state;
-    console.log('update.makePublicOn', update.makePublicOn);
-    console.log('new Date(update.makePublicOn)', new Date(update.makePublicOn));
     if (!this._isMounted) return <div />;
 
     const editor =
