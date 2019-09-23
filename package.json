@@ -15,7 +15,7 @@
     "@babel/plugin-transform-async-to-generator": "7.5.0",
     "@babel/preset-env": "7.6.0",
     "@babel/preset-typescript": "^7.6.0",
-    "@octokit/rest": "16.29.0",
+    "@octokit/rest": "16.30.0",
     "@opencollective/taxes": "2.3.0",
     "algoliasearch": "3.34.0",
     "apollo-errors": "1.9.0",
