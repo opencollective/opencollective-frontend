@@ -17,6 +17,7 @@ export const Terms = {
   GIFT_CARD: 'GIFT_CARD',
   HOST_FEE: 'HOST_FEE',
   ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
+  EXPENSE_TYPE: 'EXPENSE_TYPE',
 };
 
 const TranslatedTerms = defineMessages({
@@ -35,6 +36,10 @@ const TranslatedTerms = defineMessages({
   [Terms.ESTIMATED_BUDGET]: {
     id: 'CollectivePage.SectionBudget.Annual',
     defaultMessage: 'Estimated annual budget',
+  },
+  [Terms.EXPENSE_TYPE]: {
+    id: 'expense.type',
+    defaultMessage: 'Type',
   },
 });
 
@@ -56,6 +61,11 @@ const TranslatedDefinitions = defineMessages({
   [Terms.ESTIMATED_BUDGET]: {
     id: 'CollectivePage.SectionBudget.Annual.Definition',
     defaultMessage: 'Projected annual budget based on total financial contributions from the past 12 months.',
+  },
+  [Terms.EXPENSE_TYPE]: {
+    id: 'expense.type.tooltip',
+    defaultMessage:
+      "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
   },
 });
 
