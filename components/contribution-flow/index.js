@@ -543,7 +543,8 @@ class CreateOrderPage extends React.Component {
     const tier = this.props.tier;
     const forceInterval = Boolean(tier) || Boolean(this.props.fixedInterval);
     const forceAmount = !get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.fixedAmount);
-    return forceInterval && forceAmount;
+    const isFlexible = tier && tier.amountType === AmountTypes.FLEXIBLE;
+    return !isFlexible && forceInterval && forceAmount;
   }
 
   /** Returns true if taxes may apply with this tier/host */
