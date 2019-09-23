@@ -70,6 +70,7 @@
   "collective.archive.title": "Архивировать этот {type}",
   "collective.backgroundImage.label": "Обложка",
   "collective.balance.description": "Переведите остаток на счёт фискальному представителю. Баланс коллектива должен равняться нулю, чтобы его можно было добавить в архив или изменить представителя. Вы можете израсходовать баланс или передать его другому коллективу.",
+  "collective.balance.notAvailable": "The host doesn't support this feature. Submit an expense, donate to another Collective or contact support if you're blocked.",
   "collective.balance.title": "Опустошить баланс коллектива",
   "collective.card.collectives.count": "{n, plural, one {коллектив} other {коллективы}} с представительством",
   "collective.card.memberOf.count": "{n, plural, one {коллектив} other {коллективы}} поддерживаются",
