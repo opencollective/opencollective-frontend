@@ -101,6 +101,7 @@ class CreateOrderPage extends React.Component {
       slug: PropTypes.string,
       type: PropTypes.string,
       amount: PropTypes.number,
+      name: PropTypes.string,
       minimumAmount: PropTypes.number,
       amountType: PropTypes.string,
       presets: PropTypes.arrayOf(PropTypes.number),
