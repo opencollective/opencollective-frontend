@@ -72,7 +72,6 @@ class EditUpdateForm extends React.Component {
   }
 
   handleChange(attr, value) {
-    console.log('handleChange', attr, value);
     const update = {
       ...this.state.update,
       [attr]: value,
