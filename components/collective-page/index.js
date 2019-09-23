@@ -195,6 +195,7 @@ class CollectivePage extends Component {
         position="relative"
         borderTop="1px solid #E6E8EB"
         css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+        pb={5}
       >
         <Hero
           collective={collective}
