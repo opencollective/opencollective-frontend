@@ -5,7 +5,6 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
-import { URL } from 'universal-url';
 import * as Sentry from '@sentry/browser';
 
 // For old browsers without window.Intl
@@ -77,52 +76,7 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    const digitalClimateStrikeParticipants = [
-      'wwcodenyc',
-      'visjs',
-      'korerowellington',
-      'debates',
-      'hledger',
-      'cljdoc',
-      'streetlives',
-      'javers',
-      'dokku',
-      'kitspace',
-      'pytest',
-      'terser',
-      'ghost',
-      'adnauseam',
-      'opencollective',
-      'opencollectiveinc',
-      'engineering',
-      'design',
-    ];
-
-    const digitalClimateStrikeOptions = {
-      enabled: false,
-      cookieExpirationDays: 30,
-      disableGoogleAnalytics: true,
-      showCloseButtonOnFullPageWidget: false,
-      websiteName: 'Open Collective',
-      iframeHost: 'https://oc-digital-climate-strike.now.sh',
-    };
-
-    if (!process.env.CI) {
-      if (ctx.req) {
-        const url = new URL(`${ctx.req.protocol}://${ctx.req.get('host')}${ctx.req.originalUrl}`);
-        if (url.pathname == '/') {
-          digitalClimateStrikeOptions.enabled = true;
-        }
-      }
-      if (pageProps.slug && digitalClimateStrikeParticipants.includes(pageProps.slug)) {
-        digitalClimateStrikeOptions.enabled = true;
-      }
-      if (ctx.req && ctx.req.url.match(/\.html/)) {
-        digitalClimateStrikeOptions.enabled = false;
-      }
-    }
-
-    return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
+    return { pageProps, scripts, initialNow, locale, messages };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -138,16 +92,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const {
-      client,
-      Component,
-      pageProps,
-      scripts,
-      initialNow,
-      locale,
-      messages,
-      digitalClimateStrikeOptions,
-    } = this.props;
+    const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
 
     return (
       <Fragment>
@@ -165,16 +110,6 @@ class OpenCollectiveFrontendApp extends App {
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
-        {digitalClimateStrikeOptions && digitalClimateStrikeOptions.enabled && (
-          <Fragment>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
-              }}
-            />
-            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js?v=2" />
-          </Fragment>
-        )}
       </Fragment>
     );
   }
