@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-import '../server/env';
+import '../../server/env';
 
 import config from 'config';
 import HelloWorks from 'helloworks-sdk';
 import moment from 'moment';
 import pThrottle from 'p-throttle';
 
-import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../server/lib/tax-forms';
-import { sequelize } from '../server/models';
+import { findUsersThatNeedToBeSentTaxForm, SendHelloWorksTaxForm } from '../../server/lib/tax-forms';
+import { sequelize } from '../../server/models';
 
 const MAX_REQUESTS_PER_SECOND = 1;
 const ONE_SECOND_IN_MILLISECONDS = 1000;
