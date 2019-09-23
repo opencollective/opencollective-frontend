@@ -196,6 +196,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
         <CollectiveCallsToAction
           display={['flex', null, 'none']}
+          flexWrap="wrap"
           mt={3}
           width="100%"
           collective={collective}

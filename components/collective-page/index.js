@@ -30,7 +30,8 @@ class CollectivePage extends Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     host: PropTypes.object,
-    contributors: PropTypes.arrayOf(PropTypes.object),
+    financialContributors: PropTypes.arrayOf(PropTypes.object),
+    coreContributors: PropTypes.arrayOf(PropTypes.object),
     topOrganizations: PropTypes.arrayOf(PropTypes.object),
     topIndividuals: PropTypes.arrayOf(PropTypes.object),
     tiers: PropTypes.arrayOf(PropTypes.object),
@@ -40,6 +41,7 @@ class CollectivePage extends Component {
     events: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
+    isRoot: PropTypes.bool.isRequired,
     onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
       balance: PropTypes.number.isRequired,
@@ -85,7 +87,7 @@ class CollectivePage extends Component {
     }
 
     // Get the currently selected section
-    const distanceThreshold = 400;
+    const distanceThreshold = 500;
     const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
     const sections = this.getSections(this.props);
     for (let i = sections.length - 1; i >= 0; i--) {
@@ -116,7 +118,7 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin) => {
+  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
     return {
       hasContact: isCollective,
@@ -124,6 +126,7 @@ class CollectivePage extends Component {
       hasApply: isHost,
       hasDashboard: isHost && isAdmin,
       hasManageSubscriptions: !isHost && isAdmin && !isCollective,
+      addFunds: isRoot && type === CollectiveType.ORGANIZATION,
     };
   });
 
@@ -150,17 +153,25 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
-            contributors={this.props.contributors}
+            contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
+            isAdmin={this.props.isAdmin}
           />
         );
       case Sections.CONTRIBUTORS:
-        return <SectionContributors collective={this.props.collective} contributors={this.props.contributors} />;
+        return (
+          <SectionContributors
+            collective={this.props.collective}
+            financialContributors={this.props.financialContributors}
+            coreContributors={this.props.coreContributors}
+            stats={this.props.stats}
+          />
+        );
       case Sections.UPDATES:
         return (
           <SectionUpdates
             collective={this.props.collective}
-            canSeeDrafts={this.props.isAdmin}
+            isAdmin={this.props.isAdmin}
             isLoggedIn={Boolean(this.props.LoggedInUser)}
           />
         );
@@ -174,10 +185,10 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, isAdmin, onPrimaryColorChange } = this.props;
+    const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props);
-    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin);
+    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin, isRoot);
 
     return (
       <Container

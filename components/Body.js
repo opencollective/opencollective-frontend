@@ -26,7 +26,6 @@ export default class Body extends React.Component {
               font-weight: 300;
               font-size: 1.6rem;
               line-height: 1.5;
-              overflow-x: hidden;
               margin: 0;
               padding: 0;
             }

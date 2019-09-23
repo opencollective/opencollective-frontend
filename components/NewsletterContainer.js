@@ -18,7 +18,7 @@ class NewsletterContainer extends React.Component {
 
         <Flex justifyContent="center">
           <form
-            action="https://opencollective.us12.list-manage.com/subscribe/post?u=88fc8f0f3b646152f1cfe447a&amp;id=c44469099e"
+            action="https://opencollective.us12.list-manage.com/subscribe/post?u=88fc8f0f3b646152f1cfe447a&amp;id=475db6d2d7"
             method="post"
             name="mc-embedded-subscribe-form"
             target="_blank"

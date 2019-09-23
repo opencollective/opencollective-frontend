@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
 
 import { textTransform, whiteSpace, wordBreak, cursor } from '../lib/styled_system_custom';
@@ -16,6 +16,13 @@ export const P = styled.p.attrs(props => ({
   ${whiteSpace}
   ${wordBreak}
   ${cursor}
+  ${props =>
+    props.truncateOverflow &&
+    css`
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    `}
 `;
 
 P.defaultProps = {

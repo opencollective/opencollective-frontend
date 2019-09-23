@@ -15,13 +15,13 @@ import { P, Span } from './Text';
 import Avatar from './Avatar';
 import I18nCollectiveTags from './I18nCollectiveTags';
 import StyledTag from './StyledTag';
-import FormattedMoneyAmount from './FormattedMoneyAmount';
 
 const getBackground = collective => {
-  const backgroundImage = collective.backgroundImage || get(collective, 'parentCollective.backgroundImage');
+  const backgroundImage = collective.backgroundImageUrl || get(collective, 'parentCollective.backgroundImageUrl');
+  const primaryColor = get(collective.settings, 'collectivePage.primaryColor', '#1776E1');
   return backgroundImage
-    ? `url(/static/images/collective-card-mask.png) bottom, url(${backgroundImage}) no-repeat, #1776E1`
-    : 'url(/static/images/collective-card-mask.png) bottom, #1776E1';
+    ? `url(/static/images/collective-card-mask.svg) 0 0 / cover no-repeat, url(${backgroundImage}) 0 0 / cover no-repeat, ${primaryColor}`
+    : `url(/static/images/collective-card-mask.svg) 0 0 / cover no-repeat, ${primaryColor}`;
 };
 
 /**
@@ -53,16 +53,18 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
         </Container>
         <Container p={3}>
           <Box mb={2}>
-            <P fontSize="Caption" mb={3}>
-              <FormattedMessage
-                id="Membership.ContributorSince"
-                defaultMessage="{contributorType} since"
-                values={{ contributorType: formatMemberRole(intl, role) }}
-              />
-              <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
-                <FormattedDate value={since} month="long" year="numeric" />
-              </Span>
-            </P>
+            {role && (
+              <P fontSize="Caption" mb={3}>
+                <FormattedMessage
+                  id="Membership.ContributorSince"
+                  defaultMessage="{contributorType} since"
+                  values={{ contributorType: formatMemberRole(intl, role) }}
+                />
+                <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
+                  <FormattedDate value={since} month="long" year="numeric" />
+                </Span>
+              </P>
+            )}
             {role === roles.BACKER ? (
               <P mt={3}>
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
@@ -80,18 +82,15 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </P>
             ) : (
               <P mt={3} fontSize="Caption">
-                {collective.stats.yearlyBudget > 0 && (
+                {collective.stats.backers.all > 0 && (
                   <FormattedMessage
-                    id="StyledMembershipCard.YearlyBudget"
-                    defaultMessage="{amount} yearly budget"
+                    id="StyledMembershipCard.backers.all"
+                    defaultMessage="{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}"
                     values={{
-                      amount: (
-                        <Span fontWeight="bold">
-                          <FormattedMoneyAmount
-                            amount={collective.stats.yearlyBudget}
-                            currency={collective.currency || 'USD'}
-                            amountStyles={{ fontSize: 'LeadParagraph' }}
-                          />
+                      count: collective.stats.backers.all,
+                      prettyCount: (
+                        <Span fontWeight="bold" fontSize="LeadParagraph">
+                          {collective.stats.backers.all}
                         </Span>
                       ),
                     }}
@@ -119,16 +118,16 @@ StyledMembershipCard.propTypes = {
       type: PropTypes.string.isRequired,
       description: PropTypes.string,
       currency: PropTypes.string,
-      backgroundImage: PropTypes.string,
+      backgroundImageUrl: PropTypes.string,
       tags: PropTypes.arrayOf(PropTypes.string),
+      settings: PropTypes.object,
       host: PropTypes.shape({
         id: PropTypes.number,
       }),
       parentCollective: PropTypes.shape({
-        backgroundImage: PropTypes.string,
+        backgroundImageUrl: PropTypes.string,
       }),
       stats: PropTypes.shape({
-        yearlyBudget: PropTypes.numer,
         backers: PropTypes.shape({
           all: PropTypes.number,
         }),

@@ -5,6 +5,7 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
+import { URL } from 'universal-url';
 
 // For old browsers without window.Intl
 import 'intl';
@@ -69,18 +70,50 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    const digitalClimateStrikeBannerEnabled = true;
-    const digitalClimateStrikeFullpageEnabled = ctx.req && ctx.req.url === '/';
+    const digitalClimateStrikeParticipants = [
+      'wwcodenyc',
+      'visjs',
+      'korerowellington',
+      'debates',
+      'hledger',
+      'cljdoc',
+      'streetlives',
+      'javers',
+      'dokku',
+      'kitspace',
+      'pytest',
+      'terser',
+      'ghost',
+      'adnauseam',
+      'opencollective',
+      'opencollectiveinc',
+      'engineering',
+      'design',
+    ];
+
     const digitalClimateStrikeOptions = {
-      enabled: !process.env.CI,
+      enabled: false,
       cookieExpirationDays: 30,
       disableGoogleAnalytics: true,
-      showCloseButtonOnFullPageWidget: true,
-      footerDisplayStartDate: digitalClimateStrikeBannerEnabled ? new Date(2019, 8, 1) : new Date(2021, 8, 20),
-      fullPageDisplayStartDate: digitalClimateStrikeFullpageEnabled ? new Date(2019, 8, 20) : new Date(2021, 8, 20),
+      showCloseButtonOnFullPageWidget: false,
       websiteName: 'Open Collective',
       iframeHost: 'https://oc-digital-climate-strike.now.sh',
     };
+
+    if (!process.env.CI) {
+      if (ctx.req) {
+        const url = new URL(`${ctx.req.protocol}://${ctx.req.get('host')}${ctx.req.originalUrl}`);
+        if (url.pathname == '/') {
+          digitalClimateStrikeOptions.enabled = true;
+        }
+      }
+      if (pageProps.slug && digitalClimateStrikeParticipants.includes(pageProps.slug)) {
+        digitalClimateStrikeOptions.enabled = true;
+      }
+      if (ctx.req && ctx.req.url.match(/\.html/)) {
+        digitalClimateStrikeOptions.enabled = false;
+      }
+    }
 
     return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
   }
@@ -120,7 +153,7 @@ class OpenCollectiveFrontendApp extends App {
                 __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
               }}
             />
-            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js" />
+            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js?v=2" />
           </Fragment>
         )}
       </Fragment>

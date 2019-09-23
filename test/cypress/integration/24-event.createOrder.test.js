@@ -13,7 +13,7 @@ describe('event.createOrder page', () => {
     cy.get('#free.tier .ctabtn').click();
     cy.location({ timeout: 15000 }).should(location => {
       expect(location.pathname).to.eq('/opensource/events/webpack-webinar/order/78');
-      expect(location.search).to.eq('?quantity=2&totalAmount=0');
+      expect(location.search).to.eq('?quantity=2');
     });
 
     cy.contains('Next step').click();
@@ -45,7 +45,7 @@ describe('event.createOrder page', () => {
     cy.get('#silver-sponsor.tier .ctabtn').click();
     cy.location({ timeout: 15000 }).should(location => {
       expect(location.pathname).to.eq('/opensource/events/webpack-webinar/order/77');
-      expect(location.search).to.eq('?quantity=2&totalAmount=50000');
+      expect(location.search).to.eq('?quantity=2');
     });
 
     cy.contains('Next step').click();

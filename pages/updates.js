@@ -11,6 +11,7 @@ import UpdatesWithData from '../components/UpdatesWithData';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
+import { Sections } from '../components/collective-page/_constants';
 
 class UpdatesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -41,6 +42,7 @@ class UpdatesPage extends React.Component {
             href={`/${collective.slug}`}
             key={collective.slug}
             displayContributeLink={collective.isActive && collective.host ? true : false}
+            selectedSection={Sections.UPDATES}
           />
 
           <div className="content">

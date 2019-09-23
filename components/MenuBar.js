@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Sticky from 'react-stickynode';
-import gql from 'graphql-tag';
 import styled from 'styled-components';
-import { get, throttle, uniqBy, pick } from 'lodash';
-import { graphql } from 'react-apollo';
-import { Modal, Row, Col } from 'react-bootstrap';
+import { get, throttle, uniqBy } from 'lodash';
 
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { animateScroll } from 'react-scrollchor/lib/helpers';
@@ -18,7 +15,7 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import Link from './Link';
 import Button from './Button';
-import AddFundsForm from './AddFundsForm';
+import AddFundsModal from './AddFundsModal';
 
 const PencilIcon = styled(Pencil)`
   margin-right: 8px;
@@ -33,7 +30,6 @@ class MenuBar extends React.Component {
     LoggedInUser: PropTypes.object,
     cta: PropTypes.object,
     intl: PropTypes.object,
-    addFundsToOrg: PropTypes.func,
   };
 
   constructor(props) {
@@ -84,7 +80,6 @@ class MenuBar extends React.Component {
       sticky: false,
       logoLink: `/${props.collective.slug}`,
       showAddFunds: false,
-      fundsAdded: false,
     };
 
     this.messages = defineMessages({
@@ -215,35 +210,6 @@ class MenuBar extends React.Component {
     this.setState({ sticky: status.status === Sticky.STATUS_FIXED });
   };
 
-  addFundsToOrg = async form => {
-    const err = error => this.setState({ error, loading: false });
-
-    if (form.totalAmount === 0) {
-      return err('Total amount must be > 0');
-    }
-    if (!form.FromCollectiveId) {
-      return err('No host selected');
-    }
-
-    const { collective } = this.props;
-    const CollectiveId = collective.id;
-    const HostCollectiveId = Number(form.FromCollectiveId);
-    const params = {
-      ...pick(form, ['totalAmount', 'description']),
-      CollectiveId,
-      HostCollectiveId,
-    };
-    this.setState({ loading: true });
-    try {
-      await this.props.addFundsToOrg(params);
-      this.setState({ fundsAdded: true, loading: false, error: null });
-      return null;
-    } catch (e) {
-      console.error(e);
-      return err(e.message && e.message.replace(/GraphQL error:/, ''));
-    }
-  };
-
   // Render Contribute and Submit Expense buttons
   renderButtons = () => {
     const { collective, LoggedInUser } = this.props;
@@ -258,50 +224,6 @@ class MenuBar extends React.Component {
         </Link>
       );
     }
-
-    const AddFundsModal = () => (
-      <Modal show={this.state.showAddFunds} onHide={this.hideAddFunds} style={{ zIndex: 999999 }}>
-        <Modal.Body>
-          <Row>
-            <Col sm={12}>
-              {this.state.fundsAdded && (
-                <div>
-                  <h1>Funds added to organization successfully</h1>
-                  <center>
-                    <Button
-                      className="blue"
-                      onClick={() =>
-                        this.setState({
-                          fundsAdded: false,
-                          showAddFunds: false,
-                        })
-                      }
-                    >
-                      Ok
-                    </Button>
-                  </center>
-                </div>
-              )}
-
-              {!this.state.fundsAdded && (
-                <AddFundsForm
-                  LoggedInUser={LoggedInUser}
-                  collective={collective}
-                  onSubmit={this.addFundsToOrg}
-                  onCancel={this.hideAddFunds}
-                />
-              )}
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={2} />
-            <Col sm={10}>
-              {this.state.error && <div style={{ color: 'red', fontWeight: 'bold' }}>{this.state.error}</div>}
-            </Col>
-          </Row>
-        </Modal.Body>
-      </Modal>
-    );
 
     return (
       <div className="buttons">
@@ -337,7 +259,7 @@ class MenuBar extends React.Component {
         collective.type === 'ORGANIZATION' /* We can only create a prepaid card for an organization */ && (
             <div>
               <div className="item editCollective">
-                <AddFundsModal />
+                <AddFundsModal collective={collective} show={this.state.showAddFunds} setShow={this.hideAddFunds} />
                 <Button className="addFunds darkBackground" onClick={() => this.setState({ showAddFunds: true })}>
                   <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
                 </Button>
@@ -585,23 +507,4 @@ class MenuBar extends React.Component {
   }
 }
 
-const addFundsToOrgQuery = gql`
-  mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
-    addFundsToOrg(
-      totalAmount: $totalAmount
-      CollectiveId: $CollectiveId
-      HostCollectiveId: $HostCollectiveId
-      description: $description
-    ) {
-      id
-    }
-  }
-`;
-
-const addMutationForAddFundsToOrg = graphql(addFundsToOrgQuery, {
-  props: ({ mutate }) => ({
-    addFundsToOrg: async variables => mutate({ variables }),
-  }),
-});
-
-export default addMutationForAddFundsToOrg(injectIntl(withUser(MenuBar)));
+export default injectIntl(withUser(MenuBar));

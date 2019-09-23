@@ -149,6 +149,11 @@ class EditTiers extends React.Component {
         id: 'tier.maxQuantity.description',
         defaultMessage: 'Leave it empty for unlimited',
       },
+      forceLongDescription: {
+        id: 'tier.forceLongDescription',
+        defaultMessage:
+          'The standalone tier page, represented by the "Read more" link, will be enabled automatically if you write a short description longer than 100 characters or if you\'ve already set a long description. You can use this switch to force the display of the page.',
+      },
     });
 
     const getOptions = arr => {
@@ -235,23 +240,43 @@ class EditTiers extends React.Component {
       },
     ];
 
-    if (parseToBoolean(process.env.ENABLE_TIER_GOALS) || get(props, 'collective.settings.enableTierGoals')) {
-      this.fields.push({
-        name: 'goal',
-        pre: getCurrencySymbol(props.currency),
-        type: 'currency',
-        options: { step: 1 },
-        label: intl.formatMessage(this.messages['goal.label']),
-        description: intl.formatMessage(this.messages['goal.description']),
-      });
+    if (
+      parseToBoolean(process.env.ENABLE_TIER_GOALS) ||
+      parseToBoolean(process.env.NCP_IS_DEFAULT) ||
+      get(props, 'collective.settings.enableTierGoals')
+    ) {
+      this.fields.push(
+        {
+          name: 'goal',
+          pre: getCurrencySymbol(props.currency),
+          type: 'currency',
+          options: { step: 1 },
+          label: intl.formatMessage(this.messages['goal.label']),
+          description: intl.formatMessage(this.messages['goal.description']),
+        },
+        {
+          name: '__hasLongDescription',
+          type: 'switch',
+          label: 'Force standalone page',
+          description: intl.formatMessage(this.messages.forceLongDescription),
+        },
+      );
     }
   }
 
   editTier(index, fieldname, value) {
     const tiers = this.state.tiers;
-    if (value === 'onetime') {
+
+    if (fieldname === 'interval' && value === 'onetime') {
       value = null;
+    } else if (fieldname === '__hasLongDescription') {
+      if (value) {
+        // Setting a string with an empty line for the description will activate the page
+        fieldname = 'longDescription';
+        value = tiers[index].longDescription || '<br/>';
+      }
     }
+
     tiers[index] = {
       ...tiers[index],
       type: tiers[index]['type'] || this.defaultType,

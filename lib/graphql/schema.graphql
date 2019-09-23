@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Sep 04 2019 09:58:05 GMT+0200 (GMT+02:00)
+# timestamp: Thu Sep 19 2019 11:17:18 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -73,6 +73,11 @@ type Collective implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -170,7 +175,7 @@ type Collective implements CollectiveInterface {
   """
   All the persons and entities that contribute to this organization
   """
-  contributors(limit: Int = 1000): [Contributor]
+  contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
@@ -324,6 +329,11 @@ interface CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -405,7 +415,7 @@ interface CollectiveInterface {
   """
   All the persons and entities that contribute to this organization
   """
-  contributors(limit: Int = 1000): [Contributor]
+  contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
 
   """
   List of all collectives hosted by this collective
@@ -751,6 +761,11 @@ type Contributor {
   isFundraiser: Boolean!
 
   """
+  A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.
+  """
+  tiersIds: [Int]!
+
+  """
   Member join date
   """
   since: IsoDateString!
@@ -879,6 +894,11 @@ type Event implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -976,7 +996,7 @@ type Event implements CollectiveInterface {
   """
   All the persons and entities that contribute to this organization
   """
-  contributors(limit: Int = 1000): [Contributor]
+  contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
@@ -1975,6 +1995,11 @@ type Organization implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -2072,7 +2097,7 @@ type Organization implements CollectiveInterface {
   """
   All the persons and entities that contribute to this organization
   """
-  contributors(limit: Int = 1000): [Contributor]
+  contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
@@ -2905,6 +2930,11 @@ type User implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
+
+  """
+  Returns true if the collective has a long description
+  """
+  hasLongDescription: Boolean
   expensePolicy: String
   mission: String
   tags: [String]
@@ -3002,7 +3032,7 @@ type User implements CollectiveInterface {
   """
   All the persons and entities that contribute to this organization
   """
-  contributors(limit: Int = 1000): [Contributor]
+  contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
   collectives(
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC

@@ -1,7 +1,7 @@
 (function() {
   'use strict';
   var DOM_ID = 'DIGITAL_CLIMATE_STRIKE';
-  var CLOSED_COOKIE = '_DIGITAL_CLIMATE_STRIKE_WIDGET_CLOSED_';
+  var CLOSED_COOKIE = '_DIGITAL_CLIMATE_STRIKE_WIDGET_CLOSED_2_';
   var NOW = new Date().getTime();
   var MS_PER_DAY = 86400000;
 
@@ -9,8 +9,8 @@
   var options = window.DIGITAL_CLIMATE_STRIKE_OPTIONS || {};
   var iframeHost = options.iframeHost !== undefined ? options.iframeHost : 'https://assets.digitalclimatestrike.net';
   var websiteName = options.websiteName || null;
-  var footerDisplayStartDate = new Date(options.footerDisplayStartDate) || new Date(2019, 7, 1);       // August 1st, 2019 - arbitrary date in the past
-  var fullPageDisplayStartDate = new Date(options.fullPageDisplayStartDate) || new Date(2019, 8, 20);  // September 20th, 2019
+  var footerDisplayStartDate = options.footerDisplayStartDate || new Date(2019, 7, 1);       // August 1st, 2019 - arbitrary date in the past
+  var fullPageDisplayStartDate = options.fullPageDisplayStartDate || new Date(2019, 8, 20);  // September 20th, 2019
   var forceFullPageWidget = !!options.forceFullPageWidget;
   var cookieExpirationDays = parseFloat(options.cookieExpirationDays || 1);
   var alwaysShowWidget = !!(options.alwaysShowWidget || window.location.hash.indexOf('ALWAYS_SHOW_DIGITAL_CLIMATE_STRIKE') !== -1);
@@ -54,11 +54,6 @@
 
   function getLanguage() {
     var language = 'en';
-
-    // French is specified or no language is set and browser is set to French
-    if (options.language === 'fr' || (!options.language && navigator && navigator.language.match(/^fr/))) {
-      language = 'fr';
-    }
 
     return language;
   }
@@ -116,6 +111,7 @@
 
   function receiveMessage(event) {
     if (!event.data.DIGITAL_CLIMATE_STRIKE) return;
+    if (event.origin.lastIndexOf(iframeHost, 0) !== 0) return;
 
     switch (event.data.action) {
       case 'maximize':
@@ -123,6 +119,7 @@
       case 'closeButtonClicked':
         return closeWindow();
       case 'buttonClicked':
+        if (event.data.linkUrl.lastIndexOf('http', 0) !== 0) return;
         return navigateToLink(event.data.linkUrl);
     }
   }
@@ -136,7 +133,7 @@
    */
   function iFrameShouldNotBeShown() {
     return (footerDisplayStartDate.getTime() > NOW && fullPageDisplayStartDate.getTime() > NOW)
-      || (new Date(2019, 8, 20) + MS_PER_DAY) < NOW
+      || new Date(fullPageDisplayStartDate.getTime() + MS_PER_DAY) < NOW
       || !!getCookie(CLOSED_COOKIE)
       && !alwaysShowWidget;
   }
