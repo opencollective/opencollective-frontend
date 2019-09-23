@@ -6,6 +6,7 @@ import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
 import { URL } from 'universal-url';
+import * as Sentry from '@sentry/browser';
 
 // For old browsers without window.Intl
 import 'intl';
@@ -33,6 +34,12 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { getEnvVar } from '../lib/utils';
+
+Sentry.init({
+  dsn: getEnvVar('SENTRY_DSN'),
+  environment: process.env.NODE_ENV,
+});
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -116,6 +123,18 @@ class OpenCollectiveFrontendApp extends App {
     }
 
     return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    Sentry.withScope(scope => {
+      Object.keys(errorInfo).forEach(key => {
+        scope.setExtra(key, errorInfo[key]);
+      });
+
+      Sentry.captureException(error);
+    });
+
+    super.componentDidCatch(error, errorInfo);
   }
 
   render() {
