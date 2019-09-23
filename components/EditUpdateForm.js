@@ -223,7 +223,7 @@ class EditUpdateForm extends React.Component {
                     {...inputProps}
                     type="date"
                     value={update.makePublicOn ? moment(update.makePublicOn).format('YYYY-MM-DD') : ''}
-                    onChange={e => this.handleChange('makePublicOn', moment(e.target.value).toISOString())}
+                    onChange={e => this.handleChange('makePublicOn', new Date(e.target.value).toISOString())}
                     width="100%"
                     maxWidth="40em"
                     placeHolder="Normal"
