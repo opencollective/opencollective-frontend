@@ -21,6 +21,7 @@ import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
+import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../lib/local-storage';
 
 class OpenSourceApplyPage extends Component {
   static async getInitialProps({ query }) {
@@ -150,9 +151,10 @@ class OpenSourceApplyPage extends Component {
 
   getGithubConnectUrl() {
     const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/opensource/apply` });
+    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
-    if (typeof window !== 'undefined' && window.localStorage.accessToken) {
-      urlParams.set('access_token', window.localStorage.accessToken);
+    if (accessToken) {
+      urlParams.set('access_token', accessToken);
     }
 
     return `/api/connected-accounts/github?${urlParams.toString()}`;

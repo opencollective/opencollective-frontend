@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
-import { Link } from '../server/pages';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { withUser } from './UserProvider';
-import { formatCurrency, capitalize } from '../lib/utils';
 import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
+import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
+
+import { Link } from '../server/pages';
+import { formatCurrency, capitalize } from '../lib/utils';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { withUser } from './UserProvider';
 import Avatar from './Avatar';
 import Hide from './Hide';
 import { P } from './Text';
@@ -49,10 +51,8 @@ class TopBarProfileMenu extends React.Component {
 
   componentDidMount() {
     document.addEventListener('click', this.onClickOutside);
-    if (typeof window !== 'undefined') {
-      if (!window.localStorage.accessToken) {
-        this.setState({ loading: false });
-      }
+    if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
+      this.setState({ loading: false });
     }
   }
 

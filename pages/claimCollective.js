@@ -9,6 +9,7 @@ import { Github } from 'styled-icons/fa-brands/Github';
 import { URLSearchParams } from 'universal-url';
 
 import { compose, getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
 import { Router, Link } from '../server/pages';
 
@@ -133,11 +134,11 @@ class ClaimCollectivePage extends React.Component {
 
   getGithubConnectUrl() {
     const { slug } = this.props;
-
     const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/${slug}/claim` });
+    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
-    if (typeof window !== 'undefined' && window.localStorage.accessToken) {
-      urlParams.set('access_token', window.localStorage.accessToken);
+    if (accessToken) {
+      urlParams.set('access_token', accessToken);
     }
 
     return `/api/connected-accounts/github?${urlParams.toString()}`;

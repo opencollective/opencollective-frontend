@@ -5,6 +5,7 @@ import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'r
 import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { capitalize, getCurrencySymbol, imagePreview } from '../../lib/utils';
 import InputField from '../../components/InputField';
 import categories from '../../lib/constants/categories';
@@ -376,8 +377,7 @@ const getExpenseQuery = gql`
 `;
 
 export const addGetExpense = component => {
-  const accessToken =
-    typeof window !== 'undefined' && window.localStorage && window.localStorage.getItem('accessToken');
+  const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
   // if we don't have an accessToken, there is no need to get the details of a expense
   // as we won't have access to any more information than the allExpenses query
