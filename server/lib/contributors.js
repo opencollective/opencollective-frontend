@@ -7,12 +7,23 @@
  * contributors should surface only unique collectives.
  */
 
+import cache from './cache';
 import { sequelize } from '../models';
 
 /**
  * Returns all the contributors for given collective
  */
-export const getContributorsForCollective = (collectiveId, { limit = 5000, roles } = {}) => {
+export const getContributorsForCollective = async (collectiveId, { limit = 5000, roles } = {}) => {
+  let cacheKey = `collective_contributors_${limit}`;
+  if (roles) {
+    cacheKey = `${cacheKey}_${roles.join('_')}`;
+  }
+
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
   // Subquery to get the total amount contributed for each member
   const TotalAmountContributedQuery = `
     SELECT  COALESCE(SUM(amount), 0)
@@ -35,7 +46,7 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000, roles
     }
   };
 
-  return sequelize.query(
+  const result = await sequelize.query(
     `
       WITH member_collectives_matching_roles AS (
         SELECT      c.*
@@ -61,11 +72,11 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000, roles
         "member_collectives_matching_roles" mc
       INNER JOIN
         "Members" m ON m."MemberCollectiveId" = mc.id AND m."deletedAt" IS NULL
-      LEFT JOIN 
+      LEFT JOIN
         "Tiers" tier ON m."TierId" = tier.id
       WHERE
         m."CollectiveId" = :collectiveId
-      GROUP BY	  
+      GROUP BY
         mc.id
       ORDER BY
         "totalAmountDonated" DESC,
@@ -82,13 +93,24 @@ export const getContributorsForCollective = (collectiveId, { limit = 5000, roles
       },
     },
   );
+
+  cache.set(cacheKey, result, 3600);
+
+  return result;
 };
 
 /**
  * Returns all the contributors for given tier
  */
-export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
-  return sequelize.query(
+export const getContributorsForTier = async (tierId, { limit = 5000 } = {}) => {
+  const cacheKey = `collective_contributors_for_tier_${tierId}_${limit}`;
+
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const result = await sequelize.query(
     `
       SELECT
         mc.id,
@@ -103,11 +125,11 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         ARRAY_AGG(DISTINCT tier."id") as "tiersIds",
         COALESCE(MAX(m.description), MAX(tier.name)) as description,
         (
-          SELECT  COALESCE(SUM(amount), 0) 
-          FROM    "Transactions" 
-          WHERE   "CollectiveId" = tier."CollectiveId" 
-          AND     TYPE = 'CREDIT' 
-          AND     "deletedAt" IS NULL 
+          SELECT  COALESCE(SUM(amount), 0)
+          FROM    "Transactions"
+          WHERE   "CollectiveId" = tier."CollectiveId"
+          AND     TYPE = 'CREDIT'
+          AND     "deletedAt" IS NULL
           AND     "RefundTransactionId" IS NULL
           AND     ("FromCollectiveId" = mc.id OR "UsingVirtualCardFromCollectiveId" = mc.id)
         ) AS "totalAmountDonated"
@@ -119,7 +141,7 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
         "Tiers" tier ON m."TierId" = tier.id
       WHERE
         m."TierId" = ?
-      GROUP BY	  
+      GROUP BY
         tier.id, mc.id
       ORDER BY
         "totalAmountDonated" DESC,
@@ -131,4 +153,8 @@ export const getContributorsForTier = (tierId, { limit = 5000 } = {}) => {
       type: sequelize.QueryTypes.SELECT,
     },
   );
+
+  cache.set(cacheKey, result, 3600);
+
+  return result;
 };
