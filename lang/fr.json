@@ -929,7 +929,7 @@
   "SectionAbout.MissingDescription": "{collectiveName} n'a pas encore remplit sa présentation",
   "SectionAbout.Why": "Votre Collectif est unique et veut accomplir de grandes choses. Voici l'endroit pour l'expliquer !",
   "SectionBudget.Empty": "Aucune transaction ou dépense n'a encore été créée. Elles apparaîtront ici dès que vous aurez vos premiers contributeurs financiers ou lorsque quelqu'un fera une dépense.",
-  "SectionContribute.All": "Voir toutes les différentes manières de contribuer",
+  "SectionContribute.All": "Voir toutes les manières de contribuer",
   "SectionContribute.TopContributors": "Principaux contributeurs financiers",
   "SectionContributions.All": "Toutes les Contributions",
   "SectionContributions.Core": "Membre de l'équipe",
