@@ -21,16 +21,18 @@ if [ "$NODE_ENV" = "circleci" ]; then
     npm start &
     FRONTEND_PID=$!
   fi
-  # Record videos on CI
+fi
+
+
+# Set `$CYPRESS_RECORD` to `true` in ENV to activate records
+if [ "$CYPRESS_RECORD" = "true" ]; then
   CYPRESS_RECORD="--record"
+else
+  CYPRESS_RECORD="--record false"
 fi
 
-
-# Set `$CYPRESS_VIDEO` to `true` in ENV to activate videos recording.
+# Set `$CYPRESS_VIDEO` to `false` in ENV to de-activate videos recording.
 # See https://docs.cypress.io/guides/references/configuration.html#Videos
-if [ "$CYPRESS_VIDEO" = "false" ]; then
-  CYPRESS_RECORD=""
-fi
 
 # Wait for a service to be up
 function wait_for_service() {
