@@ -2,10 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
+import { get } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql, Query } from 'react-apollo';
 import memoizeOne from 'memoize-one';
+import styled from 'styled-components';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { P } from '../../Text';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -17,6 +20,8 @@ import StyledFilters from '../../StyledFilters';
 import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
+import { Dimensions } from '../_constants';
+import { fadeIn } from '../../StyledKeyframes';
 
 const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -60,18 +65,76 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
+/** A container for membership cards to ensure we have a smooth transition */
+const MembershipCardContainer = styled.div`
+  animation: ${fadeIn} 0.2s;
+  margin-bottom: 40px;
+  margin-right: 4px;
+
+  @media screen and (min-width: 52em) {
+    margin-right: 34px;
+  }
+
+  @media screen and (min-width: 40em) {
+    margin-right: 32px;
+  }
+`;
+
+const ParentedCollectivesQuery = gql`
+  query SuperCollectiveChildren($tags: [String]) {
+    allCollectives(orderBy: balance, orderDirection: DESC, limit: 50, tags: $tags) {
+      collectives {
+        id
+        name
+        slug
+        type
+        currency
+        isIncognito
+        description
+        imageUrl(height: 128)
+        backgroundImageUrl(height: 200)
+        tags
+        settings
+        parentCollective {
+          id
+          backgroundImage
+        }
+        host {
+          id
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+          }
+        }
+      }
+    }
+  }
+`;
+
 class SectionContributions extends React.PureComponent {
   static propTypes = {
     /** Collective */
     collective: PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      stats: PropTypes.shape({
+        backers: PropTypes.shape({
+          all: PropTypes.number,
+        }),
+      }).isRequired,
     }).isRequired,
 
     /** @ignore from withData */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       Collective: PropTypes.shape({
+        settings: PropTypes.shape({
+          superCollectiveTags: PropTypes.arrayOf(PropTypes.string),
+        }),
         memberOf: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.number.isRequired,
@@ -141,6 +204,21 @@ class SectionContributions extends React.PureComponent {
     return Object.values(membershipsMap);
   });
 
+  sortMemberships = memoizeOne(memberships => {
+    // Sort memberships: hosted are always first, then we sort by number of backers then by total amount donated
+    return [...memberships].sort((m1, m2) => {
+      if (m1.role === roles.HOST && m2.role !== roles.HOST) {
+        return -1;
+      } else if (m1.role !== roles.HOST && m2.role === roles.HOST) {
+        return 1;
+      } else if (m1.role === roles.HOST) {
+        return m1.collective.stats.backers.all > m2.collective.stats.backers.all ? -1 : 1;
+      } else {
+        return m1.stats.totalDonations > m2.stats.totalDonations ? -1 : 1;
+      }
+    });
+  });
+
   showMoreMemberships = () => {
     this.setState(state => ({
       nbMemberships: state.nbMemberships + SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
@@ -157,8 +235,11 @@ class SectionContributions extends React.PureComponent {
 
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
+    const sortedMemberships = this.sortMemberships(memberships);
+    const isOrganization = collective.type === CollectiveType.ORGANIZATION;
+    const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
-      <ContainerSectionContent pt={5} pb={6}>
+      <Box pt={5}>
         {data.Collective.memberOf.length === 0 ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
@@ -172,44 +253,82 @@ class SectionContributions extends React.PureComponent {
           </Flex>
         ) : (
           <React.Fragment>
-            <SectionTitle textAlign={['center', 'left']} mb={4}>
-              <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
-            </SectionTitle>
+            <ContainerSectionContent>
+              <SectionTitle textAlign="left" mb={4}>
+                <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
+              </SectionTitle>
+            </ContainerSectionContent>
             {filters.length > 1 && (
-              <Box mb={4}>
+              <Box mb={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
                 <StyledFilters
                   filters={filters}
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
                   onChange={filter => this.setState({ selectedFilter: filter })}
                   selected={selectedFilter}
+                  justifyContent="left"
+                  minButtonWidth={175}
+                  px={Dimensions.PADDING_X}
                 />
               </Box>
             )}
-            <Flex flexWrap="wrap" justifyContent={memberships.length >= 4 ? 'space-evenly' : 'left'}>
-              {memberships.slice(0, nbMemberships).map(membership => (
-                <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4]} />
-              ))}
-            </Flex>
-            {nbMemberships < memberships.length && (
-              <Flex mt={3} justifyContent="center">
-                <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
-                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-                </StyledButton>
+            <ContainerSectionContent>
+              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                {sortedMemberships.slice(0, nbMemberships).map(membership => (
+                  <MembershipCardContainer key={membership.id}>
+                    <StyledMembershipCard membership={membership} />
+                  </MembershipCardContainer>
+                ))}
               </Flex>
-            )}
+              {nbMemberships < sortedMemberships.length && (
+                <Flex mt={3} justifyContent="center">
+                  <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
+                    <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                  </StyledButton>
+                </Flex>
+              )}
+            </ContainerSectionContent>
           </React.Fragment>
         )}
-      </ContainerSectionContent>
+        {isOrganization && superCollectiveTags.length > 0 && (
+          <Query query={ParentedCollectivesQuery} variables={{ tags: superCollectiveTags }}>
+            {({ loading, error, data: subCollectivesData }) => {
+              const collectives = get(subCollectivesData, 'allCollectives.collectives', []);
+              if (loading || error || collectives.length === 0) {
+                return null;
+              }
+              return (
+                <section>
+                  <SectionTitle textAlign="left" mb={4}>
+                    <FormattedMessage
+                      id="CP.Contributions.PartOfOrg"
+                      defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
+                      values={{ n: collectives.length }}
+                    />
+                  </SectionTitle>
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                    {collectives.map(collective => (
+                      <MembershipCardContainer key={collective.id}>
+                        <StyledMembershipCard membership={{ collective }} />
+                      </MembershipCardContainer>
+                    ))}
+                  </Flex>
+                </section>
+              );
+            }}
+          </Query>
+        )}
+      </Box>
     );
   }
 }
 
 const withData = graphql(
   gql`
-    query SectionCollective($id: Int!) {
+    query SectionContributions($id: Int!) {
       Collective(id: $id) {
         id
-        memberOf(onlyActiveCollectives: true) {
+        settings
+        memberOf(onlyActiveCollectives: true, limit: 1500) {
           id
           role
           since
@@ -226,18 +345,18 @@ const withData = graphql(
             currency
             isIncognito
             description
-            backgroundImage
+            imageUrl(height: 128)
+            backgroundImageUrl(height: 200)
             tags
             parentCollective {
               id
-              backgroundImage
+              backgroundImageUrl(height: 200)
             }
             host {
               id
             }
             stats {
               id
-              yearlyBudget
               backers {
                 id
                 all

@@ -62,14 +62,10 @@ class HorizontalScroller extends React.PureComponent {
      *    is not scrollable, nothing will be rendered.
      */
     children: PropTypes.func.isRequired,
-    /** [0-1] Percentage of the view width scrolled when we click on prev/next chevrons */
-    scrollPercentage: PropTypes.number.isRequired,
+    /** Callback to get the scrolled distance when we click on prev/next chevrons */
+    getScrollDistance: PropTypes.func,
     /** @ignore from withViewport */
     width: PropTypes.number,
-  };
-
-  static defaultProps = {
-    scrollPercentage: 0.75,
   };
 
   constructor(props) {
@@ -109,12 +105,23 @@ class HorizontalScroller extends React.PureComponent {
   // > - If specified as a value less than 0 (greater than 0 for right-to-left elements), scrollLeft is set to 0.
   // > - If specified as a value greater than the maximum that the content can be scrolled, scrollLeft is set to the maximum.
   onPrevClick = () => {
-    this.ref.current.scrollLeft -= this.props.scrollPercentage * this.ref.current.offsetWidth;
+    this.ref.current.scrollLeft -= this.getScrollDistance();
   };
 
   onNextClick = () => {
-    this.ref.current.scrollLeft += this.props.scrollPercentage * this.ref.current.offsetWidth;
+    this.ref.current.scrollLeft += this.getScrollDistance();
   };
+
+  getScrollDistance() {
+    const offsetWidth = this.ref.current.offsetWidth;
+    if (this.props.getScrollDistance) {
+      return this.props.getScrollDistance(offsetWidth);
+    } else {
+      // Default behavior: scroll by 75% of the full width
+      const scrollPercentage = 0.75;
+      return scrollPercentage * offsetWidth;
+    }
+  }
 
   render() {
     const { canGoPrev, canGoNext } = this.state;

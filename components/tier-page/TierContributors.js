@@ -27,6 +27,8 @@ export default class TierContributors extends React.Component {
       organizations: PropTypes.number.isRequired,
       users: PropTypes.number.isRequired,
     }).isRequired,
+    /** Currency for contributions */
+    currency: PropTypes.string.isRequired,
   };
 
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
@@ -45,7 +47,7 @@ export default class TierContributors extends React.Component {
   filterContributors = memoizeOne(filterContributors);
 
   render() {
-    const { contributors, contributorsStats } = this.props;
+    const { contributors, contributorsStats, currency } = this.props;
     const { filter } = this.state;
     const hasFilters = contributors.length >= TierContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
     const filters = hasFilters && this.getContributorsFilters(contributors);
@@ -78,7 +80,7 @@ export default class TierContributors extends React.Component {
           )}
         </Box>
         <Box mb={4}>
-          <ContributorsGrid contributors={filteredContributors} />
+          <ContributorsGrid contributors={filteredContributors} currency={currency} />
         </Box>
       </Box>
     );

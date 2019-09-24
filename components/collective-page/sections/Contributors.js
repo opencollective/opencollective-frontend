@@ -19,16 +19,24 @@ import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
-  background: linear-gradient(180deg, transparent 90%, white), url(${ContributorsGridBackgroundSVG});
-
-  @media (max-width: 52em) {
-    background-size: cover;
-  }
-
-  @media (min-width: 52em) {
-    background-position-y: -200%;
-  }
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 1) 0,
+      rgba(255, 255, 255, 0) 75px,
+      rgba(255, 255, 255, 0) calc(100% - 125px),
+      rgba(255, 255, 255, 1) 100%
+    ),
+    center -900px repeat-y url(${ContributorsGridBackgroundSVG});
 `;
+
+const ExpectedContributorsPropTypes = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  since: PropTypes.string.isRequired,
+  roles: PropTypes.arrayOf(PropTypes.string.isRequired),
+  isCore: PropTypes.bool.isRequired,
+  isBacker: PropTypes.bool.isRequired,
+  totalAmountDonated: PropTypes.number.isRequired,
+});
 
 /**
  * Section that displays all the contributors to the collective (financial, admins...etc)
@@ -38,18 +46,15 @@ export default class SectionContributors extends React.PureComponent {
     collective: PropTypes.shape({
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
     }),
-    contributors: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        since: PropTypes.string.isRequired,
-        roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-        isCore: PropTypes.bool.isRequired,
-        isBacker: PropTypes.bool.isRequired,
-        isFundraiser: PropTypes.bool.isRequired,
-        totalAmountDonated: PropTypes.number.isRequired,
+    stats: PropTypes.shape({
+      backers: PropTypes.shape({
+        all: PropTypes.number,
       }),
-    ),
+    }).isRequired,
+    coreContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
+    financialContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
   };
 
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
@@ -64,49 +69,51 @@ export default class SectionContributors extends React.PureComponent {
   };
 
   // Memoize filtering functions as they can get expensive if there are a lot of contributors
-  getContributorsFilters = memoizeOne(ContributorsFilter.getContributorsFilters);
-  filterContributors = memoizeOne(ContributorsFilter.filterContributors);
-  sortContributors = memoizeOne(contributors => {
-    // Sort contributors: core contributors are always first, then we sort by total amount donated
-    // We make a copy of the array because mutation could break memoization for future renderings
-    return [...contributors].sort((c1, c2) => {
-      // Try to make a difference based on roles
-      if ((c1.isAdmin && !c2.isAdmin) || (c1.isCore && !c2.isCore)) {
-        return -1;
-      } else if ((!c1.isAdmin && c2.isAdmin) || (!c1.isCore && c2.isCore)) {
-        return 1;
-      } else if ((c1.isAdmin && c2.isAdmin) || (c1.isCore && c2.isCore)) {
-        // For admins/core contributors, sort by `since`
-        return c1.since < c2.since ? -1 : 1;
-      }
-
-      // Otherwise on the amount donated
-      if (c1.totalAmountDonated > c2.totalAmountDonated) {
-        return -1;
-      } else if (c1.totalAmountDonated < c2.totalAmountDonated) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+  getContributorsFilters = memoizeOne((coreContributors, financialContributors) => {
+    if (financialContributors.length && coreContributors.length) {
+      return ContributorsFilter.FILTERS_LIST;
+    } else {
+      return [];
+    }
   });
 
+  filterContributors = memoizeOne((coreContributors, financialContributors, filter) => {
+    // Return the proper list
+    if (filter === ContributorsFilter.CONTRIBUTOR_FILTERS.CORE) {
+      return coreContributors;
+    } else if (filter === ContributorsFilter.CONTRIBUTOR_FILTERS.FINANCIAL) {
+      return financialContributors;
+    } else {
+      const coreContributorsIds = new Set(coreContributors.map(c => c.id));
+      return [...coreContributors, ...financialContributors.filter(c => !coreContributorsIds.has(c.id))];
+    }
+  });
+
+  getTitleFontSize(collectiveName) {
+    if (collectiveName.length < 15) {
+      return 48;
+    } else if (collectiveName.length < 20) {
+      return 40;
+    } else {
+      return 32;
+    }
+  }
+
   render() {
-    const { collective, contributors } = this.props;
+    const { collective, financialContributors, coreContributors, stats } = this.props;
     const { filter } = this.state;
     const onlyShowCore = collective.type === CollectiveType.ORGANIZATION;
-    const hasFilters = !onlyShowCore && contributors.length >= SectionContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
     const activeFilter = onlyShowCore ? ContributorsFilter.CONTRIBUTOR_FILTERS.CORE : filter;
-    const filters = hasFilters && this.getContributorsFilters(contributors);
-    const filteredContributors = this.filterContributors(contributors, activeFilter);
-    const sortedContributors = this.sortContributors(filteredContributors);
+    const filters = this.getContributorsFilters(coreContributors, financialContributors);
+    const contributors = this.filterContributors(coreContributors, financialContributors, activeFilter);
+    const hasFilters = !onlyShowCore && filters.length > 1;
 
     return (
-      <MainContainer py={[4, 5]}>
+      <MainContainer pt={80} pb={[2, 3]}>
         <ContainerSectionContent>
           {!onlyShowCore ? (
             <React.Fragment>
-              <SectionTitle fontWeight="bold">
+              <SectionTitle fontWeight="bold" fontSize={this.getTitleFontSize(collective.name)} lineHeight="1em">
                 <FormattedMessage
                   id="CollectivePage.AllOfUs"
                   defaultMessage="{collectiveName} is all of us"
@@ -117,7 +124,9 @@ export default class SectionContributors extends React.PureComponent {
                 <FormattedMessage
                   id="CollectivePage.OurContributors"
                   defaultMessage="Our contributors {count}"
-                  values={{ count: <Span color="black.400">{contributors.length}</Span> }}
+                  values={{
+                    count: <Span color="black.400">{stats.backers.all + coreContributors.length}</Span>,
+                  }}
                 />
               </H3>
               <P color="black.600" mb={4}>
@@ -134,19 +143,20 @@ export default class SectionContributors extends React.PureComponent {
             </H2>
           )}
         </ContainerSectionContent>
-        {hasFilters && filters.length > 2 && (
-          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH - 30} margin="0 auto">
+        {hasFilters && (
+          <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} margin="0 auto">
             <ContributorsFilter.default
               selected={filter}
               onChange={this.setFilter}
               filters={filters}
               selectedButtonStyle="primary"
+              px={Dimensions.PADDING_X}
             />
           </Container>
         )}
         <Box mb={4}>
           <ContributorsGrid
-            contributors={sortedContributors}
+            contributors={contributors}
             getPaddingLeft={({ width, rowWidth, nbRows }) => {
               if (width < Dimensions.MAX_SECTION_WIDTH) {
                 // No need for padding on screens small enough so they don't have padding
@@ -163,7 +173,7 @@ export default class SectionContributors extends React.PureComponent {
               } else {
                 // Otherwise add a normal section padding on the left
                 const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
-                return (width - Dimensions.MAX_SECTION_WIDTH) / 2 - cardsLeftOffset;
+                return (width - Math.max(Dimensions.MAX_SECTION_WIDTH, rowWidth)) / 2 - cardsLeftOffset;
               }
             }}
           />

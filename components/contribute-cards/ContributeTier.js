@@ -4,20 +4,20 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 import { truncate } from 'lodash';
 
-import { formatCurrency } from '../../../lib/utils';
-import Link from '../../Link';
-import { P, Span } from '../../Text';
-import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import StyledProgressBar from '../../StyledProgressBar';
+import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { formatCurrency } from '../../lib/utils';
+import Link from '../Link';
+import { P, Span } from '../Text';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import StyledProgressBar from '../StyledProgressBar';
 
-import { ContributionTypes } from '../_constants';
 import Contribute from './Contribute';
 
 const messages = defineMessages({
   fallbackDescription: {
     id: 'TierCard.DefaultDescription',
     defaultMessage:
-      '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}} {minAmount, select, 0 {} other {for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!',
+      '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and help us sustain our activities!',
   },
 });
 
@@ -33,14 +33,14 @@ const getContributionTypeFromTier = tier => {
 
 const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const currency = tier.currency || collective.currency;
-  const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minAmount : tier.amount;
+  const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
 
   let description;
   let isTruncated = false;
   if (!tier.description) {
     description = intl.formatMessage(messages.fallbackDescription, {
-      minAmount,
+      minAmount: minAmount || 0,
       tierName: tier.name,
       minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
       interval: tier.interval,
@@ -160,7 +160,7 @@ ContributeTier.propTypes = {
     amountType: PropTypes.string,
     button: PropTypes.string,
     goal: PropTypes.number,
-    minAmount: PropTypes.number,
+    minimumAmount: PropTypes.number,
     amount: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,

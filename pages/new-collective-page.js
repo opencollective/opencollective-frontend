@@ -2,20 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get, throttle } from 'lodash';
-import memoizeOne from 'memoize-one';
-import { ThemeProvider, createGlobalStyle } from 'styled-components';
-import { lighten, darken } from 'polished';
+import { get } from 'lodash';
+import { createGlobalStyle } from 'styled-components';
 
-import theme, { generateTheme } from '../lib/theme';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
-import { getCollectivePrimaryColor } from '../components/collective-page/_utils';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -48,7 +46,8 @@ class NewCollectivePage extends React.Component {
         parentCollective: PropTypes.shape({ image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
-        contributors: PropTypes.arrayOf(PropTypes.object),
+        coreContributors: PropTypes.arrayOf(PropTypes.object),
+        financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
         events: PropTypes.arrayOf(PropTypes.object),
         transactions: PropTypes.arrayOf(PropTypes.object),
@@ -58,11 +57,12 @@ class NewCollectivePage extends React.Component {
     }).isRequired, // from withData
   };
 
-  static getInitialProps({ query: { slug, status } }) {
+  static getInitialProps({ req, res, query: { slug, status } }) {
+    if (res && req && (req.language || req.locale === 'en')) {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    }
     return { slug, status };
   }
-
-  state = { newPrimaryColor: null };
 
   getPageMetaData(collective) {
     if (collective) {
@@ -80,34 +80,6 @@ class NewCollectivePage extends React.Component {
     }
   }
 
-  getTheme = memoizeOne(primaryColor => {
-    if (!primaryColor) {
-      return theme;
-    } else {
-      return generateTheme({
-        colors: {
-          ...theme.colors,
-          primary: {
-            900: darken(0.15, primaryColor),
-            800: darken(0.1, primaryColor),
-            700: darken(0.05, primaryColor),
-            600: darken(0.025, primaryColor),
-            500: primaryColor,
-            400: lighten(0.1, primaryColor),
-            300: lighten(0.2, primaryColor),
-            200: lighten(0.3, primaryColor),
-            100: lighten(0.4, primaryColor),
-            50: lighten(0.6, primaryColor),
-          },
-        },
-      });
-    }
-  });
-
-  onPrimaryColorChange = throttle(newPrimaryColor => {
-    this.setState({ newPrimaryColor });
-  }, 2000);
-
   render() {
     const { data, LoggedInUser, status } = this.props;
 
@@ -123,144 +95,68 @@ class NewCollectivePage extends React.Component {
 
     const collective = data.Collective;
     const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const primaryColor = this.state.newPrimaryColor || getCollectivePrimaryColor(collective);
+    const isRoot = Boolean(LoggedInUser && LoggedInUser.isRoot());
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
-        <ThemeProvider theme={this.getTheme(primaryColor)}>
-          <CollectivePage
-            collective={collective}
-            host={collective.host}
-            contributors={collective.contributors}
-            tiers={collective.tiers}
-            events={collective.events}
-            transactions={collective.transactions}
-            expenses={collective.expenses}
-            stats={collective.stats}
-            updates={collective.updates}
-            LoggedInUser={LoggedInUser}
-            isAdmin={isAdmin}
-            status={status}
-            onPrimaryColorChange={this.onPrimaryColorChange}
-          />
-        </ThemeProvider>
+        <CollectiveThemeProvider collective={collective}>
+          {({ onPrimaryColorChange }) => (
+            <CollectivePage
+              collective={collective}
+              host={collective.host}
+              coreContributors={collective.coreContributors}
+              financialContributors={collective.financialContributors}
+              tiers={collective.tiers}
+              events={collective.events}
+              transactions={collective.transactions}
+              expenses={collective.expenses}
+              stats={collective.stats}
+              updates={collective.updates}
+              LoggedInUser={LoggedInUser}
+              isAdmin={isAdmin}
+              isRoot={isRoot}
+              status={status}
+              onPrimaryColorChange={onPrimaryColorChange}
+            />
+          )}
+        </CollectiveThemeProvider>
       </Page>
     );
   }
 }
 
 // eslint-disable graphql/template-strings
-const getCollective = graphql(gql`
-  query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
-    Collective(slug: $slug) {
-      id
-      slug
-      path
-      name
-      description
-      longDescription
-      backgroundImage
-      twitterHandle
-      githubHandle
-      website
-      tags
-      company
-      type
-      currency
-      settings
-      isApproved
-      isArchived
-      isHost
-      hostFeePercent
-      image
-      imageUrl
-      stats {
+const getCollective = graphql(
+  gql`
+    query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+      Collective(slug: $slug) {
         id
-        balance
-        yearlyBudget
-        updates
-        backers {
-          id
-          all
-          users
-          organizations
-        }
-      }
-      parentCollective {
-        id
-        image
+        slug
+        path
+        name
+        description
+        longDescription
+        backgroundImage
         twitterHandle
+        githubHandle
+        website
+        tags
+        company
         type
-      }
-      host {
-        id
-        name
-        slug
-        type
-      }
-      contributors {
-        id
-        name
-        roles
-        isAdmin
-        isCore
-        isBacker
-        isFundraiser
-        since
-        description
-        collectiveSlug
-        totalAmountDonated
-        type
-        publicMessage
-        isIncognito
-      }
-      tiers {
-        id
-        name
-        slug
-        description
-        hasLongDescription
-        goal
-        interval
         currency
-        amount
-        minimumAmount
-        button
-        stats {
-          id
-          totalDonated
-          totalRecurringDonations
-          contributors {
-            id
-            all
-            users
-            organizations
-          }
-        }
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-        }
-      }
-      events {
-        id
-        slug
-        name
-        description
+        settings
+        isApproved
+        isArchived
+        isHost
+        hostFeePercent
         image
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-        }
+        imageUrl
         stats {
           id
+          balance
+          yearlyBudget
+          updates
           backers {
             id
             all
@@ -268,16 +164,100 @@ const getCollective = graphql(gql`
             organizations
           }
         }
-      }
-      ...TransactionsAndExpensesFragment
-      updates(limit: 3, onlyPublishedUpdates: true) {
-        ...UpdatesFieldsFragment
+        parentCollective {
+          id
+          image
+          twitterHandle
+          type
+        }
+        host {
+          id
+          name
+          slug
+          type
+        }
+        coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+          ...ContributorsFieldsFragment
+        }
+        financialContributors: contributors(roles: [BACKER], limit: 150) {
+          ...ContributorsFieldsFragment
+        }
+        tiers {
+          id
+          name
+          slug
+          description
+          hasLongDescription
+          goal
+          interval
+          currency
+          amount
+          minimumAmount
+          button
+          amountType
+          stats {
+            id
+            totalDonated
+            totalRecurringDonations
+            contributors {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            image
+            collectiveSlug
+            name
+            type
+          }
+        }
+        events(includePastEvents: true) {
+          id
+          slug
+          name
+          description
+          image
+          startsAt
+          endsAt
+          contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+            id
+            image
+            collectiveSlug
+            name
+            type
+          }
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+        }
+        ...TransactionsAndExpensesFragment
+        updates(limit: 3, onlyPublishedUpdates: true) {
+          ...UpdatesFieldsFragment
+        }
       }
     }
-  }
 
-  ${fragments.TransactionsAndExpensesFragment}
-  ${fragments.UpdatesFieldsFragment}
-`);
+    ${fragments.TransactionsAndExpensesFragment}
+    ${fragments.UpdatesFieldsFragment}
+    ${fragments.ContributorsFieldsFragment}
+  `,
+  {
+    options: props => ({
+      variables: {
+        slug: props.slug,
+        nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+      },
+    }),
+  },
+);
 
 export default withUser(getCollective(NewCollectivePage));

@@ -71,6 +71,7 @@ const navigation = {
   COMPANY: {
     About: 'https://docs.opencollective.com/help/about',
     Blog: 'https://blog.opencollective.com/',
+    Hiring: '/hiring',
     'Terms of Service': '/tos',
     'Privacy Policy': '/privacypolicy',
   },
@@ -130,7 +131,7 @@ class Footer extends React.Component {
                     />
                   )}
                 >
-                  <InfoCircle size={16} cursor="pointer" />
+                  <InfoCircle size={16} />
                 </StyledTooltip>
               </P>
               <div data-cy="language-switcher">

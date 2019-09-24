@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
 import Container from './Container';
@@ -13,6 +13,14 @@ import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
+import StyledCheckbox from './StyledCheckbox';
+
+const messages = defineMessages({
+  newsletter: {
+    id: 'newsletter.label',
+    defaultMessage: 'Receive our monthly newsletter',
+  },
+});
 
 const Tab = ({ active, children, setActive }) => (
   <Container
@@ -57,8 +65,25 @@ SecondaryAction.propTypes = {
   onSecondaryAction: PropTypes.func,
 };
 
+const NewsletterCheckBox = ({ onChange, checked }) => {
+  const intl = useIntl();
+  return (
+    <StyledCheckbox
+      onChange={({ checked, name }) => onChange({ target: { name, value: checked } })}
+      checked={checked}
+      name="newsletterOptIn"
+      label={intl.formatMessage(messages.newsletter)}
+    />
+  );
+};
+
+NewsletterCheckBox.propTypes = {
+  onChange: PropTypes.func,
+  checked: PropTypes.bool,
+};
+
 const useForm = ({ onEmailChange, errors }) => {
-  const [state, setState] = useState({ errors });
+  const [state, setState] = useState({ errors, newsletterOptIn: false });
 
   return {
     getFieldProps: name => ({
@@ -131,7 +156,7 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['firstName', 'lastName']);
+            const data = pick(state, ['firstName', 'lastName', 'newsletterOptIn']);
             onPersonalSubmit({ ...data, email });
           }}
           method="POST"
@@ -163,6 +188,10 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
+          <Box mb={4}>
+            <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
+          </Box>
+
           <StyledButton
             buttonStyle="primary"
             disabled={!email}
@@ -182,7 +211,15 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['firstName', 'lastName', 'orgName', 'website', 'githubHandle', 'twitterHandle']);
+            const data = pick(state, [
+              'firstName',
+              'lastName',
+              'orgName',
+              'website',
+              'githubHandle',
+              'twitterHandle',
+              'newsletterOptIn',
+            ]);
             onOrgSubmit({ ...data, email });
           }}
           method="POST"
@@ -251,6 +288,10 @@ const CreateProfile = ({
             <StyledInputField label="Twitter (optional)" htmlFor="twitterHandle" error={getFieldError('twitterHandle')}>
               {inputProps => <StyledInputGroup {...inputProps} {...getFieldProps(inputProps.name)} prepend="@" />}
             </StyledInputField>
+          </Box>
+
+          <Box mb={4}>
+            <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
           </Box>
 
           <StyledButton

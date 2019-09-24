@@ -1,139 +1,99 @@
-import React, { Component, createRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
+import uuid from 'uuid/v4';
 
-import Container from './Container';
-import StyledCard from './StyledCard';
+const StyledTooltip = styled(ReactTooltip)`
+  max-width: 320px;
+  z-index: 1000000;
+  opacity: 0.96 !important;
+  border-radius: 8px;
+  box-shadow: 0px 3px 6px 1px rgba(20, 20, 20, 0.08);
+  padding: 16px;
+  font-size: 12px;
+  text-transform: initial;
+  white-space: normal;
 
-class Popup extends Component {
-  static propTypes = {
-    children: PropTypes.node,
-  };
-
-  constructor(props) {
-    super(props);
-    this.ref = createRef();
-    this.state = {
-      display: false,
-      position: { bottom: 20, left: -160 },
-    };
-  }
-
-  componentDidMount() {
-    const containerRect = this.ref.current.getBoundingClientRect();
-    const { bottom, height, top, width } = containerRect;
-    const centerX = -(width / 2);
-    const centerY = -(height / 2);
-
-    let nextX = width / 2 > containerRect.left ? { left: 0 } : { left: centerX };
-    let nextY = { bottom: 20 };
-
-    // popup is too tall
-    if (top < 0) {
-      // popup would be too low
-      // display centered on the y-axis, next to the container
-      if (containerRect.bottom + bottom > height - containerRect.height - 5) {
-        nextY = { bottom: centerY + containerRect.height / 2 };
-        nextX = { left: containerRect.width + 10 };
-      } else {
-        // diplay popup below container
-        nextY = { top: containerRect.height + 5 };
-      }
-    }
-
-    // popup will show too far right
-    if (containerRect.right + width >= document.body.clientWidth) {
-      nextX = { left: document.body.clientWidth - (containerRect.right + width) };
-    }
-
-    this.setState({ display: true, position: { ...nextX, ...nextY } });
-  }
-
-  render() {
-    const { children } = this.props;
-    const { display, position } = this.state;
-    return (
-      <Container role="tooltip" position="absolute" {...position} onClick={this.onClick}>
-        <StyledCard
-          borderColor="black.900"
-          bg="black.transparent.90"
-          color="white.full"
-          maxWidth={280}
-          p={3}
-          ref={this.ref}
-          style={{ opacity: display ? 1 : 0 }}
-          width="max-content"
-        >
-          {children}
-        </StyledCard>
-      </Container>
-    );
-  }
-}
-
-const MainContainer = styled.div`
-  position: relative;
-  display: inline-block;
-  &:focus {
-    outline: none;
-
-    [data-toggle='tooltip'] {
-      outline: 1px dashed lightgrey;
-    }
+  &.type-light {
+    background: white;
+    color: ${props => props.theme.colors.black[700]};
+    border: 1px solid rgba(20, 20, 20, 0.08);
   }
 `;
 
-class StyledTooltip extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { isDisplayed: false };
-    this.ref = React.createRef();
+const InlineDiv = styled.div`
+  display: inline-block;
+  cursor: help;
+`;
+
+/**
+ * A tooltip to show overlays on hover.
+ *
+ * Relies on [react-tooltip](https://react-tooltip.netlify.com/) and accepts any
+ * of its properties.
+ */
+class Tooltip extends React.Component {
+  static propTypes = {
+    /** Tooltip type */
+    type: PropTypes.oneOf(['success', 'warning', 'error', 'info', 'light', 'dark']),
+    /** Tooltip place */
+    place: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+    /** The popup content */
+    content: PropTypes.func,
+    /** See react-tooltip */
+    delayHide: PropTypes.number,
+    /** See react-tooltip */
+    delayUpdate: PropTypes.number,
+    /** The trigger. Either:
+     *  - A render func, that gets passed props to set on the trigger
+     *  - A React node, rendered inside an inline-div
+     */
+    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+  };
+
+  static defaultProps = {
+    type: 'dark',
+    place: 'top',
+    delayHide: 500,
+    delayUpdate: 500,
+  };
+
+  state = { id: null }; // We only set `id` on the client to avoid mismatches with SSR
+
+  componentDidMount() {
+    this.setState({ id: `tooltip-${uuid()}` });
   }
 
-  onMouseEnter = () => {
-    this.setState({ isDisplayed: true });
-  };
-
-  onMouseLeave = () => {
-    if (!this.state.isFocused) {
-      this.setState({ isDisplayed: false });
-    }
-  };
-
-  onBlur = e => {
-    // Ignore blur event if new target is self or a children
-    if (e.relatedTarget !== this.ref.current && !this.ref.current.contains(e.relatedTarget)) {
-      this.setState({ isDisplayed: false, isFocused: false });
-    }
-  };
-
-  onFocus = () => {
-    this.setState({ isDisplayed: true, isFocused: true });
+  renderContent = () => {
+    const { content } = this.props;
+    return typeof content === 'function' ? content() : content;
   };
 
   render() {
-    const { content, children } = this.props;
+    const isMounted = Boolean(this.state.id);
+    const triggerProps = isMounted ? { 'data-for': this.state.id, 'data-tip': true } : {};
     return (
-      <MainContainer
-        tabIndex="0"
-        ref={this.ref}
-        onFocus={this.onFocus}
-        onBlur={this.onBlur}
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
-      >
-        {this.state.isDisplayed && <Popup>{content()}</Popup>}
-        <div data-toggle="tooltip">{children}</div>
-      </MainContainer>
+      <React.Fragment>
+        {typeof this.props.children === 'function' ? (
+          this.props.children(triggerProps)
+        ) : (
+          <InlineDiv {...triggerProps}>{this.props.children}</InlineDiv>
+        )}
+        {isMounted && (
+          <StyledTooltip
+            id={this.state.id}
+            effect="solid"
+            delayHide={this.props.delayHide}
+            delayUpdate={this.props.delayUpdate}
+            place={this.props.place}
+            type={this.props.type}
+            getContent={this.renderContent}
+          />
+        )}
+      </React.Fragment>
     );
   }
 }
 
-StyledTooltip.propTypes = {
-  /** Child component that triggers tooltip */
-  children: PropTypes.node,
-  /** A function to render the content to display in the tooltip */
-  content: PropTypes.func.isRequired,
-};
-
-export default StyledTooltip;
+export default Tooltip;

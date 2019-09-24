@@ -139,7 +139,7 @@ class HostPendingApplications extends React.Component {
         {({ loading, error, data }) =>
           !data || error ? (
             <MessageBox type="error" withIcon>
-              {error.message}
+              {error ? error.message : 'Unknown error'}
             </MessageBox>
           ) : (
             this.renderPendingCollectives(data, loading)

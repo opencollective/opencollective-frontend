@@ -62,7 +62,10 @@ class CreateEvent extends React.Component {
     } catch (err) {
       console.error('>>> createEvent error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
-      this.setState({ result: { error: errorMsg } });
+      this.setState({
+        status: 'idle',
+        result: { error: errorMsg },
+      });
       throw new Error(errorMsg);
     }
   }

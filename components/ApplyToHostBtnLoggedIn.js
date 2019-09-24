@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { get, truncate } from 'lodash';
 
 import { compose } from '../lib/utils';
 
@@ -29,11 +29,6 @@ const TOS = styled(P)`
   text-shadow: none;
   margin-top: 8px;
   margin-bottom: 16px;
-`;
-
-const TOSLinkWrapper = styled.div`
-  text-align: left;
-  margin-left: 20px;
 `;
 
 class ApplyToHostBtnLoggedIn extends React.Component {
@@ -110,7 +105,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                 <FormattedMessage
                   id="host.apply.btn"
                   defaultMessage="Apply with {collective}"
-                  values={{ collective: <strong>{this.inactiveCollective.name}</strong> }}
+                  values={{ collective: <strong>{truncate(this.inactiveCollective.name, { length: 18 })}</strong> }}
                 />
               </StyledButton>
             )}
@@ -141,17 +136,21 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                 onChange={({ checked }) => this.setState({ checkTOS: checked })}
                 checked={this.state.checkTOS}
                 size={16}
+                label={
+                  <Container ml={2}>
+                    <FormattedMessage
+                      id="ApplyToHostBtnLoggedIn.TOS"
+                      defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
+                      values={{
+                        'tos-link': msg => (
+                          <ExternalLinkNewTab href={get(host, 'settings.tos')}>{msg}</ExternalLinkNewTab>
+                        ),
+                        hostName: host.name,
+                      }}
+                    />
+                  </Container>
+                }
               />
-              <TOSLinkWrapper>
-                <FormattedMessage
-                  id="ApplyToHostBtnLoggedIn.TOS"
-                  defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
-                  values={{
-                    'tos-link': msg => <ExternalLinkNewTab href={get(host, 'settings.tos')}>{msg}</ExternalLinkNewTab>,
-                    hostName: host.name,
-                  }}
-                />
-              </TOSLinkWrapper>
             </CheckboxWrapper>
           </ModalBody>
           <ModalFooter>

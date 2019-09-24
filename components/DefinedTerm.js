@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import { borderColor, color } from 'styled-system';
+import { borderColor, color, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
@@ -16,6 +16,8 @@ export const Terms = {
   FISCAL_HOST: 'FISCAL_HOST',
   GIFT_CARD: 'GIFT_CARD',
   HOST_FEE: 'HOST_FEE',
+  ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
+  EXPENSE_TYPE: 'EXPENSE_TYPE',
 };
 
 const TranslatedTerms = defineMessages({
@@ -30,6 +32,14 @@ const TranslatedTerms = defineMessages({
   [Terms.GIFT_CARD]: {
     id: 'GiftCard',
     defaultMessage: 'Gift card',
+  },
+  [Terms.ESTIMATED_BUDGET]: {
+    id: 'CollectivePage.SectionBudget.Annual',
+    defaultMessage: 'Estimated annual budget',
+  },
+  [Terms.EXPENSE_TYPE]: {
+    id: 'expense.type',
+    defaultMessage: 'Type',
   },
 });
 
@@ -48,6 +58,15 @@ const TranslatedDefinitions = defineMessages({
     id: 'GiftCard.definition',
     defaultMessage: 'Gift cards empower your employees or community members to support the projects they love.',
   },
+  [Terms.ESTIMATED_BUDGET]: {
+    id: 'CollectivePage.SectionBudget.Annual.Definition',
+    defaultMessage: 'Projected annual budget based on total financial contributions from the past 12 months.',
+  },
+  [Terms.EXPENSE_TYPE]: {
+    id: 'expense.type.tooltip',
+    defaultMessage:
+      "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
+  },
 });
 
 const UnderlinedTerm = styled.span`
@@ -57,6 +76,7 @@ const UnderlinedTerm = styled.span`
 
   ${color}
   ${borderColor}
+  ${typography}
   ${textTransform}
 
   &:hover {
@@ -69,12 +89,14 @@ const UnderlinedTerm = styled.span`
  * Underlines the given word and show a tooltip with the definition when focused
  * or hovered. Both the term and the definition are translated.
  */
-const DefinedTerm = ({ intl, term, termTextTransform, children, color }) => {
+const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color }) => {
   return (
     <StyledTooltip content={() => intl.formatMessage(TranslatedDefinitions[term])}>
-      <UnderlinedTerm textTransform={termTextTransform} color={color} borderColor={color}>
-        {children || intl.formatMessage(TranslatedTerms[term])}
-      </UnderlinedTerm>
+      {props => (
+        <UnderlinedTerm {...props} textTransform={textTransform} color={color} borderColor={color} fontSize={fontSize}>
+          {children || intl.formatMessage(TranslatedTerms[term])}
+        </UnderlinedTerm>
+      )}
     </StyledTooltip>
   );
 };
@@ -83,9 +105,11 @@ DefinedTerm.propTypes = {
   /** The term to be defined */
   term: PropTypes.oneOf(Object.values(Terms)),
   /** Applies to the underlined term */
-  termTextTransform: PropTypes.string,
+  textTransform: PropTypes.string,
   /** Color for the text and the underline */
   color: PropTypes.string,
+  /** Font size */
+  fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** If provided, will be rendered in place of the term */
   children: PropTypes.node,
   /** @ignore from injectIntl */

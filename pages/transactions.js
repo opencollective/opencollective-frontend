@@ -10,11 +10,13 @@ import ErrorPage from '../components/ErrorPage';
 
 import TransactionsWithData from '../components/expenses/TransactionsWithData';
 
+import { CollectiveType } from '../lib/constants/collectives';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { withUser } from '../components/UserProvider';
+import { Sections } from '../components/collective-page/_constants';
 
 class TransactionsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
@@ -73,6 +75,7 @@ class TransactionsPage extends React.Component {
             href={`/${collective.slug}`}
             LoggedInUser={LoggedInUser}
             key={collective.slug}
+            selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
             displayContributeLink={
               collective.isActive && collective.host && ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1
             }

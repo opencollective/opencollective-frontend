@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Mutation } from 'react-apollo';
 
 import { Camera } from 'styled-icons/feather/Camera';
+import { Settings } from 'styled-icons/feather/Settings';
 
 import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/utils';
@@ -15,6 +16,7 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import { EditAvatarMutation } from '../graphql/mutations';
+import Link from '../../Link';
 
 const AVATAR_SIZE = 128;
 
@@ -27,8 +29,8 @@ const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ '
 
 const EditOverlay = styled.div`
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 128px;
+  height: 128px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -42,6 +44,7 @@ const EditOverlay = styled.div`
 
 const EditableAvatarContainer = styled.div`
   position: relative;
+  width: 128px;
 
   ${props =>
     !props.isDragActive &&
@@ -73,7 +76,14 @@ const Triangle = styled.div`
   text-shadow: -2px -3px 4px rgba(121, 121, 121, 0.5);
 `;
 
-const HeroAvatar = ({ collective, isAdmin }) => {
+const Translations = defineMessages({
+  settings: {
+    id: 'collective.settings',
+    defaultMessage: 'Settings',
+  },
+});
+
+const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [editing, setEditing] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
@@ -83,44 +93,61 @@ const HeroAvatar = ({ collective, isAdmin }) => {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
   } else if (!editing) {
     return (
-      <Dropzone
-        style={{}}
-        multiple={false}
-        accept="image/jpeg, image/png"
-        disabled={submitting}
-        onDrop={acceptedFiles => {
-          setUploadedImage(acceptedFiles[0]);
-          setEditing(true);
-        }}
-      >
-        {({ isDragActive, isDragAccept }) => (
-          <EditableAvatarContainer isDragActive={isDragActive}>
-            <EditOverlay borderRadius={borderRadius}>
-              {!isDragActive && (
-                <React.Fragment>
-                  <StyledRoundButton backgroundColor="#297EFF" color="white.full" size={40} mb={2}>
-                    <Camera size={25} />
-                  </StyledRoundButton>
-                  <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
-                </React.Fragment>
-              )}
-              {isDragActive &&
-                (isDragAccept ? (
-                  <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
-                ) : (
-                  <FormattedMessage id="uploadImage.isDragReject" defaultMessage="🚫 This file type is not accepted" />
-                ))}
-            </EditOverlay>
-            <Avatar collective={collective} radius={AVATAR_SIZE} />
-          </EditableAvatarContainer>
-        )}
-      </Dropzone>
+      <React.Fragment>
+        <Dropzone
+          style={{}}
+          multiple={false}
+          accept="image/jpeg, image/png"
+          disabled={submitting}
+          inputProps={{ style: { width: 1 } }}
+          onDrop={acceptedFiles => {
+            setUploadedImage(acceptedFiles[0]);
+            setEditing(true);
+          }}
+        >
+          {({ isDragActive, isDragAccept }) => (
+            <EditableAvatarContainer isDragActive={isDragActive}>
+              <EditOverlay borderRadius={borderRadius}>
+                {!isDragActive && (
+                  <React.Fragment>
+                    <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
+                      <Camera size={25} />
+                    </StyledRoundButton>
+                    <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
+                  </React.Fragment>
+                )}
+                {isDragActive &&
+                  (isDragAccept ? (
+                    <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
+                  ) : (
+                    <FormattedMessage
+                      id="uploadImage.isDragReject"
+                      defaultMessage="🚫 This file type is not accepted"
+                    />
+                  ))}
+              </EditOverlay>
+              <Avatar collective={collective} radius={AVATAR_SIZE} />
+            </EditableAvatarContainer>
+          )}
+        </Dropzone>
+        <Container position="absolute" right={0} bottom={0}>
+          <Link
+            route="editCollective"
+            params={{ slug: collective.slug }}
+            title={intl.formatMessage(Translations.settings)}
+          >
+            <StyledRoundButton size={40} color="black.700">
+              <Settings size={18} />
+            </StyledRoundButton>
+          </Link>
+        </Container>
+      </React.Fragment>
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
       <Mutation mutation={EditAvatarMutation}>
         {editAvatar => (
-          <div>
+          <>
             <EditingAvatarContainer borderRadius={borderRadius}>
               <img src={uploadedImage ? uploadedImage.preview : collective.imageUrl} alt="" />
             </EditingAvatarContainer>
@@ -175,7 +202,7 @@ const HeroAvatar = ({ collective, isAdmin }) => {
                 <FormattedMessage id="save" defaultMessage="save" />
               </StyledButton>
             </Container>
-          </div>
+          </>
         )}
       </Mutation>
     ) : (
@@ -191,6 +218,7 @@ HeroAvatar.propTypes = {
     imageUrl: PropTypes.string,
   }).isRequired,
   isAdmin: PropTypes.bool,
+  intl: PropTypes.object,
 };
 
-export default HeroAvatar;
+export default injectIntl(HeroAvatar);

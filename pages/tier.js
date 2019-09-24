@@ -3,21 +3,13 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { createGlobalStyle } from 'styled-components';
 
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import TierPageContent from '../components/tier-page';
-
-/** Overrides global styles for this page */
-const GlobalStyles = createGlobalStyle`
-  main {
-    /** The "overflow: hidden" set in Body prevents from using position sticky */
-    overflow-x: inherit !important;
-  }
-`;
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -74,8 +66,7 @@ class TierPage extends React.Component {
         {data.loading || !data.Tier || !data.Tier.collective ? (
           <Loading />
         ) : (
-          <React.Fragment>
-            <GlobalStyles />
+          <CollectiveThemeProvider collective={data.Tier.collective}>
             <TierPageContent
               LoggedInUser={LoggedInUser}
               collective={data.Tier.collective}
@@ -83,14 +74,14 @@ class TierPage extends React.Component {
               contributors={data.Tier.contributors}
               contributorsStats={data.Tier.stats.contributors}
             />
-          </React.Fragment>
+          </CollectiveThemeProvider>
         )}
       </Page>
     );
   }
 }
 
-const getCollective = graphql(gql`
+const getTierData = graphql(gql`
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
@@ -122,6 +113,22 @@ const getCollective = graphql(gql`
         type
         name
         backgroundImage
+        settings
+        currency
+        isArchived
+        path
+        host {
+          id
+        }
+        stats {
+          id
+          updates
+          balance
+          transactions {
+            id
+            all
+          }
+        }
         admins: members(role: "ADMIN") {
           id
           role
@@ -152,6 +159,7 @@ const getCollective = graphql(gql`
         description
         publicMessage
         collectiveSlug
+        totalAmountDonated
         type
         isIncognito
       }
@@ -159,4 +167,4 @@ const getCollective = graphql(gql`
   }
 `);
 
-export default withUser(getCollective(TierPage));
+export default withUser(getTierData(TierPage));

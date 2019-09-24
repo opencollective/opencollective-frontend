@@ -5,11 +5,12 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { compose } from '../lib/utils';
+import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
 
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
+import Link from '../components/Link';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
@@ -60,6 +61,7 @@ class CreateOrderPage extends React.Component {
       verb: query.verb,
       redirect: query.redirect,
       customData: query.data,
+      skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
     };
   }
 
@@ -76,6 +78,7 @@ class CreateOrderPage extends React.Component {
     redirect: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from injectIntl
+    skipStepDetails: PropTypes.bool,
   };
 
   getPageMetadata() {
@@ -117,6 +120,20 @@ class CreateOrderPage extends React.Component {
           </MessageBox>
         </Flex>
       );
+    } else if (this.props.tierId && !data.Tier) {
+      return (
+        <Flex py={5} justifyContent="center">
+          <MessageBox type="error" withIcon>
+            <FormattedMessage
+              id="createOrder.missingTier"
+              defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins. "
+            />
+            <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
+              <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
+            </Link>
+          </MessageBox>
+        </Flex>
+      );
     } else {
       return (
         <ContributionFlow
@@ -131,6 +148,7 @@ class CreateOrderPage extends React.Component {
           fixedInterval={this.props.interval}
           fixedAmount={this.props.totalAmount}
           customData={this.props.customData}
+          skipStepDetails={this.props.skipStepDetails}
         />
       );
     }

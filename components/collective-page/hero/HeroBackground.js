@@ -13,6 +13,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
+import MessageBox from '../../MessageBox';
 
 // Local imports
 import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
@@ -35,7 +36,7 @@ const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ '
 
 const generateBackground = theme => {
   const color = theme.colors.primary[300];
-  const gradient = `linear-gradient(10deg, ${theme.colors.primary[700]}, ${theme.colors.primary[200]})`;
+  const gradient = `linear-gradient(10deg, ${theme.colors.primary[800]}, ${theme.colors.primary[300]})`;
   return `${gradient}, ${color}`;
 };
 
@@ -47,6 +48,10 @@ const StyledBackground = styled.div`
   width: 100%;
   max-width: 1368px; // Should match SVG's viewbox
   z-index: ${props => (props.isEditing ? 0 : -1)};
+
+  img {
+    margin: 0;
+  }
 
   @supports (mask-size: cover) {
     background: ${props => generateBackground(props.theme)};
@@ -71,10 +76,6 @@ const ImageContainer = styled.div`
   right: 0;
   position: absolute;
   overflow: hidden;
-
-  img {
-    margin: 0;
-  }
 `;
 
 const BackgroundImage = styled.img.attrs({ alt: '' })`
@@ -129,7 +130,6 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
           <Cropper
             image={uploadedImage ? uploadedImage.preview : collective.backgroundImage}
             cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}
-            apect={BASE_WIDTH / BASE_HEIGHT}
             crop={crop}
             zoom={zoom}
             minZoom={0.25}
@@ -138,7 +138,10 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             restrictPosition={false}
             onCropChange={onCropChange}
             onZoomChange={onZoomChange}
-            style={{ imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' } }}
+            style={{
+              imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
+              containerStyle: { height: BASE_HEIGHT },
+            }}
           />
           <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
             <Dropzone
@@ -238,6 +241,14 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             >
               <FormattedMessage id="save" defaultMessage="save" />
             </StyledButton>
+          </Container>
+          <Container zIndex={222} position="absolute" right={25} top={75}>
+            <MessageBox type="info" withIcon opacity={0.8} px={2} py={1}>
+              <FormattedMessage
+                id="HeroBackground.Instructions"
+                defaultMessage="Use your mouse wheel or pinch to change the zoom, drag and drop to adjust position."
+              />
+            </MessageBox>
           </Container>
         </StyledBackground>
       )}

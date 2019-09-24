@@ -40,11 +40,13 @@ const HTMLContent = styled(({ content, ...props }) => {
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
+  word-break: break-word;
 
   h1,
   h2,
   h3 {
     margin: 0;
+    margin-bottom: 0.5em;
   }
 
   img {
@@ -65,17 +67,13 @@ const HTMLContent = styled(({ content, ...props }) => {
 
   ul {
     padding: 0;
-    padding-left: 1.5em;
+    padding-left: 0.75em;
     position: relative;
-
-    @media (max-width: 40em) {
-      padding-left: 1.25em;
-    }
 
     li {
       list-style: none;
       position: relative;
-      padding: 0 0 0 2em;
+      padding: 0 0 0 1.5em;
       margin-bottom: 0.5em;
 
       &::before {
@@ -83,7 +81,7 @@ const HTMLContent = styled(({ content, ...props }) => {
         position: absolute;
         margin-left: 0;
         left: 0;
-        top: 0.3em;
+        top: 0.45em;
         width: 0.75em;
         height: 0.75em;
         border-radius: 50%;

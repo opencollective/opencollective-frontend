@@ -341,7 +341,13 @@ class UserCollective extends React.Component {
 
             {this.props.message && <MessageModal message={this.props.message} />}
 
-            <CollectiveCover collective={collective} cta={cta} LoggedInUser={LoggedInUser} key={collective.slug} />
+            <CollectiveCover
+              collective={collective}
+              cta={cta}
+              LoggedInUser={LoggedInUser}
+              key={collective.slug}
+              forceLegacy
+            />
 
             <div>
               {get(query, 'OrderId') && (

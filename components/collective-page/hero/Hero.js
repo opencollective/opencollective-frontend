@@ -8,10 +8,9 @@ import { get } from 'lodash';
 // Icons
 import { Twitter } from 'styled-icons/feather/Twitter';
 import { Github } from 'styled-icons/feather/Github';
-import { ExternalLink } from 'styled-icons/feather/ExternalLink';
-import { Settings } from 'styled-icons/feather/Settings';
 import { Camera } from 'styled-icons/feather/Camera';
 import { Palette } from 'styled-icons/boxicons-regular/Palette';
+import { Globe } from 'styled-icons/feather/Globe';
 
 // General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -25,7 +24,6 @@ import Container from '../../Container';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import StyledTag from '../../StyledTag';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
-import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import CollectiveCallsToAction from '../../CollectiveCallsToAction';
 import UserCompany from '../../UserCompany';
@@ -43,17 +41,12 @@ const Translations = defineMessages({
     id: 'collective.website.label',
     defaultMessage: 'Website',
   },
-  settings: {
-    id: 'collective.settings',
-    defaultMessage: 'Settings',
-  },
 });
 
 const StyledShortDescription = styled.h2`
   margin-top: 8px;
   font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
   line-height: 24px;
-  text-align: center;
 
   @media (min-width: 40em) {
     text-align: left;
@@ -106,27 +99,20 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           />
         </Container>
       )}
-      <ContainerSectionContent
-        pt={40}
-        display="flex"
-        flexDirection="column"
-        alignItems={['center', null, 'flex-start']}
-      >
+      <ContainerSectionContent pt={40} display="flex" flexDirection="column">
         {/* Collective presentation (name, logo, description...) */}
-        <Flex flexDirection={'column'} alignItems={['center', null, 'flex-start']}>
-          <Container position="relative" display="flex" justifyContent={['center', null, 'flex-start']} mb={2}>
-            <HeroAvatar collective={collective} isAdmin={isAdmin} />
-          </Container>
-          <H1 color="black.800" fontSize={'H3'} lineHeight={'H3'} textAlign={['center', null, 'left']}>
-            {collective.name || collective.slug}
-          </H1>
-        </Flex>
+        <Container position="relative" mb={2} width={128}>
+          <HeroAvatar collective={collective} isAdmin={isAdmin} />
+        </Container>
+        <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
+          {collective.name || collective.slug}
+        </H1>
 
         {collective.company && (
           <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
         )}
 
-        <Flex alignItems="center" justifyContent={['center', null, 'left']} flexWrap="wrap">
+        <Flex alignItems="center" flexWrap="wrap">
           {isCollective && (
             <StyledTag mx={2} my={2} mb={2}>
               <I18nCollectiveTags
@@ -135,17 +121,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             </StyledTag>
           )}
           <Flex my={2}>
-            {isAdmin && (
-              <Link
-                route="editCollective"
-                params={{ slug: collective.slug }}
-                title={intl.formatMessage(Translations.settings)}
-              >
-                <StyledRoundButton size={32} mr={3}>
-                  <Settings size={16} />
-                </StyledRoundButton>
-              </Link>
-            )}
             {collective.twitterHandle && (
               <ExternalLinkNewTab href={twitterProfileUrl(collective.twitterHandle)} title="Twitter">
                 <StyledRoundButton size={32} mr={3}>
@@ -163,7 +138,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             {collective.website && (
               <ExternalLinkNewTab href={collective.website} title={intl.formatMessage(Translations.website)}>
                 <StyledRoundButton size={32} mr={3}>
-                  <ExternalLink size={12} />
+                  <Globe size={14} />
                 </StyledRoundButton>
               </ExternalLinkNewTab>
             )}
@@ -221,10 +196,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
         <CollectiveCallsToAction
           display={['flex', null, 'none']}
+          flexWrap="wrap"
           mt={3}
           width="100%"
           collective={collective}
           callsToAction={callsToAction}
+          buttonsMinWidth={140}
         />
       </ContainerSectionContent>
     </Container>

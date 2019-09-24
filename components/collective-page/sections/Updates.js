@@ -10,7 +10,7 @@ import { graphql } from 'react-apollo';
 import { Lock } from 'styled-icons/fa-solid';
 
 import { formatDate } from '../../../lib/utils';
-import { P } from '../../Text';
+import { P, Span } from '../../Text';
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledTooltip from '../../StyledTooltip';
@@ -65,7 +65,7 @@ class SectionUpdates extends React.PureComponent {
     }).isRequired,
 
     /** Does user can see drafts? */
-    canSeeDrafts: PropTypes.bool.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
 
     /** Is user loggedIn? */
     isLoggedIn: PropTypes.bool.isRequired,
@@ -104,19 +104,41 @@ class SectionUpdates extends React.PureComponent {
   }
 
   render() {
-    const { collective, canSeeDrafts } = this.props;
+    const { collective, isAdmin } = this.props;
     const updates = get(this.props.data, 'Collective.updates', []);
 
     // Nothing to show if updates is empty and user can't add new ones
-    if (isEmpty(updates) && !canSeeDrafts) {
+    if (isEmpty(updates) && !isAdmin) {
       return null;
     }
 
     return (
-      <ContainerSectionContent py={[5, 6]}>
-        <SectionTitle mb={4}>
-          <FormattedMessage id="CollectivePage.SectionUpdates.Title" defaultMessage="Latest updates" />
+      <ContainerSectionContent pt={5}>
+        <SectionTitle mb={24}>
+          <FormattedMessage
+            id="CollectivePage.SectionUpdates.Title"
+            defaultMessage="What's new with {collectiveName}"
+            values={{ collectiveName: collective.name }}
+          />
         </SectionTitle>
+        <Flex mb={3} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+          <P color="black.700" my={2} mr={2}>
+            <FormattedMessage
+              id="section.updates.subtitle"
+              defaultMessage="Stay up to dates with our latest activities and progress."
+            />
+          </P>
+          {isAdmin && (
+            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+              <StyledButton buttonStyle="primary">
+                <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
+                  +
+                </Span>
+                <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
+              </StyledButton>
+            </Link>
+          )}
+        </Flex>
         {isEmpty(updates) ? (
           <div>
             <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="Paragraph">
@@ -125,11 +147,6 @@ class SectionUpdates extends React.PureComponent {
                 defaultMessage="Use this section to promote your actions and keep your community up-to-date."
               />
             </MessageBox>
-            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonSize="large" width={1}>
-                <FormattedMessage id="SectionUpdates.CreateBtn" defaultMessage="Post an update" />
-              </StyledButton>
-            </Link>
           </div>
         ) : (
           <StyledCard>
@@ -212,7 +229,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton buttonSize="large" mt={3} width={1}>
+            <StyledButton buttonSize="large" mt={4} width={1} p="10px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>
@@ -228,7 +245,7 @@ export default injectIntl(
       return {
         variables: {
           slug: props.collective.slug,
-          onlyPublishedUpdates: !props.canSeeDrafts,
+          onlyPublishedUpdates: !props.isAdmin,
         },
       };
     },

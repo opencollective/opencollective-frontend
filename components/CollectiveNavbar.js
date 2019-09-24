@@ -6,7 +6,6 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 
@@ -21,9 +20,8 @@ import CollectiveCallsToAction from './CollectiveCallsToAction';
 
 /** Main container for the entire component */
 const MainContainer = styled.div`
-  border-bottom: 1px solid #e6e8eb;
   background: white;
-  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.7);
+  box-shadow: 0px 6px 10px -5px rgba(214, 214, 214, 0.5);
 
   /** Everything's inside cannot be larger than max section width */
   & > * {
@@ -100,16 +98,11 @@ const MenuLinkContainer = styled.div`
     &::after {
       display: none;
     }
-    ${props =>
-      props.isSelected &&
-      css`
-        text-decoration: underline;
-      `}
   }
 `;
 
 const InfosContainer = styled(Container)`
-  padding: 16px 24px;
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -119,7 +112,7 @@ const InfosContainer = styled(Container)`
   transition: opacity 0.075s ease-out, transform 0.1s ease-out, visibility 0.075s ease-out;
 
   @media (max-width: 52em) {
-    padding: 12px 16px;
+    padding: 10px 16px;
   }
 
   /** Hidden state */
@@ -154,7 +147,7 @@ const CollectiveName = styled.h1`
   font-size: 20px;
   line-height: 24px;
   text-align: center;
-  letter-spacing: -1.2px;
+  letter-spacing: -1px;
   font-weight: bold;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -250,7 +243,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     if (!balance && !(transactions && transactions.all)) {
       toRemove.add(Sections.BUDGET);
     }
-    if (!collective.longDescription) {
+    if (!collective.hasLongDescription && !collective.longDescription) {
       toRemove.add(Sections.ABOUT);
     }
   }
@@ -283,13 +276,13 @@ const CollectiveNavbar = ({
       {/** Collective infos */}
       <InfosContainer isHidden={hideInfos} isAnimated={isAnimated}>
         <Flex alignItems="center" flex="1 1 80%" css={{ minWidth: 0 /** For text-overflow */ }}>
-          <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion>
+          <LinkCollective collective={collective} onClick={onCollectiveClick}>
             <Container borderRadius="25%" mr={2}>
               <Avatar collective={collective} radius={40} />
             </Container>
           </LinkCollective>
           <CollectiveName>
-            <LinkCollective collective={collective} onClick={onCollectiveClick} isNewVersion />
+            <LinkCollective collective={collective} onClick={onCollectiveClick} />
           </CollectiveName>
           {isAdmin && showEdit && (
             <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">
@@ -307,7 +300,7 @@ const CollectiveNavbar = ({
         position={['absolute', 'relative']}
         display="flex"
         justifyContent="space-between"
-        px={[0, 24]}
+        px={[0, Dimensions.PADDING_X[1]]}
         width="100%"
         background="white"
       >
@@ -331,7 +324,7 @@ const CollectiveNavbar = ({
             >
               <MenuLink
                 as={LinkComponent}
-                collectivePath={collective.path}
+                collectivePath={collective.path || `/${collective.slug}`}
                 section={section}
                 label={intl.formatMessage(i18nSection[section])}
               />
@@ -347,7 +340,7 @@ const CollectiveNavbar = ({
           {callsToAction.hasContact && (
             <MenuLinkContainer mobileOnly>
               <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
-                <ExternalLinkAlt size="1em" /> <FormattedMessage id="Contact" defaultMessage="Contact" />
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
               </MenuLink>
             </MenuLinkContainer>
           )}
@@ -376,8 +369,8 @@ CollectiveNavbar.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
-    path: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    path: PropTypes.string,
     isArchived: PropTypes.bool,
     host: PropTypes.object,
   }).isRequired,

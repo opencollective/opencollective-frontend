@@ -35,17 +35,9 @@ const SectionAbout = ({ collective, canEdit }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Flex flexDirection="column" alignItems="center" px={2} pb={6} pt={[3, 5]}>
+    <Flex flexDirection="column" alignItems="center" px={2} pt={[4, 5]}>
       <SectionTitle textAlign="center" mb={5}>
-        {isCollective ? (
-          <FormattedMessage id="SectionAbout.Title" defaultMessage="Why we do what we do" />
-        ) : (
-          <FormattedMessage
-            id="SectionAbout.TitleAlt"
-            defaultMessage="About {collectiveName}"
-            values={{ collectiveName: collective.name }}
-          />
-        )}
+        <FormattedMessage id="collective.about.title" defaultMessage="About" />
       </SectionTitle>
 
       <Container width="100%" maxWidth={700} margin="0 auto">
