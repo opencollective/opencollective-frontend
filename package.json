@@ -189,7 +189,7 @@
     "react-styleguidist": "9.0.4",
     "react-test-renderer": "^16.9.0",
     "shx": "^0.3.2",
-    "sinon": "^7.4.2",
+    "sinon": "^7.5.0",
     "style-loader": "^1.0.0",
     "url-loader": "^2.1.0",
     "webpack-bundle-analyzer": "^3.5.1"
