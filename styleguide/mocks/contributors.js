@@ -105,7 +105,7 @@ export const webpackContributors = [
     isBacker: true,
     isFundraiser: false,
     since: '2016-12-13T19:49:00.329Z',
-    description: 'Gold Sponsors',
+    description: '"{tierName}"s',
     collectiveSlug: 'capitalone',
     totalAmountDonated: 1200000,
     type: 'ORGANIZATION',
