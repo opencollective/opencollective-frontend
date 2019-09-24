@@ -11,11 +11,13 @@ import SignInOrJoinFree from './SignInOrJoinFree';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Router } from '../server/pages';
+import { withUser } from './UserProvider';
 
 class CreateCollective extends React.Component {
   static propTypes = {
     host: PropTypes.object,
-    LoggedInUser: PropTypes.object,
+    LoggedInUser: PropTypes.object, // from withUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     intl: PropTypes.object.isRequired,
     createCollective: PropTypes.func,
   };
@@ -124,6 +126,7 @@ class CreateCollective extends React.Component {
         result: { success: 'Collective created successfully' },
       });
 
+      await this.props.refetchLoggedInUser();
       if (CollectiveInputType.HostCollectiveId) {
         successParams.status = 'collectiveCreated';
         successParams.CollectiveId = collective.id;
@@ -237,4 +240,4 @@ class CreateCollective extends React.Component {
   }
 }
 
-export default injectIntl(addCreateCollectiveMutation(CreateCollective));
+export default injectIntl(withUser(addCreateCollectiveMutation(CreateCollective)));
