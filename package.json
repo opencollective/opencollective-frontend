@@ -150,7 +150,7 @@
     "styleguide:deploy": "npm run styleguide:build && npx now styleguide && npx now alias -A styleguide/now.json"
   },
   "devDependencies": {
-    "@babel/cli": "7.4.4",
+    "@babel/cli": "7.6.2",
     "@babel/core": "7.4.5",
     "@babel/node": "7.4.5",
     "babel-eslint": "^10.0.3",
