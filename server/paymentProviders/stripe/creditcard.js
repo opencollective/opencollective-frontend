@@ -100,7 +100,6 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
       currency: order.currency,
       customer: hostStripeCustomer.id,
       description: order.description,
-      application_fee_amount: platformFee,
       confirm: true,
       confirmation_method: 'manual',
       metadata: {
@@ -108,6 +107,9 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
         to: `${config.host.website}/${order.collective.slug}`,
       },
     };
+    if (platformFee) {
+      payload.application_fee_amount = platformFee;
+    }
     if (order.interval) {
       payload.setup_future_usage = 'off_session';
     } else if (!order.processedAt && order.data.savePaymentMethod) {
