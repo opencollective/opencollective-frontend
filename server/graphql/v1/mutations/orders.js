@@ -447,12 +447,12 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     // should be moved to a column if it starts to be widely used
     if (order.hostFeePercent) {
       orderData.data.hostFeePercent = order.hostFeePercent;
-    } else if (tier && tier.data && tier.data.hostFeePercent) {
+    } else if (tier && tier.data && tier.data.hostFeePercent !== undefined) {
       orderData.data.hostFeePercent = tier.data.hostFeePercent;
     }
     if (order.platformFeePercent) {
       orderData.data.platformFeePercent = order.platformFeePercent;
-    } else if (tier && tier.data && tier.data.hostFeePercent) {
+    } else if (tier && tier.data && tier.data.platformFeePercent !== undefined) {
       orderData.data.platformFeePercent = tier.data.platformFeePercent;
     }
 
