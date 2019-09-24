@@ -17,7 +17,6 @@ class CreateCollectivePage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveCoverData
     data: PropTypes.object, // from withData
-    LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
   };
 
@@ -26,13 +25,13 @@ class CreateCollectivePage extends React.Component {
   }
 
   render() {
-    const { data = {}, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data = {}, loadingLoggedInUser } = this.props;
 
     if (loadingLoggedInUser || data.error) {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
-    return <CreateCollective host={data.Collective} LoggedInUser={LoggedInUser} />;
+    return <CreateCollective host={data.Collective} />;
   }
 }
 
