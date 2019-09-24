@@ -7,9 +7,10 @@ import { truncate } from 'lodash';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { formatCurrency } from '../../lib/utils';
 import Link from '../Link';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
+import StyledLink from '../StyledLink';
 
 import Contribute from './Contribute';
 
@@ -108,7 +109,9 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
           <P mb={4}>
             {description}{' '}
             {(isTruncated || tier.hasLongDescription) && (
-              <Link
+              <StyledLink
+                as={Link}
+                whiteSpace="nowrap"
                 route="tier"
                 params={{
                   collectiveSlug: collective.slug,
@@ -117,10 +120,8 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                   tierId: tier.id,
                 }}
               >
-                <Span textTransform="capitalize" whiteSpace="nowrap">
-                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-                </Span>
-              </Link>
+                <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+              </StyledLink>
             )}
           </P>
         </div>
