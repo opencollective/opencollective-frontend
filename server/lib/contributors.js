@@ -14,7 +14,7 @@ import { sequelize } from '../models';
  * Returns all the contributors for given collective
  */
 export const getContributorsForCollective = async (collectiveId, { limit = 5000, roles } = {}) => {
-  let cacheKey = `collective_contributors_${limit}`;
+  let cacheKey = `collective_contributors_${collectiveId}_${limit}`;
   if (roles) {
     cacheKey = `${cacheKey}_${roles.join('_')}`;
   }
