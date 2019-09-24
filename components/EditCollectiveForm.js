@@ -86,9 +86,11 @@ class EditCollectiveForm extends React.Component {
       goals: collective.settings.goals || [{}],
     };
 
+    const isNewCollectivePage = parseToBoolean(process.env.NCP_IS_DEFAULT);
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditGoals = collective.type === 'COLLECTIVE' && !parseToBoolean(process.env.NCP_IS_DEFAULT);
+    this.showEditImages = !isNewCollectivePage;
+    this.showEditGoals = collective.type === 'COLLECTIVE' && !isNewCollectivePage;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
@@ -653,14 +655,16 @@ class EditCollectiveForm extends React.Component {
             >
               <FormattedMessage id="editCollective.menu.info" defaultMessage="Info" />
             </MenuItem>
-            <MenuItem
-              selected={this.state.section === 'images'}
-              route="editCollective"
-              params={{ slug: collective.slug, section: 'images' }}
-              className="MenuItem images"
-            >
-              <FormattedMessage id="editCollective.menu." defaultMessage="Images" />
-            </MenuItem>
+            {this.showEditImages && (
+              <MenuItem
+                selected={this.state.section === 'images'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'images' }}
+                className="MenuItem images"
+              >
+                <FormattedMessage id="editCollective.menu." defaultMessage="Images" />
+              </MenuItem>
+            )}
             {this.showEditMembers && (
               <MenuItem
                 selected={this.state.section === 'members'}
