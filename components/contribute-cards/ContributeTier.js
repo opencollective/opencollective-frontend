@@ -5,6 +5,7 @@ import { Box, Flex } from '@rebass/grid';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/utils';
 import Link from '../Link';
 import { P, Span } from '../Text';
@@ -24,6 +25,12 @@ const messages = defineMessages({
 const getContributionTypeFromTier = tier => {
   if (tier.goal) {
     return ContributionTypes.FINANCIAL_GOAL;
+  } else if (tier.type === TierTypes.PRODUCT) {
+    return ContributionTypes.PRODUCT;
+  } else if (tier.type === TierTypes.TICKET) {
+    return ContributionTypes.TICKET;
+  } else if (tier.type === TierTypes.MEMBERSHIP) {
+    return ContributionTypes.MEMBERSHIP;
   } else if (tier.interval) {
     return ContributionTypes.FINANCIAL_RECURRING;
   } else {
