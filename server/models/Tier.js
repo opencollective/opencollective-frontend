@@ -67,7 +67,7 @@ export default function(Sequelize, DataTypes) {
         defaultValue: 'TIER',
       },
 
-      description: DataTypes.STRING,
+      description: DataTypes.STRING(510),
 
       longDescription: {
         type: DataTypes.TEXT,
