@@ -57,7 +57,10 @@ class NewCollectivePage extends React.Component {
     }).isRequired, // from withData
   };
 
-  static getInitialProps({ query: { slug, status } }) {
+  static getInitialProps({ req, res, query: { slug, status } }) {
+    if (res && req && (req.language || req.locale === 'en')) {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    }
     return { slug, status };
   }
 

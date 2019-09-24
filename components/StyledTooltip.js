@@ -12,6 +12,8 @@ const StyledTooltip = styled(ReactTooltip)`
   box-shadow: 0px 3px 6px 1px rgba(20, 20, 20, 0.08);
   padding: 16px;
   font-size: 12px;
+  text-transform: initial;
+  white-space: normal;
 
   &.type-light {
     background: white;

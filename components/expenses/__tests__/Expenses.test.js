@@ -24,6 +24,7 @@ describe('Expenses component', () => {
     slug: 'test',
     id: 1,
     name: 'webpack',
+    currency: 'USD',
     stats: { balance: 10000 },
   };
 
@@ -31,6 +32,7 @@ describe('Expenses component', () => {
     id: 2,
     type: 'USER',
     slug: 'user1',
+    name: 'User 1',
   };
 
   const expenseConsts = {
@@ -38,6 +40,8 @@ describe('Expenses component', () => {
     status: 'APPROVED',
     payoutMethod: 'paypal',
     incurredAt: '2017-11-05',
+    updatedAt: '2017-11-05',
+    category: 'Travel',
     collective,
     fromCollective,
   };

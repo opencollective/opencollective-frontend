@@ -33,7 +33,7 @@ const getContributionTypeFromTier = tier => {
 
 const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const currency = tier.currency || collective.currency;
-  const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minAmount : tier.amount;
+  const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
 
   let description;
@@ -160,7 +160,7 @@ ContributeTier.propTypes = {
     amountType: PropTypes.string,
     button: PropTypes.string,
     goal: PropTypes.number,
-    minAmount: PropTypes.number,
+    minimumAmount: PropTypes.number,
     amount: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,

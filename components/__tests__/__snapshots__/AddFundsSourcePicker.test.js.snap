@@ -426,13 +426,13 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
         className=" css-at12u2-loadingIndicator"
       >
         <span
-          className="css-d0ptw1"
+          className="css-4dz72r"
         />
         <span
-          className="css-3utax6"
+          className="css-1f06n0c"
         />
         <span
-          className="css-1qyc6ze"
+          className="css-1lqdfpi"
         />
       </div>
       <span

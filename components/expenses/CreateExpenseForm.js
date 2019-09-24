@@ -14,6 +14,7 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import Button from '../Button';
 import Container from '../Container';
 import { P } from '../Text';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -65,21 +66,25 @@ class CreateExpenseForm extends React.Component {
         id: 'expense.error.attachmentMissing',
         defaultMessage: 'Missing attachment',
       },
+      'error.expenseTypeMissing': {
+        id: 'expense.error.expenseTypeMissing',
+        defaultMessage: 'Please pick the type of this expense',
+      },
     });
 
     this.categoriesOptions = categories(props.collective.slug).map(category => {
       return { [category]: category };
     });
 
-    this.expenseTypes = Object.keys(expenseTypes).map(t => {
-      return { [t]: titleCase(t) };
+    this.expenseTypes = Object.entries(expenseTypes).map(([key, value]) => {
+      return { [key]: titleCase(value) };
     });
 
     this.state = {
       modified: false,
       expense: {
         category: Object.keys(this.categoriesOptions[0])[0],
-        type: expenseTypes.RECEIPT,
+        type: expenseTypes.DEFAULT,
         payoutMethod: 'paypal',
         paypalEmail: (props.LoggedInUser && props.LoggedInUser.paypalEmail) || undefined,
       },
@@ -134,6 +139,12 @@ class CreateExpenseForm extends React.Component {
       });
       return false;
     }
+    if (expense.type === '' && !expense.type) {
+      this.setState({
+        error: intl.formatMessage(this.messages['error.expenseTypeMissing']),
+      });
+      return false;
+    }
     this.setState({ error: null });
     return true;
   }
@@ -156,7 +167,6 @@ class CreateExpenseForm extends React.Component {
     if (e) {
       e.preventDefault();
     }
-
     this.setState({
       loading: true,
     });
@@ -438,17 +448,17 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage id="expense.type" defaultMessage="type" />
+                <DefinedTerm term={Terms.EXPENSE_TYPE} />
               </label>
               <div className="expenseType">
                 <span className="expenseType">
                   <InputField
                     type="select"
                     options={this.expenseTypes}
-                    defaultValue={expenseTypes.RECEIPT}
+                    defaultValue={expenseTypes.DEFAULT}
                     name="type"
                     className="expenseField"
-                    onChange={expenseType => this.handleChange('type', expenseType)}
+                    onChange={expenseType => this.handleChange('type', expenseTypes[expenseType])}
                   />
                 </span>
               </div>

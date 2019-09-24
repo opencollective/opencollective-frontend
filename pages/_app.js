@@ -5,7 +5,7 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
-import { URL } from 'universal-url';
+import * as Sentry from '@sentry/browser';
 
 // For old browsers without window.Intl
 import 'intl';
@@ -33,6 +33,12 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { getEnvVar } from '../lib/utils';
+
+Sentry.init({
+  dsn: getEnvVar('SENTRY_DSN'),
+  environment: process.env.NODE_ENV,
+});
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -70,65 +76,23 @@ class OpenCollectiveFrontendApp extends App {
     // See https://github.com/formatjs/react-intl/issues/254
     const initialNow = Date.now();
 
-    const digitalClimateStrikeParticipants = [
-      'wwcodenyc',
-      'visjs',
-      'korerowellington',
-      'debates',
-      'hledger',
-      'cljdoc',
-      'streetlives',
-      'javers',
-      'dokku',
-      'kitspace',
-      'pytest',
-      'terser',
-      'ghost',
-      'adnauseam',
-      'opencollective',
-      'opencollectiveinc',
-      'engineering',
-      'design',
-    ];
+    return { pageProps, scripts, initialNow, locale, messages };
+  }
 
-    const digitalClimateStrikeOptions = {
-      enabled: false,
-      cookieExpirationDays: 30,
-      disableGoogleAnalytics: true,
-      showCloseButtonOnFullPageWidget: false,
-      websiteName: 'Open Collective',
-      iframeHost: 'https://oc-digital-climate-strike.now.sh',
-    };
+  componentDidCatch(error, errorInfo) {
+    Sentry.withScope(scope => {
+      Object.keys(errorInfo).forEach(key => {
+        scope.setExtra(key, errorInfo[key]);
+      });
 
-    if (!process.env.CI) {
-      if (ctx.req) {
-        const url = new URL(`${ctx.req.protocol}://${ctx.req.get('host')}${ctx.req.originalUrl}`);
-        if (url.pathname == '/') {
-          digitalClimateStrikeOptions.enabled = true;
-        }
-      }
-      if (pageProps.slug && digitalClimateStrikeParticipants.includes(pageProps.slug)) {
-        digitalClimateStrikeOptions.enabled = true;
-      }
-      if (ctx.req && ctx.req.url.match(/\.html/)) {
-        digitalClimateStrikeOptions.enabled = false;
-      }
-    }
+      Sentry.captureException(error);
+    });
 
-    return { pageProps, scripts, initialNow, locale, messages, digitalClimateStrikeOptions };
+    super.componentDidCatch(error, errorInfo);
   }
 
   render() {
-    const {
-      client,
-      Component,
-      pageProps,
-      scripts,
-      initialNow,
-      locale,
-      messages,
-      digitalClimateStrikeOptions,
-    } = this.props;
+    const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
 
     return (
       <Fragment>
@@ -146,16 +110,6 @@ class OpenCollectiveFrontendApp extends App {
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
-        {digitalClimateStrikeOptions && digitalClimateStrikeOptions.enabled && (
-          <Fragment>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `var DIGITAL_CLIMATE_STRIKE_OPTIONS = ${JSON.stringify(digitalClimateStrikeOptions)};`,
-              }}
-            />
-            <script type="text/javascript" src="/static/scripts/digitalclimatestrike.js?v=2" />
-          </Fragment>
-        )}
       </Fragment>
     );
   }
