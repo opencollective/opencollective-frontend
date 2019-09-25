@@ -1,20 +1,11 @@
+import 'cypress-file-upload';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
-const uploadReceipt = (dropzoneElement = '.InputTypeDropzone') => {
-  const dropEvent = {
-    dataTransfer: {
-      files: [],
-    },
-  };
-
+const uploadReceipt = (dropzoneElement = '.InputTypeDropzone input') => {
   cy.fixture('./images/receipt.jpg').then(picture => {
-    return Cypress.Blob.base64StringToBlob(picture, 'image/jpeg').then(blob => {
-      dropEvent.dataTransfer.files.push(blob);
-    });
+    cy.get(dropzoneElement).upload({ fileContent: picture, fileName: 'receipt.jpg', mimeType: 'image/jpeg' });
   });
-
-  cy.get(dropzoneElement).trigger('drop', dropEvent);
   cy.wait(900);
 };
 

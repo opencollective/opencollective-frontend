@@ -162,6 +162,7 @@
     "commitizen": "^4.0.3",
     "cross-env": "^6.0.0",
     "cypress": "^3.4.1",
+    "cypress-file-upload": "^3.3.4",
     "cz-conventional-changelog": "^3.0.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
