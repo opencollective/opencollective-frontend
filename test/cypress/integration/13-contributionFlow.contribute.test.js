@@ -77,8 +77,8 @@ describe('Contribution Flow: Order', () => {
       cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
       cy.contains('.step-details', '$500.00 per month');
 
-      // Frequency must be disabled
-      cy.get('#interval input[disabled]').should('exist');
+      // Frequency must not be disabled
+      cy.get('#interval input').should('exist');
       cy.contains('Next charge: Jun 1, 2042');
       cy.contains('Next step').click();
 
@@ -118,7 +118,7 @@ describe('Contribution Flow: Order', () => {
         cy.contains('Next step').click();
 
         cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
-        cy.get('#interval input[disabled]').should('exist');
+        cy.get('#interval input').should('exist');
         cy.contains('Next charge: Jun 1, 2042');
         cy.contains('Next step').click();
         cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });

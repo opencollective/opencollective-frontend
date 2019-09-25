@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
@@ -13,7 +13,10 @@ import { P, Span } from '../Text';
 import Currency from '../Currency';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInput from '../StyledInput';
+import StyledButton from '../StyledButton';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getNextChargeDate } from '../../lib/date-utils';
+import { Router } from '../../server/pages';
 
 const FrequenciesI18n = defineMessages({
   oneTime: {
@@ -71,6 +74,8 @@ const StepDetails = ({
   currency,
   disabledInterval,
   disabledAmount,
+  tierName,
+  collectiveSlug,
   minAmount,
   amount,
   interval,
@@ -86,8 +91,26 @@ const StepDetails = ({
 }) => {
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
-  const dispatchChange = values => onChange(getChangeFromState({ amount, interval, quantity, ...values }));
+  const [showModal, setShowModal] = useState(false);
+  const [tempInterval, setTempInterval] = useState(interval);
+  const verifyIntervalChange = ({ interval }) => {
+    if (disabledInterval == true) {
+      setTempInterval(interval);
+      setShowModal(true);
+    } else {
+      dispatchChange({ interval });
+    }
+  };
+  const dispatchChange = values => {
+    onChange(getChangeFromState({ amount, interval, quantity, ...values }));
+  };
   const intervalOptions = generateOptions(intl);
+
+  const confirmIntervalChange = () => {
+    setShowModal(false);
+    dispatchChange({ interval: tempInterval });
+    Router.pushRoute(`/${collectiveSlug}/donate/details`);
+  };
   interval = interval || 'oneTime';
 
   return (
@@ -174,7 +197,6 @@ const StepDetails = ({
           </StyledInputField>
         )}
       </Flex>
-
       {showInterval && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
@@ -186,10 +208,9 @@ const StepDetails = ({
                 id={id}
                 options={intervalOptions}
                 value={getOption(intl, interval)}
-                onChange={({ value }) => dispatchChange({ interval: value })}
+                onChange={({ value }) => verifyIntervalChange({ interval: value })}
                 isSearchable={false}
                 minWidth={150}
-                disabled={disabledInterval}
               />
               {interval !== 'oneTime' && (
                 <P color="black.500" ml={3}>
@@ -213,6 +234,32 @@ const StepDetails = ({
           )}
         </StyledInputField>
       )}
+      <Modal show={showModal} width="570px" onClose={() => setShowModal(false)}>
+        <ModalHeader>
+          <FormattedMessage id="Frequency.change" defaultMessage={'Change frequency?'} />
+        </ModalHeader>
+        <ModalBody>
+          <P>
+            <FormattedMessage
+              id="contribute.changeFrequency.confirmMsg"
+              values={{ tierName }}
+              defaultMessage={
+                'If you\'re changing the frequency, we will not contribute to this specific tier "{tierName}"'
+              }
+            />
+          </P>
+        </ModalBody>
+        <ModalFooter>
+          <Container display="flex" justifyContent="flex-end">
+            <StyledButton mx={20} onClick={() => setShowModal(false)}>
+              <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
+            </StyledButton>
+            <StyledButton buttonStyle="primary" onClick={() => confirmIntervalChange()}>
+              <FormattedMessage id="collective.empty.confirm.btn" defaultMessage={'Confirm'} />
+            </StyledButton>
+          </Container>
+        </ModalFooter>
+      </Modal>
       {customFields &&
         customFields.length > 0 &&
         customFields.map(customField => {
@@ -248,6 +295,8 @@ StepDetails.propTypes = {
   onChange: PropTypes.func,
   /** If true, the select for interval will be disabled */
   disabledInterval: PropTypes.bool,
+  tierName: PropTypes.string,
+  collectiveSlug: PropTypes.string.isRequired,
   /** If true, the input for amount will be disabled */
   disabledAmount: PropTypes.bool,
   /** value for frequency select, defaults to one time. */

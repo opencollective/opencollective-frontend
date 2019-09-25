@@ -102,6 +102,7 @@ class CreateOrderPage extends React.Component {
       slug: PropTypes.string,
       type: PropTypes.string,
       amount: PropTypes.number,
+      name: PropTypes.string,
       minimumAmount: PropTypes.number,
       amountType: PropTypes.string,
       presets: PropTypes.arrayOf(PropTypes.number),
@@ -723,6 +724,8 @@ class CreateOrderPage extends React.Component {
               amountOptions={this.props.fixedAmount ? null : this.getAmountsPresets()}
               currency={this.getCurrency()}
               onChange={this.updateDetails}
+              tierName={tier ? tier.name : ''}
+              collectiveSlug={collective.slug}
               interval={interval}
               amount={get(stepDetails, 'amount') || defaultStepDetails.amount}
               quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
