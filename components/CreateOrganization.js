@@ -138,7 +138,7 @@ class CreateOrganization extends React.Component {
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}
-                  showForm={!this.state.result.success}
+                  showForm={true}
                 />
 
                 <div className="result">

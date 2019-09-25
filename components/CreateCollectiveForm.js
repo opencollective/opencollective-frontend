@@ -98,6 +98,7 @@ class CreateCollectiveForm extends React.Component {
       modified: false,
       section: 'info',
       collective,
+      showForm: this.props.showForm,
     };
 
     this.categories = get(props.host, 'settings.apply.categories') || [];
@@ -221,6 +222,7 @@ class CreateCollectiveForm extends React.Component {
 
     if (fieldname === 'category') {
       this.defineFields(value);
+      this.handleForm();
     }
 
     const collective = {};
@@ -277,6 +279,12 @@ class CreateCollectiveForm extends React.Component {
       collective: Object.assign({}, this.state.collective, collective),
     });
     window.state = this.state;
+  }
+
+  handleForm() {
+    this.setState({
+      showForm: !this.state.showForm,
+    });
   }
 
   handleObjectChange(obj) {
@@ -369,7 +377,7 @@ class CreateCollectiveForm extends React.Component {
             />
           )}
 
-          {showForm && (
+          {this.state.showForm && (
             <div>
               {Object.keys(this.fields).map(key => (
                 <div className="inputs" key={key}>
