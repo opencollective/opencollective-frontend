@@ -1138,7 +1138,7 @@
   "update.createdAtBy": "Created on {date} (draft) by {author}",
   "update.delete": "delete",
   "update.edit": "edit",
-  "update.makePublicOn.label": "Automatically make the update public on this date:",
+  "update.makePublicOn.label": "Automatically make public on this date",
   "update.new.post": "Post Update",
   "update.paid": "paid",
   "update.pending": "pending",
