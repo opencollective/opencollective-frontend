@@ -10,7 +10,6 @@ import { compose } from '../lib/utils';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
-import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
@@ -20,6 +19,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 
 import { withUser } from '../components/UserProvider';
+import { Router } from '../server/pages';
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {
@@ -57,10 +57,8 @@ class CreateExpensePage extends React.Component {
       console.log('>>> createExpense', expense);
       const res = await this.props.createExpense(expense);
       console.log('>>> createExpense res', res);
-      this.setState({
-        showNewExpenseForm: false,
-        expenseCreated: res.data.createExpense,
-      });
+      const expenseCreated = res.data.createExpense;
+      Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/?createSuccess=true`);
     } catch (e) {
       console.error(e);
     }
@@ -90,45 +88,6 @@ class CreateExpensePage extends React.Component {
 
           <Flex flexDirection={['column', null, 'row']}>
             <Box width={[1, null, 3 / 4]}>
-              {expenseCreated && (
-                <Box m={3}>
-                  <p className="expenseCreated">
-                    {collective.host && (
-                      <FormattedMessage
-                        id="expense.created"
-                        defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved. Then, the host ({host}) will proceed to reimburse your expense."
-                        values={{ host: collective.host.name }}
-                      />
-                    )}
-                    {!collective.host && (
-                      <FormattedMessage
-                        id="expense.created.noHost"
-                        defaultMessage="Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved."
-                      />
-                    )}
-                  </p>
-                  <ExpenseNeedsTaxFormMessage id={expenseCreated.id} />
-                  <Flex justifyContent="center" mt={4} flexWrap="wrap">
-                    <Button
-                      className="blue"
-                      onClick={() =>
-                        this.setState({
-                          expenseCreated: null,
-                          showNewExpenseForm: true,
-                        })
-                      }
-                    >
-                      <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
-                    </Button>
-                    <Box ml={[0, null, 3]}>
-                      <Button className="whiteblue viewAllExpenses" href={`/${collective.slug}/expenses`}>
-                        <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
-                      </Button>
-                    </Box>
-                  </Flex>
-                </Box>
-              )}
-
               {showNewExpenseForm && (
                 <CreateExpenseForm collective={collective} LoggedInUser={LoggedInUser} onSubmit={this.createExpense} />
               )}
