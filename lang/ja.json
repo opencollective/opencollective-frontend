@@ -1138,6 +1138,7 @@
   "update.createdAtBy": "Created on {date} (draft) by {author}",
   "update.delete": "削除",
   "update.edit": "編集",
+  "update.makePublicOn.label": "Automatically make public on this date",
   "update.new.post": "Post Update",
   "update.paid": "支払い済み",
   "update.pending": "保留",

@@ -323,6 +323,7 @@ const editUpdateQuery = gql`
       markdown
       html
       isPrivate
+      makePublicOn
     }
   }
 `;
