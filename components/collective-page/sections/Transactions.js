@@ -50,6 +50,9 @@ class SectionTransactions extends React.Component {
       currency: PropTypes.string.isRequired,
     }).isRequired,
 
+    /** Wether user is admin of `collective` */
+    isAdmin: PropTypes.bool,
+
     /** @ignore from withData */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -118,7 +121,7 @@ class SectionTransactions extends React.Component {
   });
 
   render() {
-    const { data, intl, collective } = this.props;
+    const { data, intl, collective, isAdmin } = this.props;
     const { filter } = this.state;
     let showFilters = true;
 
@@ -165,7 +168,7 @@ class SectionTransactions extends React.Component {
         )}
 
         <ContainerSectionContent>
-          <BudgetItemsList items={budgetItems} isInverted />
+          <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin} isInverted />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
             <StyledButton mt={3} width="100%">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
@@ -181,7 +184,7 @@ export default React.memo(
   graphql(
     gql`
       query SectionTransactions($id: Int!, $nbDisplayed: Int!) {
-        contributions: allTransactions(CollectiveId: $id, type: "DEBIT", limit: $nbDisplayed) {
+        contributions: allTransactions(CollectiveId: $id, includeExpenseTransactions: false, limit: $nbDisplayed) {
           ...BudgetItemExpenseFragment
           ...BudgetItemOrderFragment
         }

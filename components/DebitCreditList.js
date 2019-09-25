@@ -3,6 +3,12 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { fadeIn } from './StyledKeyframes';
 
+/** A single item */
+const DebitCreditItem = styled.div`
+  position: relative;
+  animation: ${fadeIn} 0.15s;
+`;
+
 /**
  * A list to display CREDIT/DEBIT items, like transactions or expenses. This is
  * built in a generic way so we can use it for either displaying only orders,
@@ -14,12 +20,8 @@ const DebitCreditList = styled.div`
   border: 1px solid #e6e8eb;
   border-radius: 8px 8px 0 0;
 
-  & > div {
-    position: relative;
-    animation: ${fadeIn} 0.15s;
-    &:not(:last-child) {
-      border-bottom: 1px solid #e6e8eb;
-    }
+  & > ${DebitCreditItem}:not(:last-child) {
+    border-bottom: 1px solid #e6e8eb;
   }
 `;
 
@@ -49,10 +51,10 @@ const DebitCreditGradient = styled.div`
 /** Displays a debit entry in the list */
 export const DebitItem = ({ children }) => {
   return (
-    <div>
+    <DebitCreditItem>
       <DebitCreditGradient isCredit={false} />
       {children}
-    </div>
+    </DebitCreditItem>
   );
 };
 
@@ -61,10 +63,10 @@ DebitItem.propTypes = { children: PropTypes.node };
 /** Displays a credit entry in the list */
 export const CreditItem = ({ children }) => {
   return (
-    <div>
+    <DebitCreditItem>
       <DebitCreditGradient isCredit />
       {children}
-    </div>
+    </DebitCreditItem>
   );
 };
 

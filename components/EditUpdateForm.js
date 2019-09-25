@@ -13,7 +13,7 @@ import Container from './Container';
 import StyledCheckbox from './StyledCheckbox';
 
 import storage from '../lib/storage';
-import { toIsoDateStr } from '../lib/utils';
+import { toIsoDateStr } from '../lib/date-utils';
 
 const UpdateFormWrapper = styled(Container)`
   width: 100%;

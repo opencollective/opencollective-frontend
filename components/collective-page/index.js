@@ -180,7 +180,7 @@ class CollectivePage extends Component {
       case Sections.CONTRIBUTIONS:
         return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
-        return <SectionTransactions collective={this.props.collective} />;
+        return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
       default:
         return null;
     }

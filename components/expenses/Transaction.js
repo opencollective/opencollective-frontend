@@ -10,6 +10,7 @@ import Moment from '../Moment';
 import { P, Span } from '../Text';
 import TransactionDetails from './TransactionDetails';
 import AmountCurrency from './AmountCurrency';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 
 class Transaction extends React.Component {
   static propTypes = {
@@ -90,8 +91,9 @@ class Transaction extends React.Component {
         <LinkCollective collective={originCollective}>{originCollective.name}</LinkCollective>{' '}
         <FormattedMessage
           id="transaction.usingGiftCardFrom"
-          defaultMessage="using a gift card from {collectiveLink}"
+          defaultMessage="using a {giftCard} from {collective}"
           values={{
+            giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
             collectiveLink: (
               <LinkCollective collective={usingVirtualCardFromCollective}>
                 {usingVirtualCardFromCollective.name}
