@@ -44,6 +44,8 @@ describe('new expense when logged in', () => {
     cy.get('.categoryField select').select('Team');
     cy.get('.error').should('have.text', 'Missing attachment');
     uploadReceipt();
+    cy.get('.error').should('have.text', 'Please pick the type of this expense');
+    cy.get('.expenseField select').select('RECEIPT');
     cy.get('.inputField.paypalEmail input').type('{selectall}{del}');
     cy.get('.error').should('have.text', 'Please provide your PayPal email address (or change the payout method)');
     cy.get('.inputField.paypalEmail input').type('paypal@test.com');
@@ -65,6 +67,7 @@ describe('new expense when logged in', () => {
     cy.get('.amountField input', { timeout: 5000 }).type(12);
     cy.get('.payoutMethod.inputField select').select('other');
     uploadReceipt();
+    cy.get('.expenseField select').select('RECEIPT');
     cy.wait(300);
     cy.get('.LoginTopBarProfileButton').contains('testuseradmin', {
       timeout: 15000,

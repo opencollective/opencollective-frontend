@@ -20,6 +20,7 @@ import TopBackersCoverWithData from './TopBackersCoverWithData';
 import UserCompany from './UserCompany';
 import CollectiveNavbar from './CollectiveNavbar';
 import Container from './Container';
+import { AllSectionsNames } from './collective-page/_constants';
 
 const ContributeLink = styled(Link)`
   --webkit-appearance: none;
@@ -92,6 +93,7 @@ class CollectiveCover extends React.Component {
     cta: PropTypes.object, // { href, label }
     context: PropTypes.string,
     displayContributeLink: PropTypes.bool,
+    selectedSection: PropTypes.oneOf(AllSectionsNames),
     /** If true, the component will never render the new collective navbar */
     forceLegacy: PropTypes.bool,
   };
@@ -187,6 +189,7 @@ ${description}`;
             isAdmin={canEdit}
             showEdit
             callsToAction={this.props.callsToAction}
+            selected={this.props.selectedSection}
           />
         </Container>
       );

@@ -131,8 +131,18 @@ const StyledInputGroup = ({
           py="0"
           error={error}
           {...inputProps}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
+          onFocus={e => {
+            setFocus(true);
+            if (inputProps && inputProps.onFocus) {
+              inputProps.onFocus(e);
+            }
+          }}
+          onBlur={e => {
+            setFocus(false);
+            if (inputProps && inputProps.onBlur) {
+              inputProps.onBlur(e);
+            }
+          }}
         />
         {append && (
           <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>

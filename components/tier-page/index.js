@@ -9,14 +9,13 @@ import gql from 'graphql-tag';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { P, H1, H3 } from '../Text';
+import { P, H1, H2 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
-import Avatar from '../Avatar';
-import LinkCollective from '../LinkCollective';
+import CollectiveNavbar from '../CollectiveNavbar';
 import InlineEditField from '../InlineEditField';
 
 // Local tier page imports
@@ -26,11 +25,20 @@ import TierContributors from './TierContributors';
 import TierLongDescription from './TierLongDescription';
 import TierVideo from './TierVideo';
 import BubblesSVG from './Bubbles.svg';
+import { Sections } from '../collective-page/_constants';
+
+const generateBackground = (theme, image) => {
+  const color = theme.colors.primary[300];
+  const gradient = `linear-gradient(0deg, ${theme.colors.primary[800]}, ${theme.colors.primary[400]})`;
+  const imageCss = image ? `url(${image}), ` : '';
+  return `${imageCss}${gradient}, ${color}`;
+};
 
 /** The blured background image displayed under the tier description */
-const TierCover = styled(Container)`
+const TierCover = styled.div`
   width: 100%;
   height: ${Dimensions.COVER_HEIGHT}px;
+  background: ${props => generateBackground(props.theme, props.backgroundImage)};
   background-color: ${props => props.theme.colors.primary[300]};
   background-repeat: no-repeat;
   background-size: cover;
@@ -52,6 +60,15 @@ const Bubbles = styled.div`
     background-position-x: center;
     background-position-y: 110%;
   }
+`;
+
+/** Container for the info, with overflow hidden to truncate text with css */
+const ProgressInfoContainer = styled.div`
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 0 1 50%;
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
@@ -81,6 +98,7 @@ class TierPage extends Component {
       id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      currency: PropTypes.string,
       type: PropTypes.string.isRequired,
       image: PropTypes.string,
       backgroundImage: PropTypes.string,
@@ -142,35 +160,12 @@ class TierPage extends Component {
     return (
       <Container borderTop="1px solid #E6E8EB">
         {/** ---- Hero / Banner ---- */}
-        <Container
-          display="flex"
-          alignItems="center"
-          position="sticky"
-          top={0}
-          px={[3, 4]}
-          height={[70, 90]}
-          zIndex={999}
-          background="white"
-          borderBottom="1px solid #E6E8EB"
-        >
-          <Container flex="1" maxWidth={1440} m="0 auto">
-            <Flex alignItems="center">
-              <LinkCollective collective={collective}>
-                <Avatar collective={collective} bg="#EBEBEB" border="1px solid #efefef" radius={40} borderRadius={10} />
-              </LinkCollective>
-              <LinkCollective collective={collective}>
-                <H1 color="black.800" fontSize={'H5'} ml={3}>
-                  {collective.name || collective.slug}
-                </H1>
-              </LinkCollective>
-            </Flex>
-          </Container>
+        <Container position="sticky" top={0} zIndex={999}>
+          <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} isAdmin={canEdit} />
         </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
-            <TierCover
-              backgroundImage={collective.backgroundImage ? `url(${collective.backgroundImage})` : undefined}
-            />
+            <TierCover backgroundImage={collective.backgroundImage} />
           </Container>
           <Container
             position="absolute"
@@ -197,7 +192,7 @@ class TierPage extends Component {
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
-                <H1 textAlign="left" color="black.900" wordBreak="break-word" mb={4} data-cy="TierName">
+                <H1 fontSize="H2" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
                   <InlineEditField
                     mutation={EditTierMutation}
                     canEdit={canEdit}
@@ -206,9 +201,10 @@ class TierPage extends Component {
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
-                <H3
-                  color="black.500"
+                <H2
+                  color="black.600"
                   fontSize="H5"
+                  lineHeight="1.5em"
                   mb={4}
                   whiteSpace="pre-line"
                   data-cy="shortDescription"
@@ -223,7 +219,7 @@ class TierPage extends Component {
                       <FormattedMessage id="TierPage.AddDescription" defaultMessage="Add a short description" />
                     }
                   />
-                </H3>
+                </H2>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
                     <TierLongDescription tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
@@ -261,13 +257,14 @@ class TierPage extends Component {
               boxShadow={['0px -3px 5px rgba(70, 70, 70, 0.15)', null, null, 'none']}
             >
               {/** Tier progress */}
-              <Flex flex="0 1 50%" flexDirection="column" justifyContent="center">
+              <ProgressInfoContainer>
                 {tier.goal && (
                   <P
                     fontSize={['Caption', 'Paragraph', null, 'H5']}
                     color="black.500"
                     lineHeight={['LeadParagraph', null, null, 'H3']}
                     mb={[0, null, null, 3]}
+                    truncateOverflow
                   >
                     <FormattedMessage
                       id="TierPage.AmountGoal"
@@ -288,10 +285,11 @@ class TierPage extends Component {
                   </P>
                 )}
                 <P
-                  fontSize={['9px', 'Tiny', 'Paragraph']}
+                  fontSize={['Tiny', 'Paragraph']}
                   color="black.500"
                   lineHeight={['Caption', null, 'LeadParagraph']}
                   mb={[0, null, null, 2]}
+                  truncateOverflow
                 >
                   <FormattedMessage
                     id="TierPage.AmountRaised"
@@ -304,6 +302,8 @@ class TierPage extends Component {
                           currency={tier.currency}
                           interval={tier.interval}
                           amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                          abbreviateAmount
+                          abbreviateInterval
                         />
                       ),
                     }}
@@ -315,7 +315,7 @@ class TierPage extends Component {
                     <StyledProgressBar percentage={amountRaised / tier.goal} />
                   </Box>
                 )}
-              </Flex>
+              </ProgressInfoContainer>
               {/** Contribute button */}
               <Flex alignItems="center">
                 <Box width={1}>
@@ -344,6 +344,7 @@ class TierPage extends Component {
             collectiveName={collective.name}
             contributors={contributors}
             contributorsStats={contributorsStats}
+            currency={tier.currency || collective.currency}
           />
         )}
       </Container>

@@ -34,9 +34,9 @@ const FormButton = styled(StyledButton).attrs({
 })`
   width: 35%;
   font-weight: normal;
-  min-width: 185px;
+  min-width: 225px;
   text-transform: capitalize;
-  margin: 0 8px;
+  margin: 4px 8px;
   animation: ${fadeIn} 0.3s;
 `;
 

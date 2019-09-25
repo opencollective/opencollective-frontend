@@ -1,28 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
 import { FixedSizeGrid } from 'react-window';
-import { truncate } from 'lodash';
 import styled from 'styled-components';
-import { injectIntl, FormattedMessage } from 'react-intl';
 
-import roles from '../lib/constants/roles';
-import formatMemberRole from '../lib/i18n-member-role';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
-import { CollectiveType } from '../lib/constants/collectives';
 
-import { P } from './Text';
-import Container from './Container';
-import { ContributorAvatar } from './Avatar';
 import { fadeIn } from './StyledKeyframes';
-import LinkContributor from './LinkContributor';
+import ContributorCard from './ContributorCard';
 
 // Define static dimensions
 export const COLLECTIVE_CARD_MARGIN_X = 32;
 const COLLECTIVE_CARD_MARGIN_Y = 26;
 const COLLECTIVE_CARD_WIDTH = 144;
-const COLLECTIVE_CARD_HEIGHT = 226;
+const COLLECTIVE_CARD_HEIGHT = 272;
 const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X;
 
 /** Adds custom scrollbar for Chrome */
@@ -77,22 +68,9 @@ GridInnerContainer.propTypes = {
 };
 
 /** Cards to show individual contributors */
-const StyledContributorCard = styled.div.attrs(props => ({
-  style: { top: props.top, left: props.left },
-}))`
+const ContributorCardContainer = styled.div`
   animation: ${fadeIn} 0.3s;
-  padding: 20px 8px;
-  border: 1px solid #dcdee0;
-  border-radius: 8px;
-  background-color: #ffffff;
-  overflow: hidden;
-  width: 144px;
   position: absolute;
-  height: 226px;
-
-  a {
-    text-decoration: none;
-  }
 `;
 
 /** Get an index in a single dimension array from a matrix coordinate */
@@ -119,92 +97,10 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
   }
 };
 
-/** Returns the main role for contributor as a string */
-const getRole = (contributor, intl) => {
-  // Order of the if / else if makes the priority to decide which role we want to
-  // show first. The priority order should be:
-  // ADMIN > BACKER > FUNDRAISER > *
-  // Everything that comes after follower is considered same priority so we just
-  // take the first role in the list.
-  if (contributor.isAdmin) {
-    return formatMemberRole(intl, roles.ADMIN);
-  } else if (contributor.isCore) {
-    return formatMemberRole(intl, roles.MEMBER);
-  } else if (contributor.isBacker) {
-    return formatMemberRole(intl, roles.BACKER);
-  } else if (contributor.isFundraiser) {
-    return formatMemberRole(intl, roles.FUNDRAISER);
-  } else {
-    return formatMemberRole(intl, contributor.roles[0]);
-  }
-};
-
-/**
- * A single contributor card, implemented as a PureComponent to improve performances
- */
-class ContributorCard extends React.PureComponent {
-  static propTypes = {
-    intl: PropTypes.object.isRequired,
-    contributor: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-      type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-      isAdmin: PropTypes.bool.isRequired,
-      isCore: PropTypes.bool.isRequired,
-      isBacker: PropTypes.bool.isRequired,
-      isFundraiser: PropTypes.bool.isRequired,
-      description: PropTypes.string,
-      publicMessage: PropTypes.string,
-      collectiveSlug: PropTypes.string,
-      isIncognito: PropTypes.bool,
-    }).isRequired,
-    left: PropTypes.number.isRequired,
-    top: PropTypes.number.isRequired,
-  };
-
-  render() {
-    const { left, top, contributor, intl } = this.props;
-    const { name, description, publicMessage, isIncognito } = contributor;
-
-    return (
-      <StyledContributorCard left={left + COLLECTIVE_CARD_MARGIN_X} top={top + COLLECTIVE_CARD_MARGIN_Y}>
-        <Flex justifyContent="center" mb={3}>
-          <LinkContributor contributor={contributor}>
-            <ContributorAvatar contributor={contributor} radius={56} />
-          </LinkContributor>
-        </Flex>
-        <Container display="flex" textAlign="center" flexDirection="column" justifyContent="center">
-          <LinkContributor contributor={contributor}>
-            <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900" title={name}>
-              {isIncognito ? (
-                <FormattedMessage id="profile.incognito" defaultMessge="Incognito" />
-              ) : (
-                truncate(name, { length: 18 })
-              )}
-            </P>
-          </LinkContributor>
-          <P fontSize="Tiny" lineHeight="Caption" color="black.500">
-            {getRole(contributor, intl)}
-          </P>
-          <P fontSize="Caption" fontWeight="bold" title={description}>
-            {truncate(description, { length: 20 })}
-          </P>
-          {publicMessage && (
-            <Container textAlign="center" color="black.600" fontSize="Tiny" my={2} title={publicMessage}>
-              “{truncate(publicMessage, { length: 60 })}”
-            </Container>
-          )}
-        </Container>
-      </StyledContributorCard>
-    );
-  }
-}
-
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
-const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, viewport, getPaddingLeft }) => {
+const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport, getPaddingLeft, currency }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
 
@@ -233,18 +129,18 @@ const ContributorsGrid = ({ intl, contributors, width, maxNbRowsForViewports, vi
         const idx = getIdx(columnIndex, rowIndex, nbCols);
         const contributor = contributors[idx];
 
-        if (!contributor) {
-          return null;
-        }
-
-        return (
-          <ContributorCard
+        return !contributor ? null : (
+          <ContributorCardContainer
             key={contributor.id}
-            contributor={contributor}
-            left={style.left}
-            top={style.top}
-            intl={intl}
-          />
+            style={{ left: style.left + COLLECTIVE_CARD_MARGIN_X, top: style.top + COLLECTIVE_CARD_MARGIN_Y }}
+          >
+            <ContributorCard
+              width={COLLECTIVE_CARD_WIDTH}
+              height={COLLECTIVE_CARD_HEIGHT}
+              contributor={contributor}
+              currency={currency}
+            />
+          </ContributorCardContainer>
         );
       }}
     </FixedSizeGrid>
@@ -256,13 +152,6 @@ ContributorsGrid.propTypes = {
   contributors: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-      isCore: PropTypes.bool.isRequired,
-      isBacker: PropTypes.bool.isRequired,
-      isFundraiser: PropTypes.bool.isRequired,
-      description: PropTypes.string,
-      collectiveSlug: PropTypes.string,
     }),
   ),
 
@@ -278,14 +167,14 @@ ContributorsGrid.propTypes = {
   /** A callback to calculate left padding */
   getPaddingLeft: PropTypes.func,
 
+  /** Currency used for contributions */
+  currency: PropTypes.string,
+
   /** @ignore from withViewport */
   viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
 
   /** @ignore from withViewport */
   width: PropTypes.number.isRequired,
-
-  /** @ignore from injectIntl */
-  intl: PropTypes.object.isRequired,
 };
 
 ContributorsGrid.defaultProps = {
@@ -300,4 +189,4 @@ ContributorsGrid.defaultProps = {
   },
 };
 
-export default injectIntl(withViewport(ContributorsGrid, { withWidth: true }));
+export default withViewport(ContributorsGrid, { withWidth: true });

@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Currency abbreviated version 1`] = `
+<span
+  className="Text__P-sc-3suny7-0-span dleGAN"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  $
+  42
+</span>
+`;
+
+exports[`Currency abbreviated version 2`] = `
+<span
+  className="Text__P-sc-3suny7-0-span dleGAN"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  $
+  19k
+</span>
+`;
+
+exports[`Currency renders default options 1`] = `
+<span
+  className="Text__P-sc-3suny7-0-span dleGAN"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  $42
+</span>
+`;
+
+exports[`Currency renders default options 2`] = `
+<span
+  className="Text__P-sc-3suny7-0-span dleGAN"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  $19,000
+</span>
+`;

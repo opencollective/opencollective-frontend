@@ -4,6 +4,8 @@ import { get, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { darken, lighten } from 'polished';
 import { ThemeProvider } from 'styled-components';
+import { isHexColor } from 'validator';
+
 import defaultTheme, { generateTheme } from '../lib/theme';
 
 /**
@@ -26,6 +28,9 @@ export default class CollectiveThemeProvider extends React.PureComponent {
 
   getTheme = memoizeOne(primaryColor => {
     if (!primaryColor) {
+      return defaultTheme;
+    } else if (!isHexColor(primaryColor)) {
+      console.warn(`Invalid custom color: ${primaryColor}`);
       return defaultTheme;
     } else {
       return generateTheme({

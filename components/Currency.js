@@ -1,34 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedNumber } from 'react-intl';
-
-import { abbreviateNumber } from '../lib/utils';
+import { getCurrencySymbol, abbreviateNumber, formatCurrency } from '../lib/utils';
 
 import { Span } from './Text';
 
-const Currency = ({ abbreviate, currency, precision, value, ...styles }) => (
-  <FormattedNumber
-    value={value / 100}
-    currency={currency}
-    style="currency"
-    currencyDisplay="symbol"
-    minimumFractionDigits={precision}
-    maximumFractionDigits={precision}
-  >
-    {formattedNumber =>
-      abbreviate ? (
-        <Span {...styles} whiteSpace="nowrap">
-          {formattedNumber.slice(0, 1)}
-          {abbreviateNumber(value / 100, precision)}
-        </Span>
-      ) : (
-        <Span {...styles} whiteSpace="nowrap">
-          {formattedNumber}
-        </Span>
-      )
-    }
-  </FormattedNumber>
-);
+/**
+ * Shows a money amount with the currency.
+ *
+ * ⚠️ Abbreviated mode is only for English at the moment. Abbreviated amount will not be internationalized.
+ */
+const Currency = ({ abbreviate, currency, precision, value, ...styles }) => {
+  if (abbreviate) {
+    return (
+      <Span {...styles} whiteSpace="nowrap">
+        {getCurrencySymbol(currency)}
+        {abbreviateNumber(value / 100, precision)}
+      </Span>
+    );
+  } else {
+    return (
+      <Span {...styles} whiteSpace="nowrap">
+        {formatCurrency(value, currency, { precision })}
+      </Span>
+    );
+  }
+};
 
 Currency.propTypes = {
   /** The amount to display, in cents */

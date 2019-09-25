@@ -19,7 +19,7 @@ import StyledHr from './StyledHr';
 import MessageBox from './MessageBox';
 import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
-import StyledSelect from './DeprecatedStyledSelect';
+import StyledSelect from './StyledSelect';
 import { Add } from 'styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
 import ExternalLinkNewTab from './ExternalLinkNewTab';
@@ -220,8 +220,11 @@ class EditWebhooks extends React.Component {
           <Box>
             <Span fontSize="Paragraph">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
             <StyledSelect
-              options={this.getEventTypes(data.Collective.type, data.Collective.isHost)}
-              value={webhook.type}
+              options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(webhook => ({
+                label: webhook,
+                value: webhook,
+              }))}
+              value={{ label: webhook.type, value: webhook.type }}
               onChange={({ value }) => this.editWebhook(index, 'type', value)}
             />
           </Box>

@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql, Query } from 'react-apollo';
 import memoizeOne from 'memoize-one';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
@@ -20,6 +21,7 @@ import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 import { Dimensions } from '../_constants';
+import { fadeIn } from '../../StyledKeyframes';
 
 const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -63,7 +65,20 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
-const MAX_STYLED_FILTERS_WIDTH = Dimensions.MAX_SECTION_WIDTH - Dimensions.PADDING_X[1];
+/** A container for membership cards to ensure we have a smooth transition */
+const MembershipCardContainer = styled.div`
+  animation: ${fadeIn} 0.2s;
+  margin-bottom: 40px;
+  margin-right: 4px;
+
+  @media screen and (min-width: 52em) {
+    margin-right: 34px;
+  }
+
+  @media screen and (min-width: 40em) {
+    margin-right: 32px;
+  }
+`;
 
 const ParentedCollectivesQuery = gql`
   query SuperCollectiveChildren($tags: [String]) {
@@ -76,8 +91,10 @@ const ParentedCollectivesQuery = gql`
         currency
         isIncognito
         description
-        backgroundImage
+        imageUrl(height: 128)
+        backgroundImageUrl(height: 200)
         tags
+        settings
         parentCollective {
           id
           backgroundImage
@@ -87,7 +104,6 @@ const ParentedCollectivesQuery = gql`
         }
         stats {
           id
-          yearlyBudget
           backers {
             id
             all
@@ -106,7 +122,9 @@ class SectionContributions extends React.PureComponent {
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       stats: PropTypes.shape({
-        yearlyBudget: PropTypes.number,
+        backers: PropTypes.shape({
+          all: PropTypes.number,
+        }),
       }).isRequired,
     }).isRequired,
 
@@ -187,14 +205,14 @@ class SectionContributions extends React.PureComponent {
   });
 
   sortMemberships = memoizeOne(memberships => {
-    // Sort memberships: hosted are always first, then we sort by yearly budget then by total amount donated
+    // Sort memberships: hosted are always first, then we sort by number of backers then by total amount donated
     return [...memberships].sort((m1, m2) => {
       if (m1.role === roles.HOST && m2.role !== roles.HOST) {
         return -1;
       } else if (m1.role !== roles.HOST && m2.role === roles.HOST) {
         return 1;
       } else if (m1.role === roles.HOST) {
-        return m1.collective.stats.yearlyBudget > m2.collective.stats.yearlyBudget ? -1 : 1;
+        return m1.collective.stats.backers.all > m2.collective.stats.backers.all ? -1 : 1;
       } else {
         return m1.stats.totalDonations > m2.stats.totalDonations ? -1 : 1;
       }
@@ -221,7 +239,7 @@ class SectionContributions extends React.PureComponent {
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
-      <Box py={5}>
+      <Box pt={5}>
         {data.Collective.memberOf.length === 0 ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
@@ -236,25 +254,29 @@ class SectionContributions extends React.PureComponent {
         ) : (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionTitle textAlign={['center', 'left']} mb={4}>
+              <SectionTitle textAlign="left" mb={4}>
                 <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
               </SectionTitle>
             </ContainerSectionContent>
             {filters.length > 1 && (
-              <Box mb={4} mx="auto" maxWidth={MAX_STYLED_FILTERS_WIDTH}>
+              <Box mb={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
                 <StyledFilters
                   filters={filters}
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
                   onChange={filter => this.setState({ selectedFilter: filter })}
                   selected={selectedFilter}
-                  justifyContent={['center', 'left']}
+                  justifyContent="left"
+                  minButtonWidth={175}
+                  px={Dimensions.PADDING_X}
                 />
               </Box>
             )}
             <ContainerSectionContent>
-              <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
+              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                  <StyledMembershipCard key={membership.id} membership={membership} mb={40} mr={[1, 4, 34]} />
+                  <MembershipCardContainer key={membership.id}>
+                    <StyledMembershipCard membership={membership} />
+                  </MembershipCardContainer>
                 ))}
               </Flex>
               {nbMemberships < sortedMemberships.length && (
@@ -276,16 +298,18 @@ class SectionContributions extends React.PureComponent {
               }
               return (
                 <section>
-                  <SectionTitle textAlign={['center', 'left']} mb={4}>
+                  <SectionTitle textAlign="left" mb={4}>
                     <FormattedMessage
                       id="CP.Contributions.PartOfOrg"
                       defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
                       values={{ n: collectives.length }}
                     />
                   </SectionTitle>
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', null, null, 'left']}>
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                     {collectives.map(collective => (
-                      <StyledMembershipCard key={collective.id} membership={{ collective }} mb={40} mr={[1, 4, 34]} />
+                      <MembershipCardContainer key={collective.id}>
+                        <StyledMembershipCard membership={{ collective }} />
+                      </MembershipCardContainer>
                     ))}
                   </Flex>
                 </section>
@@ -300,11 +324,11 @@ class SectionContributions extends React.PureComponent {
 
 const withData = graphql(
   gql`
-    query SectionCollective($id: Int!) {
+    query SectionContributions($id: Int!) {
       Collective(id: $id) {
         id
         settings
-        memberOf(onlyActiveCollectives: true) {
+        memberOf(onlyActiveCollectives: true, limit: 1500) {
           id
           role
           since
@@ -321,18 +345,18 @@ const withData = graphql(
             currency
             isIncognito
             description
-            backgroundImage
+            imageUrl(height: 128)
+            backgroundImageUrl(height: 200)
             tags
             parentCollective {
               id
-              backgroundImage
+              backgroundImageUrl(height: 200)
             }
             host {
               id
             }
             stats {
               id
-              yearlyBudget
               backers {
                 id
                 all

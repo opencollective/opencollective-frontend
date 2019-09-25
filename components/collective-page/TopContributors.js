@@ -139,7 +139,7 @@ ContributorsBlock.propTypes = {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-      collectiveSlug: PropTypes.string.isRequired,
+      collectiveSlug: PropTypes.string,
       totalAmountDonated: PropTypes.number.isRequired,
       since: PropTypes.string.isRequired,
       isIncognito: PropTypes.bool,

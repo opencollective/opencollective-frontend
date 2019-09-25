@@ -57,7 +57,7 @@ aliases:
       # Loading the opencollective_dvl dump database
       - run: ./scripts/setup_circleci_db.sh
 
-      - run: npm run test:e2e
+      - run: ./scripts/run_e2e_tests.sh
 
 jobs:
   lint:
@@ -199,6 +199,7 @@ jobs:
       - image: circleci/redis
       - image: memcached
     environment:
+      TZ: UTC
       NODE_ENV: circleci
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
@@ -212,6 +213,7 @@ jobs:
       - image: circleci/redis
       - image: memcached
     environment:
+      TZ: UTC
       NODE_ENV: circleci
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
@@ -225,6 +227,7 @@ jobs:
       - image: circleci/redis
       - image: memcached
     environment:
+      TZ: UTC
       NODE_ENV: circleci
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
@@ -238,6 +241,7 @@ jobs:
       - image: circleci/redis
       - image: memcached
     environment:
+      TZ: UTC
       NODE_ENV: circleci
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1

@@ -31,11 +31,6 @@ const TOS = styled(P)`
   margin-bottom: 16px;
 `;
 
-const TOSLinkWrapper = styled.div`
-  text-align: left;
-  margin-left: 20px;
-`;
-
 class ApplyToHostBtnLoggedIn extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object.isRequired,
@@ -141,17 +136,21 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                 onChange={({ checked }) => this.setState({ checkTOS: checked })}
                 checked={this.state.checkTOS}
                 size={16}
+                label={
+                  <Container ml={2}>
+                    <FormattedMessage
+                      id="ApplyToHostBtnLoggedIn.TOS"
+                      defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
+                      values={{
+                        'tos-link': msg => (
+                          <ExternalLinkNewTab href={get(host, 'settings.tos')}>{msg}</ExternalLinkNewTab>
+                        ),
+                        hostName: host.name,
+                      }}
+                    />
+                  </Container>
+                }
               />
-              <TOSLinkWrapper>
-                <FormattedMessage
-                  id="ApplyToHostBtnLoggedIn.TOS"
-                  defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
-                  values={{
-                    'tos-link': msg => <ExternalLinkNewTab href={get(host, 'settings.tos')}>{msg}</ExternalLinkNewTab>,
-                    hostName: host.name,
-                  }}
-                />
-              </TOSLinkWrapper>
             </CheckboxWrapper>
           </ModalBody>
           <ModalFooter>
