@@ -297,7 +297,7 @@ class SectionContributions extends React.PureComponent {
                 return null;
               }
               return (
-                <section>
+                <ContainerSectionContent>
                   <SectionTitle textAlign="left" mb={4}>
                     <FormattedMessage
                       id="CP.Contributions.PartOfOrg"
@@ -312,7 +312,7 @@ class SectionContributions extends React.PureComponent {
                       </MembershipCardContainer>
                     ))}
                   </Flex>
-                </section>
+                </ContainerSectionContent>
               );
             }}
           </Query>
