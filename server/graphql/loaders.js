@@ -56,13 +56,7 @@ export const loaders = req => {
     expense: {
       findById: new DataLoader(ids =>
         models.Expense.findAll({ where: { id: { [Op.in]: ids } } }).then(results => {
-          const viewer = req.remoteUser;
-          return sortResults(ids, results, 'id').map(result => {
-            if (!result) return null;
-            if (viewer && viewer.isAdmin(result.CollectiveId)) return result.info;
-            if (viewer && viewer.id === result.UserId) return result.info;
-            return result.public;
-          });
+          return sortResults(ids, results, 'id');
         }),
       ),
     },

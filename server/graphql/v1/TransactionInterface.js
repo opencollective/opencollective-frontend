@@ -276,12 +276,47 @@ export const TransactionExpenseType = new GraphQLObjectType({
           return transaction.description || expense;
         },
       },
+      privateMessage: {
+        type: GraphQLString,
+        deprecationReason: 'Please use transaction.expense.privateMessage',
+        resolve(transaction, args, req) {
+          // If it's a expense transaction it'll have an ExpenseId
+          // otherwise we return null
+          return transaction.ExpenseId
+            ? req.loaders.expense.findById
+                .load(transaction.ExpenseId)
+                .then(expense => expense && expense.privateMessage)
+            : null;
+        },
+      },
+      category: {
+        type: GraphQLString,
+        deprecationReason: 'Please use transaction.expense.category',
+        resolve(transaction, args, req) {
+          // If it's a expense transaction it'll have an ExpenseId
+          // otherwise we return null
+          return transaction.ExpenseId
+            ? req.loaders.expense.findById.load(transaction.ExpenseId).then(expense => expense && expense.category)
+            : null;
+        },
+      },
       expense: {
         type: ExpenseType,
         resolve(transaction, args, req) {
-          if (transaction.ExpenseId) {
-            return req.loaders.expense.findById.load(transaction.ExpenseId);
-          }
+          // If it's a expense transaction it'll have an ExpenseId
+          // otherwise we return null
+          return transaction.ExpenseId ? req.loaders.expense.findById.load(transaction.ExpenseId) : null;
+        },
+      },
+      attachment: {
+        type: GraphQLString,
+        deprecationReason: 'Please use transaction.expense.attachment',
+        resolve(transaction, args, req) {
+          // If it's a expense transaction it'll have an ExpenseId
+          // otherwise we return null
+          return transaction.ExpenseId
+            ? req.loaders.expense.findById.load(transaction.ExpenseId).then(expense => expense && expense.attachment)
+            : null;
         },
       },
     };
