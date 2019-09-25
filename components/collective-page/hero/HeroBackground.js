@@ -130,7 +130,6 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
           <Cropper
             image={uploadedImage ? uploadedImage.preview : collective.backgroundImage}
             cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}
-            apect={BASE_WIDTH / BASE_HEIGHT}
             crop={crop}
             zoom={zoom}
             minZoom={0.25}

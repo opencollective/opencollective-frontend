@@ -2,16 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { defaultImage } from '../lib/constants/collectives';
-import { firstSentence, imagePreview } from '../lib/utils';
+import { firstSentence, getCollectiveImage } from '../../lib/utils';
 
-import Container from './Container';
-import Currency from './Currency';
-import { Link } from '../server/pages';
-import StyledLink from './StyledLink';
-import { P } from './Text';
+import Container from '../Container';
+import Currency from '../Currency';
+import { Link } from '../../server/pages';
+import StyledLink from '../StyledLink';
+import { P } from '../Text';
 
-const SponsorCard = ({ currency, image, name, description, slug, totalDonations, type }) => (
+const SponsorCard = ({ currency, imageUrl, name, description, slug, totalDonations }) => (
   <Container bg="white.full" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
       <Container bg="black.200" height="1px" width={0.25} />
@@ -19,9 +18,7 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
       <Link route="collective" params={{ slug }} passHref>
         <a title={`${name}\n${firstSentence(description, 80)}`}>
           <Container
-            backgroundImage={`url(${imagePreview(image, defaultImage[type], {
-              width: 76,
-            })})`}
+            backgroundImage={`url(${getCollectiveImage({ imageUrl, slug }, { width: 76 })})`}
             backgroundSize="contain"
             backgroundRepeat="no-repeat"
             backgroundPosition="center center"
@@ -61,7 +58,7 @@ const SponsorCard = ({ currency, image, name, description, slug, totalDonations,
 
 SponsorCard.propTypes = {
   currency: PropTypes.string.isRequired,
-  image: PropTypes.string,
+  imageUrl: PropTypes.string,
   description: PropTypes.string,
   name: PropTypes.string.isRequired,
   slug: PropTypes.string.isRequired,

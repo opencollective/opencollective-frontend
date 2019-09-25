@@ -52,10 +52,10 @@ npm run dev
 
 ## Tests
 
-You can run the tests using `npm test` or more specifically:
+To run the tests:
 
-- `npm run test:jest` for pages and components
-- `npm run test:e2e` for end-to-end tests using [Cypress](https://www.cypress.io/)
+- for pages and components use `npm test`
+- for end-to-end (e2e) tests using [Cypress](https://www.cypress.io/) see [our dedicated guide](docs/e2e.md).
 
 To update:
 

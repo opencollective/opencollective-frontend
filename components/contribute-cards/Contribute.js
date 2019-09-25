@@ -81,6 +81,18 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.EventPassed',
     defaultMessage: 'Past event',
   },
+  [ContributionTypes.PRODUCT]: {
+    id: 'ContributionType.Product',
+    defaultMessage: 'Product',
+  },
+  [ContributionTypes.TICKET]: {
+    id: 'ContributionType.Ticket',
+    defaultMessage: 'Ticket',
+  },
+  [ContributionTypes.MEMBERSHIP]: {
+    id: 'ContributionType.Membership',
+    defaultMessage: 'Membership',
+  },
 });
 
 const getContributeCTA = type => {

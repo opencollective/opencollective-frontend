@@ -3,23 +3,33 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { defaultImage, defaultBackgroundImage } from '../lib/constants/collectives';
+import { defaultBackgroundImage } from '../../lib/constants/collectives';
 
-import { imagePreview } from '../lib/utils';
+import { imagePreview, getCollectiveImage } from '../../lib/utils';
 
 import { Flex } from '@rebass/grid';
-import Container from './Container';
-import { P, Span } from './Text';
-import { Link } from '../server/pages';
-import StyledLink from './StyledLink';
-import Currency from './Currency';
+import Container from '../Container';
+import { P, Span } from '../Text';
+import { Link } from '../../server/pages';
+import StyledLink from '../StyledLink';
+import Currency from '../Currency';
 
 const hasGoals = (settings = {}) => get(settings, 'goals[0].amount', 0) > 0;
 
 const getGoalPercentage = ({ type, amount }, { balance, yearlyBudget }) =>
   type === 'balance' ? balance / amount : yearlyBudget / amount;
 
-const CollectiveStatsCard = ({ backgroundImage, description, image, name, settings, slug, stats, currency, type }) => (
+const CollectiveStatsCard = ({
+  backgroundImage,
+  description,
+  imageUrl,
+  name,
+  settings,
+  slug,
+  stats,
+  currency,
+  type,
+}) => (
   <Container
     bg="white"
     borderRadius="8px"
@@ -62,7 +72,8 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
               height={[52, null, 65]}
               width={[52, null, 65]}
               style={{
-                backgroundImage: `url(${imagePreview(image, defaultImage[type], { width: 65 })})`,
+                backgroundImage: `url(${getCollectiveImage({ imageUrl, slug }, { width: 65 })})`,
+                backgroundColor: 'white',
               }}
             />
           </a>
@@ -158,7 +169,7 @@ const CollectiveStatsCard = ({ backgroundImage, description, image, name, settin
 CollectiveStatsCard.propTypes = {
   backgroundImage: PropTypes.string,
   description: PropTypes.string,
-  image: PropTypes.string,
+  imageUrl: PropTypes.string,
   name: PropTypes.string.isRequired,
   settings: PropTypes.shape({
     goals: PropTypes.arrayOf(
