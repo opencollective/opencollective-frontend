@@ -798,6 +798,12 @@ export const UpdateType = new GraphQLObjectType({
           return update.isPrivate;
         },
       },
+      makePublicOn: {
+        type: IsoDateString,
+        resolve(update) {
+          return update.makePublicOn;
+        },
+      },
       userCanSeeUpdate: {
         description: 'Indicates whether or not the user is allowed to see the content of this update',
         type: GraphQLBoolean,
