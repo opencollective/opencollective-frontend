@@ -50,8 +50,8 @@ describe('new expense when logged in', () => {
     cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
     cy.get('button[type=submit]').click();
     cy.screenshot('expenseCreatedPaypalLoggedOut');
-    cy.get('.expenseCreated').contains('success');
-    cy.get('.whiteblue.viewAllExpenses').click();
+    cy.get('[data-cy="expenseCreated"]').contains('success');
+    cy.get('[data-cy="viewAllExpenses"]').click();
     cy.wait(300);
     cy.get('.itemsList .expense', { timeout: 10000 });
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
@@ -72,8 +72,8 @@ describe('new expense when logged in', () => {
     cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
     cy.get('button[type=submit]').click();
     cy.screenshot('expenseCreatedLoggedIn');
-    cy.get('.expenseCreated').contains('success');
-    cy.get('.whiteblue.viewAllExpenses').click();
+    cy.get('[data-cy="expenseCreated"]').contains('success');
+    cy.get('[data-cy="viewAllExpenses"]').click();
     cy.wait(300);
     cy.get('.itemsList .expense', { timeout: 10000 });
     cy.get('.Expenses .expense:first .description').contains(expenseDescription);
