@@ -298,7 +298,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { host, collective, loading, intl, showForm } = this.props;
+    const { host, collective, loading, intl } = this.props;
     const defaultStartsAt = new Date();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
