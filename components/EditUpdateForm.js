@@ -73,12 +73,11 @@ class EditUpdateForm extends React.Component {
   }
 
   tryUpdateDate(attr, value) {
-    try {
+    if (!value) {
+      this.handleChange(attr, null);
+    } else {
       const d = new Date(value).toISOString();
       this.handleChange(attr, d);
-    } catch {
-      // eslint-disable-next-line no-empty
-      return false;
     }
   }
 
