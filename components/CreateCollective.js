@@ -234,7 +234,7 @@ class CreateCollective extends React.Component {
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}
-                  showForm={false}
+                  showForm={this.host.isHost ? true : false}
                 />
 
                 <div className="result">
