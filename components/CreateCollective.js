@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import isURL from 'validator/lib/isURL';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -78,20 +79,10 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    const websiteRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
-
-    if (!CollectiveInputType.name) {
-      this.error('Please enter a name');
-      return;
-    } else if (!CollectiveInputType.description) {
-      this.error('Please enter a description');
-      return;
-    } else if (!CollectiveInputType.website) {
-      this.error('Please enter a website url');
-      return;
-    } else if (CollectiveInputType.description.length > 255) {
+    if (CollectiveInputType.description.length > 255) {
       this.error('The description should be of less than 255 characters');
-    } else if (!websiteRegex.test(CollectiveInputType.website)) {
+      return;
+    } else if (!isURL(CollectiveInputType.website)) {
       this.error('Please enter a valid website url');
       return;
     } else if (!CollectiveInputType.tos) {

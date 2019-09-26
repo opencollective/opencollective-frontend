@@ -222,7 +222,7 @@ class CreateCollectiveForm extends React.Component {
 
     if (fieldname === 'category') {
       this.defineFields(value);
-      this.handleForm();
+      this.toggleForm();
     }
 
     const collective = {};
@@ -281,10 +281,10 @@ class CreateCollectiveForm extends React.Component {
     window.state = this.state;
   }
 
-  handleForm() {
-    this.setState({
-      showForm: !this.state.showForm,
-    });
+  toggleForm() {
+    this.setState(state => ({
+      showForm: !state.showForm,
+    }));
   }
 
   handleObjectChange(obj) {
