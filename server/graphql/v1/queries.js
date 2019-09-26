@@ -382,6 +382,11 @@ const queries = {
       dateTo: { type: GraphQLString },
       /** @deprecated since 2018-11-29: Virtual cards now included by default when necessary */
       includeVirtualCards: { type: GraphQLBoolean },
+      includeExpenseTransactions: {
+        type: GraphQLBoolean,
+        default: true,
+        description: 'If false, only the transactions not linked to an expense (orders/refunds) will be returned',
+      },
       fetchDataFromLedger: { type: GraphQLBoolean }, // flag to go with either api or ledger transactions
       includeHostedCollectivesTransactions: {
         type: GraphQLBoolean,
@@ -403,6 +408,7 @@ const queries = {
         offset: args.offset,
         startDate: args.dateFrom,
         endDate: args.dateTo,
+        includeExpenseTransactions: args.includeExpenseTransactions,
       });
     },
   },

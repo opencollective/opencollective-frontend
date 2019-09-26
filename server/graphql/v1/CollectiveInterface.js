@@ -1336,6 +1336,11 @@ const CollectiveFields = () => {
         },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        includeExpenseTransactions: {
+          type: GraphQLBoolean,
+          default: true,
+          description: 'If false, only the transactions not linked to an expense (orders/refunds) will be returned',
+        },
       },
       resolve(collective, args) {
         return collective.getTransactions({ ...args, order: [['id', 'DESC']] });
