@@ -101,7 +101,13 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
           onDrop={acceptedFiles => {
-            setUploadedImage(acceptedFiles[0]);
+            setUploadedImage(
+              ...acceptedFiles.map(file =>
+                Object.assign(file, {
+                  preview: URL.createObjectURL(file),
+                }),
+              ),
+            );
             setEditing(true);
           }}
         >
