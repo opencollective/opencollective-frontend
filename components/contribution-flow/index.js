@@ -729,7 +729,8 @@ class CreateOrderPage extends React.Component {
               interval={interval}
               amount={get(stepDetails, 'amount') || defaultStepDetails.amount}
               quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
-              disabledInterval={Boolean(tier) || Boolean(this.props.fixedInterval)}
+              changeIntervalWarning={Boolean(tier)}
+              disabledInterval={Boolean(this.props.fixedInterval)}
               disabledAmount={!get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.fixedAmount)}
               minAmount={this.getOrderMinAmount()}
               maxQuantity={get(tier, 'stats.availableQuantity') || get(tier, 'maxQuantity')}

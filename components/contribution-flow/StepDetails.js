@@ -72,6 +72,7 @@ const buildDisplayMap = options => {
 const StepDetails = ({
   amountOptions,
   currency,
+  changeIntervalWarning,
   disabledInterval,
   disabledAmount,
   tierName,
@@ -94,7 +95,7 @@ const StepDetails = ({
   const [showModal, setShowModal] = useState(false);
   const [tempInterval, setTempInterval] = useState(interval);
   const verifyIntervalChange = ({ interval }) => {
-    if (disabledInterval == true) {
+    if (changeIntervalWarning == true) {
       setTempInterval(interval);
       setShowModal(true);
     } else {
@@ -211,6 +212,7 @@ const StepDetails = ({
                 onChange={({ value }) => verifyIntervalChange({ interval: value })}
                 isSearchable={false}
                 minWidth={150}
+                disabled={disabledInterval}
               />
               {interval !== 'oneTime' && (
                 <P color="black.500" ml={3}>
@@ -293,6 +295,8 @@ StepDetails.propTypes = {
   amountOptions: PropTypes.arrayOf(PropTypes.number),
   currency: PropTypes.string.isRequired,
   onChange: PropTypes.func,
+  /** If true, will warn before changing the frequency */
+  changeIntervalWarning: PropTypes.bool,
   /** If true, the select for interval will be disabled */
   disabledInterval: PropTypes.bool,
   tierName: PropTypes.string,
@@ -322,6 +326,7 @@ StepDetails.propTypes = {
 
 StepDetails.defaultProps = {
   onChange: () => {},
+  changeIntervalWarning: false,
   disabledInterval: false,
   disabledAmount: false,
   showQuantity: false,
