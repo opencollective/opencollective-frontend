@@ -51,7 +51,7 @@
     "flat": "4.1.0",
     "forest-express-sequelize": "3.3.4",
     "fs-extra": "8.1.0",
-    "graphql": "14.5.7",
+    "graphql": "14.5.8",
     "graphql-iso-date": "3.6.1",
     "graphql-type-json": "0.3.0",
     "handlebars": "4.3.1",
