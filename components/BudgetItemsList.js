@@ -125,19 +125,17 @@ const BudgetItemsList = ({ items, isInverted }) => {
                 <Box mr={3}>
                   <Avatar collective={fromCollective} radius={40} />
                 </Box>
-                <Flex flexDirection="column" justifyContent="space-between">
+                <Flex data-cy="transaction-details" flexDirection="column" justifyContent="space-between">
                   <P className="description" color="black.900" fontWeight="600">
                     {description}
                   </P>
-                  <Container color="black.500">
+                  <Container data-cy="transaction-details" color="black.500">
                     {item.usingVirtualCardFromCollective ? (
                       <FormattedMessage
                         id="Transactions.byWithGiftCard"
                         defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
                         values={{
-                          collectiveName: (
-                            <StyledLink className="collective-link" as={LinkCollective} collective={fromCollective} />
-                          ),
+                          collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
                           date: <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />,
                           collectiveGiftCardName: item.usingVirtualCardFromCollective.name,
                           giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
@@ -148,9 +146,7 @@ const BudgetItemsList = ({ items, isInverted }) => {
                         id="Transactions.by"
                         defaultMessage="by {collectiveName} on {date}"
                         values={{
-                          collectiveName: (
-                            <StyledLink className="collective-link" as={LinkCollective} collective={fromCollective} />
-                          ),
+                          collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
                           date: <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />,
                         }}
                       />
@@ -158,7 +154,7 @@ const BudgetItemsList = ({ items, isInverted }) => {
                   </Container>
                 </Flex>
               </Flex>
-              <P fontSize="LeadParagraph">
+              <P data-cy="amount" fontSize="LeadParagraph">
                 {isCredit ? (
                   <Span color="green.700" mr={2}>
                     +

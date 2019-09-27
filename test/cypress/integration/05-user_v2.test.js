@@ -1,60 +1,39 @@
 describe('New users profiles', () => {
   describe('Contributions section', () => {
-    it('Shows contributions with date since and amount contributed', () => {
+    before(() => {
       cy.visit('/xdamman/v2');
-      cy.get('#Contributions');
-      cy.get('.collectives').should('have.length.greaterThan', 1);
-      cy.get('.date-since')
-        .parent()
-        .contains('since');
-      cy.get('.date-since')
-        .first()
-        .contains('August 2016');
-      cy.get('.amount-contributed')
-        .first()
-        .contains('$642');
+      cy.get('[data-cy=Contributions]');
+    });
+    it('Shows contributions with date since and amount contributed', () => {
+      cy.get('[data-cy=collectives]').should('have.length.greaterThan', 1);
+      cy.get('[data-cy=date-since]').contains('since');
+      cy.get('[data-cy=amount-contributed]');
     });
 
     it('Can load more', () => {
-      cy.visit('/xdamman/v2');
-      cy.get('#Contributions');
-      cy.get('button#loadMore').contains('load more');
+      cy.get('button[data-cy=load-more]').contains('load more');
     });
 
     it('Can filter by contribution type (admin, financial...etc)', () => {
-      cy.visit('/xdamman/v2');
-      cy.get('#Contributions');
-      cy.get('button.filters')
-        .eq(1)
-        .contains('Core Contributor');
-      cy.get('button.filters')
-        .eq(2)
-        .contains('Financial Contributor');
-      cy.get('button.filters')
-        .eq(3)
-        .contains('Events');
+      cy.get('button[data-cy=filters]').contains(/(Core|Financial|Events)/);
     });
   });
 
   describe('Transactions section', () => {
-    it('Can filter by expense/contributions', () => {
+    before(() => {
       cy.visit('/xdamman/v2');
-      cy.get('.navbar-contributions').contains('Contributions');
-      cy.get('.navbar-transactions').contains('Transactions');
+    });
+    it('Can filter by expense/contributions', () => {
+      cy.get('[data-cy=navbar-contributions]').contains('Contributions');
+      cy.get('[data-cy=navbar-transactions]').contains('Transactions');
     });
 
     it('Show transactions with all info and links', () => {
-      cy.visit('/xdamman/v2');
-      cy.get('.collective-link').should('have.attr', 'href');
-      cy.get('.description')
-        .first()
-        .contains('Monthly donation to Extinction Rebellion Namur (Rebel)');
-      cy.get('.collective-link')
-        .parent()
-        .contains('July 1');
-      cy.get('.transaction-amount')
-        .first()
-        .contains('€5.00');
+      cy.get('[data-cy=transaction-details]');
+      cy.get('[data-cy=transaction-details] > p');
+      cy.get('[data-cy=transaction-details] > a').should('have.attr', 'href');
+      cy.get('[data-cy=transaction-details]').contains('on');
+      cy.get('[data-cy=amount]').contains(/(EUR|USD)/);
     });
   });
 });

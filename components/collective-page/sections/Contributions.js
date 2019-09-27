@@ -254,7 +254,7 @@ class SectionContributions extends React.PureComponent {
         ) : (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionTitle id="Contributions" textAlign="left" mb={4}>
+              <SectionTitle data-cy="Contributions" textAlign="left" mb={4}>
                 <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
               </SectionTitle>
             </ContainerSectionContent>
@@ -282,7 +282,7 @@ class SectionContributions extends React.PureComponent {
               {nbMemberships < sortedMemberships.length && (
                 <Flex mt={3} justifyContent="center">
                   <StyledButton
-                    id="loadMore"
+                    data-cy="load-more"
                     textTransform="capitalize"
                     minWidth={170}
                     onClick={this.showMoreMemberships}

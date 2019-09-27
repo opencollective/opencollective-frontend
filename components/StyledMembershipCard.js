@@ -30,7 +30,7 @@ const getBackground = collective => {
 const StyledMembershipCard = ({ membership, intl, ...props }) => {
   const { collective, since, stats, role } = membership;
   return (
-    <StyledCard className="collectives" width={250} height={360} position="relative" {...props}>
+    <StyledCard data-cy="collectives" width={250} height={360} position="relative" {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
           <LinkCollective collective={collective}>
@@ -54,19 +54,19 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
         <Container p={3}>
           <Box mb={2}>
             {role && (
-              <P fontSize="Caption" mb={3}>
+              <P fontSize="Caption" mb={3} data-cy="date-since">
                 <FormattedMessage
                   id="Membership.ContributorSince"
                   defaultMessage="{contributorType} since"
                   values={{ contributorType: formatMemberRole(intl, role) }}
                 />
-                <Span className="date-since" display="block" fontSize="LeadParagraph" fontWeight="bold">
+                <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                   <FormattedDate value={since} month="long" year="numeric" />
                 </Span>
               </P>
             )}
             {role === roles.BACKER ? (
-              <P mt={3}>
+              <P mt={3} data-cy="amount-contributed">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
                   {msg => (
                     <Span textTransform="capitalize" fontSize="Caption">
@@ -74,7 +74,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                     </Span>
                   )}
                 </FormattedMessage>
-                <Span className="amount-contributed" display="block" fontSize="LeadParagraph" fontWeight="bold">
+                <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                   {/** Ideally we should breakdown amounts donated per currency, but for now
                     API only returns the total amount in USD. */
                   formatCurrency(stats.totalDonations, 'USD', { precision: 0 })}
