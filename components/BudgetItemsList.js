@@ -296,7 +296,8 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
   const { isCredit, amount, collective, paymentMethod, transaction, isExpense } = getItemInfo(item, isInverted);
   const ItemContainer = isCredit ? CreditItem : DebitItem;
   const hasRefund = Boolean(transaction && transaction.refundTransaction);
-  const hasInvoiceBtn = canDownloadInvoice && !isExpense && !hasRefund && (!isCredit || !isInverted);
+  const hasAccessToInvoice = canDownloadInvoice && transaction && transaction.uuid;
+  const hasInvoiceBtn = hasAccessToInvoice && !isExpense && !hasRefund && (!isCredit || !isInverted);
 
   return (
     <React.Fragment>
@@ -581,4 +582,4 @@ BudgetItemsList.defaultProps = {
   canDownloadInvoice: false,
 };
 
-export default injectIntl(BudgetItemsList);
+export default injectIntl(React.memo(BudgetItemsList));
