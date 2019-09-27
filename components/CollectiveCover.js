@@ -172,6 +172,14 @@ ${description}`;
     return tooltip;
   }
 
+  getDefaultCallsToAction() {
+    if (!this.props.collective) {
+      return {};
+    } else {
+      return { hasContact: this.props.collective.type === CollectiveType.COLLECTIVE };
+    }
+  }
+
   render() {
     const { collective, context, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
@@ -188,7 +196,7 @@ ${description}`;
             collective={collective}
             isAdmin={canEdit}
             showEdit
-            callsToAction={this.props.callsToAction}
+            callsToAction={this.props.callsToAction || this.getDefaultCallsToAction()}
             selected={this.props.selectedSection}
           />
         </Container>
