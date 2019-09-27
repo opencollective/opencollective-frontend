@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { Box } from '@rebass/grid';
 import dynamic from 'next/dynamic';
 
 import Container from './Container';
@@ -51,7 +52,11 @@ const CollectiveCallsToAction = ({
           </StyledButton>
         </Link>
       )}
-      {hasApply && <ApplyToHostBtn host={collective} showConditions={false} />}
+      {hasApply && (
+        <Box mx={2} my={1}>
+          <ApplyToHostBtn host={collective} showConditions={false} minWidth={buttonsMinWidth} />
+        </Box>
+      )}
       {addFunds && (
         <>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} onClick={() => showAddFundsModal(true)}>
@@ -88,6 +93,7 @@ CollectiveCallsToAction.propTypes = {
 
 CollectiveCallsToAction.defaultProps = {
   callsToAction: {},
+  buttonsMinWidth: 100,
 };
 
 export default CollectiveCallsToAction;

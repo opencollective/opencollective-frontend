@@ -125,7 +125,7 @@ class CollectivePage extends Component {
       hasSubmitExpense: isCollective,
       hasApply: isHost,
       hasDashboard: isHost && isAdmin,
-      hasManageSubscriptions: !isHost && isAdmin && !isCollective,
+      hasManageSubscriptions: isAdmin && !isCollective,
       addFunds: isRoot && type === CollectiveType.ORGANIZATION,
     };
   });
