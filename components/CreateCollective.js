@@ -79,10 +79,13 @@ class CreateCollective extends React.Component {
   }
 
   async createCollective(CollectiveInputType) {
-    if (CollectiveInputType.description.length > 255) {
+    if (!CollectiveInputType.name) {
+      this.error('The name field is required');
+      return;
+    } else if (CollectiveInputType.description && CollectiveInputType.description.length > 255) {
       this.error('The description should be of less than 255 characters');
       return;
-    } else if (!isURL(CollectiveInputType.website)) {
+    } else if (!!CollectiveInputType.website && !isURL(CollectiveInputType.website)) {
       this.error('Please enter a valid website url');
       return;
     } else if (!CollectiveInputType.tos) {
