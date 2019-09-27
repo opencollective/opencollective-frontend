@@ -4,6 +4,7 @@ import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
+import { get } from 'lodash';
 
 import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
@@ -81,6 +82,16 @@ class CreateOrderPage extends React.Component {
     skipStepDetails: PropTypes.bool,
   };
 
+  getCanonicalURL(collective, tier) {
+    if (!tier) {
+      return `/${collective.slug}/donate`;
+    } else if (collective.type === CollectiveType.EVENT) {
+      return `/${get(collective.parentCollective, 'slug', collective.slug)}/events/${collective.slug}/order/${tier.id}`;
+    } else {
+      return `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+    }
+  }
+
   getPageMetadata() {
     const { intl, data } = this.props;
 
@@ -90,6 +101,7 @@ class CreateOrderPage extends React.Component {
 
     const collective = data.Collective;
     return {
+      canonicalURL: this.getCanonicalURL(collective, data.Tier),
       description: collective.description,
       twitterHandle: collective.twitterHandle,
       image: collective.image || collective.backgroundImage,
