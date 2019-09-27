@@ -5,6 +5,7 @@ import DataLoader from 'dataloader';
 import dataloaderSequelize from 'dataloader-sequelize';
 import { get, groupBy } from 'lodash';
 import debugLib from 'debug';
+import { types as CollectiveType } from '../constants/collectives';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -64,6 +65,13 @@ export const loaders = req => {
           sortResults(ids, collectives),
         ),
       ),
+      childCollectives: new DataLoader(parentIds => {
+        return models.Collective.findAll({
+          where: { ParentCollectiveId: { [Op.in]: parentIds }, type: CollectiveType.COLLECTIVE },
+        }).then(collectives => {
+          return sortResults(parentIds, collectives, 'ParentCollectiveId', []);
+        });
+      }),
       balance: new DataLoader(ids =>
         models.Transaction.findAll({
           attributes: [
