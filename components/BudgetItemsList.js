@@ -126,7 +126,7 @@ const BudgetItemsList = ({ items, isInverted }) => {
                   <Avatar collective={fromCollective} radius={40} />
                 </Box>
                 <Flex flexDirection="column" justifyContent="space-between">
-                  <P color="black.900" fontWeight="600">
+                  <P className="description" color="black.900" fontWeight="600">
                     {description}
                   </P>
                   <Container color="black.500">
@@ -135,7 +135,9 @@ const BudgetItemsList = ({ items, isInverted }) => {
                         id="Transactions.byWithGiftCard"
                         defaultMessage="by {collectiveName} with {collectiveGiftCardName} {giftCard} on {date}"
                         values={{
-                          collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
+                          collectiveName: (
+                            <StyledLink className="collective-link" as={LinkCollective} collective={fromCollective} />
+                          ),
                           date: <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />,
                           collectiveGiftCardName: item.usingVirtualCardFromCollective.name,
                           giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
@@ -146,7 +148,9 @@ const BudgetItemsList = ({ items, isInverted }) => {
                         id="Transactions.by"
                         defaultMessage="by {collectiveName} on {date}"
                         values={{
-                          collectiveName: <StyledLink as={LinkCollective} collective={fromCollective} />,
+                          collectiveName: (
+                            <StyledLink className="collective-link" as={LinkCollective} collective={fromCollective} />
+                          ),
                           date: <FormattedDate value={createdAt} weekday="long" day="numeric" month="long" />,
                         }}
                       />
@@ -164,7 +168,7 @@ const BudgetItemsList = ({ items, isInverted }) => {
                     −
                   </Span>
                 )}
-                <Span fontWeight="bold" mr={1}>
+                <Span className="transaction-amount" fontWeight="bold" mr={1}>
                   {formatCurrency(Math.abs(amount), item.currency)}
                 </Span>
                 <Span color="black.400" textTransform="uppercase">

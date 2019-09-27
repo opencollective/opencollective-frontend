@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
+import classNames from 'classnames';
 
 // OC Frontend imports
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -216,7 +217,11 @@ class CollectivePage extends Component {
             isAnimated={true}
             onSectionClick={this.onSectionClick}
             LinkComponent={({ section, label, className }) => (
-              <a href={`#section-${section}`} className={className} onClick={e => e.preventDefault()}>
+              <a
+                href={`#section-${section}`}
+                className={classNames(`${className} navbar-${section}`)}
+                onClick={e => e.preventDefault()}
+              >
                 {label}
               </a>
             )}
