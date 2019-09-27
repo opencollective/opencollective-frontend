@@ -195,7 +195,7 @@
     "sinon": "^7.5.0",
     "style-loader": "^1.0.0",
     "url-loader": "^2.1.0",
-    "webpack-bundle-analyzer": "^3.5.1"
+    "webpack-bundle-analyzer": "^3.5.2"
   },
   "jest": {
     "moduleNameMapper": {
