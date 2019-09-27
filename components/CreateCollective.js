@@ -82,7 +82,7 @@ class CreateCollective extends React.Component {
     if (!CollectiveInputType.name) {
       this.error('The name field is required');
       return;
-    } else if (!!CollectiveInputType.website && !isURL(CollectiveInputType.website)) {
+    } else if (CollectiveInputType.website && !isURL(CollectiveInputType.website)) {
       this.error('Please enter a valid website url');
       return;
     } else if (!CollectiveInputType.tos) {
