@@ -707,6 +707,10 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           },
         },
       },
+      childCollectives: {
+        type: new GraphQLList(CollectiveType),
+        description: "Get all child collectives (with type=COLLECTIVE, doesn't return events)",
+      },
       paymentMethods: {
         type: new GraphQLList(PaymentMethodType),
         args: {
@@ -1464,6 +1468,13 @@ const CollectiveFields = () => {
         }
 
         return models.Collective.findAll(query);
+      },
+    },
+    childCollectives: {
+      type: new GraphQLList(CollectiveType),
+      description: "Get all child collectives (with type=COLLECTIVE, doesn't return events)",
+      resolve(collective, _, req) {
+        return req.loaders.collective.childCollectives.load(collective.id);
       },
     },
     paymentMethods: {
