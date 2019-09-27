@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Sep 19 2019 11:17:18 GMT+0200 (GMT+02:00)
+# timestamp: Fri Sep 27 2019 11:00:28 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -219,6 +219,11 @@ type Collective implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -465,6 +470,11 @@ interface CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -1040,6 +1050,11 @@ type Event implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -1124,6 +1139,7 @@ type Expense implements Transaction {
   description: String
   privateMessage: String
   category: String
+  expense: ExpenseType
   attachment: String
 }
 
@@ -2141,6 +2157,11 @@ type Organization implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -3079,6 +3100,11 @@ type User implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int

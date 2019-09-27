@@ -21,6 +21,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-c
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
+import ContributeCollective from '../components/contribute-cards/ContributeCollective';
 
 const ContributeCardContainer = styled.div`
   margin: 0 20px 20px 0;
@@ -97,6 +98,12 @@ class TiersPage extends React.Component {
                     {collective.tiers.map(tier => (
                       <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">
                         <ContributeTier collective={collective} tier={tier} hideContributors={!hasContributors} />
+                      </ContributeCardContainer>
+                    ))}
+
+                    {collective.childCollectives.map(childCollective => (
+                      <ContributeCardContainer key={childCollective.id}>
+                        <ContributeCollective collective={childCollective} />
                       </ContributeCardContainer>
                     ))}
 
@@ -224,6 +231,30 @@ const addTiersData = graphql(
               users
               organizations
             }
+          }
+        }
+        childCollectives {
+          id
+          slug
+          name
+          type
+          description
+          backgroundImageUrl(height: 208)
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            image
+            collectiveSlug
+            name
+            type
           }
         }
       }
