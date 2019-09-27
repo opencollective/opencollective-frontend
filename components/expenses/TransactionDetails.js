@@ -267,8 +267,16 @@ class TransactionDetails extends React.Component {
                   <FormattedMessage id="actions.download" defaultMessage="Download" />
                 </ExternalLinkNewTab>
               ) : (
-                <InvoiceDownloadLink type="transaction" transactionUuid={uuid} viewLoading={() => 'Loading...'}>
-                  <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+                <InvoiceDownloadLink type="transaction" transactionUuid={uuid}>
+                  {({ loading, download }) => (
+                    <a onClick={download}>
+                      {loading ? (
+                        <FormattedMessage id="Select.Loading" defaultMessage="Loading..." />
+                      ) : (
+                        <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+                      )}
+                    </a>
+                  )}
                 </InvoiceDownloadLink>
               )}
             </div>

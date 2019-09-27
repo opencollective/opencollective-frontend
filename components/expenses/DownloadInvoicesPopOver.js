@@ -68,9 +68,10 @@ class Overlay extends React.Component {
           dateFrom={dateFrom}
           dateTo={dateTo}
           invoice={invoice}
-          viewLoading={() => this.renderInvoiceLabel(true, totalAmount, invoice.currency, invoice.host)}
         >
-          {this.renderInvoiceLabel(false, totalAmount, invoice.currency, invoice.host)}
+          {({ loading, download }) => (
+            <a onClick={download}>{this.renderInvoiceLabel(loading, totalAmount, invoice.currency, invoice.host)}</a>
+          )}
         </InvoiceDownloadLink>
       </div>
     );

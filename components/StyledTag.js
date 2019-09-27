@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { background, border, color, space, typography, layout, position } from 'styled-system';
+import { messageType } from '../lib/theme';
 
 /** Simple tag to display a short string */
 const StyledTag = styled.span`
@@ -21,6 +22,8 @@ const StyledTag = styled.span`
   ${typography}
   ${layout}
   ${position}
+
+  ${messageType}
 `;
 
 /** @component */
