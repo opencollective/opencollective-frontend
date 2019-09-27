@@ -1100,7 +1100,7 @@
   "tier.type.custom": "palier personnalisé",
   "tier.type.donation": "don (sans contrepartie)",
   "tier.type.label": "type",
-  "tier.type.membership": "membre (récurrent)",
+  "tier.type.membership": "adhésion (récurrent)",
   "tier.type.product": "produit (e.g. t-shirt)",
   "tier.type.service": "service (ex. support)",
   "tier.type.sponsor.add": "ajouter un autre tier",
