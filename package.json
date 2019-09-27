@@ -78,7 +78,7 @@
     "react-dnd": "5.0.0",
     "react-dnd-html5-backend": "3.0.2",
     "react-dom": "16.9.0",
-    "react-dropzone": "^10.1.9",
+    "react-dropzone": "10.1.9",
     "react-easy-crop": "^1.16.1",
     "react-geosuggest": "2.12.0",
     "react-gmaps": "1.9.0",

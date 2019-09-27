@@ -8,28 +8,28 @@ import { themeGet } from '@styled-system/theme-get';
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
 
+const messages = defineMessages({
+  placeholder: {
+    id: 'uploadImage.placeholder',
+    defaultMessage: 'Drop an image or click to upload',
+  },
+  isDragActive: {
+    id: 'uploadImage.isDragActive',
+    defaultMessage: "Drop it like it's hot 🔥",
+  },
+  isDragReject: {
+    id: 'uploadImage.isDragReject',
+    defaultMessage: '🚫 This file type is not accepted',
+  },
+  error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' },
+});
+
 const InputTypeDropzone = props => {
   const { defaultValue, className, onChange, options, intl, placeholder, name } = props;
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(defaultValue);
   const [url, setUrl] = useState(defaultValue);
   const [error, setError] = useState(null);
-
-  const messages = defineMessages({
-    placeholder: {
-      id: 'uploadImage.placeholder',
-      defaultMessage: 'Drop an image or click to upload',
-    },
-    isDragActive: {
-      id: 'uploadImage.isDragActive',
-      defaultMessage: "Drop it like it's hot 🔥",
-    },
-    isDragReject: {
-      id: 'uploadImage.isDragReject',
-      defaultMessage: '🚫 This file type is not accepted',
-    },
-    error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' },
-  });
 
   const handleChange = files => {
     if (!files) {
