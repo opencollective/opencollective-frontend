@@ -1947,6 +1947,7 @@ export default function(Sequelize, DataTypes) {
     attributes,
     order = [['createdAt', 'DESC']],
     includeUsedVirtualCardsEmittedByOthers = true,
+    includeExpenseTransactions = true,
   }) {
     // Base query
     const query = { where: this.transactionsWhereQuery(includeUsedVirtualCardsEmittedByOthers) };
@@ -1954,6 +1955,11 @@ export default function(Sequelize, DataTypes) {
     // Select attributes
     if (attributes) {
       query.attributes = attributes;
+    }
+
+    // Hide expenses transactions on demand
+    if (includeExpenseTransactions === false) {
+      query.where.ExpenseId = null;
     }
 
     // Filter on host
