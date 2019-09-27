@@ -102,7 +102,7 @@ const MenuLinkContainer = styled.div`
 `;
 
 const InfosContainer = styled(Container)`
-  padding: 14px 24px;
+  padding: 14px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
