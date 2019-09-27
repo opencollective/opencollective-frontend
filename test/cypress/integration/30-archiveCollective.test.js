@@ -4,7 +4,7 @@ describe('Archive Collective', () => {
       // Create a new organization
       cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
         const collectiveSlug = collective.slug;
-        cy.visit(`/${collectiveSlug}`);
+        cy.visit(`/${collectiveSlug}/legacy`);
         cy.wait(1000);
         cy.get('[data-cy=editBtn]').click();
         cy.wait(300);

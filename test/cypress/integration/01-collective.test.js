@@ -1,6 +1,6 @@
 describe('collective page', () => {
   before(() => {
-    cy.visit('/apex');
+    cy.visit('/apex/legacy');
   });
 
   it('loads the collective page', () => {

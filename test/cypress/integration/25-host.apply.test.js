@@ -1,6 +1,6 @@
 describe('apply to host', () => {
   it('as a new collective', () => {
-    cy.visit('/brusselstogetherasbl');
+    cy.visit('/brusselstogetherasbl/legacy');
     cy.get('#hosting h1').contains('We are fiscally hosting 2 Collectives');
     cy.contains('.CollectiveCover [data-cy="host-apply-btn"]', 'Apply').click();
     cy.get('#email').type('testuser@opencollective.com');
