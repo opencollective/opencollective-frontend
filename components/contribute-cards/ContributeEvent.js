@@ -20,6 +20,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = !canOrderTicketsFromEvent(event);
   const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
+  console.log(event);
   return (
     <Contribute
       route="event"
@@ -28,6 +29,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       title={event.name}
       contributors={event.contributors}
       stats={event.stats.backers}
+      image={event.backgroundImageUrl}
       {...props}
     >
       {(startsAt || endsAt) && (
@@ -70,6 +72,7 @@ ContributeEvent.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
+    backgroundImageUrl: PropTypes.string,
     startsAt: PropTypes.string,
     endsAt: PropTypes.string,
     description: PropTypes.string,

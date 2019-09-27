@@ -12,6 +12,7 @@ import Link from '../../Link';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
+import ContributeCollective from '../../contribute-cards/ContributeCollective';
 
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import ContainerSectionContent from '../ContainerSectionContent';
@@ -33,6 +34,11 @@ class SectionContribute extends React.PureComponent {
       PropTypes.shape({
         id: PropTypes.number.isRequired,
         contributors: PropTypes.arrayOf(PropTypes.object),
+      }),
+    ),
+    childCollectives: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
       }),
     ),
     collective: PropTypes.shape({
@@ -108,7 +114,7 @@ class SectionContribute extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, events, contributors, contributorsStats, isAdmin } = this.props;
+    const { collective, tiers, events, childCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
@@ -163,14 +169,18 @@ class SectionContribute extends React.PureComponent {
             )}
           </HorizontalScroller>
         </Box>
-        {(isAdmin || events.length > 0) && (
+        {(isAdmin || events.length > 0 || childCollectives.length > 0) && (
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
                     <H3 fontSize="H5" fontWeight="600" color="black.700">
-                      <FormattedMessage id="section.events.title" defaultMessage="Events" />
+                      {childCollectives.length > 0 ? (
+                        <FormattedMessage id="SectionContribute.MoreWays" defaultMessage="More ways to contribute" />
+                      ) : (
+                        <FormattedMessage id="section.events.title" defaultMessage="Events" />
+                      )}
                     </H3>
                     <Box m={2} flex="0 0 50px">
                       <Chevrons />
@@ -179,16 +189,20 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  {events &&
-                    events.map(event => (
-                      <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                        <ContributeEvent
-                          collective={collective}
-                          event={event}
-                          hideContributors={hasNoContributorForEvents}
-                        />
-                      </Box>
-                    ))}
+                  {childCollectives.map(childCollective => (
+                    <Box key={childCollective.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeCollective collective={childCollective} />
+                    </Box>
+                  ))}
+                  {events.map(event => (
+                    <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeEvent
+                        collective={collective}
+                        event={event}
+                        hideContributors={hasNoContributorForEvents}
+                      />
+                    </Box>
+                  ))}
                   {isAdmin && (
                     <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
                       <CreateNew route={`/${collective.slug}/events/create`}>
