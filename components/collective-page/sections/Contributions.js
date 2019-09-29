@@ -110,6 +110,7 @@ const ParentedCollectivesQuery = gql`
         }
         stats {
           id
+          yearlyBudget
           backers {
             id
             all
@@ -128,9 +129,7 @@ class SectionContributions extends React.PureComponent {
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       stats: PropTypes.shape({
-        backers: PropTypes.shape({
-          all: PropTypes.number,
-        }),
+        yearlyBudget: PropTypes.number,
       }).isRequired,
     }).isRequired,
 
@@ -211,14 +210,14 @@ class SectionContributions extends React.PureComponent {
   });
 
   sortMemberships = memoizeOne(memberships => {
-    // Sort memberships: hosted are always first, then we sort by number of backers then by total amount donated
+    // Sort memberships: hosted are always first, then we sort by yearly budget then by total amount donated
     return [...memberships].sort((m1, m2) => {
       if (m1.role === roles.HOST && m2.role !== roles.HOST) {
         return -1;
       } else if (m1.role !== roles.HOST && m2.role === roles.HOST) {
         return 1;
       } else if (m1.role === roles.HOST) {
-        return m1.collective.stats.backers.all > m2.collective.stats.backers.all ? -1 : 1;
+        return m1.collective.stats.yearlyBudget > m2.collective.stats.yearlyBudget ? -1 : 1;
       } else {
         return m1.stats.totalDonations > m2.stats.totalDonations ? -1 : 1;
       }
@@ -334,11 +333,11 @@ class SectionContributions extends React.PureComponent {
 
 const withData = graphql(
   gql`
-    query SectionContributions($id: Int!) {
+    query SectionCollective($id: Int!) {
       Collective(id: $id) {
         id
         settings
-        memberOf(onlyActiveCollectives: true, limit: 1500) {
+        memberOf(onlyActiveCollectives: true) {
           id
           role
           since
@@ -367,6 +366,7 @@ const withData = graphql(
             }
             stats {
               id
+              yearlyBudget
               backers {
                 id
                 all

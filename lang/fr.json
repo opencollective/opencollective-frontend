@@ -987,7 +987,7 @@
   "signin.noAccount": "Pas encore de compte ?",
   "signin.unknownEmail": "Il n'y a aucun utilisateur avec cette adresse e-mail.",
   "signin.usingEmail": "Connectez-vous avec votre adresse email :",
-  "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
+  "StyledMembershipCard.YearlyBudget": "Budget annuel : {amount}",
   "subscription.amountToDate": "ont contribué jusqu'à présent",
   "subscription.cancel.btn": "oui",
   "subscription.cancel.no.btn": "non",
