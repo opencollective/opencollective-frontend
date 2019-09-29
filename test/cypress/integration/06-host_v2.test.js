@@ -26,8 +26,8 @@ describe('New host page', () => {
 
   describe('Transactions section', () => {
     // The rest of the transactions section tests are in `05-user_v2.test.js`
-    it.skip("Has no filters (because hosts don't create expenses)", () => {
-      // TODO
+    it("Has no filters (because hosts don't create expenses)", () => {
+      cy.contains('[data-cy=filter-button]', 'Expenses').should('not.exist');
     });
   });
 });
