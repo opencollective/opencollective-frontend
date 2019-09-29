@@ -41,6 +41,7 @@ const getGridContainer = (paddingLeft, hasScroll) => {
   const GridContainer = ({ style, ...props }, ref) => {
     return (
       <StyledGridContainer
+        data-cy="contributors-grid"
         ref={ref}
         style={{
           ...style,
