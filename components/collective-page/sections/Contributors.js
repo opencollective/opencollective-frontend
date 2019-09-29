@@ -108,7 +108,7 @@ export default class SectionContributors extends React.PureComponent {
     const hasFilters = !onlyShowCore && filters.length > 1;
 
     return (
-      <MainContainer pt={80} pb={[2, 3]}>
+      <MainContainer data-cy="Contributors" pt={80} pb={[2, 3]}>
         <ContainerSectionContent>
           {!onlyShowCore ? (
             <React.Fragment>
