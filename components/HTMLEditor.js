@@ -165,6 +165,7 @@ class HTMLEditor extends React.Component {
               overflow-y: auto;
               border: 1px solid #dcdee0;
               border-radius: 4px;
+              overflow: hidden;
             }
             .HTMLEditor :global(.ql-editor) {
               min-height: 20rem;
