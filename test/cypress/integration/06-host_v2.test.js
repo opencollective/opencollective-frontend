@@ -9,7 +9,9 @@ describe('New host page', () => {
   describe('Contributions section', () => {
     // The rest of the contributions section is already tested in `05-user_v2.test.js`
     it('Show fiscally hosted collectives', () => {
-      cy.contains('[data-cy=filter-button]', 'Fiscal Host').click();
+      cy.get('[data-cy=filter-button]')
+        .contains('Fiscal Host')
+        .click({ force: true });
       cy.contains('[data-cy=Contributions]', 'Open Source Collective');
       cy.contains('[data-cy=Contributions]', 'APEX');
       cy.contains('[data-cy=Contributions]', 'tipbox');
