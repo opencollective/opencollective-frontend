@@ -138,7 +138,8 @@ class CollectivePage extends Component {
   renderSection(section) {
     switch (section) {
       case Sections.ABOUT:
-        return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
+        // return <SectionAbout collective={this.props.collective} canEdit={this.props.isAdmin} />;
+        return <SectionContributions collective={this.props.collective} />;
       case Sections.BUDGET:
         return (
           <SectionBudget

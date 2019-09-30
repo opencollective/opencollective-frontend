@@ -66,7 +66,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 </Span>
               </P>
             )}
-            {role === roles.BACKER ? (
+            {role !== roles.BACKER ? (
               <P mt={3}>
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
                   {msg => (
