@@ -190,6 +190,7 @@ export async function handleRetryStatus(order, transaction) {
 export function getNextChargeAndPeriodStartDates(status, order) {
   const initial = order.Subscription.nextPeriodStart || order.Subscription.createdAt;
   let nextChargeDate = moment(initial);
+  const dayOfTheMonth = nextChargeDate.date();
   const response = {};
   if (status === 'new' || status === 'success') {
     if (order.Subscription.interval === 'month') {
@@ -197,9 +198,13 @@ export function getNextChargeAndPeriodStartDates(status, order) {
     } else if (order.Subscription.interval === 'year') {
       nextChargeDate.add(1, 'years');
     }
-    if (status === 'new') {
+
+    if (status === 'new' && dayOfTheMonth >= 15) {
+      nextChargeDate.add(1, 'months').startOf('month');
+    } else if (status === 'new') {
       nextChargeDate.startOf('month');
     }
+
     response.nextPeriodStart = nextChargeDate.toDate();
   } else if (status === 'failure') {
     if (order.Subscription.chargeRetryCount >= 2) {
