@@ -2,6 +2,9 @@ describe('New host page', () => {
   /**
    * About section is already tested in `04-collective_v2.test.js`
    */
+  before(() => {
+    cy.visit('/opensourceorg/v2');
+  });
 
   describe('Contributions section', () => {
     // The rest of the contributions section is already tested in `05-user_v2.test.js`
