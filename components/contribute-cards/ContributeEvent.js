@@ -20,7 +20,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = !canOrderTicketsFromEvent(event);
   const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
-  console.log(event);
   return (
     <Contribute
       route="event"
