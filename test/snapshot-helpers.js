@@ -1,16 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { IntlProvider } from 'react-intl';
-import { ThemeProvider } from 'styled-components';
-import { get } from 'lodash';
-import 'intl';
-import 'intl/locale-data/jsonp/en.js';
-import 'intl-pluralrules';
-import '@formatjs/intl-relativetimeformat/polyfill';
-import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
-import '@formatjs/intl-relativetimeformat/dist/locale-data/fr';
-import theme from '../lib/theme';
-import * as Intl from '../server/intl';
+import { withRequiredProviders } from './providers';
 
 /**
  * A helper to:
@@ -24,19 +15,8 @@ import * as Intl from '../server/intl';
  *    - ThemeProvider: { theme }
  */
 export const snapshot = (component, providersParams = {}) => {
-  let messages;
-  const locale = get(providersParams, 'IntlProvider.locale', 'en');
-  if (locale !== 'en') {
-    messages = Intl.getMessages(locale);
-  }
-
-  const tree = renderer
-    .create(
-      <IntlProvider locale={locale} messages={messages}>
-        <ThemeProvider theme={get(providersParams, 'ThemeProvider.theme', theme)}>{component}</ThemeProvider>
-      </IntlProvider>,
-    )
-    .toJSON();
+  const componentWithProviders = withRequiredProviders(component, providersParams);
+  const tree = renderer.create(componentWithProviders).toJSON();
   return expect(tree).toMatchSnapshot();
 };
 

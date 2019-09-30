@@ -1,23 +1,12 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { IntlProvider } from 'react-intl';
-import { ApolloProvider } from 'react-apollo';
 
 import SubscriptionCard from '../SubscriptionCard';
 
-import initClient from '../../lib/initClient';
-
-const apolloClient = initClient();
+import { withRequiredProviders } from '../../test/providers';
 
 describe('SubscriptionCard.test.js', () => {
-  const mountComponent = props =>
-    mount(
-      <IntlProvider locale="en">
-        <ApolloProvider client={apolloClient}>
-          <SubscriptionCard {...props} />
-        </ApolloProvider>
-      </IntlProvider>,
-    );
+  const mountComponent = props => mount(withRequiredProviders(<SubscriptionCard {...props} />));
 
   const defaultValues = {
     slug: 'userSlug',
