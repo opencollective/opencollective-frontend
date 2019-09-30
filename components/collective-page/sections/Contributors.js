@@ -155,6 +155,7 @@ export default class SectionContributors extends React.PureComponent {
         )}
         <ContributorsGrid
           contributors={contributors}
+          currency={collective.currency}
           getPaddingLeft={({ width, rowWidth, nbRows }) => {
             if (width < Dimensions.MAX_SECTION_WIDTH) {
               // No need for padding on screens small enough so they don't have padding
