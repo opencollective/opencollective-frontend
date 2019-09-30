@@ -49,6 +49,18 @@ class TiersPage extends React.Component {
     return hasFinancial || events.find(event => event.contributors.length > 0);
   });
 
+  getPageMetadata(collective) {
+    if (!collective) {
+      return { title: 'Contribute', description: 'All the ways to contribute' };
+    } else {
+      return {
+        title: `Contribute to ${collective.name}`,
+        description: 'These are all the ways you can help make our community sustainable. ',
+        canonicalURL: `/${collective.slug}/contribute`,
+      };
+    }
+  }
+
   render() {
     const { LoggedInUser, data = {} } = this.props;
 
@@ -63,12 +75,7 @@ class TiersPage extends React.Component {
 
     return (
       <div>
-        <Header
-          title={'Tiers'}
-          description="Collective tiers"
-          canonicalURL={`/${collective.slug}/contribute`}
-          LoggedInUser={LoggedInUser}
-        />
+        <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} />
         <Body>
           {data.loading ? (
             <Loading />
