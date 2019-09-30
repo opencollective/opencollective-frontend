@@ -294,7 +294,7 @@
   "ConnectPaypal.processing": "Обрабатываем...",
   "ConnectPaypal.refill": "Пополнить баланс",
   "Contact": "Contact",
-  "contribute.changeFrequency.confirmMsg": "If you're changing the frequency, we will not contribute to this specific tier \"{tierName}\"",
+  "contribute.changeFrequency.confirmMsg": "If you're changing the frequency, you will not contribute to this specific tier \"{tierName}\"",
   "contribute.changeTaxNumber": "Изменить номер {taxName}",
   "contribute.ContributionDetailsTitle": "Contribution details:",
   "contribute.contributorType": "Contribute to \"{name}\" tier",
