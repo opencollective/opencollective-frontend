@@ -41,6 +41,7 @@ const populateIndex = async () => {
       id: {
         [Op.notIn]: [1, 7],
       },
+      isArchived: false,
     },
 
     attributes: {

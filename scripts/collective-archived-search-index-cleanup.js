@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-import '../../server/env';
+import '../server/env';
 
 import { Op } from 'sequelize';
 import moment from 'moment-timezone';
 import debugLib from 'debug';
 
-import algolia from '../../server/lib/algolia';
-import emailLib from '../../server/lib/email';
-import models from '../../server/models';
-import { types as collectiveTypes } from '../../server/constants/collectives';
+import algolia from '../server/lib/algolia';
+import emailLib from '../server/lib/email';
+import models from '../server/models';
+import { types as collectiveTypes } from '../server/constants/collectives';
 
 const debug = debugLib('clean_search_index');
 
@@ -38,18 +38,7 @@ const done = error => {
 const cleanIndex = async () => {
   const collectives = await models.Collective.findAll({
     where: {
-      [Op.or]: [
-        {
-          deletedAt: {
-            [Op.gt]: yesterday,
-          },
-        },
-        {
-          archivedAt: {
-            [Op.gt]: yesterday,
-          },
-        },
-      ],
+      isArchived: true,
       type: {
         [Op.or]: [collectiveTypes.COLLECTIVE, collectiveTypes.ORGANIZATION],
       },
@@ -68,7 +57,7 @@ const cleanIndex = async () => {
   return;
 };
 
-debug('Starting job to cleanup deleted records in search index');
+debug('Starting one-time job to cleanup archived records in search index');
 cleanIndex()
   .then(() => done())
   .catch(done);
