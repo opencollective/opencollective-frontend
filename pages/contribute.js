@@ -16,6 +16,7 @@ import ErrorPage from '../components/ErrorPage';
 import { withUser } from '../components/UserProvider';
 import { H2, P } from '../components/Text';
 import MessageBox from '../components/MessageBox';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import { Sections } from '../components/collective-page/_constants';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
@@ -72,57 +73,59 @@ class TiersPage extends React.Component {
           {data.loading ? (
             <Loading />
           ) : (
-            <Container borderTop="1px solid #E6E8EB" pb={3}>
-              <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} />
-              <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
-                <H2 fontWeight="normal" my={4}>
-                  <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
-                </H2>
-                <P color="black.700" mb={4}>
-                  <FormattedMessage
-                    id="ContributePage.Description"
-                    defaultMessage="These are all the ways you can help make our community sustainable. "
-                  />
-                </P>
-                {canContribute ? (
-                  <Container display="flex" flexWrap="wrap">
-                    <ContributeCardContainer>
-                      <ContributeCustom
-                        hideContributors={!hasContributors}
-                        collective={collective}
-                        contributors={financialContributorsWithoutTier}
-                        stats={collective.stats.backers}
-                      />
-                    </ContributeCardContainer>
-
-                    {collective.tiers.map(tier => (
-                      <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">
-                        <ContributeTier collective={collective} tier={tier} hideContributors={!hasContributors} />
-                      </ContributeCardContainer>
-                    ))}
-
-                    {collective.childCollectives.map(childCollective => (
-                      <ContributeCardContainer key={childCollective.id}>
-                        <ContributeCollective collective={childCollective} />
-                      </ContributeCardContainer>
-                    ))}
-
-                    {collective.events.map(event => (
-                      <ContributeCardContainer key={`event-${event.id}`}>
-                        <ContributeEvent collective={collective} event={event} hideContributors={!hasContributors} />
-                      </ContributeCardContainer>
-                    ))}
-                  </Container>
-                ) : (
-                  <MessageBox type="info" withIcon>
+            <CollectiveThemeProvider collective={data.Collective}>
+              <Container borderTop="1px solid #E6E8EB" pb={3}>
+                <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} />
+                <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
+                  <H2 fontWeight="normal" my={4}>
+                    <FormattedMessage id="CP.Contribute.Title" defaultMessage="Become a contributor" />
+                  </H2>
+                  <P color="black.700" mb={4}>
                     <FormattedMessage
-                      id="ContributePage.Inactive"
-                      defaultMessage="This collective can't accept financial contributions at the moment."
+                      id="ContributePage.Description"
+                      defaultMessage="These are all the ways you can help make our community sustainable. "
                     />
-                  </MessageBox>
-                )}
+                  </P>
+                  {canContribute ? (
+                    <Container display="flex" flexWrap="wrap">
+                      <ContributeCardContainer>
+                        <ContributeCustom
+                          hideContributors={!hasContributors}
+                          collective={collective}
+                          contributors={financialContributorsWithoutTier}
+                          stats={collective.stats.backers}
+                        />
+                      </ContributeCardContainer>
+
+                      {collective.tiers.map(tier => (
+                        <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">
+                          <ContributeTier collective={collective} tier={tier} hideContributors={!hasContributors} />
+                        </ContributeCardContainer>
+                      ))}
+
+                      {collective.childCollectives.map(childCollective => (
+                        <ContributeCardContainer key={childCollective.id}>
+                          <ContributeCollective collective={childCollective} />
+                        </ContributeCardContainer>
+                      ))}
+
+                      {collective.events.map(event => (
+                        <ContributeCardContainer key={`event-${event.id}`}>
+                          <ContributeEvent collective={collective} event={event} hideContributors={!hasContributors} />
+                        </ContributeCardContainer>
+                      ))}
+                    </Container>
+                  ) : (
+                    <MessageBox type="info" withIcon>
+                      <FormattedMessage
+                        id="ContributePage.Inactive"
+                        defaultMessage="This collective can't accept financial contributions at the moment."
+                      />
+                    </MessageBox>
+                  )}
+                </Container>
               </Container>
-            </Container>
+            </CollectiveThemeProvider>
           )}
         </Body>
         <Footer />
