@@ -1,12 +1,12 @@
-import { ApolloProvider } from 'react-apollo';
 import React from 'react';
-import OrderForm from '../OrderForm';
+import { mount } from 'enzyme';
 import sinon from 'sinon';
+
+import { withRequiredProviders } from '../../test/providers';
+
+import OrderForm from '../OrderForm';
 import * as stripe from '../../lib/stripe';
 import * as api from '../../lib/api';
-import { IntlProvider } from 'react-intl';
-
-import { mount } from 'enzyme';
 
 const getStripeToken = sinon.stub(stripe, 'getStripeToken').callsFake(() => {
   return {
@@ -59,15 +59,9 @@ describe('OrderForm component', () => {
 
   const mountComponent = (props, queryStub) =>
     mount(
-      <ApolloProvider
-        client={{
-          query: queryStub || Promise.resolve,
-        }}
-      >
-        <IntlProvider locale="en">
-          <OrderForm {...props} />
-        </IntlProvider>
-      </ApolloProvider>,
+      withRequiredProviders(<OrderForm {...props} />, {
+        ApolloProvider: { client: { query: queryStub || Promise.resolve } },
+      }),
     );
 
   let component;
