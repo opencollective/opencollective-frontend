@@ -49,7 +49,6 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       collective: { type: CollectiveInterfaceType },
       type: { type: GraphQLString },
       description: { type: GraphQLString },
-      privateMessage: { type: GraphQLString },
       createdAt: { type: DateString },
       updatedAt: { type: DateString },
       refundTransaction: { type: TransactionInterfaceType },
@@ -279,37 +278,44 @@ export const TransactionExpenseType = new GraphQLObjectType({
       },
       privateMessage: {
         type: GraphQLString,
+        deprecationReason: 'Please use transaction.expense.privateMessage',
         resolve(transaction, args, req) {
-          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage)
+          return transaction.ExpenseId
+            ? req.loaders.expense.findById
+                .load(transaction.ExpenseId)
+                .then(expense => expense && expense.privateMessage)
             : null;
         },
       },
       category: {
         type: GraphQLString,
+        deprecationReason: 'Please use transaction.expense.category',
         resolve(transaction, args, req) {
-          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category)
+          return transaction.ExpenseId
+            ? req.loaders.expense.findById.load(transaction.ExpenseId).then(expense => expense && expense.category)
             : null;
         },
       },
       expense: {
         type: ExpenseType,
         resolve(transaction, args, req) {
-          return req.loaders.expense.findById.load(transaction.ExpenseId);
+          // If it's a expense transaction it'll have an ExpenseId
+          // otherwise we return null
+          return transaction.ExpenseId ? req.loaders.expense.findById.load(transaction.ExpenseId) : null;
         },
       },
       attachment: {
         type: GraphQLString,
+        deprecationReason: 'Please use transaction.expense.attachment',
         resolve(transaction, args, req) {
-          // If it's a sequelize model transaction, it means it has the method getExpenseFromViewer
+          // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
-          return transaction.getExpenseForViewer
-            ? transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment)
+          return transaction.ExpenseId
+            ? req.loaders.expense.findById.load(transaction.ExpenseId).then(expense => expense && expense.attachment)
             : null;
         },
       },

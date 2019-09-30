@@ -237,15 +237,6 @@ export default (Sequelize, DataTypes) => {
     return models.Collective.findByPk(HostCollectiveId);
   };
 
-  Transaction.prototype.getExpenseForViewer = function(viewer) {
-    return models.Expense.findOne({ where: { id: this.ExpenseId } }).then(expense => {
-      if (!expense) return null;
-      if (viewer && viewer.isAdmin(this.CollectiveId)) return expense.info;
-      if (viewer && viewer.id === expense.UserId) return expense.info;
-      return expense.public;
-    });
-  };
-
   Transaction.prototype.getSource = function() {
     if (this.OrderId) return this.getOrder({ paranoid: false });
     if (this.ExpenseId) return this.getExpense({ paranoid: false });

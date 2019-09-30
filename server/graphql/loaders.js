@@ -56,7 +56,9 @@ export const loaders = req => {
   return {
     expense: {
       findById: new DataLoader(ids =>
-        models.Expense.findAll({ where: { id: { [Op.in]: ids } } }).then(results => sortResults(ids, results, 'id')),
+        models.Expense.findAll({ where: { id: { [Op.in]: ids } } }).then(results => {
+          return sortResults(ids, results, 'id');
+        }),
       ),
     },
     collective: {
