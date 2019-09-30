@@ -19,7 +19,7 @@
   "addFunds.error.amountMustBeGreatherThanZero": "Общая сумма должна быть больше 0",
   "addFunds.error.missingEmail": "Пожалуйста, предоставьте электронную почту, чтобы идентифицировать финансовый источник.",
   "addfunds.fromCollective.host": "Представитель ({host})",
-  "addfunds.fromCollective.other": "другое (пожалуйста, уточните)",
+  "addfunds.fromCollective.other": "Other (please specify)",
   "addfunds.FromCollectiveId.label": "источник",
   "addfunds.hostFeePercent.label": "Комиссия представителя",
   "addfunds.hostFees": "Комиссия представителя ({hostFees})",

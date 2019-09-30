@@ -19,7 +19,7 @@
   "addFunds.error.amountMustBeGreatherThanZero": "合計金額は 0 よりも大きくなければなりません",
   "addFunds.error.missingEmail": "お金の出所を特定するためのメールアドレスを入力してください。",
   "addfunds.fromCollective.host": "ホスト ({host})",
-  "addfunds.fromCollective.other": "その他 (指定してください)",
+  "addfunds.fromCollective.other": "Other (please specify)",
   "addfunds.FromCollectiveId.label": "ソース",
   "addfunds.hostFeePercent.label": "ホストの手数料",
   "addfunds.hostFees": "ホストの手数料 ({hostFees})",

@@ -19,7 +19,7 @@
   "addFunds.error.amountMustBeGreatherThanZero": "Betrag muss größer als 0 sein",
   "addFunds.error.missingEmail": "Bitte gib eine Email-Adresse ein, um die Quelle des Geldes identifizieren.",
   "addfunds.fromCollective.host": "Host ({host})",
-  "addfunds.fromCollective.other": "Sonstige (bitte näher spezifizieren)",
+  "addfunds.fromCollective.other": "Other (please specify)",
   "addfunds.FromCollectiveId.label": "Quelle",
   "addfunds.hostFeePercent.label": "Host-Gebühr",
   "addfunds.hostFees": "Host-Gebühren ({hostFees})",
