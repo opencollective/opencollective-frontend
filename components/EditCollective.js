@@ -54,12 +54,7 @@ class EditCollective extends React.Component {
     window.OC.editCollective = this.editCollective.bind(this);
   }
 
-  async validate(CollectiveInputType) {
-    const tiers = this.cleanTiers(CollectiveInputType.tiers);
-    if (tiers) {
-      CollectiveInputType.tiers = tiers;
-    }
-
+  validate(CollectiveInputType) {
     if (typeof CollectiveInputType.tags === 'string') {
       CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
     }
@@ -85,36 +80,8 @@ class EditCollective extends React.Component {
     return CollectiveInputType;
   }
 
-  cleanTiers(tiers) {
-    if (!tiers) return null;
-    return tiers.map(tier => {
-      let resetAttributes = [];
-      switch (tier.type) {
-        case 'TICKET':
-        case 'PRODUCT':
-          resetAttributes = ['interval', 'presets'];
-          break;
-        case 'MEMBERSHIP':
-        case 'SERVICE':
-          resetAttributes = ['presets', 'maxQuantity'];
-          break;
-        case 'DONATION':
-          resetAttributes = ['maxQuantity'];
-          break;
-      }
-      const cleanTier = { ...tier };
-      resetAttributes.map(attr => {
-        cleanTier[attr] = null;
-      });
-      if (tier.amountType === 'FIXED') {
-        cleanTier.presets = null;
-      }
-      return cleanTier;
-    });
-  }
-
   async editCollective(CollectiveInputType) {
-    CollectiveInputType = await this.validate(CollectiveInputType);
+    CollectiveInputType = this.validate(CollectiveInputType);
     if (!CollectiveInputType) {
       return false;
     }
