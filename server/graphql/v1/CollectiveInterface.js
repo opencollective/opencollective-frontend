@@ -1023,13 +1023,13 @@ const CollectiveFields = () => {
         }
 
         if (collective.ParentCollectiveId) {
-          return req.loaders.collective.findById
-            .load(collective.ParentCollectiveId)
-            .then(
-              parentCollective =>
-                parentCollective.HostCollectiveId &&
-                req.loaders.collective.findById.load(parentCollective.HostCollectiveId),
-            );
+          return req.loaders.collective.findById.load(collective.ParentCollectiveId).then(parentCollective => {
+            if (parentCollective && parentCollective.HostCollectiveId) {
+              return req.loaders.collective.findById.load(parentCollective.HostCollectiveId);
+            } else {
+              return null;
+            }
+          });
         }
 
         return null;
