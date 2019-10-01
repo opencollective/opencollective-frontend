@@ -252,7 +252,7 @@ class SectionContributions extends React.PureComponent {
             <P color="black.600" fontSize="LeadParagraph" mt={5}>
               <FormattedMessage
                 id="CollectivePage.SectionContributions.Empty"
-                defaultMessage="{collectiveName} seems to be hibernating on a cave in the North Pole ❄️☃️!"
+                defaultMessage="{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!"
                 values={{ collectiveName: collective.name }}
               />
             </P>
