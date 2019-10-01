@@ -11,7 +11,7 @@ describe('New users profiles', () => {
     });
 
     it('Can load more', () => {
-      cy.get('button[data-cy=load-more]').contains('load more');
+      // TODO
     });
 
     it('Can filter by contribution type (admin, financial...etc)', () => {
@@ -32,7 +32,6 @@ describe('New users profiles', () => {
       cy.get('[data-cy=transaction-details]');
       cy.get('[data-cy=transaction-description]');
       cy.get('[data-cy=transaction-details] > a').should('have.attr', 'href');
-      cy.get('[data-cy=transaction-details]').contains('on');
       cy.get('[data-cy=amount]').contains(/(EUR|USD)/);
     });
   });
