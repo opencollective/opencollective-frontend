@@ -46,7 +46,8 @@
       "confirmToken": 15
     },
     "maxNumberOfAppsPerUser": 15,
-    "maxWebhooksPerUserPerCollective": 50
+    "maxWebhooksPerUserPerCollective": 50,
+    "searchEmailPerHour": 150
   },
   "email": {
     "from": "Open Collective <info@opencollective.com>"

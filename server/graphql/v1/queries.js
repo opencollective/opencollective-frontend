@@ -1,12 +1,14 @@
 import Promise from 'bluebird';
-import { find, get, uniq, pick } from 'lodash';
+import { get, uniq, pick } from 'lodash';
 import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
+import { isEmail } from 'validator';
 
-import algolia from '../../lib/algolia';
 import errors from '../../lib/errors';
 import rawQueries from '../../lib/queries';
+import { types as CollectiveTypes } from '../../constants/collectives';
 import models, { sequelize, Op } from '../../models';
 import { fetchCollectiveId } from '../../lib/cache';
+import { searchCollectivesByEmail, searchCollectivesOnAlgolia, searchCollectivesInDB } from '../../lib/search';
 
 import {
   CollectiveInterfaceType,
@@ -1251,11 +1253,19 @@ const queries = {
    */
   search: {
     type: CollectiveSearchResultsType,
+    description: `
+      Search for collectives. Uses Algolia, except if searching for users or if using flag to opt-out.
+      Results are returned with best matches first.
+    `,
     args: {
       term: {
         type: GraphQLString,
         description:
           'Fetch collectives related to this term based on name, description, tags, slug, mission, and location',
+      },
+      types: {
+        type: new GraphQLList(TypeOfCollectiveType),
+        description: 'Only return collectives of this type',
       },
       limit: {
         type: GraphQLInt,
@@ -1266,46 +1276,40 @@ const queries = {
         type: GraphQLInt,
         defaultValue: 0,
       },
+      useAlgolia: {
+        type: GraphQLBoolean,
+        defaultValue: true,
+        description: `
+          If set to false, an internal query will be used to search the collective rather than Algolia. 
+          You **must** set this to false when searching for users/organizations.
+        `,
+      },
     },
-    async resolve(_, args) {
-      const { limit, offset, term } = args;
-
-      if (term.trim() === '') {
-        return {
-          collectives: [],
-          limit,
-          offset,
-          total: 0,
-        };
-      }
-
-      const index = algolia.getIndex();
-      if (!index) {
-        return { collectives: [], limit, offset, total: 0 };
-      }
-
-      const { hits, nbHits: total } = await index.search({
-        query: term,
-        length: limit,
-        offset,
-      });
-      const collectiveIds = hits.map(({ id }) => id);
-      const collectives = await models.Collective.findAll({
-        where: {
-          id: {
-            [Op.in]: collectiveIds,
-          },
-        },
-      });
-
-      // map over the collectiveIds with the database results to keep the original order from Algolia
-      // filter out null results
-      return {
-        collectives: collectiveIds.map(id => find(collectives, { id })).filter(Boolean),
+    async resolve(_, args, req) {
+      const { limit, offset, term, types, useAlgolia } = args;
+      const cleanTerm = term ? term.trim() : '';
+      const generateResults = (collectives, total) => ({
+        id: `search-${(types || []).join('_')}-${cleanTerm}-${offset}-${limit}-${useAlgolia ? 'algolia' : 'direct'}`,
+        total,
+        collectives,
         limit,
         offset,
-        total,
-      };
+      });
+
+      if (cleanTerm.length === 0) {
+        return generateResults([], 0);
+      } else if (useAlgolia) {
+        const [collectives, total] = await searchCollectivesOnAlgolia(cleanTerm, offset, limit, types);
+        return generateResults(collectives, total);
+      } else if (isEmail(cleanTerm) && req.remoteUser && (!types || types.includes(CollectiveTypes.USER))) {
+        // If an email is provided, search in the user table. Users must be authenticated
+        // because we limit the rate of queries for this feature.
+        const [collectives, total] = await searchCollectivesByEmail(cleanTerm, req.remoteUser);
+        return generateResults(collectives, total);
+      } else {
+        const [collectives, total] = await searchCollectivesInDB(cleanTerm, offset, limit, types);
+        return generateResults(collectives, total);
+      }
     },
   },
   /** Gets the transactions of a payment method

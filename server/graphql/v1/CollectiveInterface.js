@@ -1685,6 +1685,10 @@ export const CollectiveSearchResultsType = new GraphQLObjectType({
   name: 'CollectiveSearchResults',
   description: 'The results from searching for collectives with pagination info',
   fields: () => ({
+    id: {
+      type: GraphQLString,
+      description: 'A unique identifier for this search (for caching)',
+    },
     collectives: {
       type: new GraphQLList(CollectiveType),
     },
