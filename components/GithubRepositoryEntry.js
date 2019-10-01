@@ -13,7 +13,7 @@ import StyledInput from './StyledInput';
 import StyledButton from './StyledButton';
 import Link from './Link';
 import StyledRadioList from './StyledRadioList';
-import ExternalLinkNewTab from './ExternalLinkNewTab';
+import ExternalLink from './ExternalLink';
 import { FormattedMessage } from 'react-intl';
 
 const useForm = () => {
@@ -190,7 +190,11 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                   // eslint-disable-next-line
                   'tos-link': msg => <Link route="/tos">{msg}</Link>,
                   // eslint-disable-next-line
-                  'host-terms': msg => <ExternalLinkNewTab href={FISCAL_SPONSOR_TERMS}>{msg}</ExternalLinkNewTab>,
+                  'host-terms': msg => (
+                    <ExternalLink href={FISCAL_SPONSOR_TERMS} openInNewTab>
+                      {msg}
+                    </ExternalLink>
+                  ),
                   // eslint-disable-next-line
                   'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
                 }}

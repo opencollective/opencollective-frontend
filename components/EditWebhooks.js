@@ -22,7 +22,7 @@ import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
 import { Add } from 'styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
-import ExternalLinkNewTab from './ExternalLinkNewTab';
+import ExternalLink from './ExternalLink';
 
 const messages = defineMessages({
   'webhooks.url.label': {
@@ -256,9 +256,12 @@ class EditWebhooks extends React.Component {
                 defaultMessage="NEW! You can now use the Beta {zapierLink} app to manage your integrations."
                 values={{
                   zapierLink: (
-                    <ExternalLinkNewTab href="https://zapier.com/developer/public-invite/21484/63399c65bb01d75e00fe091ae7f58683/">
+                    <ExternalLink
+                      href="https://zapier.com/developer/public-invite/21484/63399c65bb01d75e00fe091ae7f58683/"
+                      openInNewTab
+                    >
                       Zapier
-                    </ExternalLinkNewTab>
+                    </ExternalLink>
                   ),
                 }}
               />
