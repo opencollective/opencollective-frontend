@@ -35,7 +35,7 @@ const getNotification = (intl, status, collective, host) => {
   if (status === 'collectiveCreated') {
     return {
       title: intl.formatMessage(messages.collectiveCreated),
-      description: intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }),
+      description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
     };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
