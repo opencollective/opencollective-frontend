@@ -175,7 +175,7 @@
     "eslint-plugin-graphql": "^3.1.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react": "^7.15.0",
     "eslint-plugin-react-hooks": "^2.1.1",
     "file-loader": "^4.2.0",
     "html-loader": "^0.5.5",
