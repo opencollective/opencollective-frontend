@@ -45,7 +45,7 @@ const SectionBudget = ({ collective, stats }) => {
       <P color="black.600" mb={4} maxWidth={830}>
         <FormattedMessage
           id="CollectivePage.SectionBudget.Description"
-          defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reinmbursed and more!"
+          defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
           values={{ collectiveName: collective.name }}
         />
       </P>
