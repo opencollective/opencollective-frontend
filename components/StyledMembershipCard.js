@@ -76,8 +76,8 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 </FormattedMessage>
                 <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                   {/** Ideally we should breakdown amounts donated per currency, but for now
-                    API only returns the total amount in USD. */
-                  formatCurrency(stats.totalDonations, 'USD', { precision: 0 })}
+                      the API only returns the total amount in collective's currency. */
+                  formatCurrency(stats.totalDonations, collective.currency || 'USD', { precision: 0 })}
                 </Span>
               </P>
             ) : (

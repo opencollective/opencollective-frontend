@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Sep 19 2019 11:17:18 GMT+0200 (GMT+02:00)
+# timestamp: Fri Sep 27 2019 13:39:01 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -198,6 +198,11 @@ type Collective implements CollectiveInterface {
     type: String
     limit: Int
     offset: Int
+
+    """
+    If false, only the transactions not linked to an expense (orders/refunds) will be returned
+    """
+    includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
@@ -219,6 +224,11 @@ type Collective implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -465,6 +475,11 @@ interface CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -1019,6 +1034,11 @@ type Event implements CollectiveInterface {
     type: String
     limit: Int
     offset: Int
+
+    """
+    If false, only the transactions not linked to an expense (orders/refunds) will be returned
+    """
+    includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
@@ -1040,6 +1060,11 @@ type Event implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -1124,6 +1149,7 @@ type Expense implements Transaction {
   description: String
   privateMessage: String
   category: String
+  expense: ExpenseType
   attachment: String
 }
 
@@ -2120,6 +2146,11 @@ type Organization implements CollectiveInterface {
     type: String
     limit: Int
     offset: Int
+
+    """
+    If false, only the transactions not linked to an expense (orders/refunds) will be returned
+    """
+    includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
@@ -2141,6 +2172,11 @@ type Organization implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int
@@ -2347,6 +2383,11 @@ type Query {
     dateFrom: String
     dateTo: String
     includeVirtualCards: Boolean
+
+    """
+    If false, only the transactions not linked to an expense (orders/refunds) will be returned
+    """
+    includeExpenseTransactions: Boolean
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
@@ -3058,6 +3099,11 @@ type User implements CollectiveInterface {
     type: String
     limit: Int
     offset: Int
+
+    """
+    If false, only the transactions not linked to an expense (orders/refunds) will be returned
+    """
+    includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
@@ -3079,6 +3125,11 @@ type User implements CollectiveInterface {
     """
     includeInactive: Boolean = false
   ): [Event]
+
+  """
+  Get all child collectives (with type=COLLECTIVE, doesn't return events)
+  """
+  childCollectives: [Collective]
   paymentMethods(
     service: String
     limit: Int

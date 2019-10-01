@@ -165,6 +165,11 @@ class HTMLEditor extends React.Component {
               overflow-y: auto;
               border: 1px solid #dcdee0;
               border-radius: 4px;
+              overflow: hidden;
+            }
+            .HTMLEditor :global(.ql-editor) {
+              min-height: 20rem;
+              max-height: 35rem;
             }
             .HTMLEditor :global(.ql-toolbar) {
               border: 1px solid #dcdee0;

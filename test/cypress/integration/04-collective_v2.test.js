@@ -110,3 +110,15 @@ describe('New collective page', () => {
     });
   });
 });
+
+describe('New Collective page with euro currency', () => {
+  before(() => {
+    cy.visit('/brusselstogether/v2');
+  });
+
+  it('contributors amount in euro', () => {
+    cy.get('[data-cy=ContributorsGrid_ContributorCard]')
+      .first()
+      .contains('€5,140 EUR');
+  });
+});

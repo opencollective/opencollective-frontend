@@ -135,6 +135,7 @@ const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport
             style={{ left: style.left + COLLECTIVE_CARD_MARGIN_X, top: style.top + COLLECTIVE_CARD_MARGIN_Y }}
           >
             <ContributorCard
+              data-cy="ContributorsGrid_ContributorCard"
               width={COLLECTIVE_CARD_WIDTH}
               height={COLLECTIVE_CARD_HEIGHT}
               contributor={contributor}

@@ -393,6 +393,7 @@ class CreateCollectiveForm extends React.Component {
                           pre={field.pre}
                           context={this.state.collective}
                           onChange={value => this.handleChange(field.name, value)}
+                          maxLength={field.maxLength}
                         />
                       ),
                   )}

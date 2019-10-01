@@ -50,6 +50,7 @@ class NewCollectivePage extends React.Component {
         financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
         events: PropTypes.arrayOf(PropTypes.object),
+        childCollectives: PropTypes.arrayOf(PropTypes.object),
         transactions: PropTypes.arrayOf(PropTypes.object),
         expenses: PropTypes.arrayOf(PropTypes.object),
         updates: PropTypes.arrayOf(PropTypes.object),
@@ -109,6 +110,7 @@ class NewCollectivePage extends React.Component {
               financialContributors={collective.financialContributors}
               tiers={collective.tiers}
               events={collective.events}
+              childCollectives={collective.childCollectives}
               transactions={collective.transactions}
               expenses={collective.expenses}
               stats={collective.stats}
@@ -223,6 +225,7 @@ const getCollective = graphql(
           image
           startsAt
           endsAt
+          backgroundImageUrl(height: 208)
           contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
             id
             image
@@ -238,6 +241,30 @@ const getCollective = graphql(
               users
               organizations
             }
+          }
+        }
+        childCollectives {
+          id
+          slug
+          name
+          type
+          description
+          backgroundImageUrl(height: 208)
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            image
+            collectiveSlug
+            name
+            type
           }
         }
         ...TransactionsAndExpensesFragment

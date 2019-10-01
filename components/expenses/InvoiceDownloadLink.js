@@ -1,20 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import { saveAs } from 'file-saver';
 import { FormattedMessage } from 'react-intl';
 
-import * as api from '../../lib/api';
+import { get as fetch } from '../../lib/api';
+import { toIsoDateStr } from '../../lib/date-utils';
 import { collectiveInvoiceURL, invoiceServiceURL, transactionInvoiceURL } from '../../lib/url_helpers';
-
 import { Span } from '../Text';
 
 export default class InvoiceDownloadLink extends Component {
   static propTypes = {
     /** Link content */
-    children: PropTypes.node.isRequired,
-    /** A function that renders children when invoice is loading */
-    viewLoading: PropTypes.func.isRequired,
+    children: PropTypes.func.isRequired,
     /** Type of the invoice. Set `transaction` for single-transactions invoices */
     type: PropTypes.oneOf(['transaction', 'invoice']).isRequired,
     /** Transaction UUID, only used if type if set to `transaction` */
@@ -23,18 +20,17 @@ export default class InvoiceDownloadLink extends Component {
     fromCollectiveSlug: PropTypes.string,
     /** Collective that is receiving money, only used if type is set to `invoice` */
     toCollectiveSlug: PropTypes.string,
-    /** Invoice data, only used if type is set to `invoice` */
-    dateFrom: PropTypes.string,
     /** Invoice date from */
-
+    dateFrom: PropTypes.string,
+    /** Invoice date to */
     dateTo: PropTypes.string,
-    /** Invoice  date to  */
+    /** Invoice date to */
     invoice: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
-    this.state = { isLoading: false, error: false };
+    this.state = { loading: false, error: false };
   }
 
   getInvoiceUrl() {
@@ -46,39 +42,40 @@ export default class InvoiceDownloadLink extends Component {
 
   getFilename() {
     const { fromCollectiveSlug, toCollectiveSlug, dateFrom, dateTo } = this.props;
-    const fromString = moment.utc(dateFrom).format('YYYYMMDD');
-    const toString = moment.utc(dateTo).format('YYYYMMDD');
-
-    return this.props.type === 'transaction'
-      ? `transaction-${this.props.transactionUuid}.pdf`
-      : `${fromCollectiveSlug}_${toCollectiveSlug}_${fromString}-${toString}.pdf`;
-  }
-
-  async download() {
-    const invoiceUrl = this.getInvoiceUrl();
-    const getParams = { format: 'blob', allowExternal: invoiceServiceURL };
-
-    this.setState({ isLoading: true });
-    try {
-      const file = await api.get(invoiceUrl, getParams);
-      this.setState({ isLoading: false });
-      return saveAs(file, this.getFilename());
-    } catch (e) {
-      this.setState({ error: e.message, isLoading: false });
+    if (this.props.type === 'transaction') {
+      return `transaction-${this.props.transactionUuid}.pdf`;
+    } else {
+      const fromString = toIsoDateStr(dateFrom ? new Date(dateFrom) : new Date());
+      const toString = toIsoDateStr(dateTo ? new Date(dateTo) : new Date());
+      return `${fromCollectiveSlug}_${toCollectiveSlug}_${fromString}_${toString}.pdf`;
     }
   }
 
+  download = async () => {
+    if (this.state.loading) {
+      return false;
+    }
+
+    this.setState({ loading: true });
+    const invoiceUrl = this.getInvoiceUrl();
+    const getParams = { format: 'blob', allowExternal: invoiceServiceURL };
+    try {
+      const file = await fetch(invoiceUrl, getParams);
+      this.setState({ loading: false });
+      return saveAs(file, this.getFilename());
+    } catch (e) {
+      this.setState({ error: e.message, loading: false });
+    }
+  };
+
   render() {
-    const { isLoading, error } = this.state;
+    const { loading, error } = this.state;
     return error ? (
       <Span color="red.700">
         <FormattedMessage id="errorMsg" defaultMessage="Error: {error}" values={{ error }} />
       </Span>
     ) : (
-      <a onClick={() => !isLoading && this.download()}>
-        {!isLoading && this.props.children}
-        {isLoading && this.props.viewLoading()}
-      </a>
+      this.props.children({ loading, download: this.download })
     );
   }
 }

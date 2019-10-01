@@ -30,7 +30,7 @@ describe('New users profiles', () => {
 
     it('Show transactions with all info and links', () => {
       cy.get('[data-cy=transaction-details]');
-      cy.get('[data-cy=transaction-details] > p');
+      cy.get('[data-cy=transaction-description]');
       cy.get('[data-cy=transaction-details] > a').should('have.attr', 'href');
       cy.get('[data-cy=transaction-details]').contains('on');
       cy.get('[data-cy=amount]').contains(/(EUR|USD)/);
