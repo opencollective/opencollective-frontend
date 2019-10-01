@@ -248,7 +248,7 @@
   "CollectivePage.SectionBudget.Title": "Budget",
   "CollectivePage.SectionBudget.ViewAll": "Посмотреть все транзакции",
   "CollectivePage.SectionBudget.ViewAllExpenses": "View all expenses",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating on a cave in the North Pole ❄️☃️!",
+  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
   "CollectivePage.SectionContributions.Title": "Contributions",
   "CollectivePage.SectionUpdates.CreateBtn": "Create a new update",
   "CollectivePage.SectionUpdates.Title": "What's new with {collectiveName}",

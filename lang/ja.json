@@ -248,7 +248,7 @@
   "CollectivePage.SectionBudget.Title": "予算",
   "CollectivePage.SectionBudget.ViewAll": "View all transactions",
   "CollectivePage.SectionBudget.ViewAllExpenses": "View all expenses",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating on a cave in the North Pole ❄️☃️!",
+  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
   "CollectivePage.SectionContributions.Title": "コントリビュート",
   "CollectivePage.SectionUpdates.CreateBtn": "アップデートを作成",
   "CollectivePage.SectionUpdates.Title": "What's new with {collectiveName}",

@@ -248,7 +248,7 @@
   "CollectivePage.SectionBudget.Title": "Budget",
   "CollectivePage.SectionBudget.ViewAll": "Bekijk alle transacties",
   "CollectivePage.SectionBudget.ViewAllExpenses": "View all expenses",
-  "CollectivePage.SectionContributions.Empty": "{collectiveName} lijkt een winterslaap te houden in een grot op de Noordpool ❄️☃️!",
+  "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
   "CollectivePage.SectionContributions.Title": "Bijdragen",
   "CollectivePage.SectionUpdates.CreateBtn": "Create a new update",
   "CollectivePage.SectionUpdates.Title": "What's new with {collectiveName}",
