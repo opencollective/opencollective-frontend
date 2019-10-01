@@ -29,6 +29,12 @@
     "production": {
       "plugins": [
         [
+          "transform-remove-console",
+          {
+            "exclude": "error"
+          },
+        ],
+        [
           "transform-react-remove-prop-types",
           {
             "removeImport": true
