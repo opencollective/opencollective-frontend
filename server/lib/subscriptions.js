@@ -9,6 +9,7 @@ import emailLib from './email';
 import * as paymentsLib from './payments';
 import { getRecommendedCollectives } from './data';
 import status from '../constants/order_status';
+import intervals from '../constants/intervals';
 
 /** Maximum number of attempts before an order gets cancelled. */
 export const MAX_RETRIES = 5;
@@ -193,13 +194,13 @@ export function getNextChargeAndPeriodStartDates(status, order) {
   const dayOfTheMonth = nextChargeDate.date();
   const response = {};
   if (status === 'new' || status === 'success') {
-    if (order.Subscription.interval === 'month') {
+    if (order.Subscription.interval === intervals.MONTH) {
       nextChargeDate.add(1, 'months');
-    } else if (order.Subscription.interval === 'year') {
+    } else if (order.Subscription.interval === intervals.YEAR) {
       nextChargeDate.add(1, 'years');
     }
 
-    if (status === 'new' && order.Subscription.interval === 'month' && dayOfTheMonth >= 15) {
+    if (status === 'new' && order.Subscription.interval === intervals.MONTH && dayOfTheMonth >= 15) {
       nextChargeDate.add(1, 'months').startOf('month');
     } else if (status === 'new') {
       nextChargeDate.startOf('month');
