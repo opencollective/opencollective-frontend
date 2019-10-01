@@ -246,7 +246,7 @@ const StepDetails = ({
               id="contribute.changeFrequency.confirmMsg"
               values={{ tierName }}
               defaultMessage={
-                'If you\'re changing the frequency, we will not contribute to this specific tier "{tierName}"'
+                'If you\'re changing the frequency, you will not contribute to this specific tier "{tierName}"'
               }
             />
           </P>
