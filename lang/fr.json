@@ -496,6 +496,7 @@
   "errors.PM.Remove.HasActiveSubscriptions": "Ce moyen de paiement ne peut pas être supprimé car des contribution financières récurrentes lui sont liées.",
   "event.amount.label": "montant",
   "event.create.btn": "Créer un événement",
+  "Event.CreatedBy": "Created by: {CollectiveLink}",
   "event.description.label": "Courte description",
   "event.endsAt.label": "heure et date de fin",
   "event.location.label": "lieux",

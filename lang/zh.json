@@ -496,6 +496,7 @@
   "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active recurring financial contributions.",
   "event.amount.label": "合计",
   "event.create.btn": "创建事件",
+  "Event.CreatedBy": "Created by: {CollectiveLink}",
   "event.description.label": "简短的描述",
   "event.endsAt.label": "结束日期和时间",
   "event.location.label": "本地",

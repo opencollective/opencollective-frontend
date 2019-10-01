@@ -520,7 +520,17 @@ ${description}`;
                 {collective.type === 'EVENT' && (
                   <div className="contact">
                     <div className="parentCollective">
-                      <Link route={`/${collective.parentCollective.slug}`}>{collective.parentCollective.name}</Link>
+                      <FormattedMessage
+                        id="Event.CreatedBy"
+                        defaultMessage="Created by: {CollectiveLink}"
+                        values={{
+                          CollectiveLink: (
+                            <Link route={`/${collective.parentCollective.slug}`}>
+                              {collective.parentCollective.name}
+                            </Link>
+                          ),
+                        }}
+                      />
                     </div>
                   </div>
                 )}

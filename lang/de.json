@@ -496,6 +496,7 @@
   "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active recurring financial contributions.",
   "event.amount.label": "amount",
   "event.create.btn": "Event erstellen",
+  "Event.CreatedBy": "Created by: {CollectiveLink}",
   "event.description.label": "Short description",
   "event.endsAt.label": "end date and time",
   "event.location.label": "location",
