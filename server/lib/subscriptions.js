@@ -200,7 +200,7 @@ export function getNextChargeAndPeriodStartDates(status, order) {
       nextChargeDate.add(1, 'years');
     }
 
-    if (status === 'new' && order.Subscription.interval === intervals.MONTH && dayOfTheMonth >= 15) {
+    if (status === 'new' && order.Subscription.interval === intervals.MONTH && dayOfTheMonth > 15) {
       nextChargeDate.add(1, 'months').startOf('month');
     } else if (status === 'new') {
       nextChargeDate.startOf('month');
