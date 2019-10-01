@@ -123,7 +123,9 @@ class MenuBar extends React.Component {
   }
 
   componentDidMount() {
-    this.height = this.domElement.current.clientHeight;
+    if (this.domElement.current) {
+      this.height = this.domElement.current.clientHeight;
+    }
 
     window.addEventListener('load', this.onLoad);
     window.addEventListener('hashchange', this.onHashChange);
@@ -175,7 +177,9 @@ class MenuBar extends React.Component {
   };
 
   onResize = () => {
-    this.height = this.domElement.current.clientHeight;
+    if (this.domElement.current) {
+      this.height = this.domElement.current.clientHeight;
+    }
   };
 
   onScroll = e => {
@@ -367,7 +371,7 @@ class MenuBar extends React.Component {
     const { collective } = this.props;
     const { logoLink } = this.state;
 
-    if (!collective) {
+    if (!collective || !collective.slug) {
       return <div />;
     }
 
