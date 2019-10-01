@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
+import Link from '../Link';
+import { capitalize } from '../../lib/utils';
+
 import Avatar from '../Avatar';
 import Container from '../Container';
 import LinkCollective from '../LinkCollective';
@@ -21,7 +24,6 @@ class Transaction extends React.Component {
     createdAt: PropTypes.string.isRequired,
     description: PropTypes.string,
     currency: PropTypes.string.isRequired,
-    attachment: PropTypes.string,
     uuid: PropTypes.string,
     netAmountInCollectiveCurrency: PropTypes.number,
     platformFeeInHostCurrency: PropTypes.number,
@@ -35,6 +37,11 @@ class Transaction extends React.Component {
     host: PropTypes.shape({
       hostFeePercent: PropTypes.number,
       slug: PropTypes.string.isRequired,
+    }),
+    expense: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      attachment: PropTypes.string,
+      category: PropTypes.string,
     }),
     fromCollective: PropTypes.shape({
       id: PropTypes.number,
@@ -117,6 +124,7 @@ class Transaction extends React.Component {
       type,
       paymentProcessorFeeInHostCurrency,
       dateDisplayType,
+      expense,
     } = this.props;
 
     if (!fromCollective) {
@@ -143,9 +151,17 @@ class Transaction extends React.Component {
         <Container ml={3} width={1}>
           <Flex justifyContent="space-between" alignItems="baseline">
             <div>
-              <P fontSize="1.4rem" color="#313233" display="inline">
-                {description}
-              </P>
+              {(expense && (
+                <Link route={`/${collective.slug}/expenses/${expense.id}`}>
+                  <P fontSize="1.4rem" color="#313233" display="inline">
+                    {description}
+                  </P>
+                </Link>
+              )) || (
+                <P fontSize="1.4rem" color="#313233" display="inline">
+                  {description}
+                </P>
+              )}
               <Span fontSize="1.6rem">{type === 'CREDIT' && ' 🎉'}</Span>
             </div>
             <AmountCurrency amount={amountToDisplay} currency={currency} precision={precision} />
@@ -154,6 +170,21 @@ class Transaction extends React.Component {
             {this.renderPaymentOrigin()}
             {' | '}
             <Moment relative={dateDisplayType === 'interval'} value={createdAt} />
+            {expense && (
+              <Fragment>
+                {' | '}
+                <Link
+                  route="expenses"
+                  params={{
+                    collectiveSlug: collective.slug,
+                    filter: 'categories',
+                    value: expense.category,
+                  }}
+                >
+                  {capitalize(expense.category)}
+                </Link>
+              </Fragment>
+            )}
             {paymentProcessorFeeInHostCurrency !== undefined && (
               <Fragment>
                 {' | '}

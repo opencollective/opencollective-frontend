@@ -20,8 +20,6 @@ class TransactionDetails extends React.Component {
     }),
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
-    /** If the transaction has an attachement attached, it will replace the invoice link */
-    attachment: PropTypes.string,
     canDownloadInvoice: PropTypes.bool,
     canRefund: PropTypes.bool,
     className: PropTypes.string,
@@ -35,6 +33,12 @@ class TransactionDetails extends React.Component {
     hostCurrencyFxRate: PropTypes.number,
     paymentMethod: PropTypes.shape({
       service: PropTypes.string.isRequired,
+    }),
+    expense: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      /** If the transaction has an attachement attached, it will replace the invoice link */
+      attachment: PropTypes.string,
+      category: PropTypes.string,
     }),
     host: PropTypes.shape({
       slug: PropTypes.string.isRequired,
@@ -169,7 +173,7 @@ class TransactionDetails extends React.Component {
       paymentMethod,
       isRefund,
       uuid,
-      attachment,
+      expense,
     } = this.props;
 
     const amountDetailsStr = this.formatAmountDetails();
@@ -262,8 +266,8 @@ class TransactionDetails extends React.Component {
               <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
             </label>
             <div>
-              {attachment ? (
-                <ExternalLinkNewTab href={attachment}>
+              {expense && expense.attachment ? (
+                <ExternalLinkNewTab href={expense.attachment}>
                   <FormattedMessage id="actions.download" defaultMessage="Download" />
                 </ExternalLinkNewTab>
               ) : (
