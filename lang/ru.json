@@ -1008,6 +1008,7 @@
   "subscription.updated": "Обновлено!",
   "subscription.whyPastDueText": "We were unable to charge your last payment. Please update your payment info to continue this recurring financial contribution.",
   "subscription.whyPastDueTitle": "Обновить платёжную информацию",
+  "Subscriptions.Empty": "No active recurring financial contributions.",
   "Subscriptions.Title": "{collectiveName}'s recurring financial contributions",
   "Tags.ASSOCIATION": "Association",
   "Tags.COLLECTIVE": "Collective",

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import SubscriptionCard from './SubscriptionCard';
 import colors from '../lib/constants/colors';
@@ -144,9 +144,16 @@ class Subscriptions extends React.Component {
         {activeSubs.length === 0 && (
           <div className="subscriptions-noactive">
             <img className="subscriptions-noactive-image" src="/static/images/no-subscription-placeholder.svg" />
-            <div className="subscriptions-noactive-text"> No active recurring financial contributions.</div>
+            <div className="subscriptions-noactive-text">
+              <FormattedMessage
+                id="Subscriptions.Empty"
+                defaultMessage="No active recurring financial contributions."
+              />
+            </div>
             <div className="subscriptions-noactive-link">
-              <a href="/discover">Discover more Collectives</a>
+              <a href="/discover">
+                <FormattedMessage id="home.discoverMore" defaultMessage="Discover more Collectives" />
+              </a>
             </div>
           </div>
         )}
