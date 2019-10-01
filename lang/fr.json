@@ -808,6 +808,7 @@
   "moreInfo": "Plus d'info",
   "multiemail.invalids": "Emails non valides :",
   "mustBeLoggedIn": "Vous devez être connecté·e pour voir cette page",
+  "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "newcreditcard.label": "Carte de crédit",
   "newExpense.paypal.label": "Veuillez fournir une adresse email",
   "newsletter.container.title": "Tenez-vous au courant de nos progrès et de nos actualités.",

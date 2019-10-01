@@ -808,6 +808,7 @@
   "moreInfo": "Más información",
   "multiemail.invalids": "Correos inválidos:",
   "mustBeLoggedIn": "Necesitas iniciar cesión para ver esta página",
+  "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "newcreditcard.label": "Tarjeta de crédito",
   "newExpense.paypal.label": "Por favor, proporciona una dirección",
   "newsletter.container.title": "Stay updated about our news and progress.",

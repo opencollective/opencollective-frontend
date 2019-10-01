@@ -17,6 +17,7 @@ import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
 import Container from '../../Container';
 import { fadeIn } from '../../StyledKeyframes';
+import MessageBox from '../../MessageBox';
 
 // Local imports
 import SectionTitle from '../SectionTitle';
@@ -237,6 +238,18 @@ class SectionContributions extends React.PureComponent {
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
+    } else if (!data.Collective) {
+      console.error(`Empty collective data #${collective.id} in Contributions section`);
+      return (
+        <Container display="flex" border="1px dashed #d1d1d1" justifyContent="center" py={[6, 7]} background="#f8f8f8">
+          <MessageBox type="error" withIcon>
+            <FormattedMessage
+              id="NCP.SectionFetchError"
+              defaultMessage="We encountered an error while retrieving the data for this section."
+            />
+          </MessageBox>
+        </Container>
+      );
     }
 
     const filters = this.getFilters(data.Collective.memberOf);
