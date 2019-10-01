@@ -45,7 +45,7 @@ const cleanIndex = async () => {
           },
         },
         {
-          archivedAt: {
+          deactivatedAt: {
             [Op.gt]: yesterday,
           },
         },
