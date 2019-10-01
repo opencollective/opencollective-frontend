@@ -6,7 +6,7 @@ import { get } from 'lodash';
 import { capitalize } from '../../lib/utils';
 
 import Link from '../Link';
-import ExternalLinkNewTab from '../ExternalLinkNewTab';
+import ExternalLink from '../ExternalLink';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 import RefundTransactionBtn from './RefundTransactionBtn';
 
@@ -267,9 +267,9 @@ class TransactionDetails extends React.Component {
             </label>
             <div>
               {expense && expense.attachment ? (
-                <ExternalLinkNewTab href={expense.attachment}>
+                <ExternalLink href={expense.attachment} openInNewTab>
                   <FormattedMessage id="actions.download" defaultMessage="Download" />
-                </ExternalLinkNewTab>
+                </ExternalLink>
               ) : (
                 <InvoiceDownloadLink type="transaction" transactionUuid={uuid}>
                   {({ loading, download }) => (

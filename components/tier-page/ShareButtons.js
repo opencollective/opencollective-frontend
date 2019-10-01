@@ -14,7 +14,7 @@ import { ContentCopy } from 'styled-icons/material/ContentCopy';
 // Open Collective Frontend imports
 import { facebooKShareURL, tweetURL, linkedInShareURL, mailToURL } from '../../lib/url_helpers';
 import StyledTooltip from '../StyledTooltip';
-import ExternalLinkNewTab from '../ExternalLinkNewTab';
+import ExternalLink from '../ExternalLink';
 import StyledRoundButton from '../StyledRoundButton';
 import Container from '../Container';
 
@@ -48,26 +48,26 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
 
   return (
     <Flex justifyContent="space-between">
-      <ExternalLinkNewTab title="Facebook" href={facebooKShareURL({ u: pageUrl })}>
+      <ExternalLink title="Facebook" href={facebooKShareURL({ u: pageUrl })} openInNewTab>
         <StyledRoundButton size={40}>
           <Facebook size={14} />
         </StyledRoundButton>
-      </ExternalLinkNewTab>
-      <ExternalLinkNewTab title="Twitter" href={tweetURL({ url: pageUrl, text: twitterShareMsg })}>
+      </ExternalLink>
+      <ExternalLink title="Twitter" href={tweetURL({ url: pageUrl, text: twitterShareMsg })} openInNewTab>
         <StyledRoundButton size={40}>
           <Twitter size={14} />
         </StyledRoundButton>
-      </ExternalLinkNewTab>
-      <ExternalLinkNewTab title="Linkedin" href={linkedInShareURL({ url: pageUrl, title: defaultShareTitle })}>
+      </ExternalLink>
+      <ExternalLink title="Linkedin" href={linkedInShareURL({ url: pageUrl, title: defaultShareTitle })} openInNewTab>
         <StyledRoundButton size={40}>
           <Linkedin size={14} />
         </StyledRoundButton>
-      </ExternalLinkNewTab>
-      <ExternalLinkNewTab title="Mail" href={mailToURL('', { subject: defaultShareTitle })}>
+      </ExternalLink>
+      <ExternalLink title="Mail" href={mailToURL('', { subject: defaultShareTitle })} openInNewTab>
         <StyledRoundButton size={40}>
           <Mail size={14} />
         </StyledRoundButton>
-      </ExternalLinkNewTab>
+      </ExternalLink>
       <StyledTooltip
         delayHide={0}
         content={() => (
