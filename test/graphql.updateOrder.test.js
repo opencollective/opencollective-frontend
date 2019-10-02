@@ -52,7 +52,7 @@ const updateOrderQuery = `
 `;
 
 describe('updateOrder', () => {
-  let sandbox, user, user2, collective, paymentMethod, existingOrder;
+  let sandbox, user, user2, externalUser, collective, paymentMethod, existingOrder;
 
   before(() => {
     sandbox = sinon.createSandbox();
@@ -64,6 +64,7 @@ describe('updateOrder', () => {
     await utils.resetTestDB();
     user = await models.User.createUserWithCollective(utils.data('user1'));
     user2 = await models.User.createUserWithCollective(utils.data('user2'));
+    externalUser = await models.User.createUserWithCollective(utils.data('user3'));
     collective = await models.Collective.create(utils.data('collective1'));
     paymentMethod = await models.PaymentMethod.create({
       ...utils.data('paymentMethod2'),
@@ -103,39 +104,31 @@ describe('updateOrder', () => {
   });
 
   it('fails if if no authorization provided', async () => {
-    const res = await utils.graphqlQuery(updateOrderQuery, {
-      order,
-    });
-
+    order.id = existingOrder.id;
+    order.totalAmount = existingOrder.totalAmount;
+    const res = await utils.graphqlQuery(updateOrderQuery, { order });
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal('You need to be logged in to update an order');
+    expect(res.errors[0].message).to.equal("You don't have the permissions to edit this order");
+  });
+
+  it('fails if user is not allowed', async () => {
+    order.id = existingOrder.id;
+    order.totalAmount = existingOrder.totalAmount;
+    const res = await utils.graphqlQuery(updateOrderQuery, { order }, externalUser);
+    expect(res.errors).to.exist;
+    expect(res.errors[0].message).to.equal("You don't have the permissions to edit this order");
   });
 
   it('fails if no order exists yet', async () => {
-    const res = await utils.graphqlQuery(
-      updateOrderQuery,
-      {
-        order,
-      },
-      user2,
-    );
-
+    const res = await utils.graphqlQuery(updateOrderQuery, { order: { ...order, id: 957856314 } }, user2);
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal('Existing order not found');
+    expect(res.errors[0].message).to.equal("This order doesn't exist");
   });
 
   it('fails if no paymentMethod is included', async () => {
     order.id = existingOrder.id;
     order.totalAmount = existingOrder.totalAmount;
-
-    const res = await utils.graphqlQuery(
-      updateOrderQuery,
-      {
-        order,
-      },
-      user2,
-    );
-
+    const res = await utils.graphqlQuery(updateOrderQuery, { order }, user2);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal('This order requires a payment method');
   });
@@ -182,7 +175,7 @@ describe('updateOrder', () => {
   it('updates an order with a new Subscription', async () => {
     order.id = existingOrder.id;
     order.interval = 'month';
-    order.totalAmount = existingOrder.totalAmount;
+    order.totalAmount = 42428963;
     order.paymentMethod = pick(paymentMethod, ['id', 'uuid', 'service', 'token', 'name']);
 
     utils.stubStripeBalance(sandbox, order.totalAmount, 'eur', Math.round(order.totalAmount * 0.05), 4500); // This is the payment processor fee.

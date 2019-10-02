@@ -629,7 +629,9 @@ export async function completePledge(remoteUser, order) {
   }
 
   if (paymentRequired) {
+    existingOrder.totalAmount = order.totalAmount;
     existingOrder.interval = order.interval;
+    existingOrder.currency = order.currency;
     if (get(order, 'paymentMethod.type') === 'manual') {
       existingOrder.paymentMethod = order.paymentMethod;
     } else {
