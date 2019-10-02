@@ -601,23 +601,17 @@ export async function confirmOrder(order, remoteUser) {
 }
 
 export async function completePledge(remoteUser, order) {
-  if (!remoteUser) {
-    throw new errors.Unauthorized({
-      message: 'You need to be logged in to update an order',
-    });
-  }
-
   const existingOrder = await models.Order.findOne({
-    where: {
-      id: order.id,
-    },
+    where: { id: order.id },
     include: [{ model: models.Collective, as: 'collective' }, { model: models.Collective, as: 'fromCollective' }],
   });
 
   if (!existingOrder) {
-    throw new errors.NotFound({
-      message: 'Existing order not found',
-    });
+    throw new errors.NotFound({ message: "This order doesn't exist" });
+  } else if (!remoteUser || !remoteUser.isAdmin(existingOrder.FromCollectiveId)) {
+    throw new errors.Unauthorized({ message: "You don't have the permissions to edit this order" });
+  } else if (existingOrder.status !== status.PENDING) {
+    throw new errors.NotFound({ message: 'This pledge has already been completed' });
   }
 
   const paymentRequired = order.totalAmount > 0 && existingOrder.collective.isActive;
