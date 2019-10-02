@@ -14,15 +14,13 @@ import { capitalize } from '../lib/utils';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let HTMLEditor, MarkdownEditor, InputTypeTags, DateTime;
+let HTMLEditor, InputTypeTags, DateTime;
 if (process.env.DYNAMIC_IMPORT) {
   HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
-  MarkdownEditor = dynamic(() => import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'));
   InputTypeTags = dynamic(() => import(/* webpackChunkName: 'InputTypeTags' */ './InputTypeTags'));
   DateTime = dynamic(() => import(/* webpackChunkName: 'DateTime' */ './DateTime'));
 } else {
   HTMLEditor = require('./HTMLEditor').default;
-  MarkdownEditor = require('./MarkdownEditor').default;
   InputTypeTags = require('./InputTypeTags').default;
   DateTime = require('./DateTime').default;
 }
@@ -561,14 +559,6 @@ class InputField extends React.Component {
         );
         break;
 
-      case 'markdown':
-        this.input = (
-          <div>
-            {field.label && <ControlLabel>{capitalize(field.label)}</ControlLabel>}
-            <MarkdownEditor defaultValue={field.defaultValue} onChange={this.handleChange} />
-          </div>
-        );
-        break;
       default: {
         this.input = (
           <FieldGroup
