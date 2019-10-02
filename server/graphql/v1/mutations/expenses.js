@@ -5,6 +5,7 @@ import statuses from '../../../constants/expense_status';
 import activities from '../../../constants/activities';
 import models from '../../../models';
 import paymentProviders from '../../../paymentProviders';
+import * as libPayments from '../../../lib/payments';
 import { formatCurrency } from '../../../lib/utils';
 import {
   createFromPaidExpense as createTransactionFromPaidExpense,
@@ -365,7 +366,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
   }
 
   const expense = await models.Expense.findByPk(ExpenseId, {
-    include: [{ model: models.Collective, as: 'collective' }],
+    include: [{ model: models.Collective, as: 'collective' }, { model: models.User, as: 'User' }],
   });
 
   if (!expense) {
@@ -388,4 +389,8 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
     where: { ExpenseId },
     include: [{ model: models.Expense }],
   });
+  const refundedTransaction = await libPayments.createRefundTransaction(transaction, 0, null, expense.User);
+  await libPayments.associateTransactionRefundId(transaction, refundedTransaction);
+
+  return expense.update({ status: statuses.APPROVED, lastEditedById: remoteUser.id });
 }
