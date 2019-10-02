@@ -131,6 +131,7 @@
     "nock": "^11.3.5",
     "nodemon": "^1.19.3",
     "nyc": "^14.1.1",
+    "post-merge-install": "^0.3.0",
     "prettier": "1.18.2",
     "react": "^16.10.1",
     "react-dom": "^16.10.1",
@@ -205,7 +206,9 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "post-merge": "post-merge-install",
+      "post-rebase": "post-merge-install"
     }
   },
   "lint-staged": {
