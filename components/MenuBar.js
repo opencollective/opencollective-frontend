@@ -183,17 +183,19 @@ class MenuBar extends React.Component {
   };
 
   onScroll = e => {
-    const top = e.target.scrollingElement.scrollTop;
-    const selectedMenuItem = this.state.menuItems
-      .filter(menuItem => !!menuItem.position)
-      .sort((a, b) => b.position - a.position)
-      .find(menuItem => menuItem.position < top + this.height + 50);
-    if (selectedMenuItem) {
-      const anchor = `#${selectedMenuItem.anchor}`;
-      this.setState({ selectedAnchor: selectedMenuItem.anchor });
-      history.replaceState({ ...history.state, as: location.pathname + anchor }, undefined, anchor);
-    } else {
-      history.replaceState(history.state, undefined, window.location.pathname + window.location.search);
+    if (e.target.scrollingElement) {
+      const top = e.target.scrollingElement.scrollTop;
+      const selectedMenuItem = this.state.menuItems
+        .filter(menuItem => !!menuItem.position)
+        .sort((a, b) => b.position - a.position)
+        .find(menuItem => menuItem.position < top + this.height + 50);
+      if (selectedMenuItem) {
+        const anchor = `#${selectedMenuItem.anchor}`;
+        this.setState({ selectedAnchor: selectedMenuItem.anchor });
+        history.replaceState({ ...history.state, as: location.pathname + anchor }, undefined, anchor);
+      } else {
+        history.replaceState(history.state, undefined, window.location.pathname + window.location.search);
+      }
     }
   };
 
