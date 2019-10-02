@@ -1,9 +1,10 @@
 import config from 'config';
 import sinon from 'sinon';
 import { expect } from 'chai';
+import nock from 'nock';
 import * as utils from '../test/utils';
 import models from '../server/models';
-import nock from 'nock';
+import { randEmail } from './stores';
 
 nock('https://data.fixer.io')
   .get(/.*/)
@@ -32,7 +33,12 @@ describe('paymentmethod.model.test.js', () => {
   });
 
   describe('instance methods', () => {
-    before('create a user', () => models.User.createUserWithCollective({ name: 'Xavier' }).then(u => (user = u)));
+    before('create a user', () =>
+      models.User.createUserWithCollective({
+        email: randEmail(),
+        name: 'Xavier',
+      }).then(u => (user = u)),
+    );
     before('create a collective', () =>
       models.Collective.create({
         name: 'BrusselsTogether',

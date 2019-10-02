@@ -2,6 +2,7 @@ import sinon from 'sinon';
 import config from 'config';
 import { expect } from 'chai';
 import { URL } from 'url';
+import { SequelizeValidationError } from 'sequelize';
 
 import models from '../server/models';
 import * as auth from '../server/lib/auth';
@@ -13,7 +14,7 @@ const userData = utils.data('user1');
 
 const { User } = models;
 
-describe('user.models.test.js', () => {
+describe('user.model.test.js', () => {
   let sandbox;
 
   before(() => {
@@ -33,10 +34,12 @@ describe('user.models.test.js', () => {
    * Create a user.
    */
   describe('#create', () => {
-    it('succeeds without email', () =>
-      User.create({ firstName: userData.firstName }).tap(user =>
-        expect(user).to.have.property('firstName', userData.firstName),
-      ));
+    it('fails without email', () => {
+      return expect(User.create({ firstName: userData.firstName })).to.be.rejectedWith(
+        SequelizeValidationError,
+        'notNull Violation: User.email cannot be null',
+      );
+    });
 
     it('fails if invalid email', () =>
       User.create({ firstName: userData.firstName, email: 'johndoe' }).catch(err => expect(err).to.exist));

@@ -76,9 +76,7 @@ describe('graphql.createOrder.opencollective', () => {
         await utils.resetTestDB();
         ({ user, userCollective } = await store.newUser('new user'));
         // for some obscure reason, it doesn't work to copy paste previous line for user2
-        user2 = await models.User.createUserWithCollective({
-          name: 'new user 2',
-        });
+        user2 = await models.User.createUserWithCollective({ email: store.randEmail(), name: 'new user 2' });
         ({ hostCollective, collective } = await store.newCollectiveWithHost('test', 'USD', 'USD', 10));
       }); /* End of "beforeEach" */
 

@@ -69,9 +69,19 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
   });
 
   describe('Collective to Collective Transactions', () => {
-    before('creates User 1', () => models.User.createUserWithCollective({ name: 'User 1' }).then(u => (user1 = u)));
+    before('creates User 1', () =>
+      models.User.createUserWithCollective({
+        email: store.randEmail(),
+        name: 'User 1',
+      }).then(u => (user1 = u)),
+    );
 
-    before('creates User 2', () => models.User.createUserWithCollective({ name: 'User 2' }).then(u => (user2 = u)));
+    before('creates User 2', () =>
+      models.User.createUserWithCollective({
+        email: store.randEmail(),
+        name: 'User 2',
+      }).then(u => (user2 = u)),
+    );
 
     before('create Host 1(USD)', () =>
       models.Collective.create({

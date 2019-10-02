@@ -1,11 +1,17 @@
 import { expect } from 'chai';
 import * as utils from '../test/utils';
 import models from '../server/models';
+import { randEmail } from './stores';
 
 describe('order.model.test.js', () => {
   let user, collective, tier, order;
   before(() => utils.resetTestDB());
-  before('create a user', () => models.User.createUserWithCollective({ name: 'Xavier' }).then(u => (user = u)));
+  before('create a user', () =>
+    models.User.createUserWithCollective({
+      email: randEmail(),
+      name: 'Xavier',
+    }).then(u => (user = u)),
+  );
   before('create a collective', () => models.Collective.create({ name: 'Webpack' }).then(c => (collective = c)));
   before('create a tier', () => models.Tier.create({ name: 'backer', amount: 0 }).then(t => (tier = t)));
   before('create an order', () =>
