@@ -17,6 +17,7 @@ import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
+import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 
 class Expense extends React.Component {
@@ -155,6 +156,11 @@ class Expense extends React.Component {
     mode = mode || view;
 
     const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
+    const canReverseOtherPayment =
+      LoggedInUser &&
+      LoggedInUser.canPayExpense(expense) &&
+      expense.status === 'PAID' &&
+      expense.payoutMethod === 'other';
 
     const canReject =
       LoggedInUser &&
@@ -385,7 +391,7 @@ class Expense extends React.Component {
                   </div>
                 </div>
               )}
-              {mode !== 'edit' && (canPay || canApprove || canReject) && (
+              {mode !== 'edit' && (canPay || canApprove || canReject || canReverseOtherPayment) && (
                 <div className="manageExpense">
                   {canPay && expense.payoutMethod === 'other' && (
                     <EditPayExpenseFeesForm
@@ -408,6 +414,7 @@ class Expense extends React.Component {
                     )}
                     {canApprove && <ApproveExpenseBtn id={expense.id} />}
                     {canReject && <RejectExpenseBtn id={expense.id} />}
+                    {canReverseOtherPayment && <MarkExpenseAsUnpaidBtn id={expense.id} />}
                   </div>
                 </div>
               )}
