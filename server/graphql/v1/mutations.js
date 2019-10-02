@@ -27,7 +27,14 @@ import { createMember, removeMember, editMembership } from './mutations/members'
 import { editTiers, editTier } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
-import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
+import {
+  createExpense,
+  editExpense,
+  updateExpenseStatus,
+  payExpense,
+  deleteExpense,
+  markExpenseAsUnpaid,
+} from './mutations/expenses';
 import * as paymentMethodsMutation from './mutations/paymentMethods';
 import * as updateMutations from './mutations/updates';
 import * as commentMutations from './mutations/comments';
@@ -328,6 +335,15 @@ const mutations = {
     },
     resolve(_, args, req) {
       return deleteExpense(req.remoteUser, args.id);
+    },
+  },
+  markExpenseAsUnpaid: {
+    type: ExpenseType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(_, args, req) {
+      return markExpenseAsUnpaid(req.remoteUser, args.id);
     },
   },
   editTier: {

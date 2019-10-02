@@ -29,6 +29,16 @@ function canUpdateExpenseStatus(remoteUser, expense) {
 }
 
 /**
+ * Only admin of expense.collective.host can mark expenses unpaid
+ */
+function canMarkExpenseUnpaid(remoteUser, expense) {
+  if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.collective.HostCollectiveId)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Only the author or an admin of the collective or collective.host can edit an expense when it hasn't been paid yet
  */
 function canEditExpense(remoteUser, expense) {
@@ -347,4 +357,35 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   }
 
   return markExpenseAsPaid(expense);
+}
+
+export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
+  if (!remoteUser) {
+    throw new errors.Unauthorized('You need to be logged in to pay an expense');
+  }
+
+  const expense = await models.Expense.findByPk(ExpenseId, {
+    include: [{ model: models.Collective, as: 'collective' }],
+  });
+
+  if (!expense) {
+    throw new errors.NotFound('No expense transaction found');
+  }
+
+  if (!canMarkExpenseUnpaid(remoteUser, expense)) {
+    throw new errors.Unauthorized("You don't have permission to mark this expense unpaid");
+  }
+
+  if (expense.status !== statuses.PAID) {
+    throw new errors.Unauthorized('Expense has not been paid');
+  }
+
+  if (expense.payoutMethod !== 'other') {
+    throw new errors.Unauthorized('Only expense with other payout method can be marked unpaid');
+  }
+
+  const transaction = await models.Transaction.findOne({
+    where: { ExpenseId },
+    include: [{ model: models.Expense }],
+  });
 }
