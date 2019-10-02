@@ -90,7 +90,7 @@ class Footer extends React.Component {
       <Container
         id="footer"
         background="white"
-        borderTop="1px solid #aaaaaa"
+        borderTop="1px solid #E8E9EB"
         bottom={0}
         minHeight="7.5rem"
         p="1rem"

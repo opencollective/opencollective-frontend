@@ -5,7 +5,7 @@ describe('Contribution Flow: Create profile', () => {
     cy.visit('/apex/donate');
 
     // Go to CreateProfile
-    cy.get('#content button')
+    cy.get('[data-cy="cf-content"] button')
       .contains('Join Free')
       .click();
 
@@ -15,19 +15,19 @@ describe('Contribution Flow: Create profile', () => {
     cy.get('[data-cy="join-conditions"] a[href="/privacypolicy"]');
 
     // Test frontend validations
-    cy.get('#content input[name=email]').type('Incorrect value');
-    cy.get('#content button[type=submit]').click();
+    cy.get('[data-cy="cf-content"] input[name=email]').type('Incorrect value');
+    cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'Incorrectvalue' is missing an '@'.");
 
     // Test backend validations
-    cy.get('#content input[name=email]').type('{selectall}Incorrect@value');
-    cy.get('#content button[type=submit]').click();
+    cy.get('[data-cy="cf-content"] input[name=email]').type('{selectall}Incorrect@value');
+    cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains('Validation error: Email must be valid');
 
     // Submit the form with correct values
     const email = randomEmail();
-    cy.get('#content input[name=email]').type(`{selectall}${email}`);
-    cy.get('#content button[type=submit]').click();
+    cy.get('[data-cy="cf-content"] input[name=email]').type(`{selectall}${email}`);
+    cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${email}.`);
   });
@@ -36,30 +36,30 @@ describe('Contribution Flow: Create profile', () => {
     cy.visit('/apex/donate');
 
     // Go to CreateProfile
-    cy.get('#content button')
+    cy.get('[data-cy="cf-content"] button')
       .contains('Join Free')
       .click();
 
     // Select "Create oganization"
-    cy.get('#content')
+    cy.get('[data-cy="cf-content"]')
       .contains('Create Organization Profile')
       .click();
 
     // Test frontend validations
-    cy.get('#content input[name=orgName]').type('Test Organization');
-    cy.get('#content input[name=email]').type('Incorrect value');
-    cy.get('#content button[type=submit]').click();
+    cy.get('[data-cy="cf-content"] input[name=orgName]').type('Test Organization');
+    cy.get('[data-cy="cf-content"] input[name=email]').type('Incorrect value');
+    cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'Incorrectvalue' is missing an '@'.");
 
     // Test backend validations
-    cy.get('#content input[name=email]').type('{selectall}Incorrect@value');
-    cy.get('#content button[type=submit]').click();
+    cy.get('[data-cy="cf-content"] input[name=email]').type('{selectall}Incorrect@value');
+    cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains('Validation error: Email must be valid');
 
     // Submit the form with correct values
     const email = randomEmail();
-    cy.get('#content input[name=email]').type(`{selectall}${email}`);
-    cy.get('#content button[type=submit]').click();
+    cy.get('[data-cy="cf-content"] input[name=email]').type(`{selectall}${email}`);
+    cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${email}.`);
   });

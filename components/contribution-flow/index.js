@@ -913,7 +913,7 @@ class CreateOrderPage extends React.Component {
     const { collective, tier, loadingLoggedInUser, LoggedInUser } = this.props;
 
     return (
-      <div>
+      <React.Fragment>
         <Cover collective={collective} tier={tier} />
         <Steps
           steps={this.getSteps()}
@@ -923,7 +923,7 @@ class CreateOrderPage extends React.Component {
           onComplete={this.submitOrder}
         >
           {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
-            <Flex id="content" flexDirection="column" alignItems="center" mb={6} p={2}>
+            <Flex data-cy="cf-content" flexDirection="column" alignItems="center" pt={2} pb={[4, 5]} px={2}>
               {(loadingLoggedInUser || LoggedInUser) && (
                 <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
                   <ContributionFlowStepsProgress
@@ -954,7 +954,7 @@ class CreateOrderPage extends React.Component {
             </Flex>
           )}
         </Steps>
-      </div>
+      </React.Fragment>
     );
   }
 }

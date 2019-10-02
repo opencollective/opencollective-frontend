@@ -237,7 +237,7 @@ const StepDetails = ({
         </StyledInputField>
       )}
       <Modal show={showModal} width="570px" onClose={() => setShowModal(false)}>
-        <ModalHeader>
+        <ModalHeader onClose={() => setShowModal(false)}>
           <FormattedMessage id="Frequency.change" defaultMessage={'Change frequency?'} />
         </ModalHeader>
         <ModalBody>
