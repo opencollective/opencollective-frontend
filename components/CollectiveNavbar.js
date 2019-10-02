@@ -415,7 +415,7 @@ CollectiveNavbar.defaultProps = {
   // eslint-disable-next-line react/prop-types
   LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (
-      <Link route={`${collectivePath}/v2#section-${section}`} className={className}>
+      <Link route={`${collectivePath}#section-${section}`} className={className}>
         {label}
       </Link>
     );
