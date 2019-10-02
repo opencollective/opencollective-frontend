@@ -127,7 +127,7 @@ pages.add(
 pages
   .add('createPledge', '/pledges/new')
   .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
-  .add('completePledge', '/pledges/:id')
+  .add('completePledge', '/pledges/:orderId/:step(contributeAs|details|payment|summary)?')
   .add('claimCollective', '/:collectiveSlug/claim');
 
 // Application management
