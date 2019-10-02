@@ -34,7 +34,7 @@
     "cloudflare": "2.7.0",
     "cloudflare-ip": "0.0.7",
     "config": "3.2.2",
-    "connect-redis": "4.0.2",
+    "connect-redis": "4.0.3",
     "cookie-parser": "1.4.4",
     "cors": "2.8.5",
     "dataloader": "1.4.0",
