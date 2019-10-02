@@ -549,6 +549,7 @@
   "expense.expensePolicy.add": "добавить политику расходов",
   "expense.hostFeeInCollectiveCurrency": "комиссия представителя",
   "expense.incurredAt": "Дата",
+  "expense.markAsUnpaid.btn": "mark as unpaid",
   "expense.new.submit": "Учесть расходы",
   "expense.paid": "оплачено",
   "expense.pay.btn": "оплатить при помощи {paymentMethod}",

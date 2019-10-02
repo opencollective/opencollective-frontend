@@ -549,6 +549,7 @@
   "expense.expensePolicy.add": "Ajouter des règles de dépense",
   "expense.hostFeeInCollectiveCurrency": "commission de l'hôte",
   "expense.incurredAt": "Date",
+  "expense.markAsUnpaid.btn": "mark as unpaid",
   "expense.new.submit": "Ajouter une dépense",
   "expense.paid": "payé",
   "expense.pay.btn": "payer avec {paymentMethod}",

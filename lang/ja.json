@@ -549,6 +549,7 @@
   "expense.expensePolicy.add": "請求ポリシーを追加",
   "expense.hostFeeInCollectiveCurrency": "ホストの手数料",
   "expense.incurredAt": "日付",
+  "expense.markAsUnpaid.btn": "mark as unpaid",
   "expense.new.submit": "経費申請する",
   "expense.paid": "支払い済み",
   "expense.pay.btn": "{paymentMethod} で支払う",

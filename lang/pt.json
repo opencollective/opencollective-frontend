@@ -549,6 +549,7 @@
   "expense.expensePolicy.add": "add an expense policy",
   "expense.hostFeeInCollectiveCurrency": "comissão do organizador",
   "expense.incurredAt": "Data",
+  "expense.markAsUnpaid.btn": "mark as unpaid",
   "expense.new.submit": "Enviar despesa",
   "expense.paid": "pago",
   "expense.pay.btn": "pagar com {paymentMethod}",

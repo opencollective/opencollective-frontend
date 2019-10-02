@@ -549,6 +549,7 @@
   "expense.expensePolicy.add": "add an expense policy",
   "expense.hostFeeInCollectiveCurrency": "host fee",
   "expense.incurredAt": "Date",
+  "expense.markAsUnpaid.btn": "mark as unpaid",
   "expense.new.submit": "Submit Expense",
   "expense.paid": "paid",
   "expense.pay.btn": "pay with {paymentMethod}",
