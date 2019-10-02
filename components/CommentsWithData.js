@@ -39,14 +39,9 @@ class CommentsWithData extends React.Component {
       FromCollectiveId: LoggedInUser.collective.id,
       ExpenseId: expense.id,
     };
-    console.log('>>> createComment', CommentInputType);
-    let res;
-    try {
-      res = await this.props.createComment(CommentInputType);
-    } catch (e) {
-      console.error('>>> error while trying to create the comment', CommentInputType, e);
-    }
-    return res;
+
+    const res = await this.props.createComment(CommentInputType);
+    return res.data.createComment;
   }
 
   renderUserAction(LoggedInUser, expense, notice) {
