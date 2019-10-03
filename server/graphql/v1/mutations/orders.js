@@ -845,7 +845,7 @@ export async function refundTransaction(_, args, req) {
   //   b. Host Collective receiving the donation
   //   c. Site Admin
 
-  if (!req.remoteUser.isAdmin(HostCollectiveId) && !req.remoteUser.isRoot()) {
+  if (!req.remoteUser.isAdmin(HostCollectiveId) && !req.remoteUser.isRoot() && !req.remoteUser.isAdmin(collective.id)) {
     throw new errors.Unauthorized({ message: 'Not a site admin or host collective admin' });
   }
 
