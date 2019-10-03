@@ -39,7 +39,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.stripe.connected': {
         id: 'collective.connectedAccounts.stripe.connected',
-        defaultMessage: 'Stripe account connected on {createdAt, date, short}',
+        defaultMessage: 'Stripe account connected on {updatedAt, date, short}',
       },
       'collective.connectedAccounts.twitter.button': {
         id: 'collective.connectedAccounts.twitter.button',
@@ -51,7 +51,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.twitter.connected': {
         id: 'collective.connectedAccounts.twitter.connected',
-        defaultMessage: 'Twitter account @{username} connected on {createdAt, date, short}',
+        defaultMessage: 'Twitter account @{username} connected on {updatedAt, date, short}',
       },
       'collective.connectedAccounts.github.button': {
         id: 'collective.connectedAccounts.github.button',
@@ -63,7 +63,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.github.connected': {
         id: 'collective.connectedAccounts.github.connected',
-        defaultMessage: 'GitHub account {username} connected on {createdAt, date, short}',
+        defaultMessage: 'GitHub account {username} connected on {updatedAt, date, short}',
       },
     });
     this.services = ['stripe', 'paypal', 'twitter', 'github'];
@@ -96,7 +96,7 @@ class EditConnectedAccount extends React.Component {
     if (connectedAccount) {
       vars = {
         username: connectedAccount.username,
-        createdAt: new Date(connectedAccount.createdAt),
+        updatedAt: new Date(connectedAccount.updatedAt),
       };
     }
     return (
