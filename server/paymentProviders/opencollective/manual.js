@@ -2,6 +2,7 @@ import { pick } from 'lodash';
 import models from '../../models';
 import { TransactionTypes } from '../../constants/transactions';
 import { maxInteger } from '../../constants/math';
+import { createRefundTransaction, associateTransactionRefundId } from '../../lib/payments';
 
 /**
  * Manual Payment method
@@ -57,6 +58,16 @@ async function processOrder(order) {
   return creditTransaction;
 }
 
+/**
+ * Refund a given transaction by creating the opposing transaction.
+ * There's nothing more to do because it's up to the host/collective to see how
+ * they want to actually refund the money.
+ */
+const refundTransaction = async (transaction, user) => {
+  const refundTransaction = await createRefundTransaction(transaction, 0, null, user);
+  return associateTransactionRefundId(transaction, refundTransaction);
+};
+
 /* Expected API of a Payment Method Type */
 export default {
   features: {
@@ -65,4 +76,5 @@ export default {
   },
   getBalance,
   processOrder,
+  refundTransaction,
 };

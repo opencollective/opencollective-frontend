@@ -89,8 +89,16 @@ export async function processOrder(order, options) {
  *  associated to the refund transaction as who performed the refund.
  */
 export async function refundTransaction(transaction, user) {
-  const paymentMethod = findPaymentMethodProvider(transaction.PaymentMethod);
-  return await paymentMethod.refundTransaction(transaction, user);
+  // If no payment method was used, it means that we're using a manual payment method
+  const paymentMethodProvider = transaction.PaymentMethod
+    ? findPaymentMethodProvider(transaction.PaymentMethod)
+    : paymentProviders.opencollective.types.manual;
+
+  if (!paymentMethodProvider.refundTransaction) {
+    throw new Error('This payment method provider does not support refunds');
+  }
+
+  return await paymentMethodProvider.refundTransaction(transaction, user);
 }
 
 /** Calculates how much an amount's fee is worth.

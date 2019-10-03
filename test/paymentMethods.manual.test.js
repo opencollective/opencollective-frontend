@@ -70,6 +70,7 @@ describe('Manual Payment Method', () => {
       expect(transaction.amountInHostCurrency).to.equal(amount);
       expect(transaction.hostFeeInHostCurrency).to.equal(-250);
       expect(transaction.platformFeeInHostCurrency).to.equal(0); // We take no fee on manual transactions
+      expect(transaction.paymentProcessorFeeInHostCurrency).to.equal(0); // We take no fee on manual transactions
       expect(transaction.netAmountInCollectiveCurrency).to.equal(4750);
       expect(transaction.HostCollectiveId).to.equal(host.id);
       expect(transaction.CreatedByUserId).to.equal(user.id);
@@ -85,6 +86,37 @@ describe('Manual Payment Method', () => {
       const transaction = await ManualPaymentMethod.processOrder(order);
       expect(transaction.amountInHostCurrency).to.equal(amount);
       expect(transaction.hostFeeInHostCurrency).to.equal(-1);
+    });
+  });
+
+  // ---- refundTransaction ----
+  describe('refundTransaction', () => {
+    it('Create opposite transactions', async () => {
+      const amount = 5000;
+      const order = await createOrder(amount);
+      const transaction = await ManualPaymentMethod.processOrder(order);
+
+      // Check that the original transaction is correctly updated
+      const updatedTransaction = await ManualPaymentMethod.refundTransaction(transaction, user);
+      expect(updatedTransaction.RefundTransactionId).to.not.be.null;
+
+      // Check the refund transaction
+      const refundTransaction = await models.Transaction.findByPk(updatedTransaction.RefundTransactionId);
+      expect(refundTransaction.type).to.equal('DEBIT');
+      expect(refundTransaction.currency).to.equal('USD');
+      expect(refundTransaction.hostCurrency).to.equal('USD');
+      expect(refundTransaction.OrderId).to.equal(order.id);
+      expect(refundTransaction.amount).to.equal(-amount);
+      expect(refundTransaction.amountInHostCurrency).to.equal(-amount);
+      expect(refundTransaction.hostFeeInHostCurrency).to.equal(250);
+      expect(refundTransaction.platformFeeInHostCurrency).to.equal(0); // We take no fee on manual refundTransactions
+      expect(refundTransaction.paymentProcessorFeeInHostCurrency).to.equal(0); // We take no fee on manual refundTransactions
+      expect(refundTransaction.netAmountInCollectiveCurrency).to.equal(-4750);
+      expect(refundTransaction.HostCollectiveId).to.equal(host.id);
+      expect(refundTransaction.CreatedByUserId).to.equal(user.id);
+      expect(refundTransaction.FromCollectiveId).to.equal(user.collective.id);
+      expect(refundTransaction.CollectiveId).to.equal(collective.id);
+      expect(refundTransaction.PaymentMethodId).to.be.null;
     });
   });
 });
