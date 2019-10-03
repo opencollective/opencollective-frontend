@@ -5,6 +5,7 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import Error from '../Error';
+import MessageBox from '../MessageBox';
 import Order from './Order';
 
 class OrderWithData extends React.Component {
@@ -23,16 +24,20 @@ class OrderWithData extends React.Component {
   render() {
     const { data, LoggedInUser, collective, view } = this.props;
 
-    if (data.error) {
-      console.error('graphql error>>>', data.error.message);
+    if (!data || data.error) {
+      console.error('graphql error>>>', data);
       return <Error message="GraphQL error" />;
-    }
-
-    if (data.loading) {
+    } else if (data.loading) {
       return (
         <div>
           <FormattedMessage id="loading" defaultMessage="loading" />
         </div>
+      );
+    } else if (!data.Order) {
+      return (
+        <MessageBox type="warning" withIcon mt={3}>
+          <FormattedMessage id="Order.NotFound" defaultMessage="This order doesn't exist" />
+        </MessageBox>
       );
     }
 

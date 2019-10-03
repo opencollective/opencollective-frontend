@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Error from '../Error';
 import CommentsWithData from '../CommentsWithData';
+import MessageBox from '../MessageBox';
 import Expense from './Expense';
 
 class ExpenseWithData extends React.Component {
@@ -32,13 +33,17 @@ class ExpenseWithData extends React.Component {
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
       return <Error message="GraphQL error" />;
-    }
-
-    if (data.loading) {
+    } else if (data.loading) {
       return (
         <div>
           <FormattedMessage id="loading" defaultMessage="loading" />
         </div>
+      );
+    } else if (!data.Expense) {
+      return (
+        <MessageBox type="warning" withIcon>
+          <FormattedMessage id="Expense.NotFound" defaultMessage="This expense doesn't exist" />
+        </MessageBox>
       );
     }
 
