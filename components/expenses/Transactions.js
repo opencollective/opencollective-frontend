@@ -177,7 +177,12 @@ class Transactions extends React.Component {
                 collective={collective}
                 {...transaction}
                 isRefund={Boolean(transaction.refundTransaction)}
-                canRefund={LoggedInUser && (LoggedInUser.isRoot() || LoggedInUser.isHostAdmin(collective))}
+                canRefund={
+                  LoggedInUser &&
+                  (LoggedInUser.isRoot() ||
+                    LoggedInUser.isHostAdmin(collective) ||
+                    LoggedInUser.canEditCollective(collective))
+                }
                 canDownloadInvoice={this.canDownloadInvoice(transaction)}
                 dateDisplayType={this.props.dateDisplayType}
               />
