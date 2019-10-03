@@ -23,6 +23,17 @@ describe('graphql.collective.test.js', () => {
     expect(result.errors[0].message).to.equal('No collective found with slug apex');
   });
 
+  it("won't generate an error if told not to", async () => {
+    // Given the following query
+    const query = `query Collective($slug: String) {
+      Collective(slug: $slug, throwIfMissing: false) { id slug } }`;
+    // When a collective that doesn't exist is retrieved
+    const result = await utils.graphqlQuery(query, { slug: 'apex' });
+    // Than we're supposed to see some errors
+    expect(result.errors).to.not.exist;
+    expect(result.data.Collective).to.be.null;
+  });
+
   it('gets the collective info for the collective page', async () => {
     // Given a collective called apex with some metadata
     const currency = 'USD';
