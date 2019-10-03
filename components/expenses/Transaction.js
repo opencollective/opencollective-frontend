@@ -91,7 +91,7 @@ class Transaction extends React.Component {
         <LinkCollective collective={originCollective}>{originCollective.name}</LinkCollective>{' '}
         <FormattedMessage
           id="transaction.usingGiftCardFrom"
-          defaultMessage="using a {giftCard} from {collective}"
+          defaultMessage="using a {giftCard} from {collectiveLink}"
           values={{
             giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
             collectiveLink: (
