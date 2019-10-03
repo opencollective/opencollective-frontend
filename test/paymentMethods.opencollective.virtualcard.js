@@ -245,16 +245,15 @@ describe('opencollective.virtualcard', () => {
           name: 'User 1',
         }).then(u => (user1 = u)),
       );
-      before('user1 to become Admin of collective1', () => {
-        return models.Member.create({
+
+      before('user1 to become Admin of collective1', () =>
+        models.Member.create({
           CreatedByUserId: user1.id,
           MemberCollectiveId: user1.CollectiveId,
           CollectiveId: collective1.id,
           role: 'ADMIN',
-        }).then(() => {
-          user1.populateRoles();
-        });
-      });
+        }).then(() => user1.populateRoles()),
+      );
 
       before('create a virtual card payment method', () => {
         const createParams = {
