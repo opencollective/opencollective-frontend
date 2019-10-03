@@ -156,7 +156,7 @@ class Expense extends React.Component {
     mode = mode || view;
 
     const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
-    const canReverseOtherPayment =
+    const canMarkExpenseAsUnpaid =
       LoggedInUser &&
       LoggedInUser.canPayExpense(expense) &&
       expense.status === 'PAID' &&
@@ -391,7 +391,7 @@ class Expense extends React.Component {
                   </div>
                 </div>
               )}
-              {mode !== 'edit' && (canPay || canApprove || canReject || canReverseOtherPayment) && (
+              {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
                 <div className="manageExpense">
                   {canPay && expense.payoutMethod === 'other' && (
                     <EditPayExpenseFeesForm
@@ -414,7 +414,7 @@ class Expense extends React.Component {
                     )}
                     {canApprove && <ApproveExpenseBtn id={expense.id} />}
                     {canReject && <RejectExpenseBtn id={expense.id} />}
-                    {canReverseOtherPayment && <MarkExpenseAsUnpaidBtn id={expense.id} />}
+                    {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn id={expense.id} />}
                   </div>
                 </div>
               )}
