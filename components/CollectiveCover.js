@@ -7,6 +7,7 @@ import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 import momentTimezone from 'moment-timezone';
+import moment from 'moment';
 import { get } from 'lodash';
 import { withUser } from './UserProvider';
 import { prettyUrl, imagePreview } from '../lib/utils';
@@ -128,13 +129,13 @@ class CollectiveCover extends React.Component {
               <React.Fragment>
                 <FormattedDate
                   value={props.collective.startsAt}
-                  timeZone={momentTimezone.tz.guess()}
+                  timeZone={props.collective.timezone}
                   weekday="short"
                   day="numeric"
                   month="long"
                 />
                 , &nbsp;
-                <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
+                <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />
                 &nbsp; - &nbsp;
               </React.Fragment>
             )}
@@ -142,17 +143,58 @@ class CollectiveCover extends React.Component {
               <React.Fragment>
                 <FormattedDate
                   value={props.collective.endsAt}
-                  timeZone={momentTimezone.tz.guess()}
+                  timeZone={props.collective.timezone}
                   weekday="short"
                   day="numeric"
                   month="long"
                   year="numeric"
                 />
                 , &nbsp;
-                <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
-                &nbsp; - &nbsp;
+                <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
+                &nbsp;{' '}
+                {moment()
+                  .tz(props.collective.timezone)
+                  .zoneAbbr()}{' '}
+                (Event Time)
               </React.Fragment>
             )}
+            <br />
+            <em>
+              {this.checkTimeDiff() && props.collective.startsAt && (
+                <React.Fragment>
+                  <FormattedDate
+                    value={props.collective.startsAt}
+                    timeZone={momentTimezone.tz.guess()}
+                    weekday="short"
+                    day="numeric"
+                    month="long"
+                  />
+                  , &nbsp;
+                  <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
+                  &nbsp; - &nbsp;
+                </React.Fragment>
+              )}
+
+              {this.checkTimeDiff() && props.collective.endsAt && (
+                <React.Fragment>
+                  <FormattedDate
+                    value={props.collective.endsAt}
+                    timeZone={momentTimezone.tz.guess()}
+                    weekday="short"
+                    day="numeric"
+                    month="long"
+                    year="numeric"
+                  />
+                  , &nbsp;
+                  <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
+                  &nbsp;{' '}
+                  {moment()
+                    .tz(momentTimezone.tz.guess())
+                    .zoneAbbr()}{' '}
+                  (Your Time)
+                </React.Fragment>
+              )}
+            </em>
             {get(props.collective, 'location.name')}
           </Link>
         </div>
@@ -181,6 +223,16 @@ ${description}`;
     } else {
       return { hasContact: this.props.collective.type === CollectiveType.COLLECTIVE };
     }
+  }
+
+  checkTimeDiff() {
+    const eventTimezone = moment()
+      .tz(this.props.collective.timezone)
+      .format('Z');
+    const browserTimezone = moment()
+      .tz(momentTimezone.tz.guess())
+      .format('Z');
+    return eventTimezone !== browserTimezone;
   }
 
   render() {
