@@ -2296,7 +2296,7 @@ export default function(Sequelize, DataTypes) {
       .then(slugList => slugSuggestionHelper(suggestions[0], slugList, 0));
   };
 
-  Collective.findBySlug = (slug, options = {}) => {
+  Collective.findBySlug = (slug, options = {}, throwIfMissing = true) => {
     if (!slug || slug.length < 1) {
       return Promise.resolve(null);
     }
@@ -2304,7 +2304,7 @@ export default function(Sequelize, DataTypes) {
       where: { slug: slug.toLowerCase() },
       ...options,
     }).then(collective => {
-      if (!collective) {
+      if (!collective && throwIfMissing) {
         throw new Error(`No collective found with slug ${slug}`);
       }
       return collective;
