@@ -63,6 +63,28 @@ const payExpenseQuery = `
   mutation payExpense($id: Int!, $paymentProcessorFeeInCollectiveCurrency: Int, $hostFeeInCollectiveCurrency: Int, $platformFeeInCollectiveCurrency: Int) {
     payExpense(id: $id, paymentProcessorFeeInCollectiveCurrency: $paymentProcessorFeeInCollectiveCurrency, hostFeeInCollectiveCurrency: $hostFeeInCollectiveCurrency, platformFeeInCollectiveCurrency: $platformFeeInCollectiveCurrency) { id status } }`;
 
+const markExpenseAsUnpaidQuery = `
+  mutation markExpenseAsUnpaid($id: Int!) {
+    markExpenseAsUnpaid(id: $id) { id status } }`;
+
+const addFunds = async (user, hostCollective, collective, amount) => {
+  const currency = collective.currency || 'USD';
+  const hostCurrencyFxRate = await getFxRate(currency, hostCollective.currency);
+  const amountInHostCurrency = Math.round(hostCurrencyFxRate * amount);
+  await models.Transaction.create({
+    CreatedByUserId: user.id,
+    HostCollectiveId: hostCollective.id,
+    type: 'CREDIT',
+    amount,
+    amountInHostCurrency,
+    hostCurrencyFxRate,
+    netAmountInCollectiveCurrency: amount,
+    hostCurrency: hostCollective.currency,
+    currency,
+    CollectiveId: collective.id,
+  });
+};
+
 describe('GraphQL Expenses API', () => {
   beforeEach(utils.resetTestDB);
 
@@ -683,24 +705,6 @@ describe('GraphQL Expenses API', () => {
       );
     }); /* End of "fails if expense is not approved (REJECTED)" */
 
-    const addFunds = async (user, hostCollective, collective, amount) => {
-      const currency = collective.currency || 'USD';
-      const hostCurrencyFxRate = await getFxRate(currency, hostCollective.currency);
-      const amountInHostCurrency = Math.round(hostCurrencyFxRate * amount);
-      await models.Transaction.create({
-        CreatedByUserId: user.id,
-        HostCollectiveId: hostCollective.id,
-        type: 'CREDIT',
-        amount,
-        amountInHostCurrency,
-        hostCurrencyFxRate,
-        netAmountInCollectiveCurrency: amount,
-        hostCurrency: hostCollective.currency,
-        currency,
-        CollectiveId: collective.id,
-      });
-    };
-
     it('fails if not enough funds', async () => {
       // Given that we have a host and a collective
       const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
@@ -1186,4 +1190,64 @@ describe('GraphQL Expenses API', () => {
       expect(await models.Expense.findByPk(expense.id)).to.be.null;
     }); /* End of "works if logged in as admin of host collective" */
   }); /* End of "#deleteExpense" */
+
+  describe('#markExpenseAsUnpaid', () => {
+    it('successfully mark expense as unpaid', async () => {
+      // Given that we have a host and a collective
+      const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
+        'railsgirlsatl',
+        'USD',
+        'USD',
+        10,
+      );
+
+      // And given a user to file expenses
+      const { user } = await store.newUser('someone cool');
+      // And given the above collective has one expense (in PENDING
+      // state)
+      const expenseAmount = 1500;
+      const expense = await store.createExpense(user, {
+        amount: expenseAmount,
+        description: 'Pizza',
+        currency: 'USD',
+        payoutMethod: 'other',
+        status: 'PENDING',
+        collective: { id: collective.id },
+      });
+      // And given the expense is approved
+      expense.status = 'APPROVED';
+      await expense.save();
+      // Add then add funds to collective
+      const initialBalance = 1500;
+
+      await addFunds(user, hostCollective, collective, initialBalance);
+      let balance = await collective.getBalance();
+      // Confirm the fund was added
+      expect(balance).to.equal(1500);
+      // Then expense is paid by host admin
+      const res = await utils.graphqlQuery(
+        payExpenseQuery,
+        {
+          id: expense.id,
+          paymentProcessorFeeInCollectiveCurrency: 0,
+        },
+        hostAdmin,
+      );
+      res.errors && console.log(res.errors);
+      expect(res.errors).to.not.exist;
+      expect(res.data.payExpense.status).to.equal('PAID');
+      // checks that the amountExpense was removed from initalBalance
+      balance = await collective.getBalance();
+      expect(balance).to.equal(initialBalance - expenseAmount);
+      // Then mark the expense as unpaid
+      const result = await utils.graphqlQuery(markExpenseAsUnpaidQuery, { id: expense.id }, hostAdmin);
+      result.errors && console.log(result.errors);
+      expect(result.errors).to.not.exist;
+      // The expense you should be back to APPROVED status
+      expect(result.data.markExpenseAsUnpaid.status).to.equal('APPROVED');
+      balance = await collective.getBalance();
+      // The balance should restored baack to initalBalance
+      expect(balance).to.equal(initialBalance);
+    }); /* End of "successfully mark expense as unpaid" */
+  }); /* #markExpenseAsUnpaid */
 }); /* End of "GraphQL Expenses API" */
