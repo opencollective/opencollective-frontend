@@ -1165,7 +1165,7 @@
   "update.delete": "delete",
   "update.edit": "edit",
   "update.makePublicOn.label": "Automaticamente torne público nesta data",
-  "update.new.post": "Post Update",
+  "update.new.post": "Postar atualização",
   "update.paid": "paid",
   "update.pending": "pending",
   "update.private.cannot_view_message": "Become a backer of {collective} to see this update",
