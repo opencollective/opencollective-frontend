@@ -645,7 +645,7 @@ const queries = {
       if (args.category) query.where.category = { [Op.iLike]: args.category };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [['incurredAt', 'DESC']];
+      query.order = [['createdAt', 'DESC']];
       return req.loaders.collective.findById.load(args.CollectiveId).then(collective => {
         if (!collective) {
           throw new Error('Collective not found');
@@ -895,9 +895,9 @@ const queries = {
           include: [
             [
               sequelize.literal(`(
-                SELECT  COALESCE(SUM("netAmountInCollectiveCurrency"), 0) 
-                FROM    "Transactions" t 
-                WHERE   t."type" = 'CREDIT' 
+                SELECT  COALESCE(SUM("netAmountInCollectiveCurrency"), 0)
+                FROM    "Transactions" t
+                WHERE   t."type" = 'CREDIT'
                 AND     t."CollectiveId" = "Collective".id
               )`),
               'totalDonations',
