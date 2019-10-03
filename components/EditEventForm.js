@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
-
+import slugify from 'limax';
 import Button from './Button';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
@@ -22,7 +22,7 @@ class EditEventForm extends React.Component {
 
     const event = { ...(props.event || {}) };
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
-    this.state = { event, tiers: event.tiers || [{}], disabled: false };
+    this.state = { slugChanged: false, event, tiers: event.tiers || [{}], disabled: false };
 
     this.messages = defineMessages({
       'slug.label': { id: 'event.slug.label', defaultMessage: 'url' },
@@ -80,6 +80,15 @@ class EditEventForm extends React.Component {
         event['endsAt'] = value;
       }
     }
+    let slugChanged = this.state.slugChanged;
+    if (fieldname === 'slug') {
+      slugChanged = true;
+    }
+    if (!slugChanged && fieldname === 'name') {
+      event['slug'] = event['name'].length
+        ? `${slugify(event['name'])}-${this.state.event.parentCollective.id}ev`.toLowerCase()
+        : `{eventName}-${this.state.event.parentCollective.id}ev`.toLowerCase();
+    }
     if (fieldname === 'name') {
       if (!event['name'].trim()) {
         this.setState({ disabled: true });
@@ -87,8 +96,14 @@ class EditEventForm extends React.Component {
         this.setState({ disabled: false });
       }
     }
-
-    this.setState({ event: Object.assign({}, this.state.event, event) });
+    if (fieldname === 'slug') {
+      if (!event['slug'].trim()) {
+        this.setState({ disabled: true });
+      } else {
+        this.setState({ disabled: false });
+      }
+    }
+    this.setState({ slugChanged: slugChanged, event: Object.assign({}, this.state.event, event) });
   }
 
   handleTiersChange(tiers) {
@@ -115,6 +130,11 @@ class EditEventForm extends React.Component {
     this.fields = [
       {
         name: 'name',
+        maxLength: 255,
+        placeholder: '',
+      },
+      {
+        name: 'slug',
         maxLength: 255,
         placeholder: '',
       },
@@ -212,7 +232,7 @@ class EditEventForm extends React.Component {
             {this.fields.map(field => (
               <InputField
                 key={field.name}
-                defaultValue={this.state.event[field.name] || field.defaultValue}
+                value={this.state.event[field.name] || field.defaultValue}
                 validate={field.validate}
                 ref={field.name}
                 name={field.name}
