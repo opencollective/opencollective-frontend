@@ -841,8 +841,7 @@ export async function refundTransaction(_, args, req) {
   const HostCollectiveId = isHost ? collective.id : await collective.getHostCollectiveId();
 
   // 1. Verify user permission. User must be either
-  //   a. User that created transaction (within 24h) -- Not implemented yet
-  //   b. Admin of the collective that received the donation
+  //   a. Admin of the collective that received the donation
   //   b. Admin of the Host Collective that received the donation
   //   c. Admin of opencollective.com/opencollective
 
