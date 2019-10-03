@@ -75,9 +75,10 @@ async function refundTransaction(transaction) {
     }
   }
   const collective = await transaction.getCollective();
-
+  const fromCollective = await transaction.getFromCollective();
   // purging cloudflare cache
   if (collective) purgeCacheForPage(`/${collective.slug}`);
+  if (fromCollective) purgeCacheForPage(`/${fromCollective.slug}`);
 
   return models.Transaction.findByPk(transaction.id);
 }
