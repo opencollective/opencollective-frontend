@@ -841,9 +841,9 @@ export async function refundTransaction(_, args, req) {
   const HostCollectiveId = isHost ? collective.id : await collective.getHostCollectiveId();
 
   // 1. Verify user permission. User must be either
-  //   a. User that created transaction (within 24h) -- Not implemented yet
-  //   b. Host Collective receiving the donation
-  //   c. Site Admin
+  //   a. Admin of the collective that received the donation
+  //   b. Admin of the Host Collective that received the donation
+  //   c. Admin of opencollective.com/opencollective
 
   if (!req.remoteUser.isAdmin(HostCollectiveId) && !req.remoteUser.isRoot() && !req.remoteUser.isAdmin(collective.id)) {
     throw new errors.Unauthorized({ message: 'Not a site admin or host collective admin' });
