@@ -50,37 +50,39 @@ export async function createCollective(_, args, req) {
   }
 
   collectiveData.isActive = false;
-
   if (args.collective.ParentCollectiveId) {
     parentCollective = await req.loaders.collective.findById.load(args.collective.ParentCollectiveId);
     if (!parentCollective) {
       return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
-    }
-    // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
-    collectiveData.currency = collectiveData.currency || parentCollective.currency;
-    collectiveData.HostCollectiveId = parentCollective.HostCollectiveId;
-    if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
+    } else if (!req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
+      throw new errors.Unauthorized({
+        message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`,
+      });
+    } else if (collectiveData.HostCollectiveId === parentCollective.HostCollectiveId && parentCollective.isActive) {
+      // We can approve the collective directly if same host and parent collective is already approved
       collectiveData.isActive = true;
       collectiveData.approvedAt = new Date();
     }
+
+    // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
+    collectiveData.currency = collectiveData.currency || parentCollective.currency;
+    collectiveData.HostCollectiveId = parentCollective.HostCollectiveId;
   }
 
   if (collectiveData.HostCollectiveId) {
     hostCollective = await req.loaders.collective.findById.load(collectiveData.HostCollectiveId);
     if (!hostCollective) {
       return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
-    }
-    collectiveData.currency = collectiveData.currency || hostCollective.currency;
-    collectiveData.hostFeePercent = hostCollective.hostFeePercent;
-
-    if (collectiveData.type === 'EVENT' || req.remoteUser.hasRole([roles.ADMIN, roles.HOST], hostCollective.id)) {
+    } else if (req.remoteUser.hasRole([roles.ADMIN], hostCollective.id)) {
       collectiveData.isActive = true;
-      // NOTE: events are not needing approvedAt
     } else if (!get(hostCollective, 'settings.apply')) {
       throw new errors.Unauthorized({
         message: 'This host does not accept applications for new collectives',
       });
     }
+
+    collectiveData.currency = collectiveData.currency || hostCollective.currency;
+    collectiveData.hostFeePercent = hostCollective.hostFeePercent;
   }
 
   // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
@@ -88,12 +90,6 @@ export async function createCollective(_, args, req) {
   const slug = slugify(args.collective.slug || args.collective.name);
   if (collectiveData.ParentCollectiveId) {
     collectiveData.slug = `${slug}-${parentCollective.id}${collectiveData.type.substr(0, 2)}`.toLowerCase();
-    const canCreateEvent = req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id);
-    if (!canCreateEvent) {
-      throw new errors.Unauthorized({
-        message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`,
-      });
-    }
   }
 
   try {
@@ -480,6 +476,21 @@ export async function approveCollective(remoteUser, CollectiveId) {
     },
   });
 
+  // Approve all events created by this collective under this host
+  models.Collective.findAll({
+    where: {
+      type: types.EVENT,
+      HostCollectiveId: hostCollective.id,
+      ParentCollectiveId: collective.id,
+      isActive: false,
+    },
+  }).then(events => {
+    events.map(event => {
+      event.update({ isActive: true, approvedAt: new Date() });
+    });
+  });
+
+  // Approve the collective and return it
   return collective.update({ isActive: true, approvedAt: new Date() });
 }
 

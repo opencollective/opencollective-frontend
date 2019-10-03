@@ -1436,12 +1436,15 @@ export default function(Sequelize, DataTypes) {
     let isActive = false;
     let approvedAt = null;
     if (creatorUser.isAdmin) {
-      if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+      if (creatorUser.isAdmin(hostCollective.id)) {
         isActive = true;
         approvedAt = new Date();
-      } else if (creatorUser.isAdmin(hostCollective.id)) {
-        isActive = true;
-        approvedAt = new Date();
+      } else if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+        const parentCollective = await models.Collective.findByPk(this.ParentCollectiveId);
+        if (parentCollective && parentCollective.isActive) {
+          isActive = true;
+          approvedAt = new Date();
+        }
       }
     }
     const updatedValues = {
