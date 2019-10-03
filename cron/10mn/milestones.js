@@ -31,7 +31,7 @@ const init = () => {
     },
     limit: 30,
     group: ['CollectiveId', 'collective.id'],
-    include: [{ model: models.Collective, as: 'collective' }],
+    include: [{ model: models.Collective, where: { type: { [Op.ne]: collectiveTypes.EVENT } }, as: 'collective' }],
   })
     .tap(transactionsGroups => {
       console.log(`${transactionsGroups.length} different collectives got new backers since ${TenMinutesAgo}`);
