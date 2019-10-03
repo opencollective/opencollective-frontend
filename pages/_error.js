@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ErrorPage from '../components/ErrorPage';
-import { withUser } from '../components/UserProvider';
+import ErrorPage, { generateError } from '../components/ErrorPage';
 
 /**
  * This page is shown when NextJS triggers a critical error during server-side
  * rendering, typically 404 errors.
  */
-class Error extends React.Component {
+class NextJSErrorPage extends React.Component {
   static getInitialProps({ res, err, req }) {
     const statusCode = res ? res.statusCode : err ? err.statusCode : null;
     return { statusCode, err, url: req && req.originalUrl };
@@ -18,25 +17,19 @@ class Error extends React.Component {
     statusCode: PropTypes.number.isRequired,
     url: PropTypes.string,
     err: PropTypes.object,
-    LoggedInUser: PropTypes.object,
   };
 
   render() {
     const { statusCode, url } = this.props;
-    const { LoggedInUser } = this.props;
 
     if (statusCode === 404 && url) {
       const slugRegex = /^\/([^/?]+)/;
       const parsedUrl = slugRegex.exec(url);
-      const errorData = parsedUrl && {
-        error: { message: 'No collective found' },
-        variables: { slug: parsedUrl[1] },
-      };
-
-      return <ErrorPage LoggedInUser={LoggedInUser} data={errorData} log={false} />;
+      return <ErrorPage log={false} error={generateError.notFound(parsedUrl[1])} />;
+    } else {
+      return <ErrorPage />;
     }
-    return <ErrorPage LoggedInUser={LoggedInUser} />;
   }
 }
 
-export default withUser(Error);
+export default NextJSErrorPage;

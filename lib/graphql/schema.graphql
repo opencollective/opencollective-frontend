@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Oct 01 2019 18:39:19 GMT+0200 (GMT+02:00)
+# timestamp: Thu Oct 03 2019 11:57:30 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -2341,7 +2341,15 @@ type PaymentMethodType {
 This is a root query
 """
 type Query {
-  Collective(slug: String, id: Int): CollectiveInterface
+  Collective(
+    slug: String
+    id: Int
+
+    """
+    If false, will return null instead of an error if collective is not found
+    """
+    throwIfMissing: Boolean = true
+  ): CollectiveInterface
   Tier(id: Int!): Tier
 
   """
