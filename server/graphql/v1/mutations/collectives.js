@@ -58,10 +58,6 @@ export async function createCollective(_, args, req) {
       throw new errors.Unauthorized({
         message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`,
       });
-    } else if (collectiveData.HostCollectiveId === parentCollective.HostCollectiveId && parentCollective.isActive) {
-      // We can approve the collective directly if same host and parent collective is already approved
-      collectiveData.isActive = true;
-      collectiveData.approvedAt = new Date();
     }
 
     // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
@@ -75,6 +71,10 @@ export async function createCollective(_, args, req) {
       return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
     } else if (req.remoteUser.hasRole([roles.ADMIN], hostCollective.id)) {
       collectiveData.isActive = true;
+    } else if (parentCollective && parentCollective.HostCollectiveId === hostCollective.id) {
+      // We can approve the collective directly if same host and parent collective is already approved
+      collectiveData.isActive = parentCollective.isActive;
+      collectiveData.approvedAt = parentCollective.isActive ? new Date() : null;
     } else if (!get(hostCollective, 'settings.apply')) {
       throw new errors.Unauthorized({
         message: 'This host does not accept applications for new collectives',
