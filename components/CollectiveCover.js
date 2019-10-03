@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectI
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
+import momentTimezone from 'moment-timezone';
 import { get } from 'lodash';
 import { withUser } from './UserProvider';
 import { prettyUrl, imagePreview } from '../lib/utils';
@@ -100,6 +101,7 @@ class CollectiveCover extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.messages = defineMessages({
       contribute: { id: 'collective.contribute', defaultMessage: 'contribute' },
       apply: {
@@ -111,6 +113,7 @@ class CollectiveCover extends React.Component {
     });
 
     this.description = props.description || props.collective.description;
+
     if (props.collective.type === 'EVENT') {
       const eventLocationRoute = props.href ? `${props.href}#location` : '#location';
       this.description = (
@@ -125,13 +128,13 @@ class CollectiveCover extends React.Component {
               <React.Fragment>
                 <FormattedDate
                   value={props.collective.startsAt}
-                  timeZone={props.collective.timezone}
+                  timeZone={momentTimezone.tz.guess()}
                   weekday="short"
                   day="numeric"
                   month="long"
                 />
                 , &nbsp;
-                <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />
+                <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
                 &nbsp; - &nbsp;
               </React.Fragment>
             )}
@@ -139,14 +142,14 @@ class CollectiveCover extends React.Component {
               <React.Fragment>
                 <FormattedDate
                   value={props.collective.endsAt}
-                  timeZone={props.collective.timezone}
+                  timeZone={momentTimezone.tz.guess()}
                   weekday="short"
                   day="numeric"
                   month="long"
                   year="numeric"
                 />
                 , &nbsp;
-                <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
+                <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
                 &nbsp; - &nbsp;
               </React.Fragment>
             )}
