@@ -48,17 +48,22 @@ const queries = {
     args: {
       slug: { type: GraphQLString },
       id: { type: GraphQLInt },
+      throwIfMissing: {
+        type: GraphQLBoolean,
+        defaultValue: true,
+        description: 'If false, will return null instead of an error if collective is not found',
+      },
     },
     resolve(_, args) {
       let collective;
       if (args.slug) {
-        collective = models.Collective.findBySlug(args.slug.toLowerCase());
+        collective = models.Collective.findBySlug(args.slug.toLowerCase(), null, args.throwIfMissing);
       } else if (args.id) {
         collective = models.Collective.findByPk(args.id);
       } else {
         return new Error('Please provide a slug or an id');
       }
-      if (!collective) {
+      if (!collective && args.throwIfMissing) {
         throw new errors.NotFound('Collective not found');
       }
       return collective;
