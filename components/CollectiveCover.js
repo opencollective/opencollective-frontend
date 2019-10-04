@@ -159,43 +159,46 @@ class CollectiveCover extends React.Component {
               </React.Fragment>
             )}
             <br />
-            <em>
-              {this.checkTimeDiff() && props.collective.startsAt && (
-                <React.Fragment>
-                  <FormattedDate
-                    value={props.collective.startsAt}
-                    timeZone={momentTimezone.tz.guess()}
-                    weekday="short"
-                    day="numeric"
-                    month="long"
-                  />
-                  , &nbsp;
-                  <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
-                  &nbsp; - &nbsp;
-                </React.Fragment>
-              )}
+            {this.checkTimeDiff() && (
+              <em>
+                {props.collective.startsAt && (
+                  <React.Fragment>
+                    <FormattedDate
+                      value={props.collective.startsAt}
+                      timeZone={momentTimezone.tz.guess()}
+                      weekday="short"
+                      day="numeric"
+                      month="long"
+                    />
+                    , &nbsp;
+                    <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
+                    &nbsp; - &nbsp;
+                  </React.Fragment>
+                )}
 
-              {this.checkTimeDiff() && props.collective.endsAt && (
-                <React.Fragment>
-                  <FormattedDate
-                    value={props.collective.endsAt}
-                    timeZone={momentTimezone.tz.guess()}
-                    weekday="short"
-                    day="numeric"
-                    month="long"
-                    year="numeric"
-                  />
-                  , &nbsp;
-                  <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
-                  &nbsp;{' '}
-                  {moment()
-                    .tz(momentTimezone.tz.guess())
-                    .zoneAbbr()}{' '}
-                  (Your Time)
-                </React.Fragment>
-              )}
-            </em>
-            {get(props.collective, 'location.name')}
+                {props.collective.endsAt && (
+                  <React.Fragment>
+                    <FormattedDate
+                      value={props.collective.endsAt}
+                      timeZone={momentTimezone.tz.guess()}
+                      weekday="short"
+                      day="numeric"
+                      month="long"
+                      year="numeric"
+                    />
+                    , &nbsp;
+                    <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
+                    &nbsp;{' '}
+                    {moment()
+                      .tz(momentTimezone.tz.guess())
+                      .zoneAbbr()}{' '}
+                    (Your Time)
+                  </React.Fragment>
+                )}
+                <br />
+              </em>
+            )}
+            Location: {get(props.collective, 'location.name')}
           </Link>
         </div>
       );
