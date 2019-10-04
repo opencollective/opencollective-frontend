@@ -8,6 +8,8 @@ export const types = {
   BOT: 'BOT',
 };
 
+export const CollectiveTypesList = Object.values(types);
+
 export const W9_BOT_SLUG = 'w9bot';
 
 export const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
