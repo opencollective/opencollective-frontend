@@ -4,7 +4,7 @@ import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { connectAccount } from '../lib/api';
+import { connectAccount, disconnectAccount } from '../lib/api';
 import EditTwitterAccount from './EditTwitterAccount';
 
 class EditConnectedAccount extends React.Component {
@@ -94,7 +94,19 @@ class EditConnectedAccount extends React.Component {
       });
   }
 
-  disconnect(service) {}
+  disconnect(service) {
+    const { collective } = this.props;
+
+    disconnectAccount(collective.id, service)
+      .then(json => {
+        if (json.deleted === true) {
+          console.log(`Disconnected: ${service}`);
+        }
+      })
+      .catch(err => {
+        console.error(`>>> /api/connected-accounts/${service}/disconnect error`, err);
+      });
+  }
 
   render() {
     const { intl, service, connectedAccount, collective } = this.props;
