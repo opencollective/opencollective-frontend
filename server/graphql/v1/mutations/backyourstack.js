@@ -1,3 +1,4 @@
+import moment from 'moment';
 import models from '../../../models';
 import { dispatchFunds, getNextDispatchingDate, needsDispatching } from '../../../lib/backyourstack/dispatcher';
 
@@ -19,7 +20,10 @@ export async function dispatchOrder(orderId) {
   }
 
   if (subscription.data && !needsDispatching(subscription.data.nextDispatchDate)) {
-    throw new Error(`Order is not up for dispatching, next dispatching date is ${subscription.data.nextDispatchDate}`);
+    const nextDispatchDate = moment(subscription.data.nextDispatchDate).format('ll');
+    throw new Error(
+      `Your BackYourStack order is already complete for this month. The next dispatch of funds will be on ${nextDispatchDate}`,
+    );
   }
 
   let dispatchedOrders;
