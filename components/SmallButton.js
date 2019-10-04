@@ -65,12 +65,14 @@ class SmallButton extends React.Component {
               border-color: #3399ff;
               color: white;
             }
-            .SmallButton.reject button {
+            .SmallButton.reject button,
+            .SmallButton.delete button {
               background: white;
               border: solid 2px #e63956;
               color: #e63956;
             }
-            .SmallButton.reject button:hover {
+            .SmallButton.reject button:hover,
+            .SmallButton.delete button:hover {
               background: #e63956;
               border: solid 2px #e63956;
               color: white;

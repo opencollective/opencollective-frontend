@@ -16,6 +16,7 @@ import ExpenseDetails from './ExpenseDetails';
 import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
+import DeleteExpenseBtn from './DeleteExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 
@@ -170,6 +171,7 @@ class Expense extends React.Component {
       (expense.status === 'PENDING' ||
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
+    const canDelete = LoggedInUser && LoggedInUser.canApproveExpense(expense) && expense.status === 'REJECTED';
     return (
       <div className={`expense ${status} ${this.state.mode}View`}>
         <style jsx>
@@ -385,7 +387,7 @@ class Expense extends React.Component {
                   </div>
                 </div>
               )}
-              {mode !== 'edit' && (canPay || canApprove || canReject) && (
+              {mode !== 'edit' && (canPay || canApprove || canReject || canDelete) && (
                 <div className="manageExpense">
                   {canPay && expense.payoutMethod === 'other' && (
                     <EditPayExpenseFeesForm
@@ -408,6 +410,7 @@ class Expense extends React.Component {
                     )}
                     {canApprove && <ApproveExpenseBtn id={expense.id} />}
                     {canReject && <RejectExpenseBtn id={expense.id} />}
+                    {canDelete && <DeleteExpenseBtn id={expense.id} />}
                   </div>
                 </div>
               )}
