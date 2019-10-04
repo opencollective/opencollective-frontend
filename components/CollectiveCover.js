@@ -155,7 +155,7 @@ class CollectiveCover extends React.Component {
                 {moment()
                   .tz(props.collective.timezone)
                   .zoneAbbr()}{' '}
-                (Event Time)
+                (<FormattedMessage id="eventTime" defaultMessage="Event Time" />)
               </React.Fragment>
             )}
             <br />
@@ -192,13 +192,13 @@ class CollectiveCover extends React.Component {
                     {moment()
                       .tz(momentTimezone.tz.guess())
                       .zoneAbbr()}{' '}
-                    (Your Time)
+                    (<FormattedMessage id="localTime" defaultMessage="Your Time" />)
                   </React.Fragment>
                 )}
                 <br />
               </em>
             )}
-            Location: {get(props.collective, 'location.name')}
+            <FormattedMessage id="location" defaultMessage="Location" /> {get(props.collective, 'location.name')}
           </Link>
         </div>
       );
