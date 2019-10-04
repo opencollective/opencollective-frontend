@@ -29,6 +29,10 @@ class EditConnectedAccount extends React.Component {
         id: 'collective.connectedAccounts.reconnect.button',
         defaultMessage: 'Reconnect',
       },
+      'collective.connectedAccounts.disconnect.button': {
+        id: 'collective.connectedAccounts.disconnect.button',
+        defaultMessage: 'Disconnect',
+      },
       'collective.connectedAccounts.stripe.button': {
         id: 'collective.connectedAccounts.stripe.button',
         defaultMessage: 'Connect Stripe',
@@ -90,6 +94,8 @@ class EditConnectedAccount extends React.Component {
       });
   }
 
+  disconnect(service) {}
+
   render() {
     const { intl, service, connectedAccount, collective } = this.props;
     let vars = {};
@@ -116,6 +122,9 @@ class EditConnectedAccount extends React.Component {
             <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
             <Button onClick={() => this.connect(service)}>
               {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
+            </Button>{' '}
+            <Button onClick={() => this.disconnect(service)}>
+              {intl.formatMessage(this.messages['collective.connectedAccounts.disconnect.button'])}
             </Button>
           </div>
         )}

@@ -98,6 +98,7 @@
   "collective.collective.memberOf.collective.parent.title": "Deelcollectieven",
   "collective.company.description": "Start met een @ om te verwijzen naar een organisatie (e.g. @XRAntwerp)",
   "collective.company.label": "onderneming",
+  "collective.connectedAccounts.disconnect.button": "Disconnect",
   "collective.connectedAccounts.github.button": "Verbind met GitHub",
   "collective.connectedAccounts.github.connected": "GitHub account {username} gekoppeld op {createdAt, date, short}",
   "collective.connectedAccounts.github.description": "Koppel een GitHub account om je identiteit te verifiëren en het aan je profiel toe te voegen",
