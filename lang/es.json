@@ -353,6 +353,7 @@
   "ContributePayment.balanceAndExpiry": "{balance} restante, expira en {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} restante",
   "ContributePayment.expiresOn": "Expira el {expiryDate}",
+  "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "Descubre otros colectivos relacionados a los que apoyar:",
   "ContributeTier.StartsAt": "Starts at",
   "contribution": "{n, plural, one {contribution} other {contributions}}",

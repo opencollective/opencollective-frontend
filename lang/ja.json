@@ -353,6 +353,7 @@
   "ContributePayment.balanceAndExpiry": "残り {balance} の有効期限が {expiryDate} に切れます",
   "ContributePayment.balanceLeft": "残り {balance}",
   "ContributePayment.expiresOn": "{expiryDate} に期限切れ",
+  "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "サポートするほかのコレクティブを見つける:",
   "ContributeTier.StartsAt": "Starts at",
   "contribution": "{n, plural, one {件のコントリビュート} other {件のコントリビュート}}",
