@@ -28,7 +28,7 @@ class EventTemplatePicker extends React.Component {
     const template = eventId ? this.props.data.allEvents.find(event => event.id === eventId) : {};
     const eventsWithTheSameName = this.props.data.allEvents.filter(event => event.name.indexOf(template.name) === 0)
       .length;
-    if (template.name) template.slug = slugify(template.name) + '-v' + (eventsWithTheSameName + 1);
+    if (template.name) template.slug = `${slugify(template.name)}-v${eventsWithTheSameName + 1}`;
     this.props.onChange(Object.assign({}, template));
   }
 
