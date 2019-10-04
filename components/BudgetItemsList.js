@@ -339,9 +339,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
                     defaultMessage="using a {giftCard} from {collective}"
                     values={{
                       giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                      collectiveName: (
-                        <StyledLink as={LinkCollective} collective={item.usingVirtualCardFromCollective} />
-                      ),
+                      collective: <StyledLink as={LinkCollective} collective={item.usingVirtualCardFromCollective} />,
                     }}
                   />
                   {INFO_SEPARATOR}

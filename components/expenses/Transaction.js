@@ -101,7 +101,7 @@ class Transaction extends React.Component {
           defaultMessage="using a {giftCard} from {collective}"
           values={{
             giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-            collectiveLink: (
+            collective: (
               <LinkCollective collective={usingVirtualCardFromCollective}>
                 {usingVirtualCardFromCollective.name}
               </LinkCollective>
