@@ -119,9 +119,10 @@ class EditConnectedAccount extends React.Component {
             </Button>
           </div>
         )}
-        {connectedAccount && connectedAccount.service === 'twitter' && (
-          <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
-        )}
+        {connectedAccount &&
+          connectedAccount.service === 'twitter' &&
+          collective.type ===
+            'ORGANIZATION'(<EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />)}
       </div>
     );
   }
