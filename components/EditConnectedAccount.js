@@ -21,8 +21,12 @@ class EditConnectedAccount extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { editMode: props.editMode || false };
+    this.state = {
+      editMode: props.editMode || false,
+      connectedAccount: props.connectedAccount,
+    };
     this.connect = this.connect.bind(this);
+    this.disconnect = this.disconnect.bind(this);
 
     this.messages = defineMessages({
       'collective.connectedAccounts.reconnect.button': {
@@ -100,7 +104,9 @@ class EditConnectedAccount extends React.Component {
     disconnectAccount(collective.id, service)
       .then(json => {
         if (json.deleted === true) {
-          console.log(`Disconnected: ${service}`);
+          this.setState({
+            connectedAccount: null,
+          });
         }
       })
       .catch(err => {
@@ -109,7 +115,9 @@ class EditConnectedAccount extends React.Component {
   }
 
   render() {
-    const { intl, service, connectedAccount, collective } = this.props;
+    const { intl, service, collective } = this.props;
+    const { connectedAccount } = this.state;
+
     let vars = {};
     if (connectedAccount) {
       vars = {
