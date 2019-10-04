@@ -66,18 +66,7 @@ const getPaymentMethodMetadata = pm => {
       />
     );
   } else if (pm.type === 'virtualcard') {
-    if (pm.expiryDate && pm.balance > minBalance) {
-      return (
-        <FormattedMessage
-          id="ContributePayment.balanceAndExpiry"
-          defaultMessage="{balance} left, expires on {expiryDate}"
-          values={{
-            expiryDate: <FormattedDate value={pm.expiryDate} day="numeric" month="long" year="numeric" />,
-            balance: formatCurrency(pm.balance, pm.currency),
-          }}
-        />
-      );
-    } else if (pm.balance < minBalance) {
+    if (pm.balance < minBalance) {
       return (
         <FormattedMessage
           id="ContributePayment.unusableBalance"
@@ -85,6 +74,17 @@ const getPaymentMethodMetadata = pm => {
           values={{
             balance: formatCurrency(pm.balance, pm.currency),
             minBalance: formatCurrency(minBalance, pm.currency),
+          }}
+        />
+      );
+    } else if (pm.expiryDate) {
+      return (
+        <FormattedMessage
+          id="ContributePayment.balanceAndExpiry"
+          defaultMessage="{balance} left, expires on {expiryDate}"
+          values={{
+            expiryDate: <FormattedDate value={pm.expiryDate} day="numeric" month="long" year="numeric" />,
+            balance: formatCurrency(pm.balance, pm.currency),
           }}
         />
       );
