@@ -150,4 +150,33 @@ paymentMethodProvider.processOrder = async order => {
   return transactions;
 };
 
+/**
+ * Refund a given transaction by creating the opposing transaction. We don't support
+ * refunds if for cross-host donations (that we stopped supporting for now).
+ */
+paymentMethodProvider.refundTransaction = async (transaction, user) => {
+  // Get the from/to collectives.
+  const collectives = await Promise.all([
+    models.Collective.findByPk(transaction.FromCollectiveId),
+    models.Collective.findByPk(transaction.CollectiveId),
+  ]);
+
+  const [fromCollective, collective] =
+    transaction.type === TransactionTypes.CREDIT ? collectives : collectives.reverse();
+
+  // Check if we allow refund for this one
+  if (!fromCollective.HostCollectiveId) {
+    throw new Error('Cannot process refunds for collectives without a host');
+  } else if (fromCollective.HostCollectiveId !== collective.HostCollectiveId) {
+    throw new Error('Cannot process refunds for collectives with different hosts');
+  } else if ((await collective.getBalance()) < transaction.amount) {
+    throw new Error("The collective doesn't have enough funds to process this refund");
+  }
+
+  // Use 0 for processor fees because there's no fees for collective to collective
+  // transactions within the same host.
+  const refundTransaction = await paymentsLib.createRefundTransaction(transaction, 0, null, user);
+  return paymentsLib.associateTransactionRefundId(transaction, refundTransaction);
+};
+
 export default paymentMethodProvider;

@@ -2,6 +2,7 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 
 import models from '../server/models';
+import CollectivePaymentProvider from '../server/paymentProviders/opencollective/collective';
 
 import * as utils from './utils';
 import * as store from './stores';
@@ -36,39 +37,26 @@ const createOrderQuery = `
 `;
 
 describe('paymentMethods.collective.to.collective.test.js', () => {
-  let sandbox,
-    user1,
-    user2,
-    transactions,
-    collective1,
-    collective2,
-    collective3,
-    collective5,
-    host1,
-    host2,
-    host3,
-    organization,
-    stripePaymentMethod,
-    openCollectivePaymentMethod;
-
   before(async () => {
     await utils.resetTestDB();
   });
 
-  describe('validation', () => {
-    it('validates the token for Stripe', done => {
-      models.PaymentMethod.create({
-        service: 'stripe',
-        type: 'creditcard',
-        token: 'invalid token',
-      }).catch(e => {
-        expect(e.message).to.equal('Invalid Stripe token invalid token');
-        done();
-      });
-    });
-  });
-
   describe('Collective to Collective Transactions', () => {
+    let sandbox,
+      user1,
+      user2,
+      transactions,
+      collective1,
+      collective2,
+      collective3,
+      collective5,
+      host1,
+      host2,
+      host3,
+      organization,
+      stripePaymentMethod,
+      openCollectivePaymentMethod;
+
     before('creates User 1', () =>
       models.User.createUserWithCollective({
         email: store.randEmail(),
@@ -454,4 +442,80 @@ describe('paymentMethods.collective.to.collective.test.js', () => {
       );
     });
   }); /** END OF "Recurring donations between Collectives with different hosts must be allowed"*/
+
+  describe('Refunds', () => {
+    let user, fromCollective, toCollective, host;
+
+    /** Create an order from `collective1` to `collective2` */
+    const createOrder = async (fromCollective, toCollective, amount = 5000) => {
+      const paymentMethod = await models.PaymentMethod.findOne({
+        where: { type: 'collective', service: 'opencollective', CollectiveId: fromCollective.id },
+      });
+
+      const order = await models.Order.create({
+        CreatedByUserId: fromCollective.CreatedByUserId,
+        FromCollectiveId: fromCollective.id,
+        CollectiveId: toCollective.id,
+        totalAmount: amount,
+        currency: 'USD',
+        status: 'PENDING',
+        PaymentMethodId: paymentMethod.id,
+      });
+
+      // Bind some required properties
+      order.collective = toCollective;
+      order.fromCollective = fromCollective;
+      order.createByUser = user;
+      order.paymentMethod = paymentMethod;
+      return order;
+    };
+
+    const checkBalances = async (expectedFrom, expectedTo) => {
+      expect(await fromCollective.getBalance()).to.eq(expectedFrom);
+      expect(await toCollective.getBalance()).to.eq(expectedTo);
+    };
+
+    before('Create initial data', async () => {
+      host = await models.Collective.create({ name: 'Host', currency: 'USD', isActive: true });
+      user = await models.User.createUserWithCollective({ email: store.randEmail(), name: 'User 1' });
+      const collectiveParams = {
+        currency: 'USD',
+        HostCollectiveId: host.id,
+        isActive: true,
+        type: 'COLLECTIVE',
+        CreatedByUserId: user.id,
+      };
+      fromCollective = await models.Collective.create({ name: 'collective1', ...collectiveParams });
+      toCollective = await models.Collective.create({ name: 'collective2', ...collectiveParams });
+    });
+
+    it('Creates the opposite transactions', async () => {
+      await checkBalances(0, 0);
+      const orderData = await createOrder(fromCollective, toCollective);
+      const transaction = await CollectivePaymentProvider.processOrder(orderData);
+      await checkBalances(-5000, 5000);
+
+      const refund = await CollectivePaymentProvider.refundTransaction(transaction, user);
+      await checkBalances(0, 0);
+
+      expect(refund.amount).to.eq(transaction.amount);
+      expect(refund.currency).to.eq(transaction.currency);
+      expect(refund.platformFeeInHostCurrency).to.eq(0);
+      expect(refund.hostFeeInHostCurrency).to.eq(0);
+      expect(refund.paymentProcessorFeeInHostCurrency).to.eq(0);
+    });
+
+    it('Cannot reimburse money if it exceeds the Collective balance', async () => {
+      await checkBalances(0, 0);
+      const orderData = await createOrder(fromCollective, toCollective);
+      const transaction = await CollectivePaymentProvider.processOrder(orderData);
+      await checkBalances(-5000, 5000);
+      const orderData2 = await createOrder(toCollective, fromCollective, 2500);
+      await CollectivePaymentProvider.processOrder(orderData2);
+      await checkBalances(-2500, 2500);
+      expect(CollectivePaymentProvider.refundTransaction(transaction, user)).to.be.rejectedWith(
+        "The collective doesn't have enough funds to process this refund",
+      );
+    }); /** END OF "Cannot send money that exceeds Collective balance" */
+  });
 }); /** END OF "payments.collectiveToCollective.test" */
