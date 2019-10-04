@@ -74,8 +74,8 @@ const ContributorCardContainer = styled.div`
 `;
 
 /** Get an index in a single dimension array from a matrix coordinate */
-const getContributorIdx = (colIndex, rowIndex, nbRows) => {
-  return rowIndex + nbRows * colIndex;
+const getContributorIdx = (colIndex, rowIndex, nbRows, nbCols, hasScroll) => {
+  return hasScroll ? rowIndex + nbRows * colIndex : rowIndex * nbCols + colIndex;
 };
 
 /** Get the items repartition, aka the number of columns and rows. */
@@ -121,12 +121,12 @@ const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport
       outerElementType={getGridContainer(paddingLeft, hasScroll)}
       innerElementType={GridInnerContainer}
       itemKey={({ columnIndex, rowIndex }) => {
-        const idx = getContributorIdx(columnIndex, rowIndex, nbRows);
+        const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
         return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
       }}
     >
       {({ columnIndex, rowIndex, style }) => {
-        const idx = getContributorIdx(columnIndex, rowIndex, nbRows);
+        const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
         const contributor = contributors[idx];
 
         return !contributor ? null : (
