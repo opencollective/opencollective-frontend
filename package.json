@@ -134,7 +134,7 @@
     "post-merge-install": "^0.3.0",
     "prettier": "1.18.2",
     "react": "^16.10.1",
-    "react-dom": "^16.10.1",
+    "react-dom": "^16.10.2",
     "sinon": "^7.5.0",
     "supertest": "^4.0.2",
     "supertest-as-promised": "^4.0.2",
