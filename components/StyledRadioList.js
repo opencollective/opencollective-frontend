@@ -44,7 +44,7 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, dis
                 id={id && key + id}
                 value={key}
                 defaultChecked={props.defaultValue !== undefined && defaultValueStr === key}
-                disabled={disabled}
+                disabled={value.disabled || disabled} // disable a specific option or entire options
               />
             ),
           })}
