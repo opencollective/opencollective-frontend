@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import slugify from 'limax';
 
 class EventTemplatePicker extends React.Component {
   static propTypes = {
@@ -25,6 +26,9 @@ class EventTemplatePicker extends React.Component {
   handleTemplateChange(e) {
     const eventId = Number(e.target.value);
     const template = eventId ? this.props.data.allEvents.find(event => event.id === eventId) : {};
+    const eventsWithTheSameName = this.props.data.allEvents.filter(event => event.name.indexOf(template.name) === 0)
+      .length;
+    if (template.name) template.slug = slugify(template.name) + '-v' + (eventsWithTheSameName + 1);
     this.props.onChange(Object.assign({}, template));
   }
 

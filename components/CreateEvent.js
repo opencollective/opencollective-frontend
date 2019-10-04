@@ -72,7 +72,7 @@ class CreateEvent extends React.Component {
 
   async handleTemplateChange(event) {
     delete event.id;
-    delete event.slug;
+
     this.setState({ event, tiers: event.tiers });
   }
 
