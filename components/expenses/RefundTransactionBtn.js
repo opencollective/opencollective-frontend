@@ -36,8 +36,8 @@ class RefundTransactionBtn extends React.Component {
    * This function should be called with a single state. An exception
    * will be thrown if more than one state is passed.
    */
-  setShowingState({ canRefund, confirmRefund, refunded, refunding }) {
-    if (canRefund && confirmRefund && refunded && refunding) {
+  setShowingState({ canRefund, confirmRefund, refunded, refunding, error }) {
+    if (canRefund && confirmRefund && refunded && refunding && error) {
       throw new Error("Can't set more than one state to true");
     }
     this.setState({
@@ -46,6 +46,7 @@ class RefundTransactionBtn extends React.Component {
         confirmRefund: !!confirmRefund,
         refunded: !!refunded,
         refunding: !!refunding,
+        error: !!error,
       },
     });
   }
@@ -60,8 +61,10 @@ class RefundTransactionBtn extends React.Component {
     this.setShowingState({ refunding: true });
     try {
       await this.props.refundTransaction(this.props.id);
-    } finally {
       this.setShowingState({ refunded: true });
+    } catch (e) {
+      this.setShowingState({ error: true });
+      this.setState({ error: (e.message || '').replace('GraphQL error: ', '') });
     }
   }
 
@@ -70,6 +73,11 @@ class RefundTransactionBtn extends React.Component {
       <div>
         <style jsx>
           {`
+            .error {
+              color: red;
+              font-weight: bold;
+              padding-top: 20px;
+            }
             .confirmation {
               border-top: solid 1px #ddd;
               margin: 10px 0;
@@ -89,6 +97,8 @@ class RefundTransactionBtn extends React.Component {
             }
           `}
         </style>
+
+        {this.state.showing.error && <div className="error">ERROR: {this.state.error}</div>}
 
         {/* Already refunded so we don't really don't need to show
             anything */}
