@@ -14,6 +14,7 @@ const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, 
         const isSelected = filter === selected;
         return (
           <StyledButton
+            data-cy="filter-button"
             key={filter}
             onClick={isSelected ? undefined : () => onChange(filter)}
             height={32}

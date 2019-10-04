@@ -290,10 +290,15 @@ class SectionContributions extends React.PureComponent {
                 />
               </Box>
             )}
-            <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
+            <Container
+              data-cy="Contributions"
+              maxWidth={Dimensions.MAX_SECTION_WIDTH}
+              pl={Dimensions.PADDING_X}
+              m="0 auto"
+            >
               <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                  <MembershipCardContainer key={membership.id}>
+                  <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                     <StyledMembershipCard membership={membership} />
                   </MembershipCardContainer>
                 ))}
