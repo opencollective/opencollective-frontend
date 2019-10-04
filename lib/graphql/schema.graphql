@@ -1151,17 +1151,10 @@ type Expense implements Transaction {
   updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
-<<<<<<< HEAD
-  privateMessage: String
-  category: String
-  expense: ExpenseType
-  attachment: String
-=======
   privateMessage: String @deprecated(reason: "Please use transaction.expense.privateMessage")
   category: String @deprecated(reason: "Please use transaction.expense.category")
   expense: ExpenseType
   attachment: String @deprecated(reason: "Please use transaction.expense.attachment")
->>>>>>> feat(CollectivePickerAsync): Base implementation
 }
 
 """
