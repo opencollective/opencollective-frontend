@@ -11,6 +11,7 @@ import twitter from '../../server/lib/twitter';
 import slackLib from '../../server/lib/slack';
 import { pluralize } from '../../server/lib/utils';
 import _, { pick, get, set } from 'lodash';
+import { types as collectiveTypes } from '../../server/constants/collectives';
 
 const TenMinutesAgo = new Date();
 TenMinutesAgo.setMinutes(TenMinutesAgo.getMinutes() - 10);
