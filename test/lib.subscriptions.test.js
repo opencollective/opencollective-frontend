@@ -62,8 +62,8 @@ describe('LibSubscription', () => {
       const order = {
         Subscription: {
           interval: 'month',
-          nextPeriodStart: new Date('2018-01-30'),
-          nextChargeDate: new Date('2018-01-30'),
+          nextPeriodStart: new Date('2018-01-01'),
+          nextChargeDate: new Date('2018-01-01'),
         },
       };
 
@@ -74,6 +74,24 @@ describe('LibSubscription', () => {
       // next month
       expect(updatedDates.nextPeriodStart.getTime()).to.equal(new Date('2018-02-01 0:0').getTime());
       expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2018-02-01 0:0').getTime());
+    });
+
+    it('should use the next 2 months first day for monthly subscriptions on or after 15th', () => {
+      // Given the following order with subscription
+      const order = {
+        Subscription: {
+          interval: 'month',
+          nextPeriodStart: new Date('2018-01-30'),
+          nextChargeDate: new Date('2018-01-30'),
+        },
+      };
+
+      // When dates are updated with success
+      const updatedDates = getNextChargeAndPeriodStartDates('new', order);
+
+      // The subscription was made after the 15th the next charge should be in 2 months time, first day.
+      expect(updatedDates.nextPeriodStart.getTime()).to.equal(new Date('2018-03-01 0:0').getTime());
+      expect(updatedDates.nextChargeDate.getTime()).to.equal(new Date('2018-03-01 0:0').getTime());
     });
 
     it('should use first day of the same month next year for yearly subscriptions', () => {
@@ -146,7 +164,7 @@ describe('LibSubscription', () => {
           interval: 'month',
           nextPeriodStart: null,
           nextChargeDate: null,
-          createdAt: new Date('2018-01-30'),
+          createdAt: new Date('2018-01-01'),
         },
       };
 
