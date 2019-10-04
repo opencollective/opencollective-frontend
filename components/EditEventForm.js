@@ -21,7 +21,15 @@ class EditEventForm extends React.Component {
     this.handleTiersChange = this.handleTiersChange.bind(this);
 
     const event = { ...(props.event || {}) };
+    if (event.slug) {
+      const slugCollectiveIdPosition = event.slug.length - `-${event.parentCollective.id}ev`.length;
+
+      if (`-${event.parentCollective.id}ev` == event.slug.substr(slugCollectiveIdPosition)) {
+        event.slug = event.slug.substr(0, slugCollectiveIdPosition);
+      }
+    }
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
+
     this.state = { slugChanged: false, event, tiers: event.tiers || [{}], disabled: false };
 
     this.messages = defineMessages({
@@ -85,9 +93,7 @@ class EditEventForm extends React.Component {
       slugChanged = true;
     }
     if (!slugChanged && fieldname === 'name') {
-      event['slug'] = event['name'].length
-        ? `${slugify(event['name'])}-${this.state.event.parentCollective.id}ev`.toLowerCase()
-        : `{eventName}-${this.state.event.parentCollective.id}ev`.toLowerCase();
+      event['slug'] = event['name'].length ? `${slugify(event['name'])}` : `event`;
     }
     if (fieldname === 'name') {
       if (!event['name'].trim()) {
