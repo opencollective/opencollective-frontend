@@ -297,6 +297,7 @@ class StepPayment extends React.Component {
               borderBottom={index !== paymentMethodsOptions.length - 1 ? '1px solid' : 'none'}
               bg="white.full"
               borderColor="black.200"
+              css={disabled ? 'filter: grayscale(1);' : undefined}
               cursor={this.getCursor(disabled || this.props.disabled, checked)}
             >
               <Flex alignItems="center">
