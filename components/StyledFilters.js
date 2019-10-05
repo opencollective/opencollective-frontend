@@ -9,12 +9,13 @@ import { Span } from './Text';
  */
 const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
   return (
-    <Flex css={{ overflowX: 'auto' }} {...flexProps}>
+    <Flex data-cy="filters" css={{ overflowX: 'auto' }} {...flexProps}>
       {filters.map((filter, idx) => {
         const isSelected = filter === selected;
         return (
           <StyledButton
             data-cy="filter-button"
+            data-type={`${filter.toLowerCase()}`}
             key={filter}
             onClick={isSelected ? undefined : () => onChange(filter)}
             height={32}

@@ -52,9 +52,9 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
           </StyledTag>
         </Container>
         <Container p={3}>
-          <Box mb={2}>
+          <Box data-cy="caption" mb={2}>
             {role && (
-              <P fontSize="Caption" mb={3}>
+              <P fontSize="Caption" mb={3} data-cy="contribution-date-since">
                 <FormattedMessage
                   id="Membership.ContributorSince"
                   defaultMessage="{contributorType} since"
@@ -66,7 +66,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </P>
             )}
             {role === roles.BACKER ? (
-              <P mt={3}>
+              <P mt={3} data-cy="amount-contributed">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
                   {msg => (
                     <Span textTransform="capitalize" fontSize="Caption">
