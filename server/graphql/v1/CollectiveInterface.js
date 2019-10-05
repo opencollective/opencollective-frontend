@@ -1364,7 +1364,7 @@ const CollectiveFields = () => {
         if (args.status) query.where.status = args.status;
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
-        query.order = [['incurredAt', 'DESC']];
+        query.order = [['createdAt', 'DESC']];
         const getCollectiveIds = () => {
           // if is host, we get all the expenses across all the hosted collectives
           if (args.includeHostedCollectives) {
