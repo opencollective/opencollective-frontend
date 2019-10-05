@@ -167,7 +167,7 @@ Cypress.Commands.add('createHostedCollective', collectiveParams => {
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/${collectiveSlug}/edit/payment-methods` });
-  cy.contains('button', 'Add a payment method').click();
+  cy.contains('button', 'Add a credit card').click();
   cy.wait(2000);
   fillStripeInput();
   cy.wait(1000);
