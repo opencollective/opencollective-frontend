@@ -5,6 +5,8 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 
+import { CollectiveType } from '../lib/constants/collectives';
+import { Router } from '../server/pages';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -14,6 +16,7 @@ import CollectiveNotificationBar from '../components/collective-page/CollectiveN
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import Container from '../components/Container';
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -37,13 +40,14 @@ class NewCollectivePage extends React.Component {
       error: PropTypes.any,
       Collective: PropTypes.shape({
         name: PropTypes.string,
+        type: PropTypes.string.isRequired,
         description: PropTypes.string,
         twitterHandle: PropTypes.string,
         image: PropTypes.string,
         isApproved: PropTypes.bool,
         isArchived: PropTypes.bool,
         isHost: PropTypes.bool,
-        parentCollective: PropTypes.shape({ image: PropTypes.string }),
+        parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
         coreContributors: PropTypes.arrayOf(PropTypes.object),
@@ -63,6 +67,25 @@ class NewCollectivePage extends React.Component {
       res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     }
     return { slug, status };
+  }
+
+  componentDidMount() {
+    this.redirectIfEvent();
+  }
+
+  componentDidUpdate() {
+    this.redirectIfEvent();
+  }
+
+  /** Will replace the route to redirect to an event if required */
+  redirectIfEvent() {
+    const { data, slug } = this.props;
+    if (get(data, 'Collective.type') === CollectiveType.EVENT) {
+      Router.replaceRoute('event', {
+        parentCollectiveSlug: get(data.Collective.parentCollective, 'slug', 'collective'),
+        eventSlug: slug,
+      });
+    }
   }
 
   getPageMetaData(collective) {
@@ -86,10 +109,13 @@ class NewCollectivePage extends React.Component {
 
     if (!data || data.error) {
       return <ErrorPage data={data} />;
-    } else if (data.loading || !data.Collective) {
+    } else if (data.loading || !data.Collective || data.Collective.type === CollectiveType.EVENT) {
+      // Show loading if no data yet, or if collective is event because we'll be redirecting
       return (
         <Page {...this.getPageMetaData()} withoutGlobalStyles>
-          <Loading />
+          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+            <Loading />
+          </Container>
         </Page>
       );
     }
@@ -168,6 +194,7 @@ const getCollective = graphql(
         }
         parentCollective {
           id
+          slug
           image
           twitterHandle
           type
