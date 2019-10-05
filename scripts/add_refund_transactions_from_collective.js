@@ -15,6 +15,7 @@ import debug from 'debug';
 
 import models from '../server/models';
 import * as libPayments from '../server/lib/payments';
+import { purgeCacheForPage } from '../server/lib/cloudflare';
 
 // the user id of the one who's running this script, will be set on the field `CreatedByUserId`.
 const UPDATER_USER_ID = parseInt(process.env.UPDATER_USER_ID);
@@ -73,6 +74,12 @@ async function refundTransaction(transaction) {
       await subscription.save();
     }
   }
+  const collective = await transaction.getCollective();
+  const fromCollective = await transaction.getFromCollective();
+  // purging cloudflare cache
+  if (collective) purgeCacheForPage(`/${collective.slug}`);
+  if (fromCollective) purgeCacheForPage(`/${fromCollective.slug}`);
+
   return models.Transaction.findByPk(transaction.id);
 }
 
