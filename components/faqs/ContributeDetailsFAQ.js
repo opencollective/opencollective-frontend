@@ -43,7 +43,7 @@ const ContributeDetailsFAQ = ({ tax, isIncognito, hasInterval, ...props }) =>
           <Content>
             <FormattedMessage
               id="ContributeDetails.faq.frequency.content"
-              defaultMessage="You will be charged today, and then on the 1st of each month (for monthly contributions) or the 1st of the same month next year (for yearly contributions). Warning: you may be charged twice in a short time frame if you are setting up a monthly contribution close to the end of the month."
+              defaultMessage="You will be charged today, and then on the 1st of each month (for monthly contributions) or the 1st of the same month next year (for yearly contributions). Note: To prevent you from being charged twice in a short time frame, if you contribute after the 15th of a given month, the next charge will not be the 1st of next month but the month after."
             />
           </Content>
         </Entry>
