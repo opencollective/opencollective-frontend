@@ -4,6 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { Router } from '../server/pages';
@@ -17,6 +18,12 @@ import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectivePage from '../components/collective-page';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
+
+/** A page rendered when collective is pledged and not active yet */
+const PledgedCollectivePage = dynamic(
+  () => import(/* webpackChunkName: 'PledgedCollectivePage' */ '../components/PledgedCollectivePage'),
+  { loading: Loading },
+);
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
@@ -47,6 +54,8 @@ class NewCollectivePage extends React.Component {
         isApproved: PropTypes.bool,
         isArchived: PropTypes.bool,
         isHost: PropTypes.bool,
+        isActive: PropTypes.bool,
+        isPledged: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
@@ -118,6 +127,8 @@ class NewCollectivePage extends React.Component {
           </Container>
         </Page>
       );
+    } else if (data.Collective.isPledged && !data.Collective.isActive) {
+      return <PledgedCollectivePage collective={data.Collective} />;
     }
 
     const collective = data.Collective;
@@ -174,6 +185,8 @@ const getCollective = graphql(
         type
         currency
         settings
+        isActive
+        isPledged
         isApproved
         isArchived
         isHost
