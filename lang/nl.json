@@ -338,7 +338,7 @@
   "ContributeCard.ReadMore": "Lees meer",
   "ContributeCard.SeeCollective": "View collective",
   "ContributedAmount": "Bijgedragen {amount}",
-  "ContributeDetails.faq.frequency.content": "Je zal vandaag vandaag kosten aangerekend krijgen en dan op de 1ste van elke maand (voor maandelijkse bijdragen) of de 1ste van dezelfde maand van volgend jaar (voor jaarlijkse bijdragen). Let op: je kan twee keer kosten aangerekend krijgen in een korte tijd als je een maandelijkse bijdrage opstelt dicht bij het einde van de maand.",
+  "ContributeDetails.faq.frequency.content": "You will be charged today, and then on the 1st of each month (for monthly contributions) or the 1st of the same month next year (for yearly contributions). Note: To prevent you from being charged twice in a short time frame, if you contribute after the 15th of a given month, the next charge will not be the 1st of next month but the month after.",
   "ContributeDetails.faq.frequency.title": "Wanneer ontvang ik de volgende rekening?",
   "ContributeDetails.faq.isIncognito.content": "Als je kiest om \"incognito\" bij te dragen, je financiële bijdrage zal publiekelijk verschijnen als een incognito donatie en het zal niet verwijzen naar je publiek profiel. Niettemin, in de poging om transparant en conform met de KYC regelgeving (Know Your Customer), de fiscaal beheerder en de administrators van het collectief kunnen een lijst oproepen van alle financiële bijdragers met hun persoonlijke informatie.",
   "ContributeDetails.faq.isIncognito.title": "Wat is een incognito bijdrage?",
