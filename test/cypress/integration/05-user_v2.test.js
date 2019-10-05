@@ -18,13 +18,16 @@ describe('New users profiles', () => {
         .contains('amount contributed');
       cy.get('[data-cy=amount-contributed]')
         .first()
-        .contains('$642');
+        .contains('€267');
     });
 
     it('Can load more', () => {
-      cy.get('[data-cy=collective-contribution]').should('have.length', 16);
-      cy.get('button[data-cy=load-more]').click({ force: true });
-      cy.get('[data-cy=collective-contribution]').should('have.length.gt', 16);
+      cy.get('[data-cy=collective-contribution]').should('have.length', 13);
+      // when the collective has more than 16 contributions
+      // check for load more button
+      // cy.get('[data-cy=collective-contribution]').should('have.length', 16);
+      // cy.get('button[data-cy=load-more]').click({ force: true });
+      // cy.get('[data-cy=collective-contribution]').should('have.length.gt', 16);
     });
 
     it('Can filter by contribution type (admin, financial...etc)', () => {
@@ -68,16 +71,16 @@ describe('New users profiles', () => {
       cy.get('[data-type=transactions]')
         .first()
         .get('[data-cy=transaction-details] > a')
-        .should('have.attr', 'href', '/xr-namur')
-        .contains('Extinction Rebellion Namur');
+        .should('have.attr', 'href', '/brusselstogether')
+        .contains('BrusselsTogether');
       cy.get('[data-type=transactions]')
         .first()
         .get('[data-cy=transaction-description]')
-        .contains('Monthly donation to Extinction Rebellion Namur (Rebel)');
+        .contains('monthly recurring subscription');
       cy.get('[data-type=transactions]')
         .first()
         .get('[data-cy=transaction-details] > span[data-cy=transaction-date]')
-        .contains('07/01/2019');
+        .contains('11/30/2017');
       cy.get('[data-type=transactions]')
         .first()
         .get('[data-cy=transaction-amount] > span')
@@ -87,7 +90,7 @@ describe('New users profiles', () => {
         .first()
         .get('[data-cy=transaction-amount] > span')
         .eq(1)
-        .contains('€5.00');
+        .contains('€10.00');
       cy.get('[data-type=transactions]')
         .first()
         .get('[data-cy=transaction-amount] > span')
