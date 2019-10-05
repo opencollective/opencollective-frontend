@@ -78,7 +78,7 @@ class EditPaymentMethods extends React.Component {
     set(CollectiveInputType, 'settings.paymentMethods.manual.instructions', this.state.bankDetails.instructions);
     this.setState({ submitting: true });
     try {
-      const res = await this.props.editCollective(CollectiveInputType);
+      await this.props.editCollective(CollectiveInputType);
       this.handleSuccess();
     } catch (e) {
       console.error('>>> EditPaymentMethods > error to save collective', e);
