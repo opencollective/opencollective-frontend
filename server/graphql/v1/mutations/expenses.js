@@ -382,7 +382,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
   }
 
   if (expense.payoutMethod !== 'other') {
-    throw new errors.Unauthorized('Only expense with other payout method can be marked unpaid');
+    throw new errors.Unauthorized('Only expenses with "other" payout method can be marked as unpaid');
   }
 
   const transaction = await models.Transaction.findOne({
