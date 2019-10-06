@@ -19,10 +19,10 @@ const debug = debugLib('expenses');
  * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
  */
 function canUpdateExpenseStatus(remoteUser, expense) {
-  if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.CollectiveId)) {
+  if (remoteUser.hasRole([roles.ADMIN], expense.CollectiveId)) {
     return true;
   }
-  if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.collective.HostCollectiveId)) {
+  if (remoteUser.hasRole([roles.ADMIN], expense.collective.HostCollectiveId)) {
     return true;
   }
   return false;

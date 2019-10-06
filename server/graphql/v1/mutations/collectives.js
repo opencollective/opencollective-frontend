@@ -54,7 +54,7 @@ export async function createCollective(_, args, req) {
     parentCollective = await req.loaders.collective.findById.load(args.collective.ParentCollectiveId);
     if (!parentCollective) {
       return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
-    } else if (!req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
+    } else if (!req.remoteUser.hasRole([roles.ADMIN, roles.MEMBER], parentCollective.id)) {
       throw new errors.Unauthorized({
         message: `You must be logged in as a member of the ${parentCollective.slug} collective to create an event`,
       });
