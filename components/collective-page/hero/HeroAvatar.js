@@ -113,7 +113,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
         >
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
-              <input {...getInputProps()} />
+              <input data-cy="heroAvatarDropzone" {...getInputProps()} />
               <EditableAvatarContainer isDragActive={isDragActive}>
                 <EditOverlay borderRadius={borderRadius}>
                   {!isDragActive && (
@@ -182,6 +182,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                 <FormattedMessage id="form.cancel" defaultMessage="cancel" />
               </StyledButton>
               <StyledButton
+                data-cy="heroAvatarDropzoneSave"
                 textTransform="capitalize"
                 buttonStyle="primary"
                 ml={3}

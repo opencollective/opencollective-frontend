@@ -122,21 +122,36 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
           <Flex my={2}>
             {collective.twitterHandle && (
-              <ExternalLink href={twitterProfileUrl(collective.twitterHandle)} title="Twitter" openInNewTab>
+              <ExternalLink
+                data-cy="twitterProfileUrl"
+                href={twitterProfileUrl(collective.twitterHandle)}
+                title="Twitter"
+                openInNewTab
+              >
                 <StyledRoundButton size={32} mr={3}>
                   <Twitter size={12} />
                 </StyledRoundButton>
               </ExternalLink>
             )}
             {collective.githubHandle && (
-              <ExternalLink href={githubProfileUrl(collective.githubHandle)} title="Github" openInNewTab>
+              <ExternalLink
+                data-cy="githubProfileUrl"
+                href={githubProfileUrl(collective.githubHandle)}
+                title="Github"
+                openInNewTab
+              >
                 <StyledRoundButton size={32} mr={3}>
                   <Github size={12} />
                 </StyledRoundButton>
               </ExternalLink>
             )}
             {collective.website && (
-              <ExternalLink href={collective.website} title={intl.formatMessage(Translations.website)} openInNewTab>
+              <ExternalLink
+                data-cy="collectiveWebsite"
+                href={collective.website}
+                title={intl.formatMessage(Translations.website)}
+                openInNewTab
+              >
                 <StyledRoundButton size={32} mr={3}>
                   <Globe size={14} />
                 </StyledRoundButton>
@@ -152,7 +167,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
                   hostName: (
                     <LinkCollective collective={host}>
-                      <Span color="black.600">{host.name}</Span>
+                      <Span data-cy="fiscalHostName" color="black.600">
+                        {host.name}
+                      </Span>
                     </LinkCollective>
                   ),
                 }}
