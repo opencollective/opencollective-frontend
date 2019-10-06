@@ -16,7 +16,7 @@ import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import MessageBox from '../components/MessageBox';
 import StyledSelect from '../components/StyledSelect';
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import SearchForm from '../components/SearchForm';
 
 const DiscoverPageDataQuery = gql`
@@ -199,7 +199,7 @@ const DiscoverPage = ({ router, intl }) => {
                   <Flex width={[1, 0.8]} my={3}>
                     <NavList as="ul" p={0} justifyContent="space-between" width={1} css={{ maxWidth: 650 }}>
                       <NavLinkContainer>
-                        <Link route="discover" params={{ show: 'all', sort: query.sort }}>
+                        <NextLink route="discover" params={{ show: 'all', sort: query.sort }}>
                           <NavLink
                             className={
                               query.show == 'all' || query.show == '' || query.show == undefined ? 'selected' : ''
@@ -207,31 +207,31 @@ const DiscoverPage = ({ router, intl }) => {
                           >
                             <FormattedMessage id="discover.allCollectives" defaultMessage="All collectives" />
                           </NavLink>
-                        </Link>
+                        </NextLink>
                       </NavLinkContainer>
                       <NavLinkContainer>
-                        <Link route="discover" params={{ show: 'open source', sort: query.sort }}>
+                        <NextLink route="discover" params={{ show: 'open source', sort: query.sort }}>
                           <NavLink className={query.show == 'open source' ? 'selected' : ''}>
                             <FormattedMessage
                               id="discover.openSourceCollectives"
                               defaultMessage="Open source collectives"
                             />
                           </NavLink>
-                        </Link>
+                        </NextLink>
                       </NavLinkContainer>
                       <NavLinkContainer>
-                        <Link route="discover" params={{ show: 'pledged', sort: query.sort }}>
+                        <NextLink route="discover" params={{ show: 'pledged', sort: query.sort }}>
                           <NavLink className={query.show == 'pledged' ? 'selected' : ''}>
                             <FormattedMessage id="discover.pledgedCollectives" defaultMessage="Pledged collectives" />
                           </NavLink>
-                        </Link>
+                        </NextLink>
                       </NavLinkContainer>
                       <NavLinkContainer>
-                        <Link route="discover" params={{ show: 'other', sort: query.sort }}>
+                        <NextLink route="discover" params={{ show: 'other', sort: query.sort }}>
                           <NavLink className={query.show == 'other' ? 'selected' : ''}>
                             <FormattedMessage id="discover.other" defaultMessage="Other" />
                           </NavLink>
-                        </Link>
+                        </NextLink>
                       </NavLinkContainer>
                     </NavList>
                   </Flex>

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import Link from './Link';
+import InternalLink from './InternalLink';
 
 /**
  * `Contributor` type is meant to surface all types of contributors, even the one that
@@ -16,9 +16,9 @@ const LinkContributor = ({ contributor, children }) => {
     return children || <FormattedMessage id="profile.incognito" defaultMessge="Incognito" />;
   } else if (contributor.collectiveSlug) {
     return (
-      <Link route="collective" params={{ slug: contributor.collectiveSlug }}>
+      <InternalLink route="collective" params={{ slug: contributor.collectiveSlug }}>
         {children || contributor.name}
-      </Link>
+      </InternalLink>
     );
   } else {
     return children || <span>{contributor.name}</span>;

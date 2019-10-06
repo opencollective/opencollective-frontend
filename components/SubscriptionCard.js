@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
 import { getStripe } from '../lib/stripe';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
@@ -501,9 +501,9 @@ class SubscriptionCard extends React.Component {
         </div>
 
         <div className="body">
-          <Link route={'collective'} params={{ slug: collective.slug }}>
+          <InternalLink route={'collective'} params={{ slug: collective.slug }}>
             <div className="name">{collective.name}</div>
-          </Link>
+          </InternalLink>
           <div className="description">{description}</div>
         </div>
 

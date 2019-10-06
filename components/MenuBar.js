@@ -13,7 +13,8 @@ import { withUser } from './UserProvider';
 
 import Avatar from './Avatar';
 import Logo from './Logo';
-import Link from './Link';
+import InternalLink from './InternalLink';
+import AnchorLink from './AnchorLink';
 import Button from './Button';
 import AddFundsModal from './AddFundsModal';
 
@@ -225,9 +226,9 @@ class MenuBar extends React.Component {
     const stickyCTA = get(this.props, 'cta.props.sticky', true);
     if (get(cta, 'label')) {
       cta = (
-        <Link route={cta.href} animate={{ offset }}>
+        <InternalLink route={cta.href} animate={{ offset }}>
           <Button className="blue">{cta.label}</Button>
-        </Link>
+        </InternalLink>
       );
     }
 
@@ -333,34 +334,34 @@ class MenuBar extends React.Component {
             className={`item ${item.anchor} ${this.state.selectedAnchor === item.anchor && 'selected'}`}
             key={/* eslint-disable-line react/no-array-index-key */ `item-${index}-${item.link}`}
           >
-            <Link route={item.link} animate={{ offset }}>
+            <AnchorLink to={`#${item.anchor}`} animate={{ offset }}>
               {this.messages[item.anchor] ? intl.formatMessage(this.messages[item.anchor]) : item.title || item.anchor}
-            </Link>
+            </AnchorLink>
           </div>
         ))}
         {LoggedInUser && LoggedInUser.canEditCollective(collective) && (
           <div className="admin">
             {['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1 && (
               <div className="item transactions">
-                <Link route={`${collective.path}/transactions`}>
+                <InternalLink route={`${collective.path}/transactions`}>
                   <FormattedMessage id="menu.transactions" defaultMessage="transactions" />
-                </Link>
+                </InternalLink>
               </div>
             )}
             {collective.type !== 'EVENT' && (
               <div className="item">
-                <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
+                <InternalLink route="subscriptions" params={{ collectiveSlug: collective.slug }}>
                   <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
-                </Link>
+                </InternalLink>
               </div>
             )}
             <div className="separator" />
             {!collective.isIncognito && (
               <div className="item editCollective">
-                <Link route={`${collective.path}/edit`}>
+                <InternalLink route={`${collective.path}/edit`}>
                   <PencilIcon size="1.75em" />
                   {intl.formatMessage(this.messages[`menu.edit.${collective.type.toLowerCase()}`])}
-                </Link>
+                </InternalLink>
               </div>
             )}
           </div>
@@ -478,12 +479,12 @@ class MenuBar extends React.Component {
                   <div className="row1">
                     <div className="pullRight">{this.renderButtons()}</div>
                     <div className="logo">
-                      <Link route={logoLink} key={logoLink}>
+                      <InternalLink route={logoLink} key={logoLink}>
                         {collective.type === 'USER' && (
                           <Avatar collective={collective} className="logo" radius="4.8rem" />
                         )}
                         {collective.type !== 'USER' && <Logo collective={collective} className="logo" height="48" />}
-                      </Link>
+                      </InternalLink>
                     </div>
                   </div>
                 </div>
@@ -498,10 +499,10 @@ class MenuBar extends React.Component {
               <div className="content">
                 <div className="pullRight">{this.renderButtons()}</div>
                 <div className="logo">
-                  <Link route={logoLink} key={logoLink}>
+                  <InternalLink route={logoLink} key={logoLink}>
                     {collective.type === 'USER' && <Avatar collective={collective} className="logo" radius="6.4rem" />}
                     {collective.type !== 'USER' && <Logo collective={collective} className="logo" height="64" />}
-                  </Link>
+                  </InternalLink>
                 </div>
                 <div className="pullLeft menu">{this.renderMenu()}</div>
               </div>

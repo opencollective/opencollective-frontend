@@ -7,7 +7,7 @@ import { pick } from 'lodash';
 import * as api from '../lib/api';
 import { Router } from '../server/pages';
 
-import Link from './Link';
+import InternalLink from './InternalLink';
 import SignIn from './SignIn';
 import CreateProfile from './CreateProfile';
 import CreateProfileFAQ from './faqs/CreateProfileFAQ';
@@ -150,8 +150,8 @@ class SignInOrJoinFree extends React.Component {
                 id="SignIn.legal"
                 defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
                 values={{
-                  'tos-link': msg => <Link route="/tos">{msg}</Link>,
-                  'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
+                  'tos-link': msg => <InternalLink route="/tos">{msg}</InternalLink>,
+                  'privacy-policy-link': msg => <InternalLink route="/privacypolicy">{msg}</InternalLink>,
                 }}
               />
             </P>

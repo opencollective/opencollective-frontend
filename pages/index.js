@@ -12,7 +12,7 @@ import { Linkedin } from 'styled-icons/fa-brands/Linkedin';
 import { pickAvatar } from '../lib/collective.lib';
 import { getBaseApiUrl, imagePreview } from '../lib/utils';
 
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -88,7 +88,7 @@ const socialButtonStyles = {
 };
 
 const BackerAvatar = ({ slug, image, stats: { totalAmountSpent } }) => (
-  <Link route={`/${slug}`} passHref>
+  <NextLink route={`/${slug}`} passHref>
     <a>
       <Container
         backgroundImage={`url(${imagePreview(image, pickAvatar(), {
@@ -109,7 +109,7 @@ const BackerAvatar = ({ slug, image, stats: { totalAmountSpent } }) => (
         minWidth={[30, null, 50]}
       />
     </a>
-  </Link>
+  </NextLink>
 );
 
 BackerAvatar.propTypes = {
@@ -303,11 +303,11 @@ class HomePage extends React.Component {
                     <FormattedMessage id="home.join" defaultMessage="Join the movement" />
                   </StyledLink>
 
-                  <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                  <NextLink route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
                     <StyledLink href="/how-it-works" mt={[3, null, 0]} ml={[0, null, 3]}>
                       <FormattedMessage id="home.howItWorks" defaultMessage="How it works" /> &gt;
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 </Flex>
               </Container>
 
@@ -453,7 +453,7 @@ class HomePage extends React.Component {
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
-                  <Link route="/create" passHref>
+                  <NextLink route="/create" passHref>
                     <StyledLink
                       buttonStyle="primary"
                       buttonSize="large"
@@ -463,7 +463,7 @@ class HomePage extends React.Component {
                     >
                       <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 </Flex>
               </Container>
 
@@ -513,7 +513,7 @@ class HomePage extends React.Component {
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
-                  <Link route="marketing" params={{ pageSlug: 'become-a-sponsor' }} passHref>
+                  <NextLink route="marketing" params={{ pageSlug: 'become-a-sponsor' }} passHref>
                     <StyledLink
                       buttonStyle="primary"
                       buttonSize="large"
@@ -523,7 +523,7 @@ class HomePage extends React.Component {
                     >
                       <FormattedMessage id="home.sponsor" defaultMessage="Become a sponsor" />
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 </Flex>
               </Container>
               <Container
@@ -718,7 +718,7 @@ class HomePage extends React.Component {
                 </P>
 
                 <Flex mx={['auto', null, 4]} my={4} justifyContent={['center', null, 'flex-start']}>
-                  <Link route="/hosts" passHref>
+                  <NextLink route="/hosts" passHref>
                     <StyledLink
                       buttonStyle="primary"
                       buttonSize="large"
@@ -728,7 +728,7 @@ class HomePage extends React.Component {
                     >
                       <FormattedMessage id="home.becomeHost" defaultMessage="Become a fiscal host" />
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 </Flex>
               </Container>
               <Container width={[1, null, 0.5]} textAlign="center" px={4} maxWidth={600} mt={[5, null, 0]}>
@@ -752,11 +752,11 @@ class HomePage extends React.Component {
                       <FormattedNumber value={totalHosts} />
                     </P>
                     <P>
-                      <Link route="hosts" passHref>
+                      <NextLink route="hosts" passHref>
                         <a>
                           <FormattedMessage id="home.hosts" defaultMessage="hosts" />
                         </a>
-                      </Link>
+                      </NextLink>
                     </P>
                   </Container>
                   <Container {...statsContainerStyles}>

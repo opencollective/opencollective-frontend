@@ -23,7 +23,7 @@ import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
 import EditWebhooks from './EditWebhooks';
 import ExportData from './ExportData';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from './CreateVirtualCardsForm';
@@ -38,7 +38,7 @@ const selectedStyle = css`
   color: black;
 `;
 
-const MenuItem = styled(Link)`
+const MenuItem = styled(InternalLink)`
   display: block;
   border-radius: 5px;
   padding: 5px 10px;
@@ -858,12 +858,12 @@ class EditCollectiveForm extends React.Component {
               {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
                 <Flex flexDirection="column">
                   <Box mb="3em">
-                    <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
+                    <InternalLink route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
                       <StyledButton>
                         <ArrowBack size="1em" />{' '}
                         <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                       </StyledButton>
-                    </Link>
+                    </InternalLink>
                   </Box>
                   <CreateVirtualCardsForm
                     collectiveId={collective.id}
@@ -900,13 +900,13 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </Button>
                 <div className="backToProfile">
-                  <Link route="collective" params={{ slug: collective.slug }}>
+                  <InternalLink route="collective" params={{ slug: collective.slug }}>
                     <FormattedMessage
                       id="collective.edit.backToProfile"
                       defaultMessage="view {type} page"
                       values={{ type }}
                     />
-                  </Link>
+                  </InternalLink>
                 </div>
               </div>
             )}

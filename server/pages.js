@@ -161,6 +161,7 @@ if (process.env.NCP_IS_DEFAULT === 'true') {
   pages.add('collective', '/:slug');
 }
 
+delete Object.assign(pages, { ['NextLink']: pages['Link'] })['Link']; // replace Link with NextLink
 export default pages;
 
-export const { Link, Router } = pages;
+export const { NextLink, Router } = pages;

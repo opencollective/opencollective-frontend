@@ -23,7 +23,7 @@ import StyledInputGroup from '../components/StyledInputGroup';
 import { Box, Flex } from '@rebass/grid';
 import Container from '../components/Container';
 import ButtonGroup from '../components/ButtonGroup';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 import StyledLink from '../components/StyledLink';
 import Currency from '../components/Currency';
 
@@ -320,9 +320,9 @@ class CreatePledgePage extends React.Component {
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
                     values={{
                       'signin-link': msg => (
-                        <Link route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
+                        <InternalLink route="signin" params={{ next: slug ? `/${slug}/pledges/new` : '/pledges/new' }}>
                           {msg}
-                        </Link>
+                        </InternalLink>
                       ),
                     }}
                   />
@@ -521,7 +521,7 @@ class CreatePledgePage extends React.Component {
                       .filter(({ fromCollective }) => fromCollective.type === 'USER')
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <InternalLink route="collective" params={{ slug: fromCollective.slug }}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,
@@ -537,7 +537,7 @@ class CreatePledgePage extends React.Component {
                               height={40}
                               width={40}
                             />
-                          </Link>
+                          </InternalLink>
                         </Box>
                       ))}
                   </Flex>
@@ -550,7 +550,7 @@ class CreatePledgePage extends React.Component {
                       )
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
-                          <Link route="collective" params={{ slug: fromCollective.slug }}>
+                          <InternalLink route="collective" params={{ slug: fromCollective.slug }}>
                             <Container
                               backgroundImage={`url(${imagePreview(
                                 fromCollective.image,
@@ -566,7 +566,7 @@ class CreatePledgePage extends React.Component {
                               height={40}
                               width={40}
                             />
-                          </Link>
+                          </InternalLink>
                         </Box>
                       ))}
                   </Flex>

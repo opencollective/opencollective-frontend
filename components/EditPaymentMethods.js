@@ -11,7 +11,7 @@ import { compose, getErrorFromGraphqlException } from '../lib/utils';
 import { paymentMethodLabel } from '../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { H3, Span } from './Text';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import Loading from './Loading';
 import EditPaymentMethod from './EditPaymentMethod';
 import StyledButton from './StyledButton';
@@ -162,14 +162,14 @@ class EditPaymentMethods extends React.Component {
             id="errors.PM.Remove.HasActiveSubscriptions"
             defaultMessage="This payment method cannot be removed because it has active recurring financial contributions."
           />{' '}
-          <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
+          <InternalLink route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
             <Span textTransform="capitalize">
               <FormattedMessage
                 id="paymentMethod.editSubscriptions"
                 defaultMessage="edit recurring financial contributions"
               />
             </Span>
-          </Link>
+          </InternalLink>
         </React.Fragment>
       );
     } else {

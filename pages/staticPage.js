@@ -6,7 +6,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 
 import staticPages from '../static/staticPages';
 import { withUser } from '../components/UserProvider';
@@ -116,7 +116,7 @@ class StaticPage extends React.Component {
           <div className="content">
             {path && pageSlug && (
               <div className="path">
-                <Link route={`/${path}`}>{path}</Link>
+                <InternalLink route={`/${path}`}>{path}</InternalLink>
               </div>
             )}
             <div dangerouslySetInnerHTML={{ __html: this.props.content }} />

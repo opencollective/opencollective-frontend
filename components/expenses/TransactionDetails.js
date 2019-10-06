@@ -5,7 +5,7 @@ import { get } from 'lodash';
 
 import { capitalize } from '../../lib/utils';
 
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import ExternalLink from '../ExternalLink';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 import RefundTransactionBtn from './RefundTransactionBtn';
@@ -240,7 +240,7 @@ class TransactionDetails extends React.Component {
             <label>
               <FormattedMessage id="transaction.host" defaultMessage="host" />
             </label>
-            <Link route={`/${host.slug}`}>{host.name}</Link> ({hostCurrency})
+            <InternalLink route={`/${host.slug}`}>{host.name}</InternalLink> ({hostCurrency})
           </div>
         )}
         {paymentMethod && (

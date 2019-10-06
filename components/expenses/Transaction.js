@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import { capitalize } from '../../lib/utils';
 
 import Avatar from '../Avatar';
@@ -152,11 +152,11 @@ class Transaction extends React.Component {
           <Flex justifyContent="space-between" alignItems="baseline">
             <div>
               {(expense && (
-                <Link route={`/${collective.slug}/expenses/${expense.id}`}>
+                <InternalLink route={`/${collective.slug}/expenses/${expense.id}`}>
                   <P fontSize="1.4rem" color="#313233" display="inline">
                     {description}
                   </P>
-                </Link>
+                </InternalLink>
               )) || (
                 <P fontSize="1.4rem" color="#313233" display="inline">
                   {description}
@@ -173,7 +173,7 @@ class Transaction extends React.Component {
             {expense && (
               <Fragment>
                 {' | '}
-                <Link
+                <InternalLink
                   route="expenses"
                   params={{
                     collectiveSlug: collective.slug,
@@ -182,7 +182,7 @@ class Transaction extends React.Component {
                   }}
                 >
                   {capitalize(expense.category)}
-                </Link>
+                </InternalLink>
               </Fragment>
             )}
             {paymentProcessorFeeInHostCurrency !== undefined && (

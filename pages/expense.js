@@ -11,7 +11,7 @@ import CollectiveCover from '../components/CollectiveCover';
 import { Box, Flex } from '@rebass/grid';
 import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 import ErrorPage from '../components/ErrorPage';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
@@ -86,16 +86,16 @@ class ExpensePage extends React.Component {
 
           <Box maxWidth={1200} m="0 auto" px={[1, 3, 4]} py={[2, 3]}>
             <Flex flexWrap="wrap" mb={4} justifyContent={['center', 'left']}>
-              <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
+              <InternalLink route="expenses" params={{ collectiveSlug: collective.slug }}>
                 <StyledButton my={1} data-cy="viewAllExpenses">
                   ← <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                 </StyledButton>
-              </Link>
-              <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+              </InternalLink>
+              <InternalLink route="createExpense" params={{ collectiveSlug: collective.slug }}>
                 <StyledButton my={1} mx={3}>
                   <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                 </StyledButton>
-              </Link>
+              </InternalLink>
             </Flex>
 
             <hr />

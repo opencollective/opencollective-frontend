@@ -8,7 +8,7 @@ import styled, { withTheme } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
 import GiftCard from './icons/GiftCard';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import Avatar from './Avatar';
 import { formatCurrency } from '../lib/utils';
 
@@ -28,9 +28,9 @@ const VirtualCardStatus = ({ isConfirmed, collective, data }) => {
         defaultMessage="claimed by {user}"
         values={{
           user: (
-            <Link route="collective" params={{ slug: collective.slug }}>
+            <InternalLink route="collective" params={{ slug: collective.slug }}>
               {collective.name}
-            </Link>
+            </InternalLink>
           ),
         }}
       />
@@ -99,9 +99,9 @@ class VirtualCardDetails extends React.Component {
             <DetailsColumnHeader>
               <FormattedMessage id="virtualCards.redeemCode" defaultMessage="REDEEM CODE" />
             </DetailsColumnHeader>
-            <Link route="redeem" params={linkParams}>
+            <InternalLink route="redeem" params={linkParams}>
               {redeemCode}
-            </Link>
+            </InternalLink>
           </Flex>
         )}
         <Flex flexDirection="column" mr="2em">
@@ -142,10 +142,10 @@ class VirtualCardDetails extends React.Component {
         {/* Avatar column */}
         <Box mr="20px">
           {isConfirmed ? (
-            <Link route="collective" params={{ slug: collective.slug }} title={collective.name} passHref>
+            <InternalLink route="collective" params={{ slug: collective.slug }} title={collective.name} passHref>
               <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
               <Avatar collective={collective} radius={24} mt="-1em" ml="1em" css={{ position: 'absolute' }} />
-            </Link>
+            </InternalLink>
           ) : (
             <GiftCard alignSelf="center" size="2.5em" color={this.getStatusColor(isConfirmed, balance)} />
           )}

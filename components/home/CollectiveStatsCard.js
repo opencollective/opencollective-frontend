@@ -10,7 +10,7 @@ import { imagePreview, getCollectiveImage } from '../../lib/utils';
 import { Flex } from '@rebass/grid';
 import Container from '../Container';
 import { P, Span } from '../Text';
-import { Link } from '../../server/pages';
+import { NextLink } from '../../server/pages';
 import StyledLink from '../StyledLink';
 import Currency from '../Currency';
 
@@ -60,7 +60,7 @@ const CollectiveStatsCard = ({
         top={10}
         left={0}
       >
-        <Link route={`/${slug}`} passHref>
+        <NextLink route={`/${slug}`} passHref>
           <a>
             <Container
               bg="#2877ED"
@@ -77,14 +77,14 @@ const CollectiveStatsCard = ({
               }}
             />
           </a>
-        </Link>
+        </NextLink>
       </Container>
     </Container>
 
     <P fontSize="1.4rem" textAlign="center" fontWeight="bold" mt={3}>
-      <Link route={`/${slug}`} passHref>
+      <NextLink route={`/${slug}`} passHref>
         <StyledLink color="#2E3033">{name}</StyledLink>
-      </Link>
+      </NextLink>
     </P>
 
     <P fontSize="1.2rem" textAlign="center" p={2}>
@@ -156,11 +156,11 @@ const CollectiveStatsCard = ({
           )}
         </React.Fragment>
       ) : (
-        <Link route={`/${slug}/contribute`} passHref>
+        <NextLink route={`/${slug}/contribute`} passHref>
           <StyledLink fontSize="1.2rem" width="100%" textAlign="center">
             <FormattedMessage id="collectiveStats.beFirstContribute" defaultMessage="Be the first to contribute!" />
           </StyledLink>
-        </Link>
+        </NextLink>
       )}
     </Container>
   </Container>

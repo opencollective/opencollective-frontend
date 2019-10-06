@@ -4,11 +4,11 @@ import styled from 'styled-components';
 import { Box } from '@rebass/grid';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import Link from './Link';
+import InternalLink from './InternalLink';
 import Container from './Container';
 import { H2 } from './Text';
 
-const LinkAction = styled(Link)`
+const LinkAction = styled(InternalLink)`
   text-align: center;
   color: #090a0a;
 `;
