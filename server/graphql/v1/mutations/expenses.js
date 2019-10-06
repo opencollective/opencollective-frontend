@@ -374,7 +374,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
   }
 
   if (!canMarkExpenseUnpaid(remoteUser, expense)) {
-    throw new errors.Unauthorized("You don't have permission to mark this expense unpaid");
+    throw new errors.Unauthorized("You don't have permission to mark this expense as unpaid");
   }
 
   if (expense.status !== statuses.PAID) {
