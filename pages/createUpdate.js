@@ -20,7 +20,7 @@ import EditUpdateForm from '../components/EditUpdateForm';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import MessageBox from '../components/MessageBox';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -112,14 +112,14 @@ class CreateUpdatePage extends React.Component {
           />
           <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
             <BackButtonWrapper>
-              <Link href={`/${collective.slug}/updates`}>
+              <InternalLink href={`/${collective.slug}/updates`}>
                 <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
                   <ArrowBack size={18} />
                   <Box as="span" mx={2}>
                     Back
                   </Box>
                 </Container>
-              </Link>
+              </InternalLink>
             </BackButtonWrapper>
             <Container width={1}>
               {!canCreateUpdate && (

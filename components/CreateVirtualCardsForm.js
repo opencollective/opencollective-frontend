@@ -18,7 +18,7 @@ import StyledInputAmount from './StyledInputAmount';
 import StyledButton from './StyledButton';
 import PaymentMethodSelect from './PaymentMethodSelect';
 import Loading from './Loading';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import { H3 } from './Text';
 import StyledInput from './StyledInput';
@@ -260,14 +260,14 @@ class CreateVirtualCardsForm extends Component {
   renderNoPaymentMethodMessage() {
     return (
       <Flex justifyContent="center">
-        <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'payment-methods' }}>
+        <InternalLink route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'payment-methods' }}>
           <StyledButton buttonSize="large" mt="2em" justifyContent="center">
             <FormattedMessage
               id="virtualCards.create.requirePM"
               defaultMessage="You must add a payment method to your account to create gift cards"
             />
           </StyledButton>
-        </Link>
+        </InternalLink>
       </Flex>
     );
   }
@@ -410,9 +410,9 @@ class CreateVirtualCardsForm extends Component {
                 defaultMessage="Limit to collectives hosted by the {openSourceCollectiveLink}"
                 values={{
                   openSourceCollectiveLink: (
-                    <Link route="collective" params={{ slug: 'opensource' }}>
+                    <InternalLink route="collective" params={{ slug: 'opensource' }}>
                       Open Source Collective 501c6 (Non Profit)
-                    </Link>
+                    </InternalLink>
                   ),
                 }}
               />

@@ -10,7 +10,7 @@ import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
 import NotificationBar from './NotificationBar';
 import MembersWithData from './MembersWithData';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import TierCard from './TierCard';
 import CollectivesWithData from './CollectivesWithData';
 import SectionTitle from './SectionTitle';
@@ -279,12 +279,15 @@ class Collective extends React.Component {
                         <TierCard key={`TierCard-${tier.slug}`} collective={collective} tier={tier} />
                       ))}
                       <div className="CustomDonationTierCard">
-                        <Link route="orderCollective" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
+                        <InternalLink
+                          route="orderCollective"
+                          params={{ collectiveSlug: collective.slug, verb: 'donate' }}
+                        >
                           <FormattedMessage
                             id="collective.tiers.donate"
                             defaultMessage="Or make a custom financial contribution"
                           />
-                        </Link>
+                        </InternalLink>
                       </div>
                     </div>
                   )}

@@ -11,7 +11,7 @@ import { URLSearchParams } from 'universal-url';
 import { compose, getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
-import { Router, Link } from '../server/pages';
+import { Router, NextLink } from '../server/pages';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -330,11 +330,11 @@ class ClaimCollectivePage extends React.Component {
                   )}
                 </Container>
 
-                <Link route="collective" params={{ slug }} passHref>
+                <NextLink route="collective" params={{ slug }} passHref>
                   <StyledLink fontSize="Caption" mt={5} textAlign="center">
                     &larr; Back to the collective page
                   </StyledLink>
-                </Link>
+                </NextLink>
               </Container>
             </Container>
           )}

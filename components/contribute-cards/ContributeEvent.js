@@ -10,7 +10,7 @@ import { Clock } from 'styled-icons/feather/Clock';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { canOrderTicketsFromEvent } from '../../lib/events';
 import { Span } from '../Text';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import Contribute from './Contribute';
 import Container from '../Container';
 
@@ -53,11 +53,11 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <Link route="event" params={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}>
+        <InternalLink route="event" params={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>
-        </Link>
+        </InternalLink>
       )}
     </Contribute>
   );

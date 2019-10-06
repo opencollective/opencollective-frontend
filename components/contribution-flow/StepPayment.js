@@ -11,7 +11,7 @@ import { ExchangeAlt } from 'styled-icons/fa-solid/ExchangeAlt';
 
 import { withStripeLoader } from '../StripeProvider';
 import Container from '../Container';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import { P } from '../Text';
 import StyledCard from '../StyledCard';
 import MessageBox from '../MessageBox';
@@ -256,9 +256,9 @@ class StepPayment extends React.Component {
             defaultMessage="The balance of this collective is too low to make orders from it. Add funds to {collectiveName} by making a donation to it first."
             values={{
               collectiveName: (
-                <Link route="orderCollectiveNew" params={{ collectiveSlug: slug, verb: 'donate' }}>
+                <InternalLink route="orderCollectiveNew" params={{ collectiveSlug: slug, verb: 'donate' }}>
                   {name}
-                </Link>
+                </InternalLink>
               ),
             }}
           />

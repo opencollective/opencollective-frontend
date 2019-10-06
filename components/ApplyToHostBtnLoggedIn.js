@@ -8,7 +8,7 @@ import { get, truncate } from 'lodash';
 
 import { compose } from '../lib/utils';
 
-import Link from './Link';
+import InternalLink from './InternalLink';
 import { P } from './Text';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 import StyledCheckbox from './StyledCheckbox';
@@ -90,11 +90,11 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       <Fragment>
         <div className="ApplyToHostBtnLoggedIn">
           {!this.inactiveCollective && (
-            <Link route={`/${host.slug}/apply`}>
+            <InternalLink route={`/${host.slug}/apply`}>
               <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} data-cy="host-apply-btn">
                 <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
               </StyledButton>
-            </Link>
+            </InternalLink>
           )}
           {this.inactiveCollective &&
             (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) && (
@@ -116,7 +116,9 @@ class ApplyToHostBtnLoggedIn extends React.Component {
               id="host.apply.pending"
               defaultMessage="Application pending for {collective}"
               values={{
-                collective: <Link route={`/${this.inactiveCollective.slug}`}>{this.inactiveCollective.name}</Link>,
+                collective: (
+                  <InternalLink route={`/${this.inactiveCollective.slug}`}>{this.inactiveCollective.name}</InternalLink>
+                ),
               }}
             />
           )}

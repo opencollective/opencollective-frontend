@@ -8,7 +8,7 @@ import { Question } from 'styled-icons/fa-solid/Question';
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
 import StyledTooltip from './StyledTooltip';
 import { withUser } from './UserProvider';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import StyledButton from './StyledButton';
 
 const IconQuestion = styled(Question).attrs({ size: 18 })`
@@ -54,11 +54,11 @@ class ApplyToHostBtn extends React.Component {
           `}
         </style>
         {!LoggedInUser && (
-          <Link route={`/${host.slug}/apply`}>
+          <InternalLink route={`/${host.slug}/apply`}>
             <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} data-cy="host-apply-btn">
               <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
             </StyledButton>
-          </Link>
+          </InternalLink>
         )}
         {LoggedInUser && (
           <ApplyToHostBtnLoggedIn

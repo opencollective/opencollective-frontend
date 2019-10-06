@@ -4,7 +4,7 @@ import { defineMessages, FormattedMessage, FormattedDate, injectIntl } from 'rea
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Avatar from './Avatar';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import SmallButton from './SmallButton';
 import { pick } from 'lodash';
 import InputField from './InputField';
@@ -149,14 +149,14 @@ class Comment extends React.Component {
           `}
         </style>
         <div className="fromCollective">
-          <Link
+          <InternalLink
             route="collective"
             params={{ slug: comment.fromCollective.slug }}
             title={comment.fromCollective.name}
             passHref
           >
             <Avatar collective={comment.fromCollective} key={comment.fromCollective.id} radius={40} />
-          </Link>
+          </InternalLink>
         </div>
         <div className="body">
           <div className="header">
@@ -166,7 +166,7 @@ class Comment extends React.Component {
               </span>{' '}
               |&nbsp;
               <span className="metaItem">
-                <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
+                <InternalLink route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</InternalLink>
               </span>
               {editable && LoggedInUser && LoggedInUser.canEditComment(comment) && (
                 <span>

@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import Link from './Link';
+import AnchorLink from './AnchorLink';
 import LinkCollective from './LinkCollective';
 import { formatCurrency } from '../lib/utils';
 import { get } from 'lodash';
@@ -172,9 +172,9 @@ class TopBackersCoverWithData extends React.Component {
           {members.map(this.renderMember)}
           {additionalBackers > 0 && (
             <div className="backer stats">
-              <Link route="#contributors">
+              <AnchorLink to="#contributors">
                 <div className="totalBackersStat">+{additionalBackers}</div>
-              </Link>
+              </AnchorLink>
             </div>
           )}
         </div>

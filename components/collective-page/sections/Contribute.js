@@ -8,7 +8,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
-import Link from '../../Link';
+import InternalLink from '../../InternalLink';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
@@ -216,11 +216,11 @@ class SectionContribute extends React.PureComponent {
           </HorizontalScroller>
         )}
         <ContainerSectionContent>
-          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+          <InternalLink route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
             <StyledButton buttonSize="large" mt={3} width={1} p="10px">
               <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
             </StyledButton>
-          </Link>
+          </InternalLink>
         </ContainerSectionContent>
         {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors

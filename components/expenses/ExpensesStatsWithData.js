@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import Currency from '../Currency';
 
 class ExpensesStatsWithData extends React.Component {
@@ -67,9 +67,9 @@ class ExpensesStatsWithData extends React.Component {
           <ol>
             {topExpenses.byCategory.map(category => (
               <li key={category.category}>
-                <Link route={`/${slug}/expenses/categories/${category.category}`} scroll={false}>
+                <InternalLink route={`/${slug}/expenses/categories/${category.category}`} scroll={false}>
                   {category.category}
-                </Link>{' '}
+                </InternalLink>{' '}
                 (
                 <Currency value={category.totalExpenses} currency={Collective.currency} />)
               </li>
@@ -83,9 +83,9 @@ class ExpensesStatsWithData extends React.Component {
           <ol>
             {topExpenses.byCollective.map(recipientCollective => (
               <li key={recipientCollective.slug}>
-                <Link route={`/${slug}/expenses/recipients/${recipientCollective.slug}`} scroll={false}>
+                <InternalLink route={`/${slug}/expenses/recipients/${recipientCollective.slug}`} scroll={false}>
                   {recipientCollective.name}
-                </Link>{' '}
+                </InternalLink>{' '}
                 (
                 <Currency value={-recipientCollective.totalExpenses} currency={Collective.currency} />)
               </li>

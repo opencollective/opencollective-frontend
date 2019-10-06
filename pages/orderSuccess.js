@@ -14,7 +14,7 @@ import orderSuccessBackgroundUrl from '../static/images/order-success-background
 
 import { tweetURL, facebooKShareURL } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 import { withUser } from '../components/UserProvider';
 import { H3, P, Span } from '../components/Text';
 import ErrorPage from '../components/ErrorPage';
@@ -252,7 +252,7 @@ class OrderSuccessPage extends React.Component {
               <Flex mt={1} flexWrap="wrap" justifyContent="center" css={{ maxWidth: 500 }}>
                 {collective.tags.map(tag => (
                   <StyledLink
-                    as={Link}
+                    as={InternalLink}
                     key={tag}
                     route="search"
                     params={{ q: tag }}

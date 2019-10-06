@@ -6,7 +6,7 @@ import { Box } from '@rebass/grid';
 import themeGet from '@styled-system/theme-get';
 
 import Currency from './Currency';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import Logo from './Logo';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
@@ -172,17 +172,17 @@ class PledgedCollectiveCard extends React.Component {
           </CollectiveDescriptionText>
           <CollectiveWebsiteText className="website">{website}</CollectiveWebsiteText>
 
-          <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
+          <InternalLink route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
             <StyledButton mt={4} width={1} buttonStyle="primary" buttonSize="small" minWidth={150}>
               <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
             </StyledButton>
-          </Link>
+          </InternalLink>
 
-          <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
+          <InternalLink route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
             <StyledButton mt={3} width={1} buttonSize="small" buttonStyle="standard">
               <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
             </StyledButton>
-          </Link>
+          </InternalLink>
         </CardBody>
         <CardFooter>
           {pledgeStats && (

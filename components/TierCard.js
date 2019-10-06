@@ -10,7 +10,7 @@ import Currency from './Currency';
 import Logo from './Logo';
 
 import colors from '../lib/constants/colors';
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import LinkCollective from './LinkCollective';
 import { formatCurrency } from '../lib/utils';
 
@@ -241,12 +241,12 @@ class TierCard extends React.Component {
           {!tier.hasLongDescription ? (
             tier.name
           ) : (
-            <Link
+            <NextLink
               route="tier"
               params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' }}
             >
               <a>{tier.name}</a>
-            </Link>
+            </NextLink>
           )}
         </div>
         {amount > 0 && (
@@ -289,14 +289,14 @@ class TierCard extends React.Component {
             </p>
           )}
           {tier.hasLongDescription && (
-            <Link
+            <NextLink
               route="tier"
               params={{ collectiveSlug: collective.slug, tierId: tier.id, tierSlug: tier.slug, verb: 'contribute' }}
             >
               <a>
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
-            </Link>
+            </NextLink>
           )}
         </div>
         {totalActiveDistinctOrders > 0 && (
@@ -318,11 +318,11 @@ class TierCard extends React.Component {
             </div>
           </div>
         )}
-        <Link route={linkRoute.name} params={linkRoute.params}>
+        <NextLink route={linkRoute.name} params={linkRoute.params}>
           <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip}>
             {tier.button ? tier.button : <FormattedMessage id="tier.contribute" defaultMessage="contribute" />}
           </a>
-        </Link>
+        </NextLink>
       </div>
     );
   }

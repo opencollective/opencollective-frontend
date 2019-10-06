@@ -4,7 +4,7 @@ import { pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import Container from './Container';
 import { P } from './Text';
 import StyledButton from './StyledButton';
@@ -47,11 +47,11 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <Link route={onSecondaryAction} passHref>
+    <NextLink route={onSecondaryAction} passHref>
       <StyledLink disabled={loading} fontSize="Paragraph" fontWeight="bold">
         {children}
       </StyledLink>
-    </Link>
+    </NextLink>
   ) : (
     <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={loading}>
       {children}

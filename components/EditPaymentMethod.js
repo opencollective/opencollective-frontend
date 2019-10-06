@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 import InputField from './InputField';
@@ -142,11 +142,11 @@ class EditPaymentMethod extends React.Component {
                 </StyledButton>
               )}
               {hasSubscriptions && (
-                <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }} passHref>
+                <NextLink route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }} passHref>
                   <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                   </StyledLink>
-                </Link>
+                </NextLink>
               )}
               {canRemove && (
                 <div className="actions">

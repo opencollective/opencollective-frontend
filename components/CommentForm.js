@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import MessageBox from './MessageBox';
 
 /**
@@ -111,14 +111,14 @@ class CommentForm extends React.Component {
         </style>
 
         <div className="fromCollective">
-          <Link
+          <InternalLink
             route="collective"
             params={{ slug: comment.fromCollective.slug }}
             title={comment.fromCollective.name}
             passHref
           >
             <Avatar collective={comment.fromCollective} key={comment.fromCollective.id} radius={40} />
-          </Link>
+          </InternalLink>
         </div>
         <div className="body">
           <div className="header">
@@ -128,7 +128,7 @@ class CommentForm extends React.Component {
               </span>{' '}
               |&nbsp;
               <span className="metaItem">
-                <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
+                <InternalLink route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</InternalLink>
               </span>
             </div>
             <div className="description">

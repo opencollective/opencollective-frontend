@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 
 import Container from './Container';
 import StyledButton from './StyledButton';
-import Link from './Link';
+import InternalLink from './InternalLink';
 
 // Dynamic imports
 const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn' */ './ApplyToHostBtn'));
@@ -32,25 +32,25 @@ const CollectiveCallsToAction = ({
         </a>
       )}
       {hasSubmitExpense && (
-        <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+        <InternalLink route="createExpense" params={{ collectiveSlug: collective.slug }}>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} buttonStyle="secondary">
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </StyledButton>
-        </Link>
+        </InternalLink>
       )}
       {hasManageSubscriptions && (
-        <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
+        <InternalLink route="subscriptions" params={{ collectiveSlug: collective.slug }}>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
           </StyledButton>
-        </Link>
+        </InternalLink>
       )}
       {hasDashboard && (
-        <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+        <InternalLink route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
           </StyledButton>
-        </Link>
+        </InternalLink>
       )}
       {hasApply && (
         <Box mx={2} my={1}>

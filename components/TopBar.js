@@ -5,7 +5,8 @@ import SearchIcon from './SearchIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import SearchForm from './SearchForm';
 import { FormattedMessage } from 'react-intl';
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
+import AnchorLink from './AnchorLink';
 
 import Hide from './Hide';
 import { Box, Flex } from '@rebass/grid';
@@ -71,7 +72,7 @@ class TopBar extends React.Component {
         justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
       >
-        <Link route="home" passHref>
+        <NextLink route="home" passHref>
           <Flex as="a" alignItems="center">
             <Logo width="24" height="24" />
             <Hide xs>
@@ -80,7 +81,7 @@ class TopBar extends React.Component {
               </Box>
             </Hide>
           </Flex>
-        </Link>
+        </NextLink>
 
         {showSearch && (
           <Flex justifyContent="center" flex="1 1 auto">
@@ -95,39 +96,39 @@ class TopBar extends React.Component {
         <Flex alignItems="center" justifyContent="flex-end" flex="1 1 auto">
           <Hide sm md lg>
             <Box mx={3}>
-              <Link href="/search">
+              <NextLink href="/search">
                 <Flex as="a">
                   <SearchIcon fill="#aaaaaa" size={24} />
                 </Flex>
-              </Link>
+              </NextLink>
             </Box>
           </Hide>
 
           <Hide sm md lg>
             <Box mx={3}>
-              <Link href="#footer">
+              <AnchorLink to="#footer">
                 <Flex as="a">
                   <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
-              </Link>
+              </AnchorLink>
             </Box>
           </Hide>
 
           <Hide xs>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               <NavLinkContainer>
-                <Link route="discover" passHref>
+                <NextLink route="discover" passHref>
                   <NavLink>
                     <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                   </NavLink>
-                </Link>
+                </NextLink>
               </NavLinkContainer>
               <NavLinkContainer>
-                <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                <NextLink route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
                   <NavLink>
                     <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
                   </NavLink>
-                </Link>
+                </NextLink>
               </NavLinkContainer>
               <NavLinkContainer>
                 <NavLink href="/pricing">

@@ -8,7 +8,7 @@ import { capitalize, formatCurrency } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import SmallButton from '../SmallButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
@@ -294,7 +294,7 @@ class Expense extends React.Component {
         </style>
 
         <div className="fromCollective">
-          <Link
+          <InternalLink
             route="collective"
             params={{ slug: expense.fromCollective.slug }}
             title={expense.fromCollective.name}
@@ -306,7 +306,7 @@ class Expense extends React.Component {
               radius={40}
               className="noFrame"
             />
-          </Link>
+          </InternalLink>
         </div>
         <div className="body">
           <div className="header">
@@ -314,17 +314,17 @@ class Expense extends React.Component {
               <AmountCurrency amount={-expense.amount} currency={expense.currency} />
             </div>
             <div className="description">
-              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
+              <InternalLink route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
                 {capitalize(title)}
                 {view !== 'compact' && <span className="ExpenseId">#{expense.id}</span>}
-              </Link>
+              </InternalLink>
             </div>
             <div className="meta">
               <Moment relative={true} value={expense.incurredAt} />
               {' | '}
               {includeHostedCollectives && expense.collective && (
                 <span className="collective">
-                  <Link route={`/${expense.collective.slug}`}>{expense.collective.slug}</Link> (balance:{' '}
+                  <InternalLink route={`/${expense.collective.slug}`}>{expense.collective.slug}</InternalLink> (balance:{' '}
                   {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
                 </span>
               )}
@@ -334,7 +334,7 @@ class Expense extends React.Component {
                 <ExpenseNeedsTaxFormBadge isTaxFormRequired={expense.userTaxFormRequiredBeforePayment} />
               )}
               <span className="metaItem">
-                <Link
+                <InternalLink
                   route="expenses"
                   params={{
                     collectiveSlug: expense.collective.slug,
@@ -344,7 +344,7 @@ class Expense extends React.Component {
                   scroll={false}
                 >
                   {capitalize(expense.category)}
-                </Link>
+                </InternalLink>
               </span>
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
                 <span>

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Link from './Link';
+import InternalLink from './InternalLink';
 import { FormattedMessage } from 'react-intl';
 
 /**
@@ -28,11 +28,11 @@ const LinkCollective = ({
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link route="collective" params={{ slug }} {...props} title={title} target={target} passHref>
+    <InternalLink route="collective" params={{ slug }} {...props} title={title} target={target} passHref>
       {children || name || slug}
-    </Link>
+    </InternalLink>
   ) : (
-    <Link
+    <InternalLink
       route="event"
       params={{ eventSlug: slug, parentCollectiveSlug: getEventParentCollectiveSlug(parentCollective) }}
       title={title}
@@ -41,7 +41,7 @@ const LinkCollective = ({
       passHref
     >
       {children || name || slug}
-    </Link>
+    </InternalLink>
   );
 };
 

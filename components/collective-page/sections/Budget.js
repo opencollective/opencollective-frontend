@@ -11,7 +11,7 @@ import { P, Span } from '../../Text';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
-import Link from '../../Link';
+import InternalLink from '../../InternalLink';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import MessageBox from '../../MessageBox';
 
@@ -75,24 +75,24 @@ const SectionBudget = ({ collective, stats }) => {
                 <BudgetItemsList items={budgetItems} isCompact />
                 <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
                   <Box flex="1 1" mx={[0, 2]}>
-                    <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+                    <InternalLink route="transactions" params={{ collectiveSlug: collective.slug }}>
                       <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAll"
                           defaultMessage="View all transactions"
                         />
                       </StyledButton>
-                    </Link>
+                    </InternalLink>
                   </Box>
                   <Box flex="1 1" mx={[0, 2]}>
-                    <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
+                    <InternalLink route="expenses" params={{ collectiveSlug: collective.slug }}>
                       <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAllExpenses"
                           defaultMessage="View all expenses"
                         />
                       </StyledButton>
-                    </Link>
+                    </InternalLink>
                   </Box>
                 </Flex>
               </Container>

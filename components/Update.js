@@ -12,7 +12,7 @@ import { compose, formatDate } from '../lib/utils';
 import Avatar from './Avatar';
 import Role from './Role';
 import UpdateTextWithData from './UpdateTextWithData';
-import { Router, Link } from '../server/pages';
+import { Router, NextLink } from '../server/pages';
 import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
@@ -177,9 +177,9 @@ class Update extends React.Component {
         <div className="body">
           {mode === 'summary' && (
             <div className="title">
-              <Link route={`/${collective.slug}/updates/${update.slug}`}>
+              <NextLink route={`/${collective.slug}/updates/${update.slug}`}>
                 <a>{update.title}</a>
-              </Link>
+              </NextLink>
             </div>
           )}
 
@@ -187,9 +187,9 @@ class Update extends React.Component {
 
           <div className="meta">
             <div className="author">
-              <Link route={`/${update.fromCollective.slug}`}>
+              <NextLink route={`/${update.fromCollective.slug}`}>
                 <a>{update.fromCollective.name}</a>
-              </Link>
+              </NextLink>
             </div>
             <Role role="ADMIN" />
             {update.publishedAt && (
@@ -258,9 +258,9 @@ class Update extends React.Component {
                 </MessageBox>
               )}
               {update.publishedAt && (
-                <Link route={`/${collective.slug}/updates`} className="viewLatestUpdates">
+                <NextLink route={`/${collective.slug}/updates`} className="viewLatestUpdates">
                   {intl.formatMessage(this.messages['viewLatestUpdates'])}
-                </Link>
+                </NextLink>
               )}
             </div>
           )}
