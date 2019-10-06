@@ -370,7 +370,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
   });
 
   if (!expense) {
-    throw new errors.NotFound('No expense transaction found');
+    throw new errors.NotFound('No expense found');
   }
 
   if (!canMarkExpenseUnpaid(remoteUser, expense)) {
