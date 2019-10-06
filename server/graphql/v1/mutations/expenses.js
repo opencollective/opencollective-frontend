@@ -362,7 +362,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
 
 export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
   if (!remoteUser) {
-    throw new errors.Unauthorized('You need to be logged in to pay an expense');
+    throw new errors.Unauthorized('You need to be logged in to unpay an expense');
   }
 
   const expense = await models.Expense.findByPk(ExpenseId, {
