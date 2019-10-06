@@ -550,6 +550,7 @@
   "expense.hostFeeInCollectiveCurrency": "comissão do organizador",
   "expense.incurredAt": "Data",
   "expense.markAsUnpaid.btn": "mark as unpaid",
+  "expense.markAsUnpaid.continue.btn": "Continue",
   "expense.new.submit": "Enviar despesa",
   "expense.paid": "pago",
   "expense.pay.btn": "pagar com {paymentMethod}",

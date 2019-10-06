@@ -550,6 +550,7 @@
   "expense.hostFeeInCollectiveCurrency": "commission de l'hôte",
   "expense.incurredAt": "Date",
   "expense.markAsUnpaid.btn": "mark as unpaid",
+  "expense.markAsUnpaid.continue.btn": "Continue",
   "expense.new.submit": "Ajouter une dépense",
   "expense.paid": "payé",
   "expense.pay.btn": "payer avec {paymentMethod}",

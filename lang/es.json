@@ -550,6 +550,7 @@
   "expense.hostFeeInCollectiveCurrency": "comisión del host",
   "expense.incurredAt": "Fecha",
   "expense.markAsUnpaid.btn": "mark as unpaid",
+  "expense.markAsUnpaid.continue.btn": "Continue",
   "expense.new.submit": "Enviar gasto",
   "expense.paid": "pagado",
   "expense.pay.btn": "pague con {paymentMethod}",
