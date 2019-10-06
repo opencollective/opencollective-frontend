@@ -33,7 +33,7 @@ function canUpdateExpenseStatus(remoteUser, expense) {
  * Only admin of expense.collective.host can mark expenses unpaid
  */
 function canMarkExpenseUnpaid(remoteUser, expense) {
-  if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.collective.HostCollectiveId)) {
+  if (remoteUser.hasRole([roles.ADMIN], expense.collective.HostCollectiveId)) {
     return true;
   }
   return false;
