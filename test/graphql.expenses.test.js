@@ -64,8 +64,8 @@ const payExpenseQuery = `
     payExpense(id: $id, paymentProcessorFeeInCollectiveCurrency: $paymentProcessorFeeInCollectiveCurrency, hostFeeInCollectiveCurrency: $hostFeeInCollectiveCurrency, platformFeeInCollectiveCurrency: $platformFeeInCollectiveCurrency) { id status } }`;
 
 const markExpenseAsUnpaidQuery = `
-  mutation markExpenseAsUnpaid($id: Int!) {
-    markExpenseAsUnpaid(id: $id) { id status } }`;
+  mutation markExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
+    markExpenseAsUnpaid(id: $id, processorFeeRefunded: $processorFeeRefunded) { id status } }`;
 
 const addFunds = async (user, hostCollective, collective, amount) => {
   const currency = collective.currency || 'USD';
@@ -1229,7 +1229,7 @@ describe('GraphQL Expenses API', () => {
         payExpenseQuery,
         {
           id: expense.id,
-          paymentProcessorFeeInCollectiveCurrency: 0,
+          paymentProcessorFeeInHostCurrency: 0,
         },
         hostAdmin,
       );
@@ -1240,7 +1240,14 @@ describe('GraphQL Expenses API', () => {
       balance = await collective.getBalance();
       expect(balance).to.equal(initialBalance - expenseAmount);
       // Then mark the expense as unpaid
-      const result = await utils.graphqlQuery(markExpenseAsUnpaidQuery, { id: expense.id }, hostAdmin);
+      const result = await utils.graphqlQuery(
+        markExpenseAsUnpaidQuery,
+        {
+          id: expense.id,
+          processorFeeRefunded: false,
+        },
+        hostAdmin,
+      );
       result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       // The expense you should be back to APPROVED status
