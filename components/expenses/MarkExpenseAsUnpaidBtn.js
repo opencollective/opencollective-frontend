@@ -1,24 +1,58 @@
-import React from 'react';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from '../StyledButton';
+import StyledCheckBox from '../StyledCheckbox';
 
 const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
-  async function handleOnClick() {
+  const [state, setState] = useState({
+    showProcessorFeeConfirmation: false,
+    processorFeeRefunded: false,
+    disableBtn: false,
+  });
+
+  async function handleOnClickContinue() {
     try {
-      await markExpenseAsUnpaid(id);
+      setState({ ...state, disableBtn: true });
+      await markExpenseAsUnpaid(id, state.processorFeeRefunded);
     } catch (err) {
-      console.error(err);
+      console.log('>>> payExpense error: ', err);
+      setState({ ...state, disableBtn: false });
     }
   }
 
   return (
-    <StyledButton onClick={() => handleOnClick()} mt={2} buttonStyle="secondary">
-      <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="mark as unpaid" />
-    </StyledButton>
+    <Fragment>
+      {state.showProcessorFeeConfirmation ? (
+        <Fragment>
+          <StyledCheckBox
+            name="processorFeeRefunded"
+            checked={state.processorFeeRefunded}
+            onChange={({ checked }) => setState({ ...state, processorFeeRefunded: checked })}
+            label="Has the payout provider refunded the payment processor fees?"
+          />
+          <StyledButton
+            mt={2}
+            disabled={state.disableBtn}
+            buttonStyle="primary"
+            onClick={() => handleOnClickContinue()}
+          >
+            <FormattedMessage id="expense.markAsUnpaid.continue.btn" defaultMessage="Continue" />
+          </StyledButton>
+        </Fragment>
+      ) : (
+        <StyledButton
+          onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })}
+          mt={2}
+          buttonStyle="secondary"
+        >
+          <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="mark as unpaid" />
+        </StyledButton>
+      )}
+    </Fragment>
   );
 };
 
@@ -28,8 +62,8 @@ MarkExpenseAsUnpaidBtn.propTypes = {
 };
 
 const markExpenseAsUnpaidQuery = gql`
-  mutation markExpenseAsUnpaid($id: Int!) {
-    markExpenseAsUnpaid(id: $id) {
+  mutation markExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
+    markExpenseAsUnpaid(id: $id, processorFeeRefunded: $processorFeeRefunded) {
       id
       status
     }
@@ -38,8 +72,8 @@ const markExpenseAsUnpaidQuery = gql`
 
 const addMutation = graphql(markExpenseAsUnpaidQuery, {
   props: ({ mutate }) => ({
-    markExpenseAsUnpaid: async id => {
-      return await mutate({ variables: { id } });
+    markExpenseAsUnpaid: async (id, processorFeeRefunded) => {
+      return await mutate({ variables: { id, processorFeeRefunded } });
     },
   }),
 });
