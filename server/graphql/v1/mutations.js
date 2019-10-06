@@ -341,9 +341,10 @@ const mutations = {
     type: ExpenseType,
     args: {
       id: { type: new GraphQLNonNull(GraphQLInt) },
+      processorFeeRefunded: { type: new GraphQLNonNull(GraphQLBoolean) },
     },
     resolve(_, args, req) {
-      return markExpenseAsUnpaid(req.remoteUser, args.id);
+      return markExpenseAsUnpaid(req.remoteUser, args.id, args.processorFeeRefunded);
     },
   },
   editTier: {

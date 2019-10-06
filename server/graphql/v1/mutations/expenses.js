@@ -360,7 +360,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   return markExpenseAsPaid(expense);
 }
 
-export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
+export async function markExpenseAsUnpaid(remoteUser, ExpenseId, processorFeeRefunded) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to unpay an expense');
   }
@@ -389,7 +389,14 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
     where: { ExpenseId },
     include: [{ model: models.Expense }],
   });
-  const refundedTransaction = await libPayments.createRefundTransaction(transaction, 0, null, expense.User);
+
+  const paymentProcessorFeeInHostCurrency = processorFeeRefunded ? transaction.paymentProcessorFeeInHostCurrency : 0;
+  const refundedTransaction = await libPayments.createRefundTransaction(
+    transaction,
+    paymentProcessorFeeInHostCurrency,
+    null,
+    expense.User,
+  );
   await libPayments.associateTransactionRefundId(transaction, refundedTransaction);
 
   return expense.update({ status: statuses.APPROVED, lastEditedById: remoteUser.id });
