@@ -378,7 +378,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId) {
   }
 
   if (expense.status !== statuses.PAID) {
-    throw new errors.Unauthorized('Expense has not been paid');
+    throw new errors.Unauthorized('Expense has not been paid yet');
   }
 
   if (expense.payoutMethod !== 'other') {
