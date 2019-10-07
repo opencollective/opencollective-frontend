@@ -303,8 +303,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
     <React.Fragment>
       <ItemContainer>
         <Flex
-          data-type="transactions"
-          data-cy={isCredit ? 'expenses' : 'contributions'}
+          data-cy={`${isCredit ? 'expenses' : 'contributions'} transactions`}
           p={[3, 24]}
           flexWrap="wrap"
           alignItems={['center', 'flex-start']}
