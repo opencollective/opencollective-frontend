@@ -30,6 +30,8 @@ export const exists = async (req, res) => {
 
 /**
  * Login or create a new user
+ * If creating a user, we set the last login attempt to when user is created
+ * If logging in, we get the last login from the db
  */
 export const signin = (req, res, next) => {
   const { user, redirect, websiteUrl } = req.body;
@@ -37,7 +39,9 @@ export const signin = (req, res, next) => {
   return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
-      loginLink = u.generateLoginLink(redirect || '/', websiteUrl);
+      const now = new Date();
+      const lastLogin = u.lastLogin || now;
+      loginLink = u.generateLoginLink(redirect || '/', websiteUrl, lastLogin);
       if (config.env === 'development') {
         logger.info(`Login Link: ${loginLink}`);
       }
