@@ -70,6 +70,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       buttonText={tier.button}
       contributors={tier.contributors}
       stats={tier.stats.contributors}
+      data-cy="contribute-card-tier"
       {...props}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">

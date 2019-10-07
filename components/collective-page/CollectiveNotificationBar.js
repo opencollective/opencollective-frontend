@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
 import NotificationBar from '../NotificationBar';
+import { CollectiveType } from '../../lib/constants/collectives';
 
 const messages = defineMessages({
+  // Created
   collectiveCreated: {
     id: 'collective.created',
     defaultMessage: 'Your collective has been created with success.',
@@ -13,6 +15,16 @@ const messages = defineMessages({
     defaultMessage:
       'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
   },
+  organizationCreated: {
+    id: 'organization.created',
+    defaultMessage: 'Your Organization has been created.',
+  },
+  organizationCreateDescription: {
+    id: 'organization.created.description',
+    defaultMessage:
+      'You can now make financial contributions as an Organization. You can also edit your Organization profile, add team members and admins, and attach a credit card with a monthly limit.',
+  },
+  // Archived
   collectiveArchived: {
     id: 'collective.isArchived',
     defaultMessage: '{name} has been archived.',
@@ -21,6 +33,7 @@ const messages = defineMessages({
     id: 'collective.isArchived.description',
     defaultMessage: 'This collective has been archived and can no longer be used for any activities.',
   },
+  // Pending
   approvalPending: {
     id: 'collective.pending',
     defaultMessage: 'Collective pending approval.',
@@ -33,10 +46,18 @@ const messages = defineMessages({
 
 const getNotification = (intl, status, collective, host) => {
   if (status === 'collectiveCreated') {
-    return {
-      title: intl.formatMessage(messages.collectiveCreated),
-      description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
-    };
+    switch (collective.type) {
+      case CollectiveType.ORGANIZATION:
+        return {
+          title: intl.formatMessage(messages.organizationCreated),
+          description: intl.formatMessage(messages.organizationCreateDescription),
+        };
+      default:
+        return {
+          title: intl.formatMessage(messages.collectiveCreated),
+          description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
+        };
+    }
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
@@ -65,6 +86,7 @@ CollectiveNotificationBar.propTypes = {
   /** Collective */
   collective: PropTypes.shape({
     name: PropTypes.string,
+    type: PropTypes.string,
     isArchived: PropTypes.bool,
   }),
   /** Host */

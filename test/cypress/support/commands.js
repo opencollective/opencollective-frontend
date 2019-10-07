@@ -233,6 +233,30 @@ Cypress.Commands.add('fillInputField', (fieldname, value) => {
   return cy.get(`.inputField.${fieldname} input`).type(value);
 });
 
+/**
+ * Wrapper around `get` specialized to retrieve data from `data-cy`. You can pass an array
+ * for deeper queries.
+ */
+Cypress.Commands.add('getByDataCy', (query, params) => {
+  if (Array.isArray(query)) {
+    return cy.get(query.map(elem => `[data-cy="${elem}"]`), params);
+  } else {
+    return cy.get(`[data-cy="${query}"]`, params);
+  }
+});
+
+/**
+ * Wrapper around `contains` specialized to retrieve data from `data-cy`. You can pass an array
+ * for deeper queries.
+ */
+Cypress.Commands.add('containsInDataCy', (query, content, params) => {
+  if (Array.isArray(query)) {
+    return cy.contains(query.map(elem => `[data-cy="${elem}"]`), content, params);
+  } else {
+    return cy.contains(`[data-cy="${query}"]`, content, params);
+  }
+});
+
 // ---- Private ----
 
 /**
