@@ -1,7 +1,7 @@
 const notFoundSlug = 'a-collective-that-does-not-exist';
-const notFoundURL = `/${notFoundSlug}`;
+const notFoundURL = `/${notFoundSlug}/v2`;
 
-it.skip("fetching a collective page that doesn't exist returns a 404", () => {
+it("fetching a collective page that doesn't exist returns a 404", () => {
   cy.request({ url: notFoundURL, failOnStatusCode: false }).then(resp => {
     expect(resp.status).to.eq(404);
   });
@@ -13,15 +13,15 @@ describe('the NotFound page when logged out', () => {
   });
 
   it('show the proper error message', () => {
-    cy.get('.NotFound').contains('Not found');
+    cy.get('[data-cy="not-found"]').contains('Not found');
   });
 
   it('has a nice comforting little buddy', () => {
-    cy.get('.NotFound .shrug').should('contain', '¯\\\\_(ツ)_/¯');
+    cy.get('[data-cy="not-found"]').should('contain', '¯\\\\_(ツ)_/¯');
   });
 
   it('includes a button to search for the collective', () => {
-    cy.contains('search for')
+    cy.contains('Search for')
       .should('contain', notFoundSlug)
       .click();
 
