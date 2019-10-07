@@ -9,7 +9,10 @@ import { URLSearchParams } from 'url';
 import models from '../../models';
 import errors from '../../lib/errors';
 import paymentProviders from '../../paymentProviders';
-import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controllers/connectedAccounts';
+import {
+  createOrUpdate as createOrUpdateConnectedAccount,
+  disconnect as disconnectConnectedAccount,
+} from '../../controllers/connectedAccounts';
 
 const { User } = models;
 
@@ -193,6 +196,10 @@ export const authenticateServiceCallback = (req, res, next) => {
     }
     createOrUpdateConnectedAccount(req, res, next, accessToken, data, emails).catch(next);
   })(req, res, next);
+};
+
+export const authenticateServiceDisconnect = (req, res) => {
+  disconnectConnectedAccount(req, res);
 };
 
 function getOAuthCallbackUrl(req) {

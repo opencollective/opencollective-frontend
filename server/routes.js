@@ -186,6 +186,7 @@ export default app => {
   app.post('/webhooks/stripe', stripeWebhook); // when it gets a new subscription invoice
   app.post('/webhooks/mailgun', email.webhook); // when receiving an email
   app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback); // oauth callback
+  app.delete('/connected-accounts/:service/disconnect/:collectiveId', aN.authenticateServiceDisconnect);
 
   app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
 

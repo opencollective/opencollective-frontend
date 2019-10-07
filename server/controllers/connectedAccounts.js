@@ -6,6 +6,7 @@ import models, { Op } from '../models';
 import errors from '../lib/errors';
 import paymentProviders from '../paymentProviders';
 import * as github from '../lib/github';
+import { mustBeLoggedInTo } from '../lib/auth';
 
 const { ConnectedAccount, User } = models;
 
@@ -128,6 +129,40 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
 
     default:
       return next(new errors.BadRequest(`unsupported service ${service}`));
+  }
+};
+
+export const disconnect = async (req, res) => {
+  const { collectiveId: CollectiveId, service } = req.params;
+  const { remoteUser } = req;
+
+  try {
+    mustBeLoggedInTo(remoteUser, 'disconnect this connected account');
+
+    if (!remoteUser.isAdmin(CollectiveId)) {
+      throw new errors.Unauthorized({
+        message: 'You are either logged out or not authorized to disconnect this account',
+      });
+    }
+
+    const account = await ConnectedAccount.findOne({
+      where: { service, CollectiveId },
+    });
+
+    if (account) {
+      await account.destroy();
+    }
+
+    res.send({
+      deleted: true,
+      service,
+    });
+  } catch (err) {
+    res.send({
+      error: {
+        message: err.message,
+      },
+    });
   }
 };
 
