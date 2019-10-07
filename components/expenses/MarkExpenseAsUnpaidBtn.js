@@ -49,7 +49,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
           mt={2}
           buttonStyle="secondary"
         >
-          <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="mark as unpaid" />
+          <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
         </StyledButton>
       )}
     </Fragment>
