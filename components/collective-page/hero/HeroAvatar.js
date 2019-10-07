@@ -16,7 +16,7 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import { EditAvatarMutation } from '../graphql/mutations';
-import Link from '../../Link';
+import InternalLink from '../../InternalLink';
 
 const AVATAR_SIZE = 128;
 
@@ -140,7 +140,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           )}
         </Dropzone>
         <Container position="absolute" right={0} bottom={0}>
-          <Link
+          <InternalLink
             route="editCollective"
             params={{ slug: collective.slug }}
             title={intl.formatMessage(Translations.settings)}
@@ -148,7 +148,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
             <StyledRoundButton size={40} color="black.700">
               <Settings size={18} />
             </StyledRoundButton>
-          </Link>
+          </InternalLink>
         </Container>
       </React.Fragment>
     );

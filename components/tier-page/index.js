@@ -12,7 +12,7 @@ import { getWebsiteUrl } from '../../lib/utils';
 import { P, H1, H2 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
 import CollectiveNavbar from '../CollectiveNavbar';
@@ -325,7 +325,7 @@ class TierPage extends Component {
               {/** Contribute button */}
               <Flex alignItems="center">
                 <Box width={1}>
-                  <Link
+                  <InternalLink
                     route="orderCollectiveTierNew"
                     params={{
                       verb: 'contribute',
@@ -337,7 +337,7 @@ class TierPage extends Component {
                     <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
                       <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
                     </StyledButton>
-                  </Link>
+                  </InternalLink>
                 </Box>
               </Flex>
               {/** Share buttons (desktop only) */}

@@ -7,7 +7,7 @@ import { truncate } from 'lodash';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/utils';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import { P } from '../Text';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
@@ -117,7 +117,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
             {description}{' '}
             {(isTruncated || tier.hasLongDescription) && (
               <StyledLink
-                as={Link}
+                as={InternalLink}
                 whiteSpace="nowrap"
                 route="tier"
                 params={{

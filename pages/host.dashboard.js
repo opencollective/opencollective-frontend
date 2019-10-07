@@ -16,10 +16,10 @@ import CollectiveCover from '../components/CollectiveCover';
 import { FormattedMessage } from 'react-intl';
 import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 import { Dashboard, PendingApplications } from '../components/host-dashboard';
 
-const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
+const MenuLink = styled(props => <InternalLink {...omit(props, ['isActive'])} />)`
   padding: 4px 20px 0 20px;
   color: #71757a;
   height: 100%;

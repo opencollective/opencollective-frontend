@@ -15,7 +15,7 @@ import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledTooltip from '../../StyledTooltip';
 import StyledCard from '../../StyledCard';
-import Link from '../../Link';
+import InternalLink from '../../InternalLink';
 import Avatar from '../../Avatar';
 import StyledButton from '../../StyledButton';
 import HTMLContent from '../../HTMLContent';
@@ -130,14 +130,14 @@ class SectionUpdates extends React.PureComponent {
             />
           </P>
           {isAdmin && (
-            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+            <InternalLink route="createUpdate" params={{ collectiveSlug: collective.slug }}>
               <StyledButton buttonStyle="primary">
                 <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
                   +
                 </Span>
                 <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
               </StyledButton>
-            </Link>
+            </InternalLink>
           )}
         </Flex>
         {isEmpty(updates) ? (
@@ -164,11 +164,11 @@ class SectionUpdates extends React.PureComponent {
                     <Avatar collective={update.fromCollective} radius={40} />
                   </Box>
                   <Flex flexDirection="column" justifyContent="space-between">
-                    <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
+                    <InternalLink route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
                       <P color="black.900" fontWeight="600">
                         {update.title}
                       </P>
-                    </Link>
+                    </InternalLink>
                     {update.userCanSeeUpdate ? (
                       <HTMLContent content={update.summary} />
                     ) : (
@@ -229,11 +229,11 @@ class SectionUpdates extends React.PureComponent {
           </StyledCard>
         )}
         {updates.length > 0 && (
-          <Link route="updates" params={{ collectiveSlug: collective.slug }}>
+          <InternalLink route="updates" params={{ collectiveSlug: collective.slug }}>
             <StyledButton buttonSize="large" mt={4} width={1} p="10px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
-          </Link>
+          </InternalLink>
         )}
       </ContainerSectionContent>
     );

@@ -4,7 +4,7 @@ import { Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
 import { CONTRIBUTE_CARD_WIDTH, CONTRIBUTE_CARD_BORDER_RADIUS } from './Contribute';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 
@@ -30,7 +30,7 @@ const CreateNewCard = styled.div`
 const CreateNew = ({ route, children }) => {
   return (
     <CreateNewCard>
-      <Link route={route}>
+      <InternalLink route={route}>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
           <StyledRoundButton buttonStyle="dark" fontSize={25}>
             +
@@ -39,7 +39,7 @@ const CreateNew = ({ route, children }) => {
             {children}
           </P>
         </Flex>
-      </Link>
+      </InternalLink>
     </CreateNewCard>
   );
 };

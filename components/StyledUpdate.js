@@ -16,7 +16,7 @@ import { Router } from '../server/pages';
 import Container from './Container';
 import Avatar from './Avatar';
 import Role from './Role';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import MessageBox from './MessageBox';
 import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
@@ -61,7 +61,7 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
   align-items: center;
 `;
 
-const ViewUpdatesLink = styled(Link)`
+const ViewUpdatesLink = styled(InternalLink)`
   margin-top: 20px;
   color: #71757a;
 `;
@@ -206,11 +206,11 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
     if (mode === 'summary') {
       return (
-        <Link route={`/${collective.slug}/updates/${update.slug}`}>
+        <InternalLink route={`/${collective.slug}/updates/${update.slug}`}>
           <H3 data-cy="updateTitle" color="#090A0A">
             {update.title}
           </H3>
-        </Link>
+        </InternalLink>
       );
     } else {
       return (

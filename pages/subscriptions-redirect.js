@@ -5,7 +5,7 @@ import Router from 'next/router';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 
 import colors from '../lib/constants/colors';
 
@@ -106,7 +106,7 @@ class SubscriptionsRedirectPage extends React.Component {
                   {LoggedInUser && (
                     <div>
                       This page has moved. Your recurring financial contributions are now at
-                      <Link
+                      <InternalLink
                         route={'subscriptions'}
                         params={{
                           collectiveSlug: LoggedInUser.collective.slug,
@@ -117,7 +117,7 @@ class SubscriptionsRedirectPage extends React.Component {
                           /{LoggedInUser.collective.slug}
                           /subscriptions
                         </span>
-                      </Link>
+                      </InternalLink>
                       . Redirecting...
                     </div>
                   )}

@@ -6,6 +6,7 @@ import TopBarProfileMenu from './TopBarProfileMenu';
 import SearchForm from './SearchForm';
 import { FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
+import InternalLink from './InternalLink';
 
 import Hide from './Hide';
 import { Box, Flex } from '@rebass/grid';
@@ -105,11 +106,11 @@ class TopBar extends React.Component {
 
           <Hide sm md lg>
             <Box mx={3}>
-              <Link href="#footer">
+              <InternalLink route="#footer">
                 <Flex as="a">
                   <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
-              </Link>
+              </InternalLink>
             </Box>
           </Hide>
 

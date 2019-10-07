@@ -13,7 +13,7 @@ import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import GoalsCover from './GoalsCover';
 import MenuBar from './MenuBar';
 import TopBackersCoverWithData from './TopBackersCoverWithData';
@@ -22,7 +22,7 @@ import CollectiveNavbar from './CollectiveNavbar';
 import Container from './Container';
 import { AllSectionsNames } from './collective-page/_constants';
 
-const ContributeLink = styled(Link)`
+const ContributeLink = styled(InternalLink)`
   --webkit-appearance: none;
   font-size: 1.4rem;
   font-weight: 500;
@@ -116,7 +116,7 @@ class CollectiveCover extends React.Component {
       this.description = (
         <div>
           {props.collective.description && <div className="eventDescription">{props.collective.description}</div>}
-          <Link route={eventLocationRoute}>
+          <InternalLink route={eventLocationRoute}>
             {!props.collective.startsAt &&
               console.warn(
                 `Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`,
@@ -151,7 +151,7 @@ class CollectiveCover extends React.Component {
               </React.Fragment>
             )}
             {get(props.collective, 'location.name')}
-          </Link>
+          </InternalLink>
         </div>
       );
     }
@@ -449,13 +449,13 @@ ${description}`;
 
           <div className="content">
             {collective.slug && (
-              <Link route={href} className="goBack">
+              <InternalLink route={href} className="goBack">
                 {collective.type === 'USER' ? (
                   <Avatar collective={collective} className="logo" radius="10rem" />
                 ) : (
                   <Logo collective={collective} className="logo" height="10rem" />
                 )}
-              </Link>
+              </InternalLink>
             )}
             <h1>{title}</h1>
             {this.description && <div className="description">{this.description}</div>}
@@ -475,7 +475,9 @@ ${description}`;
                             id="collective.cover.hostedBy"
                             defaultMessage="Hosted by {host}"
                             values={{
-                              host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                              host: (
+                                <InternalLink route={`/${collective.host.slug}`}>{collective.host.name}</InternalLink>
+                              ),
                             }}
                           />
                         </label>
@@ -488,7 +490,9 @@ ${description}`;
                             id="collective.cover.pendingApprovalFrom"
                             defaultMessage="Pending approval from {host}"
                             values={{
-                              host: <Link route={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                              host: (
+                                <InternalLink route={`/${collective.host.slug}`}>{collective.host.name}</InternalLink>
+                              ),
                             }}
                           />
                         </label>
@@ -525,9 +529,9 @@ ${description}`;
                         defaultMessage="Created by: {CollectiveLink}"
                         values={{
                           CollectiveLink: (
-                            <Link route={`/${collective.parentCollective.slug}`}>
+                            <InternalLink route={`/${collective.parentCollective.slug}`}>
                               {collective.parentCollective.name}
-                            </Link>
+                            </InternalLink>
                           ),
                         }}
                       />

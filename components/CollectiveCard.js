@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import Currency from './Currency';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
@@ -76,7 +76,7 @@ class CollectiveCard extends React.Component {
     }
 
     return (
-      <Link route={route} target="_top" params={params}>
+      <InternalLink route={route} target="_top" params={params}>
         <div className={`CollectiveCard ${collective.type}`}>
           <style jsx>
             {`
@@ -345,7 +345,7 @@ class CollectiveCard extends React.Component {
             )}
           </div>
         </div>
-      </Link>
+      </InternalLink>
     );
   }
 }

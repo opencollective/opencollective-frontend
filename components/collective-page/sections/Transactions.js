@@ -11,7 +11,7 @@ import MessageBox from '../../MessageBox';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledFilters from '../../StyledFilters';
 import StyledButton from '../../StyledButton';
-import Link from '../../Link';
+import InternalLink from '../../InternalLink';
 
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
@@ -178,11 +178,11 @@ class SectionTransactions extends React.Component {
 
         <ContainerSectionContent>
           <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin} isInverted />
-          <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+          <InternalLink route="transactions" params={{ collectiveSlug: collective.slug }}>
             <StyledButton mt={3} width="100%">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
             </StyledButton>
-          </Link>
+          </InternalLink>
         </ContainerSectionContent>
       </Box>
     );

@@ -9,7 +9,7 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import ErrorPage from '../components/ErrorPage';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
@@ -92,9 +92,9 @@ class OrderPage extends React.Component {
             <div className=" columns">
               <div className="col large">
                 <div className="viewAllOrders">
-                  <Link route={`/${collective.slug}/orders`}>
+                  <InternalLink route={`/${collective.slug}/orders`}>
                     <FormattedMessage id="orders.viewAll" defaultMessage="View All Orders" />
-                  </Link>
+                  </InternalLink>
                 </div>
 
                 <OrderWithData id={OrderId} collective={collective} view="details" LoggedInUser={LoggedInUser} />

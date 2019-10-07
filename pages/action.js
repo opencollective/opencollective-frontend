@@ -18,7 +18,7 @@ import Container from '../components/Container';
 import Expense from '../components/expenses/Expense';
 import StyledCard from '../components/StyledCard';
 import LinkCollective from '../components/LinkCollective';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 
 /** GraphQL */
 
@@ -187,7 +187,7 @@ class ActionPage extends React.Component {
             <FormattedMessage
               id="action.approveCollective.Error"
               defaultMessage="Failed to approve collective for {host}"
-              values={{ host: <Link route={`/${hostCollectiveSlug}`}>{hostCollectiveSlug}</Link> }}
+              values={{ host: <InternalLink route={`/${hostCollectiveSlug}`}>{hostCollectiveSlug}</InternalLink> }}
             />
             <br />
             <br />

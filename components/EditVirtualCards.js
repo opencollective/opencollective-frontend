@@ -12,7 +12,7 @@ import { getCollectiveVirtualCards } from '../lib/graphql/queries';
 import VirtualCardDetails from './VirtualCardDetails';
 import Loading from './Loading';
 import Pagination from './Pagination';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import { Link as LinkWrapper } from '../server/pages';
 import StyledLink from './StyledLink';
 import StyledButtonSet from './StyledButtonSet';
@@ -55,13 +55,13 @@ class EditVirtualCards extends React.Component {
         buttonProps={{ p: 0 }}
       >
         {({ item, isSelected }) => (
-          <Link route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
+          <InternalLink route="editCollective" params={{ ...this.props.router.query, filter: item, offset: 0 }}>
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="virtualCards.filterAll" defaultMessage="All" />}
               {item === 'redeemed' && <FormattedMessage id="virtualCards.filterRedeemed" defaultMessage="Redeemed" />}
               {item === 'pending' && <FormattedMessage id="virtualCards.filterPending" defaultMessage="Pending" />}
             </P>
-          </Link>
+          </InternalLink>
         )}
       </StyledButtonSet>
     );
@@ -70,9 +70,9 @@ class EditVirtualCards extends React.Component {
   renderNoVirtualCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
+        <InternalLink route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
           <FormattedMessage id="virtualCards.createFirst" defaultMessage="Create your first gift card!" />
-        </Link>
+        </InternalLink>
       );
     } else if (onlyConfirmed) {
       return <FormattedMessage id="virtualCards.emptyClaimed" defaultMessage="No gift card claimed yet" />;

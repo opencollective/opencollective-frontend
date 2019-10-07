@@ -5,7 +5,7 @@ import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import CollectiveCover from './CollectiveCover';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import NotificationBar from './NotificationBar';
 import Memberships from './Memberships';
 import CollectivesWithData from './CollectivesWithData';
@@ -395,9 +395,9 @@ class UserCollective extends React.Component {
                     <div className="adminActions" id="adminActions">
                       <ul>
                         <li>
-                          <Link route={`/${collective.slug}/dashboard`}>
+                          <InternalLink route={`/${collective.slug}/dashboard`}>
                             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
-                          </Link>
+                          </InternalLink>
                         </li>
                       </ul>
                     </div>

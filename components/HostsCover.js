@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import CollectiveCover from './CollectiveCover';
-import Link from './Link';
+import InternalLink from './InternalLink';
 
 const CoverSmallCTA = styled.div`
   a:hover {
@@ -46,7 +46,7 @@ class HostsCover extends React.Component {
     const findOutMoreMessage = intl.formatMessage(this.messages['hosts.findOutMoreLink']);
     const findOutMoreLink = (
       <CoverSmallCTA>
-        <Link route="https://docs.opencollective.com/help/hosts/become-host">{findOutMoreMessage}</Link>
+        <InternalLink route="https://docs.opencollective.com/help/hosts/become-host">{findOutMoreMessage}</InternalLink>
       </CoverSmallCTA>
     );
     const descriptionNode = (

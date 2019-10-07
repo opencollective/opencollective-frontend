@@ -6,7 +6,7 @@ import colors from '../../lib/constants/colors';
 import { capitalize } from '../../lib/utils';
 
 import Avatar from '..//Avatar';
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import LinkCollective from '../LinkCollective';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
@@ -203,10 +203,10 @@ class Order extends React.Component {
               <AmountCurrency amount={order.totalAmount} currency={order.currency} />
             </div>
             <div className="description">
-              <Link route={`/${collective.slug}/orders/${order.id}`} title={capitalize(title)}>
+              <InternalLink route={`/${collective.slug}/orders/${order.id}`} title={capitalize(title)}>
                 {capitalize(title)}
                 {view !== 'compact' && <span className="OrderId">#{order.id}</span>}
-              </Link>
+              </InternalLink>
             </div>
             <div className="meta">
               <Moment relative={true} value={order.createdAt} />

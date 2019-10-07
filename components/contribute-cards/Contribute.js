@@ -6,7 +6,7 @@ import { Flex, Box } from '@rebass/grid';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 
-import Link from '../Link';
+import InternalLink from '../InternalLink';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
 import StyledButton from '../StyledButton';
@@ -156,11 +156,11 @@ const ContributeCard = ({
           <TierBody>{children}</TierBody>
         </Flex>
         <Box>
-          <Link route={route} params={routeParams}>
+          <InternalLink route={route} params={routeParams}>
             <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3}>
               {buttonText || getContributeCTA(type)}
             </StyledButton>
-          </Link>
+          </InternalLink>
           {!hideContributors && (
             <Box mt={2} height={60}>
               {contributors && contributors.length > 0 && (
@@ -169,13 +169,13 @@ const ContributeCard = ({
                     {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={2}>
                         {contributor.collectiveSlug ? (
-                          <Link
+                          <InternalLink
                             route="collective"
                             params={{ slug: contributor.collectiveSlug }}
                             title={contributor.name}
                           >
                             <ContributorAvatar contributor={contributor} radius={32} />
-                          </Link>
+                          </InternalLink>
                         ) : (
                           <ContributorAvatar contributor={contributor} radius={32} title={contributor.name} />
                         )}

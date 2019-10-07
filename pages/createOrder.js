@@ -11,7 +11,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-import Link from '../components/Link';
+import InternalLink from '../components/InternalLink';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
@@ -140,9 +140,9 @@ class CreateOrderPage extends React.Component {
               id="createOrder.missingTier"
               defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins. "
             />
-            <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
+            <InternalLink route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
-            </Link>
+            </InternalLink>
           </MessageBox>
         </Flex>
       );

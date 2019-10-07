@@ -11,7 +11,7 @@ import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInput from './StyledInput';
 import StyledButton from './StyledButton';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import StyledRadioList from './StyledRadioList';
 import ExternalLink from './ExternalLink';
 import { FormattedMessage } from 'react-intl';
@@ -188,7 +188,7 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                 defaultMessage="By pressing ‘Create Collective’ you agree to our <tos-link>Terms of Service</tos-link>, to the <host-terms>Terms of Fiscal Sponsorship</host-terms> and to the <privacy-policy-link>Privacy Policy</privacy-policy-link> of the Fiscal Host that will collect money on behalf of this collective."
                 values={{
                   // eslint-disable-next-line
-                  'tos-link': msg => <Link route="/tos">{msg}</Link>,
+                  'tos-link': msg => <InternalLink route="/tos">{msg}</InternalLink>,
                   // eslint-disable-next-line
                   'host-terms': msg => (
                     <ExternalLink href={FISCAL_SPONSOR_TERMS} openInNewTab>
@@ -196,7 +196,7 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                     </ExternalLink>
                   ),
                   // eslint-disable-next-line
-                  'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
+                  'privacy-policy-link': msg => <InternalLink route="/privacypolicy">{msg}</InternalLink>,
                 }}
               />
             </P>

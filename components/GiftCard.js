@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import Container from './Container';
 import { Span } from './Text';
 import Currency from './Currency';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { width, height, fontSize } from 'styled-system';
 
-const WhiteLink = styled(Link)`
+const WhiteLink = styled(InternalLink)`
   color: white;
   text-decoration: underline !important;
   &&:hover {

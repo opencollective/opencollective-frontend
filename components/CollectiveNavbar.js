@@ -14,7 +14,7 @@ import Container from './Container';
 import { Sections, AllSectionsNames, Dimensions } from './collective-page/_constants';
 import LinkCollective from './LinkCollective';
 import Avatar from './Avatar';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import StyledRoundButton from './StyledRoundButton';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
 
@@ -285,11 +285,11 @@ const CollectiveNavbar = ({
             <LinkCollective collective={collective} onClick={onCollectiveClick} />
           </CollectiveName>
           {isAdmin && showEdit && (
-            <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">
+            <InternalLink route="editCollective" params={{ slug: collective.slug }} title="Settings">
               <StyledRoundButton size={24} bg="#F0F2F5" color="#4B4E52">
                 <Cog size={17} />
               </StyledRoundButton>
-            </Link>
+            </InternalLink>
           )}
         </Flex>
         <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />
@@ -332,7 +332,7 @@ const CollectiveNavbar = ({
           ))}
           {callsToAction.hasSubmitExpense && (
             <MenuLinkContainer mobileOnly>
-              <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
+              <MenuLink as={InternalLink} route="createExpense" params={{ collectiveSlug: collective.slug }}>
                 <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
               </MenuLink>
             </MenuLinkContainer>
@@ -346,7 +346,7 @@ const CollectiveNavbar = ({
           )}
           {callsToAction.hasDashboard && (
             <MenuLinkContainer mobileOnly>
-              <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+              <MenuLink as={InternalLink} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
                 <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
               </MenuLink>
             </MenuLinkContainer>
@@ -415,9 +415,9 @@ CollectiveNavbar.defaultProps = {
   // eslint-disable-next-line react/prop-types
   LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (
-      <Link route={`${collectivePath}#section-${section}`} className={className}>
+      <InternalLink to={`${collectivePath}#section-${section}`} className={className}>
         {label}
-      </Link>
+      </InternalLink>
     );
   },
 };

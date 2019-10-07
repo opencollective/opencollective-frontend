@@ -9,7 +9,7 @@ import { Radio } from '@material-ui/core';
 import CreateHostFormWithData from './CreateHostFormWithData';
 import HostsWithData from './HostsWithData';
 import CollectiveCard from './CollectiveCard';
-import Link from './Link';
+import InternalLink from './InternalLink';
 import { P } from './Text';
 import InputField from './InputField';
 import { formatCurrency, getQueryParams, formatDate } from '../lib/utils';
@@ -354,9 +354,9 @@ class EditHost extends React.Component {
                         defaultMessage="Suggested hosts"
                       />
                     </h3>
-                    <Link route="/hosts">
+                    <InternalLink route="/hosts">
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all fiscal hosts" />
-                    </Link>
+                    </InternalLink>
                   </div>
                   <div className="suggestedHostsDescription subtitle">
                     <FormattedMessage

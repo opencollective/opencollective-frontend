@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Link from './Link';
+import InternalLink from './InternalLink';
 
 class LinkButton extends React.Component {
   render() {
@@ -48,7 +48,7 @@ class LinkButton extends React.Component {
             }
           `}
         </style>
-        <Link {...this.props}>{this.props.children}</Link>
+        <InternalLink {...this.props}>{this.props.children}</InternalLink>
       </div>
     );
   }
