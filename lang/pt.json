@@ -342,6 +342,7 @@
   "ContributePayment.balanceAndExpiry": "{balance} sobrando, vence em {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} sobrando",
   "ContributePayment.expiresOn": "Vence em {expiryDate}",
+  "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "Descubra outros coletivos parecidos para ajudar:",
   "ContributeTier.StartsAt": "Começa em",
   "contribution": "{n, plural, one {contribuição} other {contribuições}}",
