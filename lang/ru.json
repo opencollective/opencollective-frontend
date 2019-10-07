@@ -342,6 +342,7 @@
   "ContributePayment.balanceAndExpiry": "{balance} осталось, истекает {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} осталось",
   "ContributePayment.expiresOn": "Истекает {expiryDate}",
+  "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "Discover other related collectives to support:",
   "ContributeTier.StartsAt": "Starts at",
   "contribution": "{n, plural, one {contribution} other {contributions}}",
