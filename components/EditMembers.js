@@ -120,35 +120,50 @@ class EditMembers extends React.Component {
       members[index][fieldname] = value;
     }
 
-    this.setState({ members });
-    this.onChange({ members });
+    this.updateMembers(members);
   }
 
   addMember(member) {
     const members = this.state.members;
     members.push(member || {});
-    this.setState({ members });
+    this.updateMembers(members);
   }
 
-  removeMember(index) {
+  removeMember(index, event) {
+    event.preventDefault();
+
     const members = this.state.members;
-    if (index < 0 || index > members.length) return;
-    const member = members[index];
-    const result = this.confirmRemoveMember(member);
+
+    // Invalid Index
+    if (index < 0 || index > members.length - 1) {
+      return;
+    }
+
+    const memberEntry = members[index];
+    const result = this.confirmRemoveMember(memberEntry);
     if (result === true) {
       members.splice(index, 1);
-      this.setState({ members });
-      this.onChange({ members });
+      this.updateMembers(members);
     }
   }
 
-  confirmRemoveMember({ member }) {
+  confirmRemoveMember(memberEntry) {
+    if (!memberEntry.member) {
+      return true;
+    }
+
     const confirmMessage = this.props.intl.formatMessage(this.messages['members.remove.confirm'], {
-      name: member.name,
-      email: member.email,
+      name: memberEntry.member.name,
+      email: memberEntry.member.email,
     });
-    const response = window.confirm(confirmMessage);
-    return response;
+
+    return window.confirm(confirmMessage);
+  }
+
+  updateMembers(members) {
+    this.setState({ members });
+    // Make sure no empty members are sent to the parent
+    this.onChange({ members: members.filter(memberEntry => (memberEntry.member ? true : false)) });
   }
 
   renderMember(member, index) {
@@ -157,7 +172,7 @@ class EditMembers extends React.Component {
     return (
       <div className="member" key={`member-${index}-${member.id}`}>
         <div className="memberActions">
-          <a className="removeMember" href="#" onClick={() => this.removeMember(index)}>
+          <a className="removeMember" href="#" onClick={event => this.removeMember(index, event)}>
             {intl.formatMessage(this.messages['members.remove'])}
           </a>
         </div>
