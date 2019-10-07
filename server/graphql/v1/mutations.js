@@ -216,7 +216,7 @@ const mutations = {
         }
 
         const user = await models.User.createUserWithCollective(args.user, transaction);
-        const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl);
+        const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl, 'firstLogin');
 
         if (!args.organization) {
           emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });

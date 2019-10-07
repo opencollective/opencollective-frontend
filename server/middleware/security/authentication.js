@@ -84,9 +84,24 @@ export const checkJwtExpiry = (req, res, next) => {
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
   const userid = Number(req.jwtPayload.sub);
+  const lastLogin = req.jwtPayload.last;
   User.findByPk(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
+      if (req.jwtPayload.last) {
+        if (req.jwtPayload.last === 'firstLogin' && !user.lastLogin) {
+          const now = new Date();
+          user.update({ lastLogin: now });
+        } else {
+          const jwtDate = new Date(lastLogin);
+          const dbLogin = user.lastLogin;
+          if (jwtDate.getTime() !== dbLogin.getTime()) {
+            throw errors.Unauthorized('Invalid login link - multiple uses');
+          }
+          const now = new Date();
+          user.update({ lastLogin: now });
+        }
+      }
       user.update({ seenAt: new Date() });
       req.remoteUser = user;
       return user.populateRoles();
