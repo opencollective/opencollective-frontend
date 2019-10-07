@@ -98,6 +98,7 @@
   "collective.collective.memberOf.collective.parent.title": "Коллективы члена",
   "collective.company.description": "Начните с @ для того, чтобы сослаться на организацию (например, @airbnb)",
   "collective.company.label": "компания",
+  "collective.connectedAccounts.disconnect.button": "Disconnect",
   "collective.connectedAccounts.github.button": "Подключить GitHub",
   "collective.connectedAccounts.github.connected": "GitHub account {username} connected on {updatedAt, date, short}",
   "collective.connectedAccounts.github.description": "Подключите Github аккаунт, чтобы идентифицироваться и добавить ссылку в свой профиль",
