@@ -6,7 +6,7 @@ import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
 import IncognitoUserCollective from '../components/IncognitoUserCollective';
-import PledgedCollective from '../components/PledgedCollective';
+import PledgedCollectivePage from '../components/PledgedCollectivePage';
 
 import { addCollectiveData } from '../lib/graphql/queries';
 
@@ -72,8 +72,8 @@ class CollectivePage extends React.Component {
       query,
     };
 
-    if (collective && collective.pledges.length > 0 && !collective.isActive) {
-      return <PledgedCollective {...props} />;
+    if (collective && collective.isPledged && !collective.isActive) {
+      return <PledgedCollectivePage collective={collective} />;
     }
 
     if (collective && collective.type === 'COLLECTIVE') {
