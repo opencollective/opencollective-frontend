@@ -4,6 +4,7 @@ import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
+import { get } from 'lodash';
 
 import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
@@ -81,6 +82,16 @@ class CreateOrderPage extends React.Component {
     skipStepDetails: PropTypes.bool,
   };
 
+  getCanonicalURL(collective, tier) {
+    if (!tier) {
+      return `/${collective.slug}/donate`;
+    } else if (collective.type === CollectiveType.EVENT) {
+      return `/${get(collective.parentCollective, 'slug', collective.slug)}/events/${collective.slug}/order/${tier.id}`;
+    } else {
+      return `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+    }
+  }
+
   getPageMetadata() {
     const { intl, data } = this.props;
 
@@ -90,6 +101,7 @@ class CreateOrderPage extends React.Component {
 
     const collective = data.Collective;
     return {
+      canonicalURL: this.getCanonicalURL(collective, data.Tier),
       description: collective.description,
       twitterHandle: collective.twitterHandle,
       image: collective.image || collective.backgroundImage,
@@ -120,13 +132,24 @@ class CreateOrderPage extends React.Component {
           </MessageBox>
         </Flex>
       );
+    } else if (!data.Collective.isActive) {
+      return (
+        <Flex py={5} justifyContent="center">
+          <MessageBox type="info" withIcon>
+            <FormattedMessage
+              id="createOrder.inactiveCollective"
+              defaultMessage="This collective is not active and can't accept financial contributions"
+            />
+          </MessageBox>
+        </Flex>
+      );
     } else if (this.props.tierId && !data.Tier) {
       return (
         <Flex py={5} justifyContent="center">
           <MessageBox type="error" withIcon>
             <FormattedMessage
               id="createOrder.missingTier"
-              defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins. "
+              defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins."
             />
             <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
@@ -180,6 +203,7 @@ const collectiveFields = `
   hostFeePercent
   tags
   settings
+  isActive
   location {
     country
   }

@@ -6,7 +6,7 @@ import { get } from 'lodash';
 import { capitalize } from '../../lib/utils';
 
 import Link from '../Link';
-import ExternalLinkNewTab from '../ExternalLinkNewTab';
+import ExternalLink from '../ExternalLink';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 import RefundTransactionBtn from './RefundTransactionBtn';
 
@@ -20,8 +20,6 @@ class TransactionDetails extends React.Component {
     }),
     id: PropTypes.number.isRequired,
     amount: PropTypes.number.isRequired,
-    /** If the transaction has an attachement attached, it will replace the invoice link */
-    attachment: PropTypes.string,
     canDownloadInvoice: PropTypes.bool,
     canRefund: PropTypes.bool,
     className: PropTypes.string,
@@ -35,6 +33,12 @@ class TransactionDetails extends React.Component {
     hostCurrencyFxRate: PropTypes.number,
     paymentMethod: PropTypes.shape({
       service: PropTypes.string.isRequired,
+    }),
+    expense: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      /** If the transaction has an attachement attached, it will replace the invoice link */
+      attachment: PropTypes.string,
+      category: PropTypes.string,
     }),
     host: PropTypes.shape({
       slug: PropTypes.string.isRequired,
@@ -169,7 +173,7 @@ class TransactionDetails extends React.Component {
       paymentMethod,
       isRefund,
       uuid,
-      attachment,
+      expense,
     } = this.props;
 
     const amountDetailsStr = this.formatAmountDetails();
@@ -262,13 +266,21 @@ class TransactionDetails extends React.Component {
               <FormattedMessage id="transaction.invoice" defaultMessage="invoice" />
             </label>
             <div>
-              {attachment ? (
-                <ExternalLinkNewTab href={attachment}>
+              {expense && expense.attachment ? (
+                <ExternalLink href={expense.attachment} openInNewTab>
                   <FormattedMessage id="actions.download" defaultMessage="Download" />
-                </ExternalLinkNewTab>
+                </ExternalLink>
               ) : (
-                <InvoiceDownloadLink type="transaction" transactionUuid={uuid} viewLoading={() => 'Loading...'}>
-                  <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+                <InvoiceDownloadLink type="transaction" transactionUuid={uuid}>
+                  {({ loading, download }) => (
+                    <a onClick={download}>
+                      {loading ? (
+                        <FormattedMessage id="Select.Loading" defaultMessage="Loading..." />
+                      ) : (
+                        <FormattedMessage id="transaction.downloadPDF" defaultMessage="Download (pdf)" />
+                      )}
+                    </a>
+                  )}
                 </InvoiceDownloadLink>
               )}
             </div>

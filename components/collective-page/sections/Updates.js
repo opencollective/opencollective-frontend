@@ -72,7 +72,7 @@ class SectionUpdates extends React.PureComponent {
 
     /** Transactions */
     data: PropTypes.shape({
-      refetch: PropTypes.func.isRequired,
+      refetch: PropTypes.func,
       Collective: PropTypes.shape({
         updates: PropTypes.arrayOf(
           PropTypes.shape({
@@ -98,8 +98,9 @@ class SectionUpdates extends React.PureComponent {
 
   componentDidUpdate(oldProps) {
     // If user log in/out we need to refresh data as it depends on the current user
-    if (oldProps.isLoggedIn !== this.props.isLoggedIn) {
-      this.props.data.refetch();
+    const refetch = get(this.props.data, 'refetch');
+    if (oldProps.isLoggedIn !== this.props.isLoggedIn && refetch) {
+      refetch();
     }
   }
 

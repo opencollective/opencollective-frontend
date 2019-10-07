@@ -18,7 +18,7 @@ import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../../lib/url_helpers';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledLink from '../../StyledLink';
-import ExternalLinkNewTab from '../../ExternalLinkNewTab';
+import ExternalLink from '../../ExternalLink';
 import { Span, H1 } from '../../Text';
 import Container from '../../Container';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
@@ -122,25 +122,25 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
           <Flex my={2}>
             {collective.twitterHandle && (
-              <ExternalLinkNewTab href={twitterProfileUrl(collective.twitterHandle)} title="Twitter">
+              <ExternalLink href={twitterProfileUrl(collective.twitterHandle)} title="Twitter" openInNewTab>
                 <StyledRoundButton size={32} mr={3}>
                   <Twitter size={12} />
                 </StyledRoundButton>
-              </ExternalLinkNewTab>
+              </ExternalLink>
             )}
             {collective.githubHandle && (
-              <ExternalLinkNewTab href={githubProfileUrl(collective.githubHandle)} title="Github">
+              <ExternalLink href={githubProfileUrl(collective.githubHandle)} title="Github" openInNewTab>
                 <StyledRoundButton size={32} mr={3}>
                   <Github size={12} />
                 </StyledRoundButton>
-              </ExternalLinkNewTab>
+              </ExternalLink>
             )}
             {collective.website && (
-              <ExternalLinkNewTab href={collective.website} title={intl.formatMessage(Translations.website)}>
+              <ExternalLink href={collective.website} title={intl.formatMessage(Translations.website)} openInNewTab>
                 <StyledRoundButton size={32} mr={3}>
                   <Globe size={14} />
                 </StyledRoundButton>
-              </ExternalLinkNewTab>
+              </ExternalLink>
             )}
           </Flex>
           {host && collective.isApproved && (

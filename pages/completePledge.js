@@ -1,135 +1,144 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
+import { Flex } from '@rebass/grid';
+import { defineMessages, injectIntl } from 'react-intl';
 
-import { compose } from '../lib/utils';
-import { Router } from '../server/pages';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
+import Page from '../components/Page';
 import ErrorPage from '../components/ErrorPage';
-import OrderForm from '../components/OrderForm';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { H1, P } from '../components/Text';
-import Container from '../components/Container';
-import { withUser } from '../components/UserProvider';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import ContributionFlow from '../components/contribution-flow';
+
+const messages = defineMessages({
+  title: {
+    id: 'completePledge.Title',
+    defaultMessage: 'Complete your pledge',
+  },
+  missingOrder: {
+    id: 'completePledge.MissingOrder',
+    defaultMessage: "This pledge doesn't exist or has already been completed.",
+  },
+  missingHost: {
+    id: 'createOrder.missingHost',
+    defaultMessage: "This collective doesn't have a host and can't accept financial contributions",
+  },
+  inactiveCollective: {
+    id: 'createOrder.inactiveCollective',
+    defaultMessage: "This collective is not active and can't accept financial contributions",
+  },
+});
 
 class CompletePledgePage extends React.Component {
   static getInitialProps({ query = {} }) {
-    return {
-      id: Number(query.id),
-    };
+    return { orderId: Number(query.orderId), step: query.step };
   }
 
   static propTypes = {
-    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object,
     completePledge: PropTypes.func,
-    data: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
+    orderId: PropTypes.number.isRequired,
+    step: PropTypes.string,
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      Order: PropTypes.shape({
+        status: PropTypes.string,
+        interval: PropTypes.string,
+        totalAmount: PropTypes.number,
+        collective: PropTypes.shape({
+          isActive: PropTypes.bool,
+          host: PropTypes.object,
+          image: PropTypes.string,
+          backgroundImage: PropTypes.string,
+          twitterHandle: PropTypes.string,
+          description: PropTypes.string,
+        }),
+      }),
+    }),
   };
 
-  state = {
-    error: null,
-  };
+  state = { isRedirecting: false };
 
-  async submitForm(order) {
-    const { completePledge, data } = this.props;
-    try {
-      const response = await completePledge(order);
-      const completedPledge = response.data.updateOrder;
+  isLoading() {
+    return this.state.isRedirecting || (this.props.data && this.props.data.loading);
+  }
 
-      Router.pushRoute('collective', {
-        slug: completedPledge.fromCollective.slug,
-        status: completedPledge.status,
-        CollectiveId: order.collective.id,
-        collectiveType: data.Order.collective.type,
-        OrderId: completedPledge.id,
-        TierId: order.tier && order.tier.id,
-        totalAmount: order.totalAmount,
-      });
-    } catch (error) {
-      this.setState({ error });
+  getPageMetadata() {
+    const { intl, data } = this.props;
+    const title = intl.formatMessage(messages.title);
+
+    if (!data || !data.Order || !data.Order.collective) {
+      return { title };
+    }
+
+    const collective = data.Order.collective;
+    return {
+      description: collective.description,
+      twitterHandle: collective.twitterHandle,
+      image: collective.image || collective.backgroundImage,
+      title: title,
+    };
+  }
+
+  renderMessage(type, message) {
+    return (
+      <Flex py={[5, 6, 7]} justifyContent="center">
+        <MessageBox type={type} withIcon>
+          {message}
+        </MessageBox>
+      </Flex>
+    );
+  }
+
+  renderPageContent() {
+    const { data, intl } = this.props;
+    const { Order } = data;
+
+    if (this.isLoading()) {
+      return (
+        <Flex py={5} justifyContent="center">
+          <Loading />
+        </Flex>
+      );
+    } else if (!Order || ['ACTIVE', 'PAID'].includes(Order.status)) {
+      return this.renderMessage('warning', intl.formatMessage(messages.missingOrder));
+    } else if (!Order.collective || !Order.collective.isActive) {
+      return this.renderMessage('warning', intl.formatMessage(messages.inactiveCollective));
+    } else if (!Order.collective.host) {
+      return this.renderMessage('error', intl.formatMessage(messages.missingHost));
+    } else {
+      return (
+        <ContributionFlow
+          collective={Order.collective}
+          host={Order.collective.host}
+          pledge={Order}
+          step={this.props.step || 'contributeAs'}
+          onSuccess={() => {
+            // Because Apollo will update the order data with the new status, we need to show
+            // a loading indicator when the order success to avoid showing a warning saying
+            // that the order has already been confirmed.
+            this.setState({ isRedirecting: true });
+          }}
+        />
+      );
     }
   }
 
   render() {
-    const { data, LoggedInUser, loadingLoggedInUser } = this.props;
-    const { error } = this.state;
+    const { data } = this.props;
 
-    const { loading, Order } = data;
-
-    if (loading || error) {
-      if (error) {
-        data.error = data.error || error;
-      }
-
-      return <ErrorPage loading={loading || loadingLoggedInUser} data={data} message={error && error.message} />;
+    if (!this.isLoading() && (!data || !data.Order)) {
+      return <ErrorPage data={data} />;
+    } else {
+      return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
     }
-
-    if (Order) {
-      Order.tier = {
-        name: 'Pledge',
-        presets: !Order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
-        type: 'DONATION',
-        currency: Order.collective.currency,
-        interval: Order.interval,
-        button: 'donate',
-        description: 'Thank you for your kind donation',
-      };
-    }
-
-    const pledgeComplete = Order && ['ACTIVE', 'PAID'].includes(Order.status);
-    const collectiveActive = get(Order, 'collective.isActive');
-    const showForm = LoggedInUser && !pledgeComplete && get(Order, 'collective.isActive');
-
-    return (
-      <Fragment>
-        <Header className={loadingLoggedInUser ? 'loading' : ''} LoggedInUser={LoggedInUser} title="Complete Pledge" />
-        <Body>
-          <Container maxWidth={1200} px={4} py={5}>
-            <H1>Complete Your Pledge</H1>
-
-            {!loadingLoggedInUser && !LoggedInUser && (
-              <Fragment>
-                <SignInOrJoinFree />
-              </Fragment>
-            )}
-
-            {pledgeComplete && (
-              <P fontWeight="bold" textAlign="center" mt={4}>
-                This pledge has already been completed. No action needed at this time.
-              </P>
-            )}
-
-            {!collectiveActive && (
-              <P fontWeight="bold" textAlign="center" mt={4}>
-                The {get(Order, 'collective.name')} collective has not been claimed. You will be notified once that
-                occurs.
-              </P>
-            )}
-
-            {showForm && (
-              <OrderForm
-                collective={Order.collective}
-                LoggedInUser={LoggedInUser}
-                onSubmit={order => this.submitForm({ ...order, id: Order.id })}
-                order={Order}
-              />
-            )}
-          </Container>
-        </Body>
-        <Footer />
-      </Fragment>
-    );
   }
 }
 
 const addOrderData = graphql(gql`
-  query getOrder($id: Int!) {
-    Order(id: $id) {
+  query getOrder($orderId: Int!) {
+    Order(id: $orderId) {
       id
       interval
       publicMessage
@@ -137,52 +146,44 @@ const addOrderData = graphql(gql`
       totalAmount
       status
       collective {
+        id
+        type
         slug
         currency
+        hostFeePercent
+        isActive
+        name
+        description
+        twitterHandle
+        backgroundImage
+        image
+        location {
+          country
+        }
+        parentCollective {
+          id
+          slug
+          settings
+          location {
+            country
+          }
+        }
         host {
           id
           name
+          settings
+          location {
+            country
+          }
         }
-        isActive
-        name
         paymentMethods {
           id
           name
           service
         }
-        website
-      }
-      fromCollective {
-        id
-        name
-        type
       }
     }
   }
 `);
 
-const addUpdateOrderMutation = graphql(
-  gql`
-    mutation completePledge($order: OrderInputType!) {
-      updateOrder(order: $order) {
-        status
-        fromCollective {
-          slug
-        }
-      }
-    }
-  `,
-  {
-    props: ({ mutate }) => ({
-      completePledge: order => mutate({ variables: { order } }),
-    }),
-  },
-);
-
-const addGraphQL = compose(
-  addOrderData,
-  addUpdateOrderMutation,
-);
-
-export { CompletePledgePage as MockCompletePledgePage };
-export default withUser(addGraphQL(CompletePledgePage));
+export default addOrderData(injectIntl(CompletePledgePage));

@@ -1,18 +1,13 @@
 import { mount } from 'enzyme';
 import React from 'react';
 import Tier from '../Tier';
-import { IntlProvider } from 'react-intl';
 import { capitalize } from '../../lib/utils';
+import { withRequiredProviders } from '../../test/providers';
 
 const DEBUG = process.env.DEBUG || false;
 
 describe('Tier component', () => {
-  const mountComponent = props =>
-    mount(
-      <IntlProvider locale="en">
-        <Tier {...props} />
-      </IntlProvider>,
-    );
+  const mountComponent = props => mount(withRequiredProviders(<Tier {...props} />));
 
   describe('Donate Tier', () => {
     it('Change the preset and interval', done => {

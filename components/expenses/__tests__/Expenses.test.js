@@ -1,13 +1,8 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { IntlProvider } from 'react-intl';
-import { ApolloProvider } from 'react-apollo';
 
 import Expenses from '../Expenses';
-
-import initClient from '../../../lib/initClient';
-
-const apolloClient = initClient();
+import { withRequiredProviders } from '../../../test/providers';
 
 describe('Expenses component', () => {
   const host = {
@@ -63,17 +58,15 @@ describe('Expenses component', () => {
   };
 
   const component = mount(
-    <IntlProvider locale="en">
-      <ApolloProvider client={apolloClient}>
-        <Expenses
-          expenses={expenses}
-          host={host}
-          editable={true}
-          LoggedInUser={loggedInUser}
-          payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
-        />
-      </ApolloProvider>
-    </IntlProvider>,
+    withRequiredProviders(
+      <Expenses
+        expenses={expenses}
+        host={host}
+        editable={true}
+        LoggedInUser={loggedInUser}
+        payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
+      />,
+    ),
   );
 
   describe('Paying expenses', () => {

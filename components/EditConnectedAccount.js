@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
+
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { connectAccount } from '../lib/api';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -76,7 +77,7 @@ class EditConnectedAccount extends React.Component {
       return window.location.replace(
         `/api/connected-accounts/${service}/oauthUrl?CollectiveId=${collective.id}&redirect=${encodeURIComponent(
           redirect,
-        )}&access_token=${localStorage.accessToken}`,
+        )}&access_token=${getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)}`,
       );
     }
 

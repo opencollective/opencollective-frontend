@@ -145,32 +145,43 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
           />
           <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
             <Dropzone
-              onDrop={acceptedFiles => setUploadedImage(acceptedFiles[0])}
+              onDrop={acceptedFiles =>
+                setUploadedImage(
+                  ...acceptedFiles.map(file =>
+                    Object.assign(file, {
+                      preview: URL.createObjectURL(file),
+                    }),
+                  ),
+                )
+              }
               multiple={false}
               accept="image/jpeg, image/png"
               style={{}}
               disabled={submitting}
             >
-              {({ isDragActive, isDragAccept }) => (
-                <StyledButton minWidth={150} disabled={submitting}>
-                  {!isDragActive && (
-                    <React.Fragment>
-                      <Span mr={2}>
-                        <Upload size="1em" />
-                      </Span>
-                      <FormattedMessage id="Upload" defaultMessage="Upload" />
-                    </React.Fragment>
-                  )}
-                  {isDragActive &&
-                    (isDragAccept ? (
-                      <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
-                    ) : (
-                      <FormattedMessage
-                        id="uploadImage.isDragReject"
-                        defaultMessage="🚫 This file type is not accepted"
-                      />
-                    ))}
-                </StyledButton>
+              {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <StyledButton minWidth={150} disabled={submitting}>
+                    {!isDragActive && (
+                      <React.Fragment>
+                        <Span mr={2}>
+                          <Upload size="1em" />
+                        </Span>
+                        <FormattedMessage id="Upload" defaultMessage="Upload" />
+                      </React.Fragment>
+                    )}
+                    {isDragActive &&
+                      (isDragAccept ? (
+                        <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
+                      ) : (
+                        <FormattedMessage
+                          id="uploadImage.isDragReject"
+                          defaultMessage="🚫 This file type is not accepted"
+                        />
+                      ))}
+                  </StyledButton>
+                </div>
               )}
             </Dropzone>
             {((collective.backgroundImage && uploadedImage !== KEY_IMG_REMOVE) || uploadedImage !== KEY_IMG_REMOVE) && (

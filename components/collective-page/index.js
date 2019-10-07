@@ -39,6 +39,7 @@ class CollectivePage extends Component {
     expenses: PropTypes.arrayOf(PropTypes.object),
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
+    childCollectives: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
@@ -125,7 +126,7 @@ class CollectivePage extends Component {
       hasSubmitExpense: isCollective,
       hasApply: isHost,
       hasDashboard: isHost && isAdmin,
-      hasManageSubscriptions: !isHost && isAdmin && !isCollective,
+      hasManageSubscriptions: isAdmin && !isCollective,
       addFunds: isRoot && type === CollectiveType.ORGANIZATION,
     };
   });
@@ -153,6 +154,7 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
+            childCollectives={this.props.childCollectives}
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
@@ -178,7 +180,7 @@ class CollectivePage extends Component {
       case Sections.CONTRIBUTIONS:
         return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
-        return <SectionTransactions collective={this.props.collective} />;
+        return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
       default:
         return null;
     }

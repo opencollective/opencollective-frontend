@@ -11,7 +11,7 @@ import {
  */
 export const TransactionsAndExpensesFragment = gql`
   fragment TransactionsAndExpensesFragment on Collective {
-    transactions(limit: 3, type: "CREDIT") {
+    transactions(limit: 3, includeExpenseTransactions: false) {
       ...BudgetItemOrderFragment
       ...BudgetItemExpenseFragment
     }

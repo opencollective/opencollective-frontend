@@ -101,33 +101,42 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
           onDrop={acceptedFiles => {
-            setUploadedImage(acceptedFiles[0]);
+            setUploadedImage(
+              ...acceptedFiles.map(file =>
+                Object.assign(file, {
+                  preview: URL.createObjectURL(file),
+                }),
+              ),
+            );
             setEditing(true);
           }}
         >
-          {({ isDragActive, isDragAccept }) => (
-            <EditableAvatarContainer isDragActive={isDragActive}>
-              <EditOverlay borderRadius={borderRadius}>
-                {!isDragActive && (
-                  <React.Fragment>
-                    <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
-                      <Camera size={25} />
-                    </StyledRoundButton>
-                    <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
-                  </React.Fragment>
-                )}
-                {isDragActive &&
-                  (isDragAccept ? (
-                    <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
-                  ) : (
-                    <FormattedMessage
-                      id="uploadImage.isDragReject"
-                      defaultMessage="🚫 This file type is not accepted"
-                    />
-                  ))}
-              </EditOverlay>
-              <Avatar collective={collective} radius={AVATAR_SIZE} />
-            </EditableAvatarContainer>
+          {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <EditableAvatarContainer isDragActive={isDragActive}>
+                <EditOverlay borderRadius={borderRadius}>
+                  {!isDragActive && (
+                    <React.Fragment>
+                      <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
+                        <Camera size={25} />
+                      </StyledRoundButton>
+                      <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
+                    </React.Fragment>
+                  )}
+                  {isDragActive &&
+                    (isDragAccept ? (
+                      <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
+                    ) : (
+                      <FormattedMessage
+                        id="uploadImage.isDragReject"
+                        defaultMessage="🚫 This file type is not accepted"
+                      />
+                    ))}
+                </EditOverlay>
+                <Avatar collective={collective} radius={AVATAR_SIZE} />
+              </EditableAvatarContainer>
+            </div>
           )}
         </Dropzone>
         <Container position="absolute" right={0} bottom={0}>

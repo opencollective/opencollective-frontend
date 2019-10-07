@@ -15,13 +15,15 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
+import Container from '../../Container';
+import { fadeIn } from '../../StyledKeyframes';
+import MessageBox from '../../MessageBox';
 
 // Local imports
 import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 import { Dimensions } from '../_constants';
-import { fadeIn } from '../../StyledKeyframes';
 
 const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
 const FILTERS_LIST = Object.values(FILTERS);
@@ -71,12 +73,17 @@ const MembershipCardContainer = styled.div`
   margin-bottom: 40px;
   margin-right: 4px;
 
-  @media screen and (min-width: 52em) {
-    margin-right: 34px;
+  @media screen and (min-width: 40em) {
+    margin-right: 5%;
   }
 
-  @media screen and (min-width: 40em) {
-    margin-right: 32px;
+  @media screen and (min-width: 64em) {
+    margin-right: 2%;
+  }
+
+  @media screen and (min-width: 1250px) {
+    margin-right: 57px;
+    margin-bottom: 50px;
   }
 `;
 
@@ -231,6 +238,18 @@ class SectionContributions extends React.PureComponent {
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
+    } else if (!data.Collective) {
+      console.error(`Empty collective data #${collective.id} in Contributions section`);
+      return (
+        <Container display="flex" border="1px dashed #d1d1d1" justifyContent="center" py={[6, 7]} background="#f8f8f8">
+          <MessageBox type="error" withIcon>
+            <FormattedMessage
+              id="NCP.SectionFetchError"
+              defaultMessage="We encountered an error while retrieving the data for this section."
+            />
+          </MessageBox>
+        </Container>
+      );
     }
 
     const filters = this.getFilters(data.Collective.memberOf);
@@ -246,7 +265,7 @@ class SectionContributions extends React.PureComponent {
             <P color="black.600" fontSize="LeadParagraph" mt={5}>
               <FormattedMessage
                 id="CollectivePage.SectionContributions.Empty"
-                defaultMessage="{collectiveName} seems to be hibernating on a cave in the North Pole ❄️☃️!"
+                defaultMessage="{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!"
                 values={{ collectiveName: collective.name }}
               />
             </P>
@@ -271,22 +290,27 @@ class SectionContributions extends React.PureComponent {
                 />
               </Box>
             )}
-            <ContainerSectionContent>
+            <Container
+              data-cy="Contributions"
+              maxWidth={Dimensions.MAX_SECTION_WIDTH}
+              pl={Dimensions.PADDING_X}
+              m="0 auto"
+            >
               <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                  <MembershipCardContainer key={membership.id}>
+                  <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                     <StyledMembershipCard membership={membership} />
                   </MembershipCardContainer>
                 ))}
               </Flex>
-              {nbMemberships < sortedMemberships.length && (
-                <Flex mt={3} justifyContent="center">
-                  <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
-                    <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-                  </StyledButton>
-                </Flex>
-              )}
-            </ContainerSectionContent>
+            </Container>
+            {nbMemberships < sortedMemberships.length && (
+              <Flex mt={3} justifyContent="center">
+                <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
+                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                </StyledButton>
+              </Flex>
+            )}
           </React.Fragment>
         )}
         {isOrganization && superCollectiveTags.length > 0 && (
@@ -297,22 +321,26 @@ class SectionContributions extends React.PureComponent {
                 return null;
               }
               return (
-                <section>
-                  <SectionTitle textAlign="left" mb={4}>
-                    <FormattedMessage
-                      id="CP.Contributions.PartOfOrg"
-                      defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
-                      values={{ n: collectives.length }}
-                    />
-                  </SectionTitle>
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                    {collectives.map(collective => (
-                      <MembershipCardContainer key={collective.id}>
-                        <StyledMembershipCard membership={{ collective }} />
-                      </MembershipCardContainer>
-                    ))}
-                  </Flex>
-                </section>
+                <React.Fragment>
+                  <ContainerSectionContent>
+                    <SectionTitle textAlign="left" mb={4}>
+                      <FormattedMessage
+                        id="CP.Contributions.PartOfOrg"
+                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
+                        values={{ n: collectives.length }}
+                      />
+                    </SectionTitle>
+                  </ContainerSectionContent>
+                  <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
+                    <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                      {collectives.map(collective => (
+                        <MembershipCardContainer key={collective.id}>
+                          <StyledMembershipCard membership={{ collective }} />
+                        </MembershipCardContainer>
+                      ))}
+                    </Flex>
+                  </Container>
+                </React.Fragment>
               );
             }}
           </Query>

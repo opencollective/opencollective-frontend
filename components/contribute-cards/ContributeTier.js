@@ -5,11 +5,13 @@ import { Box, Flex } from '@rebass/grid';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/utils';
 import Link from '../Link';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledProgressBar from '../StyledProgressBar';
+import StyledLink from '../StyledLink';
 
 import Contribute from './Contribute';
 
@@ -24,6 +26,12 @@ const messages = defineMessages({
 const getContributionTypeFromTier = tier => {
   if (tier.goal) {
     return ContributionTypes.FINANCIAL_GOAL;
+  } else if (tier.type === TierTypes.PRODUCT) {
+    return ContributionTypes.PRODUCT;
+  } else if (tier.type === TierTypes.TICKET) {
+    return ContributionTypes.TICKET;
+  } else if (tier.type === TierTypes.MEMBERSHIP) {
+    return ContributionTypes.MEMBERSHIP;
   } else if (tier.interval) {
     return ContributionTypes.FINANCIAL_RECURRING;
   } else {
@@ -33,7 +41,8 @@ const getContributionTypeFromTier = tier => {
 
 const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const currency = tier.currency || collective.currency;
-  const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minimumAmount : tier.amount;
+  const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
+  const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
 
   let description;
@@ -108,7 +117,9 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
           <P mb={4}>
             {description}{' '}
             {(isTruncated || tier.hasLongDescription) && (
-              <Link
+              <StyledLink
+                as={Link}
+                whiteSpace="nowrap"
                 route="tier"
                 params={{
                   collectiveSlug: collective.slug,
@@ -117,18 +128,18 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                   tierId: tier.id,
                 }}
               >
-                <Span textTransform="capitalize" whiteSpace="nowrap">
-                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-                </Span>
-              </Link>
+                <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+              </StyledLink>
             )}
           </P>
         </div>
-        {minAmount && (
+        {minAmount > 0 && (
           <div>
-            <P fontSize="Tiny" color="black.600" textTransform="uppercase" mb={1}>
-              <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
-            </P>
+            {isFlexibleAmount && (
+              <P fontSize="Tiny" color="black.600" textTransform="uppercase" mb={1}>
+                <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
+              </P>
+            )}
             <P color="black.700">
               <FormattedMoneyAmount
                 amount={minAmount}

@@ -26,7 +26,7 @@ import InputField from './InputField';
 import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
 
 const MIN_AMOUNT = 5;
-const MAX_AMOUNT = 10000;
+const MAX_AMOUNT = 1000000;
 
 const messages = defineMessages({
   emailCustomMessage: {
@@ -334,7 +334,7 @@ class CreateVirtualCardsForm extends Component {
           type="number"
           step="1"
           min="1"
-          max="100"
+          max="100000"
           maxWidth="6.5em"
           onChange={e => this.onChange('numberOfVirtualCards', e.target.value)}
           value={this.state.values.numberOfVirtualCards}

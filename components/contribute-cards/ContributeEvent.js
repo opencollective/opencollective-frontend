@@ -28,6 +28,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       title={event.name}
       contributors={event.contributors}
       stats={event.stats.backers}
+      image={event.backgroundImageUrl}
       {...props}
     >
       {(startsAt || endsAt) && (
@@ -70,6 +71,7 @@ ContributeEvent.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
+    backgroundImageUrl: PropTypes.string,
     startsAt: PropTypes.string,
     endsAt: PropTypes.string,
     description: PropTypes.string,

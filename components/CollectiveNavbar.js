@@ -102,7 +102,7 @@ const MenuLinkContainer = styled.div`
 `;
 
 const InfosContainer = styled(Container)`
-  padding: 14px 24px;
+  padding: 14px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -411,11 +411,11 @@ CollectiveNavbar.propTypes = {
 CollectiveNavbar.defaultProps = {
   hideInfos: false,
   isAnimated: false,
-  callsToAction: { hasContact: true },
+  callsToAction: {},
   // eslint-disable-next-line react/prop-types
   LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {
     return (
-      <Link route={`${collectivePath}/v2#section-${section}`} className={className}>
+      <Link route={`${collectivePath}#section-${section}`} className={className}>
         {label}
       </Link>
     );

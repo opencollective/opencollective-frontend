@@ -33,8 +33,9 @@ const StyledContributeCard = styled.div`
 const CoverImage = styled.div`
   background: ${props => {
     const primary = props.theme.colors.primary;
-    const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 150%)`;
-    return `${radial}, ${primary[500]}`;
+    const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 150%), `;
+    const image = props.image ? `url(${props.image}), ` : '';
+    return `${image}${radial}${primary[500]}`;
   }};
   height: 104px;
   background-repeat: no-repeat;
@@ -81,17 +82,36 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.EventPassed',
     defaultMessage: 'Past event',
   },
+  [ContributionTypes.PRODUCT]: {
+    id: 'ContributionType.Product',
+    defaultMessage: 'Product',
+  },
+  [ContributionTypes.TICKET]: {
+    id: 'ContributionType.Ticket',
+    defaultMessage: 'Ticket',
+  },
+  [ContributionTypes.MEMBERSHIP]: {
+    id: 'ContributionType.Membership',
+    defaultMessage: 'Membership',
+  },
+  [ContributionTypes.CHILD_COLLECTIVE]: {
+    id: 'ContributionType.ChildCollective',
+    defaultMessage: 'Member collective',
+  },
 });
 
 const getContributeCTA = type => {
-  if (type === ContributionTypes.FINANCIAL_GOAL) {
-    return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
-  } else if (type === ContributionTypes.EVENT_PARTICIPATE) {
-    return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
-  } else if (type === ContributionTypes.EVENT_PASSED) {
-    return <FormattedMessage id="ContributeCard.BtnEventPassed" defaultMessage="View event" />;
-  } else {
-    return <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />;
+  switch (type) {
+    case ContributionTypes.FINANCIAL_GOAL:
+      return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
+    case ContributionTypes.EVENT_PARTICIPATE:
+      return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
+    case ContributionTypes.EVENT_PASSED:
+      return <FormattedMessage id="ContributeCard.BtnEventPassed" defaultMessage="View event" />;
+    case ContributionTypes.CHILD_COLLECTIVE:
+      return <FormattedMessage id="ContributeCard.SeeCollective" defaultMessage="View collective" />;
+    default:
+      return <FormattedMessage id="ContributeCard.Btn" defaultMessage="Contribute" />;
   }
 };
 
@@ -117,12 +137,13 @@ const ContributeCard = ({
   contributors,
   stats,
   hideContributors,
+  image,
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
   return (
     <StyledContributeCard>
-      <CoverImage>
+      <CoverImage image={image}>
         <StyledTag position="absolute" bottom="8px" left="8px" background="white" color="black.700" fontWeight="600">
           {intl.formatMessage(I18nContributionType[type])}
         </StyledTag>
@@ -199,6 +220,8 @@ ContributeCard.propTypes = {
   route: PropTypes.string.isRequired,
   /** A custom button text to override the default one */
   buttonText: PropTypes.string,
+  /** An image to display on the card hero */
+  image: PropTypes.string,
   /** Params for the route */
   routeParams: PropTypes.object,
   /** The card body */

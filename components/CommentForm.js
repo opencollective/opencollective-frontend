@@ -6,6 +6,7 @@ import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
 import Link from './Link';
+import MessageBox from './MessageBox';
 
 /**
  * Component to render for for **new** comments. Comment Edit form is created
@@ -37,15 +38,19 @@ class CommentForm extends React.Component {
       },
     });
 
-    this.state = { comment: {} };
+    this.state = { comment: {}, error: null };
   }
 
   async onSubmit() {
-    const res = await this.props.onSubmit(pick(this.state.comment, ['html']));
-    const comment = res.data && res.data.createComment;
-    if (comment) {
-      const newEmptyComment = { id: comment.id++ };
-      this.setState({ comment: newEmptyComment });
+    this.setState({ error: null });
+    try {
+      const comment = await this.props.onSubmit(pick(this.state.comment, ['html']));
+      if (comment) {
+        const newEmptyComment = { id: comment.id++ };
+        this.setState({ comment: newEmptyComment });
+      }
+    } catch (e) {
+      this.setState({ error: e });
     }
   }
 
@@ -136,6 +141,11 @@ class CommentForm extends React.Component {
                   className="small"
                 />
               </div>
+              {this.state.error && (
+                <MessageBox type="error" withIcon mb={2}>
+                  {this.state.error.toString()}
+                </MessageBox>
+              )}
               <div className="actions">
                 <SmallButton className="primary save" onClick={this.onSubmit}>
                   <FormattedMessage id="comment.btn" defaultMessage="Comment" />

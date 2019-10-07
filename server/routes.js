@@ -43,6 +43,9 @@ export default (server, app) => {
 
   server.get('/static/*', maxAge(7200));
 
+  // Security policy, following the standard from https://securitytxt.org/
+  server.use('/.well-known/security.txt', express.static(path.join(__dirname, '../static/.well-known/security.txt')));
+
   server.get('/favicon.*', maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../static/images/favicon.ico.png'));
   });

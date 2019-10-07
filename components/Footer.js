@@ -16,7 +16,7 @@ import Container from './Container';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 import StyledTooltip from './StyledTooltip';
-import ExternalLinkNewTab from './ExternalLinkNewTab';
+import ExternalLink from './ExternalLink';
 
 import languages from '../lib/constants/locales';
 
@@ -90,7 +90,7 @@ class Footer extends React.Component {
       <Container
         id="footer"
         background="white"
-        borderTop="1px solid #aaaaaa"
+        borderTop="1px solid #E8E9EB"
         bottom={0}
         minHeight="7.5rem"
         p="1rem"
@@ -123,9 +123,9 @@ class Footer extends React.Component {
                       defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
                       values={{
                         crowdinLink: (
-                          <ExternalLinkNewTab href="https://crowdin.com/project/opencollective">
+                          <ExternalLink href="https://crowdin.com/project/opencollective" openInNewTab>
                             Crowdin
-                          </ExternalLinkNewTab>
+                          </ExternalLink>
                         ),
                       }}
                     />

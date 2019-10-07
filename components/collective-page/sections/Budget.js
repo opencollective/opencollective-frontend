@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { get, filter, orderBy, isEmpty } from 'lodash';
+import { get, orderBy, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
@@ -45,7 +45,7 @@ const SectionBudget = ({ collective, stats }) => {
       <P color="black.600" mb={4} maxWidth={830}>
         <FormattedMessage
           id="CollectivePage.SectionBudget.Description"
-          defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reinmbursed and more!"
+          defaultMessage="See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!"
           values={{ collectiveName: collective.name }}
         />
       </P>
@@ -68,12 +68,11 @@ const SectionBudget = ({ collective, stats }) => {
 
             // Merge items, filter expenses that already have a transaction as they'll already be
             // included in `transactions`.
-            const unpaidExpenses = filter(expenses, e => !e.transaction);
-            const budgetItemsUnsorted = [...transactions, ...unpaidExpenses];
+            const budgetItemsUnsorted = [...transactions, ...expenses];
             const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
             return (
               <Container flex="10" mb={3} width="100%" maxWidth={800}>
-                <BudgetItemsList items={budgetItems} />
+                <BudgetItemsList items={budgetItems} isCompact />
                 <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
                   <Box flex="1 1" mx={[0, 2]}>
                     <Link route="transactions" params={{ collectiveSlug: collective.slug }}>

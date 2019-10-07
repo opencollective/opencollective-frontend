@@ -172,6 +172,14 @@ ${description}`;
     return tooltip;
   }
 
+  getDefaultCallsToAction() {
+    if (!this.props.collective) {
+      return {};
+    } else {
+      return { hasContact: this.props.collective.type === CollectiveType.COLLECTIVE };
+    }
+  }
+
   render() {
     const { collective, context, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
@@ -188,7 +196,7 @@ ${description}`;
             collective={collective}
             isAdmin={canEdit}
             showEdit
-            callsToAction={this.props.callsToAction}
+            callsToAction={this.props.callsToAction || this.getDefaultCallsToAction()}
             selected={this.props.selectedSection}
           />
         </Container>
@@ -512,7 +520,17 @@ ${description}`;
                 {collective.type === 'EVENT' && (
                   <div className="contact">
                     <div className="parentCollective">
-                      <Link route={`/${collective.parentCollective.slug}`}>{collective.parentCollective.name}</Link>
+                      <FormattedMessage
+                        id="Event.CreatedBy"
+                        defaultMessage="Created by: {CollectiveLink}"
+                        values={{
+                          CollectiveLink: (
+                            <Link route={`/${collective.parentCollective.slug}`}>
+                              {collective.parentCollective.name}
+                            </Link>
+                          ),
+                        }}
+                      />
                     </div>
                   </div>
                 )}

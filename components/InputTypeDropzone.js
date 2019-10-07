@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import { themeGet } from '@styled-system/theme-get';
@@ -8,83 +8,67 @@ import { themeGet } from '@styled-system/theme-get';
 import { imagePreview } from '../lib/utils';
 import { upload } from '../lib/api';
 
-class InputTypeDropzone extends React.Component {
-  static propTypes = {
-    defaultValue: PropTypes.string,
-    className: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    options: PropTypes.object,
-    intl: PropTypes.object.isRequired,
-    placeholder: PropTypes.string,
-    name: PropTypes.string,
-  };
+const messages = defineMessages({
+  placeholder: {
+    id: 'uploadImage.placeholder',
+    defaultMessage: 'Drop an image or click to upload',
+  },
+  isDragActive: {
+    id: 'uploadImage.isDragActive',
+    defaultMessage: "Drop it like it's hot 🔥",
+  },
+  isDragReject: {
+    id: 'uploadImage.isDragReject',
+    defaultMessage: '🚫 This file type is not accepted',
+  },
+  error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' },
+});
 
-  constructor(props) {
-    super(props);
-    this.renderContainer = this.renderContainer.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.state = {
-      loading: false,
-      value: props.defaultValue,
-      url: props.defaultValue,
-    }; // value can be base64 encoded after upload, url is always an url
-    this.messages = defineMessages({
-      placeholder: {
-        id: 'uploadImage.placeholder',
-        defaultMessage: 'Drop an image or click to upload',
-      },
-      isDragActive: {
-        id: 'uploadImage.isDragActive',
-        defaultMessage: "Drop it like it's hot 🔥",
-      },
-      isDragReject: {
-        id: 'uploadImage.isDragReject',
-        defaultMessage: '🚫 This file type is not accepted',
-      },
-      error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' },
-    });
-  }
+const InputTypeDropzone = props => {
+  const { defaultValue, className, onChange, options, intl, placeholder, name } = props;
+  const [loading, setLoading] = useState(false);
+  const [value, setValue] = useState(defaultValue);
+  const [url, setUrl] = useState(defaultValue);
+  const [error, setError] = useState(null);
 
-  handleChange(files) {
+  const handleChange = files => {
     if (!files) {
-      this.setState({ value: null, url: null, loading: false });
-      return this.props.onChange(null);
+      setValue(null);
+      setUrl(null);
+      setLoading(false);
+      return onChange(null);
     }
 
-    this.setState({ loading: true });
+    setLoading(true);
     // for e2e testing purposes
     if (window.location.hostname === 'localhost') {
       const fileUrl = 'https://d.pr/free/i/OlQVIb+';
       return setTimeout(() => {
-        this.setState({ value: fileUrl, url: fileUrl, loading: false });
-        return this.props.onChange(fileUrl);
+        setValue(fileUrl);
+        setUrl(fileUrl);
+        setLoading(false);
+        return onChange(fileUrl);
       }, 2500);
     }
 
     const file = files[0];
     upload(file)
       .then(fileUrl => {
-        this.setState({
-          value: fileUrl,
-          url: fileUrl,
-          loading: false,
-          error: null,
-        });
-        return this.props.onChange(fileUrl);
+        setValue(fileUrl);
+        setUrl(fileUrl);
+        setLoading(false);
+        setError(null);
+        return onChange(fileUrl);
       })
       .catch(err => {
         console.error('>>> error uploading image', file, err);
         const message = get(err, ['json', 'error', 'fields', 'file']);
-        this.setState({
-          error: message || 'error uploading image, please try again',
-          loading: false,
-        });
+        setError(message || 'error uploading image, please try again');
+        setLoading(false);
       });
-  }
+  };
 
-  renderContainer({ isDragActive, isDragReject }) {
-    const { intl } = this.props;
-
+  const renderContainer = (isDragActive, isDragReject) => {
     let messageId = 'placeholder';
     if (isDragActive) {
       messageId = 'isDragActive';
@@ -92,7 +76,7 @@ class InputTypeDropzone extends React.Component {
     if (isDragReject) {
       messageId = 'isDragReject';
     }
-    if (this.state.error) {
+    if (error) {
       messageId = 'error';
     }
 
@@ -136,12 +120,12 @@ class InputTypeDropzone extends React.Component {
         </style>
         {messageId && (
           <div className={`message ${messageId}`}>
-            {intl.formatMessage(this.messages[messageId], {
-              error: this.state.error,
+            {intl.formatMessage(messages[messageId], {
+              error: error,
             })}
           </div>
         )}
-        {this.state.loading && (
+        {loading && (
           <div className="message loading">
             <img
               src="/static/images/opencollective-icon.svg"
@@ -153,81 +137,87 @@ class InputTypeDropzone extends React.Component {
           </div>
         )}
         <img
-          src={imagePreview(this.state.url, this.props.placeholder, {
+          src={imagePreview(url, placeholder, {
             width: 128,
           })}
         />
       </div>
     );
-  }
+  };
 
-  render() {
-    const options = this.props.options || {};
-    options.accept = options.accept || 'image/png, image/jpeg';
+  const option = options || {};
+  option.accept = option.accept || 'image/png, image/jpeg';
 
-    return (
-      <div className={`InputTypeDropzone ${this.props.className}`}>
-        <style jsx global>
-          {`
-            .dropzone {
-              border: 2px dashed transparent;
-              position: relative;
-              min-height: 80px;
-              overflow: hidden;
-            }
-            .dropzone:hover .placeholder {
-              display: flex;
-            }
-            .dropzone:hover,
-            .dropzone.empty {
-              border-color: grey;
-            }
-            .dropzone:hover .placeholder,
-            .dropzone.empty .placeholder {
-              display: flex;
-            }
-            .dropzone:focus {
-              border-color: ${themeGet('colors.primary.300')};
-            }
-            .removeImage {
-              color: ${themeGet('colors.primary.400')};
-              cursor: pointer;
-              font-size: 11px;
-            }
-            .removeImage:hover {
-              color: ${themeGet('colors.primary.500')};
-            }
-          `}
-        </style>
-        <Dropzone
-          multiple={false}
-          onDrop={this.handleChange}
-          className={`${this.props.name}-dropzone dropzone ${!this.state.value && 'empty'}`}
-          style={{}}
-          inputProps={{ tabIndex: '-1' }}
-          tabIndex="0"
-          onKeyDown={({ key, target }) => {
-            if (key === 'Enter') {
-              target.querySelector('input[type="file"]').click();
-            }
-          }}
-          {...options}
-        >
-          {this.renderContainer}
-        </Dropzone>
-        {this.state.value && (
-          <span
-            className="removeImage"
-            tabIndex="0"
-            onClick={() => this.handleChange(null)}
-            onKeyDown={({ key }) => key === 'Enter' && this.handleChange(null)}
-          >
-            ❌ remove image
-          </span>
-        )}
+  const onDrop = useCallback(files => {
+    files.length && handleChange(files);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
+    accept: option.accept,
+    multiple: false,
+    onDrop,
+  });
+
+  return (
+    <div className={`InputTypeDropzone ${className}`}>
+      <style jsx global>
+        {`
+          .dropzone {
+            border: 2px dashed transparent;
+            position: relative;
+            min-height: 80px;
+            overflow: hidden;
+          }
+          .dropzone:hover .placeholder {
+            display: flex;
+          }
+          .dropzone:hover,
+          .dropzone.empty {
+            border-color: grey;
+          }
+          .dropzone:hover .placeholder,
+          .dropzone.empty .placeholder {
+            display: flex;
+          }
+          .dropzone:focus {
+            border-color: ${themeGet('colors.primary.300')};
+          }
+          .removeImage {
+            color: ${themeGet('colors.primary.400')};
+            cursor: pointer;
+            font-size: 11px;
+          }
+          .removeImage:hover {
+            color: ${themeGet('colors.primary.500')};
+          }
+        `}
+      </style>
+      <div {...getRootProps()} className={`${name}-dropzone dropzone ${!value && 'empty'}`}>
+        <input {...getInputProps()} />
+        {renderContainer(isDragActive, isDragReject)}
       </div>
-    );
-  }
-}
+      {value && (
+        <span
+          className="removeImage"
+          tabIndex="0"
+          onClick={() => handleChange(null)}
+          onKeyDown={({ key }) => key === 'Enter' && handleChange(null)}
+        >
+          ❌ remove image
+        </span>
+      )}
+    </div>
+  );
+};
+
+InputTypeDropzone.propTypes = {
+  defaultValue: PropTypes.string,
+  className: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  options: PropTypes.object,
+  intl: PropTypes.object.isRequired,
+  placeholder: PropTypes.string,
+  name: PropTypes.string,
+};
 
 export default injectIntl(InputTypeDropzone);

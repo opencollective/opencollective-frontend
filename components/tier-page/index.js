@@ -158,7 +158,7 @@ class TierPage extends Component {
     const shareBlock = this.renderShareBlock();
 
     return (
-      <Container borderTop="1px solid #E6E8EB">
+      <Container borderTop="1px solid #E6E8EB" pb={4}>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
           <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} isAdmin={canEdit} />
@@ -188,7 +188,13 @@ class TierPage extends Component {
               mx={[0, null, 3]}
             >
               <Bubbles />
-              <Container background="white" borderRadius={8} px={[3, 4]} py={[4, 5]}>
+              <Container
+                background="white"
+                borderRadius={8}
+                px={[3, 4]}
+                py={[4, 5]}
+                boxShadow="-3px 11px 13px rgba(75, 75, 75, 0.1)"
+              >
                 <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>

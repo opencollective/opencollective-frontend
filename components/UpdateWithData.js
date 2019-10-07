@@ -48,6 +48,7 @@ const getUpdateQuery = gql`
       html
       markdown
       isPrivate
+      makePublicOn
       userCanSeeUpdate
       collective {
         id

@@ -18,6 +18,7 @@ import { getStripeToken } from '../lib/stripe';
 import { getRecaptcha, getRecaptchaSiteKey } from '../lib/recaptcha';
 import { checkUserExistence, signin } from '../lib/api';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
+import { removeFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
 class OrderForm extends React.Component {
   static propTypes = {
@@ -409,8 +410,8 @@ class OrderForm extends React.Component {
   };
 
   logout = () => {
-    window.localStorage.removeItem('accessToken');
-    window.localStorage.removeItem('LoggedInUser');
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LOGGED_IN_USER);
     window.location.replace(window.location.href);
   };
 

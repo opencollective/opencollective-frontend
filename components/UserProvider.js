@@ -1,11 +1,12 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 import PropTypes from 'prop-types';
-
 import { withApollo } from 'react-apollo';
-import UserClass from '../lib/LoggedInUser';
+
 import { Router } from '../server/pages';
+import UserClass from '../lib/LoggedInUser';
 import withLoggedInUser from '../lib/withLoggedInUser';
+import { removeFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -64,8 +65,8 @@ class UserProvider extends React.Component {
   };
 
   logout = async () => {
-    window.localStorage.removeItem('accessToken');
-    window.localStorage.removeItem('LoggedInUser');
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LOGGED_IN_USER);
     this.props.client.resetStore();
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
