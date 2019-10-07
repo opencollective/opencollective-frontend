@@ -155,7 +155,7 @@ class CollectiveCover extends React.Component {
                 {moment()
                   .tz(props.collective.timezone)
                   .zoneAbbr()}{' '}
-                (<FormattedMessage id="eventTime" defaultMessage="Event Time" />)
+                (<FormattedMessage id="EventCover.EventTime" defaultMessage="Event Time" />)
               </React.Fragment>
             )}
             <br />
@@ -192,13 +192,19 @@ class CollectiveCover extends React.Component {
                     {moment()
                       .tz(momentTimezone.tz.guess())
                       .zoneAbbr()}{' '}
-                    (<FormattedMessage id="localTime" defaultMessage="Your Time" />)
+                    (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
                   </React.Fragment>
                 )}
                 <br />
               </em>
             )}
-            <FormattedMessage id="location" defaultMessage="Location" /> {get(props.collective, 'location.name')}
+            {get(props.collective, 'location.name') && (
+              <FormattedMessage
+                id="EventCover.Location"
+                defaultMessage="Location: {location}"
+                values={{ location: get(props.collective, 'location.name') }}
+              />
+            )}
           </Link>
         </div>
       );
@@ -515,7 +521,9 @@ ${description}`;
                 )}
               </Link>
             )}
-            <h1>{title}</h1>
+            <h1>
+              <FormattedMessage id="EventCover.Title" defaultMessage="{title}" values={{ title }} />
+            </h1>
             {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
               <div>
