@@ -4,24 +4,8 @@ import gql from 'graphql-tag';
 import { FormControl } from 'react-bootstrap';
 import { graphql } from 'react-apollo';
 import { defineMessages, injectIntl } from 'react-intl';
-import { get, groupBy, sortBy } from 'lodash';
-import memoizeOne from 'memoize-one';
-import StyledSelect from './StyledSelect';
-
-const CollectiveTypesI18n = defineMessages({
-  collective: {
-    id: 'collective.types.collective',
-    defaultMessage: '{n, plural, one {collective} other {collectives}}',
-  },
-  organization: {
-    id: 'collective.types.organization',
-    defaultMessage: '{n, plural, one {organization} other {organizations}}',
-  },
-  user: {
-    id: 'collective.types.user',
-    defaultMessage: '{n, plural, one {people} other {people}}',
-  },
-});
+import { get } from 'lodash';
+import CollectivePicker from './CollectivePicker';
 
 const messages = defineMessages({
   addFundsFromHost: {
@@ -30,7 +14,7 @@ const messages = defineMessages({
   },
   addFundsFromOther: {
     id: 'addfunds.fromCollective.other',
-    defaultMessage: 'other (please specify)',
+    defaultMessage: 'Other (please specify)',
   },
 });
 
@@ -49,55 +33,23 @@ class AddFundsSourcePicker extends React.Component {
     this.props.onChange(FromCollectiveId);
   };
 
-  getSelectOptions = memoizeOne((intl, host, PaymentMethod) => {
-    if (!host || !PaymentMethod) {
-      return [];
-    }
-
-    const fromCollectives = get(PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id);
-    const collectivesByTypes = groupBy(fromCollectives, m => get(m, 'type'));
-    const sortedActiveTypes = Object.keys(collectivesByTypes).sort();
-
-    return [
-      // Add funds from host
-      {
-        value: host.id,
-        label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }),
-      },
-      // Add funds from given collectives
-      ...sortedActiveTypes.map(type => {
-        const sortedCollectives = sortBy(collectivesByTypes[type], 'name');
-        const sectionI18n = CollectiveTypesI18n[type.toLowerCase()];
-        const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, { n: sortedCollectives.length }) : type;
-        return {
-          label: sectionLabel,
-          options: sortedCollectives.map(collective => ({
-            value: collective.id,
-            label: collective.name,
-          })),
-        };
-      }),
-      // Other
-      {
-        value: 'other',
-        label: intl.formatMessage(messages.addFundsFromOther),
-      },
-    ];
-  });
-
   render() {
     const { intl, host, data } = this.props;
-    const options = this.getSelectOptions(intl, host, data.PaymentMethod);
+    const customOptions = [
+      { value: host.id, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
+      { value: 'other', label: intl.formatMessage(messages.addFundsFromOther) },
+    ];
 
     return (
-      <StyledSelect
+      <CollectivePicker
         id="sourcePicker"
         isLoading={data.loading}
         disabled={!data.PaymentMethod}
-        options={options}
-        defaultValue={options[0]}
         onChange={this.onChange}
         maxMenuHeight={200}
+        collectives={get(data.PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id)}
+        getDefaultOption={() => customOptions[0]}
+        customOptions={customOptions}
       />
     );
   }
