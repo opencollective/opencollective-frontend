@@ -13,7 +13,7 @@ import VirtualCardDetails from './VirtualCardDetails';
 import Loading from './Loading';
 import Pagination from './Pagination';
 import Link from './Link';
-import { Link as LinkWrapper } from '../server/pages';
+import { NextLink as LinkWrapper } from '../server/pages';
 import StyledLink from './StyledLink';
 import StyledButtonSet from './StyledButtonSet';
 import { P } from './Text';

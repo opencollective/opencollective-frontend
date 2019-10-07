@@ -7,7 +7,7 @@ import { defaultImage } from '../lib/constants/collectives';
 
 import Container from './Container';
 import { P, Span } from './Text';
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import StyledLink from './StyledLink';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 
@@ -16,7 +16,7 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={4}>
       <Container bg="black.200" height="1px" width={0.25} />
 
-      <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
+      <NextLink route="collective" params={{ slug: fromCollective.slug }} passHref>
         <a>
           <Container
             backgroundImage={`url(${imagePreview(fromCollective.image, defaultImage[fromCollective.type], {
@@ -31,15 +31,15 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
             width={[52, null, 65]}
           />
         </a>
-      </Link>
+      </NextLink>
 
       <Container bg="black.200" height="1px" width={0.25} />
     </Container>
 
     <P textAlign="center" fontWeight="bold" mt={3} px={2}>
-      <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
+      <NextLink route="collective" params={{ slug: fromCollective.slug }} passHref>
         <StyledLink color="black.800">{fromCollective.name}</StyledLink>
-      </Link>
+      </NextLink>
     </P>
 
     <P fontSize="Tiny" textAlign="center" mt={2} px={2} pb={2}>

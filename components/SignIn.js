@@ -9,7 +9,7 @@ import StyledInput from './StyledInput';
 import { H5, P, Span } from './Text';
 import { FormattedMessage } from 'react-intl';
 import StyledLink from './StyledLink';
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 
 /**
  * Component for handing user sign-in or redirecting to sign-up.
@@ -35,11 +35,11 @@ export default class SignIn extends React.Component {
   renderSecondaryAction(message) {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
-      <Link route={onSecondaryAction} passHref>
+      <NextLink route={onSecondaryAction} passHref>
         <StyledLink disabled={loading} fontSize="Paragraph" fontWeight="bold">
           {message}
         </StyledLink>
-      </Link>
+      </NextLink>
     ) : (
       <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={loading}>
         {message}

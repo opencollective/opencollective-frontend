@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
 
 import { Flex } from '@rebass/grid';
@@ -25,11 +25,11 @@ const Pagination = ({ router, limit, offset, total }) => {
   return (
     <Flex alignItems="center">
       {currentPage > 1 && (
-        <Link route={route.slice(1)} scroll={false} params={{ ...query, offset: offset - limit }} passHref>
+        <NextLink route={route.slice(1)} scroll={false} params={{ ...query, offset: offset - limit }} passHref>
           <StyledLink buttonStyle="standard" buttonSize="small">
             <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
           </StyledLink>
-        </Link>
+        </NextLink>
       )}
       <Flex alignItems="center" mx={2}>
         <FormattedMessage
@@ -54,11 +54,11 @@ const Pagination = ({ router, limit, offset, total }) => {
         />
       </Flex>
       {currentPage < totalPages && (
-        <Link route={route.slice(1)} scroll={false} params={{ ...query, offset: offset + limit }} passHref>
+        <NextLink route={route.slice(1)} scroll={false} params={{ ...query, offset: offset + limit }} passHref>
           <StyledLink buttonStyle="standard" buttonSize="small">
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
           </StyledLink>
-        </Link>
+        </NextLink>
       )}
     </Flex>
   );

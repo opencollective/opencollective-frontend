@@ -6,7 +6,7 @@ import { firstSentence, getCollectiveImage } from '../../lib/utils';
 
 import Container from '../Container';
 import Currency from '../Currency';
-import { Link } from '../../server/pages';
+import { NextLink } from '../../server/pages';
 import StyledLink from '../StyledLink';
 import { P } from '../Text';
 
@@ -15,7 +15,7 @@ const SponsorCard = ({ currency, imageUrl, name, description, slug, totalDonatio
     <Container display="flex" justifyContent="space-between" alignItems="center" pt={3}>
       <Container bg="black.200" height="1px" width={0.25} />
 
-      <Link route="collective" params={{ slug }} passHref>
+      <NextLink route="collective" params={{ slug }} passHref>
         <a title={`${name}\n${firstSentence(description, 80)}`}>
           <Container
             backgroundImage={`url(${getCollectiveImage({ imageUrl, slug }, { width: 76 })})`}
@@ -28,18 +28,18 @@ const SponsorCard = ({ currency, imageUrl, name, description, slug, totalDonatio
             width={[68, null, 76]}
           />
         </a>
-      </Link>
+      </NextLink>
 
       <Container bg="black.200" height="1px" width={0.25} />
     </Container>
 
     <Container height={90} overflow="hidden">
       <P textAlign="center" mt={2} px={2} pb={3} color="black.800" fontSize="1.2rem" lineHeight="1.5">
-        <Link route="collective" params={{ slug }} passHref>
+        <NextLink route="collective" params={{ slug }} passHref>
           <StyledLink color="black.800" fontWeight="bold" fontSize="1.4rem">
             {name}
           </StyledLink>
-        </Link>
+        </NextLink>
         <br />
         {firstSentence(description, 70)}
       </P>

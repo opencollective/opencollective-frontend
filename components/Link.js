@@ -54,11 +54,11 @@ class Link extends React.Component {
       );
     } else {
       return (
-        <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
+        <router.NextLink {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
           <a className={className} title={title} onClick={onClick}>
             {children}
           </a>
-        </router.Link>
+        </router.NextLink>
       );
     }
   }

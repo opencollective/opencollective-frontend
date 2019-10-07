@@ -6,7 +6,7 @@ import { get, uniqBy } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 import { formatCurrency, capitalize } from '../lib/utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { withUser } from './UserProvider';
@@ -139,16 +139,16 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="collective" defaultMessage="my collectives" />
             </P>
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
-            <Link route="/create" passHref>
+            <NextLink route="/create" passHref>
               <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
                 + New
               </StyledLink>
-            </Link>
+            </NextLink>
           </Flex>
           <Box as="ul" p={0} my={2}>
             {collectives.map(membership => (
               <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
-                <Link route={`/${get(membership, 'collective.slug')}`} passHref>
+                <NextLink route={`/${get(membership, 'collective.slug')}`} passHref>
                   <StyledLink
                     title={this.tooltip(membership)}
                     color="#494D52"
@@ -161,7 +161,7 @@ class TopBarProfileMenu extends React.Component {
                       {get(membership, 'collective.name')}
                     </Flex>
                   </StyledLink>
-                </Link>
+                </NextLink>
                 {get(membership, 'collective.stats.expenses.pending') > 0 && (
                   <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge>
                 )}
@@ -192,16 +192,16 @@ class TopBarProfileMenu extends React.Component {
               <FormattedMessage id="organization" defaultMessage="my organizations" />
             </P>
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
-            <Link route="/organizations/new" passHref>
+            <NextLink route="/organizations/new" passHref>
               <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
                 + New
               </StyledLink>
-            </Link>
+            </NextLink>
           </Flex>
           <Box as="ul" p={0} my={2}>
             {orgs.map(membership => (
               <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
-                <Link route={`/${get(membership, 'collective.slug')}`} passHref>
+                <NextLink route={`/${get(membership, 'collective.slug')}`} passHref>
                   <StyledLink
                     title={this.tooltip(membership)}
                     color="#494D52"
@@ -214,7 +214,7 @@ class TopBarProfileMenu extends React.Component {
                       {get(membership, 'collective.name')}
                     </Flex>
                   </StyledLink>
-                </Link>
+                </NextLink>
                 {get(membership, 'collective.stats.expenses.pending') > 0 && (
                   <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge>
                 )}
@@ -245,41 +245,41 @@ class TopBarProfileMenu extends React.Component {
           </P>
           <Box as="ul" p={0} my={2}>
             <ListItem py={1}>
-              <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
+              <NextLink route="collective" params={{ slug: LoggedInUser.username }} passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                   <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                 </StyledLink>
-              </Link>
+              </NextLink>
             </ListItem>
             {incognitoProfileMembership && (
               <ListItem py={1}>
-                <Link route="collective" params={{ slug: incognitoProfileMembership.collective.slug }} passHref>
+                <NextLink route="collective" params={{ slug: incognitoProfileMembership.collective.slug }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.incognitoProfile" defaultMessage="Incognito profile" />
                   </StyledLink>
-                </Link>
+                </NextLink>
               </ListItem>
             )}
             <ListItem py={1}>
-              <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+              <NextLink route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                   <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                 </StyledLink>
-              </Link>
+              </NextLink>
             </ListItem>
             <ListItem py={1}>
-              <Link route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+              <NextLink route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                   {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
                 </StyledLink>
-              </Link>
+              </NextLink>
             </ListItem>
             <ListItem py={1}>
-              <Link route="applications" passHref>
+              <NextLink route="applications" passHref>
                 <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                   {capitalize(intl.formatMessage(this.messages['menu.applications']))}
                 </StyledLink>
-              </Link>
+              </NextLink>
             </ListItem>
             <ListItem py={1}>
               <StyledLink

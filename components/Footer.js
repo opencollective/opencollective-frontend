@@ -9,7 +9,7 @@ import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { Mail } from 'styled-icons/material/Mail';
 import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle';
 
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 
 import { P, Span } from './Text';
 import Container from './Container';
@@ -185,9 +185,9 @@ class Footer extends React.Component {
                   {Object.keys(navigation[key]).map(item => (
                     <ListItem key={item} textAlign={['center', null, 'left']} mb={2}>
                       {navigation[key][item][0] === '/' ? (
-                        <Link route={navigation[key][item]} passHref>
+                        <NextLink route={navigation[key][item]} passHref>
                           <MenuLink>{item}</MenuLink>
-                        </Link>
+                        </NextLink>
                       ) : (
                         <MenuLink href={navigation[key][item]}>{item}</MenuLink>
                       )}

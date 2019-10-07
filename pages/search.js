@@ -5,7 +5,7 @@ import { Box, Flex } from '@rebass/grid';
 import { withRouter } from 'next/router';
 import styled from 'styled-components';
 
-import { Link, Router } from '../server/pages';
+import { NextLink, Router } from '../server/pages';
 
 import Page from '../components/Page';
 import Button from '../components/Button';
@@ -126,7 +126,7 @@ class SearchPage extends React.Component {
                   </em>
                 </p>
                 {
-                  <Link route="createPledge" params={{ name: term }} passHref>
+                  <NextLink route="createPledge" params={{ name: term }} passHref>
                     <StyledLink
                       display="block"
                       fontSize="Paragraph"
@@ -139,7 +139,7 @@ class SearchPage extends React.Component {
                     >
                       Make a pledge
                     </StyledLink>
-                  </Link>
+                  </NextLink>
                 }
               </Flex>
             )}
@@ -156,7 +156,7 @@ class SearchPage extends React.Component {
                 <em>If you don&apos;t see the collective you&apos;re searching for:</em>
               </p>
               {
-                <Link route="createPledge" params={{ name: term }} passHref>
+                <NextLink route="createPledge" params={{ name: term }} passHref>
                   <StyledLink
                     display="block"
                     fontSize="Paragraph"
@@ -169,7 +169,7 @@ class SearchPage extends React.Component {
                   >
                     Make a pledge
                   </StyledLink>
-                </Link>
+                </NextLink>
               }
             </Flex>
           )}

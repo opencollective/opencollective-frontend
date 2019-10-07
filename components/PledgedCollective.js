@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
 
-import { Link } from '../server/pages';
+import { NextLink } from '../server/pages';
 
 import Header from './Header';
 import Body from './Body';
@@ -78,11 +78,11 @@ class PledgedCollective extends React.Component {
           </Container>
 
           <Container display="flex" justifyContent="center" position="relative" top={-30}>
-            <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
+            <NextLink route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
               <StyledLink buttonStyle="primary" buttonSize="large">
                 <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
               </StyledLink>
-            </Link>
+            </NextLink>
           </Container>
 
           <Container display="flex" alignItems="center" flexDirection="column" maxWidth={800} mx="auto" mt={4} px={3}>
@@ -165,11 +165,11 @@ class PledgedCollective extends React.Component {
                 </P>
               </Box>
               <Flex width={[1, null, 0.35]} justifyContent="center" mt={[4, null, 0]}>
-                <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
+                <NextLink route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
                   <StyledLink textAlign="center" width={1} buttonSize="medium" buttonStyle="standard">
                     <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
                   </StyledLink>
-                </Link>
+                </NextLink>
               </Flex>
             </Container>
           </Box>
