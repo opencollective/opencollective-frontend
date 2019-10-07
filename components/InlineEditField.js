@@ -55,6 +55,8 @@ class InlineEditField extends Component {
     mutation: PropTypes.object.isRequired,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
+    /** Max field length */
+    maxLength: PropTypes.number,
     /** Called to format the value before submitting */
     formatBeforeSubmit: PropTypes.func,
     /** Set to false to disable edit icon even if user is allowed to edit */
@@ -132,6 +134,7 @@ class InlineEditField extends Component {
                 children({
                   isEditing: true,
                   value: draft,
+                  maxLength: this.props.maxLength,
                   setValue: this.setDraft,
                   enableEditor: this.enableEditor,
                   disableEditor: this.disableEditor,
@@ -150,6 +153,7 @@ class InlineEditField extends Component {
                   fontSize="inherit"
                   fontWeight="inherit"
                   lineHeight="inherit"
+                  maxLength={this.props.maxLength}
                   data-cy={`InlineEditField-Textarea-${field}`}
                 />
               )}

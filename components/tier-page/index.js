@@ -204,6 +204,7 @@ class TierPage extends Component {
                     canEdit={canEdit}
                     values={tier}
                     field="name"
+                    maxLength={255}
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
@@ -221,6 +222,7 @@ class TierPage extends Component {
                     canEdit={canEdit}
                     values={tier}
                     field="description"
+                    maxLength={510}
                     placeholder={
                       <FormattedMessage id="TierPage.AddDescription" defaultMessage="Add a short description" />
                     }
