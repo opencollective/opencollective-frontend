@@ -19,7 +19,7 @@
   "addFunds.error.amountMustBeGreatherThanZero": "总金额必须大于0",
   "addFunds.error.missingEmail": "请提供电子邮件地址, 以确定资金来源。",
   "addfunds.fromCollective.host": "Host ({host})",
-  "addfunds.fromCollective.other": "其他 (请注明)",
+  "addfunds.fromCollective.other": "Other (please specify)",
   "addfunds.FromCollectiveId.label": "资源",
   "addfunds.hostFeePercent.label": "主办方手续费",
   "addfunds.hostFees": "Host fees ({hostFees})",
