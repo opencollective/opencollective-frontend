@@ -148,8 +148,6 @@ class CreateOrderPage extends React.Component {
     verb: 'contribute',
   };
 
-  static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";
-
   constructor(props) {
     super(props);
     this.recaptcha = null;
@@ -206,6 +204,8 @@ class CreateOrderPage extends React.Component {
       unloadRecaptcha();
     }
   }
+
+  static errorRecaptchaConnect = "Can't connect to ReCaptcha. Try to reload the page, or disable your Ad Blocker.";
 
   loadInitialData() {
     this.setState(state => ({

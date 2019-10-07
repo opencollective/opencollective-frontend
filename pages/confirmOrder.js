@@ -20,10 +20,6 @@ class ConfirmOrderPage extends React.Component {
     return { id: parseInt(query.id) };
   }
 
-  static SUBMITTING = 1;
-  static SUCCESS = 2;
-  static ERROR = 3;
-
   static propTypes = {
     /** OrderId */
     id: PropTypes.number.isRequired,
@@ -52,6 +48,10 @@ class ConfirmOrderPage extends React.Component {
       return this.triggerRequest();
     }
   }
+
+  static SUBMITTING = 1;
+  static SUCCESS = 2;
+  static ERROR = 3;
 
   async triggerRequest() {
     try {

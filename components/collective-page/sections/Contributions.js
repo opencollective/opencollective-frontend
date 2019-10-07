@@ -161,12 +161,12 @@ class SectionContributions extends React.PureComponent {
     intl: PropTypes.object,
   };
 
-  static NB_MEMBERSHIPS_PER_PAGE = 16;
-
   state = {
     nbMemberships: SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
     selectedFilter: FILTERS.ALL,
   };
+
+  static NB_MEMBERSHIPS_PER_PAGE = 16;
 
   /** There's no point to show all filters if not required */
   getFilters = memoizeOne(memberships => {

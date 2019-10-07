@@ -37,6 +37,13 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
+  static getInitialProps({ req, res, query: { slug, status } }) {
+    if (res && req && (req.language || req.locale === 'en')) {
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    }
+    return { slug, status };
+  }
+
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
@@ -70,13 +77,6 @@ class NewCollectivePage extends React.Component {
       }),
     }).isRequired, // from withData
   };
-
-  static getInitialProps({ req, res, query: { slug, status } }) {
-    if (res && req && (req.language || req.locale === 'en')) {
-      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
-    }
-    return { slug, status };
-  }
 
   componentDidMount() {
     this.redirectIfEvent();

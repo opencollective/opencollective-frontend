@@ -9,17 +9,17 @@ import { withUser } from '../components/UserProvider';
  * rendering, typically 404 errors.
  */
 class Error extends React.Component {
+  static getInitialProps({ res, err, req }) {
+    const statusCode = res ? res.statusCode : err ? err.statusCode : null;
+    return { statusCode, err, url: req && req.originalUrl };
+  }
+
   static propTypes = {
     statusCode: PropTypes.number.isRequired,
     url: PropTypes.string,
     err: PropTypes.object,
     LoggedInUser: PropTypes.object,
   };
-
-  static getInitialProps({ res, err, req }) {
-    const statusCode = res ? res.statusCode : err ? err.statusCode : null;
-    return { statusCode, err, url: req && req.originalUrl };
-  }
 
   render() {
     const { statusCode, url } = this.props;
