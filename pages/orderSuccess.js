@@ -95,6 +95,10 @@ const GetOrderQuery = gql`
 `;
 
 class OrderSuccessPage extends React.Component {
+  static getInitialProps({ query: { OrderId } }) {
+    return { OrderId: parseInt(OrderId) };
+  }
+
   static propTypes = {
     OrderId: PropTypes.number.isRequired,
     data: PropTypes.object.isRequired, // from withData
@@ -102,10 +106,6 @@ class OrderSuccessPage extends React.Component {
     loggedInUserLoading: PropTypes.bool, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
   };
-
-  static getInitialProps({ query: { OrderId } }) {
-    return { OrderId: parseInt(OrderId) };
-  }
 
   constructor(props) {
     super(props);
