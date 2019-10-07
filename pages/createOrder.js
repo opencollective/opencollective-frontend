@@ -132,13 +132,24 @@ class CreateOrderPage extends React.Component {
           </MessageBox>
         </Flex>
       );
+    } else if (!data.Collective.isActive) {
+      return (
+        <Flex py={5} justifyContent="center">
+          <MessageBox type="info" withIcon>
+            <FormattedMessage
+              id="createOrder.inactiveCollective"
+              defaultMessage="This collective is not active and can't accept financial contributions"
+            />
+          </MessageBox>
+        </Flex>
+      );
     } else if (this.props.tierId && !data.Tier) {
       return (
         <Flex py={5} justifyContent="center">
           <MessageBox type="error" withIcon>
             <FormattedMessage
               id="createOrder.missingTier"
-              defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins. "
+              defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins."
             />
             <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
@@ -192,6 +203,7 @@ const collectiveFields = `
   hostFeePercent
   tags
   settings
+  isActive
   location {
     country
   }
