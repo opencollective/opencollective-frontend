@@ -16,6 +16,10 @@ import TierPageContent from '../components/tier-page';
  * to render `components/collective-page` with everything needed.
  */
 class TierPage extends React.Component {
+  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug } }) {
+    return { collectiveSlug, tierId: Number(tierId), tierSlug };
+  }
+
   static propTypes = {
     tierId: PropTypes.number.isRequired,
     collectiveSlug: PropTypes.string.isRequired,
@@ -23,10 +27,6 @@ class TierPage extends React.Component {
     LoggedInUser: PropTypes.object, // from withUser
     tierSlug: PropTypes.string,
   };
-
-  static getInitialProps({ query: { collectiveSlug, tierId, tierSlug } }) {
-    return { collectiveSlug, tierId: Number(tierId), tierSlug };
-  }
 
   // See https://github.com/opencollective/opencollective/issues/1872
   shouldComponentUpdate(newProps) {

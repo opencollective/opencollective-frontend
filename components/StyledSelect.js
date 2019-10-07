@@ -96,7 +96,7 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
 `;
 
 StyledSelect.propTypes = {
-  placeholder: PropTypes.string,
+  placeholder: PropTypes.node,
   /** Wether the component is disabled */
   disabled: PropTypes.bool,
   /** Alias for `disabled` */

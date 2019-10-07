@@ -31,12 +31,12 @@ export default class TierContributors extends React.Component {
     currency: PropTypes.string.isRequired,
   };
 
-  static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
-
   constructor(props) {
     super(props);
     this.state = { filter: null };
   }
+
+  static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
   setFilter = filter => {
     this.setState({ filter });

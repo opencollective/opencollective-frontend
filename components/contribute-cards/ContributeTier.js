@@ -41,7 +41,8 @@ const getContributionTypeFromTier = tier => {
 
 const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const currency = tier.currency || collective.currency;
-  const minAmount = tier.amountType === 'FLEXIBLE' ? tier.minimumAmount : tier.amount;
+  const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
+  const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
 
   let description;
@@ -132,11 +133,13 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
             )}
           </P>
         </div>
-        {minAmount && (
+        {minAmount > 0 && (
           <div>
-            <P fontSize="Tiny" color="black.600" textTransform="uppercase" mb={1}>
-              <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
-            </P>
+            {isFlexibleAmount && (
+              <P fontSize="Tiny" color="black.600" textTransform="uppercase" mb={1}>
+                <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
+              </P>
+            )}
             <P color="black.700">
               <FormattedMoneyAmount
                 amount={minAmount}

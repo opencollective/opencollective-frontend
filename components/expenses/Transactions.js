@@ -44,11 +44,11 @@ class Transactions extends React.Component {
     });
   }
 
-  canDownloadInvoice(transaction) {
-    const { LoggedInUser, collective } = this.props;
+  canDownloadInvoice(transaction, isRoot, isCollectiveAdmin) {
+    const { collective } = this.props;
 
     // User must be logged in as collective admin or root
-    if (!LoggedInUser || (!LoggedInUser.canEditCollective(collective) && !LoggedInUser.isRoot())) {
+    if (!isCollectiveAdmin && !isRoot) {
       return false;
     }
 
@@ -60,6 +60,11 @@ class Transactions extends React.Component {
     return true;
   }
 
+  canRefund(isRoot, isHostAdmin /* , isCollectiveAdmin */) {
+    /** || isCollectiveAdmin -- disabled while we enforce security for the refund endpoint on the API */
+    return isRoot || isHostAdmin;
+  }
+
   render() {
     const { collective, transactions, LoggedInUser, showCSVlink, filters } = this.props;
 
@@ -67,6 +72,9 @@ class Transactions extends React.Component {
       return <div />;
     }
 
+    const isRoot = LoggedInUser && LoggedInUser.isRoot();
+    const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(collective);
+    const isCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
     return (
       <div className="Transactions">
         <style jsx>
@@ -177,8 +185,8 @@ class Transactions extends React.Component {
                 collective={collective}
                 {...transaction}
                 isRefund={Boolean(transaction.refundTransaction)}
-                canRefund={LoggedInUser && (LoggedInUser.isRoot() || LoggedInUser.isHostAdmin(collective))}
-                canDownloadInvoice={this.canDownloadInvoice(transaction)}
+                canRefund={this.canRefund(isRoot, isHostAdmin, isCollectiveAdmin)}
+                canDownloadInvoice={this.canDownloadInvoice(transaction, isRoot, isCollectiveAdmin)}
                 dateDisplayType={this.props.dateDisplayType}
               />
             </Box>

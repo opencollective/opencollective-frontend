@@ -35,12 +35,6 @@ export default class PayWithPaypalButton extends Component {
     }),
   };
 
-  static defaultStyle = {
-    color: 'blue',
-    tagline: false,
-    label: 'pay',
-  };
-
   constructor(props) {
     super(props);
     this.container = React.createRef();
@@ -55,6 +49,12 @@ export default class PayWithPaypalButton extends Component {
   componentWillUnmount() {
     this.container.current.remove();
   }
+
+  static defaultStyle = {
+    color: 'blue',
+    tagline: false,
+    label: 'pay',
+  };
 
   getOptions() {
     return {

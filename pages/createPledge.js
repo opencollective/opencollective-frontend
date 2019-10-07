@@ -130,6 +130,24 @@ class CreatePledgePage extends React.Component {
     };
   }
 
+  static propTypes = {
+    intl: PropTypes.object.isRequired, // from injectIntl
+    data: PropTypes.object,
+    name: PropTypes.string,
+    slug: PropTypes.string,
+    githubHandle: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    createPledge: PropTypes.func,
+  };
+
+  state = {
+    errorMessage: null,
+    loadingUserLogin: true,
+    LoggedInUser: undefined,
+    submitting: false,
+  };
+
   static messages = defineMessages({
     'menu.createPledge': {
       id: 'menu.createPledge',
@@ -148,24 +166,6 @@ class CreatePledgePage extends React.Component {
       defaultMessage: 'One-Time',
     },
   });
-
-  static propTypes = {
-    intl: PropTypes.object.isRequired, // from injectIntl
-    data: PropTypes.object,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    githubHandle: PropTypes.string,
-    LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    createPledge: PropTypes.func,
-  };
-
-  state = {
-    errorMessage: null,
-    loadingUserLogin: true,
-    LoggedInUser: undefined,
-    submitting: false,
-  };
 
   async createPledge(event) {
     event.preventDefault();
