@@ -1,5 +1,4 @@
-import winston from 'winston';
-import expressWinston from 'express-winston';
+const winston = require('winston');
 
 function getLogLevel() {
   if (process.env.DEBUG) {
@@ -21,17 +20,4 @@ const winstonConsole = new winston.transports.Console({
 logger.add(winstonConsole);
 logger.exceptions.handle(winstonConsole);
 
-const loggerMiddleware = {
-  logger: expressWinston.logger({
-    winstonInstance: logger,
-    meta: false,
-    colorize: true,
-    expressFormat: true,
-    ignoreRoute: req => req.url.match(/^\/_/),
-  }),
-  errorLogger: expressWinston.errorLogger({
-    winstonInstance: logger,
-  }),
-};
-
-export { logger, loggerMiddleware };
+module.exports = logger;

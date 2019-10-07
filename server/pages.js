@@ -1,8 +1,6 @@
-import nextRoutes from 'next-routes';
+const routes = require('next-routes');
 
-const pages = nextRoutes();
-
-pages
+const pages = routes()
   .add('home', '/', 'index')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
   .add('redeem', '/redeem/:code?')
@@ -161,6 +159,4 @@ if (process.env.NCP_IS_DEFAULT === 'true') {
   pages.add('collective', '/:slug');
 }
 
-export default pages;
-
-export const { Link, Router } = pages;
+module.exports = pages;

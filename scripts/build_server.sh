@@ -1,8 +1,9 @@
 SRC=./
 DIST=./dist
 
-echo "> Compiling server"
-babel $SRC --only "env.js,server/*,lib/utils.js" --out-dir $DIST || exit 1
+echo "> Copying server"
+cp env.js $DIST
+cp -R server $DIST
 
 echo "> Copying lang"
 cp -R $SRC/lang $DIST
