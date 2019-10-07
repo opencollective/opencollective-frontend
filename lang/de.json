@@ -98,6 +98,7 @@
   "collective.collective.memberOf.collective.parent.title": "Member collectives",
   "collective.company.description": "Start with a @ to reference an organization (e.g. @airbnb)",
   "collective.company.label": "Firma",
+  "collective.connectedAccounts.disconnect.button": "Disconnect",
   "collective.connectedAccounts.github.button": "GitHub verbinden",
   "collective.connectedAccounts.github.connected": "GitHub account {username} connected on {updatedAt, date, short}",
   "collective.connectedAccounts.github.description": "Connect a GitHub account to verify your identity and add it to your profile",

@@ -98,6 +98,7 @@
   "collective.collective.memberOf.collective.parent.title": "成员集体",
   "collective.company.description": "Start with a @ to reference an organization (e.g. @airbnb)",
   "collective.company.label": "公司",
+  "collective.connectedAccounts.disconnect.button": "Disconnect",
   "collective.connectedAccounts.github.button": "连接 GitHub",
   "collective.connectedAccounts.github.connected": "GitHub account {username} connected on {updatedAt, date, short}",
   "collective.connectedAccounts.github.description": "通过连接GitHub来验证身份并显示在个人资料中",
