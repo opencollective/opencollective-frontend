@@ -623,6 +623,8 @@
   "ExportContributors.OnlyIndividuals": "Apenas indivíduos: {link}",
   "ExportContributors.OnlyOrganizations": "Apenas organizações: {link}",
   "ExportContributors.Title": "Exportar para {format}",
+  "ExportImages.AllFinancial": "All financial contributors badge",
+  "ExportImages.Title": "You can export images showing the financial contributors to each tier.",
   "Filter.ByName": "Filtrar por nome",
   "Fiscalhost": "Administrador Fiscal",
   "Fiscalhost.definition": "Um administrador fiscal é uma entidade legal que detém o dinheiro e é responsável pelos formulários de administração/impostos do coletivo.",

@@ -29,7 +29,7 @@ class ExportImages extends React.Component {
         name: tier.name,
         images: [
           {
-            name: 'badge',
+            name: 'Tier badge',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${tier.name}&color=brightgreen`,
             code: `<img src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${tier.name}&color=brightgreen" />`,
             options: [
@@ -47,7 +47,7 @@ class ExportImages extends React.Component {
             ],
           },
           {
-            name: 'financial contributors',
+            name: 'Financial contributors widget',
             url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
             code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
             options: [
@@ -125,7 +125,12 @@ class ExportImages extends React.Component {
         <h1>
           <FormattedMessage id="export.images.title" defaultMessage="Export images" />
         </h1>
-        <p>You can export images showing the financial contributors to each tier.</p>
+        <p>
+          <FormattedMessage
+            id="ExportImages.Title"
+            defaultMessage="You can export images showing the financial contributors to each tier."
+          />
+        </p>
         <div>
           <InputField
             name="tiers"
@@ -173,6 +178,20 @@ class ExportImages extends React.Component {
             ))}
           </div>
         )}
+        <hr />
+        <label>
+          <FormattedMessage id="ExportImages.AllFinancial" defaultMessage="All financial contributors badge" />
+        </label>
+        <div className="url">
+          <a
+            href={`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
+          </a>
+        </div>
+        <img src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
       </div>
     );
   }
