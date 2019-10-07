@@ -91,7 +91,7 @@ class PayExpenseBtn extends React.Component {
         <style jsx>
           {`
             .PayExpenseBtn {
-              align-items: flex-end;
+              align-items: center;
               display: flex;
               flex-wrap: wrap;
             }
