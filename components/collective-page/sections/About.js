@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import dynamic from 'next/dynamic';
 
@@ -26,10 +26,17 @@ const HTMLEditor = dynamic(() => import('../ReverseCompatibleHTMLEditor'), {
 // if this is the case.
 const Markdown = dynamic(() => import('react-markdown'));
 
+const messages = defineMessages({
+  placeholder: {
+    id: 'CollectivePage.AddLongDescription',
+    defaultMessage: 'Add a description',
+  },
+});
+
 /**
  * Display the inline editable description section for the collective
  */
-const SectionAbout = ({ collective, canEdit }) => {
+const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   canEdit = collective.isArchived ? false : canEdit;
@@ -52,11 +59,14 @@ const SectionAbout = ({ collective, canEdit }) => {
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {
               return (
-                <HTMLContent>
+                <HTMLContent mt={-60}>
                   <HTMLEditor
-                    defaultValue={value}
+                    defaultValue={collective.longDescription}
                     onChange={setValue}
-                    allowedHeaders={[false, 2, 3]} /** Disable H1 */
+                    placeholder={intl.formatMessage(messages.placeholder)}
+                    toolbarTop={[60, null, 119]}
+                    withStickyToolbar
+                    autoFocus
                   />
                 </HTMLContent>
               );
@@ -118,6 +128,8 @@ SectionAbout.propTypes = {
 
   /** Can user edit the description? */
   canEdit: PropTypes.bool,
+  /** @ignore from injectIntl */
+  intl: PropTypes.object,
 };
 
-export default React.memo(SectionAbout);
+export default React.memo(injectIntl(SectionAbout));

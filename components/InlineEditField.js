@@ -159,7 +159,7 @@ class InlineEditField extends Component {
                     {error.message.replace('GraphQL error: ', '')}
                   </MessageBox>
                 )}
-                <Flex flexWrap="wrap" justifyContent="space-evenly" mt={2}>
+                <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
                   <FormButton data-cy="InlineEditField-Btn-Cancel" disabled={loading} onClick={this.disableEditor}>
                     <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                   </FormButton>

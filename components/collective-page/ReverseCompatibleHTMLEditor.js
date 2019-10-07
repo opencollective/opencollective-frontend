@@ -1,7 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Showdown from 'showdown';
-import HTMLEditor from '../HTMLEditor';
+import RichTextEditor from '../RichTextEditor';
+
+/**
+ * Convert all titles below `h3` to `h3`.
+ */
+const convertTitlesDown = htmlString => {
+  if (!htmlString) {
+    return htmlString;
+  }
+
+  return htmlString.replace(/<h(1|2)>/g, '<h3>').replace(/<\/h(1|2)>/g, '</h3>');
+};
 
 /**
  * Having a convertion with Showdown here will ensure a smooth migration
@@ -9,15 +20,17 @@ import HTMLEditor from '../HTMLEditor';
  * Once the new collective page becomes the default, we should remove all
  * markdow-related code from the new collective page.
  */
-const ReverseCompatibleHTMLEditor = props => {
-  const defaultValue = props.defaultValue;
+const ReverseCompatibleHTMLEditor = ({ defaultValue, ...props }) => {
   const isMarkdown = defaultValue && defaultValue[0] !== '<';
   const htmlValue = isMarkdown ? new Showdown.Converter().makeHtml(defaultValue) : defaultValue;
-  return <HTMLEditor {...props} defaultValue={htmlValue} />;
+  return <RichTextEditor {...props} defaultValue={convertTitlesDown(htmlValue)} />;
 };
 
 ReverseCompatibleHTMLEditor.propTypes = {
   defaultValue: PropTypes.string,
+  placeholder: PropTypes.string,
+  onChange: PropTypes.func,
+  autoFocus: PropTypes.bool,
 };
 
-export default ReverseCompatibleHTMLEditor;
+export default React.memo(ReverseCompatibleHTMLEditor);
