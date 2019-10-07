@@ -4,21 +4,22 @@ import Liana from 'forest-express-sequelize';
 
 import models, { sequelize, Op } from '../models';
 
+export const init = () =>
+  Liana.init({
+    modelsDir: path.resolve(__dirname, '../models'),
+    configDir: path.resolve(__dirname, '../forest'),
+    envSecret: process.env.FOREST_ENV_SECRET,
+    authSecret: process.env.FOREST_AUTH_SECRET,
+    connections: [{ models: getForestModels(), options: sequelize.options }],
+    sequelize: sequelize.Sequelize,
+  });
+
 export default app => {
   if (!process.env.FOREST_ENV_SECRET || !process.env.FOREST_AUTH_SECRET) {
     return;
   }
 
-  app.use(
-    Liana.init({
-      modelsDir: path.resolve(__dirname, '../models'),
-      configDir: path.resolve(__dirname, '../forest'),
-      envSecret: process.env.FOREST_ENV_SECRET,
-      authSecret: process.env.FOREST_AUTH_SECRET,
-      connections: [{ models: getForestModels(), options: sequelize.options }],
-      sequelize: sequelize.Sequelize,
-    }),
-  );
+  app.use(init());
 
   app.post('/forest/actions/activate-subscription', Liana.ensureAuthenticated, (req, res) => {
     const data = req.body.data;

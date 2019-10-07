@@ -172,6 +172,7 @@
     "deploy:staging": "./scripts/pre-deploy.sh staging && bash -x scripts/deploy.sh staging",
     "dev": "nodemon server/index.js -x \"babel-node --extensions .js,.ts\" . -e js,hbs,ts",
     "export:csv": "babel-node --extensions .js,.ts scripts/monthly_data_exports.js",
+    "forestadmin-schema:update": "npm run script scripts/forestadmin-schema-update",
     "git:clean": "./scripts/git_clean.sh",
     "hint": "npm run lint:quiet",
     "lint": "eslint .",
