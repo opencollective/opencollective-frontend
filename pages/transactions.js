@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
+import styled from 'styled-components';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -17,6 +18,15 @@ import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { withUser } from '../components/UserProvider';
 import { Sections } from '../components/collective-page/_constants';
+
+const TransactionPageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  #footer {
+    margin-top: auto;
+  }
+`;
 
 class TransactionsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
@@ -66,7 +76,7 @@ class TransactionsPage extends React.Component {
     }
 
     return (
-      <div className="TransactionsPage">
+      <TransactionPageWrapper className="TransactionsPage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
@@ -93,7 +103,7 @@ class TransactionsPage extends React.Component {
         </Body>
 
         <Footer />
-      </div>
+      </TransactionPageWrapper>
     );
   }
 }
