@@ -18,6 +18,7 @@ import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
 import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
+import UnapproveExpenseBtn from './UnapproveExpenseBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 
 class Expense extends React.Component {
@@ -412,6 +413,7 @@ class Expense extends React.Component {
                         unlock={this.props.unlockPayAction}
                       />
                     )}
+                    {canPay && <UnapproveExpenseBtn id={expense.id} />}
                     {canApprove && <ApproveExpenseBtn id={expense.id} />}
                     {canReject && <RejectExpenseBtn id={expense.id} />}
                     {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn id={expense.id} />}
