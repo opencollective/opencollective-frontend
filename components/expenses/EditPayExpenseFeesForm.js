@@ -12,6 +12,7 @@ class EditPayExpenseFees extends React.Component {
     onChange: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
     canEditPlatformFee: PropTypes.bool,
+    payoutMethod: PropTypes.string,
   };
 
   constructor(props) {
@@ -29,7 +30,7 @@ class EditPayExpenseFees extends React.Component {
   }
 
   render() {
-    const { currency, canEditPlatformFee } = this.props;
+    const { currency, canEditPlatformFee, payoutMethod } = this.props;
 
     return (
       <div className="EditPayExpenseFees">
@@ -81,20 +82,21 @@ class EditPayExpenseFees extends React.Component {
         </style>
 
         <div className="columns fees">
-          <div className="hostFeeInCollectiveCurrency col">
-            <label htmlFor="hostFeeInCollectiveCurrency">
-              <FormattedMessage id="expense.hostFeeInCollectiveCurrency" defaultMessage="host fee" />
-            </label>
-            <InputField
-              defaultValue={0}
-              id="hostFeeInCollectiveCurrency"
-              name="hostFeeInCollectiveCurrency"
-              onChange={hostFeeInCollectiveCurrency => this.handleChange({ hostFeeInCollectiveCurrency })}
-              pre={getCurrencySymbol(currency)}
-              type="currency"
-            />
-          </div>
-
+          {payoutMethod === 'other' && (
+            <div className="hostFeeInCollectiveCurrency col">
+              <label htmlFor="hostFeeInCollectiveCurrency">
+                <FormattedMessage id="expense.hostFeeInCollectiveCurrency" defaultMessage="host fee" />
+              </label>
+              <InputField
+                defaultValue={0}
+                id="hostFeeInCollectiveCurrency"
+                name="hostFeeInCollectiveCurrency"
+                onChange={hostFeeInCollectiveCurrency => this.handleChange({ hostFeeInCollectiveCurrency })}
+                pre={getCurrencySymbol(currency)}
+                type="currency"
+              />
+            </div>
+          )}
           <div className="paymentProcessorFeeInCollectiveCurrency col">
             <label htmlFor="paymentProcessorFeeInCollectiveCurrency">
               <FormattedMessage
@@ -114,7 +116,7 @@ class EditPayExpenseFees extends React.Component {
             />
           </div>
 
-          {canEditPlatformFee && (
+          {canEditPlatformFee && payoutMethod === 'other' && (
             <div className="platformFeeInCollectiveCurrency col">
               <label htmlFor="platformFeeInCollectiveCurrency">
                 <FormattedMessage id="expense.platformFeeInCollectiveCurrency" defaultMessage="platform fee" />

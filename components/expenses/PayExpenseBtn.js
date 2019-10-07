@@ -96,6 +96,7 @@ class PayExpenseBtn extends React.Component {
               align-items: center;
               display: flex;
               flex-wrap: wrap;
+              justify-content: space-between;
             }
             .error {
               display: flex;
@@ -134,17 +135,23 @@ class PayExpenseBtn extends React.Component {
           disabled={this.props.disabled || disabled}
           title={title}
         >
-          {selectedPayoutMethod === 'other' && (
-            <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
-          )}
-          {selectedPayoutMethod !== 'other' && (
+          <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
+        </StyledButton>
+        {selectedPayoutMethod !== 'other' && (
+            <StyledButton
+            className="pay"
+            buttonStyle="success"
+            onClick={this.onClick}
+            disabled={this.props.disabled || disabled}
+            title={title}
+          >
             <FormattedMessage
               id="expense.pay.btn"
               defaultMessage="Pay with {paymentMethod}"
               values={{ paymentMethod: expense.payoutMethod }}
             />
-          )}
-        </StyledButton>
+          </StyledButton>
+        )}
         <div className="error">{error}</div>
       </div>
     );

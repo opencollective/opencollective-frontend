@@ -439,11 +439,12 @@ class Expense extends React.Component {
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
                 <div className="manageExpense">
-                  {canPay && expense.payoutMethod === 'other' && (
+                  {canPay && (
                     <EditPayExpenseFeesForm
                       canEditPlatformFee={LoggedInUser.isRoot()}
                       currency={collective.currency}
                       onChange={fees => this.handleChange({ fees })}
+                      payoutMethod={expense.payoutMethod}
                     />
                   )}
                   <div className="expenseActions" data-cy="expense-actions">
