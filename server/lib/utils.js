@@ -65,7 +65,21 @@ export function strip_tags(str, allowedTags) {
     allowedAttributes: {
       a: ['href', 'name', 'target'],
       img: ['src'],
+      iframe: [
+        'src',
+        'allowfullscreen',
+        'frameborder',
+        'autoplay',
+        'width',
+        'height',
+        {
+          name: 'allow',
+          multiple: true,
+          values: ['autoplay', 'encrypted-media', 'gyroscope'],
+        },
+      ],
     },
+    allowedIframeHostnames: ['www.youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com'],
   });
 }
 
