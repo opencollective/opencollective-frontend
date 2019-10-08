@@ -192,7 +192,7 @@ class CreateVirtualCardsForm extends Component {
   onSubmit(e) {
     e.preventDefault();
     const { values, submitting, deliverType } = this.state;
-    if (!submitting && this.form.current.reportValidity()) {
+    if (!submitting && this.form.current.reportValidity && this.form.current.reportValidity()) {
       this.setState({ submitting: true });
       const params = {
         amount: Math.round(values.amount * 100),

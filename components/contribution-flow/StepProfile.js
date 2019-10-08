@@ -91,7 +91,7 @@ const useForm = ({ onProfileChange }) => {
       onBlur: event => {
         const hasValue = event.target.value;
         const wasUpdatedOnce = Object.prototype.hasOwnProperty.call(state, event.target.name);
-        if (hasValue || wasUpdatedOnce) event.target.reportValidity();
+        if (hasValue || wasUpdatedOnce) event.target.reportValidity && event.target.reportValidity();
       },
       onInvalid: event => {
         event.persist();
