@@ -11,6 +11,7 @@ import twitter from '../../server/lib/twitter';
 import slackLib from '../../server/lib/slack';
 import { pluralize } from '../../server/lib/utils';
 import _, { pick, get, set } from 'lodash';
+import { types as collectiveTypes } from '../../server/constants/collectives';
 
 const TenMinutesAgo = new Date();
 TenMinutesAgo.setMinutes(TenMinutesAgo.getMinutes() - 10);
@@ -31,7 +32,7 @@ const init = () => {
     },
     limit: 30,
     group: ['CollectiveId', 'collective.id'],
-    include: [{ model: models.Collective, as: 'collective' }],
+    include: [{ model: models.Collective, where: { type: { [Op.ne]: collectiveTypes.EVENT } }, as: 'collective' }],
   })
     .tap(transactionsGroups => {
       console.log(`${transactionsGroups.length} different collectives got new backers since ${TenMinutesAgo}`);
@@ -160,7 +161,8 @@ const compileTweet = async (collective, template, twitterAccount) => {
   }
 
   let tweet = twitter.compileTweet(template, replacements, get(twitterAccount, `settings.${template}.tweet`));
-  tweet += `\nhttps://opencollective.com/${collective.slug}`;
+  const path = await collective.getUrlPath();
+  tweet += `\nhttps://opencollective.com/${path}`;
   return tweet;
 };
 
