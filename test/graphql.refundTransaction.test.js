@@ -24,7 +24,7 @@ async function setupTestObjects() {
   const user = await models.User.createUserWithCollective(utils.data('user1'));
   const host = await models.User.createUserWithCollective(utils.data('host1'));
   const collective = await models.Collective.create(utils.data('collective1'));
-  await collective.addHost(host.collective);
+  await collective.addHost(host.collective, host);
   const tier = await models.Tier.create(utils.data('tier1'));
   const paymentMethod = await models.PaymentMethod.create(utils.data('paymentMethod2'));
   await models.ConnectedAccount.create({

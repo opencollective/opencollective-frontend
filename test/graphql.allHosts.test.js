@@ -37,11 +37,11 @@ describe('graphql.allHosts.test.js', () => {
     privateHost = await models.Collective.create({ name: 'Xavier' });
     await publicHost.addUserWithRole(hostAdmin, 'ADMIN');
     collective1 = await models.Collective.create({ name: 'VeganBrussels' });
-    await collective1.addHost(publicHost, user1);
+    await collective1.addHost(publicHost, user1, { shouldAutomaticallyApprove: true });
     collective2 = await models.Collective.create({
       name: 'Personal Collective',
     });
-    await collective2.addHost(privateHost, user1);
+    await collective2.addHost(privateHost, user1, { shouldAutomaticallyApprove: true });
     await publicHost.createConnectedAccount({
       service: 'stripe',
     });

@@ -848,6 +848,14 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  /**
+   * If the collective is a host, this function return true in case it's open to applications.
+   * It does **not** check that the collective is indeed a host.
+   */
+  Collective.prototype.canApply = function() {
+    return Boolean(this.settings && this.settings.apply);
+  };
+
   // This is quite ugly, and only needed for events.
   // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
   Collective.prototype.getUrlPath = function() {
@@ -1424,8 +1432,6 @@ export default function(Sequelize, DataTypes) {
       throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
     }
 
-    creatorUser = creatorUser || { id: hostCollective.CreatedByUserId };
-
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
@@ -1433,25 +1439,31 @@ export default function(Sequelize, DataTypes) {
       CollectiveId: this.id,
     };
 
-    let isActive = false;
-    let approvedAt = null;
-    if (creatorUser.isAdmin) {
+    let shouldAutomaticallyApprove = options && options.shouldAutomaticallyApprove;
+
+    // If not forced, let's check for cases where we can still safely automatically approve collective
+    if (!shouldAutomaticallyApprove) {
       if (creatorUser.isAdmin(hostCollective.id)) {
-        isActive = true;
-        approvedAt = new Date();
+        // If user is admin of the host, we can automatically approve
+        shouldAutomaticallyApprove = true;
       } else if (this.ParentCollectiveId && creatorUser.isAdmin(this.ParentCollectiveId)) {
+        // If there's a parent collective already approved by the host and user is admin of it, we can also approve
         const parentCollective = await models.Collective.findByPk(this.ParentCollectiveId);
-        if (parentCollective && parentCollective.isActive) {
-          isActive = true;
-          approvedAt = new Date();
+        if (parentCollective && parentCollective.HostCollectiveId === hostCollective.id && parentCollective.isActive) {
+          shouldAutomaticallyApprove = true;
         }
       }
     }
+
+    // If we can't automatically approve the collective and it is not open to new applications, reject it
+    if (!shouldAutomaticallyApprove && !hostCollective.canApply()) {
+      throw new Error('This host is not open to applications');
+    }
+
     const updatedValues = {
       HostCollectiveId: hostCollective.id,
       hostFeePercent: hostCollective.hostFeePercent,
-      isActive,
-      approvedAt,
+      ...(shouldAutomaticallyApprove ? { isActive: true, approvedAt: new Date() } : null),
     };
 
     // events should take the currency of their parent collective, not necessarily the host of their host.

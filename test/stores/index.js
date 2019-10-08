@@ -113,6 +113,7 @@ export async function newHost(name, currency, hostFee, userData = {}) {
     hostFeePercent,
     CreatedByUserId: hostAdmin.id,
     isActive: true,
+    settings: { apply: true },
   });
   await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
   return { hostAdmin, hostCollective, [slug]: hostCollective };
@@ -157,7 +158,7 @@ export async function newCollectiveWithHost(name, currency, hostCurrency, hostFe
   const args = { ...data, name, slug, currency, hostFeePercent };
   if (user) args['CreatedByUserId'] = user.id;
   const collective = await models.Collective.create(args);
-  await collective.addHost(hostCollective);
+  await collective.addHost(hostCollective, hostAdmin);
   // We activate the collective
   collective.isActive = true;
   // when adding the host, the collective.currency becomes the currency of the host
@@ -188,10 +189,11 @@ export async function newCollectiveInHost(name, currency, hostCollective, user =
   const args = { ...data, name, slug, currency, hostFeePercent };
   if (user) args['CreatedByUserId'] = user.id;
   const collective = await models.Collective.create(args);
-  await collective.addHost(hostCollective);
+  user = user || (await models.User.createUserWithCollective({ email: randEmail(), name: 'Test' }));
+  await collective.addUserWithRole(user, 'ADMIN');
+  await collective.addHost(hostCollective, user, { shouldAutomaticallyApprove: true });
   collective.isActive = true;
   await collective.save();
-  if (user) await collective.addUserWithRole(user, 'ADMIN');
   return { collective, [slug]: collective };
 }
 

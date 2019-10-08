@@ -515,6 +515,7 @@ export default (Sequelize, DataTypes) => {
       isActive: true,
       CreatedByUserId: userData.CreatedByUserId || user.id,
       data: { UserId: user.id },
+      settings: userData.settings,
     };
     user.collective = await models.Collective.create(userCollectiveData, sequelizeParams);
 

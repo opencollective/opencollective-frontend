@@ -31,7 +31,7 @@ describe('api.v1.test.js', () => {
   before('create collective', () => models.Collective.create(publicCollectiveData).tap(g => (collective = g)));
 
   // Add users to collectives
-  before('add host to collective', () => collective.addHost(host.collective));
+  before('add host to collective', () => collective.addHost(host.collective, host));
   before('add user to collective as a member', () => collective.addUserWithRole(user, roles.ADMIN));
 
   let transaction, defaultAttributes;

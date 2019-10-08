@@ -5,6 +5,7 @@ import Promise from 'bluebird';
 import * as utils from './utils';
 import emailLib from '../server/lib/email';
 import sinon from 'sinon';
+import { randEmail } from './stores';
 
 describe('graphql.orders.test.js', () => {
   const backers = [],
@@ -45,7 +46,10 @@ describe('graphql.orders.test.js', () => {
       currency: 'EUR',
       tags: ['brussels', 'coding'],
     });
-    await Promise.map(collectives, collective => collective.addHost(host));
+    const randomUser = models.User.createUserWithCollective({ email: randEmail() });
+    await Promise.map(collectives, collective =>
+      collective.addHost(host, randomUser, { shouldAutomaticallyApprove: true }),
+    );
     orders[0] = await models.Order.create({
       CreatedByUserId: backers[1].id,
       CollectiveId: collectives[1].id,
@@ -181,10 +185,10 @@ describe('graphql.orders.test.js', () => {
       expect(transactions[1].PaymentMethodId).to.be.null;
       expect(transactions[1].platformFeeInHostCurrency).to.equal(0);
       expect(transactions[1].hostFeeInHostCurrency).to.equal(-0.05 * orders[0].totalAmount);
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
-      expect(emailSendMessageSpy.callCount).to.equal(3);
-      expect(emailSendMessageSpy.thirdCall.args[0]).to.equal(backers[1].email);
-      expect(emailSendMessageSpy.thirdCall.args[1]).to.equal('Thank you for your €150 donation to codenplay');
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1);
+      expect(emailSendMessageSpy.callCount).to.equal(1);
+      expect(emailSendMessageSpy.firstCall.args[0]).to.equal(backers[1].email);
+      expect(emailSendMessageSpy.firstCall.args[1]).to.match(/Thank you for your €\s?150 donation to codenplay/);
     });
   });
 });

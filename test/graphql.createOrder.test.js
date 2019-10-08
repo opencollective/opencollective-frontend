@@ -206,10 +206,12 @@ describe('createOrder', () => {
   });
 
   it('creates a pending order if the collective is active and the payment method type is manual', async () => {
+    const hostAdmin = await models.User.create({ email: store.randEmail(), name: '_____' });
     const host = await models.Collective.create({
       slug: 'host-collective',
       name: 'Open Collective 501c3',
       currency: 'USD',
+      CreatedByUserId: hostAdmin.id,
       settings: {
         paymentMethods: {
           manual: {
@@ -239,7 +241,7 @@ describe('createOrder', () => {
       currency: collective.currency,
       CollectiveId: event.id,
     });
-    await collective.addHost(host);
+    await collective.addHost(host, hostAdmin, { shouldAutomaticallyApprove: true });
     await collective.update({ isActive: true });
     const thisOrder = cloneDeep(baseOrder);
     delete thisOrder.paymentMethod;
