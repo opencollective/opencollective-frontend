@@ -257,10 +257,13 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       if (existingUser) {
         throw new Error('An account already exists for this email address. Please login.');
       }
+      if (!remoteUser) {
+        throw new Error('You have to be authenticated. Please login.');
+      }
       user = await models.User.createUserWithCollective({
         ...order.user,
         currency: order.currency,
-        CreatedByUserId: remoteUser ? remoteUser.id : null,
+        CreatedByUserId: remoteUser.id,
       });
     } else if (remoteUser) {
       user = remoteUser;

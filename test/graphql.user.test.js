@@ -103,12 +103,9 @@ describe('Query Tests', () => {
         };
       };
 
-      const generateLoggedOutOrder = (user, tier = tier1) => {
+      const generateLoggedOutOrder = (tier = tier1) => {
         return {
           ...generateLoggedInOrder(tier),
-          user: {
-            email: user.email,
-          },
         };
       };
 
@@ -175,9 +172,16 @@ describe('Query Tests', () => {
           }
         }`;
 
-        await utils.graphqlQuery(createOrderQuery, {
-          order: generateLoggedOutOrder({ email: store.randEmail('user@opencollective.com') }, ticket1),
+        const remoteUser = await models.User.createUserWithCollective({
+          email: store.randEmail('user@opencollective.com'),
         });
+        await utils.graphqlQuery(
+          createOrderQuery,
+          {
+            order: generateLoggedOutOrder(ticket1),
+          },
+          remoteUser,
+        );
 
         const query = `
           query Tier($id: Int!) {

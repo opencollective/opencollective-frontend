@@ -963,13 +963,14 @@ describe('Mutation Tests', () => {
         `;
 
           const order = {
-            user: { email: 'newuser@email.com' },
             collective: { id: event1.id },
             tier: { id: 3 },
             quantity: 2,
           };
-
-          const result = await utils.graphqlQuery(query, { order });
+          const remoteUser = await models.User.createUserWithCollective({
+            email: 'newuser@email.com',
+          });
+          const result = await utils.graphqlQuery(query, { order }, remoteUser);
           expect(result).to.deep.equal({
             data: {
               createOrder: {
@@ -984,7 +985,7 @@ describe('Mutation Tests', () => {
                   },
                 },
                 createdByUser: {
-                  email: null,
+                  email: 'newuser@email.com',
                   id: 5,
                 },
               },
@@ -1160,9 +1161,6 @@ describe('Mutation Tests', () => {
           `;
 
           const order = {
-            user: {
-              email: 'newuser@email.com',
-            },
             paymentMethod: {
               token: 'tok_123456781234567812345678',
               name: '4242',
@@ -1175,7 +1173,8 @@ describe('Mutation Tests', () => {
             tier: { id: 4 },
             quantity: 2,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const remoteUser = await models.User.createUserWithCollective({ email: 'newuser@email.com' });
+          const result = await utils.graphqlQuery(query, { order }, remoteUser);
           result.errors && console.error(result.errors[0]);
           const executeOrderArgument = executeOrderStub.firstCall.args;
           expect(result).to.deep.equal({
@@ -1192,7 +1191,7 @@ describe('Mutation Tests', () => {
                   },
                 },
                 createdByUser: {
-                  email: null,
+                  email: 'newuser@email.com',
                   id: 5,
                 },
                 collective: {

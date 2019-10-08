@@ -148,17 +148,21 @@ describe('createOrder', () => {
     });
     const thisOrder = cloneDeep(baseOrder);
     thisOrder.collective.id = collective.id;
-    thisOrder.user = {
+
+    const remoteUser = await models.User.createUserWithCollective({
       firstName: 'John',
       lastName: 'Smith',
       email: 'jsmith@email.com',
       twitterHandle: 'johnsmith',
       newsletterOptIn: true,
-    };
-
-    const res = await utils.graphqlQuery(createOrderQuery, {
-      order: thisOrder,
     });
+    const res = await utils.graphqlQuery(
+      createOrderQuery,
+      {
+        order: thisOrder,
+      },
+      remoteUser,
+    );
 
     // There should be no errors
     res.errors && console.error(res.errors);
@@ -176,18 +180,22 @@ describe('createOrder', () => {
     });
     const thisOrder = cloneDeep(baseOrder);
     thisOrder.collective.id = collective.id;
-    thisOrder.user = {
+    thisOrder.interval = 'month';
+
+    const remoteUser = await models.User.createUserWithCollective({
       firstName: 'John',
       lastName: 'Smith',
       email: 'jsmith@email.com',
       twitterHandle: 'johnsmith',
       newsletterOptIn: true,
-    };
-    thisOrder.interval = 'month';
-
-    const res = await utils.graphqlQuery(createOrderQuery, {
-      order: thisOrder,
     });
+    const res = await utils.graphqlQuery(
+      createOrderQuery,
+      {
+        order: thisOrder,
+      },
+      remoteUser,
+    );
 
     // There should be no errors
     res.errors && console.error(res.errors);
@@ -237,18 +245,22 @@ describe('createOrder', () => {
     delete thisOrder.paymentMethod;
     thisOrder.paymentMethod = { type: 'manual' };
     thisOrder.collective.id = event.id;
-    thisOrder.user = {
+    thisOrder.tier = { id: tier.id };
+    thisOrder.quantity = 2;
+    thisOrder.totalAmount = 2000;
+    const remoteUser = await models.User.createUserWithCollective({
       firstName: 'John',
       lastName: 'Smith',
       email: 'jsmith@email.com',
       twitterHandle: 'johnsmith',
-    };
-    thisOrder.tier = { id: tier.id };
-    thisOrder.quantity = 2;
-    thisOrder.totalAmount = 2000;
-    const res = await utils.graphqlQuery(createOrderQuery, {
-      order: thisOrder,
     });
+    const res = await utils.graphqlQuery(
+      createOrderQuery,
+      {
+        order: thisOrder,
+      },
+      remoteUser,
+    );
 
     // There should be no errors
     res.errors && console.error(res.errors);
@@ -261,7 +273,7 @@ describe('createOrder', () => {
     expect(transactionsCount).to.equal(0);
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
     expect(emailSendMessageSpy.callCount).to.equal(2);
-    expect(emailSendMessageSpy.secondCall.args[0]).to.equal(thisOrder.user.email);
+    expect(emailSendMessageSpy.secondCall.args[0]).to.equal(remoteUser.email);
     expect(emailSendMessageSpy.secondCall.args[2]).to.match(/IBAN 1234567890987654321/);
     expect(emailSendMessageSpy.secondCall.args[2]).to.match(
       /for the amount of \$20 with the mention: webpack event backer order: [0-9]+/,
@@ -289,15 +301,16 @@ describe('createOrder', () => {
     });
     // And given an order
     order.collective = { id: fearlesscitiesbrussels.id };
-    order.user = {
+    const remoteUser = await models.User.createUserWithCollective({
       firstName: 'John',
       lastName: 'Smith',
       email: 'jsmith@email.com',
       twitterHandle: 'johnsmith',
       newsletterOptIn: true,
-    };
+    });
+
     // When the query is executed
-    const res = await utils.graphqlQuery(createOrderQuery, { order });
+    const res = await utils.graphqlQuery(createOrderQuery, { order }, remoteUser);
 
     // Then there should be no errors
     res.errors && console.error(res.errors);
@@ -397,7 +410,7 @@ describe('createOrder', () => {
     expect(emailSendMessageSpy.firstCall.args[1]).to.equal(`1 ticket confirmed for ${event.name}`);
   });
 
-  it('creates an order as new incognito user', async () => {
+  it('shoud not create an order as new incognito user', async () => {
     // Given an order request
     const newOrder = cloneDeep(baseOrder);
     newOrder.collective = { id: fearlesscitiesbrussels.id };
@@ -412,15 +425,9 @@ describe('createOrder', () => {
     // When the GraphQL query is executed
     const res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
 
-    // Then there should be no errors
-    res.errors && console.error(res.errors);
-    expect(res.errors).to.not.exist;
-
-    // And then the donor's Collective slug & name should be
-    // incognito
-    const fromCollective = res.data.createOrder.fromCollective;
-    expect(fromCollective.slug).to.match(/incognito/);
-    expect(fromCollective.name).to.match(/incognito/);
+    // Then there should be errors
+    expect(res.errors).to.exist;
+    expect(res.errors[0].message).to.equal('You have to be authenticated. Please login.');
   });
 
   it("doesn't store the payment method for user if order fail", async () => {
@@ -430,7 +437,6 @@ describe('createOrder', () => {
     const newOrder = {
       ...cloneDeep(baseOrder),
       collective: { id: fearlesscitiesbrussels.id },
-      user: { firstName: '', lastName: '', email: store.randEmail('rejectedcard@protonmail.ch') },
       paymentMethod: {
         name: uniqueName,
         token: 'tok_chargeDeclinedProcessingError', // See https://stripe.com/docs/testing#cards
@@ -444,8 +450,12 @@ describe('createOrder', () => {
         save: true,
       },
     };
-
-    const res = await utils.graphqlQuery(createOrderQuery, { order: newOrder });
+    const remoteUser = await models.User.createUserWithCollective({
+      firstName: '',
+      lastName: '',
+      email: store.randEmail('rejectedcard@protonmail.ch'),
+    });
+    const res = await utils.graphqlQuery(createOrderQuery, { order: newOrder }, remoteUser);
     expect(res.errors[0].message).to.equal('Your card was declined.');
     const pm = await models.PaymentMethod.findOne({ where: { name: uniqueName } });
     expect(pm.saved).to.equal(false);
@@ -593,8 +603,13 @@ describe('createOrder', () => {
       ...constants.paymentMethod,
       token: 'tok_3B5j8xDjPFcHOcTm3ogdnq0K',
     };
+
+    const remoteUser = await models.User.create({
+      email: 'test@email.com',
+    });
+
     // When the order is created
-    const res = await utils.graphqlQuery(createOrderQuery, { order });
+    const res = await utils.graphqlQuery(createOrderQuery, { order }, remoteUser);
 
     // There should be no errors
     res.errors && console.error(res.errors);
