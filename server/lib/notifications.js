@@ -286,8 +286,7 @@ async function notifyByEmail(activity) {
       notifyAdminsOfCollective(activity.data.collective.id, activity);
       break;
 
-    case activityType.COLLECTIVE_APPLY: {
-
+    case activityType.COLLECTIVE_APPLY:
       notifyAdminsOfCollective(activity.data.host.id, activity, {
         template: 'collective.apply.for.host',
         replyTo: activity.data.user.email,
@@ -296,7 +295,7 @@ async function notifyByEmail(activity) {
         from: `hello@${activity.data.host.slug}.opencollective.com`,
       });
       break;
-    }
+
     case activityType.COLLECTIVE_CREATED:
       if ((get(activity, 'data.collective.tags') || []).includes('meetup')) {
         notifyAdminsOfCollective(activity.data.collective.id, activity, {
