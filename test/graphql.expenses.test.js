@@ -67,6 +67,11 @@ const markExpenseAsUnpaidQuery = `
   mutation markExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
     markExpenseAsUnpaid(id: $id, processorFeeRefunded: $processorFeeRefunded) { id status } }`;
 
+const unapproveExpenseQuery = `
+  mutation unapproveExpense($id: Int!) {
+    unapproveExpense(id: $id) { id status } }
+`;
+
 const addFunds = async (user, hostCollective, collective, amount) => {
   const currency = collective.currency || 'USD';
   const hostCurrencyFxRate = await getFxRate(currency, hostCollective.currency);
@@ -1255,4 +1260,40 @@ describe('GraphQL Expenses API', () => {
       expect(balance).to.equal(initialBalance);
     }); /* End of "successfully mark expense as unpaid" */
   }); /* #markExpenseAsUnpaid */
+  describe('#unapproveExpense', () => {
+    it('successfully unapprove expense', async () => {
+      // Given that we have a collective
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
+      // And given a user that will file an expense
+      const { user } = await store.newUser('an internet user', {
+        paypalEmail: 'testuser@paypal.com',
+      });
+      // And given the above collective has one expense (created by
+      // the above user)
+      const data = {
+        currency: 'USD',
+        payoutMethod: 'paypal',
+        privateMessage: 'Private instructions to reimburse this expense',
+        collective: { id: collective.id },
+      };
+      const expense = await store.createExpense(user, {
+        amount: 1000,
+        description: 'Pizza',
+        ...data,
+      });
+      // approve the expense
+      const res = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
+      res.errors && console.log(res.errors);
+      expect(res.errors).to.not.exist;
+      // expect expense to be first approved
+      expect(res.data.approveExpense.status).to.equal('APPROVED');
+      // When the expense is approved by the admin of host
+      const result = await utils.graphqlQuery(unapproveExpenseQuery, { id: expense.id }, hostAdmin);
+      result.errors && console.log(result.errors);
+      // Then there should be no errors in the result
+      expect(result.errors).to.not.exist;
+      // And then the approved expense should be set as PENDING
+      expect(result.data.unapproveExpense.status).to.equal('PENDING');
+    }); /* End of "successfully unapprove expense" */
+  }); /* End of #unapproveExpense */
 }); /* End of "GraphQL Expenses API" */

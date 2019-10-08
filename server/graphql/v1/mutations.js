@@ -280,6 +280,15 @@ const mutations = {
       return updateExpenseStatus(req.remoteUser, args.id, statuses.APPROVED);
     },
   },
+  unapproveExpense: {
+    type: ExpenseType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(_, args, req) {
+      return updateExpenseStatus(req.remoteUser, args.id, statuses.PENDING);
+    },
+  },
   rejectExpense: {
     type: ExpenseType,
     args: {
