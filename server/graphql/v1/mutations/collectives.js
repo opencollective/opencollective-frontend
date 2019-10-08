@@ -3,6 +3,7 @@ import slugify from 'limax';
 import { get, omit, truncate } from 'lodash';
 import { map } from 'bluebird';
 import config from 'config';
+import uuidv4 from 'uuid/v4';
 
 import models, { Op } from '../../../models';
 import * as errors from '../../errors';
@@ -85,11 +86,11 @@ export async function createCollective(_, args, req) {
     collectiveData.hostFeePercent = hostCollective.hostFeePercent;
   }
 
-  // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
-  // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
-  const slug = slugify(args.collective.slug || args.collective.name);
-  if (collectiveData.ParentCollectiveId) {
-    collectiveData.slug = `${slug}-${parentCollective.id}${collectiveData.type.substr(0, 2)}`.toLowerCase();
+  // To ensure uniqueness of the slug, if the type of collective is EVENT
+  // we force the slug to be of the form of `${slug}-${randomIdentifier}`
+  if (collectiveData.type === 'EVENT') {
+    const slug = slugify(args.collective.slug || args.collective.name);
+    collectiveData.slug = `${slug}-${uuidv4().substr(0, 8)}`;
   }
 
   try {
@@ -372,12 +373,6 @@ export function editCollective(_, args, req) {
       }
     })
     .then(() => {
-      if (args.collective.slug && collective.type === 'EVENT') {
-        // To ensure uniqueness of the slug, if the type of collective is not COLLECTIVE (e.g. EVENT)
-        // we force the slug to be of the form of `${slug}-${ParentCollectiveId}${collective.type.substr(0,2)}`
-        const slug = slugify(args.collective.slug.replace(/(\-[0-9]+[a-z]{2})$/i, '') || args.collective.name);
-        newCollectiveData.slug = `${slug}-${parentCollective.id}${collective.type.substr(0, 2)}`.toLowerCase();
-      }
       if (collective.type === 'EVENT') {
         return req.remoteUser.isAdmin(collective.id) || req.remoteUser.isAdmin(parentCollective.id);
       } else {

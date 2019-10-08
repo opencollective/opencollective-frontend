@@ -166,11 +166,10 @@ describe('Mutation Tests', () => {
         const result = await utils.graphqlQuery(createCollectiveQuery, { collective: event }, user1);
         result.errors && console.error(result.errors[0]);
         const createdEvent = result.data.createCollective;
-        expect(createdEvent.slug).to.equal('brusselstogether-meetup-3-5ev');
+        expect(createdEvent.slug).to.contain('brusselstogether-meetup');
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
         expect(createdEvent.isActive).to.be.true;
         event.id = createdEvent.id;
-        event.slug = 'newslug';
         event.tiers = createdEvent.tiers;
 
         // Make sure the creator of the event has been added as an ADMIN
@@ -220,7 +219,6 @@ describe('Mutation Tests', () => {
 
         const r4 = await utils.graphqlQuery(updateQuery, { collective: event }, user1);
         const updatedEvent = r4.data.editCollective;
-        expect(updatedEvent.slug).to.equal(`${event.slug}-${event.ParentCollectiveId}ev`);
         expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
         expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
       });
