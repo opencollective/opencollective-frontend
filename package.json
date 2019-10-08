@@ -125,7 +125,7 @@
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-react": "^7.16.0",
     "husky": "^3.0.8",
-    "lint-staged": "^9.4.1",
+    "lint-staged": "^9.4.2",
     "mocha": "^6.2.1",
     "mocha-circleci-reporter": "^0.0.3",
     "nock": "^11.3.6",
