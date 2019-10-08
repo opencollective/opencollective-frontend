@@ -60,9 +60,6 @@ module.exports = {
         defaultValue: DataTypes.NOW,
       },
       seenAt: DataTypes.DATE,
-      lastLogin: {
-        type: DataTypes.DATE,
-      },
       deletedAt: {
         type: DataTypes.DATE,
       },

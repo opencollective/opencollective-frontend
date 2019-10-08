@@ -133,7 +133,7 @@ export default (Sequelize, DataTypes) => {
 
       seenAt: DataTypes.DATE,
 
-      lastLogin: {
+      lastLoginAt: {
         type: DataTypes.DATE,
       },
 
@@ -260,8 +260,8 @@ export default (Sequelize, DataTypes) => {
     return auth.createJwt(this.id, payload, expiration);
   };
 
-  User.prototype.generateLoginLink = function(redirect = '/', websiteUrl, lastLogin) {
-    const token = this.jwt({ scope: 'login', last: lastLogin });
+  User.prototype.generateLoginLink = function(redirect = '/', websiteUrl, lastLoginAt) {
+    const token = this.jwt({ scope: 'login', lastLoginAt: lastLoginAt });
     // if a different websiteUrl is passed
     // we don't accept that in production to avoid fishing related issues
     if (websiteUrl && config.env !== 'production') {
