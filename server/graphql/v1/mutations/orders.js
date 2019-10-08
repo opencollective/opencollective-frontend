@@ -282,7 +282,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         throw new Error(`From collective id ${order.fromCollective.id} not found`);
       }
 
-      const possibleRoles = [roles.ADMIN, roles.HOST];
+      const possibleRoles = [roles.ADMIN];
       if (fromCollective.type === types.ORGANIZATION) {
         possibleRoles.push(roles.MEMBER);
       }
