@@ -287,14 +287,10 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_APPLY: {
-      const user = await models.User.findByPk(activity.data.user.id);
-      let userEmail;
-      if (user) {
-        userEmail = user.email;
-      }
+
       notifyAdminsOfCollective(activity.data.host.id, activity, {
         template: 'collective.apply.for.host',
-        replyTo: userEmail,
+        replyTo: activity.data.user.email,
       });
       notifyAdminsOfCollective(activity.data.collective.id, activity, {
         from: `hello@${activity.data.host.slug}.opencollective.com`,
