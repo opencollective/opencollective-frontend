@@ -857,7 +857,7 @@ export default function(Sequelize, DataTypes) {
       }).then(parent => {
         if (!parent) {
           logger.error(`Event (${this.id}) with an invalid parent (${this.ParentCollectiveId}).`);
-          return `/events/${this.slug}`;
+          return `/collective/events/${this.slug}`;
         }
         return `/${parent.slug}/events/${this.slug}`;
       });
