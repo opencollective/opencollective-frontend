@@ -362,6 +362,22 @@
           "validations": []
         },
         {
+          "field": "HostCollective",
+          "type": "Number",
+          "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": "Collective.HostCollectiveId",
+          "inverseOf": null,
+          "relationship": "BelongsTo",
+          "validations": []
+        },
+        {
           "field": "IssuedOrders",
           "type": ["Number"],
           "defaultValue": null,
@@ -492,6 +508,21 @@
         {
           "field": "address",
           "type": "String",
+          "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
+          "field": "approvedAt",
+          "type": "Date",
           "defaultValue": null,
           "enums": null,
           "integration": null,
@@ -743,6 +774,22 @@
           ]
         },
         {
+          "field": "hostedCollectives",
+          "type": ["Number"],
+          "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": "Collective.HostCollectiveId",
+          "inverseOf": null,
+          "relationship": "HasMany",
+          "validations": []
+        },
+        {
           "field": "id",
           "type": "Number",
           "defaultValue": null,
@@ -774,6 +821,21 @@
         },
         {
           "field": "isActive",
+          "type": "Boolean",
+          "defaultValue": false,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
+          "field": "isIncognito",
           "type": "Boolean",
           "defaultValue": false,
           "enums": null,
@@ -1769,6 +1831,21 @@
           ]
         },
         {
+          "field": "type",
+          "type": "Enum",
+          "defaultValue": null,
+          "enums": ["INVOICE", "RECEIPT"],
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
           "field": "updatedAt",
           "type": "Date",
           "defaultValue": null,
@@ -2553,6 +2630,21 @@
           "validations": []
         },
         {
+          "field": "interval",
+          "type": "String",
+          "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
           "field": "paymentMethod",
           "type": "Number",
           "defaultValue": null,
@@ -2633,22 +2725,6 @@
               "value": 1
             }
           ]
-        },
-        {
-          "field": "referral",
-          "type": "Number",
-          "defaultValue": null,
-          "enums": null,
-          "integration": null,
-          "isFilterable": true,
-          "isReadOnly": false,
-          "isRequired": false,
-          "isSortable": true,
-          "isVirtual": false,
-          "reference": "Collective.ReferralCollectiveId",
-          "inverseOf": null,
-          "relationship": "BelongsTo",
-          "validations": []
         },
         {
           "field": "status",
@@ -3006,21 +3082,6 @@
           "validations": []
         },
         {
-          "field": "matching",
-          "type": "Number",
-          "defaultValue": null,
-          "enums": null,
-          "integration": null,
-          "isFilterable": true,
-          "isReadOnly": false,
-          "isRequired": false,
-          "isSortable": true,
-          "isVirtual": false,
-          "reference": null,
-          "inverseOf": null,
-          "validations": []
-        },
-        {
           "field": "monthlyLimitPerMember",
           "type": "Number",
           "defaultValue": null,
@@ -3054,6 +3115,21 @@
           "field": "primary",
           "type": "Boolean",
           "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
+          "field": "saved",
+          "type": "Boolean",
+          "defaultValue": false,
           "enums": null,
           "integration": null,
           "isFilterable": true,
@@ -3842,7 +3918,22 @@
         },
         {
           "field": "customFields",
-          "type": ["String"],
+          "type": "Json",
+          "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
+          "field": "data",
+          "type": "Json",
           "defaultValue": null,
           "enums": null,
           "integration": null,
@@ -4724,6 +4815,21 @@
           "validations": []
         },
         {
+          "field": "makePublicOn",
+          "type": "Date",
+          "defaultValue": null,
+          "enums": null,
+          "integration": null,
+          "isFilterable": true,
+          "isReadOnly": false,
+          "isRequired": false,
+          "isSortable": true,
+          "isVirtual": false,
+          "reference": null,
+          "inverseOf": null,
+          "validations": []
+        },
+        {
           "field": "markdown",
           "type": "String",
           "defaultValue": null,
@@ -4880,22 +4986,7 @@
         {
           "field": "_salt",
           "type": "String",
-          "defaultValue": "$2b$10$7MMiHbhPKBSofDkrsjzQU.",
-          "enums": null,
-          "integration": null,
-          "isFilterable": true,
-          "isReadOnly": false,
-          "isRequired": false,
-          "isSortable": true,
-          "isVirtual": false,
-          "reference": null,
-          "inverseOf": null,
-          "validations": []
-        },
-        {
-          "field": "billingAddress",
-          "type": "String",
-          "defaultValue": null,
+          "defaultValue": "$2b$10$DMR4gz6lVP4Mkj.W5deR3O",
           "enums": null,
           "integration": null,
           "isFilterable": true,
@@ -4961,12 +5052,17 @@
           "integration": null,
           "isFilterable": true,
           "isReadOnly": false,
-          "isRequired": false,
+          "isRequired": true,
           "isSortable": true,
           "isVirtual": false,
           "reference": null,
           "inverseOf": null,
           "validations": [
+            {
+              "message": null,
+              "type": "is present",
+              "value": null
+            },
             {
               "message": "Email must be between 6 and 128 characters in length",
               "type": "is longer than",
@@ -5134,7 +5230,7 @@
         {
           "field": "refresh_token",
           "type": "String",
-          "defaultValue": "$2b$10$RHFOtTPPMImC1vIvGUs3pe",
+          "defaultValue": "$2b$10$y6MzqPJPE0QEz/pdqmixIO",
           "enums": null,
           "integration": null,
           "isFilterable": true,
@@ -5286,7 +5382,7 @@
   "meta": {
     "database_type": "postgres",
     "liana": "forest-express-sequelize",
-    "liana_version": "3.2.3",
-    "orm_version": "5.9.4"
+    "liana_version": "3.3.5",
+    "orm_version": "5.19.2"
   }
 }
