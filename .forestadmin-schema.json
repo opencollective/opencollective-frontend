@@ -5288,7 +5288,7 @@
           "validations": []
         },
         {
-          "field": "lastLogin",
+          "field": "lastLoginAt",
           "type": "Date",
           "defaultValue": null,
           "enums": null,

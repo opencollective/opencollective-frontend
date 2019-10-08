@@ -40,8 +40,8 @@ export const signin = (req, res, next) => {
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       const now = new Date();
-      const lastLogin = u.lastLogin || now;
-      loginLink = u.generateLoginLink(redirect || '/', websiteUrl, lastLogin);
+      const lastLoginAt = u.lastLoginAt || now;
+      loginLink = u.generateLoginLink(redirect || '/', websiteUrl, lastLoginAt);
       if (config.env === 'development') {
         logger.info(`Login Link: ${loginLink}`);
       }
