@@ -2097,6 +2097,7 @@ export default function(Sequelize, DataTypes) {
           id &&
           models.ConnectedAccount.findOne({
             where: { service: 'stripe', CollectiveId: id },
+            order: [['createdAt', 'DESC']],
           })
         );
       })
