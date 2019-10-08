@@ -119,12 +119,12 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot) => {
+  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
     return {
       hasContact: isCollective,
       hasSubmitExpense: isCollective,
-      hasApply: isHost,
+      hasApply: canApply,
       hasDashboard: isHost && isAdmin,
       hasManageSubscriptions: isAdmin && !isCollective,
       addFunds: isRoot && type === CollectiveType.ORGANIZATION,
@@ -188,9 +188,10 @@ class CollectivePage extends Component {
 
   render() {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
+    const { type, isHost, canApply } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props);
-    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin, isRoot);
+    const callsToAction = this.getCallsToAction(type, isHost, isAdmin, isRoot, canApply);
 
     return (
       <Container
