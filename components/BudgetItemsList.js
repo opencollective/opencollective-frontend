@@ -378,7 +378,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
           </Flex>
           <Container data-cy="transaction-amount" fontSize="LeadParagraph" ml="auto" order={[2, 3]}>
             <Span
-              data-cy="credit"
+              data-cy="transaction-sign"
               color={isCredit ? 'green.700' : 'red.700'}
               mr={2}
               css={{ verticalAlign: 'text-bottom' }}

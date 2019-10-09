@@ -52,12 +52,12 @@ describe('New users profiles', () => {
       cy.get('[data-cy=section-transactions-title]').contains('Transactions');
       cy.get('button[data-cy="filter-button expenses"]').click({ force: true });
       cy.get('[data-cy="expenses transactions"]');
-      cy.get('[data-cy=credit]')
+      cy.get('[data-cy="transaction-sign"]')
         .first()
         .contains('+');
       cy.get('button[data-cy="filter-button contributions"]').click({ force: true });
       cy.get('[data-cy="contributions transactions"]');
-      cy.get('[data-cy=credit]')
+      cy.get('[data-cy="transaction-sign"]')
         .first()
         .contains('-');
     });
