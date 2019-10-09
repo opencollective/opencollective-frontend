@@ -196,6 +196,7 @@ const getCollective = graphql(
         hostFeePercent
         image
         imageUrl
+        canApply
         stats {
           id
           balance
