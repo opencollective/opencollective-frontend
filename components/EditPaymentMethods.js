@@ -2,15 +2,16 @@ import React from 'react';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
-import { get, sortBy } from 'lodash';
+import { set, get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from 'styled-icons/material/Add';
 
 import { compose, getErrorFromGraphqlException } from '../lib/utils';
+import { addEditCollectiveMutation } from '../lib/graphql/mutations';
 import { paymentMethodLabel } from '../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
-import { H3, Span } from './Text';
+import { H1, H2, H3, Span, P } from './Text';
 import Link from './Link';
 import Loading from './Loading';
 import EditPaymentMethod from './EditPaymentMethod';
@@ -18,6 +19,7 @@ import StyledButton from './StyledButton';
 import Container from './Container';
 import { withStripeLoader } from './StripeProvider';
 import NewCreditCardForm from './NewCreditCardForm';
+import UpdateBankDetailsForm from './UpdateBankDetailsForm';
 import MessageBox from './MessageBox';
 
 class EditPaymentMethods extends React.Component {
@@ -33,6 +35,8 @@ class EditPaymentMethods extends React.Component {
     removePaymentMethod: PropTypes.func.isRequired,
     /** From graphql query */
     updatePaymentMethod: PropTypes.func.isRequired,
+    /** From graphql query */
+    editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
   };
@@ -48,8 +52,9 @@ class EditPaymentMethods extends React.Component {
   }
 
   state = {
-    hasForm: false,
+    showCreditCardForm: false,
     newCreditCardInfo: null,
+    bankDetails: null,
     error: null,
     stripe: null,
     submitting: false,
@@ -60,6 +65,28 @@ class EditPaymentMethods extends React.Component {
   componentDidMount() {
     this.props.loadStripe();
   }
+
+  updateBankDetails = async () => {
+    if (!this.state.bankDetails) {
+      // we haven't modified anything, return
+      console.info('>>> updateBankDetails: no change to save, skipping');
+      this.setState({ showCreditCardForm: false, error: null, showManualPaymentMethodForm: false, submitting: false });
+      return;
+    }
+    const { Collective } = this.props.data;
+    const CollectiveInputType = { id: Collective.id, settings: Collective.settings || {} };
+    set(CollectiveInputType, 'settings.paymentMethods.manual.instructions', this.state.bankDetails.instructions);
+    this.setState({ submitting: true });
+    try {
+      await this.props.editCollective(CollectiveInputType);
+      this.handleSuccess();
+    } catch (e) {
+      console.error('>>> EditPaymentMethods > error to save collective', e);
+      this.setState({ error: e.message });
+    } finally {
+      this.setState({ submitting: false });
+    }
+  };
 
   submitNewCreditCard = async () => {
     const data = get(this.state, 'newCreditCardInfo.value');
@@ -91,7 +118,13 @@ class EditPaymentMethods extends React.Component {
 
   handleSuccess = () => {
     this.props.data.refetch();
-    this.setState({ hasForm: false, error: null, newCreditCardInfo: null, submitting: false });
+    this.setState({
+      showCreditCardForm: false,
+      showManualPaymentMethodForm: false,
+      error: null,
+      newCreditCardInfo: null,
+      submitting: false,
+    });
   };
 
   handleStripeError = async ({ message, response }) => {
@@ -178,25 +211,186 @@ class EditPaymentMethods extends React.Component {
   }
 
   render() {
-    const { hasForm, error, submitting, removedId, savingId } = this.state;
+    const { showCreditCardForm, showManualPaymentMethodForm, error, submitting, removedId, savingId } = this.state;
     const { Collective, loading } = this.props.data;
     const paymentMethods = this.getPaymentMethodsToDisplay();
+    const showEditManualPaymentMethod =
+      !showCreditCardForm && !showManualPaymentMethodForm && get(Collective, 'isHost');
+    const existingManualPaymentMethod = !!get(Collective, 'settings.paymentMethods.manual.instructions');
 
     return loading ? (
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        {!hasForm ? (
-          <Flex justifyContent="center" mx={3} my={4}>
-            <Box>
-              <StyledButton buttonStyle="standard" buttonSize="large" onClick={() => this.setState({ hasForm: true })}>
-                <Add size="1em" />
-                {'  '}
-                <FormattedMessage id="paymentMethods.add" defaultMessage="Add a payment method" />
+        {error && (
+          <MessageBox type="error" withIcon mb={4}>
+            {this.renderError(error)}
+          </MessageBox>
+        )}
+        {!showManualPaymentMethodForm && (
+          <Flex className="paymentMethods" flexDirection="column" my={2}>
+            <H2>
+              <FormattedMessage id="paymentMethods.send.title" defaultMessage="Sending money" />
+            </H2>
+            {paymentMethods.map(pm => (
+              <Container
+                className="paymentMethod"
+                key={pm.id}
+                my={3}
+                p={3}
+                border="1px solid #dedede"
+                borderRadius={4}
+                style={{ filter: pm.id === removedId ? 'blur(1px)' : 'none' }}
+              >
+                <EditPaymentMethod
+                  paymentMethod={pm}
+                  subscriptions={pm.subscriptions}
+                  hasMonthlyLimitPerMember={Collective.type === 'ORGANIZATION' && pm.type !== 'prepaid'}
+                  currency={pm.currency || Collective.currency}
+                  collectiveSlug={Collective.slug}
+                  onSave={pm => this.updatePaymentMethod(pm)}
+                  onRemove={pm => this.removePaymentMethod(pm)}
+                  isSaving={pm.id === savingId}
+                />
+              </Container>
+            ))}
+          </Flex>
+        )}
+        {!showCreditCardForm && !showManualPaymentMethodForm && (
+          <Flex alignItems="center" mx={3} my={4} flexDirection="column">
+            <StyledButton
+              buttonStyle="standard"
+              buttonSize="large"
+              onClick={() => this.setState({ showCreditCardForm: true })}
+            >
+              <Add size="1em" />
+              {'  '}
+              <FormattedMessage id="paymentMethods.creditcard.add" defaultMessage="Add a credit card" />
+            </StyledButton>
+            <Span fontSize="Caption" mt={2} color="black.600">
+              <FormattedMessage
+                id="paymentMethods.creditcard.add.info"
+                defaultMessage="To make donations as {contributeAs}"
+                values={{ contributeAs: Collective.name }}
+              />
+            </Span>
+          </Flex>
+        )}
+        {showEditManualPaymentMethod && (
+          <React.Fragment>
+            <H2>
+              <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />
+            </H2>
+            <Flex alignItems="center" mx={3} my={4} flexDirection="column">
+              <StyledButton
+                buttonStyle="standard"
+                buttonSize="large"
+                onClick={() => this.setState({ showManualPaymentMethodForm: true })}
+              >
+                {existingManualPaymentMethod ? (
+                  <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit your bank account details" />
+                ) : (
+                  <React.Fragment>
+                    <Add size="1em" />
+                    {'  '}
+                    <FormattedMessage id="paymentMethods.manual.add" defaultMessage="Add your bank account details" />
+                  </React.Fragment>
+                )}
+              </StyledButton>
+              <Box maxWidth={350}>
+                <Container fontSize="Caption" mt={2} color="black.600" textAlign="center">
+                  <FormattedMessage
+                    id="paymentMethods.manual.add.info"
+                    defaultMessage="To receive donations directly on your bank account on behalf of the collectives that you are hosting"
+                  />
+                  <Box mt={1}>
+                    <FormattedMessage
+                      id="paymentMethods.manual.add.trial"
+                      defaultMessage="Free for the first $1,000 received, "
+                    />
+                    <a href="https://docs.opencollective.com/help/about/pricing">
+                      <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
+                    </a>
+                  </Box>
+                </Container>
+              </Box>
+            </Flex>
+          </React.Fragment>
+        )}
+        {showManualPaymentMethodForm && (
+          <Container px={3} py={1}>
+            <H1 fontSize="3rem" textAlign="left">
+              <FormattedMessage
+                id="paymentMethod.manual.edit.title"
+                defaultMessage="Enable contributors to make donations by wire transfer"
+              />
+            </H1>
+            <H2>
+              <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
+            </H2>
+            <Flex>
+              <P>
+                <FormattedMessage
+                  id="paymentMethod.manual.edit.description"
+                  defaultMessage='Contributors will be able to choose "Bank Transfer" as a payment method when they check out. The instructions to make the wire transfer will be emailed to them along with a unique order id. Once you received the money, you will be able to mark the corresponding pending order as paid in your host dashboard.'
+                />
+              </P>
+              <img src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
+            </Flex>
+            <H2>
+              <FormattedMessage id="paymentMethods.manual.pricing" defaultMessage="Pricing" />
+            </H2>
+            <P>
+              <FormattedMessage
+                id="paymentMethod.manual.edit.description.pricing"
+                defaultMessage="There is no platform fee for donations made this way. However, we ask you to kindly subscribe to our special plans for fiscal hosts to be able to maintain and improve this feature over time (the first $1,000 of yearly budget are included in the free plan)"
+              />
+              <div>
+                <a href="https://opencollective.com/opencollective">
+                  <FormattedMessage
+                    id="paymentMethods.manual.upgradePlan"
+                    defaultMessage="Subscribe to our special plans for hosts"
+                  />
+                </a>
+              </div>
+            </P>
+
+            <H2>
+              <FormattedMessage
+                id="paymentMethods.manual.instructions.title"
+                defaultMessage="Define the instructions to make a bank transfer to your account"
+              />
+            </H2>
+            <Box mr={2} css={{ flexGrow: 1 }}>
+              <UpdateBankDetailsForm
+                value={get(Collective, 'settings.paymentMethods.manual')}
+                onChange={bankDetails => this.setState({ bankDetails, error: null })}
+              />
+            </Box>
+            <Box my={2}>
+              <StyledButton
+                mr={2}
+                buttonStyle="standard"
+                buttonSize="medium"
+                onClick={() => this.setState({ showManualPaymentMethodForm: false, error: null })}
+                disabled={submitting}
+              >
+                <FormattedMessage id="paymentMethod.cancel" defaultMessage="Cancel" />
+              </StyledButton>
+              <StyledButton
+                buttonStyle="primary"
+                buttonSize="medium"
+                type="submit"
+                onClick={this.updateBankDetails}
+                disabled={submitting}
+                loading={submitting}
+              >
+                <FormattedMessage id="paymentMethod.save" defaultMessage="Save" />
               </StyledButton>
             </Box>
-          </Flex>
-        ) : (
+          </Container>
+        )}
+        {showCreditCardForm && (
           <Container
             display="flex"
             alignItems="center"
@@ -206,7 +400,6 @@ class EditPaymentMethods extends React.Component {
             py={1}
             borderRadius={4}
             border="1px solid #dedede"
-            boxShadow="0px 3px 18px #eaeaea"
           >
             <H3 mr={4}>
               <FormattedMessage id="paymentMethod.add" defaultMessage="New Credit Card" />
@@ -223,7 +416,7 @@ class EditPaymentMethods extends React.Component {
                 mr={2}
                 buttonStyle="standard"
                 buttonSize="medium"
-                onClick={() => this.setState({ hasForm: false, error: null })}
+                onClick={() => this.setState({ showCreditCardForm: false, error: null })}
                 disabled={submitting}
               >
                 <FormattedMessage id="paymentMethod.cancel" defaultMessage="Cancel" />
@@ -241,36 +434,6 @@ class EditPaymentMethods extends React.Component {
             </Box>
           </Container>
         )}
-        {error && (
-          <MessageBox type="error" withIcon mb={4}>
-            {this.renderError(error)}
-          </MessageBox>
-        )}
-        <Flex className="paymentMethods" flexDirection="column" my={2}>
-          {paymentMethods.map(pm => (
-            <Container
-              className="paymentMethod"
-              key={pm.id}
-              mb={4}
-              p={3}
-              border="1px solid #dedede"
-              boxShadow="0px 3px 18px #eaeaea"
-              borderRadius={4}
-              style={{ filter: pm.id === removedId ? 'blur(1px)' : 'none' }}
-            >
-              <EditPaymentMethod
-                paymentMethod={pm}
-                subscriptions={pm.subscriptions}
-                hasMonthlyLimitPerMember={Collective.type === 'ORGANIZATION' && pm.type !== 'prepaid'}
-                currency={pm.currency || Collective.currency}
-                collectiveSlug={Collective.slug}
-                onSave={pm => this.updatePaymentMethod(pm)}
-                onRemove={pm => this.removePaymentMethod(pm)}
-                isSaving={pm.id === savingId}
-              />
-            </Container>
-          ))}
-        </Flex>
       </Flex>
     );
   }
@@ -282,7 +445,10 @@ const getPaymentMethods = graphql(gql`
       id
       type
       slug
+      name
       currency
+      isHost
+      settings
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
         id
         uuid
@@ -367,6 +533,7 @@ const addData = compose(
   getPaymentMethods,
   removePaymentMethod,
   updatePaymentMethod,
+  addEditCollectiveMutation,
   addCreditCard,
 );
 

@@ -358,7 +358,7 @@ class EditCollectiveForm extends React.Component {
     if (['loading', 'saved'].includes(status)) {
       submitBtnMessageId = status;
     }
-    console.log('>>> submitBtnMessageId', submitBtnMessageId);
+
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
     const type = collective.type.toLowerCase();

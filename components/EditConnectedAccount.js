@@ -4,7 +4,7 @@ import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { connectAccount } from '../lib/api';
+import { connectAccount, disconnectAccount } from '../lib/api';
 import EditTwitterAccount from './EditTwitterAccount';
 
 class EditConnectedAccount extends React.Component {
@@ -21,13 +21,21 @@ class EditConnectedAccount extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { editMode: props.editMode || false };
+    this.state = {
+      editMode: props.editMode || false,
+      connectedAccount: props.connectedAccount,
+    };
     this.connect = this.connect.bind(this);
+    this.disconnect = this.disconnect.bind(this);
 
     this.messages = defineMessages({
       'collective.connectedAccounts.reconnect.button': {
         id: 'collective.connectedAccounts.reconnect.button',
         defaultMessage: 'Reconnect',
+      },
+      'collective.connectedAccounts.disconnect.button': {
+        id: 'collective.connectedAccounts.disconnect.button',
+        defaultMessage: 'Disconnect',
       },
       'collective.connectedAccounts.stripe.button': {
         id: 'collective.connectedAccounts.stripe.button',
@@ -39,7 +47,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.stripe.connected': {
         id: 'collective.connectedAccounts.stripe.connected',
-        defaultMessage: 'Stripe account connected on {createdAt, date, short}',
+        defaultMessage: 'Stripe account connected on {updatedAt, date, short}',
       },
       'collective.connectedAccounts.twitter.button': {
         id: 'collective.connectedAccounts.twitter.button',
@@ -51,7 +59,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.twitter.connected': {
         id: 'collective.connectedAccounts.twitter.connected',
-        defaultMessage: 'Twitter account @{username} connected on {createdAt, date, short}',
+        defaultMessage: 'Twitter account @{username} connected on {updatedAt, date, short}',
       },
       'collective.connectedAccounts.github.button': {
         id: 'collective.connectedAccounts.github.button',
@@ -63,7 +71,7 @@ class EditConnectedAccount extends React.Component {
       },
       'collective.connectedAccounts.github.connected': {
         id: 'collective.connectedAccounts.github.connected',
-        defaultMessage: 'GitHub account {username} connected on {createdAt, date, short}',
+        defaultMessage: 'GitHub account {username} connected on {updatedAt, date, short}',
       },
     });
     this.services = ['stripe', 'paypal', 'twitter', 'github'];
@@ -90,13 +98,31 @@ class EditConnectedAccount extends React.Component {
       });
   }
 
+  disconnect(service) {
+    const { collective } = this.props;
+
+    disconnectAccount(collective.id, service)
+      .then(json => {
+        if (json.deleted === true) {
+          this.setState({
+            connectedAccount: null,
+          });
+        }
+      })
+      .catch(err => {
+        console.error(`>>> /api/connected-accounts/${service}/disconnect error`, err);
+      });
+  }
+
   render() {
-    const { intl, service, connectedAccount, collective } = this.props;
+    const { intl, service, collective } = this.props;
+    const { connectedAccount } = this.state;
+
     let vars = {};
     if (connectedAccount) {
       vars = {
         username: connectedAccount.username,
-        createdAt: new Date(connectedAccount.createdAt),
+        updatedAt: new Date(connectedAccount.updatedAt),
       };
     }
     return (
@@ -116,10 +142,13 @@ class EditConnectedAccount extends React.Component {
             <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
             <Button onClick={() => this.connect(service)}>
               {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
+            </Button>{' '}
+            <Button onClick={() => this.disconnect(service)}>
+              {intl.formatMessage(this.messages['collective.connectedAccounts.disconnect.button'])}
             </Button>
           </div>
         )}
-        {connectedAccount && connectedAccount.service === 'twitter' && (
+        {connectedAccount && connectedAccount.service === 'twitter' && collective.type === 'ORGANIZATION' && (
           <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
         )}
       </div>
