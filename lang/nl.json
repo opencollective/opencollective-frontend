@@ -164,7 +164,6 @@
   "collective.isArchived.description": "Dit collectief is gearchiveerd en kan niet meer gebruikt worden voor enige activiteiten.",
   "collective.isArchived.edit.description": "Deze {type} is gearchiveerd en kan niet meer gebruikt worden voor enige activiteiten.",
   "collective.location.label": "Stad",
-  "collective.longDescription.label": "Lange beschrijving",
   "collective.markdown.description": "Gebruik prijsverlagingsbewerker",
   "collective.markdown.label": "Standaard editor",
   "collective.meetup.label": "Bijeenkomst URL",
