@@ -51,7 +51,7 @@ describe('Contribution Flow: Order', () => {
 
   it('Can order as new user', () => {
     // Mock clock so we can check next contribution date in a consistent way
-    cy.clock(Date.parse('2042/05/25'));
+    cy.clock(Date.parse('2042/05/03'));
 
     const userParams = { firstName: 'Order', lastName: 'Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
@@ -98,7 +98,7 @@ describe('Contribution Flow: Order', () => {
   });
 
   it('Can order with an existing orgnanization', () => {
-    cy.clock(Date.parse('2042/05/25'));
+    cy.clock(Date.parse('2042/05/03'));
     let collectiveSlug = null;
     const visitParams = { onBeforeLoad: mockRecaptcha };
 

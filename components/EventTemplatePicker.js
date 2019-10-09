@@ -5,16 +5,16 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 class EventTemplatePicker extends React.Component {
+  static getInitialProps({ query: { collectiveSlug } }) {
+    return { collectiveSlug };
+  }
+
   static propTypes = {
     collectiveSlug: PropTypes.string,
     onChange: PropTypes.func,
     data: PropTypes.object,
     label: PropTypes.string,
   };
-
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { collectiveSlug };
-  }
 
   constructor(props) {
     super(props);

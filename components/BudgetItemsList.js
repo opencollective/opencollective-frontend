@@ -24,6 +24,7 @@ import Avatar from './Avatar';
 import StyledLink from './StyledLink';
 import StyledButton from './StyledButton';
 import StyledTag from './StyledTag';
+import Link from './Link';
 
 /** A fragment to use for `ExpenseType` items */
 export const BudgetItemExpenseTypeFragment = gql`
@@ -293,11 +294,21 @@ const getAmountDetailsStr = (amount, currency, transaction) => {
 const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   const { description, createdAt, currency } = item;
-  const { isCredit, amount, collective, paymentMethod, transaction, isExpense } = getItemInfo(item, isInverted);
+  const { isCredit, amount, paymentMethod, transaction, isExpense, collective } = getItemInfo(item, isInverted);
   const ItemContainer = isCredit ? CreditItem : DebitItem;
   const hasRefund = Boolean(transaction && transaction.refundTransaction);
   const hasAccessToInvoice = canDownloadInvoice && transaction && transaction.uuid;
   const hasInvoiceBtn = hasAccessToInvoice && !isExpense && !hasRefund && (!isCredit || !isInverted);
+
+  const formattedDescription = description ? (
+    <P color="black.900" fontWeight="600" fontSize="Paragraph" title={description}>
+      {truncate(description, { length: 60 })}
+    </P>
+  ) : (
+    <P color="black.500" fontStyle="italic" fontWeight="600" fontSize="Paragraph">
+      <FormattedMessage id="BudgetItemsList.NoDescription" defaultMessage="No description provided" />
+    </P>
+  );
 
   return (
     <React.Fragment>
@@ -319,14 +330,10 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
             mt={[2, 0]}
           >
             <Flex data-cy="transaction-description" alignItems="center" flexWrap="wrap">
-              {description ? (
-                <P color="black.900" fontWeight="600" fontSize="Paragraph" title={description}>
-                  {truncate(description, { length: 60 })}
-                </P>
+              {isExpense ? (
+                <Link route={`/${collective.slug}/expenses/${item.id}`}>{formattedDescription}</Link>
               ) : (
-                <P color="black.500" fontStyle="italic" fontWeight="600" fontSize="Paragraph">
-                  <FormattedMessage id="BudgetItemsList.NoDescription" defaultMessage="No description provided" />
-                </P>
+                formattedDescription
               )}
               {isExpense && (
                 <StyledTag type={getExpenseStatusMsgType(item.status)} ml={3} py="6px">

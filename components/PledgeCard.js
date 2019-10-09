@@ -2,14 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { imagePreview } from '../lib/utils';
-import { defaultImage } from '../lib/constants/collectives';
-
 import Container from './Container';
 import { P, Span } from './Text';
 import { Link } from '../server/pages';
 import StyledLink from './StyledLink';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
+import Avatar from './Avatar';
 
 const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAmount }) => (
   <Container bg="white" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">
@@ -18,18 +16,7 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
 
       <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
         <a>
-          <Container
-            backgroundImage={`url(${imagePreview(fromCollective.image, defaultImage[fromCollective.type], {
-              width: 65,
-            })})`}
-            backgroundSize="contain"
-            backgroundRepeat="no-repeat"
-            backgroundPosition="center center"
-            borderRadius={12}
-            border="2px solid white"
-            height={[52, null, 65]}
-            width={[52, null, 65]}
-          />
+          <Avatar collective={fromCollective} radius={[52, null, 65]} />
         </a>
       </Link>
 

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Fri Sep 27 2019 13:39:01 GMT+0200 (GMT+02:00)
+# timestamp: Sun Oct 06 2019 22:51:40 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -561,6 +561,10 @@ enum CollectiveOrderField {
 The results from searching for collectives with pagination info
 """
 type CollectiveSearchResults {
+  """
+  A unique identifier for this search (for caching)
+  """
+  id: String
   collectives: [Collective]
   limit: Int
   offset: Int
@@ -1147,10 +1151,10 @@ type Expense implements Transaction {
   updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
-  privateMessage: String
-  category: String
+  privateMessage: String @deprecated(reason: "Please use transaction.expense.privateMessage")
+  category: String @deprecated(reason: "Please use transaction.expense.category")
   expense: ExpenseType
-  attachment: String
+  attachment: String @deprecated(reason: "Please use transaction.expense.attachment")
 }
 
 """
@@ -1508,6 +1512,7 @@ type Mutation {
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
+  markExpenseAsUnpaid(id: Int!, processorFeeRefunded: Boolean!): ExpenseType
 
   """
   Update a single tier
@@ -2337,7 +2342,15 @@ type PaymentMethodType {
 This is a root query
 """
 type Query {
-  Collective(slug: String, id: Int): CollectiveInterface
+  Collective(
+    slug: String
+    id: Int
+
+    """
+    If false, will return null instead of an error if collective is not found
+    """
+    throwIfMissing: Boolean = true
+  ): CollectiveInterface
   Tier(id: Int!): Tier
 
   """
@@ -2556,6 +2569,11 @@ type Query {
     isArchived: Boolean
   ): [CollectiveInterface]
   PaymentMethod(id: Int, code: String): PaymentMethodType
+
+  """
+  Search for collectives. Uses Algolia, except if searching for users or if using flag to opt-out.
+  Results are returned with best matches first.
+  """
   search(
     """
     Fetch collectives related to this term based on name, description, tags, slug, mission, and location
@@ -2563,10 +2581,21 @@ type Query {
     term: String
 
     """
+    Only return collectives of this type
+    """
+    types: [TypeOfCollective]
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20
     offset: Int = 0
+
+    """
+    If set to false, an internal query will be used to search the collective rather than Algolia.
+    You **must** set this to false when searching for users/organizations.
+    """
+    useAlgolia: Boolean = true
   ): CollectiveSearchResults
   allTransactionsFromPaymentMethod(
     uuid: String!
@@ -2831,7 +2860,6 @@ interface Transaction {
   collective: CollectiveInterface
   type: String
   description: String
-  privateMessage: String
   createdAt: DateString
   updatedAt: DateString
   refundTransaction: Transaction

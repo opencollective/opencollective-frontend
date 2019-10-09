@@ -52,7 +52,7 @@ class EditPayExpenseFees extends React.Component {
               font-size: 1.2rem;
             }
             .col {
-              width: 13rem;
+              width: 14rem;
               margin-right: 2rem;
             }
             label {

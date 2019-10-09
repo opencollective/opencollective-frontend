@@ -1,19 +1,28 @@
-import fs from 'fs';
-import path from 'path';
-import pdf from 'html-pdf';
-import moment from 'moment';
-import express from 'express';
-import proxy from 'express-http-proxy';
-import { template } from 'lodash';
-import { URL, URLSearchParams } from 'universal-url';
+const fs = require('fs');
+const path = require('path');
+const url = require('url');
 
-import pages from './pages';
-import { languages } from './intl';
-import { maxAge } from './middlewares';
-import { logger } from './logger';
-import { getBaseApiUrl } from '../lib/utils';
+const pdf = require('html-pdf');
+const moment = require('moment');
+const express = require('express');
+const proxy = require('express-http-proxy');
+const { template } = require('lodash');
 
-export default (server, app) => {
+const intl = require('./intl');
+const logger = require('./logger');
+const pages = require('./pages');
+
+const { URL, URLSearchParams } = url;
+const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
+
+const maxAge = (maxAge = 60) => {
+  return (req, res, next) => {
+    res.set('Cache-Control', `public, max-age=${maxAge}`);
+    next();
+  };
+};
+
+module.exports = (server, app) => {
   server.use((req, res, next) => {
     if (!req.language && req.locale !== 'en') {
       // Prevent server side caching of non english content
@@ -27,7 +36,7 @@ export default (server, app) => {
   });
 
   server.use((req, res, next) => {
-    if (req.query.language && languages.includes(req.query.language) && req.query.set) {
+    if (req.query.language && intl.languages.includes(req.query.language) && req.query.set) {
       res.cookie('language', req.language);
       const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
       url.searchParams.delete('language');
@@ -40,11 +49,11 @@ export default (server, app) => {
 
   // Support older assets from website
   server.use('/public/images', express.static(path.join(__dirname, '../static/images')));
+  server.use('/.well-known', express.static(path.join(__dirname, '../static/.well-known')));
 
   server.get('/static/*', maxAge(7200));
 
   // Security policy, following the standard from https://securitytxt.org/
-  server.use('/.well-known/security.txt', express.static(path.join(__dirname, '../static/.well-known/security.txt')));
 
   server.get('/favicon.*', maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../static/images/favicon.ico.png'));
@@ -54,7 +63,7 @@ export default (server, app) => {
   // we use Cloudflare workers to route the request directly to the API
   server.use(
     '/api',
-    proxy(getBaseApiUrl({ internal: true }), {
+    proxy(baseApiUrl, {
       parseReqBody: false,
       proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
         proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
@@ -146,5 +155,5 @@ export default (server, app) => {
     );
   });
 
-  return pages.getRequestHandler(server.next);
+  return pages.getRequestHandler(app);
 };
