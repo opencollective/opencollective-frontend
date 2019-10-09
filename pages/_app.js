@@ -95,6 +95,15 @@ class OpenCollectiveFrontendApp extends App {
     super.componentDidCatch(error, errorInfo);
   }
 
+  componentDidMount() {
+    Router.events.on('routeChangeStart', url => {
+      if (window && window._paq) {
+        window._paq.push(['setCustomUrl', url]);
+        window._paq.push(['trackPageView']);
+      }
+    });
+  }
+
   render() {
     const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
 

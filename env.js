@@ -19,6 +19,7 @@ const defaults = {
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
   RECAPTCHA_ENABLED: false,
   NCP_IS_DEFAULT: 'true',
+  CLIENT_ANALYTICS_ENABLED: false,
 };
 
 for (const key in defaults) {
