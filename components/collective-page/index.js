@@ -219,7 +219,12 @@ class CollectivePage extends Component {
             isAnimated={true}
             onSectionClick={this.onSectionClick}
             LinkComponent={({ section, label, className }) => (
-              <a href={`#section-${section}`} className={className} onClick={e => e.preventDefault()}>
+              <a
+                data-cy={`section-${section}`}
+                href={`#section-${section}`}
+                className={className}
+                onClick={e => e.preventDefault()}
+              >
                 {label}
               </a>
             )}

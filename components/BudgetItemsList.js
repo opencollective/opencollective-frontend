@@ -313,7 +313,12 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
   return (
     <React.Fragment>
       <ItemContainer>
-        <Flex p={[3, 24]} flexWrap="wrap" alignItems={['center', 'flex-start']}>
+        <Flex
+          data-cy={`${isCredit ? 'expenses' : 'contributions'} transactions`}
+          p={[3, 24]}
+          flexWrap="wrap"
+          alignItems={['center', 'flex-start']}
+        >
           <Box mr={3} order="1">
             <Avatar collective={collective} radius={40} />
           </Box>
@@ -324,7 +329,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
             width={['100%', 'auto']}
             mt={[2, 0]}
           >
-            <Flex alignItems="center" flexWrap="wrap">
+            <Flex data-cy="transaction-description" alignItems="center" flexWrap="wrap">
               {isExpense ? (
                 <Link route={`/${collective.slug}/expenses/${item.id}`}>{formattedDescription}</Link>
               ) : (
@@ -336,7 +341,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
                 </StyledTag>
               )}
             </Flex>
-            <Container fontSize="Caption" color="black.500" mt={2}>
+            <Container data-cy="transaction-details" fontSize="Caption" color="black.500" mt={2}>
               <StyledLink as={LinkCollective} collective={collective} />
               {INFO_SEPARATOR}
               {item.usingVirtualCardFromCollective && (
@@ -352,7 +357,9 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
                   {INFO_SEPARATOR}
                 </React.Fragment>
               )}
-              <FormattedDate value={createdAt} day="2-digit" month="2-digit" year="numeric" />
+              <span data-cy="transaction-date">
+                <FormattedDate value={createdAt} day="2-digit" month="2-digit" year="numeric" />
+              </span>
               {INFO_SEPARATOR}
               {isExpanded ? (
                 <ViewMoreLink onClick={() => setExpanded(false)}>
@@ -369,8 +376,13 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
               )}
             </Container>
           </Flex>
-          <Container fontSize="LeadParagraph" ml="auto" order={[2, 3]}>
-            <Span color={isCredit ? 'green.700' : 'red.700'} mr={2} css={{ verticalAlign: 'text-bottom' }}>
+          <Container data-cy="transaction-amount" fontSize="LeadParagraph" ml="auto" order={[2, 3]}>
+            <Span
+              data-cy="transaction-sign"
+              color={isCredit ? 'green.700' : 'red.700'}
+              mr={2}
+              css={{ verticalAlign: 'text-bottom' }}
+            >
               {isCredit ? '+' : '-'}
             </Span>
             <Span fontWeight="bold" mr={1}>
