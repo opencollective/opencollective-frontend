@@ -333,8 +333,7 @@ class CreateOrderPage extends React.Component {
 
   /** Validate step profile, create new org if necessary */
   validateStepProfile = async () => {
-    // We don't want to crash if `reportValidity` is not supported by the browser
-    if (!this.state.stepProfile || !this.activeFormRef.current || !reportValidityHTML5(this.activeFormRef.current)) {
+    if (!this.state.stepProfile || !reportValidityHTML5(this.activeFormRef.current)) {
       return false;
     }
 
@@ -623,7 +622,7 @@ class CreateOrderPage extends React.Component {
         name: 'details',
         isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
         validate: () => {
-          return stepDetails && this.activeFormRef.current && reportValidityHTML5(this.activeFormRef.current);
+          return stepDetails && reportValidityHTML5(this.activeFormRef.current);
         },
       });
     }
