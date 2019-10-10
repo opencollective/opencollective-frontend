@@ -90,7 +90,7 @@ class EditCollectiveForm extends React.Component {
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
     this.showEditImages = !isNewCollectivePage;
-    this.showEditGoals = collective.type === 'COLLECTIVE' && !isNewCollectivePage;
+    this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
@@ -100,8 +100,8 @@ class EditCollectiveForm extends React.Component {
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
-      save: { id: 'save', defaultMessage: 'save' },
-      saved: { id: 'saved', defaultMessage: 'saved' },
+      save: { id: 'save', defaultMessage: 'Save' },
+      saved: { id: 'saved', defaultMessage: 'Saved' },
       'event.create.btn': {
         id: 'event.create.btn',
         defaultMessage: 'Create Event',
@@ -594,10 +594,6 @@ class EditCollectiveForm extends React.Component {
               font-size: 1.5rem;
             }
 
-            .FormInputs {
-              overflow-x: hidden;
-            }
-
             .EditCollectiveForm :global(textarea[name='longDescription']) {
               height: 30rem;
             }
@@ -837,7 +833,6 @@ class EditCollectiveForm extends React.Component {
               )}
               {this.state.section === 'goals' && (
                 <EditGoals
-                  title="goals"
                   goals={this.state.goals}
                   collective={collective}
                   currency={collective.currency}
