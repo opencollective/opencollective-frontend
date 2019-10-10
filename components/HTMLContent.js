@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { getLuminance } from 'polished';
 import styled, { css } from 'styled-components';
+import { typography, space } from 'styled-system';
 
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
@@ -53,6 +54,8 @@ const HTMLContent = styled(({ content, ...props }) => {
     max-width: 100%;
   }
 
+  /** Legacy styles for react-quill */
+
   .ql-align-center {
     text-align: center;
   }
@@ -67,29 +70,44 @@ const HTMLContent = styled(({ content, ...props }) => {
 
   ul {
     padding: 0;
-    padding-left: 0.75em;
+    padding-left: 0 0 0 0.5em;
     position: relative;
 
     li {
       list-style: none;
       position: relative;
-      padding: 0 0 0 1.5em;
-      margin-bottom: 0.5em;
-
+      padding: 0 0 0 1em;
+      margin-bottom: 0.4em;
+      
       &::before {
-        content: '';
-        position: absolute;
-        margin-left: 0;
-        left: 0;
-        top: 0.45em;
-        width: 0.75em;
-        height: 0.75em;
-        border-radius: 50%;
-        border: 0.1em solid #1f87ff;
+        content: "◯";
+        margin-right: 0.75em;
+        font-size: 0.9em;
+        vertical-align: top;
+      }
+      
+      /** Nested list, depth: 1 */
+      ul {
+        li {
+          padding: 0 0 0 2em;
+          margin-bottom: 0;
+          &::before {
+            content: "▷";
+          }
+          
+          /** Nested list, depth >= 2 */
+          li::before {
+            content: "■";
+            font-size: 1em;
+          }
+        }
       }
     }
   }
 
+  ${typography}
+  ${space}
+  
   // Apply custom theme if the color is safe to apply
 
   ${props => {
@@ -116,7 +134,7 @@ const HTMLContent = styled(({ content, ...props }) => {
       }
 
       ul li::before {
-        border-color: ${primaryColor};
+        color: ${primaryColor};
       }
     `;
   }}
@@ -125,6 +143,10 @@ const HTMLContent = styled(({ content, ...props }) => {
 HTMLContent.propTypes = {
   /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
+};
+
+HTMLContent.defaultProps = {
+  fontSize: 'Paragraph',
 };
 
 export default HTMLContent;

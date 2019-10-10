@@ -31,6 +31,10 @@ const GlobalStyles = createGlobalStyle`
   html {
     scroll-behavior: smooth;
   }
+
+  section {
+    margin: 0;
+  }
 `;
 
 /**
