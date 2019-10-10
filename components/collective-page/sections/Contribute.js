@@ -13,13 +13,13 @@ import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
+import CreateNew from '../../contribute-cards/CreateNew';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
 import SectionTitle from '../SectionTitle';
-import CreateNew from '../../contribute-cards/CreateNew';
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];
 
@@ -128,7 +128,7 @@ class SectionContribute extends React.PureComponent {
           </SectionTitle>
         </ContainerSectionContent>
 
-        <Box mb={4}>
+        <Box mb={4} data-cy="financial-contributions">
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
@@ -205,7 +205,7 @@ class SectionContribute extends React.PureComponent {
                   ))}
                   {isAdmin && (
                     <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                      <CreateNew route={`/${collective.slug}/events/create`}>
+                      <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
                         <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
                       </CreateNew>
                     </Box>

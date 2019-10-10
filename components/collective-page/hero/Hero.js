@@ -71,7 +71,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
 
   return (
-    <Container position="relative" minHeight={325} zIndex={1000}>
+    <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
       <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
       {isAdmin && !isEditing && (
         // We don't have any mobile view for this one yet
@@ -104,7 +104,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         <Container position="relative" mb={2} width={128}>
           <HeroAvatar collective={collective} isAdmin={isAdmin} />
         </Container>
-        <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left">
+        <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left" data-cy="collective-title">
           {collective.name || collective.slug}
         </H1>
 
@@ -159,7 +159,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               />
             </Container>
           )}
-          {collective.isHost && (
+          {collective.canApply && (
             <React.Fragment>
               {collective.settings.tos && (
                 <StyledLink
@@ -217,6 +217,7 @@ Hero.propTypes = {
     slug: PropTypes.string.isRequired,
     company: PropTypes.string,
     isApproved: PropTypes.bool,
+    canApply: PropTypes.bool,
     backgroundImage: PropTypes.string,
     twitterHandle: PropTypes.string,
     githubHandle: PropTypes.string,

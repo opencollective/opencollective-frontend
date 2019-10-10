@@ -153,9 +153,6 @@ if (process.env.NCP_IS_DEFAULT === 'true') {
   pages.add('collective', '/:slug', 'new-collective-page');
   pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
 } else {
-  // Hardcode some collectives for the V2 beta program
-  const collectivesBeta = process.env.NCP_BETA_COLLECTIVES || 'betree';
-  pages.add('new-collective-page-beta', `/:slug(${collectivesBeta})`, 'new-collective-page');
   pages.add('collective', '/:slug');
 }
 

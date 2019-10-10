@@ -36,7 +36,6 @@ const CustomCheckbox = styled.span`
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
-  width: 100%;
   line-height: 1.4em;
   ${typography}
   align-items: center;
@@ -56,6 +55,7 @@ const CheckboxContainer = styled.div`
     margin-left: 1.5em;
     z-index: 9;
     font-weight: normal;
+    width: auto;
   }
 
   /* Show our custom checkbox */
@@ -162,7 +162,7 @@ StyledCheckbox.propTypes = {
   /** Wether checkbox should be disabled */
   disabled: PropTypes.bool,
   /** An optional label to display next to checkbox */
-  label: PropTypes.string,
+  label: PropTypes.node,
   /** An optional size */
   size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
 };

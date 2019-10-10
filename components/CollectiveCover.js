@@ -6,6 +6,8 @@ import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectI
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
+import momentTimezone from 'moment-timezone';
+import moment from 'moment';
 import { get } from 'lodash';
 import { withUser } from './UserProvider';
 import { prettyUrl, imagePreview } from '../lib/utils';
@@ -100,6 +102,7 @@ class CollectiveCover extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.messages = defineMessages({
       contribute: { id: 'collective.contribute', defaultMessage: 'contribute' },
       apply: {
@@ -111,6 +114,7 @@ class CollectiveCover extends React.Component {
     });
 
     this.description = props.description || props.collective.description;
+
     if (props.collective.type === 'EVENT') {
       const eventLocationRoute = props.href ? `${props.href}#location` : '#location';
       this.description = (
@@ -147,10 +151,60 @@ class CollectiveCover extends React.Component {
                 />
                 , &nbsp;
                 <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
-                &nbsp; - &nbsp;
+                &nbsp;{' '}
+                {moment()
+                  .tz(props.collective.timezone)
+                  .zoneAbbr()}{' '}
+                (<FormattedMessage id="EventCover.EventTime" defaultMessage="Event Time" />)
               </React.Fragment>
             )}
-            {get(props.collective, 'location.name')}
+            <br />
+            {this.checkTimeDiff() && (
+              <em>
+                {props.collective.startsAt && (
+                  <React.Fragment>
+                    <FormattedDate
+                      value={props.collective.startsAt}
+                      timeZone={momentTimezone.tz.guess()}
+                      weekday="short"
+                      day="numeric"
+                      month="long"
+                    />
+                    , &nbsp;
+                    <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
+                    &nbsp; - &nbsp;
+                  </React.Fragment>
+                )}
+
+                {props.collective.endsAt && (
+                  <React.Fragment>
+                    <FormattedDate
+                      value={props.collective.endsAt}
+                      timeZone={momentTimezone.tz.guess()}
+                      weekday="short"
+                      day="numeric"
+                      month="long"
+                      year="numeric"
+                    />
+                    , &nbsp;
+                    <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
+                    &nbsp;{' '}
+                    {moment()
+                      .tz(momentTimezone.tz.guess())
+                      .zoneAbbr()}{' '}
+                    (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
+                  </React.Fragment>
+                )}
+                <br />
+              </em>
+            )}
+            {get(props.collective, 'location.name') && (
+              <FormattedMessage
+                id="EventCover.Location"
+                defaultMessage="Location: {location}"
+                values={{ location: get(props.collective, 'location.name') }}
+              />
+            )}
           </Link>
         </div>
       );
@@ -177,6 +231,18 @@ ${description}`;
       return {};
     } else {
       return { hasContact: this.props.collective.type === CollectiveType.COLLECTIVE };
+    }
+  }
+
+  checkTimeDiff() {
+    if (this.props.collective.timezone) {
+      const eventTimezone = moment()
+        .tz(this.props.collective.timezone)
+        .format('Z');
+      const browserTimezone = moment()
+        .tz(momentTimezone.tz.guess())
+        .format('Z');
+      return eventTimezone !== browserTimezone;
     }
   }
 
@@ -457,7 +523,9 @@ ${description}`;
                 )}
               </Link>
             )}
-            <h1>{title}</h1>
+            <h1>
+              <FormattedMessage id="EventCover.Title" defaultMessage="{title}" values={{ title }} />
+            </h1>
             {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
               <div>
