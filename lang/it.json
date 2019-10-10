@@ -1,7 +1,7 @@
 {
   "action.approveCollective.Error": "Impossibile approvare il collettivo per {host}",
   "action.collective.Approved": "Il collettivo {collective} è stato approvato per essere ospitato da {host}",
-  "action.expense.approved": "Expense approved",
+  "action.expense.approved": "italian",
   "action.expense.rejected": "Expense rejected",
   "action.Invalid": "Link di conferma invalido",
   "actions.approveCollective.processing": "Approvazione collettivo",
