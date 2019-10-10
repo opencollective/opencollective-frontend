@@ -218,8 +218,10 @@ class SectionContributions extends React.PureComponent {
         return -1;
       } else if (m1.role !== roles.HOST && m2.role === roles.HOST) {
         return 1;
-      } else if (m1.role === roles.HOST) {
+      } else if (m1.role === roles.HOST && m1.collective.stats.backers.all !== m2.collective.stats.backers.all) {
         return m1.collective.stats.backers.all > m2.collective.stats.backers.all ? -1 : 1;
+      } else if (m1.stats.totalDonations === m2.stats.totalDonations) {
+        return 0;
       } else {
         return m1.stats.totalDonations > m2.stats.totalDonations ? -1 : 1;
       }
