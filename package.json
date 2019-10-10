@@ -228,7 +228,12 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,md,graphql}": [
+    "*.{js}": [
+      "npm run lint:fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json,md,graphql}": [
       "prettier --write",
       "git add"
     ]
