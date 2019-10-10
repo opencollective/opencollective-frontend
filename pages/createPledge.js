@@ -26,6 +26,8 @@ import ButtonGroup from '../components/ButtonGroup';
 import Link from '../components/Link';
 import StyledLink from '../components/StyledLink';
 import Currency from '../components/Currency';
+import Loading from '../components/Loading';
+import Page from '../components/Page';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
@@ -225,6 +227,16 @@ class CreatePledgePage extends React.Component {
   render() {
     const { errorMessage, submitting } = this.state;
     const { data = {}, name, slug, githubHandle, LoggedInUser, loadingLoggedInUser, intl } = this.props;
+
+    if (data.loading) {
+      return (
+        <Page>
+          <Container my={6}>
+            <Loading />
+          </Container>
+        </Page>
+      );
+    }
 
     let website;
     if (data.Collective) {
