@@ -1,0 +1,11 @@
+!next.config.js
+!env.js
+!styleguide.config.js
+.next
+.circleci
+node_modules
+docs
+langs
+dist
+styleguide
+static
