@@ -8,12 +8,13 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage from '../components/ErrorPage';
+import ErrorPage, { generateError } from '../components/ErrorPage';
 import SectionTitle from '../components/SectionTitle';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
+import { ssrNotFoundError } from '../lib/nextjs_utils';
 
 class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -29,9 +30,14 @@ class OrdersPage extends React.Component {
   };
 
   render() {
-    const { data, LoggedInUser } = this.props;
+    const { slug, data, LoggedInUser } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data || data.error || data.loading) {
+      return <ErrorPage data={data} />;
+    } else if (!data.Collective) {
+      ssrNotFoundError(); // Force 404 when rendered server side
+      return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+    }
 
     const collective = data.Collective;
 
@@ -117,4 +123,10 @@ class OrdersPage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveCoverData(OrdersPage));
+export default withUser(
+  addCollectiveCoverData(OrdersPage, {
+    options: props => ({
+      variables: { slug: props.slug, throwIfMissing: false },
+    }),
+  }),
+);

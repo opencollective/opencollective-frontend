@@ -29,10 +29,13 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
   render() {
     const { data } = this.props;
 
-    if (data.error) {
+    if (!data || data.error) {
       return <Error message="GraphQL error" />;
     } else if (data.loading) {
       return this.props.loadingPlaceholder || null;
+    } else if (!data.Expense) {
+      // Don't show if expense doesn't exist
+      return null;
     }
 
     return data.Expense.userTaxFormRequiredBeforePayment ? (
