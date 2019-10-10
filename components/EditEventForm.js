@@ -13,6 +13,8 @@ class EditEventForm extends React.Component {
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    deleteLoading: PropTypes.bool,
+    onDelete: PropTypes.func,
   };
 
   constructor(props) {
@@ -108,12 +110,13 @@ class EditEventForm extends React.Component {
   }
 
   render() {
-    const { event, loading, intl } = this.props;
+    const { event, loading, intl, deleteLoading, onDelete } = this.props;
 
     if (!event.parentCollective) return <div />;
 
     const isNew = !(event && event.id);
     const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
+    const deleteBtnLabel = deleteLoading ? 'loading...' : 'Delete Event';
     const defaultStartsAt = new Date();
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
@@ -255,6 +258,7 @@ class EditEventForm extends React.Component {
             onClick={this.handleSubmit}
             disabled={this.state.disabled ? true : loading}
           />
+          {!isNew && <Button className="blue" label={deleteBtnLabel} onClick={onDelete} />}
         </div>
       </div>
     );
