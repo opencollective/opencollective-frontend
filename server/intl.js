@@ -62,4 +62,4 @@ function middleware() {
   };
 }
 
-module.exports = { middleware, getMessages };
+module.exports = { middleware, getMessages, languages };
