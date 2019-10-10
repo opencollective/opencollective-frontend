@@ -12,6 +12,7 @@ import { RadioButtonChecked } from 'styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from 'styled-icons/material/RadioButtonUnchecked';
 
 import { getCollectiveSourcePaymentMethodsQuery } from '../lib/graphql/queries';
+import { reportValidityHTML5 } from '../lib/utils';
 import { createVirtualCardsMutationQuery } from '../lib/graphql/mutations';
 import MessageBox from './MessageBox';
 import StyledInputAmount from './StyledInputAmount';
@@ -192,7 +193,7 @@ class CreateVirtualCardsForm extends Component {
   onSubmit(e) {
     e.preventDefault();
     const { values, submitting, deliverType } = this.state;
-    if (!submitting && this.form.current.reportValidity()) {
+    if (!submitting && reportValidityHTML5(this.form.current)) {
       this.setState({ submitting: true });
       const params = {
         amount: Math.round(values.amount * 100),

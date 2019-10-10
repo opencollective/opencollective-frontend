@@ -15,7 +15,7 @@ import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { compose, formatCurrency, getEnvVar, parseToBoolean } from '../../lib/utils';
+import { compose, formatCurrency, getEnvVar, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
 import { getPaypal } from '../../lib/paypal';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
@@ -333,7 +333,7 @@ class CreateOrderPage extends React.Component {
 
   /** Validate step profile, create new org if necessary */
   validateStepProfile = async () => {
-    if (!this.state.stepProfile || !this.activeFormRef.current || !this.activeFormRef.current.reportValidity()) {
+    if (!this.state.stepProfile || !reportValidityHTML5(this.activeFormRef.current)) {
       return false;
     }
 
@@ -622,7 +622,7 @@ class CreateOrderPage extends React.Component {
         name: 'details',
         isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
         validate: () => {
-          return stepDetails && this.activeFormRef.current && this.activeFormRef.current.reportValidity();
+          return stepDetails && reportValidityHTML5(this.activeFormRef.current);
         },
       });
     }
