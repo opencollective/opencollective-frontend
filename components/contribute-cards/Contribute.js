@@ -103,7 +103,7 @@ const I18nContributionType = defineMessages({
 const getContributeCTA = type => {
   switch (type) {
     case ContributionTypes.FINANCIAL_GOAL:
-      return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
+      return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute to this goal" />;
     case ContributionTypes.EVENT_PARTICIPATE:
       return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
     case ContributionTypes.EVENT_PASSED:

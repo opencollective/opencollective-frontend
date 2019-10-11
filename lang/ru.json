@@ -324,7 +324,7 @@
   "ContributeCard.Btn": "Поддержать",
   "ContributeCard.BtnEvent": "Get tickets",
   "ContributeCard.BtnEventPassed": "View event",
-  "ContributeCard.BtnGoal": "Contribute with this goal",
+  "ContributeCard.BtnGoal": "Contribute to this goal",
   "ContributeCard.ReadMore": "Узнать больше",
   "ContributeCard.SeeCollective": "View collective",
   "ContributedAmount": "Contributed {amount}",
