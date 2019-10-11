@@ -144,39 +144,27 @@ class CreateVirtualCardsForm extends Component {
   }
 
   onChange(fieldName, value) {
+    const errors = {};
+
+    // Format value
     if (fieldName === 'emails') {
       const { emails, invalids } = value;
-      this.setState(state => ({
-        ...state,
-        values: { ...state.values, emails },
-        errors: { ...state.errors, emails: invalids },
-      }));
+      value = emails;
+      errors.emails = invalids;
     } else if (fieldName === 'numberOfVirtualCards') {
-      const intnumberOfVirtualCards = parseInt(value);
-      if (!isNaN(intnumberOfVirtualCards)) {
-        this.setState(state => ({
-          ...state,
-          values: { ...state.values, numberOfVirtualCards: intnumberOfVirtualCards },
-        }));
-      } else if (this.state.values.numberOfVirtualCards === undefined) {
-        this.setState(state => ({ ...state, values: { ...state.values, numberOfVirtualCards: 1 } }));
-      }
+      const intNumberOfVirtualCards = parseInt(value);
+      value = !isNaN(intNumberOfVirtualCards) ? intNumberOfVirtualCards : 1;
     } else if (fieldName === 'amount') {
       const amount = parseFloat(value);
-      if (!isNaN(amount)) {
-        this.setState(state => ({ ...state, values: { ...state.values, amount: amount } }));
-      } else if (this.state.values.amount === undefined) {
-        this.setState(state => ({ ...state, values: { ...state.values, amount: MIN_AMOUNT } }));
-      }
-    } else if (fieldName === 'paymentMethod') {
-      this.setState(state => ({ ...state, values: { ...state.values, PaymentMethodId: value } }));
-    } else if (fieldName === 'onlyOpensource') {
-      this.setState(state => ({ ...state, values: { ...state.values, onlyOpensource: value } }));
-    } else if (fieldName === 'customMessage') {
-      this.setState(state => ({ ...state, values: { ...state.values, customMessage: value } }));
-    } else if (fieldName === 'expiryDate') {
-      this.setState(state => ({ ...state, values: { ...state.values, expiryDate: value } }));
+      value = !isNaN(amount) ? amount : MIN_AMOUNT;
     }
+
+    // Set value
+    this.setState(state => ({
+      ...state,
+      values: Object.assign(state.values, { [fieldName]: value }),
+      errors: Object.assign(state.errors, errors),
+    }));
   }
 
   isSubmitEnabled() {
@@ -398,7 +386,7 @@ class CreateVirtualCardsForm extends Component {
               disabled={submitting}
               paymentMethods={paymentMethods}
               defaultPaymentMethod={this.getDefaultPaymentMethod()}
-              onChange={option => this.onChange('paymentMethod', option)}
+              onChange={pm => this.onChange('PaymentMethodId', pm.id)}
             />
           </InlineField>
 
