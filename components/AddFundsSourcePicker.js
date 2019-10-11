@@ -98,12 +98,14 @@ const getSourcesQuery = gql`
     PaymentMethod(id: $id) {
       id
       fromCollectives {
+        id
         total
         collectives {
           id
           type
           name
           slug
+          imageUrl
         }
       }
     }

@@ -25,22 +25,30 @@ const CollectiveTypesI18n = defineMessages({
   },
 });
 
-/** Default label builder used to render a collective */
-const DefaultCollectiveLabel = ({ value: collective }) => (
-  <Flex alignItems="center">
-    <Avatar collective={collective} radius={28} />
-    <Flex flexDirection="column" ml={2}>
-      <Span fontSize="Caption" color="black.700">
-        {collective.name}
-      </Span>
-      <Span fontSize="Caption" color="black.500">
-        @{collective.slug}
-      </Span>
+/**
+ * Default label builder used to render a collective. For sections titles and custom options,
+ * this will just return the default label.
+ */
+const DefaultCollectiveLabel = ({ __collective_picker_collective__, label, value: collective }) =>
+  !__collective_picker_collective__ ? (
+    label
+  ) : (
+    <Flex alignItems="center">
+      <Avatar collective={collective} radius={28} />
+      <Flex flexDirection="column" ml={2}>
+        <Span fontSize="Caption" color="black.700">
+          {collective.name}
+        </Span>
+        <Span fontSize="Caption" color="black.500">
+          @{collective.slug}
+        </Span>
+      </Flex>
     </Flex>
-  </Flex>
-);
+  );
 
 DefaultCollectiveLabel.propTypes = {
+  __collective_picker_collective__: PropTypes.bool,
+  label: PropTypes.string,
   value: PropTypes.shape({
     id: PropTypes.number,
     type: PropTypes.string,
@@ -72,7 +80,7 @@ class CollectivePicker extends React.PureComponent {
 
     // Function to generate a single select option
     const buildCollectiveOption = collective => {
-      return { value: collective, label: collective.name };
+      return { value: collective, label: collective.name, __collective_picker_collective__: true };
     };
 
     // If not grouped, just sort the collectives by names and return their options
