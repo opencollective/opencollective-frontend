@@ -978,9 +978,13 @@ const queries = {
         type: GraphQLBoolean,
         defaultValue: true,
       },
+      minNbCollectivesHosted: {
+        type: new GraphQLNonNull(GraphQLInt),
+        defaultValue: 0,
+      },
     },
     async resolve(_, args) {
-      const { collectives, total } = await rawQueries.getPublicHostsByTotalCollectives(args);
+      const { collectives, total } = await rawQueries.getHosts(args);
       return {
         total,
         collectives,
