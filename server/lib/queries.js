@@ -34,7 +34,7 @@ const generateFXConversionSQL = aggregate => {
   return sql;
 };
 
-const getPublicHostsByTotalCollectives = async args => {
+const getHosts = async args => {
   let hostConditions = '';
   if (args.tags && args.tags.length > 0) {
     hostConditions = 'AND c.tags && $tags';
@@ -47,10 +47,15 @@ const getPublicHostsByTotalCollectives = async args => {
   }
 
   const query = `
-    SELECT c.*, count(c.id) as __hosts_count__, COUNT(m.id) AS __members_count__
-    FROM "Collectives" c
-    LEFT JOIN "Members" m ON m."MemberCollectiveId" = c.id AND m.role = 'HOST' AND m."deletedAt" IS NULL
-    WHERE c."deletedAt" IS NULL ${hostConditions}
+    WITH all_hosts AS (
+      SELECT max(c.id) as "HostCollectiveId", count(m.id) as count
+      FROM "Collectives" c
+      LEFT JOIN "Members" m ON m."MemberCollectiveId" = c.id AND m.role = 'HOST' AND m."deletedAt" IS NULL
+      WHERE c."deletedAt" IS NULL ${hostConditions}
+      GROUP BY c.id
+      HAVING count(m.id) >= $minNbCollectivesHosted
+    ) SELECT c.*, (SELECT COUNT(*) FROM all_hosts) AS __hosts_count__, SUM(all_hosts.count) as __members_count__
+    FROM "Collectives" c INNER JOIN all_hosts ON all_hosts."HostCollectiveId" = c.id
     GROUP BY c.id
     ORDER BY ${args.orderBy === 'collectives' ? '__members_count__' : args.orderBy} ${args.orderDirection}
     LIMIT $limit
@@ -63,10 +68,12 @@ const getPublicHostsByTotalCollectives = async args => {
       currency: args.currency,
       limit: args.limit,
       offset: args.offset,
+      minNbCollectivesHosted: args.minNbCollectivesHosted,
     },
     type: sequelize.QueryTypes.SELECT,
     model: models.Collective,
     mapToModel: true,
+    logging: console.log,
   });
 
   return { collectives: result, total: get(result[0], 'dataValues.__hosts_count__', 0) };
@@ -912,7 +919,7 @@ const getCollectivesWithMinBackers = memoize(getCollectivesWithMinBackersQuery, 
 });
 
 const queries = {
-  getPublicHostsByTotalCollectives,
+  getHosts,
   getCollectivesOrderedByMonthlySpending,
   getCollectivesOrderedByMonthlySpendingQuery,
   getTotalDonationsByCollectiveType,
