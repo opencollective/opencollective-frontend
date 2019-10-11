@@ -87,14 +87,14 @@ class CollectivePage extends Component {
       isFixed = false;
     }
 
-    // Get the currently selected section
-    const distanceThreshold = 500;
-    const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
+    // Get the currently section that is at the top of the screen.
+    const distanceThreshold = 200;
+    const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
-      if (sectionRef && currentViewBottom > sectionRef.offsetTop) {
+      if (sectionRef && breakpoint >= sectionRef.offsetTop) {
         selectedSection = sectionName;
         break;
       }
