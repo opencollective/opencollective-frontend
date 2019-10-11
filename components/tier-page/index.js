@@ -283,7 +283,7 @@ class TierPage extends Component {
                             amount={tier.goal}
                             currency={tier.currency}
                             interval={tier.interval}
-                            abbreviateAmount
+                            abbreviateAmount={tier.goal > 1000000}
                             abbreviateInterval
                             amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                           />
@@ -310,7 +310,7 @@ class TierPage extends Component {
                           currency={tier.currency}
                           interval={tier.interval}
                           amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
-                          abbreviateAmount
+                          abbreviateAmount={amountRaised > 1000000}
                           abbreviateInterval
                         />
                       ),
