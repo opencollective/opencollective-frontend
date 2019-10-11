@@ -1276,6 +1276,10 @@ const queries = {
         description:
           'Fetch collectives related to this term based on name, description, tags, slug, mission, and location',
       },
+      hostCollectiveIds: {
+        type: new GraphQLList(GraphQLInt),
+        description: '[NON AVAILABLE WITH ALGOLIA] Limit the search to collectives under these hosts',
+      },
       types: {
         type: new GraphQLList(TypeOfCollectiveType),
         description: 'Only return collectives of this type',
@@ -1299,28 +1303,35 @@ const queries = {
       },
     },
     async resolve(_, args, req) {
-      const { limit, offset, term, types, useAlgolia } = args;
+      const { limit, offset, term, types, hostCollectiveIds, useAlgolia } = args;
       const cleanTerm = term ? term.trim() : '';
-      const generateResults = (collectives, total) => ({
-        id: `search-${(types || []).join('_')}-${cleanTerm}-${offset}-${limit}-${useAlgolia ? 'algolia' : 'direct'}`,
-        total,
-        collectives,
-        limit,
-        offset,
-      });
+      const isEmptyTerm = cleanTerm.length === 0;
+      const listToStr = list => (list ? list.join('_') : '');
+      const generateResults = (collectives, total) => {
+        const optionalParamsKey = `${listToStr(types)}-${listToStr(hostCollectiveIds)}`;
+        return {
+          id: `search-${optionalParamsKey}-${cleanTerm}-${offset}-${limit}-${useAlgolia ? 'algolia' : 'direct'}`,
+          total,
+          collectives,
+          limit,
+          offset,
+        };
+      };
 
-      if (cleanTerm.length === 0) {
-        return generateResults([], 0);
-      } else if (useAlgolia) {
-        const [collectives, total] = await searchCollectivesOnAlgolia(cleanTerm, offset, limit, types);
-        return generateResults(collectives, total);
+      if (useAlgolia) {
+        if (isEmptyTerm) {
+          return generateResults([], 0);
+        } else {
+          const [collectives, total] = await searchCollectivesOnAlgolia(cleanTerm, offset, limit, types);
+          return generateResults(collectives, total);
+        }
       } else if (isEmail(cleanTerm) && req.remoteUser && (!types || types.includes(CollectiveTypes.USER))) {
         // If an email is provided, search in the user table. Users must be authenticated
         // because we limit the rate of queries for this feature.
         const [collectives, total] = await searchCollectivesByEmail(cleanTerm, req.remoteUser);
         return generateResults(collectives, total);
       } else {
-        const [collectives, total] = await searchCollectivesInDB(cleanTerm, offset, limit, types);
+        const [collectives, total] = await searchCollectivesInDB(cleanTerm, offset, limit, types, hostCollectiveIds);
         return generateResults(collectives, total);
       }
     },

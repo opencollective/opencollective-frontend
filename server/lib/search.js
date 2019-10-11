@@ -74,13 +74,26 @@ const searchTermToTsVector = term => {
 /**
  * Search collectives directly in the DB, using a full-text query.
  */
-export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types) => {
+export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types, hostCollectiveIds) => {
+  // TSVector to search for collectives names/description/slug
   const tsVector = `
     to_tsvector('simple', c.name)
     || to_tsvector('simple', c.slug)
     || to_tsvector('simple', COALESCE(c.description, ''))
   `;
 
+  // Build dynamic conditions based on arguments
+  let dynamicConditions = '';
+
+  if (term && term.length > 0) {
+    term = term.replace(/(_|%|\\)/g, ' ');
+    dynamicConditions += `AND ${tsVector} @@ to_tsquery('simple', :term) OR name ILIKE '%' || :term || '%' `;
+  }
+  if (hostCollectiveIds && hostCollectiveIds.length > 0) {
+    dynamicConditions += 'AND "HostCollectiveId" IN (:hostCollectiveIds) ';
+  }
+
+  // Build the query
   const result = await sequelize.query(
     `
     SELECT 
@@ -88,8 +101,9 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
       COUNT(*) OVER() AS __total__,
       ts_rank(${tsVector}, to_tsquery('simple', :term)) AS __rank__
     FROM "Collectives" c
-    WHERE ${tsVector} @@ to_tsquery('simple', :term)
-    AND type IN (:types)
+    WHERE "deletedAt" IS NULL 
+    AND "deactivatedAt" IS NULL 
+    AND type IN (:types) ${dynamicConditions}
     ORDER BY __rank__ DESC
     OFFSET :offset
     LIMIT :limit
@@ -102,6 +116,7 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
         term: searchTermToTsVector(term),
         offset,
         limit,
+        hostCollectiveIds,
       },
     },
   );
