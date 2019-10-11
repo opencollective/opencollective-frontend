@@ -43,7 +43,6 @@ class EditEvent extends React.Component {
       console.error('>>> editEvent error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
-      throw new Error(errorMsg);
     }
   }
 
@@ -60,7 +59,6 @@ class EditEvent extends React.Component {
       console.error('>>> deleteEvent error: ', JSON.stringify(err));
       const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
       this.setState({ result: { error: errorMsg } });
-      throw new Error(errorMsg);
     }
   }
 
