@@ -35,39 +35,41 @@ const generateFXConversionSQL = aggregate => {
 };
 
 const getPublicHostsByTotalCollectives = async args => {
-  let conditions = '';
+  let hostConditions = '';
   if (args.tags && args.tags.length > 0) {
-    conditions = 'AND c.tags && $tags';
+    hostConditions = 'AND c.tags && $tags';
   }
   if (args.currency && args.currency.length === 3) {
-    conditions += ' AND c.currency=$currency';
+    hostConditions += ' AND c.currency=$currency';
   }
+  if (args.onlyOpenHosts) {
+    hostConditions += ` AND c."settings" #>> '{apply}' IS NOT NULL AND (c."settings" #>> '{apply}') != 'false'`;
+  }
+
   const query = `
-  WITH counts AS (
-    SELECT max(c.id) as "HostCollectiveId", count(m.id) as count FROM "Collectives" c
+    SELECT c.*, count(c.id) as __hosts_count__, COUNT(m.id) AS __members_count__
+    FROM "Collectives" c
     LEFT JOIN "Members" m ON m."MemberCollectiveId" = c.id AND m.role = 'HOST' AND m."deletedAt" IS NULL
-    WHERE c."settings" #>> '{apply}' IS NOT NULL
-      ${conditions}
-      AND c."deletedAt" IS NULL
+    WHERE c."deletedAt" IS NULL ${hostConditions}
     GROUP BY c.id
-  )
-  SELECT c.*, counts.count as __TOTAL_COUNT__
-  FROM "Collectives" c INNER JOIN counts ON counts."HostCollectiveId" = c.id
-  ORDER BY $orderBy ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
+    ORDER BY ${args.orderBy === 'collectives' ? '__members_count__' : args.orderBy} ${args.orderDirection}
+    LIMIT $limit
+    OFFSET $offset
   `;
 
   const result = await sequelize.query(query, {
     bind: {
       tags: args.tags || [],
       currency: args.currency,
-      orderBy: args.orderBy === 'collectives' ? '__TOTAL_COUNT__' : args.orderBy,
+      limit: args.limit,
+      offset: args.offset,
     },
     type: sequelize.QueryTypes.SELECT,
     model: models.Collective,
     mapToModel: true,
   });
 
-  return { collectives: result, total: get(result[0], '__TOTAL_COUNT__', 0) };
+  return { collectives: result, total: get(result[0], 'dataValues.__hosts_count__', 0) };
 };
 
 const getTotalAnnualBudgetForHost = HostCollectiveId => {
