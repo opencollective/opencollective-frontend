@@ -13,10 +13,9 @@ import VirtualCardDetails from './VirtualCardDetails';
 import Loading from './Loading';
 import Pagination from './Pagination';
 import Link from './Link';
-import { Link as LinkWrapper } from '../server/pages';
-import StyledLink from './StyledLink';
 import StyledButtonSet from './StyledButtonSet';
 import { P } from './Text';
+import StyledButton from './StyledButton';
 
 /**
  * A filterable list of virtual cards meant to be displayed for organization
@@ -93,17 +92,13 @@ class EditVirtualCards extends React.Component {
         <Flex mb={4} flexDirection={['column-reverse', 'row']} justifyContent="space-between" flexWrap="wrap">
           {this.renderFilters(onlyConfirmed)}
           <Flex justifyContent="center">
-            <LinkWrapper
-              route="editCollective"
-              params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}
-              passHref
-            >
-              <StyledLink buttonStyle="primary" buttonSize="medium">
+            <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
+              <StyledButton buttonStyle="primary" buttonSize="medium">
                 <Add size="1em" />
                 {'  '}
                 <FormattedMessage id="virtualCards.create" defaultMessage="Create gift cards" />
-              </StyledLink>
-            </LinkWrapper>
+              </StyledButton>
+            </Link>
           </Flex>
         </Flex>
         {loading ? (
