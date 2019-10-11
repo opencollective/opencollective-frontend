@@ -157,6 +157,7 @@
   "collective.empty.confirm.btn": "Confirmar",
   "collective.emptyBalance.body": "Você tem certeza de que deseja {action} para {collective}?",
   "collective.emptyBalance.header": "{action} Balanço",
+  "collective.event.modal.body": "Are you sure you want to delete this event?",
   "collective.expensePolicy.description": "Pode ser assustador registrar uma despesa se você não tiver certeza do que é permitido. Forneça uma política clara para orientar os remetentes de despesas.",
   "collective.expensePolicy.label": "Política de despesas do Coletivo",
   "collective.expensePolicy.placeholder": "Por exemplo: que tipo de despesa será aprovada, quaisquer limitações de valores, que documentação é necessária e com quem entrar em contato em caso de perguntas.",

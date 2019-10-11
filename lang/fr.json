@@ -157,6 +157,7 @@
   "collective.empty.confirm.btn": "Confirmer",
   "collective.emptyBalance.body": "Êtes-vous sûr de vouloir {action} ce {collective} ?",
   "collective.emptyBalance.header": "{action} Balance",
+  "collective.event.modal.body": "Are you sure you want to delete this event?",
   "collective.expensePolicy.description": "Ajouter une dépense peut être intimidant si vous ne savez pas ce qui est attendu. Ajoutez des consignes claires pour guider les personnes qui ajoutent ces dépenses.",
   "collective.expensePolicy.label": "Politique de remboursement du collectif",
   "collective.expensePolicy.placeholder": "Par exemple : quel type de dépenses seront acceptées, les limites sur le montant, les documents requis et qui contacter s'il y a des questions.",

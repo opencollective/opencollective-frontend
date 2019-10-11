@@ -157,6 +157,7 @@
   "collective.empty.confirm.btn": "Conferma",
   "collective.emptyBalance.body": "Are you sure you want to {action} to {collective}?",
   "collective.emptyBalance.header": "{action} Balance",
+  "collective.event.modal.body": "Are you sure you want to delete this event?",
   "collective.expensePolicy.description": "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
   "collective.expensePolicy.label": "Collective expense policy",
   "collective.expensePolicy.placeholder": "For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.",

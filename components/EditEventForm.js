@@ -282,9 +282,8 @@ class EditEventForm extends React.Component {
                 <ModalBody>
                   <P>
                     <FormattedMessage
-                      id="collective.delete.modal.body"
-                      values={{ type: event.type.toLowerCase() }}
-                      defaultMessage={'Are you sure you want to delete this {type}?'}
+                      id="collective.event.modal.body"
+                      defaultMessage="Are you sure you want to delete this event?"
                     />
                   </P>
                 </ModalBody>
