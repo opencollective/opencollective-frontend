@@ -29,7 +29,7 @@ class AddFundsSourcePicker extends React.Component {
   };
 
   onChange = option => {
-    const FromCollectiveId = option.value;
+    const FromCollectiveId = option.value.id;
     this.props.onChange(FromCollectiveId);
   };
 
