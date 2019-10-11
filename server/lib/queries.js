@@ -73,7 +73,6 @@ const getHosts = async args => {
     type: sequelize.QueryTypes.SELECT,
     model: models.Collective,
     mapToModel: true,
-    logging: console.log,
   });
 
   return { collectives: result, total: get(result[0], 'dataValues.__hosts_count__', 0) };
