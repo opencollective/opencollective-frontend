@@ -18,8 +18,16 @@ const addTier = tier => {
 };
 
 describe('edit collective', () => {
+  let collectiveSlug = null;
+
+  before(() => {
+    cy.createHostedCollective().then(({ slug }) => {
+      collectiveSlug = slug;
+    });
+  });
+
   beforeEach(() => {
-    cy.login({ redirect: '/testcollective/edit' });
+    cy.login({ redirect: `/${collectiveSlug}/edit` });
   });
 
   it('edit info', () => {
@@ -28,19 +36,14 @@ describe('edit collective', () => {
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
     cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
     cy.get('.website.inputField input').type('{selectall}opencollective.com');
-    cy.get('.longDescription.inputField textarea').type(
-      '{selectall}Testing *markdown* [link to google](https://google.com).',
-    );
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
-    cy.get('.CollectivePage .cover h1').contains('edited');
-    cy.get('.cover .twitterHandle').contains('@opencollect');
-    cy.get('.cover .githubHandle').contains('AwesomeHandle');
-    cy.get('.cover .website').contains('opencollective.com');
-    cy.get('.CollectivePage .longDescription').contains('Testing markdown link to google');
-    cy.get('.CollectivePage .longDescription a').contains('link to google');
+    cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
+    cy.get('[data-cy="collective-hero"] [title="Twitter"][href="https://twitter.com/opencollect"]');
+    cy.get('[data-cy="collective-hero"] [title="Github"][href="https://github.com/AwesomeHandle"]');
+    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://opencollective.com"]');
   });
 
   it('edit tiers', () => {
@@ -74,43 +77,36 @@ describe('edit collective', () => {
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
-    cy.wait(500);
-    cy.get('.TierCard', { timeout: 5000 });
+    const tierCardSelector = '[data-cy="financial-contributions"] [data-cy="contribute-card-tier"]';
+    cy.get(tierCardSelector, { timeout: 5000 });
     cy.screenshot('tierEdited');
-    cy.get('.TierCard')
+    cy.get(tierCardSelector)
       .first()
-      .find('.name')
+      .find('[data-cy="contribute-title"]')
       .contains('Backer edited');
-    cy.get('.TierCard')
+    cy.get(tierCardSelector)
       .first()
-      .find('.description')
+      .find('[data-cy="contribute-description"]')
       .contains('New description for backers');
-    cy.get('.TierCard')
+    cy.get(tierCardSelector)
       .first()
-      .find('.amount')
-      .contains('$5+');
-    cy.get('.TierCard')
-      .first()
-      .find('.interval')
-      .contains('per month');
+      .contains('$5 USD / month');
     cy.screenshot('tierAdded');
-    cy.get('.CollectivePage .tiers', { timeout: 5000 })
-      .find('.TierCard')
+    cy.get(tierCardSelector)
       .should('have.length', 4)
       .last()
       .should('contain', 'Priority Support');
-    cy.get('.CollectivePage .tiers')
-      .find('.TierCard')
+    cy.get(tierCardSelector)
       .first()
-      .find('a.action')
-      .click();
+      .find('[data-cy="contribute-btn"]')
+      .click({ force: true });
 
     // Ensure the new tiers are properly displayed on order form
     cy.contains('button', 'Next step', { timeout: 20000 }).click();
     cy.get('#interval').contains('Monthly');
     cy.get('#amount > button').should('have.length', 3);
 
-    cy.visit('/testcollective/edit/tiers');
+    cy.visit(`/${collectiveSlug}/edit/tiers`);
     cy.get('.EditTiers .tier')
       .first()
       .find('.amountType select')
@@ -127,8 +123,6 @@ describe('edit collective', () => {
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
-    cy.get('.CollectivePage .tiers', { timeout: 10000 })
-      .find('.TierCard')
-      .should('have.length', 2);
+    cy.get(tierCardSelector, { timeout: 10000 }).should('have.length', 2);
   });
 });

@@ -4,13 +4,20 @@ const updatedTitle = `New event updated ${Math.round(Math.random() * 10000)}`;
 let i = 0;
 
 describe('event.create.test.js', () => {
+  let collectiveSlug = null;
+
   before(() => {
-    cy.login({ redirect: '/testcollective' });
-    cy.get('#events .action').click();
+    cy.createHostedCollective().then(({ slug }) => {
+      collectiveSlug = slug;
+    });
+  });
+
+  beforeEach(() => {
+    cy.login({ redirect: `/${collectiveSlug}/events/create` });
   });
 
   it('create an event', () => {
-    cy.get('.inputs .inputField.name input').type(title);
+    cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
     cy.get('.inputField.longDescription textarea')
       .type(longDescription)
       .blur();

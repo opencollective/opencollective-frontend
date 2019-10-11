@@ -11,10 +11,8 @@ describe('create an organization', () => {
     cy.wait(500);
     cy.get('.actions button').click();
     cy.wait(1000);
-    cy.get('.UserCollectivePage .CollectiveCover h1', {
-      timeout: 10000,
-    }).contains('New org');
-    cy.get('.UserCollectivePage .CollectiveCover .website').contains('newco.com');
+    cy.containsInDataCy('collective-title', 'New org', { timeout: 10000 });
+    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://newco.com"]');
     cy.get('.NotificationBar h1').contains('Your Organization has been created.');
   });
 });

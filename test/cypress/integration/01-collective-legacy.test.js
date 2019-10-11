@@ -1,6 +1,6 @@
 describe('collective page', () => {
   before(() => {
-    cy.visit('/apex');
+    cy.visit('/apex/legacy');
   });
 
   it('loads the collective page', () => {
@@ -28,27 +28,8 @@ describe('collective page', () => {
   });
 
   it('opens new expense page', () => {
-    cy.get('.desktopOnly button.submitExpense').click();
+    cy.get('[data-cy="submit-expense-btn"]').click();
     cy.wait(500);
     cy.get('.ExpensesPage .CreateExpenseForm').contains('Sign up or login to submit an expense');
-    cy.get('.ExpensesPage .desktopOnly .menu .item.budget').click();
-  });
-
-  it('loads the latest transactions', () => {
-    cy.get('#transactions .itemsList .transaction').should('have.length', 5);
-    cy.get('#transactions .itemsList .transaction:first .AmountCurrency').contains('$2');
-    cy.get('#transactions .itemsList .transaction:first .AmountCurrency .currency').contains('USD');
-  });
-
-  it('opens all transactions page', () => {
-    cy.get('#transactions .ViewAllTransactionsBtn a').click();
-    cy.wait(500);
-    cy.get('.TransactionsPage .itemsList .transaction').should('have.length', 20);
-    cy.get('.TransactionsPage .loadMoreBtn');
-    cy.get('.TransactionsPage .filterBtnGroup button')
-      .last()
-      .click();
-    cy.get('.TransactionsPage .itemsList .transaction').should('have.length', 6);
-    cy.get('.TransactionsPage .desktopOnly .menu .item.about').click();
   });
 });

@@ -4,10 +4,7 @@ describe('Unarchive collective', () => {
       // Create a new organization
       cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
         const collectiveSlug = collective.slug;
-        cy.visit(`/${collectiveSlug}`);
-        cy.wait(1000);
-        cy.get('[data-cy=editBtn]').click();
-        cy.contains('a', 'Advanced').click();
+        cy.visit(`/${collectiveSlug}/edit/advanced`);
         // Archive the collective
         cy.contains('button', 'Archive this organization').click();
         cy.get('[data-cy=action]').click();

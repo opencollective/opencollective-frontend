@@ -96,7 +96,7 @@ class ExpensePage extends React.Component {
                 </StyledButton>
               </Link>
               <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton my={1} mx={3}>
+                <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
                   <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                 </StyledButton>
               </Link>

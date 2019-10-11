@@ -1,6 +1,6 @@
 describe('user profile page', () => {
   it('shows the collectives backed by the user', () => {
-    cy.visit('/xdamman');
+    cy.visit('/xdamman/legacy');
     cy.get('#backer');
     cy.get('#admin.organization [data-cy=subtitle]').contains("I'm an admin of these 2 Organizations");
     cy.get('#admin.organization .CollectiveCard').should('have.length', 2);

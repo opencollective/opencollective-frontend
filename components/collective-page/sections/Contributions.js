@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
-import { P } from '../../Text';
+import { P, H3 } from '../../Text';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import StyledButton from '../../StyledButton';
@@ -139,6 +139,11 @@ class SectionContributions extends React.PureComponent {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       Collective: PropTypes.shape({
+        stats: PropTypes.shape({
+          collectives: PropTypes.shape({
+            hosted: PropTypes.number,
+          }).isRequired,
+        }).isRequired,
         settings: PropTypes.shape({
           superCollectiveTags: PropTypes.arrayOf(PropTypes.string),
         }),
@@ -275,12 +280,21 @@ class SectionContributions extends React.PureComponent {
         ) : (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={4}>
+              <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
                 <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
               </SectionTitle>
+              {data.Collective.stats.collectives.hosted > 0 && (
+                <H3 fontSize="H5" fontWeight="500" color="black.600">
+                  <FormattedMessage
+                    id="organization.collective.memberOf.collective.host.title"
+                    values={{ n: data.Collective.stats.collectives.hosted }}
+                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
+                  />
+                </H3>
+              )}
             </ContainerSectionContent>
             {filters.length > 1 && (
-              <Box mb={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+              <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
                 <StyledFilters
                   filters={filters}
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
@@ -296,7 +310,8 @@ class SectionContributions extends React.PureComponent {
               data-cy="Contributions"
               maxWidth={Dimensions.MAX_SECTION_WIDTH}
               pl={Dimensions.PADDING_X}
-              m="0 auto"
+              mt={4}
+              mx="auto"
             >
               <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
@@ -363,6 +378,13 @@ const withData = graphql(
       Collective(id: $id) {
         id
         settings
+        stats {
+          id
+          collectives {
+            id
+            hosted
+          }
+        }
         memberOf(onlyActiveCollectives: true, limit: 1500) {
           id
           role
