@@ -235,13 +235,15 @@ ${description}`;
   }
 
   checkTimeDiff() {
-    const eventTimezone = moment()
-      .tz(this.props.collective.timezone)
-      .format('Z');
-    const browserTimezone = moment()
-      .tz(momentTimezone.tz.guess())
-      .format('Z');
-    return eventTimezone !== browserTimezone;
+    if (this.props.collective.timezone) {
+      const eventTimezone = moment()
+        .tz(this.props.collective.timezone)
+        .format('Z');
+      const browserTimezone = moment()
+        .tz(momentTimezone.tz.guess())
+        .format('Z');
+      return eventTimezone !== browserTimezone;
+    }
   }
 
   render() {
