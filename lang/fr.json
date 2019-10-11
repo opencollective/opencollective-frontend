@@ -819,6 +819,7 @@
   "no": "Non",
   "notFound": "Pas trouvé",
   "notFound.search": "Rechercher {term}",
+  "openinbox": "Open {buttontext}",
   "openSourceApply.description.p1": "Vous créez un logiciel. Vous ne voulez pas vous soucier de créer une entité juridique ou un compte bancaire distinct, de payer des impôts ou de fournir des factures aux sponsors. Laissez-nous nous occuper de tout ça, pour que vous puissiez rester concentré sur votre projet.",
   "openSourceApply.description.p2": "We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}.",
   "openSourceApply.description.p3": "Fees: 10% of funds raised. Half goes to Open Collective Inc to continue improving the software platform, and half to the Open Source Collective to cover its legal and financial services.",

@@ -8,6 +8,7 @@ import Container from '../components/Container';
 import Page from '../components/Page';
 import { H3, P } from '../components/Text';
 import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane';
+import OpenEmailProviderButton from '../components/OpenEmailProviderButton';
 
 const Icon = styled(PaperPlane)`
   color: ${themeGet('colors.primary.300')};
@@ -47,6 +48,9 @@ class SignInLinkSent extends Component {
 
           <P color="black.700" mt={3}>
             You&apos;ll be automatically redirected to the page before signing in. You can close this tab.
+          </P>
+          <P>
+            <OpenEmailProviderButton email={email} />
           </P>
         </Container>
       </Page>
