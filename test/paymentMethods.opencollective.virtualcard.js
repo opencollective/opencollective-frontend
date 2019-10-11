@@ -575,7 +575,7 @@ describe('opencollective.virtualcard', () => {
           currency: CURRENCY,
           isActive: true,
         }).then(c => (targetCollective = c));
-        await targetCollective.addHost(hostCollective);
+        await targetCollective.addHost(hostCollective, user, { shouldAutomaticallyApprove: true });
       });
 
       before(async () => {
@@ -942,10 +942,8 @@ describe('opencollective.virtualcard', () => {
         }).then(c => (collective2 = c)),
       );
       before('add hosts', async () => {
-        await collective1.addHost(host1);
-        await collective1.update({ isActive: true });
-        await collective2.addHost(host2);
-        await collective2.update({ isActive: true });
+        await collective1.addHost(host1, user1, { shouldAutomaticallyApprove: true });
+        await collective2.addHost(host2, user1, { shouldAutomaticallyApprove: true });
       });
       before('creates User 1', () =>
         models.User.createUserWithCollective({

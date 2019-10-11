@@ -34,7 +34,7 @@ const generateFXConversionSQL = aggregate => {
   return sql;
 };
 
-const getPublicHostsByTotalCollectives = args => {
+const getPublicHostsByTotalCollectives = async args => {
   let conditions = '';
   if (args.tags && args.tags.length > 0) {
     conditions = 'AND c.tags && $tags';
@@ -51,14 +51,23 @@ const getPublicHostsByTotalCollectives = args => {
       AND c."deletedAt" IS NULL
     GROUP BY c.id
   )
-  SELECT counts.count as collectives, c.*
+  SELECT c.*, counts.count as __TOTAL_COUNT__
   FROM "Collectives" c INNER JOIN counts ON counts."HostCollectiveId" = c.id
-  ORDER BY ${args.orderBy} ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
+  ORDER BY $orderBy ${args.orderDirection} LIMIT ${args.limit} OFFSET ${args.offset}
   `;
-  return sequelize.query(query, {
-    bind: { tags: args.tags || [], currency: args.currency },
+
+  const result = await sequelize.query(query, {
+    bind: {
+      tags: args.tags || [],
+      currency: args.currency,
+      orderBy: args.orderBy === 'collectives' ? '__TOTAL_COUNT__' : args.orderBy,
+    },
     type: sequelize.QueryTypes.SELECT,
+    model: models.Collective,
+    mapToModel: true,
   });
+
+  return { collectives: result, total: get(result[0], '__TOTAL_COUNT__', 0) };
 };
 
 const getTotalAnnualBudgetForHost = HostCollectiveId => {

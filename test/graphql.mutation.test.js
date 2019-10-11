@@ -247,6 +247,7 @@ describe('Mutation Tests', () => {
       });
 
       it("fails to create a collective on a host that doesn't accept applications", async () => {
+        await host.collective.update({ settings: { apply: false } });
         const collective = {
           name: 'new collective',
           HostCollectiveId: host.CollectiveId,

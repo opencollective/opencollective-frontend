@@ -58,7 +58,7 @@ describe('graphql.updateSubscription.test.js', () => {
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => (collective = g)));
 
-  beforeEach(() => collective.addHost(user.collective));
+  beforeEach(() => collective.addHost(user.collective, user));
 
   // create stripe account
   beforeEach(() => {

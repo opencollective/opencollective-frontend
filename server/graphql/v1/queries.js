@@ -976,10 +976,10 @@ const queries = {
       },
     },
     async resolve(_, args) {
-      const results = await rawQueries.getPublicHostsByTotalCollectives(args);
+      const { collectives, total } = await rawQueries.getPublicHostsByTotalCollectives(args);
       return {
-        total: results.length,
-        collectives: results,
+        total,
+        collectives,
         limit: args.limit,
         offset: args.offset,
       };

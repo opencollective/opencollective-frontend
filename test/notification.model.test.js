@@ -21,21 +21,17 @@ describe('notification.model.test.js', () => {
 
   afterEach(() => sandbox.restore());
 
-  beforeEach(() => {
-    const promises = [
-      Collective.create({ name: 'host', type: 'ORGANIZATION' }),
-      Collective.create({ name: 'webpack', type: 'COLLECTIVE' }),
-      User.createUserWithCollective({
-        name: 'host admin',
-        email: 'admin@host.com',
-      }),
-    ];
-    return Promise.all(promises).then(results => {
-      host = results[0];
-      collective = results[1];
-      hostAdmin = results[2];
-      return Promise.all([collective.addHost(host), host.addUserWithRole(hostAdmin, 'ADMIN')]);
+  beforeEach(async () => {
+    hostAdmin = await User.createUserWithCollective({ name: 'host admin', email: 'admin@host.com' });
+    host = await Collective.create({
+      name: 'host',
+      type: 'ORGANIZATION',
+      CreatedByUserId: hostAdmin.id,
+      settings: { apply: true },
     });
+    collective = await Collective.create({ name: 'webpack', type: 'COLLECTIVE' });
+    await host.addUserWithRole(hostAdmin, 'ADMIN');
+    await collective.addHost(host, hostAdmin);
   });
 
   describe('getSubscribers', () => {

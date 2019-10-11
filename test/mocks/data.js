@@ -12,6 +12,7 @@ export default {
     twitterHandle: 'wwcode',
     address: 'Paradize street\nSan Francisco CA 94100\nUSA',
     currency: 'USD',
+    settings: { apply: true },
   },
   user1: {
     firstName: 'Phil',

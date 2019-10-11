@@ -28,7 +28,7 @@ describe('transaction model', () => {
           HostCollectiveId: host.CollectiveId,
         };
       })
-      .then(() => collective.addHost(host.collective)),
+      .then(() => collective.addHost(host.collective, host)),
   );
 
   it('automatically generates uuid', done => {

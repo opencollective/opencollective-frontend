@@ -966,7 +966,7 @@ const CollectiveFields = () => {
       description: 'Returns whether this host accepts applications for new collectives',
       type: GraphQLBoolean,
       resolve(collective) {
-        return Boolean(collective.settings && collective.settings.apply);
+        return collective.canApply();
       },
     },
     isIncognito: {

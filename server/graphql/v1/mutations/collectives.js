@@ -205,7 +205,7 @@ export async function createCollectiveFromGithub(_, args, req) {
     const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
     const promises = [
       collective.addUserWithRole(user, roles.ADMIN),
-      collective.addHost(host, user),
+      collective.addHost(host, user, { shouldAutomaticallyApprove: true }),
       collective.update({ isActive: true, approvedAt: new Date() }),
     ];
 
@@ -585,10 +585,7 @@ export async function claimCollective(_, args, req) {
   // create default tiers
   const host = await models.Collective.findByPk(defaultHostCollective('opensource').CollectiveId);
 
-  collective = await collective.addHost(host, {
-    ...req.remoteUser.minimal,
-    isAdmin: () => true,
-  });
+  collective = await collective.addHost(host, req.remoteUser, { shouldAutomaticallyApprove: true });
 
   // get pledges
   const pledges = await models.Order.findAll({

@@ -13,13 +13,16 @@ describe('paymentMethods.opencollective.prepaid', () => {
   let hostCollective = null;
   let targetCollective = null;
   let prepaidPm = null;
+  let hostAdmin = null;
 
   before(async () => {
+    hostAdmin = await models.User.createUserWithCollective({ name: '___', email: randEmail() });
     hostCollective = await models.Collective.create({
       type: 'ORGANIZATION',
       name: 'Test HOST',
       currency: CURRENCY,
       isActive: true,
+      CreatedByUserId: hostAdmin.id,
     });
   });
 
@@ -36,7 +39,7 @@ describe('paymentMethods.opencollective.prepaid', () => {
       currency: CURRENCY,
       isActive: true,
     }).then(c => (targetCollective = c));
-    await targetCollective.addHost(hostCollective);
+    await targetCollective.addHost(hostCollective, user, { shouldAutomaticallyApprove: true });
   });
 
   before(async () => {
