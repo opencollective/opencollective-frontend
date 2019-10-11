@@ -15,6 +15,7 @@ import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionContribute from './sections/Contribute';
 import SectionContributors from './sections/Contributors';
+import SectionGoals from './sections/Goals';
 import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
 import SectionTransactions from './sections/Transactions';
@@ -181,6 +182,8 @@ class CollectivePage extends Component {
         return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
       default:
         return null;
     }

@@ -1,17 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { set, get } from 'lodash';
 
-import { Button, Form } from 'react-bootstrap';
-import { defineMessages, injectIntl } from 'react-intl';
+import { Form } from 'react-bootstrap';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
-import InputField from './InputField';
 import { getCurrencySymbol } from '../lib/utils';
-import { cloneDeep } from 'lodash';
+import InputField from './InputField';
+import GoalsCover from './GoalsCover';
+import Container from './Container';
+import StyledButton from './StyledButton';
+import { P, H3 } from './Text';
+import StyledCheckbox from './StyledCheckbox';
+
+const BORDER = '1px solid #efefef';
+const GOALS_SETTINGS_PATH = 'collectivePage.showGoals';
 
 class EditGoals extends React.Component {
   static propTypes = {
     goals: PropTypes.arrayOf(PropTypes.object),
-    collective: PropTypes.object,
+    collective: PropTypes.shape({
+      settings: PropTypes.object,
+    }).isRequired,
     currency: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
@@ -23,7 +33,6 @@ class EditGoals extends React.Component {
     const { intl } = props;
 
     this.defaultType = 'yearlyBudget';
-    this.state = { goals: cloneDeep(props.goals) };
     this.renderGoal = this.renderGoal.bind(this);
     this.addGoal = this.addGoal.bind(this);
     this.removeGoal = this.removeGoal.bind(this);
@@ -31,24 +40,15 @@ class EditGoals extends React.Component {
     this.onChange = props.onChange.bind(this);
 
     this.messages = defineMessages({
-      'goal.add': { id: 'goal.add', defaultMessage: 'add goal' },
-      'goal.remove': { id: 'goal.remove', defaultMessage: 'remove goal' },
-      'type.label': { id: 'goal.type.label', defaultMessage: 'type' },
-      balance: { id: 'goal.balance.label', defaultMessage: 'balance' },
-      yearlyBudget: {
-        id: 'goal.yearlyBudget.label',
-        defaultMessage: 'yearly budget',
-      },
-      'title.label': { id: 'goal.title.label', defaultMessage: 'title' },
-      'title.placeholder': {
-        id: 'goal.title.placeholder',
-        defaultMessage: 'Required if you want the goal to be displayed on the collective page',
-      },
-      'description.label': {
-        id: 'goal.description.label',
-        defaultMessage: 'description',
-      },
-      'amount.label': { id: 'goal.amount.label', defaultMessage: 'amount' },
+      add: { id: 'goal.add', defaultMessage: 'Add goal' },
+      remove: { id: 'goal.remove', defaultMessage: 'Remove goal' },
+      type: { id: 'goal.type.label', defaultMessage: 'Type' },
+      balance: { id: 'goal.balance.label', defaultMessage: 'Balance' },
+      yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
+      title: { id: 'goal.title.label', defaultMessage: 'Title' },
+      description: { id: 'goal.description.label', defaultMessage: 'Description' },
+      amount: { id: 'goal.amount.label', defaultMessage: 'Amount' },
+      showToggle: { id: 'goal.show', defaultMessage: 'Show the goals on my collective page' },
     });
 
     const getOptions = arr => {
@@ -64,53 +64,56 @@ class EditGoals extends React.Component {
         name: 'type',
         type: 'select',
         options: getOptions(['balance', 'yearlyBudget']),
-        label: intl.formatMessage(this.messages['type.label']),
+        label: intl.formatMessage(this.messages.type),
       },
       {
         name: 'amount',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
-        label: intl.formatMessage(this.messages['amount.label']),
+        label: intl.formatMessage(this.messages.amount),
       },
       {
         name: 'title',
-        label: intl.formatMessage(this.messages['title.label']),
+        label: intl.formatMessage(this.messages.title),
         maxLength: 64,
-        placeholder: intl.formatMessage(this.messages['title.placeholder']),
       },
       {
         name: 'description',
         type: 'textarea',
-        label: intl.formatMessage(this.messages['description.label']),
+        label: intl.formatMessage(this.messages.description),
       },
     ];
   }
 
-  editGoal(index, fieldname, value) {
-    const goals = this.state.goals;
+  editGoal(index, fieldName, value) {
+    const goals = [...this.props.goals];
+
     if (value === 'onetime') {
       value = null;
     }
+
     goals[index] = {
       ...goals[index],
       type: goals[index]['type'] || this.defaultType,
-      [fieldname]: value,
+      [fieldName]: value,
     };
-    this.setState({ goals });
+
     this.onChange({ goals });
   }
 
+  toggleGoalsOnCollectivePage = ({ checked }) => {
+    const settings = set({ ...this.props.collective.settings }, GOALS_SETTINGS_PATH, checked);
+    this.onChange({ settings });
+  };
+
   addGoal() {
-    const goals = this.state.goals;
-    goals.push({});
-    this.setState({ goals });
+    this.onChange({ goals: [...this.props.goals, {}] });
   }
 
   removeGoal(index) {
-    const goals = this.state.goals;
+    const goals = this.props.goals;
     if (index < 0 || index > goals.length) return;
     goals.splice(index, 1);
-    this.setState({ goals });
     this.onChange({ goals });
   }
 
@@ -126,11 +129,9 @@ class EditGoals extends React.Component {
     goal.key = goal.key || Math.round(Math.random() * 100000);
 
     return (
-      <div className={`goal ${goal.slug}`} key={`goal-${index}-${goal.key}`}>
+      <Container mt={4} pb={4} borderBottom={BORDER} key={`goal-${index}-${goal.key}`}>
         <div className="goalActions">
-          <a className="removeGoal" href="#" onClick={() => this.removeGoal(index)}>
-            {intl.formatMessage(this.messages['goal.remove'])}
-          </a>
+          <StyledButton onClick={() => this.removeGoal(index)}>{intl.formatMessage(this.messages.remove)}</StyledButton>
         </div>
         <Form horizontal>
           {this.fields.map(
@@ -154,44 +155,46 @@ class EditGoals extends React.Component {
               ),
           )}
         </Form>
-      </div>
+      </Container>
     );
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, collective, goals } = this.props;
 
     return (
-      <div className="EditGoals">
-        <style jsx>
-          {`
-            :global(.goalActions) {
-              text-align: right;
-              font-size: 1.3rem;
-            }
-            :global(.field) {
-              margin: 1rem;
-            }
-            .editGoalsActions {
-              text-align: right;
-              margin-top: -10px;
-            }
-            :global(.goal) {
-              margin: 3rem 0;
-            }
-          `}
-        </style>
-
-        <div className="goals">
-          <h2>{this.props.title}</h2>
-          {this.state.goals.map(this.renderGoal)}
-        </div>
-        <div className="editGoalsActions">
-          <Button className="addGoal" bsStyle="primary" onClick={() => this.addGoal()}>
-            {intl.formatMessage(this.messages['goal.add'])}
-          </Button>
-        </div>
-      </div>
+      <Container>
+        <Container borderBottom={BORDER} mb={4} pb={4}>
+          <H3>
+            <FormattedMessage id="Goals" defaultMessage="Goals" />
+          </H3>
+          <P>
+            <FormattedMessage
+              id="EditGoals.Instructions"
+              defaultMessage="You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below."
+            />
+          </P>
+          <Container>
+            <StyledCheckbox
+              name="show-on-collective-page"
+              label={intl.formatMessage(this.messages.showToggle)}
+              onChange={this.toggleGoalsOnCollectivePage}
+              defaultChecked={get(collective.settings, GOALS_SETTINGS_PATH)}
+            />
+          </Container>
+        </Container>
+        <Container textAlign="right">
+          <Container background="rgb(245, 247, 250)" pt={5} pb={40}>
+            <GoalsCover collective={{ ...collective, settings: { goals } }} />
+          </Container>
+          <Container borderTop={BORDER}>{goals.map(this.renderGoal)}</Container>
+        </Container>
+        <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
+          <StyledButton buttonStyle="primary" onClick={() => this.addGoal()}>
+            {intl.formatMessage(this.messages.add)}
+          </StyledButton>
+        </Container>
+      </Container>
     );
   }
 }

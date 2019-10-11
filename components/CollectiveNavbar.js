@@ -196,6 +196,10 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Transactions',
     defaultMessage: 'Transactions',
   },
+  [Sections.GOALS]: {
+    id: 'CollectivePage.NavBar.Goals',
+    defaultMessage: 'Goals',
+  },
 });
 
 /**
@@ -227,11 +231,17 @@ const getCollectiveTypeBlacklistedSections = collectiveType => {
  */
 export const getSectionsForCollective = (collective, isAdmin) => {
   const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
+  const showGoals = get(collective, 'settings.collectivePage.showGoals', false);
   const toRemove = new Set(getCollectiveTypeBlacklistedSections(collective.type));
 
   // Can't contribute anymore if the collective is archived or has no host
   if (collective.isArchived || !collective.host) {
     toRemove.add(Sections.CONTRIBUTE);
+  }
+
+  // Goals are opt-in
+  if (!showGoals) {
+    toRemove.add(Sections.GOALS);
   }
 
   // Some sections are hidden for non-admins (usually when there's no data)
@@ -326,7 +336,7 @@ const CollectiveNavbar = ({
                 as={LinkComponent}
                 collectivePath={collective.path || `/${collective.slug}`}
                 section={section}
-                label={intl.formatMessage(i18nSection[section])}
+                label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
               />
             </MenuLinkContainer>
           ))}
