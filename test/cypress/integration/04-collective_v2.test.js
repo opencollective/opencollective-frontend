@@ -3,7 +3,6 @@ import { Sections } from '../../../components/collective-page/_constants';
 import 'cypress-file-upload';
 
 const uploadImage = ({ dropzone, file }) => {
-  console.log('image/'.concat(file.includes('.png') ? 'png' : 'jpeg'));
   cy.fixture(`./images/${file}`).then(picture => {
     cy.get(dropzone).upload({
       fileContent: picture,
@@ -34,10 +33,12 @@ describe('New collective page', () => {
       .then(() => cy.visit(`/${collectiveSlug}/v2`));
   });
 
+  beforeEach(() => {
+    cy.login({ redirect: `/${collectiveSlug}/edit` });
+  });
+
   describe('Hero', () => {
     it('Must have links to twitter, github and website', () => {
-      cy.login({ redirect: `/${collectiveSlug}/v2` });
-      cy.wait(2000);
       cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://twitter.com/testCollective');
       cy.get('[data-cy=githubProfileUrl]').should('have.attr', 'href', 'https://github.com/testCollective');
       cy.get('[data-cy=collectiveWebsite]').should('have.attr', 'href', 'https://opencollective.com/testCollective');
@@ -48,8 +49,6 @@ describe('New collective page', () => {
     });
 
     it('Can change avatar', () => {
-      cy.login({ redirect: `/${collectiveSlug}/v2` });
-      cy.wait(2000);
       uploadImage({
         dropzone: '[data-cy=heroAvatarDropzone]',
         file: 'gophercon.jpg',
@@ -58,15 +57,10 @@ describe('New collective page', () => {
     });
 
     it.skip('Can edit primary color', () => {
-      cy.login({ redirect: `/${collectiveSlug}/v2` });
-      cy.wait(2000);
-
       // TODO - must check hero or buttons CSS to ensure primary color is properly applied
     });
 
     it('Can change cover background image', () => {
-      cy.login({ redirect: `/${collectiveSlug}/v2` });
-      cy.wait(2000);
       uploadImage({
         dropzone: '[data-cy=heroBackgroundDropzone]',
         file: 'gopherBack.png',
@@ -138,12 +132,15 @@ describe('New collective page', () => {
 <<<<<<< HEAD
     it('Can add description to about section', () => {
       const richDescription = 'Hello world!{selectall}{ctrl}b';
+<<<<<<< HEAD
 =======
     // TODO: unskip
     it.skip('Can add description to about section', () => {
       const richDescription = 'Hello{selectall}{ctrl}B{rightarrow}{ctrl}B world!';
 >>>>>>> test(04-collective_v2.test.js): add hero section test for collective - incomplete
       cy.login({ redirect: `/${collectiveSlug}/v2` });
+=======
+>>>>>>> update login process to use beforeEach
       scrollToSection(Sections.ABOUT);
       cy.contains('#section-about button', 'Add a description').click();
       cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type(richDescription);
